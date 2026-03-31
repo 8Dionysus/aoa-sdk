@@ -10,6 +10,7 @@ FIXTURE_WORKSPACE = Path(__file__).parent / "fixtures" / "workspace"
 
 
 @pytest.fixture()
-def workspace_root(tmp_path: Path) -> Path:
+def workspace_root(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> Path:
     copytree(FIXTURE_WORKSPACE, tmp_path, dirs_exist_ok=True)
+    monkeypatch.setenv("HOME", str(tmp_path))
     return tmp_path

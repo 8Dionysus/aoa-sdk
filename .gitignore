@@ -13,3 +13,5 @@ htmlcov/
 
 .venv/
 venv/
+
+.aoa/skill-runtime-session.json

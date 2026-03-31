@@ -36,6 +36,10 @@ This repository was seeded from the `Dionysus` starter artifacts on
   by the new repository
 - `docs/versioning.md` - explicit surface compatibility policy for local-first
   federation reads
+- `docs/workspace-layout.md` - machine and agent facing topology contract for
+  `/srv` source checkouts, `~/src` exceptions, and deployment mirrors
+- `.aoa/workspace.toml` - tracked workspace manifest used by discovery
+- `AGENTS.md` - local instructions for agents working inside this repository
 
 ## Status
 
@@ -48,8 +52,9 @@ This repository was seeded from the `Dionysus` starter artifacts on
   `aoa-evals`
 - compatibility policy is now explicit per surface before deeper CLI and
   orchestration growth
-- workspace discovery now prefers the `abyss-stack` source checkout in
-  `~/src/abyss-stack` over the deployed runtime mirror under `/srv/abyss-stack`
+- workspace discovery is now backed by a tracked manifest and prefers the
+  `abyss-stack` source checkout in `~/src/abyss-stack` over the deployed
+  runtime mirror under `/srv/abyss-stack`
 
 ## Current Slice
 
@@ -66,6 +71,12 @@ playbook = sdk.playbooks.get("bounded-change-safe")
 memory = sdk.memo.recall(mode="semantic", query="charter")
 eval_bundle = sdk.evals.inspect("aoa-bounded-change-quality")
 compatibility = sdk.compatibility.check_all()
+```
+
+Inspect the resolved workspace layout:
+
+```bash
+aoa workspace inspect /srv/aoa-sdk
 ```
 
 ## Development

@@ -28,11 +28,11 @@ REPO_MARKERS = (
     "generated",
 )
 
-EXTERNAL_ROOT_PATTERNS = (
+DEFAULT_EXTERNAL_ROOT_PATTERNS = (
     "~/src",
 )
 
-PREFERRED_REPO_PATH_PATTERNS = {
+DEFAULT_PREFERRED_REPO_PATH_PATTERNS = {
     "abyss-stack": (
         "~/src/abyss-stack",
     ),

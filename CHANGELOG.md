@@ -15,3 +15,5 @@
   versionless surface handling
 - taught workspace discovery to prefer the git source checkout at
   `~/src/abyss-stack` over the deployed runtime mirror
+- added a tracked workspace manifest, environment overrides, and CLI
+  inspection for source-checkout versus runtime-mirror topology

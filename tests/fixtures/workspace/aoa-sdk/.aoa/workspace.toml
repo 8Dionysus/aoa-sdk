@@ -1,0 +1,13 @@
+schema_version = 1
+
+[layout]
+federation_roots = ["{workspace_parent}"]
+
+[roots]
+external = ["~/src"]
+
+[repos.abyss-stack]
+role = "source_checkout"
+preferred = ["~/src/abyss-stack"]
+runtime_mirror = "{workspace_parent}/abyss-stack"
+notes = "Use the git checkout for source work. The /srv path is a deployed runtime mirror."
