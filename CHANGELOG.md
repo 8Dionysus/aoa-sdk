@@ -13,3 +13,5 @@
   local-first read path
 - added an explicit per-surface compatibility policy, including versioned and
   versionless surface handling
+- taught workspace discovery to prefer the git source checkout at
+  `~/src/abyss-stack` over the deployed runtime mirror

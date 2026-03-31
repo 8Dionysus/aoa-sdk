@@ -19,3 +19,21 @@ CORE_FEDERATION_REPOS = (
     "aoa-skills",
     "aoa-agents",
 )
+
+REPO_MARKERS = (
+    ".git",
+    "README.md",
+    "AGENTS.md",
+    "pyproject.toml",
+    "generated",
+)
+
+EXTERNAL_ROOT_PATTERNS = (
+    "~/src",
+)
+
+PREFERRED_REPO_PATH_PATTERNS = {
+    "abyss-stack": (
+        "~/src/abyss-stack",
+    ),
+}

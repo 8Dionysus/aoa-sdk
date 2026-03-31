@@ -4,7 +4,12 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from ..errors import RepoNotFound
-from .roots import KNOWN_REPOS
+from .roots import (
+    EXTERNAL_ROOT_PATTERNS,
+    KNOWN_REPOS,
+    PREFERRED_REPO_PATH_PATTERNS,
+    REPO_MARKERS,
+)
 
 
 @dataclass(slots=True)
@@ -23,17 +28,17 @@ class Workspace:
             repo_roots = {
                 repo: candidate / repo
                 for repo in KNOWN_REPOS
-                if (candidate / repo).is_dir()
+                if _is_repo_root(candidate / repo)
             }
             if len(repo_roots) >= 2:
                 federation_root = candidate
                 break
 
-        repo_roots = {
-            repo: federation_root / repo
-            for repo in KNOWN_REPOS
-            if (federation_root / repo).is_dir()
-        }
+        repo_roots = {}
+        for repo in KNOWN_REPOS:
+            path = _discover_repo_path(repo=repo, federation_root=federation_root)
+            if path is not None:
+                repo_roots[repo] = path
         return cls(root=start, federation_root=federation_root, repo_roots=repo_roots)
 
     def has_repo(self, repo: str) -> bool:
@@ -47,3 +52,42 @@ class Workspace:
 
     def surface_path(self, repo: str, relative_path: str | Path) -> Path:
         return self.repo_path(repo) / Path(relative_path)
+
+
+def _discover_repo_path(*, repo: str, federation_root: Path) -> Path | None:
+    for candidate in _repo_candidates(repo=repo, federation_root=federation_root):
+        if _is_repo_root(candidate):
+            return candidate
+    return None
+
+
+def _repo_candidates(*, repo: str, federation_root: Path) -> list[Path]:
+    candidates: list[Path] = []
+
+    for pattern in PREFERRED_REPO_PATH_PATTERNS.get(repo, ()):
+        candidates.append(Path(pattern).expanduser())
+
+    candidates.append(federation_root / repo)
+
+    for pattern in EXTERNAL_ROOT_PATTERNS:
+        candidates.append(Path(pattern).expanduser() / repo)
+
+    unique_candidates: list[Path] = []
+    seen: set[Path] = set()
+    for candidate in candidates:
+        resolved = candidate.resolve(strict=False)
+        if resolved not in seen:
+            seen.add(resolved)
+            unique_candidates.append(resolved)
+    return unique_candidates
+
+
+def _is_repo_root(path: Path) -> bool:
+    if not path.is_dir():
+        return False
+
+    return any(_marker_exists(path / marker) for marker in REPO_MARKERS)
+
+
+def _marker_exists(path: Path) -> bool:
+    return path.is_dir() or path.is_file()

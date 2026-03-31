@@ -48,6 +48,8 @@ This repository was seeded from the `Dionysus` starter artifacts on
   `aoa-evals`
 - compatibility policy is now explicit per surface before deeper CLI and
   orchestration growth
+- workspace discovery now prefers the `abyss-stack` source checkout in
+  `~/src/abyss-stack` over the deployed runtime mirror under `/srv/abyss-stack`
 
 ## Current Slice
 
