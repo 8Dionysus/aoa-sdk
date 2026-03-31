@@ -1,0 +1,42 @@
+{
+  "version": 1,
+  "hints": [
+    {
+      "kind": "skill",
+      "enabled": true,
+      "source_repo": "aoa-skills",
+      "use_when": "need a bounded agent-facing workflow to execute",
+      "actions": {
+        "pick": {
+          "enabled": true
+        },
+        "inspect": {
+          "enabled": true,
+          "surface_file": "generated/skill_capsules.json",
+          "match_field": "name"
+        },
+        "expand": {
+          "enabled": true,
+          "surface_file": "generated/skill_sections.full.json",
+          "match_field": "name",
+          "section_key_field": "key",
+          "default_sections": [
+            "intent",
+            "procedure",
+            "verification"
+          ],
+          "supported_sections": [
+            "intent",
+            "trigger_boundary",
+            "inputs",
+            "outputs",
+            "procedure",
+            "contracts",
+            "risks_and_anti_patterns",
+            "verification"
+          ]
+        }
+      }
+    }
+  ]
+}

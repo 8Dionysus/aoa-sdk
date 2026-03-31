@@ -40,6 +40,21 @@ This repository was seeded from the `Dionysus` starter artifacts on
 - initial scaffold only
 - local filesystem loading first
 - typed read path before orchestration depth
+- first live read-path slice now wired to `aoa-routing`, `aoa-skills`, and
+  `aoa-agents`
+
+## Current Slice
+
+```python
+from aoa_sdk import AoASDK
+
+sdk = AoASDK.from_workspace("/srv/aoa-sdk")
+
+matches = sdk.routing.pick(kind="skill", query="bounded repo change")
+preview = sdk.skills.disclose("aoa-change-protocol")
+activation = sdk.skills.activate("aoa-change-protocol")
+verify_binding = sdk.agents.binding_for_phase("verify")
+```
 
 ## Development
 

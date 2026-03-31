@@ -5,3 +5,7 @@
 - seeded the repository from the initial `Dionysus` `aoa-sdk` starter artifacts
 - established the first package scaffold, boundary notes, and ecosystem impact
   notes
+- connected the first live local-first read path to `aoa-routing`,
+  `aoa-skills`, and `aoa-agents`
+- added sibling workspace discovery, typed surface loaders, skill session
+  helpers, and isolated fixture-based tests

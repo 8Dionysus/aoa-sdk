@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "profile": "fixture-runtime",
+  "session_file_hint": ".aoa/skill-runtime-session.json",
+  "description": "Fixture runtime session contract.",
+  "behaviors": [
+    "deduplicate activations by skill name within one session"
+  ],
+  "state_schema": {
+    "required": [
+      "schema_version",
+      "profile",
+      "session_id",
+      "created_at",
+      "updated_at",
+      "active_skills",
+      "activation_log"
+    ]
+  },
+  "compact_output": {
+    "required": [
+      "session_id",
+      "active_skill_packets",
+      "reactivation_instructions"
+    ]
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "version": 1,
+  "layer": "aoa-agents",
+  "bindings": [
+    {
+      "phase": "route",
+      "tier_id": "router",
+      "role_names": [
+        "architect"
+      ],
+      "artifact_type": "route_decision"
+    },
+    {
+      "phase": "verify",
+      "tier_id": "verifier",
+      "role_names": [
+        "reviewer"
+      ],
+      "artifact_type": "verification_result"
+    }
+  ]
+}

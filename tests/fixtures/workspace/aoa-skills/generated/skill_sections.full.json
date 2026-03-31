@@ -1,0 +1,29 @@
+{
+  "section_version": 1,
+  "skills": [
+    {
+      "name": "aoa-change-protocol",
+      "scope": "core",
+      "skill_path": "skills/aoa-change-protocol/SKILL.md",
+      "status": "canonical",
+      "sections": [
+        {
+          "heading": "Intent",
+          "key": "intent",
+          "content_markdown": "Use a visible, bounded workflow for non-trivial changes."
+        },
+        {
+          "heading": "Procedure",
+          "key": "procedure",
+          "content_markdown": "1. state the goal\\n2. keep the change scoped\\n3. verify explicitly"
+        },
+        {
+          "heading": "Verification",
+          "key": "verification",
+          "content_markdown": "- confirm the plan existed\\n- confirm the change stayed scoped"
+        }
+      ]
+    }
+  ],
+  "source_of_truth": "tests/fixtures"
+}

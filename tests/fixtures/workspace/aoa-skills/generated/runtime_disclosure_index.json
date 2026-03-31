@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "profile": "fixture-runtime",
+  "root": ".agents/skills",
+  "skills": [
+    {
+      "name": "aoa-change-protocol",
+      "display_name": "AoA Change Protocol",
+      "description": "Plan and execute a bounded, non-trivial repository change with explicit verification and reporting.",
+      "short_description": "Plan, scope, verify, report",
+      "path": ".agents/skills/aoa-change-protocol/SKILL.md",
+      "skill_dir": ".agents/skills/aoa-change-protocol",
+      "compatibility": "Designed for coding agents with repository file access.",
+      "metadata": {
+        "aoa_source_skill_path": "skills/aoa-change-protocol/SKILL.md"
+      },
+      "headings_available": [
+        "Intent",
+        "Procedure",
+        "Verification"
+      ],
+      "section_summaries": {
+        "Intent": "Use a visible bounded workflow for non-trivial changes.",
+        "Procedure": "State the goal, scope the change, and verify explicitly.",
+        "Verification": "Confirm the plan, scope, and explicit verification path."
+      },
+      "resource_inventory": {
+        "scripts": [],
+        "references": [],
+        "assets": []
+      },
+      "policy": {
+        "allow_implicit_invocation": true
+      },
+      "interface": {
+        "display_name": "AoA Change Protocol",
+        "short_description": "Plan, scope, verify, report"
+      },
+      "runtime_contract_ref": "generated/skill_runtime_contracts.json#aoa-change-protocol",
+      "context_retention_ref": "generated/context_retention_manifest.json#aoa-change-protocol",
+      "trust_policy_ref": "generated/trust_policy_matrix.json#aoa-change-protocol"
+    }
+  ]
+}

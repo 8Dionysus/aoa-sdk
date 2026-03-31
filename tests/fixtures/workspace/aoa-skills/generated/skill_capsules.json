@@ -1,0 +1,18 @@
+{
+  "capsule_version": 1,
+  "skills": [
+    {
+      "name": "aoa-change-protocol",
+      "summary": "Plan and execute a bounded repository change with explicit verification and reporting.",
+      "workflow_short": "State the goal, keep the diff scoped, and verify explicitly.",
+      "inputs_short": "Needs: target goal, touched files, main risk, validation path.",
+      "outputs_short": "Produces: explicit plan, scoped change, named verification result.",
+      "verification_short": "Checks: confirm a plan existed, the change stayed scoped, and verification was explicit.",
+      "scope": "core",
+      "status": "canonical",
+      "invocation_mode": "explicit-preferred",
+      "skill_path": "skills/aoa-change-protocol/SKILL.md"
+    }
+  ],
+  "source_of_truth": "tests/fixtures"
+}

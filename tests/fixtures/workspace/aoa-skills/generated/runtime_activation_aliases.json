@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "profile": "fixture-runtime",
+  "aliases": [
+    {
+      "name": "aoa-change-protocol",
+      "codex_mention": "$aoa-change-protocol",
+      "local_slash_alias": "/aoa-change-protocol",
+      "tool_call": {
+        "name": "activate_skill",
+        "arguments": {
+          "skill_name": "aoa-change-protocol"
+        }
+      }
+    }
+  ]
+}

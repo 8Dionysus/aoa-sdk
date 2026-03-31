@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "profile": "fixture-runtime",
+  "root": ".agents/skills",
+  "behavioral_instructions": [
+    "Use discover_skills before activation when multiple candidates may fit."
+  ],
+  "skills": [
+    {
+      "name": "aoa-change-protocol",
+      "display_name": "AoA Change Protocol",
+      "description": "Plan and execute a bounded, non-trivial repository change with explicit verification and reporting.",
+      "short_description": "Plan, scope, verify, report",
+      "path": ".agents/skills/aoa-change-protocol/SKILL.md",
+      "trust_posture": "portable-core",
+      "invocation_mode": "explicit-preferred",
+      "allow_implicit_invocation": true,
+      "mutation_surface": "repo",
+      "recommended_install_scopes": [
+        "repo"
+      ],
+      "explicit_handles": {
+        "codex": {
+          "mention": "$aoa-change-protocol",
+          "browser": "/skills"
+        }
+      },
+      "keywords": [
+        "plan",
+        "change",
+        "verify",
+        "report"
+      ]
+    },
+    {
+      "name": "aoa-source-of-truth-check",
+      "display_name": "AoA Source Of Truth Check",
+      "description": "Check source-of-truth boundaries before editing, transplanting, or reporting.",
+      "short_description": "Check authority boundaries",
+      "path": ".agents/skills/aoa-source-of-truth-check/SKILL.md",
+      "trust_posture": "portable-core",
+      "invocation_mode": "explicit-preferred",
+      "allow_implicit_invocation": false,
+      "mutation_surface": "none",
+      "recommended_install_scopes": [
+        "repo"
+      ],
+      "explicit_handles": {
+        "codex": {
+          "mention": "$aoa-source-of-truth-check",
+          "browser": "/skills"
+        }
+      },
+      "keywords": [
+        "source",
+        "truth",
+        "authority"
+      ]
+    }
+  ]
+}
