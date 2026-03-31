@@ -22,5 +22,9 @@ class UnknownKind(SurfaceNotFound):
     pass
 
 
+class IncompatibleSurfaceVersion(AoASDKError):
+    pass
+
+
 class InvalidSurface(AoASDKError):
     pass

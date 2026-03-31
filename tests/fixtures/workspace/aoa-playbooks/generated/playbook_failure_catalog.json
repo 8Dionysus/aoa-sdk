@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "layer": "aoa-playbooks",
+  "profile": "fixture-playbooks",
+  "failures": [
+    {
+      "code": "APPROVAL_REQUIRED",
+      "summary": "The requested action crosses an approval boundary that should be resolved before mutation.",
+      "severity": "high",
+      "recommended_skills": [
+        "aoa-approval-gate-check"
+      ],
+      "next_actions": [
+        "Pause mutation until approval is explicit."
+      ],
+      "used_by_playbooks": [
+        "bounded-change-safe"
+      ]
+    }
+  ]
+}

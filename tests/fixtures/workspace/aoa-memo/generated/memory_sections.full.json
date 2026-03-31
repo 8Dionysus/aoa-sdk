@@ -1,0 +1,27 @@
+{
+  "sections_version": 1,
+  "source_of_truth": "fixture-memo",
+  "memo_surfaces": [
+    {
+      "id": "AOA-M-0001",
+      "name": "charter",
+      "source_path": "CHARTER.md",
+      "sections": [
+        {
+          "section_id": "AOA-M-0001#mission",
+          "heading": "Mission",
+          "ordinal": 1,
+          "summary": "Defines aoa-memo as the explicit memory and recall layer.",
+          "body": "`aoa-memo` is the explicit memory and recall layer."
+        },
+        {
+          "section_id": "AOA-M-0001#core-rules",
+          "heading": "Core rules",
+          "ordinal": 2,
+          "summary": "Names the layer's rules about memory, truth, and provenance.",
+          "body": "Memory is not proof. Provenance should stay visible."
+        }
+      ]
+    }
+  ]
+}

@@ -34,6 +34,8 @@ This repository was seeded from the `Dionysus` starter artifacts on
 - `docs/boundaries.md` - compact ownership rules for keeping the SDK narrow
 - `docs/ecosystem-impact.md` - immediate effects, obligations, and risks added
   by the new repository
+- `docs/versioning.md` - explicit surface compatibility policy for local-first
+  federation reads
 
 ## Status
 
@@ -42,6 +44,10 @@ This repository was seeded from the `Dionysus` starter artifacts on
 - typed read path before orchestration depth
 - first live read-path slice now wired to `aoa-routing`, `aoa-skills`, and
   `aoa-agents`
+- local-first read path now also covers `aoa-playbooks`, `aoa-memo`, and
+  `aoa-evals`
+- compatibility policy is now explicit per surface before deeper CLI and
+  orchestration growth
 
 ## Current Slice
 
@@ -54,6 +60,10 @@ matches = sdk.routing.pick(kind="skill", query="bounded repo change")
 preview = sdk.skills.disclose("aoa-change-protocol")
 activation = sdk.skills.activate("aoa-change-protocol")
 verify_binding = sdk.agents.binding_for_phase("verify")
+playbook = sdk.playbooks.get("bounded-change-safe")
+memory = sdk.memo.recall(mode="semantic", query="charter")
+eval_bundle = sdk.evals.inspect("aoa-bounded-change-quality")
+compatibility = sdk.compatibility.check_all()
 ```
 
 ## Development

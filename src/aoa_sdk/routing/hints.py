@@ -2,22 +2,19 @@ from __future__ import annotations
 
 import re
 
+from ..compatibility import load_surface
 from ..errors import UnknownKind
-from ..loaders import extract_records, load_json
+from ..loaders import extract_records
 from ..models import RegistryEntry, RoutingHint
 from ..workspace.discovery import Workspace
 
-ROUTING_HINTS_SURFACE = "generated/task_to_surface_hints.json"
-ROUTING_REGISTRY_SURFACE = "generated/cross_repo_registry.min.json"
-
-
 def load_routing_hints(workspace: Workspace) -> list[RoutingHint]:
-    data = load_json(workspace.surface_path("aoa-routing", ROUTING_HINTS_SURFACE))
+    data = load_surface(workspace, "aoa-routing.task_to_surface_hints")
     return [RoutingHint.model_validate(item) for item in data.get("hints", [])]
 
 
 def load_cross_repo_registry(workspace: Workspace) -> list[RegistryEntry]:
-    data = load_json(workspace.surface_path("aoa-routing", ROUTING_REGISTRY_SURFACE))
+    data = load_surface(workspace, "aoa-routing.cross_repo_registry.min")
     records = extract_records(data, preferred_keys=("entries",))
     return [RegistryEntry.model_validate(item) for item in records]
 

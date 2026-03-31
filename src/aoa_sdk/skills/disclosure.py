@@ -2,17 +2,14 @@ from __future__ import annotations
 
 from typing import Any
 
+from ..compatibility import load_surface
 from ..errors import SkillNotFound, SurfaceNotFound
-from ..loaders import extract_records, find_record, load_json
+from ..loaders import extract_records, find_record
 from ..models import SkillDisclosure
 from ..workspace.discovery import Workspace
 
-RUNTIME_DISCLOSURE_SURFACE = "generated/runtime_disclosure_index.json"
-RUNTIME_ALIASES_SURFACE = "generated/runtime_activation_aliases.json"
-
-
 def load_skill_disclosures(workspace: Workspace) -> list[SkillDisclosure]:
-    data = load_json(workspace.surface_path("aoa-skills", RUNTIME_DISCLOSURE_SURFACE))
+    data = load_surface(workspace, "aoa-skills.runtime_disclosure_index")
     records = extract_records(data, preferred_keys=("skills",))
     return [SkillDisclosure.model_validate(item) for item in records]
 
@@ -23,7 +20,7 @@ def resolve_skill_name(workspace: Workspace, skill_name: str) -> str:
     if skill_name in by_name:
         return skill_name
 
-    aliases = load_json(workspace.surface_path("aoa-skills", RUNTIME_ALIASES_SURFACE)).get("aliases", [])
+    aliases = load_surface(workspace, "aoa-skills.runtime_activation_aliases").get("aliases", [])
     for alias in aliases:
         if skill_name in {
             alias.get("name"),

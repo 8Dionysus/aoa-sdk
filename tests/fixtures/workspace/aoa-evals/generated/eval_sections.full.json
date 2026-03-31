@@ -1,0 +1,25 @@
+{
+  "section_version": 1,
+  "evals": [
+    {
+      "category": "artifact",
+      "eval_path": "bundles/aoa-bounded-change-quality/EVAL.md",
+      "name": "aoa-bounded-change-quality",
+      "sections": [
+        {
+          "heading": "Intent",
+          "key": "intent",
+          "content_markdown": "Use this eval to check a bounded repository change."
+        },
+        {
+          "heading": "Verification",
+          "key": "verification",
+          "content_markdown": "Confirm the change stayed scoped and verification was explicit."
+        }
+      ],
+      "status": "starter",
+      "verdict_shape": "categorical"
+    }
+  ],
+  "source_of_truth": "fixture-evals"
+}

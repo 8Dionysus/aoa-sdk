@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from datetime import datetime, timezone
 
-from ..loaders import extract_records, load_json
+from ..compatibility import load_surface
+from ..loaders import extract_records
 from ..models import ArtifactEnvelope
 from ..models import PhaseBinding
 
@@ -11,7 +12,7 @@ class AgentsAPI:
         self.workspace = workspace
 
     def bindings(self) -> list[PhaseBinding]:
-        data = load_json(self.workspace.surface_path("aoa-agents", "generated/runtime_seam_bindings.json"))
+        data = load_surface(self.workspace, "aoa-agents.runtime_seam_bindings")
         records = extract_records(data, preferred_keys=("bindings",))
         return [PhaseBinding.model_validate(item) for item in records]
 

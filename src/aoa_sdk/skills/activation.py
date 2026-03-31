@@ -4,20 +4,17 @@ from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from ..loaders import load_json
+from ..compatibility import load_surface
 from ..models import SkillActivationRequest
 from ..workspace.discovery import Workspace
 from .disclosure import disclose_skill, load_skill_markdown, split_frontmatter
 from .session import activate_session_skill, ensure_session, save_session
 
-RUNTIME_TOOL_SCHEMAS_SURFACE = "generated/runtime_tool_schemas.json"
-
-
 def activate_skill(
     workspace: Workspace,
     request: SkillActivationRequest,
 ) -> dict[str, Any]:
-    tool_schemas = load_json(workspace.surface_path("aoa-skills", RUNTIME_TOOL_SCHEMAS_SURFACE))
+    tool_schemas = load_surface(workspace, "aoa-skills.runtime_tool_schemas")
     _ensure_skill_allowed(tool_schemas, request.skill_name)
 
     disclosure = disclose_skill(workspace, request.skill_name)

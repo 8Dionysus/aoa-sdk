@@ -1,0 +1,18 @@
+{
+  "capsule_version": 1,
+  "source_of_truth": "fixture-memo-objects",
+  "memory_objects": [
+    {
+      "id": "memo.anchor.2026-03-23.charter-operating-axis",
+      "kind": "anchor",
+      "title": "aoa-memo charter remains a stable operating anchor",
+      "summary": "Stabilizes the charter as a frozen operating axis.",
+      "recall_posture_short": "preferred current recall; frozen review state",
+      "trust_posture_short": "frozen temperature; human_reviewed authority",
+      "use_when_short": "Use as the current anchor surface for semantic recall.",
+      "do_not_use_short": "Do not treat this anchor as proof.",
+      "strongest_next_source": "CHARTER.md#core-rules",
+      "source_path": "examples/anchor.example.json"
+    }
+  ]
+}

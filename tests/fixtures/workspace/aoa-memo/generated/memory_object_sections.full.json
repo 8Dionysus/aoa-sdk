@@ -1,0 +1,28 @@
+{
+  "sections_version": 1,
+  "source_of_truth": "fixture-memo-objects",
+  "memory_objects": [
+    {
+      "id": "memo.anchor.2026-03-23.charter-operating-axis",
+      "kind": "anchor",
+      "title": "aoa-memo charter remains a stable operating anchor",
+      "source_path": "examples/anchor.example.json",
+      "sections": [
+        {
+          "section_id": "memo.anchor.2026-03-23.charter-operating-axis#identity-and-recall",
+          "heading": "Identity and Recall",
+          "ordinal": 1,
+          "summary": "Names the anchor surface and active recall modes.",
+          "body": "Primary recall modes: semantic, source_route, lineage."
+        },
+        {
+          "section_id": "memo.anchor.2026-03-23.charter-operating-axis#trust-and-lifecycle",
+          "heading": "Trust and Lifecycle",
+          "ordinal": 2,
+          "summary": "Summarizes trust posture and lifecycle posture.",
+          "body": "Authority kind: human_reviewed. Temperature: frozen."
+        }
+      ]
+    }
+  ]
+}

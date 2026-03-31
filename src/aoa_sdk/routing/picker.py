@@ -2,7 +2,8 @@ from __future__ import annotations
 
 from typing import Any
 
-from ..loaders import extract_records, find_record, load_json
+from ..compatibility import load_surface
+from ..loaders import extract_records, find_record
 from ..models import RegistryEntry, RoutingHint
 from .hints import hint_for_kind, load_cross_repo_registry, load_routing_hints, rank_registry_entries
 
@@ -65,6 +66,29 @@ class RoutingAPI:
         if not surface_file or not match_field:
             raise ValueError(f"Routing action for {hint.kind!r} does not define a record surface")
 
-        data = load_json(self.workspace.surface_path(action_repo, surface_file))
+        surface_id = _surface_id_for(action_repo, surface_file)
+        data = load_surface(self.workspace, surface_id) if surface_id is not None else load_surface_from_path(
+            self.workspace,
+            action_repo,
+            surface_file,
+        )
         records = extract_records(data, preferred_keys=("skills", "entries", "items", "bindings", "hints"))
         return find_record(records, field=match_field, value=value)
+
+
+def _surface_id_for(repo: str, surface_file: str) -> str | None:
+    surface_map = {
+        ("aoa-skills", "generated/skill_capsules.json"): "aoa-skills.skill_capsules",
+        ("aoa-skills", "generated/skill_sections.full.json"): "aoa-skills.skill_sections.full",
+        ("aoa-evals", "generated/eval_capsules.json"): "aoa-evals.eval_capsules",
+        ("aoa-evals", "generated/eval_sections.full.json"): "aoa-evals.eval_sections.full",
+        ("aoa-memo", "generated/memory_catalog.min.json"): "aoa-memo.memory_catalog.min",
+        ("aoa-memo", "generated/memory_sections.full.json"): "aoa-memo.memory_sections.full",
+    }
+    return surface_map.get((repo, surface_file))
+
+
+def load_surface_from_path(workspace, repo: str, surface_file: str):
+    from ..loaders import load_json
+
+    return load_json(workspace.surface_path(repo, surface_file))

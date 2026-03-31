@@ -1,0 +1,20 @@
+{
+  "capsule_version": 1,
+  "source_of_truth": "fixture-memo",
+  "memo_surfaces": [
+    {
+      "id": "AOA-M-0001",
+      "name": "charter",
+      "summary": "Role, mission, and hard rules of aoa-memo as the explicit memory and recall layer.",
+      "one_line_intent": "Orient a reader to what aoa-memo is for and what it refuses to become.",
+      "use_when_short": "Use when deciding whether work belongs in aoa-memo.",
+      "do_not_use_short": "Avoid when the need is routing logic or proof doctrine.",
+      "inputs_short": "Needs a question about role, ownership, or mission.",
+      "outputs_short": "Produces mission-level orientation and rule-level constraints.",
+      "core_contract_short": "Memory stays explicit, bounded, and distinct from proof and routing.",
+      "main_risk_short": "Charter language gets stretched into permission for aoa-memo to swallow neighboring layers.",
+      "validation_short": "Check that the proposed work still keeps memory distinct from proof and routing.",
+      "source_path": "CHARTER.md"
+    }
+  ]
+}

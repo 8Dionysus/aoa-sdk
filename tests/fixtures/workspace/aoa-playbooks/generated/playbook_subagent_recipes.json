@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "layer": "aoa-playbooks",
+  "profile": "fixture-playbooks",
+  "recipes": [
+    {
+      "name": "safety-split",
+      "playbook": "bounded-change-safe",
+      "description": "Split source-of-truth mapping from the main change application.",
+      "when_to_use": [
+        "cross-repo bounded change"
+      ],
+      "roles": [
+        {
+          "role": "canon-scout",
+          "skills": [
+            "aoa-source-of-truth-check"
+          ],
+          "deliverable": "canon map"
+        }
+      ],
+      "handoff_artifacts": [
+        "canon_map",
+        "bounded_plan"
+      ],
+      "caution": "Keep the split bounded and merge back only distilled artifacts."
+    }
+  ]
+}

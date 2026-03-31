@@ -2,18 +2,16 @@ from __future__ import annotations
 
 import re
 
-from ..loaders import extract_records, load_json
+from ..compatibility import load_surface
+from ..loaders import extract_records
 from ..models import SkillActivationRequest, SkillCard, SkillDisclosure, SkillSession
 from ..workspace.discovery import Workspace
 from .activation import activate_skill
 from .disclosure import disclose_skill
 from .session import compact_session, deactivate_session_skill, ensure_session, load_session, save_session
 
-RUNTIME_DISCOVERY_SURFACE = "generated/runtime_discovery_index.json"
-
-
 def load_skill_cards(workspace: Workspace) -> list[SkillCard]:
-    data = load_json(workspace.surface_path("aoa-skills", RUNTIME_DISCOVERY_SURFACE))
+    data = load_surface(workspace, "aoa-skills.runtime_discovery_index")
     records = extract_records(data, preferred_keys=("skills",))
     return [SkillCard.model_validate(item) for item in records]
 

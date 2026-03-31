@@ -9,3 +9,7 @@
   `aoa-skills`, and `aoa-agents`
 - added sibling workspace discovery, typed surface loaders, skill session
   helpers, and isolated fixture-based tests
+- connected `aoa-playbooks`, `aoa-memo`, and `aoa-evals` to the same
+  local-first read path
+- added an explicit per-surface compatibility policy, including versioned and
+  versionless surface handling

@@ -5,17 +5,17 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from ..compatibility import load_surface
 from ..models import ActiveSkillRecord, SkillDisclosure, SkillSession
 from ..loaders import load_json, write_json
 from ..workspace.discovery import Workspace
 from .disclosure import build_allowlist_paths
 
-RUNTIME_SESSION_CONTRACT_SURFACE = "generated/runtime_session_contract.json"
 DEFAULT_MUST_KEEP_SECTIONS = ("Intent", "Trigger boundary", "Procedure", "Verification")
 
 
 def load_session_contract(workspace: Workspace) -> dict[str, Any]:
-    return load_json(workspace.surface_path("aoa-skills", RUNTIME_SESSION_CONTRACT_SURFACE))
+    return load_surface(workspace, "aoa-skills.runtime_session_contract")
 
 
 def resolve_session_file(workspace: Workspace, session_file: str | Path | None) -> Path:

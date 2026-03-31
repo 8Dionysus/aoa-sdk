@@ -1,0 +1,50 @@
+{
+  "schema_version": 1,
+  "layer": "aoa-playbooks",
+  "profile": "fixture-playbooks",
+  "playbooks": [
+    {
+      "playbook_id": "AOA-P-0011",
+      "name": "bounded-change-safe",
+      "required_skills": [
+        "aoa-source-of-truth-check",
+        "aoa-change-protocol"
+      ],
+      "upstream_skill_handoffs": [
+        {
+          "name": "aoa-change-protocol",
+          "ref": "../aoa-skills/generated/skill_handoff_contracts.json#aoa-change-protocol",
+          "consumes_artifact_tags": [
+            "target-goal"
+          ],
+          "provides_artifact_tags": [
+            "explicit-plan"
+          ]
+        }
+      ],
+      "decision_points": [
+        "Decide whether approval is explicit enough to proceed."
+      ],
+      "handoffs": [
+        {
+          "from": "architect",
+          "to": "coder",
+          "artifact": "bounded_plan"
+        }
+      ],
+      "expected_artifacts": [
+        "bounded_plan",
+        "verification_result"
+      ],
+      "return_anchor_artifacts": [
+        "bounded_plan"
+      ],
+      "handoff_packet_template": {
+        "required": [
+          "goal",
+          "risk"
+        ]
+      }
+    }
+  ]
+}

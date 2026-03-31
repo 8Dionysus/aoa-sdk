@@ -1,0 +1,27 @@
+{
+  "comparison_spine_version": 1,
+  "evals": [
+    {
+      "baseline_mode": "fixed-baseline",
+      "comparison_surface": {
+        "anchor_surface": "aoa-bounded-change-quality",
+        "selection_question": "Do you need regression against a fixed baseline?"
+      },
+      "eval_path": "bundles/aoa-regression-same-task/EVAL.md",
+      "interpretation_boundary": "proof that this one baseline did not regress under the bounded task family",
+      "name": "aoa-regression-same-task",
+      "proof_artifacts": {
+        "shared_fixture_family_path": "fixtures/fixed-baseline-v1/README.md"
+      },
+      "relations": [
+        {
+          "target": "aoa-bounded-change-quality",
+          "type": "complements"
+        }
+      ],
+      "selection_summary": "Use for fixed-baseline regression checks on one bounded workflow surface.",
+      "status": "draft"
+    }
+  ],
+  "source_of_truth": "fixture-evals"
+}

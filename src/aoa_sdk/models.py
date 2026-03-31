@@ -41,6 +41,28 @@ class RegistryEntry(BaseModel):
     attributes: dict[str, Any] = Field(default_factory=dict)
 
 
+class SurfaceCompatibilityRule(BaseModel):
+    surface_id: str
+    repo: str
+    relative_path: str
+    version_field: str | None = None
+    supported_versions: list[int | str] = Field(default_factory=list)
+    notes: str = ""
+
+
+class SurfaceCompatibilityCheck(BaseModel):
+    surface_id: str
+    repo: str
+    relative_path: str
+    exists: bool = True
+    compatibility_mode: Literal["versioned", "unversioned"]
+    version_field: str | None = None
+    supported_versions: list[int | str] = Field(default_factory=list)
+    detected_version: int | str | None = None
+    compatible: bool
+    reason: str
+
+
 class SkillCard(BaseModel):
     name: str
     display_name: str
@@ -103,6 +125,225 @@ class SkillSession(BaseModel):
     updated_at: datetime
     active_skills: list[ActiveSkillRecord] = Field(default_factory=list)
     activation_log: list[dict[str, Any]] = Field(default_factory=list)
+
+
+class PlaybookCard(BaseModel):
+    id: str
+    name: str
+    status: str
+    summary: str
+    scenario: str
+    trigger: str
+    prerequisites: list[str] = Field(default_factory=list)
+    participating_agents: list[str] = Field(default_factory=list)
+    required_skill_families: list[str] = Field(default_factory=list)
+    evaluation_posture: str
+    memory_posture: str
+    fallback_mode: str
+    expected_artifacts: list[str] = Field(default_factory=list)
+
+
+class PlaybookActivationSurface(BaseModel):
+    surface_type: str
+    playbook_id: str
+    name: str
+    scenario: str
+    trigger: str
+    participating_agents: list[str] = Field(default_factory=list)
+    required_skill_families: list[str] = Field(default_factory=list)
+    expected_artifacts: list[str] = Field(default_factory=list)
+    evaluation_posture: str
+    memory_posture: str
+    fallback_mode: str
+    eval_anchors: list[str] = Field(default_factory=list)
+    return_posture: str
+    return_anchor_artifacts: list[str] = Field(default_factory=list)
+    return_reentry_modes: list[str] = Field(default_factory=list)
+    memo_recall_modes: list[str] = Field(default_factory=list)
+    memo_scope_default: str | None = None
+    memo_scope_ceiling: str | None = None
+    memo_read_path: str | None = None
+    memo_checkpoint_posture: str | None = None
+    memo_source_route_policy: str | None = None
+
+
+class PlaybookHandoffContract(BaseModel):
+    playbook_id: str
+    name: str
+    required_skills: list[str] = Field(default_factory=list)
+    upstream_skill_handoffs: list[dict[str, Any]] = Field(default_factory=list)
+    decision_points: list[str] = Field(default_factory=list)
+    handoffs: list[dict[str, Any]] = Field(default_factory=list)
+    expected_artifacts: list[str] = Field(default_factory=list)
+    return_anchor_artifacts: list[str] = Field(default_factory=list)
+    handoff_packet_template: dict[str, Any] = Field(default_factory=dict)
+
+
+class PlaybookFailure(BaseModel):
+    code: str
+    summary: str
+    severity: str
+    recommended_skills: list[str] = Field(default_factory=list)
+    next_actions: list[str] = Field(default_factory=list)
+    used_by_playbooks: list[str] = Field(default_factory=list)
+
+
+class PlaybookSubagentRecipe(BaseModel):
+    name: str
+    playbook: str
+    description: str
+    when_to_use: list[str] = Field(default_factory=list)
+    roles: list[dict[str, Any]] = Field(default_factory=list)
+    handoff_artifacts: list[str] = Field(default_factory=list)
+    caution: str
+
+
+class MemoSurface(BaseModel):
+    id: str
+    name: str
+    surface_kind: str
+    summary: str
+    primary_focus: str
+    recall_modes: list[str] = Field(default_factory=list)
+    status: str
+    temperature: str
+    inspect_surface: str
+    expand_surface: str
+    source_path: str
+
+
+class MemoCapsule(BaseModel):
+    id: str
+    name: str
+    summary: str
+    one_line_intent: str
+    use_when_short: str
+    do_not_use_short: str
+    inputs_short: str
+    outputs_short: str
+    core_contract_short: str
+    main_risk_short: str
+    validation_short: str
+    source_path: str
+
+
+class MemoSection(BaseModel):
+    section_id: str
+    heading: str
+    ordinal: int
+    summary: str
+    body: str
+
+
+class MemoSectionBundle(BaseModel):
+    id: str
+    name: str
+    source_path: str
+    sections: list[MemoSection] = Field(default_factory=list)
+
+
+class MemoObjectCard(BaseModel):
+    id: str
+    kind: str
+    title: str
+    summary: str
+    temperature: str
+    review_state: str
+    current_recall_status: str
+    authority_kind: str
+    primary_recall_modes: list[str] = Field(default_factory=list)
+    source_path: str
+    inspect_key: str
+    expand_key: str
+
+
+class MemoObjectCapsule(BaseModel):
+    id: str
+    kind: str
+    title: str
+    summary: str
+    recall_posture_short: str
+    trust_posture_short: str
+    use_when_short: str
+    do_not_use_short: str
+    strongest_next_source: str
+    source_path: str
+
+
+class MemoObjectSectionBundle(BaseModel):
+    id: str
+    kind: str
+    title: str
+    source_path: str
+    sections: list[MemoSection] = Field(default_factory=list)
+
+
+class EvalCard(BaseModel):
+    baseline_mode: str
+    category: str
+    claim_type: str
+    eval_path: str
+    export_ready: bool
+    maturity_score: int
+    name: str
+    object_under_evaluation: str
+    portability_level: str
+    repeatability: str
+    report_format: str
+    review_required: bool
+    rigor_level: str
+    skill_dependencies: list[str] = Field(default_factory=list)
+    status: str
+    summary: str
+    technique_dependencies: list[str] = Field(default_factory=list)
+    validation_strength: str
+    verdict_shape: str
+
+
+class EvalCapsule(BaseModel):
+    blind_spot_short: str
+    bounded_claim_short: str
+    category: str
+    comparison_surface: dict[str, Any] | None = None
+    do_not_use_short: str
+    eval_path: str
+    name: str
+    proof_artifact_short: str
+    skill_dependencies: list[str] = Field(default_factory=list)
+    status: str
+    summary: str
+    technique_dependencies: list[str] = Field(default_factory=list)
+    use_when_short: str
+    verdict_shape: str
+    what_this_does_not_prove: str
+
+
+class EvalSection(BaseModel):
+    heading: str
+    key: str
+    content_markdown: str
+
+
+class EvalSectionBundle(BaseModel):
+    category: str
+    eval_path: str
+    name: str
+    sections: list[EvalSection] = Field(default_factory=list)
+    status: str
+    verdict_shape: str
+
+
+class ComparisonEntry(BaseModel):
+    baseline_mode: str
+    comparison_surface: dict[str, Any]
+    eval_path: str
+    interpretation_boundary: str
+    name: str
+    proof_artifacts: dict[str, Any] = Field(default_factory=dict)
+    relations: list[dict[str, Any]] = Field(default_factory=list)
+    selection_summary: str
+    status: str
+
 
 class PhaseBinding(BaseModel):
     phase: Literal["route", "plan", "do", "verify", "transition", "deep", "distill"]

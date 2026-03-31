@@ -1,0 +1,27 @@
+{
+  "capsule_version": 1,
+  "evals": [
+    {
+      "blind_spot_short": "overall agent quality outside bounded change tasks",
+      "bounded_claim_short": "under these conditions, the agent can produce a reviewable bounded change",
+      "category": "artifact",
+      "comparison_surface": null,
+      "do_not_use_short": "the main question is authority handling rather than artifact quality",
+      "eval_path": "bundles/aoa-bounded-change-quality/EVAL.md",
+      "name": "aoa-bounded-change-quality",
+      "proof_artifact_short": "fixture family, runner contract, and report schema",
+      "skill_dependencies": [
+        "aoa-change-protocol"
+      ],
+      "status": "starter",
+      "summary": "Checks the quality of a bounded repository change.",
+      "technique_dependencies": [
+        "AOA-T-0001"
+      ],
+      "use_when_short": "the task is a bounded change and the question is output quality",
+      "verdict_shape": "categorical",
+      "what_this_does_not_prove": "proof that the overall workflow was perfect"
+    }
+  ],
+  "source_of_truth": "fixture-evals"
+}
