@@ -1,0 +1,60 @@
+{
+  "contract_type": "checkpoint_to_memory_contract",
+  "contract_id": "aoa-memo.runtime-writeback.v1",
+  "source_seed_ref": "repo:Dionysus/seed_expansion/seed.aoa.agents-runtime-pack.v0.md#aoa-seed-r3-runtime-writeback-to-memo",
+  "checkpoint_artifact": {
+    "artifact_name": "inquiry_checkpoint",
+    "schema_ref": "schemas/inquiry_checkpoint.schema.json",
+    "posture": "route_artifact_not_memory_object"
+  },
+  "runtime_boundary": {
+    "scratchpad_posture": "runtime_local_only",
+    "checkpoint_export_kind": "state_capsule",
+    "distillation_review_posture": "review_required",
+    "review_boundary_refs": [
+      "docs/WRITEBACK_TEMPERATURE_POLICY.md#writeback-classes",
+      "docs/MEMORY_MODEL.md#checkpoint-route-writeback",
+      "repo:aoa-agents/docs/AGENT_MEMORY_POSTURE.md"
+    ]
+  },
+  "mapping_rules": [
+    {
+      "runtime_surface": "checkpoint_export",
+      "runtime_refs": [
+        "schemas/inquiry_checkpoint.schema.json",
+        "docs/WRITEBACK_TEMPERATURE_POLICY.md#inquiry-checkpoint-packs"
+      ],
+      "target_kind": "state_capsule",
+      "writeback_class": "checkpoint_export",
+      "temperature_hint": "hot",
+      "review_state_default": "captured",
+      "requires_human_review": false,
+      "notes": "Checkpoint packs stay route-shaped until a bounded state_capsule export is needed."
+    },
+    {
+      "runtime_surface": "approval_record",
+      "runtime_refs": [
+        "docs/MEMORY_MODEL.md#checkpoint-route-writeback"
+      ],
+      "target_kind": "decision",
+      "writeback_class": "memo_surviving_event",
+      "temperature_hint": "warm",
+      "review_state_default": "confirmed",
+      "requires_human_review": false,
+      "notes": "Explicit approval outcomes survive as decisions rather than hidden state flags."
+    },
+    {
+      "runtime_surface": "distillation_claim_candidate",
+      "runtime_refs": [
+        "repo:aoa-agents/schemas/artifact.distillation_pack.schema.json",
+        "docs/WRITEBACK_TEMPERATURE_POLICY.md#bridge-ready-memory"
+      ],
+      "target_kind": "claim",
+      "writeback_class": "reviewed_candidate",
+      "temperature_hint": "cool",
+      "review_state_default": "proposed",
+      "requires_human_review": true,
+      "notes": "Distilled claims remain candidates until review confirms provenance and temporal posture."
+    }
+  ]
+}

@@ -4,12 +4,13 @@ from ..compatibility import load_surface
 from ..errors import RecordNotFound
 from ..models import (
     PlaybookActivationSurface,
+    PlaybookAutomationSeed,
     PlaybookCard,
     PlaybookCompositionManifest,
     PlaybookFederationSurface,
-    PlaybookAutomationSeed,
     PlaybookFailure,
     PlaybookHandoffContract,
+    PlaybookReviewStatus,
     PlaybookSubagentRecipe,
 )
 from ..workspace.discovery import Workspace
@@ -22,6 +23,7 @@ def _match_playbook_name_or_id(
     contract=None,
     activation=None,
     federation=None,
+    review_status: PlaybookReviewStatus | None = None,
 ) -> bool:
     needle = value.casefold()
     if card is not None:
@@ -32,6 +34,8 @@ def _match_playbook_name_or_id(
         return needle in {activation.playbook_id.casefold(), activation.name.casefold()}
     if federation is not None:
         return needle in {federation.playbook_id.casefold(), federation.name.casefold()}
+    if review_status is not None:
+        return needle in {review_status.playbook_id.casefold(), review_status.playbook_name.casefold()}
     return False
 
 
@@ -127,6 +131,12 @@ class PlaybooksAPI:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_composition_manifest")
         return PlaybookCompositionManifest.model_validate(data)
 
+    def review_status(self, playbook_id_or_name: str) -> PlaybookReviewStatus:
+        for entry in self._review_status_entries():
+            if _match_playbook_name_or_id(playbook_id_or_name, review_status=entry):
+                return entry
+        raise RecordNotFound(f"No review status for playbook: {playbook_id_or_name}")
+
     def _registry(self) -> list[PlaybookCard]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_registry.min")
         return [PlaybookCard.model_validate(item) for item in data.get("playbooks", [])]
@@ -154,3 +164,7 @@ class PlaybooksAPI:
     def _automation_seeds(self) -> list[PlaybookAutomationSeed]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_automation_seeds")
         return [PlaybookAutomationSeed.model_validate(item) for item in data.get("seeds", [])]
+
+    def _review_status_entries(self) -> list[PlaybookReviewStatus]:
+        data = load_surface(self.workspace, "aoa-playbooks.playbook_review_status.min")
+        return [PlaybookReviewStatus.model_validate(item) for item in data.get("playbooks", [])]

@@ -148,6 +148,13 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="schema_version",
         supported_versions=[1],
     ),
+    "aoa-playbooks.playbook_review_status.min": SurfaceCompatibilityRule(
+        surface_id="aoa-playbooks.playbook_review_status.min",
+        repo="aoa-playbooks",
+        relative_path="generated/playbook_review_status.min.json",
+        version_field="schema_version",
+        supported_versions=[1],
+    ),
     "aoa-memo.memory_catalog.min": SurfaceCompatibilityRule(
         surface_id="aoa-memo.memory_catalog.min",
         repo="aoa-memo",
@@ -189,6 +196,14 @@ SURFACE_COMPATIBILITY_RULES = {
         relative_path="generated/memory_object_sections.full.json",
         version_field="sections_version",
         supported_versions=[1],
+    ),
+    "aoa-memo.checkpoint_to_memory_contract.example": SurfaceCompatibilityRule(
+        surface_id="aoa-memo.checkpoint_to_memory_contract.example",
+        repo="aoa-memo",
+        relative_path="examples/checkpoint_to_memory_contract.example.json",
+        version_field=None,
+        supported_versions=[],
+        notes="Unversioned example contract; treated as strict-shape local-first dependency.",
     ),
     "aoa-evals.eval_catalog.min": SurfaceCompatibilityRule(
         surface_id="aoa-evals.eval_catalog.min",

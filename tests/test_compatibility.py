@@ -21,6 +21,10 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatible is True
     assert report["aoa-playbooks.playbook_federation_surfaces.min"].compatibility_mode == "unversioned"
     assert report["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
+    assert report["aoa-playbooks.playbook_review_status.min"].detected_version == 1
+    assert report["aoa-playbooks.playbook_review_status.min"].compatible is True
+    assert report["aoa-memo.checkpoint_to_memory_contract.example"].compatibility_mode == "unversioned"
+    assert report["aoa-memo.checkpoint_to_memory_contract.example"].compatible is True
     assert report["aoa-evals.eval_catalog.min"].detected_version == 1
     assert report["aoa-evals.eval_catalog.min"].compatible is True
     assert report["aoa-kag.kag_registry.min"].detected_version == 1
@@ -76,9 +80,12 @@ def test_repo_filtered_compatibility_covers_playbook_and_kag_surfaces(workspace_
 
     playbook_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-playbooks")}
     kag_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-kag")}
+    memo_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-memo")}
 
     assert playbook_checks["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
     assert playbook_checks["aoa-playbooks.playbook_automation_seeds"].detected_version == 1
     assert playbook_checks["aoa-playbooks.playbook_composition_manifest"].compatible is True
+    assert playbook_checks["aoa-playbooks.playbook_review_status.min"].detected_version == 1
+    assert memo_checks["aoa-memo.checkpoint_to_memory_contract.example"].compatible is True
     assert kag_checks["aoa-kag.kag_registry.min"].detected_version == 1
     assert kag_checks["aoa-kag.tos_zarathustra_route_retrieval_pack.min"].compatible is True
