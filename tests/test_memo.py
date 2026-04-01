@@ -18,6 +18,8 @@ def test_memo_local_read_path(workspace_root: Path) -> None:
     )
     recalled_objects = sdk.memo.recall_object(mode="semantic", query="charter")
     writeback = sdk.memo.writeback_map("checkpoint_export")
+    writeback_targets = sdk.memo.writeback_targets()
+    writeback_target = sdk.memo.writeback_target("distillation_claim_candidate")
 
     assert doctrine.id == "AOA-M-0001"
     assert capsule.name == "charter"
@@ -30,3 +32,6 @@ def test_memo_local_read_path(workspace_root: Path) -> None:
     assert writeback.mapping.target_kind == "state_capsule"
     assert writeback.mapping.writeback_class == "checkpoint_export"
     assert writeback.runtime_boundary["scratchpad_posture"] == "runtime_local_only"
+    assert writeback_targets[0].runtime_surface == "checkpoint_export"
+    assert writeback_target.target_kind == "claim"
+    assert writeback_target.requires_human_review is True

@@ -2,7 +2,13 @@ from __future__ import annotations
 
 from ..compatibility import load_surface
 from ..errors import RecordNotFound
-from ..models import ComparisonEntry, EvalCapsule, EvalCard, EvalSectionBundle
+from ..models import (
+    ComparisonEntry,
+    EvalCapsule,
+    EvalCard,
+    EvalRuntimeCandidateTemplate,
+    EvalSectionBundle,
+)
 from ..workspace.discovery import Workspace
 
 
@@ -68,6 +74,19 @@ class EvalsAPI:
                 return entry
         raise RecordNotFound(f"Unknown comparison entry: {name}")
 
+    def runtime_candidate_templates(
+        self,
+        *,
+        template_kind: str | None = None,
+        playbook_id: str | None = None,
+    ) -> list[EvalRuntimeCandidateTemplate]:
+        templates = self._runtime_candidate_templates()
+        if template_kind is not None:
+            templates = [entry for entry in templates if entry.template_kind == template_kind]
+        if playbook_id is not None:
+            templates = [entry for entry in templates if entry.playbook_id == playbook_id]
+        return templates
+
     def _cards(self) -> list[EvalCard]:
         data = load_surface(self.workspace, "aoa-evals.eval_catalog.min")
         return [EvalCard.model_validate(item) for item in data.get("evals", [])]
@@ -83,3 +102,7 @@ class EvalsAPI:
     def _comparison_entries(self) -> list[ComparisonEntry]:
         data = load_surface(self.workspace, "aoa-evals.comparison_spine")
         return [ComparisonEntry.model_validate(item) for item in data.get("evals", [])]
+
+    def _runtime_candidate_templates(self) -> list[EvalRuntimeCandidateTemplate]:
+        data = load_surface(self.workspace, "aoa-evals.runtime_candidate_template_index.min")
+        return [EvalRuntimeCandidateTemplate.model_validate(item) for item in data.get("templates", [])]
