@@ -20,6 +20,20 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="registry_version",
         supported_versions=[1],
     ),
+    "aoa-techniques.technique_capsules": SurfaceCompatibilityRule(
+        surface_id="aoa-techniques.technique_capsules",
+        repo="aoa-techniques",
+        relative_path="generated/technique_capsules.json",
+        version_field="capsule_version",
+        supported_versions=[1],
+    ),
+    "aoa-techniques.technique_sections.full": SurfaceCompatibilityRule(
+        surface_id="aoa-techniques.technique_sections.full",
+        repo="aoa-techniques",
+        relative_path="generated/technique_sections.full.json",
+        version_field="section_version",
+        supported_versions=[1],
+    ),
     "aoa-skills.runtime_discovery_index": SurfaceCompatibilityRule(
         surface_id="aoa-skills.runtime_discovery_index",
         repo="aoa-skills",

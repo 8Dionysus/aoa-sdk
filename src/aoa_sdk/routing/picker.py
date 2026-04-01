@@ -8,6 +8,18 @@ from ..models import RegistryEntry, RoutingHint
 from .hints import hint_for_kind, load_cross_repo_registry, load_routing_hints, rank_registry_entries
 
 
+ROUTING_ACTION_SURFACE_IDS = {
+    ("aoa-techniques", "generated/technique_capsules.json"): "aoa-techniques.technique_capsules",
+    ("aoa-techniques", "generated/technique_sections.full.json"): "aoa-techniques.technique_sections.full",
+    ("aoa-skills", "generated/skill_capsules.json"): "aoa-skills.skill_capsules",
+    ("aoa-skills", "generated/skill_sections.full.json"): "aoa-skills.skill_sections.full",
+    ("aoa-evals", "generated/eval_capsules.json"): "aoa-evals.eval_capsules",
+    ("aoa-evals", "generated/eval_sections.full.json"): "aoa-evals.eval_sections.full",
+    ("aoa-memo", "generated/memory_catalog.min.json"): "aoa-memo.memory_catalog.min",
+    ("aoa-memo", "generated/memory_sections.full.json"): "aoa-memo.memory_sections.full",
+}
+
+
 class RoutingAPI:
     def __init__(self, workspace) -> None:
         self.workspace = workspace
@@ -77,15 +89,7 @@ class RoutingAPI:
 
 
 def _surface_id_for(repo: str, surface_file: str) -> str | None:
-    surface_map = {
-        ("aoa-skills", "generated/skill_capsules.json"): "aoa-skills.skill_capsules",
-        ("aoa-skills", "generated/skill_sections.full.json"): "aoa-skills.skill_sections.full",
-        ("aoa-evals", "generated/eval_capsules.json"): "aoa-evals.eval_capsules",
-        ("aoa-evals", "generated/eval_sections.full.json"): "aoa-evals.eval_sections.full",
-        ("aoa-memo", "generated/memory_catalog.min.json"): "aoa-memo.memory_catalog.min",
-        ("aoa-memo", "generated/memory_sections.full.json"): "aoa-memo.memory_sections.full",
-    }
-    return surface_map.get((repo, surface_file))
+    return ROUTING_ACTION_SURFACE_IDS.get((repo, surface_file))
 
 
 def load_surface_from_path(workspace, repo: str, surface_file: str):

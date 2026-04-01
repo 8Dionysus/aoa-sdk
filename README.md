@@ -79,6 +79,19 @@ Inspect the resolved workspace layout:
 aoa workspace inspect /srv/aoa-sdk
 ```
 
+Inspect the same topology in machine-readable form:
+
+```bash
+aoa workspace inspect /srv/aoa-sdk --json
+```
+
+Check consumed surface compatibility across the local workspace:
+
+```bash
+aoa compatibility check /srv/aoa-sdk
+aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
+```
+
 ## Development
 
 ```bash
