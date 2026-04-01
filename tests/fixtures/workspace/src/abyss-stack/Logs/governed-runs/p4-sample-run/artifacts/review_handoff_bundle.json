@@ -1,0 +1,133 @@
+{
+  "schema_version": 1,
+  "run_id": "p4-sample-run",
+  "playbook_id": "AOA-P-0011",
+  "audit_verdict": "partial",
+  "replayable": true,
+  "playbook_intake": {
+    "playbook_id": "AOA-P-0011",
+    "playbook_name": "bounded-change-safe",
+    "scenario": "safe_change",
+    "gate_verdict": "composition-landed",
+    "gate_review_ref": "docs/gate-reviews/bounded-change-safe.md",
+    "real_run_template_ref": "examples/playbook_activation.bounded-change-safe.example.json",
+    "required_artifact_set": [
+      "approval_record",
+      "source_map",
+      "scoped_change_set",
+      "verification_pack",
+      "shareable_summary"
+    ],
+    "accepted_packet_kinds": [
+      "memo_candidate",
+      "runtime_evidence_selection_candidate",
+      "artifact_hook_candidate"
+    ],
+    "source_review_refs": [
+      "playbooks/bounded-change-safe/PLAYBOOK.md"
+    ],
+    "review_outcome_targets": {
+      "real_runs": [
+        "docs/real-runs/2026-03-28.bounded-change-safe.md"
+      ],
+      "gate_reviews": [
+        "docs/gate-reviews/bounded-change-safe.md"
+      ]
+    },
+    "composition_posture": "landed"
+  },
+  "eval_intake_entries": [
+    {
+      "template_kind": "runtime_evidence_selection",
+      "template_name": "return-anchor-integrity-wrapper-v1",
+      "playbook_id": null,
+      "eval_anchor": null,
+      "verdict_bundle_ref": null,
+      "required_runtime_artifacts": [
+        "summary",
+        "case-breakdown",
+        "environment-note",
+        "integrity-sidecar"
+      ],
+      "review_required": true,
+      "review_guide_ref": "docs/RUNTIME_BENCH_PROMOTION_GUIDE.md",
+      "owner_review_refs": [
+        "docs/RUNTIME_BENCH_PROMOTION_GUIDE.md",
+        "docs/EVAL_REVIEW_GUIDE.md",
+        "examples/runtime_evidence_selection.return-anchor-integrity.example.json"
+      ],
+      "candidate_acceptance_posture": "candidate_until_eval_review"
+    }
+  ],
+  "memo_intake_entries": [
+    {
+      "runtime_surface": "approval_record",
+      "target_kind": "decision",
+      "writeback_class": "memo_surviving_event",
+      "requires_human_review": false,
+      "review_state_default": "confirmed",
+      "runtime_refs": [
+        "docs/MEMORY_MODEL.md#checkpoint-route-writeback"
+      ],
+      "owner_review_refs": [
+        "docs/MEMORY_MODEL.md#checkpoint-route-writeback",
+        "docs/RUNTIME_WRITEBACK_SEAM.md",
+        "docs/QUEST_EVIDENCE_WRITEBACK.md"
+      ],
+      "intake_posture": "capturable_runtime_export"
+    }
+  ],
+  "emitted_candidate_artifact_refs": [
+    {
+      "packet_kind": "memo_candidate",
+      "runtime_surface": "approval_record",
+      "input_ref": "local:/tmp/p4-sample-run/artifacts/review-packets/inputs/memo_candidate/approval-record.json",
+      "artifact_ref": "local:/tmp/p4-sample-run/Logs/memo-exports/latest/approval_record.private.json",
+      "command_meta": {
+        "script": "aoa-export-memo-candidate"
+      },
+      "record_id": "memo-candidate-approval-record"
+    },
+    {
+      "packet_kind": "runtime_evidence_selection_candidate",
+      "template_name": "return-anchor-integrity-wrapper-v1",
+      "input_ref": "local:/tmp/p4-sample-run/artifacts/review-packets/inputs/runtime_evidence_selection_candidate/return-anchor-integrity-wrapper-v1.json",
+      "artifact_ref": "local:/tmp/p4-sample-run/Logs/eval-exports/latest/runtime-evidence-selection/return-anchor-integrity-wrapper-v1.private.json",
+      "command_meta": {
+        "script": "aoa-export-runtime-evidence-selection"
+      },
+      "record_id": "eval-selection-return-anchor-integrity"
+    }
+  ],
+  "recommended_review_targets": {
+    "aoa-playbooks": [
+      {
+        "ref": "playbooks/bounded-change-safe/PLAYBOOK.md",
+        "why": "Owning playbook review stays the first adoption gate."
+      }
+    ],
+    "aoa-evals": [
+      {
+        "ref": "examples/runtime_evidence_selection.return-anchor-integrity.example.json",
+        "why": "Runtime evidence selection stays eval-owned until review."
+      }
+    ],
+    "aoa-memo": [
+      {
+        "ref": "docs/RUNTIME_WRITEBACK_SEAM.md",
+        "why": "Memo writeback mapping remains the human review seam."
+      }
+    ]
+  },
+  "missing_or_blocked_packet_kinds": [
+    {
+      "packet_kind": "artifact_hook_candidate",
+      "reason": "no_artifact_hook_templates"
+    }
+  ],
+  "operator_next_steps": [
+    "Review the bounded-change-safe playbook outcome and confirm gate posture.",
+    "Review runtime evidence selection candidate packaging in aoa-evals.",
+    "Review memo writeback posture before any source-owned adoption."
+  ]
+}
