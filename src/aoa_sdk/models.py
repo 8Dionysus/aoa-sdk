@@ -257,6 +257,19 @@ class PlaybookReviewStatus(BaseModel):
     composition_signal_summary: PlaybookCompositionSignalSummary
 
 
+class PlaybookReviewPacketContract(BaseModel):
+    playbook_id: str
+    playbook_name: str
+    scenario: str
+    expected_artifacts: list[str] = Field(default_factory=list)
+    eval_anchors: list[str] = Field(default_factory=list)
+    memo_runtime_surfaces: list[str] = Field(default_factory=list)
+    candidate_packet_kinds: list[str] = Field(default_factory=list)
+    review_required: bool
+    source_review_refs: list[str] = Field(default_factory=list)
+    gate_verdict: str | None = None
+
+
 class MemoSurface(BaseModel):
     id: str
     name: str
@@ -357,6 +370,16 @@ class MemoWritebackMap(BaseModel):
     source_files: list[str] = Field(default_factory=list)
 
 
+class MemoWritebackTarget(BaseModel):
+    runtime_surface: str
+    target_kind: str
+    writeback_class: str
+    requires_human_review: bool
+    review_state_default: str
+    runtime_refs: list[str] = Field(default_factory=list)
+    notes: str
+
+
 class EvalCard(BaseModel):
     baseline_mode: str
     category: str
@@ -422,6 +445,17 @@ class ComparisonEntry(BaseModel):
     relations: list[dict[str, Any]] = Field(default_factory=list)
     selection_summary: str
     status: str
+
+
+class EvalRuntimeCandidateTemplate(BaseModel):
+    template_kind: Literal["runtime_evidence_selection", "artifact_to_verdict_hook"]
+    template_name: str
+    playbook_id: str | None = None
+    eval_anchor: str | None = None
+    verdict_bundle_ref: str | None = None
+    required_runtime_artifacts: list[str] = Field(default_factory=list)
+    review_required: bool
+    source_example_ref: str
 
 
 class PhaseBinding(BaseModel):
