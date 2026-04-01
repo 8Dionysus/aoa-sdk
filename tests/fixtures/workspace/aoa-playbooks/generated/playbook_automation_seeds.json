@@ -1,0 +1,61 @@
+{
+  "schema_version": 1,
+  "layer": "aoa-playbooks",
+  "profile": "aoa-playbook-composition-v1",
+  "seeds": [
+    {
+      "name": "weekly-doc-drift",
+      "playbook": "source-truth-then-share",
+      "title": "Weekly doc drift watch",
+      "execution_mode": "worktree",
+      "worktree_recommended": true,
+      "skill_handles": [
+        "$aoa-source-of-truth-check",
+        "$aoa-sanitized-share"
+      ],
+      "schedule_hint": "weekly",
+      "prompt": "Use $aoa-source-of-truth-check to audit top-level docs for authority drift, summary bloat, or conflicting guidance. Do not mutate by default. Then use $aoa-sanitized-share to produce a short shareable drift report with canonical file pointers and recommended bounded next steps."
+    },
+    {
+      "name": "guarded-infra-preview",
+      "playbook": "infra-change-guarded",
+      "title": "Guarded infra preview",
+      "execution_mode": "worktree",
+      "worktree_recommended": true,
+      "skill_handles": [
+        "$aoa-approval-gate-check",
+        "$aoa-dry-run-first",
+        "$aoa-safe-infra-change"
+      ],
+      "schedule_hint": "manual or scheduled after config drift alerts",
+      "prompt": "Use $aoa-approval-gate-check to classify whether the requested infrastructure action is approved as stated. If a preview path exists, use $aoa-dry-run-first and stop before mutation. Only if authority already exists and the task remains bounded, use $aoa-safe-infra-change to recommend the smallest next step. Always report rollback notes and residual risk."
+    },
+    {
+      "name": "local-stack-health-check",
+      "playbook": "local-stack-diagnosis",
+      "title": "Local stack health check",
+      "execution_mode": "local",
+      "worktree_recommended": false,
+      "skill_handles": [
+        "$aoa-source-of-truth-check",
+        "$aoa-local-stack-bringup",
+        "$aoa-sanitized-share"
+      ],
+      "schedule_hint": "daily before high-traffic coding sessions",
+      "prompt": "Use $aoa-source-of-truth-check to locate the canonical startup and dependency docs, then use $aoa-local-stack-bringup to verify the smallest viable local stack on current HEAD. If blockers appear, stop at the bounded bring-up seam and use $aoa-sanitized-share to prepare a concise blocker report."
+    },
+    {
+      "name": "decision-brief",
+      "playbook": "bounded-change-safe",
+      "title": "Decision brief after notable changes",
+      "execution_mode": "worktree",
+      "worktree_recommended": false,
+      "skill_handles": [
+        "$aoa-adr-write",
+        "$aoa-sanitized-share"
+      ],
+      "schedule_hint": "after a set of notable merges",
+      "prompt": "Use $aoa-adr-write to capture any meaningful architectural or workflow decisions implied by recent merged work. Then use $aoa-sanitized-share to produce a brief shareable note that preserves rationale and tradeoffs without leaking internal detail."
+    }
+  ]
+}

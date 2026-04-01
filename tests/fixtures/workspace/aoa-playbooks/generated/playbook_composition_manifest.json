@@ -1,0 +1,29 @@
+{
+  "schema_version": 1,
+  "layer": "aoa-playbooks",
+  "profile": "aoa-playbook-composition-v1",
+  "source_of_truth": {
+    "registry": "generated/playbook_registry.min.json",
+    "bundles": "playbooks/*/PLAYBOOK.md",
+    "composition_overrides": "config/playbook_composition_overrides.json",
+    "skill_handoff_contracts": "../aoa-skills/generated/skill_handoff_contracts.json"
+  },
+  "generated_files": [
+    "generated/playbook_handoff_contracts.json",
+    "generated/playbook_failure_catalog.json",
+    "generated/playbook_subagent_recipes.json",
+    "generated/playbook_automation_seeds.json",
+    "generated/playbook_composition_manifest.json"
+  ],
+  "managed_playbooks": [
+    "bounded-change-safe",
+    "infra-change-guarded",
+    "invariants-first-refactor",
+    "local-stack-diagnosis",
+    "source-truth-then-share",
+    "atm10-bounded-change",
+    "split-wave-cross-repo-rollout"
+  ],
+  "composition_playbook_count": 7,
+  "total_playbook_count": 20
+}

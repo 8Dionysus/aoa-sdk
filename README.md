@@ -50,6 +50,8 @@ This repository was seeded from the `Dionysus` starter artifacts on
   `aoa-agents`
 - local-first read path now also covers `aoa-playbooks`, `aoa-memo`, and
   `aoa-evals`
+- local-first read path now also covers `aoa-kag`, including bounded inspect
+  support for `AOA-K-0011`
 - compatibility policy is now explicit per surface before deeper CLI and
   orchestration growth
 - workspace discovery is now backed by a tracked manifest and prefers the
@@ -70,6 +72,7 @@ verify_binding = sdk.agents.binding_for_phase("verify")
 playbook = sdk.playbooks.get("bounded-change-safe")
 memory = sdk.memo.recall(mode="semantic", query="charter")
 eval_bundle = sdk.evals.inspect("aoa-bounded-change-quality")
+kag = sdk.kag.inspect("AOA-K-0011")
 compatibility = sdk.compatibility.check_all()
 ```
 

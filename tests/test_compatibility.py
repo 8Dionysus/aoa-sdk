@@ -19,8 +19,12 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
 
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatibility_mode == "unversioned"
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatible is True
+    assert report["aoa-playbooks.playbook_federation_surfaces.min"].compatibility_mode == "unversioned"
+    assert report["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
     assert report["aoa-evals.eval_catalog.min"].detected_version == 1
     assert report["aoa-evals.eval_catalog.min"].compatible is True
+    assert report["aoa-kag.kag_registry.min"].detected_version == 1
+    assert report["aoa-kag.federation_spine.min"].compatible is True
 
 
 def test_assert_compatible_raises_on_version_mismatch(workspace_root: Path) -> None:
@@ -65,3 +69,16 @@ def test_routing_action_surfaces_are_compatibility_checked(workspace_root: Path)
     assert "aoa-skills.skill_capsules" in routed_surface_ids
     assert "aoa-skills.skill_sections.full" in routed_surface_ids
     assert routed_surface_ids.issubset(available_rule_ids)
+
+
+def test_repo_filtered_compatibility_covers_playbook_and_kag_surfaces(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    playbook_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-playbooks")}
+    kag_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-kag")}
+
+    assert playbook_checks["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
+    assert playbook_checks["aoa-playbooks.playbook_automation_seeds"].detected_version == 1
+    assert playbook_checks["aoa-playbooks.playbook_composition_manifest"].compatible is True
+    assert kag_checks["aoa-kag.kag_registry.min"].detected_version == 1
+    assert kag_checks["aoa-kag.tos_zarathustra_route_retrieval_pack.min"].compatible is True

@@ -23,3 +23,6 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert sdk.workspace.repo_origins["abyss-stack"] == "manifest:repos.abyss-stack.preferred"
     assert report["aoa-techniques.technique_capsules"].compatible is True
     assert report["aoa-techniques.technique_sections.full"].compatible is True
+    assert report["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
+    assert report["aoa-kag.kag_registry.min"].compatible is True
+    assert report["aoa-kag.tos_zarathustra_route_retrieval_pack.min"].compatible is True

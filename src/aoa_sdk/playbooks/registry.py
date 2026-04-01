@@ -5,6 +5,9 @@ from ..errors import RecordNotFound
 from ..models import (
     PlaybookActivationSurface,
     PlaybookCard,
+    PlaybookCompositionManifest,
+    PlaybookFederationSurface,
+    PlaybookAutomationSeed,
     PlaybookFailure,
     PlaybookHandoffContract,
     PlaybookSubagentRecipe,
@@ -12,7 +15,14 @@ from ..models import (
 from ..workspace.discovery import Workspace
 
 
-def _match_playbook_name_or_id(value: str, *, card: PlaybookCard | None = None, contract=None, activation=None) -> bool:
+def _match_playbook_name_or_id(
+    value: str,
+    *,
+    card: PlaybookCard | None = None,
+    contract=None,
+    activation=None,
+    federation=None,
+) -> bool:
     needle = value.casefold()
     if card is not None:
         return needle in {card.id.casefold(), card.name.casefold()}
@@ -20,6 +30,8 @@ def _match_playbook_name_or_id(value: str, *, card: PlaybookCard | None = None, 
         return needle in {contract.playbook_id.casefold(), contract.name.casefold()}
     if activation is not None:
         return needle in {activation.playbook_id.casefold(), activation.name.casefold()}
+    if federation is not None:
+        return needle in {federation.playbook_id.casefold(), federation.name.casefold()}
     return False
 
 
@@ -46,6 +58,12 @@ class PlaybooksAPI:
             if _match_playbook_name_or_id(playbook_id_or_name, activation=surface):
                 return surface
         raise RecordNotFound(f"No activation surface for playbook: {playbook_id_or_name}")
+
+    def federation_surface(self, playbook_id_or_name: str) -> PlaybookFederationSurface:
+        for surface in self._federation_surfaces():
+            if _match_playbook_name_or_id(playbook_id_or_name, federation=surface):
+                return surface
+        raise RecordNotFound(f"No federation surface for playbook: {playbook_id_or_name}")
 
     def handoff_contracts(
         self,
@@ -91,6 +109,24 @@ class PlaybooksAPI:
                 return recipe
         raise RecordNotFound(f"Unknown playbook subagent recipe: {name}")
 
+    def automation_seeds(self, playbook_id_or_name: str | None = None) -> list[PlaybookAutomationSeed]:
+        seeds = self._automation_seeds()
+        if playbook_id_or_name is None:
+            return seeds
+
+        filtered = [
+            seed
+            for seed in seeds
+            if playbook_id_or_name.casefold() in {seed.playbook.casefold(), seed.name.casefold()}
+        ]
+        if filtered:
+            return filtered
+        raise RecordNotFound(f"No automation seeds for playbook: {playbook_id_or_name}")
+
+    def composition_manifest(self) -> PlaybookCompositionManifest:
+        data = load_surface(self.workspace, "aoa-playbooks.playbook_composition_manifest")
+        return PlaybookCompositionManifest.model_validate(data)
+
     def _registry(self) -> list[PlaybookCard]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_registry.min")
         return [PlaybookCard.model_validate(item) for item in data.get("playbooks", [])]
@@ -98,6 +134,10 @@ class PlaybooksAPI:
     def _activation_surfaces(self) -> list[PlaybookActivationSurface]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_activation_surfaces.min")
         return [PlaybookActivationSurface.model_validate(item) for item in data]
+
+    def _federation_surfaces(self) -> list[PlaybookFederationSurface]:
+        data = load_surface(self.workspace, "aoa-playbooks.playbook_federation_surfaces.min")
+        return [PlaybookFederationSurface.model_validate(item) for item in data]
 
     def _handoff_contracts(self) -> list[PlaybookHandoffContract]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_handoff_contracts")
@@ -110,3 +150,7 @@ class PlaybooksAPI:
     def _subagent_recipes(self) -> list[PlaybookSubagentRecipe]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_subagent_recipes")
         return [PlaybookSubagentRecipe.model_validate(item) for item in data.get("recipes", [])]
+
+    def _automation_seeds(self) -> list[PlaybookAutomationSeed]:
+        data = load_surface(self.workspace, "aoa-playbooks.playbook_automation_seeds")
+        return [PlaybookAutomationSeed.model_validate(item) for item in data.get("seeds", [])]
