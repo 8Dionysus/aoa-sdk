@@ -270,6 +270,25 @@ class PlaybookReviewPacketContract(BaseModel):
     gate_verdict: str | None = None
 
 
+class PlaybookReviewOutcomeTargets(BaseModel):
+    real_runs: list[str] = Field(default_factory=list)
+    gate_reviews: list[str] = Field(default_factory=list)
+
+
+class PlaybookReviewIntake(BaseModel):
+    playbook_id: str
+    playbook_name: str
+    scenario: str
+    gate_verdict: str | None = None
+    gate_review_ref: str | None = None
+    real_run_template_ref: str | None = None
+    required_artifact_set: list[str] = Field(default_factory=list)
+    accepted_packet_kinds: list[str] = Field(default_factory=list)
+    source_review_refs: list[str] = Field(default_factory=list)
+    review_outcome_targets: PlaybookReviewOutcomeTargets
+    composition_posture: str
+
+
 class MemoSurface(BaseModel):
     id: str
     name: str
@@ -458,6 +477,30 @@ class EvalRuntimeCandidateTemplate(BaseModel):
     source_example_ref: str
 
 
+class EvalRuntimeCandidateIntake(BaseModel):
+    template_kind: Literal["runtime_evidence_selection", "artifact_to_verdict_hook"]
+    template_name: str
+    playbook_id: str | None = None
+    eval_anchor: str | None = None
+    verdict_bundle_ref: str | None = None
+    required_runtime_artifacts: list[str] = Field(default_factory=list)
+    review_required: bool
+    review_guide_ref: str
+    owner_review_refs: list[str] = Field(default_factory=list)
+    candidate_acceptance_posture: str
+
+
+class MemoWritebackIntakeTarget(BaseModel):
+    runtime_surface: str
+    target_kind: str
+    writeback_class: str
+    requires_human_review: bool
+    review_state_default: str
+    runtime_refs: list[str] = Field(default_factory=list)
+    owner_review_refs: list[str] = Field(default_factory=list)
+    intake_posture: str
+
+
 class PhaseBinding(BaseModel):
     phase: Literal["route", "plan", "do", "verify", "transition", "deep", "distill"]
     tier_id: str
@@ -601,3 +644,18 @@ class GovernedRunReviewPacketAudit(BaseModel):
     recommended_review_targets: list[dict[str, str]] = Field(default_factory=list)
     replayable: bool
     safe_replay_command: str | None = None
+
+
+class GovernedRunReviewHandoffBundle(BaseModel):
+    schema_version: int
+    run_id: str
+    playbook_id: str
+    audit_verdict: Literal["ready", "partial", "blocked"]
+    replayable: bool
+    playbook_intake: PlaybookReviewIntake | None = None
+    eval_intake_entries: list[EvalRuntimeCandidateIntake] = Field(default_factory=list)
+    memo_intake_entries: list[MemoWritebackIntakeTarget] = Field(default_factory=list)
+    emitted_candidate_artifact_refs: list[dict[str, Any]] = Field(default_factory=list)
+    recommended_review_targets: dict[str, list[dict[str, str]]] = Field(default_factory=dict)
+    missing_or_blocked_packet_kinds: list[dict[str, Any]] = Field(default_factory=list)
+    operator_next_steps: list[str] = Field(default_factory=list)

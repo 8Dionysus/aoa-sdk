@@ -6,6 +6,7 @@ from ..models import (
     ComparisonEntry,
     EvalCapsule,
     EvalCard,
+    EvalRuntimeCandidateIntake,
     EvalRuntimeCandidateTemplate,
     EvalSectionBundle,
 )
@@ -87,6 +88,19 @@ class EvalsAPI:
             templates = [entry for entry in templates if entry.playbook_id == playbook_id]
         return templates
 
+    def runtime_candidate_intake(
+        self,
+        *,
+        template_kind: str | None = None,
+        playbook_id: str | None = None,
+    ) -> list[EvalRuntimeCandidateIntake]:
+        entries = self._runtime_candidate_intake_entries()
+        if template_kind is not None:
+            entries = [entry for entry in entries if entry.template_kind == template_kind]
+        if playbook_id is not None:
+            entries = [entry for entry in entries if entry.playbook_id == playbook_id]
+        return entries
+
     def _cards(self) -> list[EvalCard]:
         data = load_surface(self.workspace, "aoa-evals.eval_catalog.min")
         return [EvalCard.model_validate(item) for item in data.get("evals", [])]
@@ -106,3 +120,7 @@ class EvalsAPI:
     def _runtime_candidate_templates(self) -> list[EvalRuntimeCandidateTemplate]:
         data = load_surface(self.workspace, "aoa-evals.runtime_candidate_template_index.min")
         return [EvalRuntimeCandidateTemplate.model_validate(item) for item in data.get("templates", [])]
+
+    def _runtime_candidate_intake_entries(self) -> list[EvalRuntimeCandidateIntake]:
+        data = load_surface(self.workspace, "aoa-evals.runtime_candidate_intake.min")
+        return [EvalRuntimeCandidateIntake.model_validate(item) for item in data.get("templates", [])]

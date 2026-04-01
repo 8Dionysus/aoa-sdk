@@ -10,6 +10,7 @@ from ..models import (
     PlaybookFederationSurface,
     PlaybookFailure,
     PlaybookHandoffContract,
+    PlaybookReviewIntake,
     PlaybookReviewPacketContract,
     PlaybookReviewStatus,
     PlaybookSubagentRecipe,
@@ -144,6 +145,12 @@ class PlaybooksAPI:
                 return entry
         raise RecordNotFound(f"No review packet contract for playbook: {playbook_id_or_name}")
 
+    def review_intake(self, playbook_id_or_name: str) -> PlaybookReviewIntake:
+        for entry in self._review_intake_entries():
+            if playbook_id_or_name.casefold() in {entry.playbook_id.casefold(), entry.playbook_name.casefold()}:
+                return entry
+        raise RecordNotFound(f"No review intake for playbook: {playbook_id_or_name}")
+
     def _registry(self) -> list[PlaybookCard]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_registry.min")
         return [PlaybookCard.model_validate(item) for item in data.get("playbooks", [])]
@@ -179,3 +186,7 @@ class PlaybooksAPI:
     def _review_packet_contracts(self) -> list[PlaybookReviewPacketContract]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_review_packet_contracts.min")
         return [PlaybookReviewPacketContract.model_validate(item) for item in data.get("playbooks", [])]
+
+    def _review_intake_entries(self) -> list[PlaybookReviewIntake]:
+        data = load_surface(self.workspace, "aoa-playbooks.playbook_review_intake.min")
+        return [PlaybookReviewIntake.model_validate(item) for item in data.get("playbooks", [])]

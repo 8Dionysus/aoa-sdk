@@ -4,7 +4,11 @@ from pathlib import Path
 
 from ..errors import RecordNotFound
 from ..loaders.json_file import load_json
-from ..models import GovernedRunReviewPacketAudit, GovernedRunReviewPacketManifest
+from ..models import (
+    GovernedRunReviewHandoffBundle,
+    GovernedRunReviewPacketAudit,
+    GovernedRunReviewPacketManifest,
+)
 from ..workspace.discovery import Workspace
 
 
@@ -19,6 +23,10 @@ class GovernedRunsAPI:
     def audit(self, run_dir: str | Path) -> GovernedRunReviewPacketAudit:
         data = load_json(self._artifact_path(run_dir, "review_packet_audit.json"))
         return GovernedRunReviewPacketAudit.model_validate(data)
+
+    def handoff_bundle(self, run_dir: str | Path) -> GovernedRunReviewHandoffBundle:
+        data = load_json(self._artifact_path(run_dir, "review_handoff_bundle.json"))
+        return GovernedRunReviewHandoffBundle.model_validate(data)
 
     def _artifact_path(self, run_dir: str | Path, filename: str) -> Path:
         resolved_run_dir = self._resolve_run_dir(run_dir)

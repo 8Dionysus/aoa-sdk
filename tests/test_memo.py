@@ -20,6 +20,8 @@ def test_memo_local_read_path(workspace_root: Path) -> None:
     writeback = sdk.memo.writeback_map("checkpoint_export")
     writeback_targets = sdk.memo.writeback_targets()
     writeback_target = sdk.memo.writeback_target("distillation_claim_candidate")
+    writeback_intake_entries = sdk.memo.writeback_intake()
+    writeback_intake_target = sdk.memo.writeback_intake("distillation_claim_candidate")
 
     assert doctrine.id == "AOA-M-0001"
     assert capsule.name == "charter"
@@ -35,3 +37,7 @@ def test_memo_local_read_path(workspace_root: Path) -> None:
     assert writeback_targets[0].runtime_surface == "checkpoint_export"
     assert writeback_target.target_kind == "claim"
     assert writeback_target.requires_human_review is True
+    assert writeback_intake_entries[0].runtime_surface == "approval_record"
+    assert writeback_intake_target.target_kind == "claim"
+    assert writeback_intake_target.intake_posture == "review_candidate_only"
+    assert "docs/QUEST_EVIDENCE_WRITEBACK.md" in writeback_intake_target.owner_review_refs

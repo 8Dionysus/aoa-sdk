@@ -162,6 +162,13 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="schema_version",
         supported_versions=[1],
     ),
+    "aoa-playbooks.playbook_review_intake.min": SurfaceCompatibilityRule(
+        surface_id="aoa-playbooks.playbook_review_intake.min",
+        repo="aoa-playbooks",
+        relative_path="generated/playbook_review_intake.min.json",
+        version_field="schema_version",
+        supported_versions=[1],
+    ),
     "aoa-memo.memory_catalog.min": SurfaceCompatibilityRule(
         surface_id="aoa-memo.memory_catalog.min",
         repo="aoa-memo",
@@ -219,6 +226,13 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="schema_version",
         supported_versions=[1],
     ),
+    "aoa-memo.runtime_writeback_intake.min": SurfaceCompatibilityRule(
+        surface_id="aoa-memo.runtime_writeback_intake.min",
+        repo="aoa-memo",
+        relative_path="generated/runtime_writeback_intake.min.json",
+        version_field="schema_version",
+        supported_versions=[1],
+    ),
     "aoa-evals.eval_catalog.min": SurfaceCompatibilityRule(
         surface_id="aoa-evals.eval_catalog.min",
         repo="aoa-evals",
@@ -251,6 +265,13 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-evals.runtime_candidate_template_index.min",
         repo="aoa-evals",
         relative_path="generated/runtime_candidate_template_index.min.json",
+        version_field="schema_version",
+        supported_versions=[1],
+    ),
+    "aoa-evals.runtime_candidate_intake.min": SurfaceCompatibilityRule(
+        surface_id="aoa-evals.runtime_candidate_intake.min",
+        repo="aoa-evals",
+        relative_path="generated/runtime_candidate_intake.min.json",
         version_field="schema_version",
         supported_versions=[1],
     ),
