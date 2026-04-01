@@ -18,10 +18,10 @@ def test_prefers_abyss_stack_source_checkout_over_runtime_mirror(
     workspace_root: Path,
 ) -> None:
     runtime_mirror = workspace_root / "abyss-stack" / "Configs"
-    runtime_mirror.mkdir(parents=True)
+    runtime_mirror.mkdir(parents=True, exist_ok=True)
 
     source_checkout = workspace_root / "src" / "abyss-stack"
-    source_checkout.mkdir(parents=True)
+    source_checkout.mkdir(parents=True, exist_ok=True)
     (source_checkout / ".git").mkdir()
     (source_checkout / "README.md").write_text("# abyss-stack\n", encoding="utf-8")
 

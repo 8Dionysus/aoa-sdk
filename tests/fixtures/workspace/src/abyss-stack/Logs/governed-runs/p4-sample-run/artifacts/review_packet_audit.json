@@ -1,0 +1,56 @@
+{
+  "schema_version": 1,
+  "run_id": "p4-sample-run",
+  "playbook_id": "AOA-P-0011",
+  "audit_verdict": "partial",
+  "review_packet_manifest_ref": "local:Logs/governed-runs/p4-sample-run/artifacts/review_packet_manifest.json",
+  "advisory_trace_ref": "local:Logs/governed-runs/p4-sample-run/artifacts/advisory_trace.json",
+  "packet_statuses": [
+    {
+      "packet_kind": "memo_candidate",
+      "status": "emitted",
+      "artifact_refs": [
+        "local:Logs/memo-exports/latest/approval_record.private.json"
+      ],
+      "reason": null
+    },
+    {
+      "packet_kind": "runtime_evidence_selection_candidate",
+      "status": "emitted",
+      "artifact_refs": [
+        "local:Logs/eval-exports/latest/runtime-evidence-selection/return-anchor-integrity-wrapper-v1.private.json"
+      ],
+      "reason": null
+    },
+    {
+      "packet_kind": "artifact_hook_candidate",
+      "status": "skipped",
+      "artifact_refs": [],
+      "reason": "no_artifact_hook_templates"
+    }
+  ],
+  "contract_refs": [
+    "aoa-playbooks/generated/playbook_review_packet_contracts.min.json",
+    "aoa-evals/generated/runtime_candidate_template_index.min.json",
+    "aoa-memo/generated/runtime_writeback_targets.min.json"
+  ],
+  "recommended_review_targets": [
+    {
+      "owner_repo": "aoa-playbooks",
+      "ref": "playbooks/bounded-change-safe/PLAYBOOK.md",
+      "why": "Owning playbook contract stays the first human review target."
+    },
+    {
+      "owner_repo": "aoa-evals",
+      "ref": "examples/runtime_evidence_selection.return-anchor-integrity.example.json",
+      "why": "Runtime evidence selection candidates remain eval-owned review inputs."
+    },
+    {
+      "owner_repo": "aoa-memo",
+      "ref": "docs/RUNTIME_WRITEBACK_SEAM.md",
+      "why": "Memo writeback mapping remains human-reviewed before adoption."
+    }
+  ],
+  "replayable": true,
+  "safe_replay_command": "scripts/aoa-governed-run replay-review-packets p4-sample-run"
+}
