@@ -1,0 +1,97 @@
+{
+  "artifact_kind": "aoa.governed-run.review-packet-manifest",
+  "schema_version": "v1",
+  "run_id": "p4-sample-run",
+  "generated_at": "2026-04-01T12:00:00Z",
+  "selected_playbook": {
+    "playbook_id": "AOA-P-0011",
+    "playbook_name": "bounded-change-safe"
+  },
+  "matched_playbook_packet_contract": {
+    "playbook_id": "AOA-P-0011",
+    "playbook_name": "bounded-change-safe",
+    "scenario": "bounded_change_safe",
+    "expected_artifacts": [
+      "approval_record",
+      "source_map",
+      "scoped_change_set",
+      "verification_pack",
+      "shareable_summary"
+    ],
+    "eval_anchors": [
+      "aoa-approval-boundary-adherence"
+    ],
+    "memo_runtime_surfaces": [
+      "approval_record"
+    ],
+    "candidate_packet_kinds": [
+      "memo_candidate",
+      "runtime_evidence_selection_candidate",
+      "artifact_hook_candidate"
+    ],
+    "review_required": true,
+    "source_review_refs": [
+      "playbooks/bounded-change-safe/PLAYBOOK.md"
+    ],
+    "gate_verdict": null
+  },
+  "matched_eval_template_entries": [
+    {
+      "template_kind": "runtime_evidence_selection",
+      "template_name": "return-anchor-integrity-wrapper-v1",
+      "playbook_id": null,
+      "eval_anchor": null,
+      "verdict_bundle_ref": null,
+      "required_runtime_artifacts": [
+        "summary",
+        "case-breakdown",
+        "environment-note",
+        "integrity-sidecar"
+      ],
+      "review_required": true,
+      "source_example_ref": "examples/runtime_evidence_selection.return-anchor-integrity.example.json"
+    }
+  ],
+  "matched_memo_writeback_targets": [
+    {
+      "runtime_surface": "approval_record",
+      "target_kind": "decision",
+      "writeback_class": "memo_surviving_event",
+      "requires_human_review": false,
+      "review_state_default": "confirmed",
+      "runtime_refs": [
+        "docs/MEMORY_MODEL.md#checkpoint-route-writeback"
+      ],
+      "notes": "Explicit approval outcomes survive as decisions rather than hidden state flags."
+    }
+  ],
+  "advisory_trace_ref": "local:/tmp/p4-sample-run/artifacts/advisory_trace.json",
+  "emitted_candidate_artifact_refs": [
+    {
+      "packet_kind": "memo_candidate",
+      "runtime_surface": "approval_record",
+      "input_ref": "local:/tmp/p4-sample-run/artifacts/review-packets/inputs/memo_candidate/approval-record.json",
+      "artifact_ref": "local:/tmp/p4-sample-run/Logs/memo-exports/latest/approval_record.private.json",
+      "command_meta": {
+        "script": "aoa-export-memo-candidate"
+      },
+      "record_id": "memo-candidate-approval-record"
+    },
+    {
+      "packet_kind": "runtime_evidence_selection_candidate",
+      "template_name": "return-anchor-integrity-wrapper-v1",
+      "input_ref": "local:/tmp/p4-sample-run/artifacts/review-packets/inputs/runtime_evidence_selection_candidate/return-anchor-integrity-wrapper-v1.json",
+      "artifact_ref": "local:/tmp/p4-sample-run/Logs/eval-exports/latest/runtime-evidence-selection/return-anchor-integrity-wrapper-v1.private.json",
+      "command_meta": {
+        "script": "aoa-export-runtime-evidence-selection"
+      },
+      "record_id": "eval-selection-return-anchor-integrity"
+    }
+  ],
+  "skipped_packet_kinds": [
+    {
+      "packet_kind": "artifact_hook_candidate",
+      "reason": "no_artifact_hook_templates"
+    }
+  ]
+}

@@ -5,6 +5,7 @@ from pathlib import Path
 from .compatibility import CompatibilityAPI
 from .evals import EvalsAPI
 from .agents.phase_bindings import AgentsAPI
+from .governed_runs import GovernedRunsAPI
 from .kag import KagAPI
 from .memo import MemoAPI
 from .playbooks import PlaybooksAPI
@@ -24,6 +25,7 @@ class AoASDK:
         self.memo = MemoAPI(workspace)
         self.evals = EvalsAPI(workspace)
         self.kag = KagAPI(workspace)
+        self.governed_runs = GovernedRunsAPI(workspace)
 
     @classmethod
     def from_workspace(cls, root: str | Path) -> "AoASDK":
