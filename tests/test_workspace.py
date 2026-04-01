@@ -47,14 +47,14 @@ def test_repo_path_env_override_wins(workspace_root: Path, monkeypatch) -> None:
 
 
 def test_external_root_env_adds_repo_search_prefix(workspace_root: Path, monkeypatch) -> None:
-    source_checkout = workspace_root / "worktrees" / "aoa-kag"
+    source_checkout = workspace_root / "worktrees" / "Tree-of-Sophia"
     source_checkout.mkdir(parents=True)
     (source_checkout / ".git").mkdir()
-    (source_checkout / "README.md").write_text("# aoa-kag\n", encoding="utf-8")
+    (source_checkout / "README.md").write_text("# Tree-of-Sophia\n", encoding="utf-8")
 
     monkeypatch.setenv("AOA_SDK_EXTERNAL_ROOTS", str(workspace_root / "worktrees"))
 
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
-    assert sdk.workspace.repo_path("aoa-kag") == source_checkout.resolve()
-    assert sdk.workspace.repo_origins["aoa-kag"] == "env:AOA_SDK_EXTERNAL_ROOTS"
+    assert sdk.workspace.repo_path("Tree-of-Sophia") == source_checkout.resolve()
+    assert sdk.workspace.repo_origins["Tree-of-Sophia"] == "env:AOA_SDK_EXTERNAL_ROOTS"

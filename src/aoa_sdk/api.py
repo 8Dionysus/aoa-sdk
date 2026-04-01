@@ -4,12 +4,14 @@ from pathlib import Path
 
 from .compatibility import CompatibilityAPI
 from .evals import EvalsAPI
-from .routing.picker import RoutingAPI
-from .skills.discovery import SkillsAPI
 from .agents.phase_bindings import AgentsAPI
+from .kag import KagAPI
 from .memo import MemoAPI
 from .playbooks import PlaybooksAPI
+from .routing.picker import RoutingAPI
+from .skills.discovery import SkillsAPI
 from .workspace.discovery import Workspace
+
 
 class AoASDK:
     def __init__(self, workspace: Workspace) -> None:
@@ -21,6 +23,7 @@ class AoASDK:
         self.playbooks = PlaybooksAPI(workspace)
         self.memo = MemoAPI(workspace)
         self.evals = EvalsAPI(workspace)
+        self.kag = KagAPI(workspace)
 
     @classmethod
     def from_workspace(cls, root: str | Path) -> "AoASDK":
