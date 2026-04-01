@@ -15,6 +15,7 @@ def test_playbooks_local_read_path(workspace_root: Path) -> None:
     recipe = sdk.playbooks.subagent_recipe(playbook="bounded-change-safe")
     seeds = sdk.playbooks.automation_seeds("source-truth-then-share")
     manifest = sdk.playbooks.composition_manifest()
+    review_status = sdk.playbooks.review_status("bounded-change-safe")
 
     assert [item.name for item in listed] == ["bounded-change-safe", "restartable-inquiry-loop"]
     assert registry_entry.name == "bounded-change-safe"
@@ -25,3 +26,5 @@ def test_playbooks_local_read_path(workspace_root: Path) -> None:
     assert recipe[0].name == "safety-split"
     assert seeds[0].playbook == "source-truth-then-share"
     assert manifest.total_playbook_count >= manifest.composition_playbook_count
+    assert review_status.playbook_id == "AOA-P-0011"
+    assert review_status.gate_verdict == "composition-landed"

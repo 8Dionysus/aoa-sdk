@@ -238,6 +238,25 @@ class PlaybookCompositionManifest(BaseModel):
     total_playbook_count: int
 
 
+class PlaybookCompositionSignalSummary(BaseModel):
+    failure_or_follow_up: str
+    adjunct_candidate: str
+
+
+class PlaybookReviewStatus(BaseModel):
+    playbook_id: str
+    playbook_name: str
+    scenario: str
+    gate_review_ref: str
+    reviewed_run_count: int
+    reviewed_run_refs: list[str] = Field(default_factory=list)
+    latest_reviewed_run_ref: str | None = None
+    minimum_evidence_threshold: str
+    gate_verdict: str
+    next_trigger: str
+    composition_signal_summary: PlaybookCompositionSignalSummary
+
+
 class MemoSurface(BaseModel):
     id: str
     name: str
@@ -316,6 +335,26 @@ class MemoObjectSectionBundle(BaseModel):
     title: str
     source_path: str
     sections: list[MemoSection] = Field(default_factory=list)
+
+
+class MemoWritebackRule(BaseModel):
+    runtime_surface: str
+    runtime_refs: list[str] = Field(default_factory=list)
+    target_kind: str
+    writeback_class: str
+    temperature_hint: str
+    review_state_default: str
+    requires_human_review: bool
+    notes: str
+
+
+class MemoWritebackMap(BaseModel):
+    runtime_surface: str
+    contract_type: str
+    contract_id: str
+    runtime_boundary: dict[str, Any] = Field(default_factory=dict)
+    mapping: MemoWritebackRule
+    source_files: list[str] = Field(default_factory=list)
 
 
 class EvalCard(BaseModel):

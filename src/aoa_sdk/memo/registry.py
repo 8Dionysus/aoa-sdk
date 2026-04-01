@@ -11,6 +11,8 @@ from ..models import (
     MemoObjectSectionBundle,
     MemoSectionBundle,
     MemoSurface,
+    MemoWritebackMap,
+    MemoWritebackRule,
 )
 from ..workspace.discovery import Workspace
 
@@ -139,3 +141,21 @@ class MemoAPI:
                     sections=_filter_sections(bundle.sections, sections),
                 )
         raise RecordNotFound(f"Unknown memo object section bundle: {id_or_title}")
+
+    def writeback_map(self, runtime_surface: str) -> MemoWritebackMap:
+        data = load_surface(self.workspace, "aoa-memo.checkpoint_to_memory_contract.example")
+        for item in data.get("mapping_rules", []):
+            if item.get("runtime_surface") != runtime_surface:
+                continue
+            return MemoWritebackMap(
+                runtime_surface=runtime_surface,
+                contract_type=data["contract_type"],
+                contract_id=data["contract_id"],
+                runtime_boundary=data.get("runtime_boundary", {}),
+                mapping=MemoWritebackRule.model_validate(item),
+                source_files=[
+                    str(self.workspace.surface_path("aoa-memo", "examples/checkpoint_to_memory_contract.example.json")),
+                    str(self.workspace.surface_path("aoa-memo", "docs/RUNTIME_WRITEBACK_SEAM.md")),
+                ],
+            )
+        raise RecordNotFound(f"Unknown memo writeback runtime surface: {runtime_surface}")
