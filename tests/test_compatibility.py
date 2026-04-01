@@ -1,9 +1,15 @@
+import re
 from pathlib import Path
 
 import pytest
 
 from aoa_sdk import AoASDK
+from aoa_sdk.compatibility.policy import SURFACE_COMPATIBILITY_RULES
 from aoa_sdk.errors import IncompatibleSurfaceVersion
+from aoa_sdk.routing.picker import ROUTING_ACTION_SURFACE_IDS
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_compatibility_report_includes_versioned_and_unversioned_surfaces(workspace_root: Path) -> None:
@@ -27,3 +33,35 @@ def test_assert_compatible_raises_on_version_mismatch(workspace_root: Path) -> N
 
     with pytest.raises(IncompatibleSurfaceVersion):
         sdk.compatibility.assert_compatible("aoa-skills.runtime_discovery_index")
+
+
+def test_compatibility_rules_cover_every_literal_sdk_surface_load() -> None:
+    pattern = re.compile(r'\bload_surface\(\s*[^,]+,\s*"([^"]+)"\s*\)')
+    loaded_surface_ids: set[str] = set()
+
+    for path in (REPO_ROOT / "src" / "aoa_sdk").rglob("*.py"):
+        loaded_surface_ids.update(pattern.findall(path.read_text(encoding="utf-8")))
+
+    expected_surface_ids = loaded_surface_ids | set(ROUTING_ACTION_SURFACE_IDS.values())
+
+    assert expected_surface_ids.issubset(SURFACE_COMPATIBILITY_RULES)
+
+
+def test_routing_action_surfaces_are_compatibility_checked(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    available_rule_ids = set(SURFACE_COMPATIBILITY_RULES)
+
+    routed_surface_ids: set[str] = set()
+    for hint in sdk.routing.hints():
+        for action_name in ("inspect", "expand"):
+            action = hint.actions.get(action_name)
+            if action is None or not action.surface_file:
+                continue
+            action_repo = action.surface_repo or hint.source_repo
+            surface_id = ROUTING_ACTION_SURFACE_IDS.get((action_repo, action.surface_file))
+            if surface_id is not None:
+                routed_surface_ids.add(surface_id)
+
+    assert "aoa-skills.skill_capsules" in routed_surface_ids
+    assert "aoa-skills.skill_sections.full" in routed_surface_ids
+    assert routed_surface_ids.issubset(available_rule_ids)
