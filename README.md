@@ -2,63 +2,40 @@
 
 Typed Python SDK for the AoA federation.
 
-`aoa-sdk` is the local-first typed consumer and orchestration spine for
-source-owned AoA surfaces. It loads generated contracts from sibling
-repositories and exposes stable Python APIs for routing, skill discovery and
-activation, phase-aware artifacts, and bounded orchestration without taking
-ownership away from the repositories that define meaning.
+`aoa-sdk` is the local-first typed consumer and orchestration spine for source-owned AoA surfaces. It loads generated contracts from sibling repositories and exposes stable Python APIs for routing, skill discovery and activation, phase-aware artifacts, compatibility checks, and bounded orchestration without taking ownership away from the repositories that define meaning.
 
-This repository was seeded from the `Dionysus` starter artifacts on
-2026-03-31 and should now become the live development home for the SDK itself.
+This repository was seeded from the `Dionysus` starter artifacts on 2026-03-31. It is now the live development home for the SDK itself.
 
-## Role In The Federation
+## Start here
 
-- Provide one Python entrypoint for downstream consumers such as ATM10-Agent,
-  local scripts, notebooks, CI helpers, and future adapters.
-- Keep typed loaders, policy-aware wrappers, and orchestration helpers in one
-  place instead of scattering parsing glue across multiple consumers.
-- Stay on the control plane: load, type, validate, activate, and hand off.
+Use the shortest route by need:
 
-## What This Repository Does Not Own
+- ownership and scope: `docs/boundaries.md`
+- workspace topology and override rules: `docs/workspace-layout.md`
+- compatibility posture: `docs/versioning.md`
+- federation effects and obligations: `docs/ecosystem-impact.md`
+- original seed blueprint: `docs/blueprint.md`
+- local agent instructions: `AGENTS.md`
+
+## What `aoa-sdk` owns
+
+This repository is the source of truth for:
+
+- typed loaders and facades over source-owned federation surfaces
+- workspace discovery and topology resolution
+- compatibility checks across consumed local surfaces
+- bounded activation, disclosure, and orchestration helpers
+- local CLI inspection surfaces that stay subordinate to source-owned meaning
+
+## What it does not own
 
 - It does not replace `aoa-routing`.
-- It does not become the source of truth for skills, evals, memo, playbooks,
-  or agents.
+- It does not become the source of truth for skills, evals, memo, playbooks, agents, or KAG.
 - It does not become a service runtime or hidden monolith.
 
-## Seed Contents
+The SDK stays on the control plane: load, type, validate, activate, and hand off.
 
-- `src/aoa_sdk/` - initial scaffold for the public Python package
-- `docs/blueprint.md` - the original seed blueprint carried over from
-  `Dionysus`
-- `docs/boundaries.md` - compact ownership rules for keeping the SDK narrow
-- `docs/ecosystem-impact.md` - immediate effects, obligations, and risks added
-  by the new repository
-- `docs/versioning.md` - explicit surface compatibility policy for local-first
-  federation reads
-- `docs/workspace-layout.md` - machine and agent facing topology contract for
-  `/srv` source checkouts, `~/src` exceptions, and deployment mirrors
-- `.aoa/workspace.toml` - tracked workspace manifest used by discovery
-- `AGENTS.md` - local instructions for agents working inside this repository
-
-## Status
-
-- initial scaffold only
-- local filesystem loading first
-- typed read path before orchestration depth
-- first live read-path slice now wired to `aoa-routing`, `aoa-skills`, and
-  `aoa-agents`
-- local-first read path now also covers `aoa-playbooks`, `aoa-memo`, and
-  `aoa-evals`
-- local-first read path now also covers `aoa-kag`, including bounded inspect
-  support for `AOA-K-0011`
-- compatibility policy is now explicit per surface before deeper CLI and
-  orchestration growth
-- workspace discovery is now backed by a tracked manifest and prefers the
-  `abyss-stack` source checkout in `~/src/abyss-stack` over the deployed
-  runtime mirror under `/srv/abyss-stack`
-
-## Current Slice
+## Current slice
 
 ```python
 from aoa_sdk import AoASDK
@@ -76,15 +53,21 @@ kag = sdk.kag.inspect("AOA-K-0011")
 compatibility = sdk.compatibility.check_all()
 ```
 
+The live read path already covers `aoa-routing`, `aoa-skills`, `aoa-agents`, `aoa-playbooks`, `aoa-memo`, `aoa-evals`, and bounded `aoa-kag` inspect support.
+
+## Workspace topology
+
+- the usual editable federation root is `/srv`
+- `abyss-stack` is the important exception: the source checkout lives at `~/src/abyss-stack`
+- `/srv/abyss-stack` is a deployed runtime mirror, not the preferred source checkout
+- `.aoa/workspace.toml` is the machine-readable workspace manifest
+
+## Local commands
+
 Inspect the resolved workspace layout:
 
 ```bash
 aoa workspace inspect /srv/aoa-sdk
-```
-
-Inspect the same topology in machine-readable form:
-
-```bash
 aoa workspace inspect /srv/aoa-sdk --json
 ```
 
@@ -95,9 +78,13 @@ aoa compatibility check /srv/aoa-sdk
 aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
 ```
 
-## Development
+Install for development and run tests:
 
 ```bash
 python -m pip install -e '.[dev]'
 pytest -q
 ```
+
+## Downstream consumers
+
+The SDK is intended for downstream consumers such as `ATM10-Agent`, local scripts, notebooks, CI helpers, and future adapters that need typed access to AoA surfaces without scattering parsing glue across multiple projects.
