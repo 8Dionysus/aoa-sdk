@@ -11,11 +11,19 @@ This repository was seeded from the `Dionysus` starter artifacts on 2026-03-31. 
 Use the shortest route by need:
 
 - ownership and scope: `docs/boundaries.md`
-- workspace topology and override rules: `docs/workspace-layout.md`
+- workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
 - compatibility posture: `docs/versioning.md`
 - federation effects and obligations: `docs/ecosystem-impact.md`
 - original seed blueprint: `docs/blueprint.md`
 - local agent instructions: `AGENTS.md`
+
+## Route by need
+
+- machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
+- source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
+- compatibility rules and local checks: `docs/versioning.md`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
+- typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
+- local validation and workspace inspection: `aoa workspace inspect /srv/aoa-sdk`, `python -m pip install -e '.[dev]'`, and `pytest -q`
 
 ## What `aoa-sdk` owns
 
