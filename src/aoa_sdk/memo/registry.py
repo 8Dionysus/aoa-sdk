@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+from builtins import list as builtin_list
 import re
 
 from ..compatibility import load_surface
@@ -59,7 +60,7 @@ class MemoAPI:
     def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
 
-    def list(self) -> list[MemoSurface]:
+    def list(self) -> builtin_list[MemoSurface]:
         data = load_surface(self.workspace, "aoa-memo.memory_catalog.min")
         return [MemoSurface.model_validate(item) for item in data.get("memo_surfaces", [])]
 
@@ -77,7 +78,11 @@ class MemoAPI:
                 return capsule
         raise RecordNotFound(f"Unknown memo capsule: {id_or_name}")
 
-    def expand(self, id_or_name: str, sections: list[str] | None = None) -> MemoSectionBundle:
+    def expand(
+        self,
+        id_or_name: str,
+        sections: builtin_list[str] | None = None,
+    ) -> MemoSectionBundle:
         data = load_surface(self.workspace, "aoa-memo.memory_sections.full")
         for entry in data.get("memo_surfaces", []):
             bundle = MemoSectionBundle.model_validate(entry)
@@ -90,7 +95,7 @@ class MemoAPI:
                 )
         raise RecordNotFound(f"Unknown memo section bundle: {id_or_name}")
 
-    def recall(self, *, mode: str = "semantic", query: str) -> list[MemoSurface]:
+    def recall(self, *, mode: str = "semantic", query: str) -> builtin_list[MemoSurface]:
         candidates = [entry for entry in self.list() if mode in entry.recall_modes]
         ranked = sorted(
             candidates,
@@ -99,7 +104,12 @@ class MemoAPI:
         )
         return [entry for entry in ranked if _score_texts(query, entry.name, entry.summary, entry.primary_focus) > 0]
 
-    def recall_object(self, *, mode: str = "working", query: str) -> list[MemoObjectCard]:
+    def recall_object(
+        self,
+        *,
+        mode: str = "working",
+        query: str,
+    ) -> builtin_list[MemoObjectCard]:
         candidates = [entry for entry in self.object_list() if mode in entry.primary_recall_modes]
         ranked = sorted(
             candidates,
@@ -108,7 +118,7 @@ class MemoAPI:
         )
         return [entry for entry in ranked if _score_texts(query, entry.id, entry.title, entry.summary, entry.kind) > 0]
 
-    def object_list(self) -> list[MemoObjectCard]:
+    def object_list(self) -> builtin_list[MemoObjectCard]:
         data = load_surface(self.workspace, "aoa-memo.memory_object_catalog.min")
         return [MemoObjectCard.model_validate(item) for item in data.get("memory_objects", [])]
 
@@ -129,7 +139,7 @@ class MemoAPI:
     def expand_object(
         self,
         id_or_title: str,
-        sections: list[str] | None = None,
+        sections: builtin_list[str] | None = None,
     ) -> MemoObjectSectionBundle:
         data = load_surface(self.workspace, "aoa-memo.memory_object_sections.full")
         for entry in data.get("memory_objects", []):
@@ -162,7 +172,7 @@ class MemoAPI:
             )
         raise RecordNotFound(f"Unknown memo writeback runtime surface: {runtime_surface}")
 
-    def writeback_targets(self) -> list[MemoWritebackTarget]:
+    def writeback_targets(self) -> builtin_list[MemoWritebackTarget]:
         data = load_surface(self.workspace, "aoa-memo.runtime_writeback_targets.min")
         return [MemoWritebackTarget.model_validate(item) for item in data.get("targets", [])]
 
@@ -175,7 +185,7 @@ class MemoAPI:
     def writeback_intake(
         self,
         runtime_surface: str | None = None,
-    ) -> list[MemoWritebackIntakeTarget] | MemoWritebackIntakeTarget:
+    ) -> builtin_list[MemoWritebackIntakeTarget] | MemoWritebackIntakeTarget:
         entries = self._writeback_intake_entries()
         if runtime_surface is None:
             return entries
@@ -184,6 +194,6 @@ class MemoAPI:
                 return entry
         raise RecordNotFound(f"Unknown memo writeback intake runtime surface: {runtime_surface}")
 
-    def _writeback_intake_entries(self) -> list[MemoWritebackIntakeTarget]:
+    def _writeback_intake_entries(self) -> builtin_list[MemoWritebackIntakeTarget]:
         data = load_surface(self.workspace, "aoa-memo.runtime_writeback_intake.min")
         return [MemoWritebackIntakeTarget.model_validate(item) for item in data.get("targets", [])]

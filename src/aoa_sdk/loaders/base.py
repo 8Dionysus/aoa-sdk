@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-from typing import Any
+from typing import Any, TypeGuard
 
 from ..errors import InvalidSurface, RecordNotFound
 
 
-def _is_record_list(value: Any) -> bool:
+def _is_record_list(value: Any) -> TypeGuard[list[dict[str, Any]]]:
     return isinstance(value, list) and all(isinstance(item, dict) for item in value)
 
 

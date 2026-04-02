@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from builtins import list as builtin_list
+
 from ..compatibility import load_surface
 from ..errors import RecordNotFound
 from ..models import (
@@ -22,9 +24,9 @@ def _match_playbook_name_or_id(
     value: str,
     *,
     card: PlaybookCard | None = None,
-    contract=None,
-    activation=None,
-    federation=None,
+    contract: PlaybookHandoffContract | None = None,
+    activation: PlaybookActivationSurface | None = None,
+    federation: PlaybookFederationSurface | None = None,
     review_status: PlaybookReviewStatus | None = None,
 ) -> bool:
     needle = value.casefold()
@@ -45,7 +47,12 @@ class PlaybooksAPI:
     def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
 
-    def list(self, *, status: str | None = None, scenario: str | None = None) -> list[PlaybookCard]:
+    def list(
+        self,
+        *,
+        status: str | None = None,
+        scenario: str | None = None,
+    ) -> builtin_list[PlaybookCard]:
         cards = self._registry()
         if status is not None:
             cards = [card for card in cards if card.status == status]
@@ -74,7 +81,7 @@ class PlaybooksAPI:
     def handoff_contracts(
         self,
         playbook_id_or_name: str | None = None,
-    ) -> list[PlaybookHandoffContract] | PlaybookHandoffContract:
+    ) -> builtin_list[PlaybookHandoffContract] | PlaybookHandoffContract:
         contracts = self._handoff_contracts()
         if playbook_id_or_name is None:
             return contracts
@@ -88,7 +95,7 @@ class PlaybooksAPI:
         *,
         code: str | None = None,
         playbook: str | None = None,
-    ) -> list[PlaybookFailure] | PlaybookFailure:
+    ) -> builtin_list[PlaybookFailure] | PlaybookFailure:
         failures = self._failure_catalog()
         if playbook is not None:
             failures = [item for item in failures if playbook in item.used_by_playbooks]
@@ -104,7 +111,7 @@ class PlaybooksAPI:
         *,
         name: str | None = None,
         playbook: str | None = None,
-    ) -> list[PlaybookSubagentRecipe] | PlaybookSubagentRecipe:
+    ) -> builtin_list[PlaybookSubagentRecipe] | PlaybookSubagentRecipe:
         recipes = self._subagent_recipes()
         if playbook is not None:
             recipes = [recipe for recipe in recipes if recipe.playbook == playbook]
@@ -115,7 +122,10 @@ class PlaybooksAPI:
                 return recipe
         raise RecordNotFound(f"Unknown playbook subagent recipe: {name}")
 
-    def automation_seeds(self, playbook_id_or_name: str | None = None) -> list[PlaybookAutomationSeed]:
+    def automation_seeds(
+        self,
+        playbook_id_or_name: str | None = None,
+    ) -> builtin_list[PlaybookAutomationSeed]:
         seeds = self._automation_seeds()
         if playbook_id_or_name is None:
             return seeds
@@ -151,42 +161,42 @@ class PlaybooksAPI:
                 return entry
         raise RecordNotFound(f"No review intake for playbook: {playbook_id_or_name}")
 
-    def _registry(self) -> list[PlaybookCard]:
+    def _registry(self) -> builtin_list[PlaybookCard]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_registry.min")
         return [PlaybookCard.model_validate(item) for item in data.get("playbooks", [])]
 
-    def _activation_surfaces(self) -> list[PlaybookActivationSurface]:
+    def _activation_surfaces(self) -> builtin_list[PlaybookActivationSurface]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_activation_surfaces.min")
         return [PlaybookActivationSurface.model_validate(item) for item in data]
 
-    def _federation_surfaces(self) -> list[PlaybookFederationSurface]:
+    def _federation_surfaces(self) -> builtin_list[PlaybookFederationSurface]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_federation_surfaces.min")
         return [PlaybookFederationSurface.model_validate(item) for item in data]
 
-    def _handoff_contracts(self) -> list[PlaybookHandoffContract]:
+    def _handoff_contracts(self) -> builtin_list[PlaybookHandoffContract]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_handoff_contracts")
         return [PlaybookHandoffContract.model_validate(item) for item in data.get("playbooks", [])]
 
-    def _failure_catalog(self) -> list[PlaybookFailure]:
+    def _failure_catalog(self) -> builtin_list[PlaybookFailure]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_failure_catalog")
         return [PlaybookFailure.model_validate(item) for item in data.get("failures", [])]
 
-    def _subagent_recipes(self) -> list[PlaybookSubagentRecipe]:
+    def _subagent_recipes(self) -> builtin_list[PlaybookSubagentRecipe]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_subagent_recipes")
         return [PlaybookSubagentRecipe.model_validate(item) for item in data.get("recipes", [])]
 
-    def _automation_seeds(self) -> list[PlaybookAutomationSeed]:
+    def _automation_seeds(self) -> builtin_list[PlaybookAutomationSeed]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_automation_seeds")
         return [PlaybookAutomationSeed.model_validate(item) for item in data.get("seeds", [])]
 
-    def _review_status_entries(self) -> list[PlaybookReviewStatus]:
+    def _review_status_entries(self) -> builtin_list[PlaybookReviewStatus]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_review_status.min")
         return [PlaybookReviewStatus.model_validate(item) for item in data.get("playbooks", [])]
 
-    def _review_packet_contracts(self) -> list[PlaybookReviewPacketContract]:
+    def _review_packet_contracts(self) -> builtin_list[PlaybookReviewPacketContract]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_review_packet_contracts.min")
         return [PlaybookReviewPacketContract.model_validate(item) for item in data.get("playbooks", [])]
 
-    def _review_intake_entries(self) -> list[PlaybookReviewIntake]:
+    def _review_intake_entries(self) -> builtin_list[PlaybookReviewIntake]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_review_intake.min")
         return [PlaybookReviewIntake.model_validate(item) for item in data.get("playbooks", [])]

@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from ..compatibility import load_surface
 from ..errors import RecordNotFound
 from ..models import (
@@ -22,6 +24,8 @@ INSPECT_PACK_SURFACES = {
     "AOA-K-0009": "aoa-kag.federation_spine.min",
     "AOA-K-0011": "aoa-kag.tos_zarathustra_route_retrieval_pack.min",
 }
+
+KagQueryModeName = Literal["local_search", "global_search", "drift_search"]
 
 
 class KagAPI:
@@ -61,7 +65,14 @@ class KagAPI:
         )
 
     def query_mode(self, mode: str) -> KagQueryModeResult:
-        if mode not in {"local_search", "global_search", "drift_search"}:
+        validated_mode: KagQueryModeName
+        if mode == "local_search":
+            validated_mode = "local_search"
+        elif mode == "global_search":
+            validated_mode = "global_search"
+        elif mode == "drift_search":
+            validated_mode = "drift_search"
+        else:
             raise RecordNotFound(f"Unknown KAG query mode: {mode}")
 
         handoff_pack = load_surface(self.workspace, "aoa-kag.reasoning_handoff_pack.min")
@@ -81,7 +92,7 @@ class KagAPI:
             raise RecordNotFound(f"No KAG query-mode support for: {mode}")
 
         return KagQueryModeResult(
-            mode=mode,
+            mode=validated_mode,
             reasoning_scenarios=scenarios,
             regrounding_modes=regrounding_modes,
             source_files=[

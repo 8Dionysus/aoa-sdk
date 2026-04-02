@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import re
+from typing import Literal
 
 from ..compatibility import load_surface
 from ..loaders import extract_records
@@ -96,7 +97,7 @@ class SkillsAPI:
         session_file: str | None = None,
         explicit_handle: str | None = None,
         include_frontmatter: bool = False,
-        wrap_mode: str = "structured",
+        wrap_mode: Literal["structured", "markdown", "raw"] = "structured",
     ) -> dict:
         request = SkillActivationRequest(
             skill_name=skill_name,
