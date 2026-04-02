@@ -1,19 +1,44 @@
 # Changelog
 
-## Unreleased
+All notable changes to `aoa-sdk` will be documented in this file.
+
+The format is intentionally simple and human-first.
+
+## [Unreleased]
+
+## [0.1.0] - 2026-04-01
+
+First public baseline release of `aoa-sdk` as the typed Python SDK for the AoA federation.
+
+This changelog entry uses the release-prep merge date.
+
+### Summary
+
+- first public baseline release of `aoa-sdk` as the local-first typed consumer and orchestration spine for source-owned AoA surfaces
+- the live read path now covers `aoa-routing`, `aoa-skills`, `aoa-agents`, `aoa-playbooks`, `aoa-memo`, `aoa-evals`, and bounded `aoa-kag` inspect support
+- the release also ships workspace discovery, source-checkout versus runtime-mirror topology handling, compatibility checks, skill session helpers, and CLI inspection surfaces
+
+### Added
 
 - seeded the repository from the initial `Dionysus` `aoa-sdk` starter artifacts
-- established the first package scaffold, boundary notes, and ecosystem impact
-  notes
-- connected the first live local-first read path to `aoa-routing`,
-  `aoa-skills`, and `aoa-agents`
-- added sibling workspace discovery, typed surface loaders, skill session
-  helpers, and isolated fixture-based tests
-- connected `aoa-playbooks`, `aoa-memo`, and `aoa-evals` to the same
-  local-first read path
-- added an explicit per-surface compatibility policy, including versioned and
-  versionless surface handling
-- taught workspace discovery to prefer the git source checkout at
-  `~/src/abyss-stack` over the deployed runtime mirror
-- added a tracked workspace manifest, environment overrides, and CLI
-  inspection for source-checkout versus runtime-mirror topology
+- the first package scaffold, boundary docs, workspace layout docs, versioning docs, and ecosystem impact docs
+- the first live local-first read path to `aoa-routing`, `aoa-skills`, and `aoa-agents`
+- sibling workspace discovery, typed surface loaders, skill session helpers, and isolated fixture-based tests
+- the extended local-first read path to `aoa-playbooks`, `aoa-memo`, and `aoa-evals`
+- an explicit per-surface compatibility policy, including versioned and versionless surface handling
+- a tracked workspace manifest, environment overrides, and CLI inspection for source-checkout versus runtime-mirror topology
+
+### Changed
+
+- workspace discovery now prefers the git source checkout at `~/src/abyss-stack` over the deployed runtime mirror at `/srv/abyss-stack`
+- package and CLI version surfaces are now aligned to `0.1.0` for the first repository release
+
+### Validation
+
+- `pytest -q`
+- `python -m ruff check .`
+- `aoa workspace inspect /srv/aoa-sdk`
+
+### Notes
+
+- this release keeps `aoa-sdk` on the control plane: typed loading, disclosure, compatibility, activation, and handoff helpers rather than runtime ownership
