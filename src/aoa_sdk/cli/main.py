@@ -37,7 +37,7 @@ def _workspace_payload(workspace: Workspace) -> dict[str, Any]:
 
 @app.command()
 def version() -> None:
-    print("aoa-sdk 0.1.0a1")
+    print("aoa-sdk 0.1.0")
 
 
 @workspace_app.command("inspect")
