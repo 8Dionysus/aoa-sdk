@@ -5,6 +5,7 @@ from pathlib import Path
 import pytest
 
 from aoa_sdk import AoASDK
+from aoa_sdk.errors import SurfaceNotFound
 
 
 LIVE_WORKSPACE_ROOT = Path("/srv/aoa-sdk")
@@ -34,3 +35,29 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
 
     assert review_status.gate_verdict == "composition-landed"
     assert writeback.mapping.target_kind == "state_capsule"
+
+
+@pytest.mark.skipif(
+    not LIVE_WORKSPACE_ROOT.exists() or not LIVE_ABYSS_STACK_SOURCE.exists(),
+    reason="live /srv workspace or ~/src/abyss-stack source checkout is unavailable",
+)
+def test_live_workspace_rpg_slice_reports_missing_future_transport_surfaces_honestly() -> None:
+    sdk = AoASDK.from_workspace(LIVE_WORKSPACE_ROOT)
+    report = {entry.surface_id: entry for entry in sdk.rpg.compatibility.check_all()}
+
+    expected_surface_ids = {
+        "Agents-of-Abyss.dual_vocabulary_overlay",
+        "abyss-stack.rpg_build_snapshots",
+        "abyss-stack.rpg_reputation_ledgers",
+        "abyss-stack.rpg_quest_run_results",
+        "abyss-stack.rpg_frontend_projection_bundles",
+    }
+
+    assert expected_surface_ids <= set(report)
+    assert sdk.workspace.repo_path("abyss-stack") == LIVE_ABYSS_STACK_SOURCE
+    for surface_id in expected_surface_ids:
+        assert report[surface_id].exists is False
+        assert report[surface_id].compatible is False
+
+    with pytest.raises(SurfaceNotFound):
+        sdk.rpg.vocabulary()
