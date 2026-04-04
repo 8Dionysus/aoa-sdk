@@ -49,7 +49,4 @@ class GovernedRunsAPI:
             governed_candidate = (stack_root / "Logs" / "governed-runs" / candidate).resolve(strict=False)
             if governed_candidate.is_dir():
                 return governed_candidate
-            resolved = candidate.resolve(strict=False)
-            if resolved.is_dir():
-                return resolved
         raise RecordNotFound(f"Unknown governed run directory: {run_dir}")

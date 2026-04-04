@@ -59,3 +59,16 @@ def test_governed_run_artifact_readers_fail_for_unknown_run(workspace_root: Path
 
     with pytest.raises(RecordNotFound):
         sdk.governed_runs.manifest("missing-run")
+
+
+def test_governed_run_artifact_readers_ignore_same_named_cwd_directory(
+    workspace_root: Path,
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    (tmp_path / "missing-run").mkdir()
+    monkeypatch.chdir(tmp_path)
+
+    with pytest.raises(RecordNotFound):
+        sdk.governed_runs.manifest("missing-run")
