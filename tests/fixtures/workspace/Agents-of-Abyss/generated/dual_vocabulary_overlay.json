@@ -1,0 +1,166 @@
+{
+  "schema_version": "dual_vocabulary_overlay_v1",
+  "overlay_id": "aoa_default_rpg_en",
+  "theme_id": "aoa_default_rpg",
+  "language": "en",
+  "entries": [
+    {
+      "canonical_key": "class_archetype",
+      "canonical_label": "class_archetype",
+      "presentation_label": "Class",
+      "presentation_group": "identity"
+    },
+    {
+      "canonical_key": "execution_origin",
+      "canonical_label": "execution_origin",
+      "presentation_label": "Origin",
+      "presentation_group": "identity"
+    },
+    {
+      "canonical_key": "rank",
+      "canonical_label": "rank",
+      "presentation_label": "Rank",
+      "presentation_group": "identity"
+    },
+    {
+      "canonical_key": "boundary_integrity",
+      "canonical_label": "boundary_integrity",
+      "presentation_label": "Boundary",
+      "presentation_group": "attribute"
+    },
+    {
+      "canonical_key": "execution_reliability",
+      "canonical_label": "execution_reliability",
+      "presentation_label": "Execution",
+      "presentation_group": "attribute"
+    },
+    {
+      "canonical_key": "change_legibility",
+      "canonical_label": "change_legibility",
+      "presentation_label": "Clarity",
+      "presentation_group": "attribute"
+    },
+    {
+      "canonical_key": "review_sharpness",
+      "canonical_label": "review_sharpness",
+      "presentation_label": "Review",
+      "presentation_group": "attribute"
+    },
+    {
+      "canonical_key": "proof_discipline",
+      "canonical_label": "proof_discipline",
+      "presentation_label": "Proof",
+      "presentation_group": "attribute"
+    },
+    {
+      "canonical_key": "provenance_hygiene",
+      "canonical_label": "provenance_hygiene",
+      "presentation_label": "Lineage",
+      "presentation_group": "attribute"
+    },
+    {
+      "canonical_key": "deep_readiness",
+      "canonical_label": "deep_readiness",
+      "presentation_label": "Depth",
+      "presentation_group": "attribute"
+    },
+    {
+      "canonical_key": "integrity_budget",
+      "canonical_label": "integrity_budget",
+      "presentation_label": "Integrity",
+      "presentation_group": "resource"
+    },
+    {
+      "canonical_key": "focus_budget",
+      "canonical_label": "focus_budget",
+      "presentation_label": "Focus",
+      "presentation_group": "resource"
+    },
+    {
+      "canonical_key": "deep_budget",
+      "canonical_label": "deep_budget",
+      "presentation_label": "Depth",
+      "presentation_group": "resource"
+    },
+    {
+      "canonical_key": "recall_budget",
+      "canonical_label": "recall_budget",
+      "presentation_label": "Recall",
+      "presentation_group": "resource"
+    },
+    {
+      "canonical_key": "autonomy_budget",
+      "canonical_label": "autonomy_budget",
+      "presentation_label": "Autonomy",
+      "presentation_group": "resource"
+    },
+    {
+      "canonical_key": "inspect",
+      "canonical_label": "inspect",
+      "presentation_label": "Inspect",
+      "presentation_group": "action"
+    },
+    {
+      "canonical_key": "expand",
+      "canonical_label": "expand",
+      "presentation_label": "Expand",
+      "presentation_group": "action"
+    },
+    {
+      "canonical_key": "handoff",
+      "canonical_label": "handoff",
+      "presentation_label": "Handoff",
+      "presentation_group": "action"
+    },
+    {
+      "canonical_key": "verify",
+      "canonical_label": "verify",
+      "presentation_label": "Verify",
+      "presentation_group": "action"
+    },
+    {
+      "canonical_key": "reanchor",
+      "canonical_label": "reanchor",
+      "presentation_label": "Reanchor",
+      "presentation_group": "action"
+    },
+    {
+      "canonical_key": "proof_trust",
+      "canonical_label": "proof_trust",
+      "presentation_label": "Proof Trust",
+      "presentation_group": "reputation"
+    },
+    {
+      "canonical_key": "handoff_trust",
+      "canonical_label": "handoff_trust",
+      "presentation_label": "Handoff Trust",
+      "presentation_group": "reputation"
+    },
+    {
+      "canonical_key": "provenance_trust",
+      "canonical_label": "provenance_trust",
+      "presentation_label": "Lineage Trust",
+      "presentation_group": "reputation"
+    },
+    {
+      "canonical_key": "campaign_discipline",
+      "canonical_label": "campaign_discipline",
+      "presentation_label": "Campaign Discipline",
+      "presentation_group": "reputation"
+    },
+    {
+      "canonical_key": "boundary_trust",
+      "canonical_label": "boundary_trust",
+      "presentation_label": "Boundary Trust",
+      "presentation_group": "reputation"
+    },
+    {
+      "canonical_key": "review_trust",
+      "canonical_label": "review_trust",
+      "presentation_label": "Review Trust",
+      "presentation_group": "reputation"
+    }
+  ],
+  "notes": "Example only. Stable canonical keys remain available even when the UI chooses compact game-facing labels.",
+  "public_safe": true
+}
