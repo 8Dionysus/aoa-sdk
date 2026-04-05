@@ -56,7 +56,9 @@ CampaignStatus = Literal["seed", "proven", "promoted", "canonical", "deprecated"
 
 
 class StrictModel(BaseModel):
-    model_config = ConfigDict(extra="forbid")
+    # RPG transport surfaces are version-gated upstream, so additive fields inside a
+    # supported schema version should not break typed read paths downstream.
+    model_config = ConfigDict(extra="ignore")
 
 
 class DualVocabularyEntry(StrictModel):
