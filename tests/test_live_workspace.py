@@ -5,7 +5,7 @@ from pathlib import Path
 import pytest
 
 from aoa_sdk import AoASDK
-from aoa_sdk.errors import SurfaceNotFound
+from aoa_sdk.errors import IncompatibleSurfaceVersion, SurfaceNotFound
 
 
 LIVE_WORKSPACE_ROOT = Path("/srv/aoa-sdk")
@@ -55,9 +55,17 @@ def test_live_workspace_rpg_slice_reports_missing_future_transport_surfaces_hone
 
     assert expected_surface_ids <= set(report)
     assert sdk.workspace.repo_path("abyss-stack") == LIVE_ABYSS_STACK_SOURCE
-    for surface_id in expected_surface_ids:
-        assert report[surface_id].exists is False
-        assert report[surface_id].compatible is False
+    loaders = {
+        "Agents-of-Abyss.dual_vocabulary_overlay": sdk.rpg.vocabulary,
+        "abyss-stack.rpg_build_snapshots": sdk.rpg.builds,
+        "abyss-stack.rpg_reputation_ledgers": sdk.rpg.ledgers,
+        "abyss-stack.rpg_quest_run_results": sdk.rpg.runs,
+        "abyss-stack.rpg_frontend_projection_bundles": sdk.rpg.bundles,
+    }
 
-    with pytest.raises(SurfaceNotFound):
-        sdk.rpg.vocabulary()
+    for surface_id in expected_surface_ids:
+        if report[surface_id].compatible:
+            assert loaders[surface_id]() is not None
+        else:
+            with pytest.raises((SurfaceNotFound, IncompatibleSurfaceVersion)):
+                loaders[surface_id]()
