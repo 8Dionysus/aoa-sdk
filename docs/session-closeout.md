@@ -147,6 +147,23 @@ aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md \
 This keeps the control plane explicit without forcing outer wrappers to
 hand-author request or manifest JSON.
 
+When an outer reviewed wrapper does not own a receipt publisher yet, use
+`--allow-empty` for an audit-only closeout:
+
+```bash
+aoa closeout submit-reviewed /srv/path/to/W4-closeout.md \
+  --session-ref session:qwen-local-pilot-v1:W4:closeout \
+  --audit-ref /srv/path/to/W4-closeout.json \
+  --trigger runtime-wave-closeout \
+  --allow-empty \
+  --root /srv/aoa-sdk \
+  --json
+```
+
+Audit-only closeouts still produce the canonical request, manifest, queue item,
+and report trail, but they do not invoke owner-local publishers and they skip
+the stats refresh step on purpose.
+
 ## Commands
 
 Run one manifest directly:
@@ -176,6 +193,17 @@ Submit one reviewed artifact plus receipt bundle directly:
 aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md \
   --session-ref session:2026-04-06-session-growth \
   --receipt-dir /srv/path/to/receipts \
+  --root /srv/aoa-sdk \
+  --json
+```
+
+Submit one reviewed artifact without a receipt bundle yet:
+
+```bash
+aoa closeout submit-reviewed /srv/path/to/W4-closeout.md \
+  --session-ref session:qwen-local-pilot-v1:W4:closeout \
+  --audit-ref /srv/path/to/W4-closeout.json \
+  --allow-empty \
   --root /srv/aoa-sdk \
   --json
 ```

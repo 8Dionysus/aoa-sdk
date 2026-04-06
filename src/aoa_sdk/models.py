@@ -758,6 +758,7 @@ class CloseoutManifest(BaseModel):
     closeout_id: str
     session_ref: str
     reviewed: bool
+    audit_only: bool = False
     trigger: str
     batches: list[CloseoutPublisherBatch] = Field(default_factory=list)
     audit_refs: list[str] = Field(default_factory=list)
@@ -769,6 +770,7 @@ class CloseoutBuildRequest(BaseModel):
     closeout_id: str
     session_ref: str
     reviewed: bool
+    audit_only: bool = False
     reviewed_artifact_path: str
     trigger: str
     batches: list[CloseoutPublisherBatch] = Field(default_factory=list)
@@ -784,6 +786,7 @@ class CloseoutBuildReport(BaseModel):
     manifest_path: str
     built_at: datetime
     reviewed_artifact_path: str
+    audit_only: bool = False
     enqueue_report: CloseoutEnqueueReport | None = None
 
 
@@ -794,6 +797,7 @@ class CloseoutSubmitReviewedReport(BaseModel):
     request_path: str
     submitted_at: datetime
     reviewed_artifact_path: str
+    audit_only: bool = False
     receipt_paths: list[str] = Field(default_factory=list)
     detected_publishers: list[str] = Field(default_factory=list)
     build_report: CloseoutBuildReport
@@ -839,6 +843,7 @@ class CloseoutRunReport(BaseModel):
     processed_at: datetime
     trigger: str
     reviewed: bool
+    audit_only: bool = False
     audit_refs: list[str] = Field(default_factory=list)
     notes: str | None = None
     publisher_runs: list[CloseoutPublisherRun] = Field(default_factory=list)

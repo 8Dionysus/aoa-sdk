@@ -136,6 +136,7 @@ class CloseoutAPI:
         inbox_dir: str | Path | None = None,
         enqueue: bool = True,
         overwrite: bool = False,
+        allow_empty: bool = False,
     ) -> CloseoutSubmitReviewedReport:
         reviewed_artifact = Path(reviewed_artifact_path).expanduser().resolve()
         if not reviewed_artifact.exists():
@@ -145,13 +146,14 @@ class CloseoutAPI:
             receipt_paths=receipt_paths or [],
             receipt_dirs=receipt_dirs or [],
         )
-        if not resolved_receipt_paths:
+        if not resolved_receipt_paths and not allow_empty:
             raise ValueError("submit-reviewed requires at least one receipt file")
 
         batches_by_publisher: dict[str, list[str]] = {}
         for receipt_path in resolved_receipt_paths:
             publisher = self._publisher_for_receipt_path(receipt_path)
             batches_by_publisher.setdefault(publisher, []).append(str(receipt_path))
+        audit_only = not resolved_receipt_paths
 
         resolved_closeout_id = closeout_id or self._derive_closeout_id(session_ref)
         resolved_request_dir = self._resolve_queue_dir(request_dir, leaf="requests")
@@ -167,6 +169,7 @@ class CloseoutAPI:
             closeout_id=resolved_closeout_id,
             session_ref=session_ref,
             reviewed=True,
+            audit_only=audit_only,
             reviewed_artifact_path=str(reviewed_artifact),
             trigger=trigger,
             batches=[
@@ -197,6 +200,7 @@ class CloseoutAPI:
             request_path=str(request_path),
             submitted_at=datetime.now(timezone.utc),
             reviewed_artifact_path=str(reviewed_artifact),
+            audit_only=audit_only,
             receipt_paths=[str(path) for path in resolved_receipt_paths],
             detected_publishers=sorted(batches_by_publisher),
             build_report=build_report,
@@ -238,6 +242,7 @@ class CloseoutAPI:
             closeout_id=request.closeout_id,
             session_ref=request.session_ref,
             reviewed=True,
+            audit_only=request.audit_only,
             trigger=request.trigger,
             batches=[
                 batch.model_copy(
@@ -281,6 +286,7 @@ class CloseoutAPI:
             manifest_path=str(manifest_path),
             built_at=datetime.now(timezone.utc),
             reviewed_artifact_path=str(reviewed_artifact_path),
+            audit_only=request.audit_only,
             enqueue_report=enqueue_report,
         )
 
@@ -299,7 +305,13 @@ class CloseoutAPI:
             self._run_publisher_batch(manifest_path=resolved_manifest_path, batch=batch)
             for batch in manifest.batches
         ]
-        stats_refresh = self._run_stats_refresh()
+        stats_refresh = (
+            self._skipped_stats_refresh(
+                "audit-only closeout requested; no owner-local receipt publishers were invoked"
+            )
+            if manifest.audit_only
+            else self._run_stats_refresh()
+        )
         report = CloseoutRunReport(
             schema_version=1,
             closeout_id=manifest.closeout_id,
@@ -308,6 +320,7 @@ class CloseoutAPI:
             processed_at=datetime.now(timezone.utc),
             trigger=manifest.trigger,
             reviewed=manifest.reviewed,
+            audit_only=manifest.audit_only,
             audit_refs=manifest.audit_refs,
             notes=manifest.notes,
             publisher_runs=publisher_runs,
@@ -512,7 +525,7 @@ class CloseoutAPI:
             raise ValueError("reviewed_artifact_path must be a non-empty string")
         if not request.trigger.strip():
             raise ValueError("trigger must be a non-empty string")
-        if not request.batches:
+        if not request.audit_only and not request.batches:
             raise ValueError("closeout build request must include at least one publisher batch")
         for batch in request.batches:
             if batch.publisher not in PUBLISHER_SPECS:
@@ -529,7 +542,7 @@ class CloseoutAPI:
             raise ValueError("session_ref must be a non-empty string")
         if not manifest.trigger.strip():
             raise ValueError("trigger must be a non-empty string")
-        if not manifest.batches:
+        if not manifest.audit_only and not manifest.batches:
             raise ValueError("closeout manifest must include at least one publisher batch")
         for batch in manifest.batches:
             if batch.publisher not in PUBLISHER_SPECS:
@@ -683,6 +696,17 @@ class CloseoutAPI:
             feed_output=self._parse_named_path(completed, FEED_OUTPUT_RE),
             summary_output_dir=self._parse_named_path(completed, SUMMARY_OUTPUT_RE),
             stdout=completed,
+        )
+
+    def _skipped_stats_refresh(self, reason: str) -> CloseoutStatsRefresh:
+        return CloseoutStatsRefresh(
+            command=[],
+            source_count=None,
+            receipt_count=None,
+            cleared=False,
+            feed_output=None,
+            summary_output_dir=None,
+            stdout=f"[skip] stats refresh skipped: {reason}",
         )
 
     def _run_command(self, command: list[str]) -> str:

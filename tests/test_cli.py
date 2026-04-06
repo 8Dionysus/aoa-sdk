@@ -167,3 +167,35 @@ def test_closeout_submit_reviewed_can_emit_json(workspace_root: Path) -> None:
         ".aoa/closeout/manifests/closeout-submit-cli-001.json"
     )
     assert payload["build_report"]["enqueue_report"] is None
+
+
+def test_closeout_submit_reviewed_allow_empty_can_emit_json(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "closeout",
+            "submit-reviewed",
+            str(fixture["reviewed_artifact_path"]),
+            "--session-ref",
+            "session:test-submit-reviewed-audit-only",
+            "--audit-ref",
+            str(fixture["route_summary_path"]),
+            "--closeout-id",
+            "closeout-submit-cli-audit-only-001",
+            "--allow-empty",
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--no-enqueue",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["closeout_id"] == "closeout-submit-cli-audit-only-001"
+    assert payload["audit_only"] is True
+    assert payload["receipt_paths"] == []
+    assert payload["detected_publishers"] == []
