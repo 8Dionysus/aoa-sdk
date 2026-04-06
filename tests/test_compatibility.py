@@ -45,6 +45,10 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-skills.project_core_outer_ring.min"].compatible is True
     assert report["aoa-skills.project_core_outer_ring_readiness.min"].detected_version == 1
     assert report["aoa-skills.project_core_outer_ring_readiness.min"].compatible is True
+    assert report["aoa-skills.project_risk_guard_ring.min"].detected_version == 1
+    assert report["aoa-skills.project_risk_guard_ring.min"].compatible is True
+    assert report["aoa-skills.project_risk_guard_ring_governance.min"].detected_version == 1
+    assert report["aoa-skills.project_risk_guard_ring_governance.min"].compatible is True
     assert report["aoa-kag.kag_registry.min"].detected_version == 1
     assert report["aoa-kag.federation_spine.min"].compatible is True
 

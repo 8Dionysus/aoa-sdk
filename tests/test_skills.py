@@ -37,6 +37,24 @@ def test_project_core_outer_ring_reads(workspace_root: Path) -> None:
     assert all(entry.readiness_passed for entry in readiness)
 
 
+def test_project_risk_guard_ring_reads(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    ring = sdk.skills.project_risk_guard_ring()
+    governance = sdk.skills.project_risk_guard_ring_governance()
+
+    assert ring.ring_id == "project-risk-guard-ring-v1"
+    assert ring.skills == [
+        "aoa-approval-gate-check",
+        "aoa-dry-run-first",
+        "aoa-local-stack-bringup",
+        "aoa-safe-infra-change",
+        "aoa-sanitized-share",
+    ]
+    assert [entry.skill_name for entry in governance] == ring.skills
+    assert all(entry.governance_passed for entry in governance)
+
+
 def test_activate_and_manage_session(workspace_root: Path, tmp_path: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     session_file = tmp_path / ".aoa" / "skill-runtime-session.json"

@@ -32,6 +32,7 @@ Use the shortest route by need:
 - reviewed session request assembly from receipt bundles or audit-only reviewed artifacts: `docs/session-closeout.md` and `aoa closeout submit-reviewed`
 - kernel-aware next-step brief after reviewed closeout: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - project-core outer-ring structure and readiness: `sdk.skills.project_core_outer_ring()`, `sdk.skills.project_core_outer_ring_readiness()`, and the `aoa-skills` generated project-core ring surfaces
+- project risk guard ring structure and governance: `sdk.skills.project_risk_guard_ring()`, `sdk.skills.project_risk_guard_ring_governance()`, and the `aoa-skills` generated risk-ring surfaces
 
 ## What `aoa-sdk` owns
 
@@ -48,6 +49,7 @@ This repository is the source of truth for:
 - separate closeout routing for skill-detail receipts and generic project-core kernel skill-application receipts
 - kernel-aware next-step brief generation based on `aoa-skills.project_core_skill_kernel.min` and refreshed `aoa-stats.core_skill_application_summary.min`
 - typed readability for the static project-core engineering outer ring from `aoa-skills.project_core_outer_ring.min` and `aoa-skills.project_core_outer_ring_readiness.min`
+- typed readability for the static project risk guard ring from `aoa-skills.project_risk_guard_ring.min` and `aoa-skills.project_risk_guard_ring_governance.min`
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own
@@ -89,6 +91,8 @@ preview = sdk.skills.disclose("aoa-change-protocol")
 activation = sdk.skills.activate("aoa-change-protocol")
 outer_ring = sdk.skills.project_core_outer_ring()
 outer_ring_readiness = sdk.skills.project_core_outer_ring_readiness()
+risk_ring = sdk.skills.project_risk_guard_ring()
+risk_ring_governance = sdk.skills.project_risk_guard_ring_governance()
 verify_binding = sdk.agents.binding_for_phase("verify")
 playbook = sdk.playbooks.get("bounded-change-safe")
 memory = sdk.memo.recall(mode="semantic", query="charter")
