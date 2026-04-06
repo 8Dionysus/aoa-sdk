@@ -659,3 +659,88 @@ class GovernedRunReviewHandoffBundle(BaseModel):
     recommended_review_targets: dict[str, list[dict[str, str]]] = Field(default_factory=dict)
     missing_or_blocked_packet_kinds: list[dict[str, Any]] = Field(default_factory=list)
     operator_next_steps: list[str] = Field(default_factory=list)
+
+
+class StatsGeneratedFrom(BaseModel):
+    receipt_input_paths: list[str] = Field(default_factory=list)
+    total_receipts: int
+    latest_observed_at: str
+
+
+class StatsObjectRef(BaseModel):
+    repo: str
+    kind: str
+    id: str
+    version: str | None = None
+
+
+class StatsAutomationCandidateCounts(BaseModel):
+    total: int
+    seed_ready: int
+    checkpoint_required: int
+
+
+class StatsObjectSummaryEntry(BaseModel):
+    object_ref: StatsObjectRef
+    receipt_count_total: int
+    receipt_counts_by_event_kind: dict[str, int] = Field(default_factory=dict)
+    first_observed_at: str
+    last_observed_at: str
+    latest_session_ref: str
+    latest_run_ref: str
+    evidence_ref_count: int
+    latest_eval_verdict: str | None = None
+    latest_progression_verdict: str | None = None
+    automation_candidate_counts: StatsAutomationCandidateCounts
+
+
+class StatsRepeatedWindow(BaseModel):
+    window_id: str
+    window_date: str
+    total_receipts: int
+    unique_objects: int
+    event_counts_by_kind: dict[str, int] = Field(default_factory=dict)
+    eval_result_count: int
+    progression_delta_count: int
+    automation_candidate_count: int
+    evidence_ref_count: int
+
+
+class StatsRouteProgression(BaseModel):
+    route_ref: str
+    total_progression_receipts: int
+    latest_verdict: str
+    latest_observed_at: str
+    cumulative_axis_deltas: dict[str, int] = Field(default_factory=dict)
+    caution_count: int
+    evidence_ref_count: int
+
+
+class StatsForkCalibration(BaseModel):
+    route_ref: str
+    decision_count: int
+    chosen_branch_counts: dict[str, int] = Field(default_factory=dict)
+    max_option_count: int
+    realized_outcome_link_count: int
+    evidence_ref_count: int
+    latest_observed_at: str
+
+
+class StatsAutomationPipeline(BaseModel):
+    pipeline_ref: str
+    candidate_count: int
+    seed_ready_count: int
+    checkpoint_required_count: int
+    deterministic_ready_count: int
+    reversible_ready_count: int
+    next_artifact_hints: list[str] = Field(default_factory=list)
+    evidence_ref_count: int
+    latest_observed_at: str
+
+
+class StatsSummarySurface(BaseModel):
+    name: str
+    path: str
+    schema_ref: str
+    primary_question: str
+    derivation_rule: str

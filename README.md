@@ -77,12 +77,13 @@ verify_binding = sdk.agents.binding_for_phase("verify")
 playbook = sdk.playbooks.get("bounded-change-safe")
 memory = sdk.memo.recall(mode="semantic", query="charter")
 eval_bundle = sdk.evals.inspect("aoa-bounded-change-quality")
+automation = sdk.stats.automation_pipelines("pipeline:session-growth")
 kag = sdk.kag.inspect("AOA-K-0011")
 rpg_build = sdk.rpg.latest_build("AOA-A-0002")
 compatibility = sdk.compatibility.check_all()
 ```
 
-The live read path already covers `aoa-routing`, `aoa-skills`, `aoa-agents`, `aoa-playbooks`, `aoa-memo`, `aoa-evals`, and bounded `aoa-kag` inspect support.
+The live read path already covers `aoa-routing`, `aoa-skills`, `aoa-agents`, `aoa-playbooks`, `aoa-memo`, `aoa-evals`, `aoa-stats`, and bounded `aoa-kag` inspect support.
 The RPG addendum is also available as a typed consumer slice when its
 canonical transport surfaces are present or fixture-staged.
 
