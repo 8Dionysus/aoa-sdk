@@ -22,6 +22,8 @@ repositories remain authoritative.
 - session and orchestration helpers that preserve source ownership
 - policy-aware guards around approval, mutation, and trust posture
 - adapters that can change transport without changing ownership
+- reviewed-session closeout helpers that call owner-owned publisher scripts and
+  refresh derived stats without taking over workflow or proof meaning
 
 ## aoa-sdk Should Not Absorb
 
