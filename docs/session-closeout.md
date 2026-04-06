@@ -9,7 +9,8 @@ manifest-driven handoff.
 
 By April 6, 2026 the federation already had:
 
-- owner-local live receipt publishers in `aoa-skills` and `aoa-evals`
+- owner-local live receipt publishers in `aoa-skills`, `aoa-evals`,
+  `aoa-playbooks`, `aoa-techniques`, and `aoa-memo`
 - an automatic `aoa-stats` watcher that rebuilds live summaries when those logs
   change
 
@@ -54,6 +55,24 @@ reviewed session into:
       "publisher": "aoa-evals.eval-result",
       "input_paths": [
         "receipts/eval_result_receipt.json"
+      ]
+    },
+    {
+      "publisher": "aoa-playbooks.reviewed-run",
+      "input_paths": [
+        "receipts/playbook_review_harvest_receipt.json"
+      ]
+    },
+    {
+      "publisher": "aoa-techniques.promotion",
+      "input_paths": [
+        "receipts/technique_promotion_receipt.json"
+      ]
+    },
+    {
+      "publisher": "aoa-memo.writeback",
+      "input_paths": [
+        "receipts/memo_writeback_receipt.json"
       ]
     }
   ]

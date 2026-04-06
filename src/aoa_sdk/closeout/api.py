@@ -41,6 +41,24 @@ PUBLISHER_SPECS = {
         script_relative_path="scripts/publish_live_receipts.py",
         default_log_relative_path=".aoa/live_receipts/eval-result-receipts.jsonl",
     ),
+    "aoa-playbooks.reviewed-run": PublisherSpec(
+        publisher="aoa-playbooks.reviewed-run",
+        repo="aoa-playbooks",
+        script_relative_path="scripts/publish_live_receipts.py",
+        default_log_relative_path=".aoa/live_receipts/playbook-receipts.jsonl",
+    ),
+    "aoa-techniques.promotion": PublisherSpec(
+        publisher="aoa-techniques.promotion",
+        repo="aoa-techniques",
+        script_relative_path="scripts/publish_live_receipts.py",
+        default_log_relative_path=".aoa/live_receipts/technique-receipts.jsonl",
+    ),
+    "aoa-memo.writeback": PublisherSpec(
+        publisher="aoa-memo.writeback",
+        repo="aoa-memo",
+        script_relative_path="scripts/publish_live_receipts.py",
+        default_log_relative_path=".aoa/live_receipts/memo-writeback-receipts.jsonl",
+    ),
 }
 
 PUBLISH_RESULT_RE = re.compile(

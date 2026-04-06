@@ -13,19 +13,22 @@ def install_closeout_fixture(workspace_root: Path) -> dict[str, Path]:
     sdk_root = workspace_root / "aoa-sdk"
     skills_root = workspace_root / "aoa-skills"
     evals_root = workspace_root / "aoa-evals"
+    playbooks_root = workspace_root / "aoa-playbooks"
+    techniques_root = workspace_root / "aoa-techniques"
+    memo_root = workspace_root / "aoa-memo"
     stats_root = workspace_root / "aoa-stats"
 
-    for root in (skills_root, evals_root, stats_root):
+    for root in (skills_root, evals_root, playbooks_root, techniques_root, memo_root, stats_root):
         root.mkdir(parents=True, exist_ok=True)
         (root / "README.md").write_text(f"# {root.name}\n", encoding="utf-8")
 
-    skill_script = """#!/usr/bin/env python3
+    publisher_script_template = """#!/usr/bin/env python3
 from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
 
-DEFAULT_LOG_PATH = Path(__file__).resolve().parents[1] / ".aoa" / "live_receipts" / "session-harvest-family.jsonl"
+DEFAULT_LOG_PATH = Path(__file__).resolve().parents[1] / ".aoa" / "live_receipts" / "__LOG_NAME__"
 
 parser = argparse.ArgumentParser()
 parser.add_argument("--input", action="append", default=[])
@@ -52,14 +55,9 @@ with log_path.open("a", encoding="utf-8") as handle:
         handle.write(json.dumps(payload, sort_keys=True) + "\\n")
         existing.add(event_id)
         appended += 1
-print(f"[ok] appended {appended} session receipts to {log_path}")
+print(f"[ok] appended {appended} __LABEL__ receipts to {log_path}")
 print(f"[skip] duplicate event ids skipped: {skipped}")
 """
-    eval_script = skill_script.replace(
-        "session-harvest-family.jsonl", "eval-result-receipts.jsonl"
-    ).replace(
-        "session receipts", "eval receipts"
-    )
     refresh_script = """#!/usr/bin/env python3
 from __future__ import annotations
 import json
@@ -98,6 +96,9 @@ feed_output.write_text(json.dumps(receipts, indent=2) + "\\n", encoding="utf-8")
                 "receipt_input_paths": [
                     "aoa-skills/.aoa/live_receipts/session-harvest-family.jsonl",
                     "aoa-evals/.aoa/live_receipts/eval-result-receipts.jsonl",
+                    "aoa-playbooks/.aoa/live_receipts/playbook-receipts.jsonl",
+                    "aoa-techniques/.aoa/live_receipts/technique-receipts.jsonl",
+                    "aoa-memo/.aoa/live_receipts/memo-writeback-receipts.jsonl",
                 ],
                 "total_receipts": len(receipts),
                 "latest_observed_at": receipts[-1]["observed_at"],
@@ -116,10 +117,31 @@ print(f"[summaries] {summary_dir}")
 
     (skills_root / "scripts").mkdir(parents=True, exist_ok=True)
     (evals_root / "scripts").mkdir(parents=True, exist_ok=True)
+    (playbooks_root / "scripts").mkdir(parents=True, exist_ok=True)
+    (techniques_root / "scripts").mkdir(parents=True, exist_ok=True)
+    (memo_root / "scripts").mkdir(parents=True, exist_ok=True)
     (stats_root / "scripts").mkdir(parents=True, exist_ok=True)
     (stats_root / "config").mkdir(parents=True, exist_ok=True)
-    (skills_root / "scripts" / "publish_live_receipts.py").write_text(skill_script, encoding="utf-8")
-    (evals_root / "scripts" / "publish_live_receipts.py").write_text(eval_script, encoding="utf-8")
+    (skills_root / "scripts" / "publish_live_receipts.py").write_text(
+        publisher_script_template.replace("__LOG_NAME__", "session-harvest-family.jsonl").replace("__LABEL__", "session"),
+        encoding="utf-8",
+    )
+    (evals_root / "scripts" / "publish_live_receipts.py").write_text(
+        publisher_script_template.replace("__LOG_NAME__", "eval-result-receipts.jsonl").replace("__LABEL__", "eval"),
+        encoding="utf-8",
+    )
+    (playbooks_root / "scripts" / "publish_live_receipts.py").write_text(
+        publisher_script_template.replace("__LOG_NAME__", "playbook-receipts.jsonl").replace("__LABEL__", "playbook"),
+        encoding="utf-8",
+    )
+    (techniques_root / "scripts" / "publish_live_receipts.py").write_text(
+        publisher_script_template.replace("__LOG_NAME__", "technique-receipts.jsonl").replace("__LABEL__", "technique"),
+        encoding="utf-8",
+    )
+    (memo_root / "scripts" / "publish_live_receipts.py").write_text(
+        publisher_script_template.replace("__LOG_NAME__", "memo-writeback-receipts.jsonl").replace("__LABEL__", "memo"),
+        encoding="utf-8",
+    )
     (stats_root / "scripts" / "refresh_live_stats.py").write_text(refresh_script, encoding="utf-8")
 
     registry = {
@@ -135,6 +157,24 @@ print(f"[summaries] {summary_dir}")
                 "name": "evals-live-log",
                 "repo": "aoa-evals",
                 "relative_path": ".aoa/live_receipts/eval-result-receipts.jsonl",
+                "required": True,
+            },
+            {
+                "name": "playbooks-live-log",
+                "repo": "aoa-playbooks",
+                "relative_path": ".aoa/live_receipts/playbook-receipts.jsonl",
+                "required": True,
+            },
+            {
+                "name": "techniques-live-log",
+                "repo": "aoa-techniques",
+                "relative_path": ".aoa/live_receipts/technique-receipts.jsonl",
+                "required": True,
+            },
+            {
+                "name": "memo-live-log",
+                "repo": "aoa-memo",
+                "relative_path": ".aoa/live_receipts/memo-writeback-receipts.jsonl",
                 "required": True,
             },
         ],
@@ -170,10 +210,49 @@ print(f"[summaries] {summary_dir}")
         "evidence_refs": ["tmp/EVAL_RESULT.json"],
         "payload": {"verdict": "green"},
     }
+    playbook_receipt = {
+        "event_kind": "playbook_review_harvest_receipt",
+        "event_id": "event-playbook-001",
+        "observed_at": "2026-04-06T18:06:00Z",
+        "run_ref": "run-playbook-001",
+        "session_ref": "session:test-closeout",
+        "actor_ref": {"repo": "aoa-playbooks", "kind": "playbook", "id": "AOA-P-0021"},
+        "object_ref": {"repo": "aoa-playbooks", "kind": "playbook", "id": "AOA-P-0021"},
+        "evidence_refs": ["tmp/PLAYBOOK_REVIEW.md"],
+        "payload": {"gate_verdict": "composition-landed"},
+    }
+    technique_receipt = {
+        "event_kind": "technique_promotion_receipt",
+        "event_id": "event-technique-001",
+        "observed_at": "2026-04-06T18:07:00Z",
+        "run_ref": "run-technique-001",
+        "session_ref": "session:test-closeout",
+        "actor_ref": {"repo": "aoa-techniques", "kind": "technique", "id": "AOA-T-0089"},
+        "object_ref": {"repo": "aoa-techniques", "kind": "technique", "id": "AOA-T-0089"},
+        "evidence_refs": ["tmp/TECHNIQUE.md"],
+        "payload": {"promotion_state": "promoted"},
+    }
+    memo_receipt = {
+        "event_kind": "memo_writeback_receipt",
+        "event_id": "event-memo-001",
+        "observed_at": "2026-04-06T18:08:00Z",
+        "run_ref": "run-memo-001",
+        "session_ref": "session:test-closeout",
+        "actor_ref": {"repo": "aoa-memo", "kind": "memory_object", "id": "memo.decision.test-closeout"},
+        "object_ref": {"repo": "aoa-memo", "kind": "memory_object", "id": "memo.decision.test-closeout"},
+        "evidence_refs": ["tmp/MEMO.json"],
+        "payload": {"target_kind": "decision"},
+    }
     skill_receipt_path = receipts_dir / "skill.json"
     eval_receipt_path = receipts_dir / "eval.json"
+    playbook_receipt_path = receipts_dir / "playbook.json"
+    technique_receipt_path = receipts_dir / "technique.json"
+    memo_receipt_path = receipts_dir / "memo.json"
     skill_receipt_path.write_text(json.dumps(skill_receipt, indent=2) + "\n", encoding="utf-8")
     eval_receipt_path.write_text(json.dumps(eval_receipt, indent=2) + "\n", encoding="utf-8")
+    playbook_receipt_path.write_text(json.dumps(playbook_receipt, indent=2) + "\n", encoding="utf-8")
+    technique_receipt_path.write_text(json.dumps(technique_receipt, indent=2) + "\n", encoding="utf-8")
+    memo_receipt_path.write_text(json.dumps(memo_receipt, indent=2) + "\n", encoding="utf-8")
 
     manifest = {
         "schema_version": 1,
@@ -190,6 +269,18 @@ print(f"[summaries] {summary_dir}")
             {
                 "publisher": "aoa-evals.eval-result",
                 "input_paths": ["receipts/eval.json"],
+            },
+            {
+                "publisher": "aoa-playbooks.reviewed-run",
+                "input_paths": ["receipts/playbook.json"],
+            },
+            {
+                "publisher": "aoa-techniques.promotion",
+                "input_paths": ["receipts/technique.json"],
+            },
+            {
+                "publisher": "aoa-memo.writeback",
+                "input_paths": ["receipts/memo.json"],
             },
         ],
     }
@@ -219,6 +310,9 @@ print(f"[summaries] {summary_dir}")
         "queue_manifest_path": queue_manifest_path,
         "skill_log_path": skills_root / ".aoa" / "live_receipts" / "session-harvest-family.jsonl",
         "eval_log_path": evals_root / ".aoa" / "live_receipts" / "eval-result-receipts.jsonl",
+        "playbook_log_path": playbooks_root / ".aoa" / "live_receipts" / "playbook-receipts.jsonl",
+        "technique_log_path": techniques_root / ".aoa" / "live_receipts" / "technique-receipts.jsonl",
+        "memo_log_path": memo_root / ".aoa" / "live_receipts" / "memo-writeback-receipts.jsonl",
         "feed_path": stats_root / "state" / "live_receipts.min.json",
         "summary_catalog_path": stats_root / "state" / "generated" / "summary_surface_catalog.min.json",
         "report_path": sdk_root / ".aoa" / "closeout" / "reports" / "closeout-test-queue-001.report.json",
@@ -233,12 +327,18 @@ def test_closeout_api_run_publishes_receipts_and_refreshes_stats(workspace_root:
     report = sdk.closeout.run(fixture["manifest_path"])
 
     assert report.closeout_id == "closeout-test-001"
-    assert len(report.publisher_runs) == 2
+    assert len(report.publisher_runs) == 5
     assert report.publisher_runs[0].appended_count == 1
     assert report.publisher_runs[1].appended_count == 1
-    assert report.stats_refresh.receipt_count == 2
+    assert report.publisher_runs[2].appended_count == 1
+    assert report.publisher_runs[3].appended_count == 1
+    assert report.publisher_runs[4].appended_count == 1
+    assert report.stats_refresh.receipt_count == 5
     assert fixture["skill_log_path"].exists()
     assert fixture["eval_log_path"].exists()
+    assert fixture["playbook_log_path"].exists()
+    assert fixture["technique_log_path"].exists()
+    assert fixture["memo_log_path"].exists()
     assert fixture["feed_path"].exists()
     assert fixture["summary_catalog_path"].exists()
 
