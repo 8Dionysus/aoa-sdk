@@ -4,6 +4,7 @@ from pathlib import Path
 from typer.testing import CliRunner
 
 from aoa_sdk.cli.main import app
+from tests.test_closeout import install_closeout_fixture
 
 
 def test_workspace_inspect_reports_manifest_and_repo_paths(workspace_root: Path) -> None:
@@ -72,3 +73,28 @@ def test_compatibility_check_can_emit_kag_repo_filtered_json(workspace_root: Pat
     assert payload["compatible"] is True
     assert payload["checks"]
     assert all(entry["repo"] == "aoa-kag" for entry in payload["checks"])
+
+
+def test_closeout_enqueue_current_can_emit_json(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "closeout",
+            "enqueue-current",
+            str(fixture["manifest_path"]),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["closeout_id"] == "closeout-test-001"
+    assert payload["queue_depth"] == 2
+    assert payload["queued_manifest_path"].endswith(
+        ".aoa/closeout/inbox/closeout-test-001.json"
+    )

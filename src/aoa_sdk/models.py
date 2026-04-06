@@ -764,6 +764,17 @@ class CloseoutManifest(BaseModel):
     notes: str | None = None
 
 
+class CloseoutEnqueueReport(BaseModel):
+    schema_version: int
+    closeout_id: str
+    session_ref: str
+    source_manifest_path: str
+    queued_manifest_path: str
+    enqueued_at: datetime
+    queue_depth: int
+    overwritten: bool = False
+
+
 class CloseoutPublisherRun(BaseModel):
     publisher: str
     repo: str
@@ -818,3 +829,20 @@ class CloseoutInboxReport(BaseModel):
     processed_count: int
     failed_count: int
     items: list[CloseoutInboxItemResult] = Field(default_factory=list)
+
+
+class CloseoutStatusReport(BaseModel):
+    schema_version: int
+    root_dir: str
+    inbox_dir: str
+    processed_dir: str
+    failed_dir: str
+    report_dir: str
+    pending_manifest_count: int
+    processed_manifest_count: int
+    failed_manifest_count: int
+    report_count: int
+    pending_manifest_paths: list[str] = Field(default_factory=list)
+    latest_report_path: str | None = None
+    latest_processed_manifest_path: str | None = None
+    latest_failed_manifest_path: str | None = None
