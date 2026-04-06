@@ -98,3 +98,29 @@ def test_closeout_enqueue_current_can_emit_json(workspace_root: Path) -> None:
     assert payload["queued_manifest_path"].endswith(
         ".aoa/closeout/inbox/closeout-test-001.json"
     )
+
+
+def test_closeout_build_manifest_can_emit_json(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "closeout",
+            "build-manifest",
+            str(fixture["build_request_path"]),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--enqueue",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["closeout_id"] == "closeout-build-001"
+    assert payload["manifest_path"].endswith(
+        ".aoa/closeout/manifests/closeout-build-001.json"
+    )
+    assert payload["enqueue_report"]["queue_depth"] == 2

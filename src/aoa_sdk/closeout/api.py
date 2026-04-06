@@ -10,6 +10,8 @@ import sys
 
 from ..loaders import load_json, write_json
 from ..models import (
+    CloseoutBuildReport,
+    CloseoutBuildRequest,
     CloseoutEnqueueReport,
     CloseoutInboxItemResult,
     CloseoutInboxReport,
@@ -81,11 +83,93 @@ class CloseoutAPI:
     def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
 
+    def load_build_request(self, request_path: str | Path) -> CloseoutBuildRequest:
+        path = Path(request_path).expanduser().resolve()
+        request = CloseoutBuildRequest.model_validate(load_json(path))
+        self._validate_build_request(request)
+        return request
+
     def load_manifest(self, manifest_path: str | Path) -> CloseoutManifest:
         path = Path(manifest_path).expanduser().resolve()
         manifest = CloseoutManifest.model_validate(load_json(path))
         self._validate_manifest(manifest)
         return manifest
+
+    def build_manifest(
+        self,
+        request_path: str | Path,
+        *,
+        manifest_dir: str | Path | None = None,
+        enqueue: bool = False,
+        inbox_dir: str | Path | None = None,
+        overwrite: bool = False,
+    ) -> CloseoutBuildReport:
+        resolved_request_path = Path(request_path).expanduser().resolve()
+        request = self.load_build_request(resolved_request_path)
+        reviewed_artifact_path = self._resolve_existing_path(
+            resolved_request_path, request.reviewed_artifact_path
+        )
+        audit_refs = self._unique_strings(
+            [
+                str(reviewed_artifact_path),
+                *[
+                    str(path)
+                    for path in self._resolve_input_paths(
+                        resolved_request_path, request.audit_refs
+                    )
+                ],
+            ]
+        )
+        manifest = CloseoutManifest(
+            schema_version=1,
+            closeout_id=request.closeout_id,
+            session_ref=request.session_ref,
+            reviewed=True,
+            trigger=request.trigger,
+            batches=[
+                batch.model_copy(
+                    update={
+                        "input_paths": [
+                            str(path)
+                            for path in self._resolve_input_paths(
+                                resolved_request_path, batch.input_paths
+                            )
+                        ]
+                    }
+                )
+                for batch in request.batches
+            ],
+            audit_refs=audit_refs,
+            notes=request.notes,
+        )
+
+        resolved_manifest_dir = self._resolve_queue_dir(manifest_dir, leaf="manifests")
+        resolved_manifest_dir.mkdir(parents=True, exist_ok=True)
+        manifest_path = resolved_manifest_dir / f"{self._safe_closeout_filename(request.closeout_id)}.json"
+        if manifest_path.exists() and not overwrite:
+            raise FileExistsError(
+                f"{manifest_path} already exists; rerun with overwrite=True to replace it"
+            )
+        write_json(manifest_path, manifest.model_dump(mode="json"))
+
+        enqueue_report = None
+        if enqueue:
+            enqueue_report = self.enqueue(
+                manifest_path,
+                inbox_dir=inbox_dir,
+                overwrite=overwrite,
+            )
+
+        return CloseoutBuildReport(
+            schema_version=1,
+            closeout_id=request.closeout_id,
+            session_ref=request.session_ref,
+            request_path=str(resolved_request_path),
+            manifest_path=str(manifest_path),
+            built_at=datetime.now(timezone.utc),
+            reviewed_artifact_path=str(reviewed_artifact_path),
+            enqueue_report=enqueue_report,
+        )
 
     def run(
         self,
@@ -241,6 +325,7 @@ class CloseoutAPI:
     def status(
         self,
         *,
+        manifest_dir: str | Path | None = None,
         inbox_dir: str | Path | None = None,
         processed_dir: str | Path | None = None,
         failed_dir: str | Path | None = None,
@@ -248,11 +333,13 @@ class CloseoutAPI:
     ) -> CloseoutStatusReport:
         queue_paths = {
             "root": self.default_closeout_root(),
+            "manifests": self._resolve_queue_dir(manifest_dir, leaf="manifests"),
             "inbox": self._resolve_queue_dir(inbox_dir, leaf="inbox"),
             "processed": self._resolve_queue_dir(processed_dir, leaf="processed"),
             "failed": self._resolve_queue_dir(failed_dir, leaf="failed"),
             "reports": self._resolve_queue_dir(report_dir, leaf="reports"),
         }
+        manifests = sorted(queue_paths["manifests"].glob("*.json"))
         pending_manifests = sorted(queue_paths["inbox"].glob("*.json"))
         processed_manifests = sorted(queue_paths["processed"].glob("*.json"))
         failed_manifests = sorted(queue_paths["failed"].glob("*.json"))
@@ -261,15 +348,18 @@ class CloseoutAPI:
         return CloseoutStatusReport(
             schema_version=1,
             root_dir=str(queue_paths["root"]),
+            manifest_dir=str(queue_paths["manifests"]),
             inbox_dir=str(queue_paths["inbox"]),
             processed_dir=str(queue_paths["processed"]),
             failed_dir=str(queue_paths["failed"]),
             report_dir=str(queue_paths["reports"]),
+            manifest_count=len(manifests),
             pending_manifest_count=len(pending_manifests),
             processed_manifest_count=len(processed_manifests),
             failed_manifest_count=len(failed_manifests),
             report_count=len(reports),
             pending_manifest_paths=[str(path) for path in pending_manifests],
+            latest_manifest_path=self._latest_path(manifests),
             latest_report_path=self._latest_path(reports),
             latest_processed_manifest_path=self._latest_path(processed_manifests),
             latest_failed_manifest_path=self._latest_path(failed_manifests),
@@ -282,11 +372,33 @@ class CloseoutAPI:
         root = self.default_closeout_root()
         return {
             "root": root,
+            "manifests": root / "manifests",
             "inbox": root / "inbox",
             "processed": root / "processed",
             "failed": root / "failed",
             "reports": root / "reports",
         }
+
+    def _validate_build_request(self, request: CloseoutBuildRequest) -> None:
+        if request.schema_version != 1:
+            raise ValueError(f"unsupported closeout build schema_version {request.schema_version!r}")
+        if not request.closeout_id.strip():
+            raise ValueError("closeout_id must be a non-empty string")
+        if not request.session_ref.strip():
+            raise ValueError("session_ref must be a non-empty string")
+        if not request.reviewed:
+            raise ValueError("closeout build requests must set reviewed=true before manifest assembly")
+        if not request.reviewed_artifact_path.strip():
+            raise ValueError("reviewed_artifact_path must be a non-empty string")
+        if not request.trigger.strip():
+            raise ValueError("trigger must be a non-empty string")
+        if not request.batches:
+            raise ValueError("closeout build request must include at least one publisher batch")
+        for batch in request.batches:
+            if batch.publisher not in PUBLISHER_SPECS:
+                raise ValueError(f"unknown closeout publisher {batch.publisher!r}")
+            if not batch.input_paths:
+                raise ValueError(f"{batch.publisher}: input_paths must be non-empty")
 
     def _validate_manifest(self, manifest: CloseoutManifest) -> None:
         if manifest.schema_version != 1:
@@ -310,17 +422,20 @@ class CloseoutAPI:
             return self.default_closeout_root() / leaf
         return Path(candidate).expanduser().resolve()
 
+    def _resolve_existing_path(self, manifest_path: Path, item: str) -> Path:
+        path = Path(item).expanduser()
+        if not path.is_absolute():
+            path = (manifest_path.parent / path).resolve()
+        else:
+            path = path.resolve()
+        if not path.exists():
+            raise FileNotFoundError(f"missing closeout input: {path}")
+        return path
+
     def _resolve_input_paths(self, manifest_path: Path, input_paths: list[str]) -> list[Path]:
         resolved: list[Path] = []
         for item in input_paths:
-            path = Path(item).expanduser()
-            if not path.is_absolute():
-                path = (manifest_path.parent / path).resolve()
-            else:
-                path = path.resolve()
-            if not path.exists():
-                raise FileNotFoundError(f"missing closeout input: {path}")
-            resolved.append(path)
+            resolved.append(self._resolve_existing_path(manifest_path, item))
         return resolved
 
     def _resolve_optional_paths(self, manifest_path: Path, input_paths: list[str]) -> list[str]:
@@ -439,3 +554,13 @@ class CloseoutAPI:
     def _safe_closeout_filename(self, closeout_id: str) -> str:
         safe = re.sub(r"[^A-Za-z0-9._-]+", "-", closeout_id).strip("-")
         return safe or "closeout"
+
+    def _unique_strings(self, items: list[str]) -> list[str]:
+        seen: set[str] = set()
+        unique: list[str] = []
+        for item in items:
+            if item in seen:
+                continue
+            seen.add(item)
+            unique.append(item)
+        return unique
