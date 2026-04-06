@@ -2,7 +2,7 @@
 
 Typed Python SDK for the AoA federation.
 
-`aoa-sdk` is the local-first typed consumer and orchestration spine for source-owned AoA surfaces. It loads generated contracts from sibling repositories and exposes stable Python APIs for routing, skill discovery and activation, phase-aware artifacts, compatibility checks, and bounded orchestration without taking ownership away from the repositories that define meaning.
+`aoa-sdk` is the local-first typed consumer and control-plane helper layer for source-owned AoA surfaces. It loads generated contracts from sibling repositories and exposes stable Python APIs for routing, skill discovery and activation, phase-aware artifact reads, compatibility checks, governed-run inspection, and other bounded control-plane helpers without taking ownership away from the repositories that define meaning.
 
 This repository was seeded from the `Dionysus` starter artifacts on 2026-03-31. It is now the live development home for the SDK itself.
 
@@ -15,7 +15,7 @@ Use the shortest route by need:
 - compatibility posture: `docs/versioning.md`
 - RPG typed consumer slice: `docs/RPG_SDK_ADDENDUM.md`, `docs/RPG_SURFACE_PATHS.md`, and `src/aoa_sdk/rpg/`
 - federation effects and obligations: `docs/ecosystem-impact.md`
-- original seed blueprint: `docs/blueprint.md`
+- seed blueprint and direction surface: `docs/blueprint.md`
 - local agent instructions: `AGENTS.md`
 
 ## Route by need
@@ -24,7 +24,7 @@ Use the shortest route by need:
 - source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
 - compatibility rules and local checks: `docs/versioning.md`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
-- local validation and workspace inspection: `aoa workspace inspect /srv/aoa-sdk`, `python -m pip install -e '.[dev]'`, and `pytest -q`
+- local validation and workspace inspection: `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 
 ## What `aoa-sdk` owns
 
@@ -43,6 +43,25 @@ This repository is the source of truth for:
 - It does not become a service runtime or hidden monolith.
 
 The SDK stays on the control plane: load, type, validate, activate, and hand off.
+
+## Verify current repo state
+
+Use this read-only/current-state battery:
+
+```bash
+python -m pytest -q
+python -m ruff check .
+aoa workspace inspect /srv/aoa-sdk
+aoa compatibility check /srv/aoa-sdk
+aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
+```
+
+CI also reinforces this path with:
+
+```bash
+python -m mypy src
+python -m build
+```
 
 ## Current slice
 
@@ -90,11 +109,10 @@ aoa compatibility check /srv/aoa-sdk
 aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
 ```
 
-Install for development and run tests:
+Install for development:
 
 ```bash
 python -m pip install -e '.[dev]'
-pytest -q
 ```
 
 ## Downstream consumers

@@ -1,5 +1,19 @@
 # aoa-sdk blueprint
 
+This document is the original seed blueprint and direction surface for `aoa-sdk`.
+It is not the current-state source of truth for every module, CLI slice, or helper named below.
+
+Current repo truth lives first in:
+
+- `README.md`
+- `docs/boundaries.md`
+- `docs/workspace-layout.md`
+- `docs/versioning.md`
+- `src/aoa_sdk/`
+- `tests/`
+
+Treat any module, command, or layout entry that is not present in the current tree as planned or aspirational rather than landed.
+
 ## 1. Charter
 
 `aoa-sdk` is the typed Python consumer and orchestration spine for the AoA federation.
