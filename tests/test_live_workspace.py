@@ -28,6 +28,8 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert report["aoa-playbooks.playbook_review_status.min"].compatible is True
     assert report["aoa-memo.checkpoint_to_memory_contract.example"].compatible is True
     assert report["aoa-skills.project_core_skill_kernel.min"].compatible is True
+    assert report["aoa-skills.project_core_outer_ring.min"].compatible is True
+    assert report["aoa-skills.project_core_outer_ring_readiness.min"].compatible is True
     assert report["aoa-stats.object_summary.min"].compatible is True
     assert report["aoa-stats.core_skill_application_summary.min"].compatible is True
     assert report["aoa-stats.automation_pipeline_summary.min"].compatible is True
@@ -36,11 +38,17 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
 
     review_status = sdk.playbooks.review_status("AOA-P-0017")
     writeback = sdk.memo.writeback_map("checkpoint_export")
+    outer_ring = sdk.skills.project_core_outer_ring()
+    outer_ring_readiness = sdk.skills.project_core_outer_ring_readiness()
     core_kernel = sdk.stats.core_skill_applications()
     automation = sdk.stats.automation_pipelines()
 
     assert review_status.gate_verdict == "composition-landed"
     assert writeback.mapping.target_kind == "state_capsule"
+    assert outer_ring.ring_id == "project-core-engineering-ring-v1"
+    assert len(outer_ring.skills) == 10
+    assert len(outer_ring_readiness) == 10
+    assert all(item.readiness_passed for item in outer_ring_readiness)
     assert isinstance(core_kernel, list)
     assert automation
     assert any(item.seed_ready_count >= 1 for item in automation)

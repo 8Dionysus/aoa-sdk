@@ -282,6 +282,20 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="schema_version",
         supported_versions=[1],
     ),
+    "aoa-skills.project_core_outer_ring.min": SurfaceCompatibilityRule(
+        surface_id="aoa-skills.project_core_outer_ring.min",
+        repo="aoa-skills",
+        relative_path="generated/project_core_outer_ring.min.json",
+        version_field="schema_version",
+        supported_versions=[1],
+    ),
+    "aoa-skills.project_core_outer_ring_readiness.min": SurfaceCompatibilityRule(
+        surface_id="aoa-skills.project_core_outer_ring_readiness.min",
+        repo="aoa-skills",
+        relative_path="generated/project_core_outer_ring_readiness.min.json",
+        version_field="schema_version",
+        supported_versions=[1],
+    ),
     "aoa-stats.object_summary.min": SurfaceCompatibilityRule(
         surface_id="aoa-stats.object_summary.min",
         repo="aoa-stats",

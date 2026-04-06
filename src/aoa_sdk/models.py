@@ -787,6 +787,49 @@ class ProjectCoreSkillKernelSurface(BaseModel):
     skill_contracts: list[ProjectCoreKernelSkillContract] = Field(default_factory=list)
 
 
+class ProjectCoreOuterRingCluster(BaseModel):
+    cluster_id: str
+    skill_count: int | None = None
+    skills: list[str] = Field(default_factory=list)
+
+
+class ProjectCoreOuterRingSurface(BaseModel):
+    schema_version: int
+    source_config: str | None = None
+    ring_id: str
+    owner_repo: str
+    description: str | None = None
+    canonical_install_profile: str
+    adjacent_kernel_id: str
+    skill_count: int | None = None
+    skills: list[str] = Field(default_factory=list)
+    clusters: list[ProjectCoreOuterRingCluster] = Field(default_factory=list)
+
+
+class ProjectCoreOuterRingReadinessEntry(BaseModel):
+    skill_name: str
+    cluster_id: str
+    scope: str
+    status: str
+    invocation_mode: str
+    in_repo_core_only: bool
+    in_repo_project_core_outer_ring: bool
+    in_user_curated_core: bool
+    collision_family: str | None = None
+    readiness_passed: bool
+    blockers: list[str] = Field(default_factory=list)
+
+
+class ProjectCoreOuterRingReadinessSurface(BaseModel):
+    schema_version: int
+    source_config: str | None = None
+    ring_id: str
+    canonical_install_profile: str
+    repo_core_only_profile: str
+    user_curated_core_profile: str
+    skills: list[ProjectCoreOuterRingReadinessEntry] = Field(default_factory=list)
+
+
 class KernelNextStepBrief(BaseModel):
     kernel_id: str
     current_session_skill_names: list[str] = Field(default_factory=list)

@@ -14,6 +14,29 @@ def test_discover_and_disclose_skills(workspace_root: Path) -> None:
     assert "Verification" in disclosure.headings_available
 
 
+def test_project_core_outer_ring_reads(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    ring = sdk.skills.project_core_outer_ring()
+    readiness = sdk.skills.project_core_outer_ring_readiness()
+
+    assert ring.ring_id == "project-core-engineering-ring-v1"
+    assert ring.skills == [
+        "aoa-adr-write",
+        "aoa-source-of-truth-check",
+        "aoa-bounded-context-map",
+        "aoa-core-logic-boundary",
+        "aoa-port-adapter-refactor",
+        "aoa-change-protocol",
+        "aoa-tdd-slice",
+        "aoa-contract-test",
+        "aoa-property-invariants",
+        "aoa-invariant-coverage-audit",
+    ]
+    assert [entry.skill_name for entry in readiness] == ring.skills
+    assert all(entry.readiness_passed for entry in readiness)
+
+
 def test_activate_and_manage_session(workspace_root: Path, tmp_path: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     session_file = tmp_path / ".aoa" / "skill-runtime-session.json"
