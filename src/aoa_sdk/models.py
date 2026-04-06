@@ -830,6 +830,59 @@ class ProjectCoreOuterRingReadinessSurface(BaseModel):
     skills: list[ProjectCoreOuterRingReadinessEntry] = Field(default_factory=list)
 
 
+class ProjectRiskGuardRingCluster(BaseModel):
+    cluster_id: str
+    skill_count: int | None = None
+    skills: list[str] = Field(default_factory=list)
+
+
+class ProjectRiskGuardRingAdjacentOverlay(BaseModel):
+    base_skill_name: str
+    overlay_skill_name: str
+
+
+class ProjectRiskGuardRingSurface(BaseModel):
+    schema_version: int
+    source_config: str | None = None
+    ring_id: str
+    owner_repo: str
+    description: str | None = None
+    canonical_install_profile: str
+    backcompat_alias_profile: str
+    adjacent_kernel_id: str
+    adjacent_outer_ring_id: str
+    skill_count: int | None = None
+    skills: list[str] = Field(default_factory=list)
+    clusters: list[ProjectRiskGuardRingCluster] = Field(default_factory=list)
+    adjacent_overlays: list[ProjectRiskGuardRingAdjacentOverlay] = Field(default_factory=list)
+
+
+class ProjectRiskGuardRingGovernanceEntry(BaseModel):
+    skill_name: str
+    cluster_id: str
+    scope: str
+    status: str
+    invocation_mode: str
+    in_repo_project_risk_guard_ring: bool
+    in_repo_risk_explicit: bool
+    in_repo_default: bool
+    collision_family: str | None = None
+    adjacent_overlay_skill_name: str | None = None
+    adjacent_overlay_present: bool
+    governance_passed: bool
+    blockers: list[str] = Field(default_factory=list)
+
+
+class ProjectRiskGuardRingGovernanceSurface(BaseModel):
+    schema_version: int
+    source_config: str | None = None
+    ring_id: str
+    canonical_install_profile: str
+    backcompat_alias_profile: str
+    repo_default_profile: str
+    skills: list[ProjectRiskGuardRingGovernanceEntry] = Field(default_factory=list)
+
+
 class KernelNextStepBrief(BaseModel):
     kernel_id: str
     current_session_skill_names: list[str] = Field(default_factory=list)

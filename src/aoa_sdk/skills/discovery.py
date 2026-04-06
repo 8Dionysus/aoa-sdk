@@ -6,6 +6,9 @@ from typing import Literal
 from ..compatibility import load_surface
 from ..loaders import extract_records
 from ..models import (
+    ProjectRiskGuardRingGovernanceEntry,
+    ProjectRiskGuardRingGovernanceSurface,
+    ProjectRiskGuardRingSurface,
     ProjectCoreOuterRingReadinessEntry,
     ProjectCoreOuterRingReadinessSurface,
     ProjectCoreOuterRingSurface,
@@ -136,3 +139,12 @@ class SkillsAPI:
         data = load_surface(self.workspace, "aoa-skills.project_core_outer_ring_readiness.min")
         readiness = ProjectCoreOuterRingReadinessSurface.model_validate(data)
         return readiness.skills
+
+    def project_risk_guard_ring(self) -> ProjectRiskGuardRingSurface:
+        data = load_surface(self.workspace, "aoa-skills.project_risk_guard_ring.min")
+        return ProjectRiskGuardRingSurface.model_validate(data)
+
+    def project_risk_guard_ring_governance(self) -> list[ProjectRiskGuardRingGovernanceEntry]:
+        data = load_surface(self.workspace, "aoa-skills.project_risk_guard_ring_governance.min")
+        governance = ProjectRiskGuardRingGovernanceSurface.model_validate(data)
+        return governance.skills
