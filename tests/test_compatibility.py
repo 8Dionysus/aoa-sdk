@@ -39,6 +39,8 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-evals.runtime_candidate_template_index.min"].compatible is True
     assert report["aoa-evals.runtime_candidate_intake.min"].detected_version == 1
     assert report["aoa-evals.runtime_candidate_intake.min"].compatible is True
+    assert report["aoa-skills.project_core_skill_kernel.min"].detected_version == 1
+    assert report["aoa-skills.project_core_skill_kernel.min"].compatible is True
     assert report["aoa-kag.kag_registry.min"].detected_version == 1
     assert report["aoa-kag.federation_spine.min"].compatible is True
 

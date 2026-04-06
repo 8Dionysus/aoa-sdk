@@ -30,6 +30,7 @@ Use the shortest route by need:
 - reviewed session auto-closeout inbox: `docs/session-closeout.md`, `aoa closeout enqueue-current`, `aoa closeout status`, and `scripts/install_closeout_units.py`
 - reviewed session manifest assembly: `docs/session-closeout.md` and `aoa closeout build-manifest`
 - reviewed session request assembly from receipt bundles or audit-only reviewed artifacts: `docs/session-closeout.md` and `aoa closeout submit-reviewed`
+- kernel-aware next-step brief after reviewed closeout: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 
 ## What `aoa-sdk` owns
 
@@ -44,6 +45,7 @@ This repository is the source of truth for:
 - canonical manifest assembly from reviewed artifacts and receipt paths, with optional audit-only reviewed closeout when no owner-local receipts exist yet
 - canonical request assembly from reviewed artifacts plus receipt bundles before manifest/enqueue
 - separate closeout routing for skill-detail receipts and generic project-core kernel skill-application receipts
+- kernel-aware next-step brief generation based on `aoa-skills.project_core_skill_kernel.min` and refreshed `aoa-stats.core_skill_application_summary.min`
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own

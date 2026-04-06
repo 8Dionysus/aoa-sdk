@@ -27,6 +27,7 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert report["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
     assert report["aoa-playbooks.playbook_review_status.min"].compatible is True
     assert report["aoa-memo.checkpoint_to_memory_contract.example"].compatible is True
+    assert report["aoa-skills.project_core_skill_kernel.min"].compatible is True
     assert report["aoa-stats.object_summary.min"].compatible is True
     assert report["aoa-stats.core_skill_application_summary.min"].compatible is True
     assert report["aoa-stats.automation_pipeline_summary.min"].compatible is True

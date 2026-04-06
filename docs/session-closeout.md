@@ -24,6 +24,7 @@ reviewed session into:
 5. one canonical closeout manifest assembled from a reviewed artifact and ready receipt paths
 6. one canonical request assembled from a reviewed artifact and receipt bundle without hand-authoring JSON
 7. one explicit split between detail skill receipts and generic project-core kernel receipts so one receipt file never mixes publisher families
+8. one kernel-aware next-step brief in the closeout report after owner-local publication and stats refresh
 
 ## Boundary
 
@@ -32,6 +33,8 @@ reviewed session into:
 - It calls owner-owned publisher scripts instead of reimplementing their
   meaning in the SDK.
 - It refreshes `aoa-stats` after receipt publication.
+- It reads the canonical project-core kernel surface from `aoa-skills` and
+  writes one deterministic next-step brief into each non-audit closeout report.
 - It does not silently invoke Codex skill reasoning, rewrite proof meaning, or
   replace source-owned truth.
 
@@ -264,3 +267,18 @@ This makes the closeout step easy to automate from any outer session wrapper
 without hiding ownership inside the SDK itself: wrappers enqueue reviewed
 manifests, the inbox watcher processes them, and `aoa-stats` is refreshed only
 through the existing source-owned publisher spine.
+
+## Kernel-aware brief
+
+For non-audit closeouts, the SDK now adds `kernel_next_step_brief` to the JSON
+report and to the human CLI output of `aoa closeout run` and
+`aoa closeout process-inbox`.
+
+The brief stays bounded:
+
+- kernel order comes from `aoa-skills.project_core_skill_kernel.min`
+- current-session skill coverage comes from the current closeout receipt batch
+- usage counts come from refreshed `aoa-stats.core_skill_application_summary.min`
+
+This keeps the next-step suggestion subordinate to source-owned kernel and
+stats surfaces instead of hard-coding a second hidden router in the SDK.

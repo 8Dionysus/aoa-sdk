@@ -758,6 +758,48 @@ class StatsSummarySurface(BaseModel):
     derivation_rule: str
 
 
+class ProjectCoreKernelGovernanceContract(BaseModel):
+    core_receipt_kind: str
+    core_receipt_schema_ref: str
+    detail_publisher: str
+    core_publisher: str
+    stats_surface: str
+    application_stage: str
+
+
+class ProjectCoreKernelSkillContract(BaseModel):
+    skill_name: str
+    detail_event_kind: str
+    detail_receipt_schema_ref: str
+
+
+class ProjectCoreSkillKernelSurface(BaseModel):
+    schema_version: int
+    source_config: str | None = None
+    kernel_id: str
+    owner_repo: str
+    description: str | None = None
+    canonical_install_profile: str
+    backward_compatible_aliases: list[str] = Field(default_factory=list)
+    skill_count: int | None = None
+    skills: list[str] = Field(default_factory=list)
+    governance_contract: ProjectCoreKernelGovernanceContract
+    skill_contracts: list[ProjectCoreKernelSkillContract] = Field(default_factory=list)
+
+
+class KernelNextStepBrief(BaseModel):
+    kernel_id: str
+    current_session_skill_names: list[str] = Field(default_factory=list)
+    current_session_detail_event_kinds: list[str] = Field(default_factory=list)
+    missing_kernel_skill_names: list[str] = Field(default_factory=list)
+    kernel_usage_counts: dict[str, int] = Field(default_factory=dict)
+    suggested_action: Literal["invoke-core-skill", "shift-to-owner-layer", "hold"]
+    suggested_skill_name: str | None = None
+    suggested_owner_repo: str | None = None
+    reason: str
+    stats_surface_ref: str
+
+
 class CloseoutPublisherBatch(BaseModel):
     publisher: str
     input_paths: list[str] = Field(default_factory=list)
@@ -858,6 +900,7 @@ class CloseoutRunReport(BaseModel):
     notes: str | None = None
     publisher_runs: list[CloseoutPublisherRun] = Field(default_factory=list)
     stats_refresh: CloseoutStatsRefresh
+    kernel_next_step_brief: KernelNextStepBrief | None = None
 
 
 class CloseoutInboxItemResult(BaseModel):
@@ -868,6 +911,7 @@ class CloseoutInboxItemResult(BaseModel):
     closeout_id: str | None = None
     session_ref: str | None = None
     error: str | None = None
+    kernel_next_step_brief: KernelNextStepBrief | None = None
 
 
 class CloseoutInboxReport(BaseModel):

@@ -61,6 +61,7 @@ print(f"[skip] duplicate event ids skipped: {skipped}")
     refresh_script = """#!/usr/bin/env python3
 from __future__ import annotations
 import json
+from collections import defaultdict
 from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -88,6 +89,61 @@ if not receipts:
 feed_output.parent.mkdir(parents=True, exist_ok=True)
 summary_dir.mkdir(parents=True, exist_ok=True)
 feed_output.write_text(json.dumps(receipts, indent=2) + "\\n", encoding="utf-8")
+(core_summary := defaultdict(lambda: {
+    "application_count": 0,
+    "latest_observed_at": "",
+    "latest_session_ref": "",
+    "latest_run_ref": "",
+    "detail_event_kind_counts": defaultdict(int),
+}))  # type: ignore[call-arg]
+for receipt in receipts:
+    if receipt.get("event_kind") != "core_skill_application_receipt":
+        continue
+    payload = receipt.get("payload", {})
+    kernel_id = payload.get("kernel_id", "unknown-kernel")
+    skill_name = payload.get("skill_name", "unknown-skill")
+    detail_event_kind = payload.get("detail_event_kind", "unknown-detail-event")
+    key = (kernel_id, skill_name)
+    entry = core_summary[key]
+    entry["application_count"] += 1
+    entry["latest_observed_at"] = receipt["observed_at"]
+    entry["latest_session_ref"] = receipt["session_ref"]
+    entry["latest_run_ref"] = receipt["run_ref"]
+    entry["detail_event_kind_counts"][detail_event_kind] += 1
+(summary_dir / "core_skill_application_summary.min.json").write_text(
+    json.dumps(
+        {
+            "schema_version": "aoa_stats_core_skill_application_summary_v1",
+            "generated_from": {
+                "receipt_input_paths": [
+                    "aoa-skills/.aoa/live_receipts/session-harvest-family.jsonl",
+                    "aoa-skills/.aoa/live_receipts/core-skill-applications.jsonl",
+                    "aoa-evals/.aoa/live_receipts/eval-result-receipts.jsonl",
+                    "aoa-playbooks/.aoa/live_receipts/playbook-receipts.jsonl",
+                    "aoa-techniques/.aoa/live_receipts/technique-receipts.jsonl",
+                    "aoa-memo/.aoa/live_receipts/memo-writeback-receipts.jsonl",
+                ],
+                "total_receipts": len(receipts),
+                "latest_observed_at": receipts[-1]["observed_at"],
+            },
+            "skills": [
+                {
+                    "kernel_id": kernel_id,
+                    "skill_name": skill_name,
+                    "application_count": entry["application_count"],
+                    "latest_observed_at": entry["latest_observed_at"],
+                    "latest_session_ref": entry["latest_session_ref"],
+                    "latest_run_ref": entry["latest_run_ref"],
+                    "detail_event_kind_counts": dict(entry["detail_event_kind_counts"]),
+                }
+                for (kernel_id, skill_name), entry in sorted(core_summary.items())
+            ],
+        },
+        indent=2,
+    )
+    + "\\n",
+    encoding="utf-8",
+)
 (summary_dir / "summary_surface_catalog.min.json").write_text(
     json.dumps(
         {
@@ -148,6 +204,79 @@ print(f"[summaries] {summary_dir}")
         encoding="utf-8",
     )
     (stats_root / "scripts" / "refresh_live_stats.py").write_text(refresh_script, encoding="utf-8")
+
+    (skills_root / "generated").mkdir(parents=True, exist_ok=True)
+    (skills_root / "generated" / "project_core_skill_kernel.min.json").write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "source_config": "config/project_core_skill_kernel.json",
+                "kernel_id": "project-core-session-growth-v1",
+                "owner_repo": "aoa-skills",
+                "description": "Canonical project-core kernel for explicit reviewed session growth work.",
+                "canonical_install_profile": "repo-project-core-kernel",
+                "backward_compatible_aliases": ["repo-session-harvest-family"],
+                "skill_count": 7,
+                "skills": [
+                    "aoa-session-donor-harvest",
+                    "aoa-automation-opportunity-scan",
+                    "aoa-session-route-forks",
+                    "aoa-session-self-diagnose",
+                    "aoa-session-self-repair",
+                    "aoa-session-progression-lift",
+                    "aoa-quest-harvest",
+                ],
+                "governance_contract": {
+                    "core_receipt_kind": "core_skill_application_receipt",
+                    "core_receipt_schema_ref": "references/core-skill-application-receipt-schema.yaml",
+                    "detail_publisher": "aoa-skills.session-harvest-family",
+                    "core_publisher": "aoa-skills.core-kernel-applications",
+                    "stats_surface": "aoa-stats.core_skill_application_summary.min",
+                    "application_stage": "finish",
+                },
+                "skill_contracts": [
+                    {
+                        "skill_name": "aoa-session-donor-harvest",
+                        "detail_event_kind": "harvest_packet_receipt",
+                        "detail_receipt_schema_ref": "references/harvest-packet-receipt-schema.yaml",
+                    },
+                    {
+                        "skill_name": "aoa-automation-opportunity-scan",
+                        "detail_event_kind": "automation_candidate_receipt",
+                        "detail_receipt_schema_ref": "references/automation-candidate-receipt-schema.yaml",
+                    },
+                    {
+                        "skill_name": "aoa-session-route-forks",
+                        "detail_event_kind": "decision_fork_receipt",
+                        "detail_receipt_schema_ref": "references/decision-fork-receipt-schema.yaml",
+                    },
+                    {
+                        "skill_name": "aoa-session-self-diagnose",
+                        "detail_event_kind": "skill_run_receipt",
+                        "detail_receipt_schema_ref": "references/skill-run-receipt-schema.yaml",
+                    },
+                    {
+                        "skill_name": "aoa-session-self-repair",
+                        "detail_event_kind": "repair_cycle_receipt",
+                        "detail_receipt_schema_ref": "references/repair-cycle-receipt-schema.yaml",
+                    },
+                    {
+                        "skill_name": "aoa-session-progression-lift",
+                        "detail_event_kind": "progression_delta_receipt",
+                        "detail_receipt_schema_ref": "references/progression-delta-receipt-schema.yaml",
+                    },
+                    {
+                        "skill_name": "aoa-quest-harvest",
+                        "detail_event_kind": "quest_promotion_receipt",
+                        "detail_receipt_schema_ref": "references/quest-promotion-receipt-schema.yaml",
+                    },
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
     registry = {
         "schema_version": 1,
@@ -417,6 +546,10 @@ def test_closeout_api_run_publishes_receipts_and_refreshes_stats(workspace_root:
     assert report.publisher_runs[4].appended_count == 1
     assert report.publisher_runs[5].appended_count == 1
     assert report.stats_refresh.receipt_count == 6
+    assert report.kernel_next_step_brief is not None
+    assert report.kernel_next_step_brief.suggested_action == "invoke-core-skill"
+    assert report.kernel_next_step_brief.suggested_skill_name == "aoa-automation-opportunity-scan"
+    assert report.kernel_next_step_brief.kernel_usage_counts["aoa-session-donor-harvest"] == 1
     assert fixture["skill_log_path"].exists()
     assert fixture["core_skill_log_path"].exists()
     assert fixture["eval_log_path"].exists()
@@ -543,6 +676,87 @@ def test_closeout_api_run_audit_only_skips_stats_refresh(workspace_root: Path) -
     assert run_report.publisher_runs == []
     assert run_report.stats_refresh.command == []
     assert "audit-only closeout requested" in run_report.stats_refresh.stdout
+    assert run_report.kernel_next_step_brief is None
+
+
+def test_closeout_api_run_returns_shift_to_owner_layer_brief_for_quest_promotion(
+    workspace_root: Path,
+) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    receipts_dir = fixture["skill_receipt_path"].parent
+    manifest_dir = fixture["manifest_path"].parent
+
+    quest_receipt = {
+        "event_kind": "quest_promotion_receipt",
+        "event_id": "event-quest-001",
+        "observed_at": "2026-04-06T19:00:00Z",
+        "run_ref": "run-quest-001",
+        "session_ref": "session:test-closeout-quest",
+        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
+        "evidence_refs": ["tmp/QUEST_PROMOTION_TRIAGE.json"],
+        "payload": {
+            "promotion_verdict": "promote_to_playbook",
+            "owner_repo": "aoa-playbooks",
+            "next_surface": "playbooks/owner-first-capability-landing/PLAYBOOK.md",
+            "nearest_wrong_target": "promote_to_skill",
+        },
+    }
+    quest_core_receipt = {
+        "event_kind": "core_skill_application_receipt",
+        "event_id": "event-core-quest-001",
+        "observed_at": "2026-04-06T19:00:01Z",
+        "run_ref": "run-quest-001",
+        "session_ref": "session:test-closeout-quest",
+        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
+        "evidence_refs": ["tmp/QUEST_PROMOTION_RECEIPT.json"],
+        "payload": {
+            "kernel_id": "project-core-session-growth-v1",
+            "skill_name": "aoa-quest-harvest",
+            "application_stage": "finish",
+            "detail_event_kind": "quest_promotion_receipt",
+            "detail_receipt_ref": "tmp/QUEST_PROMOTION_RECEIPT.json",
+        },
+    }
+    quest_receipt_path = receipts_dir / "quest.json"
+    quest_core_receipt_path = receipts_dir / "quest-core.json"
+    quest_receipt_path.write_text(json.dumps(quest_receipt, indent=2) + "\n", encoding="utf-8")
+    quest_core_receipt_path.write_text(json.dumps(quest_core_receipt, indent=2) + "\n", encoding="utf-8")
+
+    quest_manifest_path = manifest_dir / "closeout-test-quest.json"
+    quest_manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "closeout_id": "closeout-test-quest",
+                "session_ref": "session:test-closeout-quest",
+                "reviewed": True,
+                "trigger": "reviewed-closeout",
+                "batches": [
+                    {
+                        "publisher": "aoa-skills.session-harvest-family",
+                        "input_paths": ["receipts/quest.json"],
+                    },
+                    {
+                        "publisher": "aoa-skills.core-kernel-applications",
+                        "input_paths": ["receipts/quest-core.json"],
+                    },
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    report = sdk.closeout.run(quest_manifest_path)
+
+    assert report.kernel_next_step_brief is not None
+    assert report.kernel_next_step_brief.suggested_action == "shift-to-owner-layer"
+    assert report.kernel_next_step_brief.suggested_skill_name is None
+    assert report.kernel_next_step_brief.suggested_owner_repo == "aoa-playbooks"
 
 
 def test_closeout_cli_process_inbox_archives_manifest_and_writes_report(workspace_root: Path) -> None:
@@ -559,6 +773,7 @@ def test_closeout_cli_process_inbox_archives_manifest_and_writes_report(workspac
     assert payload["processed_count"] == 1
     assert payload["failed_count"] == 0
     assert payload["items"][0]["status"] == "processed"
+    assert payload["items"][0]["kernel_next_step_brief"]["suggested_skill_name"] == "aoa-automation-opportunity-scan"
     assert fixture["processed_manifest_path"].exists()
     assert fixture["report_path"].exists()
 
