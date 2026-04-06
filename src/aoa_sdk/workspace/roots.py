@@ -7,6 +7,7 @@ KNOWN_REPOS = (
     "aoa-memo",
     "aoa-evals",
     "aoa-kag",
+    "aoa-stats",
     "aoa-techniques",
     "Agents-of-Abyss",
     "Tree-of-Sophia",
