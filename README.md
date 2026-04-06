@@ -13,6 +13,7 @@ Use the shortest route by need:
 - ownership and scope: `docs/boundaries.md`
 - workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
 - compatibility posture: `docs/versioning.md`
+- reviewed session closeout orchestration: `docs/session-closeout.md`
 - RPG typed consumer slice: `docs/RPG_SDK_ADDENDUM.md`, `docs/RPG_SURFACE_PATHS.md`, and `src/aoa_sdk/rpg/`
 - federation effects and obligations: `docs/ecosystem-impact.md`
 - seed blueprint and direction surface: `docs/blueprint.md`
@@ -25,6 +26,7 @@ Use the shortest route by need:
 - compatibility rules and local checks: `docs/versioning.md`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
 - local validation and workspace inspection: `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
+- reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 
 ## What `aoa-sdk` owns
 
@@ -34,6 +36,7 @@ This repository is the source of truth for:
 - workspace discovery and topology resolution
 - compatibility checks across consumed local surfaces
 - bounded activation, disclosure, and orchestration helpers
+- reviewed-session closeout helpers that publish owner-local receipts and refresh live stats
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own
@@ -108,6 +111,18 @@ Check consumed surface compatibility across the local workspace:
 ```bash
 aoa compatibility check /srv/aoa-sdk
 aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
+```
+
+Run one reviewed session closeout manifest:
+
+```bash
+aoa closeout run /srv/path/to/closeout.json --root /srv/aoa-sdk --json
+```
+
+Process the canonical closeout inbox:
+
+```bash
+aoa closeout process-inbox /srv/aoa-sdk --json
 ```
 
 Install for development:

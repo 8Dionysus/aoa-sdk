@@ -5,6 +5,7 @@ from typing import Any
 
 import typer
 
+from ..closeout import CloseoutAPI
 from ..compatibility import CompatibilityAPI
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
@@ -12,9 +13,11 @@ from ..workspace.roots import KNOWN_REPOS
 app = typer.Typer(help="AoA SDK CLI")
 workspace_app = typer.Typer(help="Inspect workspace topology")
 compatibility_app = typer.Typer(help="Inspect compatibility of consumed surfaces")
+closeout_app = typer.Typer(help="Run bounded reviewed-session closeout orchestration")
 
 app.add_typer(workspace_app, name="workspace")
 app.add_typer(compatibility_app, name="compatibility")
+app.add_typer(closeout_app, name="closeout")
 
 
 def _workspace_payload(workspace: Workspace) -> dict[str, Any]:
@@ -102,6 +105,87 @@ def compatibility_check(
             typer.echo(f"{status}: {check.surface_id} -> {check.reason}")
 
     if not payload["compatible"]:
+        raise typer.Exit(code=1)
+
+
+@closeout_app.command("run")
+def closeout_run(
+    manifest: str = typer.Argument(..., help="Path to the reviewed session closeout manifest."),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional JSON path where the closeout report should be written."
+    ),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    workspace = Workspace.discover(root)
+    closeout = CloseoutAPI(workspace)
+    report = closeout.run(manifest, report_output=report_output)
+    payload = report.model_dump(mode="json")
+
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+
+    typer.echo(f"closeout_id: {report.closeout_id}")
+    typer.echo(f"session_ref: {report.session_ref}")
+    typer.echo(f"manifest: {report.manifest_path}")
+    typer.echo(f"trigger: {report.trigger}")
+    typer.echo(f"reviewed: {report.reviewed}")
+    for item in report.publisher_runs:
+        typer.echo(
+            f"published: {item.publisher} -> {item.log_path} "
+            f"(appended={item.appended_count if item.appended_count is not None else 'unknown'}, "
+            f"skipped={item.duplicate_skip_count if item.duplicate_skip_count is not None else 'unknown'})"
+        )
+    if report.stats_refresh.cleared:
+        typer.echo(
+            f"stats: cleared live state across {report.stats_refresh.source_count or 'unknown'} sources"
+        )
+    else:
+        typer.echo(
+            f"stats: refreshed {report.stats_refresh.receipt_count or 'unknown'} receipts "
+            f"from {report.stats_refresh.source_count or 'unknown'} sources"
+        )
+    if report_output:
+        typer.echo(f"report: {report_output}")
+
+
+@closeout_app.command("process-inbox")
+def closeout_process_inbox(
+    root: str = typer.Argument(".", help="Workspace root used for federation discovery."),
+    inbox_dir: str | None = typer.Option(None, "--inbox-dir", help="Override the inbox directory."),
+    processed_dir: str | None = typer.Option(
+        None, "--processed-dir", help="Override the processed-manifest directory."
+    ),
+    failed_dir: str | None = typer.Option(None, "--failed-dir", help="Override the failed-manifest directory."),
+    report_dir: str | None = typer.Option(None, "--report-dir", help="Override the closeout report directory."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    workspace = Workspace.discover(root)
+    closeout = CloseoutAPI(workspace)
+    report = closeout.process_inbox(
+        inbox_dir=inbox_dir,
+        processed_dir=processed_dir,
+        failed_dir=failed_dir,
+        report_dir=report_dir,
+    )
+    payload = report.model_dump(mode="json")
+
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+    else:
+        typer.echo(f"inbox: {report.inbox_dir}")
+        typer.echo(f"processed: {report.processed_count}")
+        typer.echo(f"failed: {report.failed_count}")
+        for item in report.items:
+            summary = item.archived_manifest_path or item.manifest_path
+            typer.echo(f"{item.status}: {summary}")
+            if item.report_path:
+                typer.echo(f"  report: {item.report_path}")
+            if item.error:
+                typer.echo(f"  error: {item.error}")
+
+    if report.failed_count:
         raise typer.Exit(code=1)
 
 

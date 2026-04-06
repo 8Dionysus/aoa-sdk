@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 
 from .compatibility import CompatibilityAPI
+from .closeout import CloseoutAPI
 from .evals import EvalsAPI
 from .agents.phase_bindings import AgentsAPI
 from .governed_runs import GovernedRunsAPI
@@ -30,6 +31,7 @@ class AoASDK:
         self.kag = KagAPI(workspace)
         self.rpg = RpgAPI(workspace)
         self.governed_runs = GovernedRunsAPI(workspace)
+        self.closeout = CloseoutAPI(workspace)
 
     @classmethod
     def from_workspace(cls, root: str | Path) -> "AoASDK":

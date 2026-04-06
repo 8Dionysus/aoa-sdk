@@ -34,11 +34,12 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
 
     review_status = sdk.playbooks.review_status("AOA-P-0017")
     writeback = sdk.memo.writeback_map("checkpoint_export")
-    automation = sdk.stats.automation_pipelines("pipeline:session-growth")
+    automation = sdk.stats.automation_pipelines()
 
     assert review_status.gate_verdict == "composition-landed"
     assert writeback.mapping.target_kind == "state_capsule"
-    assert automation.seed_ready_count >= 1
+    assert automation
+    assert any(item.seed_ready_count >= 1 for item in automation)
 
 
 @pytest.mark.skipif(

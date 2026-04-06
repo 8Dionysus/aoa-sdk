@@ -746,3 +746,75 @@ class StatsSummarySurface(BaseModel):
     schema_ref: str
     primary_question: str
     derivation_rule: str
+
+
+class CloseoutPublisherBatch(BaseModel):
+    publisher: str
+    input_paths: list[str] = Field(default_factory=list)
+
+
+class CloseoutManifest(BaseModel):
+    schema_version: int
+    closeout_id: str
+    session_ref: str
+    reviewed: bool
+    trigger: str
+    batches: list[CloseoutPublisherBatch] = Field(default_factory=list)
+    audit_refs: list[str] = Field(default_factory=list)
+    notes: str | None = None
+
+
+class CloseoutPublisherRun(BaseModel):
+    publisher: str
+    repo: str
+    input_paths: list[str] = Field(default_factory=list)
+    log_path: str
+    command: list[str] = Field(default_factory=list)
+    appended_count: int | None = None
+    duplicate_skip_count: int | None = None
+    stdout: str = ""
+
+
+class CloseoutStatsRefresh(BaseModel):
+    command: list[str] = Field(default_factory=list)
+    source_count: int | None = None
+    receipt_count: int | None = None
+    cleared: bool = False
+    feed_output: str | None = None
+    summary_output_dir: str | None = None
+    stdout: str = ""
+
+
+class CloseoutRunReport(BaseModel):
+    schema_version: int
+    closeout_id: str
+    session_ref: str
+    manifest_path: str
+    processed_at: datetime
+    trigger: str
+    reviewed: bool
+    audit_refs: list[str] = Field(default_factory=list)
+    notes: str | None = None
+    publisher_runs: list[CloseoutPublisherRun] = Field(default_factory=list)
+    stats_refresh: CloseoutStatsRefresh
+
+
+class CloseoutInboxItemResult(BaseModel):
+    manifest_path: str
+    archived_manifest_path: str | None = None
+    report_path: str | None = None
+    status: Literal["processed", "failed"]
+    closeout_id: str | None = None
+    session_ref: str | None = None
+    error: str | None = None
+
+
+class CloseoutInboxReport(BaseModel):
+    schema_version: int
+    inbox_dir: str
+    processed_dir: str
+    failed_dir: str
+    report_dir: str
+    processed_count: int
+    failed_count: int
+    items: list[CloseoutInboxItemResult] = Field(default_factory=list)
