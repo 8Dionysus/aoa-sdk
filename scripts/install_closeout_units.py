@@ -82,7 +82,7 @@ def ensure_queue_dirs(*, root: Path) -> list[Path]:
     closeout = CloseoutAPI(workspace)
     queue_paths = closeout.default_queue_paths()
     ensured: list[Path] = []
-    for key in ("root", "inbox", "processed", "failed", "reports"):
+    for key in ("root", "requests", "manifests", "inbox", "processed", "failed", "reports"):
         path = queue_paths[key]
         path.mkdir(parents=True, exist_ok=True)
         ensured.append(path)

@@ -342,6 +342,11 @@ print(f"[summaries] {summary_dir}")
         "route_summary_path": route_summary_path,
         "built_manifest_path": manifest_dir / "closeout-build-001.json",
         "queue_manifest_path": queue_manifest_path,
+        "skill_receipt_path": skill_receipt_path,
+        "eval_receipt_path": eval_receipt_path,
+        "playbook_receipt_path": playbook_receipt_path,
+        "technique_receipt_path": technique_receipt_path,
+        "memo_receipt_path": memo_receipt_path,
         "skill_log_path": skills_root / ".aoa" / "live_receipts" / "session-harvest-family.jsonl",
         "eval_log_path": evals_root / ".aoa" / "live_receipts" / "eval-result-receipts.jsonl",
         "playbook_log_path": playbooks_root / ".aoa" / "live_receipts" / "playbook-receipts.jsonl",
@@ -418,6 +423,33 @@ def test_closeout_api_build_manifest_can_enqueue_built_manifest(workspace_root: 
     assert Path(report.enqueue_report.queued_manifest_path).exists()
 
 
+def test_closeout_api_submit_reviewed_builds_request_and_manifest(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.closeout.submit_reviewed(
+        fixture["reviewed_artifact_path"],
+        session_ref="session:test-submit-reviewed",
+        receipt_paths=[fixture["skill_receipt_path"], fixture["eval_receipt_path"]],
+        audit_refs=[fixture["route_summary_path"]],
+        closeout_id="closeout-submit-001",
+        enqueue=False,
+    )
+
+    request_path = Path(report.request_path)
+    request_payload = json.loads(request_path.read_text(encoding="utf-8"))
+    assert report.closeout_id == "closeout-submit-001"
+    assert report.detected_publishers == [
+        "aoa-evals.eval-result",
+        "aoa-skills.session-harvest-family",
+    ]
+    assert request_path == workspace_root / "aoa-sdk" / ".aoa" / "closeout" / "requests" / "closeout-submit-001.request.json"
+    assert request_payload["reviewed_artifact_path"] == str(fixture["reviewed_artifact_path"])
+    assert request_payload["audit_refs"] == [str(fixture["route_summary_path"])]
+    assert report.build_report.manifest_path.endswith(".aoa/closeout/manifests/closeout-submit-001.json")
+    assert report.build_report.enqueue_report is None
+
+
 def test_closeout_cli_process_inbox_archives_manifest_and_writes_report(workspace_root: Path) -> None:
     fixture = install_closeout_fixture(workspace_root)
     runner = CliRunner()
@@ -447,10 +479,14 @@ def test_closeout_cli_status_reports_queue_state(workspace_root: Path) -> None:
 
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
+    assert payload["request_count"] == 1
     assert payload["manifest_count"] == 1
     assert payload["pending_manifest_count"] == 1
     assert payload["processed_manifest_count"] == 0
     assert payload["failed_manifest_count"] == 0
     assert payload["report_count"] == 0
     assert payload["pending_manifest_paths"]
+    assert payload["latest_request_path"].endswith(
+        ".aoa/closeout/requests/closeout-build-001.request.json"
+    )
     assert payload["latest_manifest_path"].endswith(".aoa/closeout/manifests/closeout-test-001.json")

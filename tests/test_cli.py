@@ -124,3 +124,46 @@ def test_closeout_build_manifest_can_emit_json(workspace_root: Path) -> None:
         ".aoa/closeout/manifests/closeout-build-001.json"
     )
     assert payload["enqueue_report"]["queue_depth"] == 2
+
+
+def test_closeout_submit_reviewed_can_emit_json(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "closeout",
+            "submit-reviewed",
+            str(fixture["reviewed_artifact_path"]),
+            "--session-ref",
+            "session:test-submit-reviewed",
+            "--receipt-path",
+            str(fixture["skill_receipt_path"]),
+            "--receipt-path",
+            str(fixture["eval_receipt_path"]),
+            "--audit-ref",
+            str(fixture["route_summary_path"]),
+            "--closeout-id",
+            "closeout-submit-cli-001",
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--no-enqueue",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["closeout_id"] == "closeout-submit-cli-001"
+    assert payload["request_path"].endswith(
+        ".aoa/closeout/requests/closeout-submit-cli-001.request.json"
+    )
+    assert payload["detected_publishers"] == [
+        "aoa-evals.eval-result",
+        "aoa-skills.session-harvest-family",
+    ]
+    assert payload["build_report"]["manifest_path"].endswith(
+        ".aoa/closeout/manifests/closeout-submit-cli-001.json"
+    )
+    assert payload["build_report"]["enqueue_report"] is None
