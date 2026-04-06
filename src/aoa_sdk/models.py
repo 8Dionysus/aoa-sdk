@@ -45,6 +45,7 @@ class SurfaceCompatibilityRule(BaseModel):
     surface_id: str
     repo: str
     relative_path: str
+    preferred_relative_paths: list[str] = Field(default_factory=list)
     version_field: str | None = None
     supported_versions: list[int | str] = Field(default_factory=list)
     notes: str = ""
@@ -54,6 +55,7 @@ class SurfaceCompatibilityCheck(BaseModel):
     surface_id: str
     repo: str
     relative_path: str
+    resolved_relative_path: str | None = None
     exists: bool = True
     compatibility_mode: Literal["versioned", "unversioned"]
     version_field: str | None = None

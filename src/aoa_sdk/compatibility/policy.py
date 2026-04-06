@@ -279,6 +279,7 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-stats.object_summary.min",
         repo="aoa-stats",
         relative_path="generated/object_summary.min.json",
+        preferred_relative_paths=["state/generated/object_summary.min.json"],
         version_field="schema_version",
         supported_versions=["aoa_stats_object_summary_v1"],
     ),
@@ -286,6 +287,7 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-stats.repeated_window_summary.min",
         repo="aoa-stats",
         relative_path="generated/repeated_window_summary.min.json",
+        preferred_relative_paths=["state/generated/repeated_window_summary.min.json"],
         version_field="schema_version",
         supported_versions=["aoa_stats_repeated_window_summary_v1"],
     ),
@@ -293,6 +295,7 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-stats.route_progression_summary.min",
         repo="aoa-stats",
         relative_path="generated/route_progression_summary.min.json",
+        preferred_relative_paths=["state/generated/route_progression_summary.min.json"],
         version_field="schema_version",
         supported_versions=["aoa_stats_route_progression_summary_v1"],
     ),
@@ -300,6 +303,7 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-stats.fork_calibration_summary.min",
         repo="aoa-stats",
         relative_path="generated/fork_calibration_summary.min.json",
+        preferred_relative_paths=["state/generated/fork_calibration_summary.min.json"],
         version_field="schema_version",
         supported_versions=["aoa_stats_fork_calibration_summary_v1"],
     ),
@@ -307,6 +311,7 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-stats.automation_pipeline_summary.min",
         repo="aoa-stats",
         relative_path="generated/automation_pipeline_summary.min.json",
+        preferred_relative_paths=["state/generated/automation_pipeline_summary.min.json"],
         version_field="schema_version",
         supported_versions=["aoa_stats_automation_pipeline_summary_v1"],
     ),
@@ -314,6 +319,7 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-stats.summary_surface_catalog.min",
         repo="aoa-stats",
         relative_path="generated/summary_surface_catalog.min.json",
+        preferred_relative_paths=["state/generated/summary_surface_catalog.min.json"],
         version_field="schema_version",
         supported_versions=["aoa_stats_summary_surface_catalog_v1"],
     ),
@@ -394,15 +400,26 @@ def get_rule(surface_id: str) -> SurfaceCompatibilityRule:
     return SURFACE_COMPATIBILITY_RULES[surface_id]
 
 
+def _candidate_relative_paths(rule: SurfaceCompatibilityRule) -> list[str]:
+    candidates: list[str] = []
+    for relative_path in [*rule.preferred_relative_paths, rule.relative_path]:
+        if relative_path not in candidates:
+            candidates.append(relative_path)
+    return candidates
+
+
 def _evaluate_data(
     rule: SurfaceCompatibilityRule,
     data,
+    *,
+    resolved_relative_path: str,
 ) -> SurfaceCompatibilityCheck:
     if rule.version_field is None:
         return SurfaceCompatibilityCheck(
             surface_id=rule.surface_id,
             repo=rule.repo,
             relative_path=rule.relative_path,
+            resolved_relative_path=resolved_relative_path,
             compatibility_mode="unversioned",
             version_field=None,
             supported_versions=[],
@@ -415,6 +432,7 @@ def _evaluate_data(
             surface_id=rule.surface_id,
             repo=rule.repo,
             relative_path=rule.relative_path,
+            resolved_relative_path=resolved_relative_path,
             compatibility_mode="versioned",
             version_field=rule.version_field,
             supported_versions=rule.supported_versions,
@@ -427,6 +445,7 @@ def _evaluate_data(
             surface_id=rule.surface_id,
             repo=rule.repo,
             relative_path=rule.relative_path,
+            resolved_relative_path=resolved_relative_path,
             compatibility_mode="versioned",
             version_field=rule.version_field,
             supported_versions=rule.supported_versions,
@@ -445,6 +464,7 @@ def _evaluate_data(
         surface_id=rule.surface_id,
         repo=rule.repo,
         relative_path=rule.relative_path,
+        resolved_relative_path=resolved_relative_path,
         compatibility_mode="versioned",
         version_field=rule.version_field,
         supported_versions=rule.supported_versions,
@@ -456,13 +476,22 @@ def _evaluate_data(
 
 def load_surface(workspace: Workspace, surface_id: str):
     rule = get_rule(surface_id)
-    data = load_json(workspace.surface_path(rule.repo, rule.relative_path))
-    result = _evaluate_data(rule, data)
-    if not result.compatible:
-        raise IncompatibleSurfaceVersion(
-            f"Incompatible surface {surface_id}: {result.reason}"
-        )
-    return data
+    last_missing_error: Exception | None = None
+    for relative_path in _candidate_relative_paths(rule):
+        try:
+            data = load_json(workspace.surface_path(rule.repo, relative_path))
+        except (RepoNotFound, SurfaceNotFound) as exc:
+            last_missing_error = exc
+            continue
+        result = _evaluate_data(rule, data, resolved_relative_path=relative_path)
+        if not result.compatible:
+            raise IncompatibleSurfaceVersion(
+                f"Incompatible surface {surface_id}: {result.reason}"
+            )
+        return data
+    if last_missing_error is not None:
+        raise last_missing_error
+    raise SurfaceNotFound(f"Surface file is missing: {rule.repo}/{rule.relative_path}")
 
 
 class CompatibilityAPI:
@@ -474,22 +503,24 @@ class CompatibilityAPI:
 
     def check(self, surface_id: str) -> SurfaceCompatibilityCheck:
         rule = get_rule(surface_id)
-        try:
-            data = load_json(self.workspace.surface_path(rule.repo, rule.relative_path))
-        except (RepoNotFound, SurfaceNotFound):
-            return SurfaceCompatibilityCheck(
-                surface_id=rule.surface_id,
-                repo=rule.repo,
-                relative_path=rule.relative_path,
-                exists=False,
-                compatibility_mode="versioned" if rule.version_field else "unversioned",
-                version_field=rule.version_field,
-                supported_versions=rule.supported_versions,
-                compatible=False,
-                reason="Surface file is missing.",
-            )
+        for relative_path in _candidate_relative_paths(rule):
+            try:
+                data = load_json(self.workspace.surface_path(rule.repo, relative_path))
+            except (RepoNotFound, SurfaceNotFound):
+                continue
+            return _evaluate_data(rule, data, resolved_relative_path=relative_path)
 
-        return _evaluate_data(rule, data)
+        return SurfaceCompatibilityCheck(
+            surface_id=rule.surface_id,
+            repo=rule.repo,
+            relative_path=rule.relative_path,
+            exists=False,
+            compatibility_mode="versioned" if rule.version_field else "unversioned",
+            version_field=rule.version_field,
+            supported_versions=rule.supported_versions,
+            compatible=False,
+            reason="Surface file is missing.",
+        )
 
     def check_repo(self, repo: str) -> list[SurfaceCompatibilityCheck]:
         return [self.check(rule.surface_id) for rule in self.rules() if rule.repo == repo]
