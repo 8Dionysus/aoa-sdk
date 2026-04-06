@@ -20,6 +20,7 @@ reviewed session into:
 1. receipt publication into owner-local logs
 2. deterministic `aoa-stats` refresh
 3. one machine-readable closeout report and queueable audit trail
+4. one inbox file that can be auto-processed by a user-level path watcher
 
 ## Boundary
 
@@ -89,10 +90,22 @@ Run one manifest directly:
 aoa closeout run /srv/path/to/closeout.json --root /srv/aoa-sdk --json
 ```
 
+Queue one reviewed manifest into the canonical inbox:
+
+```bash
+aoa closeout enqueue-current /srv/path/to/closeout.json --root /srv/aoa-sdk --json
+```
+
 Process the canonical queue under `aoa-sdk/.aoa/closeout/`:
 
 ```bash
 aoa closeout process-inbox /srv/aoa-sdk --json
+```
+
+Inspect the queue state:
+
+```bash
+aoa closeout status /srv/aoa-sdk --json
 ```
 
 The queue layout is:
@@ -102,5 +115,18 @@ The queue layout is:
 - `.aoa/closeout/failed/`
 - `.aoa/closeout/reports/`
 
+Install the user-level inbox watcher when the machine should auto-process new
+reviewed manifests as soon as they land in the canonical inbox:
+
+```bash
+python /srv/aoa-sdk/scripts/install_closeout_units.py --overwrite --enable
+```
+
+The watcher uses `aoa-closeout-inbox.path` to watch
+`.aoa/closeout/inbox/*.json` and runs `aoa-closeout-inbox.service`, which calls
+the bounded inbox processor script under `scripts/process_closeout_inbox.py`.
+
 This makes the closeout step easy to automate from any outer session wrapper
-without hiding ownership inside the SDK itself.
+without hiding ownership inside the SDK itself: wrappers enqueue reviewed
+manifests, the inbox watcher processes them, and `aoa-stats` is refreshed only
+through the existing source-owned publisher spine.

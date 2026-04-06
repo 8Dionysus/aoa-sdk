@@ -343,6 +343,25 @@ def test_closeout_api_run_publishes_receipts_and_refreshes_stats(workspace_root:
     assert fixture["summary_catalog_path"].exists()
 
 
+def test_closeout_api_enqueue_rewrites_relative_inputs_for_inbox_processing(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.closeout.enqueue(fixture["manifest_path"])
+
+    queued_manifest_path = Path(report.queued_manifest_path)
+    queued_manifest = json.loads(queued_manifest_path.read_text(encoding="utf-8"))
+    assert report.closeout_id == "closeout-test-001"
+    assert report.queue_depth == 2
+    assert queued_manifest_path.parent == workspace_root / "aoa-sdk" / ".aoa" / "closeout" / "inbox"
+    assert all(Path(item).is_absolute() for item in queued_manifest["audit_refs"])
+    assert all(
+        Path(item).is_absolute()
+        for batch in queued_manifest["batches"]
+        for item in batch["input_paths"]
+    )
+
+
 def test_closeout_cli_process_inbox_archives_manifest_and_writes_report(workspace_root: Path) -> None:
     fixture = install_closeout_fixture(workspace_root)
     runner = CliRunner()
@@ -359,3 +378,21 @@ def test_closeout_cli_process_inbox_archives_manifest_and_writes_report(workspac
     assert payload["items"][0]["status"] == "processed"
     assert fixture["processed_manifest_path"].exists()
     assert fixture["report_path"].exists()
+
+
+def test_closeout_cli_status_reports_queue_state(workspace_root: Path) -> None:
+    install_closeout_fixture(workspace_root)
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        ["closeout", "status", str(workspace_root / "aoa-sdk"), "--json"],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["pending_manifest_count"] == 1
+    assert payload["processed_manifest_count"] == 0
+    assert payload["failed_manifest_count"] == 0
+    assert payload["report_count"] == 0
+    assert payload["pending_manifest_paths"]

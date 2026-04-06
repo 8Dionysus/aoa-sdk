@@ -1,0 +1,7 @@
+[Unit]
+Description=Process aoa-sdk reviewed session closeout inbox
+
+[Service]
+Type=oneshot
+WorkingDirectory=/srv/aoa-sdk
+ExecStart=/usr/bin/env python3 /srv/aoa-sdk/scripts/process_closeout_inbox.py --root /srv/aoa-sdk --json

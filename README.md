@@ -27,6 +27,7 @@ Use the shortest route by need:
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
 - local validation and workspace inspection: `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
+- reviewed session auto-closeout inbox: `docs/session-closeout.md`, `aoa closeout enqueue-current`, `aoa closeout status`, and `scripts/install_closeout_units.py`
 
 ## What `aoa-sdk` owns
 
@@ -37,6 +38,7 @@ This repository is the source of truth for:
 - compatibility checks across consumed local surfaces
 - bounded activation, disclosure, and orchestration helpers
 - reviewed-session closeout helpers that publish owner-local receipts and refresh live stats
+- reviewed-session inbox automation that stays subordinate to reviewed manifests and owner-owned publishers
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own
@@ -123,6 +125,14 @@ Process the canonical closeout inbox:
 
 ```bash
 aoa closeout process-inbox /srv/aoa-sdk --json
+```
+
+Queue one reviewed closeout manifest for automatic inbox processing:
+
+```bash
+aoa closeout enqueue-current /srv/path/to/closeout.json --root /srv/aoa-sdk --json
+aoa closeout status /srv/aoa-sdk --json
+python scripts/install_closeout_units.py --overwrite --enable
 ```
 
 Install for development:

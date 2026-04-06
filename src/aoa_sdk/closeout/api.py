@@ -10,11 +10,13 @@ import sys
 
 from ..loaders import load_json, write_json
 from ..models import (
+    CloseoutEnqueueReport,
     CloseoutInboxItemResult,
     CloseoutInboxReport,
     CloseoutManifest,
     CloseoutPublisherRun,
     CloseoutRunReport,
+    CloseoutStatusReport,
     CloseoutStatsRefresh,
 )
 from ..workspace.discovery import Workspace
@@ -118,6 +120,62 @@ class CloseoutAPI:
             write_json(Path(report_output).expanduser().resolve(), report.model_dump(mode="json"))
         return report
 
+    def enqueue(
+        self,
+        manifest_path: str | Path,
+        *,
+        inbox_dir: str | Path | None = None,
+        overwrite: bool = False,
+    ) -> CloseoutEnqueueReport:
+        resolved_manifest_path = Path(manifest_path).expanduser().resolve()
+        manifest = self.load_manifest(resolved_manifest_path)
+        if not manifest.reviewed:
+            raise ValueError("session closeout manifests must set reviewed=true before queueing")
+
+        inbox = self._resolve_queue_dir(inbox_dir, leaf="inbox")
+        inbox.mkdir(parents=True, exist_ok=True)
+        queued_manifest_path = inbox / f"{self._safe_closeout_filename(manifest.closeout_id)}.json"
+        overwritten = False
+        if queued_manifest_path.exists():
+            if not overwrite and queued_manifest_path.resolve() != resolved_manifest_path:
+                raise FileExistsError(
+                    f"{queued_manifest_path} already exists; rerun with overwrite=True to replace it"
+                )
+            overwritten = queued_manifest_path.resolve() != resolved_manifest_path
+
+        queued_manifest = manifest.model_copy(
+            update={
+                "audit_refs": self._resolve_optional_paths(
+                    resolved_manifest_path, manifest.audit_refs
+                ),
+                "batches": [
+                    batch.model_copy(
+                        update={
+                            "input_paths": [
+                                str(path)
+                                for path in self._resolve_input_paths(
+                                    resolved_manifest_path, batch.input_paths
+                                )
+                            ]
+                        }
+                    )
+                    for batch in manifest.batches
+                ],
+            }
+        )
+        write_json(queued_manifest_path, queued_manifest.model_dump(mode="json"))
+        queue_depth = len(list(inbox.glob("*.json")))
+        return CloseoutEnqueueReport(
+            schema_version=1,
+            closeout_id=manifest.closeout_id,
+            session_ref=manifest.session_ref,
+            source_manifest_path=str(resolved_manifest_path),
+            queued_manifest_path=str(queued_manifest_path),
+            enqueued_at=datetime.now(timezone.utc),
+            queue_depth=queue_depth,
+            overwritten=overwritten,
+        )
+
     def process_inbox(
         self,
         *,
@@ -180,6 +238,43 @@ class CloseoutAPI:
             items=items,
         )
 
+    def status(
+        self,
+        *,
+        inbox_dir: str | Path | None = None,
+        processed_dir: str | Path | None = None,
+        failed_dir: str | Path | None = None,
+        report_dir: str | Path | None = None,
+    ) -> CloseoutStatusReport:
+        queue_paths = {
+            "root": self.default_closeout_root(),
+            "inbox": self._resolve_queue_dir(inbox_dir, leaf="inbox"),
+            "processed": self._resolve_queue_dir(processed_dir, leaf="processed"),
+            "failed": self._resolve_queue_dir(failed_dir, leaf="failed"),
+            "reports": self._resolve_queue_dir(report_dir, leaf="reports"),
+        }
+        pending_manifests = sorted(queue_paths["inbox"].glob("*.json"))
+        processed_manifests = sorted(queue_paths["processed"].glob("*.json"))
+        failed_manifests = sorted(queue_paths["failed"].glob("*.json"))
+        reports = sorted(queue_paths["reports"].glob("*.json"))
+
+        return CloseoutStatusReport(
+            schema_version=1,
+            root_dir=str(queue_paths["root"]),
+            inbox_dir=str(queue_paths["inbox"]),
+            processed_dir=str(queue_paths["processed"]),
+            failed_dir=str(queue_paths["failed"]),
+            report_dir=str(queue_paths["reports"]),
+            pending_manifest_count=len(pending_manifests),
+            processed_manifest_count=len(processed_manifests),
+            failed_manifest_count=len(failed_manifests),
+            report_count=len(reports),
+            pending_manifest_paths=[str(path) for path in pending_manifests],
+            latest_report_path=self._latest_path(reports),
+            latest_processed_manifest_path=self._latest_path(processed_manifests),
+            latest_failed_manifest_path=self._latest_path(failed_manifests),
+        )
+
     def default_closeout_root(self) -> Path:
         return self.workspace.repo_path("aoa-sdk") / ".aoa" / "closeout"
 
@@ -226,6 +321,17 @@ class CloseoutAPI:
             if not path.exists():
                 raise FileNotFoundError(f"missing closeout input: {path}")
             resolved.append(path)
+        return resolved
+
+    def _resolve_optional_paths(self, manifest_path: Path, input_paths: list[str]) -> list[str]:
+        resolved: list[str] = []
+        for item in input_paths:
+            path = Path(item).expanduser()
+            if not path.is_absolute():
+                path = (manifest_path.parent / path).resolve()
+            else:
+                path = path.resolve()
+            resolved.append(str(path))
         return resolved
 
     def _run_publisher_batch(
@@ -323,3 +429,13 @@ class CloseoutAPI:
                 counter += 1
         shutil.move(str(manifest_path), str(candidate))
         return candidate
+
+    def _latest_path(self, paths: list[Path]) -> str | None:
+        if not paths:
+            return None
+        latest = max(paths, key=lambda path: path.stat().st_mtime)
+        return str(latest)
+
+    def _safe_closeout_filename(self, closeout_id: str) -> str:
+        safe = re.sub(r"[^A-Za-z0-9._-]+", "-", closeout_id).strip("-")
+        return safe or "closeout"
