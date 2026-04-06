@@ -131,13 +131,16 @@ def closeout_run(
     typer.echo(f"manifest: {report.manifest_path}")
     typer.echo(f"trigger: {report.trigger}")
     typer.echo(f"reviewed: {report.reviewed}")
+    typer.echo(f"audit_only: {report.audit_only}")
     for item in report.publisher_runs:
         typer.echo(
             f"published: {item.publisher} -> {item.log_path} "
             f"(appended={item.appended_count if item.appended_count is not None else 'unknown'}, "
             f"skipped={item.duplicate_skip_count if item.duplicate_skip_count is not None else 'unknown'})"
         )
-    if report.stats_refresh.cleared:
+    if not report.stats_refresh.command:
+        typer.echo(report.stats_refresh.stdout or "stats: skipped")
+    elif report.stats_refresh.cleared:
         typer.echo(
             f"stats: cleared live state across {report.stats_refresh.source_count or 'unknown'} sources"
         )
@@ -186,6 +189,7 @@ def closeout_build_manifest(
     typer.echo(f"request: {report.request_path}")
     typer.echo(f"manifest: {report.manifest_path}")
     typer.echo(f"reviewed_artifact: {report.reviewed_artifact_path}")
+    typer.echo(f"audit_only: {report.audit_only}")
     if report.enqueue_report is not None:
         typer.echo(f"queued_manifest: {report.enqueue_report.queued_manifest_path}")
         typer.echo(f"queue_depth: {report.enqueue_report.queue_depth}")
@@ -222,6 +226,11 @@ def closeout_submit_reviewed(
     enqueue: bool = typer.Option(
         True, "--enqueue/--no-enqueue", help="Immediately enqueue the built manifest into the canonical inbox."
     ),
+    allow_empty: bool = typer.Option(
+        False,
+        "--allow-empty",
+        help="Allow audit-only reviewed closeout submission when the outer wrapper has no owner-local receipt bundle yet.",
+    ),
     overwrite: bool = typer.Option(
         False, "--overwrite", help="Replace an existing request, built manifest, or queued manifest with the same id."
     ),
@@ -243,6 +252,7 @@ def closeout_submit_reviewed(
         inbox_dir=inbox_dir,
         enqueue=enqueue,
         overwrite=overwrite,
+        allow_empty=allow_empty,
     )
     payload = report.model_dump(mode="json")
 
@@ -254,6 +264,7 @@ def closeout_submit_reviewed(
     typer.echo(f"session_ref: {report.session_ref}")
     typer.echo(f"request: {report.request_path}")
     typer.echo(f"reviewed_artifact: {report.reviewed_artifact_path}")
+    typer.echo(f"audit_only: {report.audit_only}")
     typer.echo(f"receipt_count: {len(report.receipt_paths)}")
     typer.echo(f"publishers: {', '.join(report.detected_publishers)}")
     typer.echo(f"manifest: {report.build_report.manifest_path}")

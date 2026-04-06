@@ -450,6 +450,51 @@ def test_closeout_api_submit_reviewed_builds_request_and_manifest(workspace_root
     assert report.build_report.enqueue_report is None
 
 
+def test_closeout_api_submit_reviewed_can_build_audit_only_closeout(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.closeout.submit_reviewed(
+        fixture["reviewed_artifact_path"],
+        session_ref="session:test-audit-only",
+        audit_refs=[fixture["route_summary_path"]],
+        closeout_id="closeout-audit-only-001",
+        enqueue=False,
+        allow_empty=True,
+    )
+
+    request_path = Path(report.request_path)
+    request_payload = json.loads(request_path.read_text(encoding="utf-8"))
+    manifest_payload = json.loads(Path(report.build_report.manifest_path).read_text(encoding="utf-8"))
+    assert report.audit_only is True
+    assert report.receipt_paths == []
+    assert report.detected_publishers == []
+    assert request_payload["audit_only"] is True
+    assert request_payload["batches"] == []
+    assert manifest_payload["audit_only"] is True
+    assert manifest_payload["batches"] == []
+
+
+def test_closeout_api_run_audit_only_skips_stats_refresh(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.closeout.submit_reviewed(
+        fixture["reviewed_artifact_path"],
+        session_ref="session:test-audit-only-run",
+        audit_refs=[fixture["route_summary_path"]],
+        closeout_id="closeout-audit-only-run-001",
+        enqueue=False,
+        allow_empty=True,
+    )
+    run_report = sdk.closeout.run(report.build_report.manifest_path)
+
+    assert run_report.audit_only is True
+    assert run_report.publisher_runs == []
+    assert run_report.stats_refresh.command == []
+    assert "audit-only closeout requested" in run_report.stats_refresh.stdout
+
+
 def test_closeout_cli_process_inbox_archives_manifest_and_writes_report(workspace_root: Path) -> None:
     fixture = install_closeout_fixture(workspace_root)
     runner = CliRunner()
