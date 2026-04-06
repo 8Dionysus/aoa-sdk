@@ -43,6 +43,12 @@ PUBLISHER_SPECS = {
         script_relative_path="scripts/publish_live_receipts.py",
         default_log_relative_path=".aoa/live_receipts/session-harvest-family.jsonl",
     ),
+    "aoa-skills.core-kernel-applications": PublisherSpec(
+        publisher="aoa-skills.core-kernel-applications",
+        repo="aoa-skills",
+        script_relative_path="scripts/publish_core_skill_receipts.py",
+        default_log_relative_path=".aoa/live_receipts/core-skill-applications.jsonl",
+    ),
     "aoa-evals.eval-result": PublisherSpec(
         publisher="aoa-evals.eval-result",
         repo="aoa-evals",
@@ -79,6 +85,7 @@ PUBLISHER_EVENT_KINDS = {
         "repair_cycle_receipt",
         "skill_run_receipt",
     },
+    "aoa-skills.core-kernel-applications": {"core_skill_application_receipt"},
     "aoa-evals.eval-result": {"eval_result_receipt"},
     "aoa-playbooks.reviewed-run": {
         "playbook_publication_receipt",

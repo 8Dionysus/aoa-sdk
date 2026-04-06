@@ -43,6 +43,7 @@ This repository is the source of truth for:
 - reviewed-session inbox automation that stays subordinate to reviewed manifests and owner-owned publishers
 - canonical manifest assembly from reviewed artifacts and receipt paths, with optional audit-only reviewed closeout when no owner-local receipts exist yet
 - canonical request assembly from reviewed artifacts plus receipt bundles before manifest/enqueue
+- separate closeout routing for skill-detail receipts and generic project-core kernel skill-application receipts
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own

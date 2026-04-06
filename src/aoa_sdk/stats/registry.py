@@ -6,6 +6,7 @@ from ..compatibility import load_surface
 from ..errors import RecordNotFound
 from ..models import (
     StatsAutomationPipeline,
+    StatsCoreSkillApplication,
     StatsForkCalibration,
     StatsGeneratedFrom,
     StatsObjectSummaryEntry,
@@ -38,6 +39,19 @@ class StatsAPI:
             entries = [entry for entry in entries if entry.object_ref.kind == kind]
         if object_id is not None:
             entries = [entry for entry in entries if entry.object_ref.id == object_id]
+        return entries
+
+    def core_skill_applications(
+        self,
+        *,
+        kernel_id: str | None = None,
+        skill_name: str | None = None,
+    ) -> builtin_list[StatsCoreSkillApplication]:
+        entries = self._core_skill_application_entries()
+        if kernel_id is not None:
+            entries = [entry for entry in entries if entry.kernel_id == kernel_id]
+        if skill_name is not None:
+            entries = [entry for entry in entries if entry.skill_name == skill_name]
         return entries
 
     def repeated_windows(
@@ -96,6 +110,10 @@ class StatsAPI:
     def _object_summary_entries(self) -> builtin_list[StatsObjectSummaryEntry]:
         data = load_surface(self.workspace, "aoa-stats.object_summary.min")
         return [StatsObjectSummaryEntry.model_validate(item) for item in data.get("objects", [])]
+
+    def _core_skill_application_entries(self) -> builtin_list[StatsCoreSkillApplication]:
+        data = load_surface(self.workspace, "aoa-stats.core_skill_application_summary.min")
+        return [StatsCoreSkillApplication.model_validate(item) for item in data.get("skills", [])]
 
     def _repeated_window_entries(self) -> builtin_list[StatsRepeatedWindow]:
         data = load_surface(self.workspace, "aoa-stats.repeated_window_summary.min")

@@ -141,6 +141,8 @@ def test_closeout_submit_reviewed_can_emit_json(workspace_root: Path) -> None:
             "--receipt-path",
             str(fixture["skill_receipt_path"]),
             "--receipt-path",
+            str(fixture["core_skill_receipt_path"]),
+            "--receipt-path",
             str(fixture["eval_receipt_path"]),
             "--audit-ref",
             str(fixture["route_summary_path"]),
@@ -161,6 +163,7 @@ def test_closeout_submit_reviewed_can_emit_json(workspace_root: Path) -> None:
     )
     assert payload["detected_publishers"] == [
         "aoa-evals.eval-result",
+        "aoa-skills.core-kernel-applications",
         "aoa-skills.session-harvest-family",
     ]
     assert payload["build_report"]["manifest_path"].endswith(
