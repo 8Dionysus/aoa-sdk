@@ -14,6 +14,7 @@ from .rpg import RpgAPI
 from .routing.picker import RoutingAPI
 from .skills.discovery import SkillsAPI
 from .stats import StatsAPI
+from .techniques import TechniquesAPI
 from .workspace.discovery import Workspace
 
 
@@ -26,6 +27,7 @@ class AoASDK:
         self.agents = AgentsAPI(workspace)
         self.playbooks = PlaybooksAPI(workspace)
         self.memo = MemoAPI(workspace)
+        self.techniques = TechniquesAPI(workspace)
         self.evals = EvalsAPI(workspace)
         self.stats = StatsAPI(workspace)
         self.kag = KagAPI(workspace)

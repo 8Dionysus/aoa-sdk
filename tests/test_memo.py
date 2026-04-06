@@ -22,6 +22,8 @@ def test_memo_local_read_path(workspace_root: Path) -> None:
     writeback_target = sdk.memo.writeback_target("distillation_claim_candidate")
     writeback_intake_entries = sdk.memo.writeback_intake()
     writeback_intake_target = sdk.memo.writeback_intake("distillation_claim_candidate")
+    writeback_governance_entries = sdk.memo.writeback_governance()
+    writeback_governance_target = sdk.memo.writeback_governance("distillation_claim_candidate")
 
     assert doctrine.id == "AOA-M-0001"
     assert capsule.name == "charter"
@@ -41,3 +43,7 @@ def test_memo_local_read_path(workspace_root: Path) -> None:
     assert writeback_intake_target.target_kind == "claim"
     assert writeback_intake_target.intake_posture == "review_candidate_only"
     assert "docs/QUEST_EVIDENCE_WRITEBACK.md" in writeback_intake_target.owner_review_refs
+    assert writeback_governance_entries[0].runtime_surface == "approval_record"
+    assert writeback_governance_target.writeback_class == "reviewed_candidate"
+    assert writeback_governance_target.intake_posture == "review_candidate_only"
+    assert writeback_governance_target.governance_passed is True

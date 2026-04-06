@@ -27,12 +27,18 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-playbooks.playbook_review_packet_contracts.min"].compatible is True
     assert report["aoa-playbooks.playbook_review_intake.min"].detected_version == 1
     assert report["aoa-playbooks.playbook_review_intake.min"].compatible is True
+    assert report["aoa-playbooks.playbook_landing_governance.min"].detected_version == 1
+    assert report["aoa-playbooks.playbook_landing_governance.min"].compatible is True
     assert report["aoa-memo.checkpoint_to_memory_contract.example"].compatibility_mode == "unversioned"
     assert report["aoa-memo.checkpoint_to_memory_contract.example"].compatible is True
     assert report["aoa-memo.runtime_writeback_targets.min"].detected_version == 1
     assert report["aoa-memo.runtime_writeback_targets.min"].compatible is True
     assert report["aoa-memo.runtime_writeback_intake.min"].detected_version == 1
     assert report["aoa-memo.runtime_writeback_intake.min"].compatible is True
+    assert report["aoa-memo.runtime_writeback_governance.min"].detected_version == 1
+    assert report["aoa-memo.runtime_writeback_governance.min"].compatible is True
+    assert report["aoa-techniques.technique_promotion_readiness.min"].detected_version == 1
+    assert report["aoa-techniques.technique_promotion_readiness.min"].compatible is True
     assert report["aoa-evals.eval_catalog.min"].detected_version == 1
     assert report["aoa-evals.eval_catalog.min"].compatible is True
     assert report["aoa-evals.runtime_candidate_template_index.min"].detected_version == 1
@@ -97,12 +103,13 @@ def test_routing_action_surfaces_are_compatibility_checked(workspace_root: Path)
     assert routed_surface_ids.issubset(available_rule_ids)
 
 
-def test_repo_filtered_compatibility_covers_playbook_and_kag_surfaces(workspace_root: Path) -> None:
+def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surfaces(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     playbook_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-playbooks")}
     kag_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-kag")}
     memo_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-memo")}
+    technique_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-techniques")}
 
     assert playbook_checks["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
     assert playbook_checks["aoa-playbooks.playbook_automation_seeds"].detected_version == 1
@@ -110,12 +117,17 @@ def test_repo_filtered_compatibility_covers_playbook_and_kag_surfaces(workspace_
     assert playbook_checks["aoa-playbooks.playbook_review_status.min"].detected_version == 1
     assert playbook_checks["aoa-playbooks.playbook_review_packet_contracts.min"].detected_version == 1
     assert playbook_checks["aoa-playbooks.playbook_review_intake.min"].detected_version == 1
+    assert playbook_checks["aoa-playbooks.playbook_landing_governance.min"].detected_version == 1
     assert memo_checks["aoa-memo.checkpoint_to_memory_contract.example"].compatible is True
     assert memo_checks["aoa-memo.runtime_writeback_targets.min"].detected_version == 1
     assert memo_checks["aoa-memo.runtime_writeback_intake.min"].detected_version == 1
     assert memo_checks["aoa-memo.runtime_writeback_intake.min"].compatible is True
+    assert memo_checks["aoa-memo.runtime_writeback_governance.min"].detected_version == 1
+    assert memo_checks["aoa-memo.runtime_writeback_governance.min"].compatible is True
     eval_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-evals")}
     assert eval_checks["aoa-evals.runtime_candidate_intake.min"].detected_version == 1
     assert eval_checks["aoa-evals.runtime_candidate_intake.min"].compatible is True
+    assert technique_checks["aoa-techniques.technique_promotion_readiness.min"].detected_version == 1
+    assert technique_checks["aoa-techniques.technique_promotion_readiness.min"].compatible is True
     assert kag_checks["aoa-kag.kag_registry.min"].detected_version == 1
     assert kag_checks["aoa-kag.tos_zarathustra_route_retrieval_pack.min"].compatible is True
