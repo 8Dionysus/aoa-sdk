@@ -5,7 +5,15 @@ from typing import Literal
 
 from ..compatibility import load_surface
 from ..loaders import extract_records
-from ..models import SkillActivationRequest, SkillCard, SkillDisclosure, SkillSession
+from ..models import (
+    ProjectCoreOuterRingReadinessEntry,
+    ProjectCoreOuterRingReadinessSurface,
+    ProjectCoreOuterRingSurface,
+    SkillActivationRequest,
+    SkillCard,
+    SkillDisclosure,
+    SkillSession,
+)
 from ..workspace.discovery import Workspace
 from .activation import activate_skill
 from .disclosure import disclose_skill
@@ -119,3 +127,12 @@ class SkillsAPI:
 
     def compact(self, session_file: str) -> dict:
         return compact_session(load_session(self.workspace, session_file))
+
+    def project_core_outer_ring(self) -> ProjectCoreOuterRingSurface:
+        data = load_surface(self.workspace, "aoa-skills.project_core_outer_ring.min")
+        return ProjectCoreOuterRingSurface.model_validate(data)
+
+    def project_core_outer_ring_readiness(self) -> list[ProjectCoreOuterRingReadinessEntry]:
+        data = load_surface(self.workspace, "aoa-skills.project_core_outer_ring_readiness.min")
+        readiness = ProjectCoreOuterRingReadinessSurface.model_validate(data)
+        return readiness.skills
