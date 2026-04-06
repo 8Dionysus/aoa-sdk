@@ -29,6 +29,7 @@ Use the shortest route by need:
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - reviewed session auto-closeout inbox: `docs/session-closeout.md`, `aoa closeout enqueue-current`, `aoa closeout status`, and `scripts/install_closeout_units.py`
 - reviewed session manifest assembly: `docs/session-closeout.md` and `aoa closeout build-manifest`
+- reviewed session request assembly from receipt bundles: `docs/session-closeout.md` and `aoa closeout submit-reviewed`
 
 ## What `aoa-sdk` owns
 
@@ -41,6 +42,7 @@ This repository is the source of truth for:
 - reviewed-session closeout helpers that publish owner-local receipts and refresh live stats
 - reviewed-session inbox automation that stays subordinate to reviewed manifests and owner-owned publishers
 - canonical manifest assembly from reviewed artifacts and receipt paths without hand-authoring final closeout JSON
+- canonical request assembly from reviewed artifacts plus receipt bundles before manifest/enqueue
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own
@@ -132,6 +134,7 @@ aoa closeout process-inbox /srv/aoa-sdk --json
 Queue one reviewed closeout manifest for automatic inbox processing:
 
 ```bash
+aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md --session-ref session:2026-04-06-session-growth --receipt-dir /srv/path/to/receipts --root /srv/aoa-sdk --json
 aoa closeout build-manifest /srv/path/to/closeout.request.json --root /srv/aoa-sdk --enqueue --json
 aoa closeout enqueue-current /srv/path/to/closeout.json --root /srv/aoa-sdk --json
 aoa closeout status /srv/aoa-sdk --json

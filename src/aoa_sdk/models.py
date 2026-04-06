@@ -787,6 +787,18 @@ class CloseoutBuildReport(BaseModel):
     enqueue_report: CloseoutEnqueueReport | None = None
 
 
+class CloseoutSubmitReviewedReport(BaseModel):
+    schema_version: int
+    closeout_id: str
+    session_ref: str
+    request_path: str
+    submitted_at: datetime
+    reviewed_artifact_path: str
+    receipt_paths: list[str] = Field(default_factory=list)
+    detected_publishers: list[str] = Field(default_factory=list)
+    build_report: CloseoutBuildReport
+
+
 class CloseoutEnqueueReport(BaseModel):
     schema_version: int
     closeout_id: str
@@ -857,17 +869,20 @@ class CloseoutInboxReport(BaseModel):
 class CloseoutStatusReport(BaseModel):
     schema_version: int
     root_dir: str
+    request_dir: str
     manifest_dir: str
     inbox_dir: str
     processed_dir: str
     failed_dir: str
     report_dir: str
+    request_count: int
     manifest_count: int
     pending_manifest_count: int
     processed_manifest_count: int
     failed_manifest_count: int
     report_count: int
     pending_manifest_paths: list[str] = Field(default_factory=list)
+    latest_request_path: str | None = None
     latest_manifest_path: str | None = None
     latest_report_path: str | None = None
     latest_processed_manifest_path: str | None = None

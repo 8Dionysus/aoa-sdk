@@ -1,7 +1,9 @@
 from __future__ import annotations
 
+from collections.abc import Sequence
 from dataclasses import dataclass
 from datetime import datetime, timezone
+import json
 from pathlib import Path
 import re
 import shutil
@@ -16,10 +18,12 @@ from ..models import (
     CloseoutInboxItemResult,
     CloseoutInboxReport,
     CloseoutManifest,
+    CloseoutPublisherBatch,
     CloseoutPublisherRun,
     CloseoutRunReport,
     CloseoutStatusReport,
     CloseoutStatsRefresh,
+    CloseoutSubmitReviewedReport,
 )
 from ..workspace.discovery import Workspace
 
@@ -65,6 +69,33 @@ PUBLISHER_SPECS = {
     ),
 }
 
+PUBLISHER_EVENT_KINDS = {
+    "aoa-skills.session-harvest-family": {
+        "automation_candidate_receipt",
+        "decision_fork_receipt",
+        "harvest_packet_receipt",
+        "progression_delta_receipt",
+        "quest_promotion_receipt",
+        "repair_cycle_receipt",
+        "skill_run_receipt",
+    },
+    "aoa-evals.eval-result": {"eval_result_receipt"},
+    "aoa-playbooks.reviewed-run": {
+        "playbook_publication_receipt",
+        "playbook_review_harvest_receipt",
+    },
+    "aoa-techniques.promotion": {
+        "technique_promotion_receipt",
+        "technique_publication_receipt",
+    },
+    "aoa-memo.writeback": {"memo_writeback_receipt"},
+}
+EVENT_KIND_TO_PUBLISHER = {
+    event_kind: publisher
+    for publisher, event_kinds in PUBLISHER_EVENT_KINDS.items()
+    for event_kind in event_kinds
+}
+
 PUBLISH_RESULT_RE = re.compile(
     r"\[ok\] appended (?P<appended>\d+) .*?\n\[skip\] duplicate event ids skipped: (?P<skipped>\d+)",
     re.DOTALL,
@@ -88,6 +119,88 @@ class CloseoutAPI:
         request = CloseoutBuildRequest.model_validate(load_json(path))
         self._validate_build_request(request)
         return request
+
+    def submit_reviewed(
+        self,
+        reviewed_artifact_path: str | Path,
+        *,
+        session_ref: str,
+        receipt_paths: Sequence[str | Path] | None = None,
+        receipt_dirs: Sequence[str | Path] | None = None,
+        closeout_id: str | None = None,
+        audit_refs: Sequence[str | Path] | None = None,
+        trigger: str = "reviewed-closeout",
+        notes: str | None = None,
+        request_dir: str | Path | None = None,
+        manifest_dir: str | Path | None = None,
+        inbox_dir: str | Path | None = None,
+        enqueue: bool = True,
+        overwrite: bool = False,
+    ) -> CloseoutSubmitReviewedReport:
+        reviewed_artifact = Path(reviewed_artifact_path).expanduser().resolve()
+        if not reviewed_artifact.exists():
+            raise FileNotFoundError(f"missing reviewed artifact: {reviewed_artifact}")
+
+        resolved_receipt_paths = self._collect_receipt_paths(
+            receipt_paths=receipt_paths or [],
+            receipt_dirs=receipt_dirs or [],
+        )
+        if not resolved_receipt_paths:
+            raise ValueError("submit-reviewed requires at least one receipt file")
+
+        batches_by_publisher: dict[str, list[str]] = {}
+        for receipt_path in resolved_receipt_paths:
+            publisher = self._publisher_for_receipt_path(receipt_path)
+            batches_by_publisher.setdefault(publisher, []).append(str(receipt_path))
+
+        resolved_closeout_id = closeout_id or self._derive_closeout_id(session_ref)
+        resolved_request_dir = self._resolve_queue_dir(request_dir, leaf="requests")
+        resolved_request_dir.mkdir(parents=True, exist_ok=True)
+        request_path = resolved_request_dir / f"{self._safe_closeout_filename(resolved_closeout_id)}.request.json"
+        if request_path.exists() and not overwrite:
+            raise FileExistsError(
+                f"{request_path} already exists; rerun with overwrite=True to replace it"
+            )
+
+        build_request = CloseoutBuildRequest(
+            schema_version=1,
+            closeout_id=resolved_closeout_id,
+            session_ref=session_ref,
+            reviewed=True,
+            reviewed_artifact_path=str(reviewed_artifact),
+            trigger=trigger,
+            batches=[
+                CloseoutPublisherBatch(
+                    publisher=publisher,
+                    input_paths=paths,
+                )
+                for publisher, paths in sorted(batches_by_publisher.items())
+            ],
+            audit_refs=[
+                str(self._resolve_existing_path(reviewed_artifact, str(path)))
+                for path in (audit_refs or [])
+            ],
+            notes=notes,
+        )
+        write_json(request_path, build_request.model_dump(mode="json"))
+        build_report = self.build_manifest(
+            request_path,
+            manifest_dir=manifest_dir,
+            enqueue=enqueue,
+            inbox_dir=inbox_dir,
+            overwrite=overwrite,
+        )
+        return CloseoutSubmitReviewedReport(
+            schema_version=1,
+            closeout_id=resolved_closeout_id,
+            session_ref=session_ref,
+            request_path=str(request_path),
+            submitted_at=datetime.now(timezone.utc),
+            reviewed_artifact_path=str(reviewed_artifact),
+            receipt_paths=[str(path) for path in resolved_receipt_paths],
+            detected_publishers=sorted(batches_by_publisher),
+            build_report=build_report,
+        )
 
     def load_manifest(self, manifest_path: str | Path) -> CloseoutManifest:
         path = Path(manifest_path).expanduser().resolve()
@@ -325,6 +438,7 @@ class CloseoutAPI:
     def status(
         self,
         *,
+        request_dir: str | Path | None = None,
         manifest_dir: str | Path | None = None,
         inbox_dir: str | Path | None = None,
         processed_dir: str | Path | None = None,
@@ -333,12 +447,14 @@ class CloseoutAPI:
     ) -> CloseoutStatusReport:
         queue_paths = {
             "root": self.default_closeout_root(),
+            "requests": self._resolve_queue_dir(request_dir, leaf="requests"),
             "manifests": self._resolve_queue_dir(manifest_dir, leaf="manifests"),
             "inbox": self._resolve_queue_dir(inbox_dir, leaf="inbox"),
             "processed": self._resolve_queue_dir(processed_dir, leaf="processed"),
             "failed": self._resolve_queue_dir(failed_dir, leaf="failed"),
             "reports": self._resolve_queue_dir(report_dir, leaf="reports"),
         }
+        requests = sorted(queue_paths["requests"].glob("*.json"))
         manifests = sorted(queue_paths["manifests"].glob("*.json"))
         pending_manifests = sorted(queue_paths["inbox"].glob("*.json"))
         processed_manifests = sorted(queue_paths["processed"].glob("*.json"))
@@ -348,17 +464,20 @@ class CloseoutAPI:
         return CloseoutStatusReport(
             schema_version=1,
             root_dir=str(queue_paths["root"]),
+            request_dir=str(queue_paths["requests"]),
             manifest_dir=str(queue_paths["manifests"]),
             inbox_dir=str(queue_paths["inbox"]),
             processed_dir=str(queue_paths["processed"]),
             failed_dir=str(queue_paths["failed"]),
             report_dir=str(queue_paths["reports"]),
+            request_count=len(requests),
             manifest_count=len(manifests),
             pending_manifest_count=len(pending_manifests),
             processed_manifest_count=len(processed_manifests),
             failed_manifest_count=len(failed_manifests),
             report_count=len(reports),
             pending_manifest_paths=[str(path) for path in pending_manifests],
+            latest_request_path=self._latest_path(requests),
             latest_manifest_path=self._latest_path(manifests),
             latest_report_path=self._latest_path(reports),
             latest_processed_manifest_path=self._latest_path(processed_manifests),
@@ -372,6 +491,7 @@ class CloseoutAPI:
         root = self.default_closeout_root()
         return {
             "root": root,
+            "requests": root / "requests",
             "manifests": root / "manifests",
             "inbox": root / "inbox",
             "processed": root / "processed",
@@ -431,6 +551,74 @@ class CloseoutAPI:
         if not path.exists():
             raise FileNotFoundError(f"missing closeout input: {path}")
         return path
+
+    def _collect_receipt_paths(
+        self,
+        *,
+        receipt_paths: Sequence[str | Path],
+        receipt_dirs: Sequence[str | Path],
+    ) -> list[Path]:
+        collected: list[Path] = []
+        for item in receipt_paths:
+            path = Path(item).expanduser().resolve()
+            if not path.exists():
+                raise FileNotFoundError(f"missing closeout input: {path}")
+            if not path.is_file():
+                raise ValueError(f"receipt path must be a file: {path}")
+            collected.append(path)
+        for item in receipt_dirs:
+            directory = Path(item).expanduser().resolve()
+            if not directory.exists():
+                raise FileNotFoundError(f"missing closeout receipt directory: {directory}")
+            if not directory.is_dir():
+                raise ValueError(f"receipt directory must be a directory: {directory}")
+            for candidate in sorted(directory.iterdir()):
+                if candidate.is_file() and candidate.suffix in {".json", ".jsonl"}:
+                    collected.append(candidate)
+        return self._unique_paths(collected)
+
+    def _publisher_for_receipt_path(self, receipt_path: Path) -> str:
+        publisher: str | None = None
+        for receipt in self._load_receipt_file(receipt_path):
+            event_kind = receipt.get("event_kind")
+            if not isinstance(event_kind, str) or not event_kind:
+                raise ValueError(f"{receipt_path}: receipt is missing a non-empty event_kind")
+            detected = EVENT_KIND_TO_PUBLISHER.get(event_kind)
+            if detected is None:
+                raise ValueError(f"{receipt_path}: unsupported closeout receipt kind {event_kind!r}")
+            if publisher is None:
+                publisher = detected
+                continue
+            if publisher != detected:
+                raise ValueError(
+                    f"{receipt_path}: mixed publisher families are not supported in one receipt file"
+                )
+        if publisher is None:
+            raise ValueError(f"{receipt_path}: receipt file does not contain any receipts")
+        return publisher
+
+    def _load_receipt_file(self, path: Path) -> list[dict[str, object]]:
+        receipts: list[dict[str, object]] = []
+        if path.suffix == ".jsonl":
+            for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+                line = raw_line.strip()
+                if not line:
+                    continue
+                item = json.loads(line)
+                if not isinstance(item, dict):
+                    raise ValueError(f"{path}:{line_number}: receipt must be an object")
+                receipts.append(item)
+            return receipts
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            return [payload]
+        if not isinstance(payload, list):
+            raise ValueError(f"{path}: receipt payload must be an object or list")
+        for index, item in enumerate(payload):
+            if not isinstance(item, dict):
+                raise ValueError(f"{path}[{index}]: receipt must be an object")
+            receipts.append(item)
+        return receipts
 
     def _resolve_input_paths(self, manifest_path: Path, input_paths: list[str]) -> list[Path]:
         resolved: list[Path] = []
@@ -564,3 +752,17 @@ class CloseoutAPI:
             seen.add(item)
             unique.append(item)
         return unique
+
+    def _unique_paths(self, items: list[Path]) -> list[Path]:
+        seen: set[str] = set()
+        unique: list[Path] = []
+        for item in items:
+            key = str(item)
+            if key in seen:
+                continue
+            seen.add(key)
+            unique.append(item)
+        return unique
+
+    def _derive_closeout_id(self, session_ref: str) -> str:
+        return f"closeout-{self._safe_closeout_filename(session_ref)}"

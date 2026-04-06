@@ -22,6 +22,7 @@ reviewed session into:
 3. one machine-readable closeout report and queueable audit trail
 4. one inbox file that can be auto-processed by a user-level path watcher
 5. one canonical closeout manifest assembled from a reviewed artifact and ready receipt paths
+6. one canonical request assembled from a reviewed artifact and receipt bundle without hand-authoring JSON
 
 ## Boundary
 
@@ -122,6 +123,30 @@ artifact into `audit_refs`, writes the resulting manifest under
 `.aoa/closeout/manifests/`, and can immediately enqueue it for automatic inbox
 processing.
 
+## Reviewed submission flow
+
+When the outer session layer already has a reviewed artifact plus emitted owner
+receipts, the highest-level control-plane entrypoint is:
+
+```bash
+aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md \
+  --session-ref session:2026-04-06-session-growth \
+  --receipt-dir /srv/path/to/receipts \
+  --audit-ref /srv/path/to/route_summary.md \
+  --root /srv/aoa-sdk \
+  --json
+```
+
+`submit-reviewed` does four bounded things:
+
+1. validates the reviewed artifact exists
+2. groups receipt files by owner-local publisher using explicit receipt `event_kind`
+3. writes a canonical request under `.aoa/closeout/requests/`
+4. builds the manifest and, by default, enqueues it for the existing inbox watcher
+
+This keeps the control plane explicit without forcing outer wrappers to
+hand-author request or manifest JSON.
+
 ## Commands
 
 Run one manifest directly:
@@ -145,6 +170,16 @@ aoa closeout build-manifest /srv/path/to/closeout.request.json \
   --json
 ```
 
+Submit one reviewed artifact plus receipt bundle directly:
+
+```bash
+aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md \
+  --session-ref session:2026-04-06-session-growth \
+  --receipt-dir /srv/path/to/receipts \
+  --root /srv/aoa-sdk \
+  --json
+```
+
 Process the canonical queue under `aoa-sdk/.aoa/closeout/`:
 
 ```bash
@@ -163,6 +198,10 @@ The queue layout is:
 - `.aoa/closeout/processed/`
 - `.aoa/closeout/failed/`
 - `.aoa/closeout/reports/`
+
+`aoa closeout status` now discloses both request and manifest surfaces so an
+operator can tell whether the seam is failing before or after manifest
+assembly.
 
 Install the user-level inbox watcher when the machine should auto-process new
 reviewed manifests as soon as they land in the canonical inbox:

@@ -191,6 +191,77 @@ def closeout_build_manifest(
         typer.echo(f"queue_depth: {report.enqueue_report.queue_depth}")
 
 
+@closeout_app.command("submit-reviewed")
+def closeout_submit_reviewed(
+    reviewed_artifact: str = typer.Argument(..., help="Path to the reviewed session artifact."),
+    session_ref: str = typer.Option(..., "--session-ref", help="Canonical session_ref for the reviewed session."),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    receipt_paths: list[str] = typer.Option(
+        None,
+        "--receipt-path",
+        help="Receipt JSON or JSONL file to include in the closeout request. Repeat for multiple files.",
+    ),
+    receipt_dirs: list[str] = typer.Option(
+        None,
+        "--receipt-dir",
+        help="Directory scanned for receipt JSON or JSONL files. Repeat for multiple directories.",
+    ),
+    closeout_id: str | None = typer.Option(None, "--closeout-id", help="Optional explicit closeout id."),
+    audit_refs: list[str] = typer.Option(
+        None,
+        "--audit-ref",
+        help="Extra reviewed audit artifact that should be carried into the closeout request.",
+    ),
+    trigger: str = typer.Option("reviewed-closeout", "--trigger", help="Closeout trigger label."),
+    notes: str | None = typer.Option(None, "--notes", help="Optional closeout notes."),
+    request_dir: str | None = typer.Option(None, "--request-dir", help="Override the canonical request directory."),
+    manifest_dir: str | None = typer.Option(
+        None, "--manifest-dir", help="Override the canonical built-manifest directory."
+    ),
+    inbox_dir: str | None = typer.Option(None, "--inbox-dir", help="Override the canonical inbox directory."),
+    enqueue: bool = typer.Option(
+        True, "--enqueue/--no-enqueue", help="Immediately enqueue the built manifest into the canonical inbox."
+    ),
+    overwrite: bool = typer.Option(
+        False, "--overwrite", help="Replace an existing request, built manifest, or queued manifest with the same id."
+    ),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    workspace = Workspace.discover(root)
+    closeout = CloseoutAPI(workspace)
+    report = closeout.submit_reviewed(
+        reviewed_artifact,
+        session_ref=session_ref,
+        receipt_paths=receipt_paths or [],
+        receipt_dirs=receipt_dirs or [],
+        closeout_id=closeout_id,
+        audit_refs=audit_refs or [],
+        trigger=trigger,
+        notes=notes,
+        request_dir=request_dir,
+        manifest_dir=manifest_dir,
+        inbox_dir=inbox_dir,
+        enqueue=enqueue,
+        overwrite=overwrite,
+    )
+    payload = report.model_dump(mode="json")
+
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+
+    typer.echo(f"closeout_id: {report.closeout_id}")
+    typer.echo(f"session_ref: {report.session_ref}")
+    typer.echo(f"request: {report.request_path}")
+    typer.echo(f"reviewed_artifact: {report.reviewed_artifact_path}")
+    typer.echo(f"receipt_count: {len(report.receipt_paths)}")
+    typer.echo(f"publishers: {', '.join(report.detected_publishers)}")
+    typer.echo(f"manifest: {report.build_report.manifest_path}")
+    if report.build_report.enqueue_report is not None:
+        typer.echo(f"queued_manifest: {report.build_report.enqueue_report.queued_manifest_path}")
+        typer.echo(f"queue_depth: {report.build_report.enqueue_report.queue_depth}")
+
+
 @closeout_app.command("enqueue-current")
 def closeout_enqueue_current(
     manifest: str = typer.Argument(..., help="Path to the reviewed closeout manifest to queue."),
@@ -260,6 +331,7 @@ def closeout_process_inbox(
 @closeout_app.command("status")
 def closeout_status(
     root: str = typer.Argument(".", help="Workspace root used for federation discovery."),
+    request_dir: str | None = typer.Option(None, "--request-dir", help="Override the request directory."),
     manifest_dir: str | None = typer.Option(None, "--manifest-dir", help="Override the built-manifest directory."),
     inbox_dir: str | None = typer.Option(None, "--inbox-dir", help="Override the inbox directory."),
     processed_dir: str | None = typer.Option(
@@ -272,6 +344,7 @@ def closeout_status(
     workspace = Workspace.discover(root)
     closeout = CloseoutAPI(workspace)
     report = closeout.status(
+        request_dir=request_dir,
         manifest_dir=manifest_dir,
         inbox_dir=inbox_dir,
         processed_dir=processed_dir,
@@ -285,13 +358,17 @@ def closeout_status(
         return
 
     typer.echo(f"root: {report.root_dir}")
+    typer.echo(f"requests: {report.request_dir}")
     typer.echo(f"manifests: {report.manifest_dir}")
     typer.echo(f"inbox: {report.inbox_dir}")
+    typer.echo(f"review_requests: {report.request_count}")
     typer.echo(f"built_manifests: {report.manifest_count}")
     typer.echo(f"pending: {report.pending_manifest_count}")
     typer.echo(f"processed: {report.processed_manifest_count}")
     typer.echo(f"failed: {report.failed_manifest_count}")
     typer.echo(f"reports: {report.report_count}")
+    if report.latest_request_path:
+        typer.echo(f"latest_request: {report.latest_request_path}")
     if report.latest_manifest_path:
         typer.echo(f"latest_manifest: {report.latest_manifest_path}")
     if report.latest_report_path:
