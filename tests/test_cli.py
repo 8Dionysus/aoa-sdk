@@ -202,3 +202,42 @@ def test_closeout_submit_reviewed_allow_empty_can_emit_json(workspace_root: Path
     assert payload["audit_only"] is True
     assert payload["receipt_paths"] == []
     assert payload["detected_publishers"] == []
+
+
+def test_closeout_run_prints_kernel_next_brief(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "closeout",
+            "run",
+            str(fixture["manifest_path"]),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "kernel_next:" in result.stdout
+    assert "action: invoke-core-skill" in result.stdout
+    assert "skill: aoa-automation-opportunity-scan" in result.stdout
+
+
+def test_closeout_process_inbox_prints_kernel_next_brief(workspace_root: Path) -> None:
+    install_closeout_fixture(workspace_root)
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "closeout",
+            "process-inbox",
+            str(workspace_root / "aoa-sdk"),
+        ],
+    )
+
+    assert result.exit_code == 0
+    assert "kernel_next:" in result.stdout
+    assert "skill: aoa-automation-opportunity-scan" in result.stdout

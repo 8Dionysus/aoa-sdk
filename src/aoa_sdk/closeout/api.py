@@ -9,7 +9,9 @@ import re
 import shutil
 import subprocess
 import sys
+from typing import Any, Literal
 
+from ..compatibility import load_surface
 from ..loaders import load_json, write_json
 from ..models import (
     CloseoutBuildReport,
@@ -24,6 +26,8 @@ from ..models import (
     CloseoutStatusReport,
     CloseoutStatsRefresh,
     CloseoutSubmitReviewedReport,
+    KernelNextStepBrief,
+    ProjectCoreSkillKernelSurface,
 )
 from ..workspace.discovery import Workspace
 
@@ -319,6 +323,14 @@ class CloseoutAPI:
             if manifest.audit_only
             else self._run_stats_refresh()
         )
+        kernel_next_step_brief = (
+            None
+            if manifest.audit_only
+            else self._build_kernel_next_step_brief(
+                manifest_path=resolved_manifest_path,
+                manifest=manifest,
+            )
+        )
         report = CloseoutRunReport(
             schema_version=1,
             closeout_id=manifest.closeout_id,
@@ -332,6 +344,7 @@ class CloseoutAPI:
             notes=manifest.notes,
             publisher_runs=publisher_runs,
             stats_refresh=stats_refresh,
+            kernel_next_step_brief=kernel_next_step_brief,
         )
         if report_output is not None:
             write_json(Path(report_output).expanduser().resolve(), report.model_dump(mode="json"))
@@ -428,6 +441,7 @@ class CloseoutAPI:
                         status="processed",
                         closeout_id=report.closeout_id,
                         session_ref=report.session_ref,
+                        kernel_next_step_brief=report.kernel_next_step_brief,
                     )
                 )
                 processed_count += 1
@@ -705,6 +719,58 @@ class CloseoutAPI:
             stdout=completed,
         )
 
+    def _build_kernel_next_step_brief(
+        self,
+        *,
+        manifest_path: Path,
+        manifest: CloseoutManifest,
+    ) -> KernelNextStepBrief:
+        kernel = ProjectCoreSkillKernelSurface.model_validate(
+            load_surface(self.workspace, "aoa-skills.project_core_skill_kernel.min")
+        )
+        detail_receipts, core_receipts = self._load_kernel_receipt_batches(
+            manifest_path=manifest_path,
+            manifest=manifest,
+            kernel=kernel,
+        )
+        current_detail_event_kinds = self._collect_current_detail_event_kinds(
+            detail_receipts=detail_receipts,
+            core_receipts=core_receipts,
+        )
+        current_session_skill_names = self._collect_current_session_skill_names(
+            kernel=kernel,
+            detail_receipts=detail_receipts,
+            core_receipts=core_receipts,
+        )
+        kernel_usage_counts = self._load_kernel_usage_counts(
+            kernel_id=kernel.kernel_id,
+            kernel_skills=kernel.skills,
+        )
+        missing_kernel_skill_names = [
+            skill_name
+            for skill_name in kernel.skills
+            if skill_name not in set(current_session_skill_names)
+        ]
+        suggested_action, suggested_skill_name, suggested_owner_repo, reason = self._resolve_kernel_next_step(
+            kernel=kernel,
+            detail_receipts=detail_receipts,
+            current_session_skill_names=current_session_skill_names,
+            current_detail_event_kinds=current_detail_event_kinds,
+            missing_kernel_skill_names=missing_kernel_skill_names,
+        )
+        return KernelNextStepBrief(
+            kernel_id=kernel.kernel_id,
+            current_session_skill_names=current_session_skill_names,
+            current_session_detail_event_kinds=current_detail_event_kinds,
+            missing_kernel_skill_names=missing_kernel_skill_names,
+            kernel_usage_counts=kernel_usage_counts,
+            suggested_action=suggested_action,
+            suggested_skill_name=suggested_skill_name,
+            suggested_owner_repo=suggested_owner_repo,
+            reason=reason,
+            stats_surface_ref=kernel.governance_contract.stats_surface,
+        )
+
     def _skipped_stats_refresh(self, reason: str) -> CloseoutStatsRefresh:
         return CloseoutStatsRefresh(
             command=[],
@@ -750,6 +816,224 @@ class CloseoutAPI:
         if match is None:
             return None
         return match.group("path").strip()
+
+    def _load_kernel_receipt_batches(
+        self,
+        *,
+        manifest_path: Path,
+        manifest: CloseoutManifest,
+        kernel: ProjectCoreSkillKernelSurface,
+    ) -> tuple[list[dict[str, Any]], list[dict[str, Any]]]:
+        detail_receipts: list[dict[str, Any]] = []
+        core_receipts: list[dict[str, Any]] = []
+        for batch in manifest.batches:
+            resolved_paths = self._resolve_input_paths(manifest_path, batch.input_paths)
+            loaded_receipts: list[dict[str, Any]] = []
+            for path in resolved_paths:
+                loaded_receipts.extend(self._load_receipt_file(path))
+            if batch.publisher == kernel.governance_contract.detail_publisher:
+                detail_receipts.extend(loaded_receipts)
+            elif batch.publisher == kernel.governance_contract.core_publisher:
+                core_receipts.extend(loaded_receipts)
+        return detail_receipts, core_receipts
+
+    def _collect_current_detail_event_kinds(
+        self,
+        *,
+        detail_receipts: list[dict[str, Any]],
+        core_receipts: list[dict[str, Any]],
+    ) -> list[str]:
+        event_kinds: list[str] = []
+        for receipt in detail_receipts:
+            event_kind = receipt.get("event_kind")
+            if isinstance(event_kind, str) and event_kind and event_kind not in event_kinds:
+                event_kinds.append(event_kind)
+        for receipt in core_receipts:
+            payload = receipt.get("payload")
+            detail_event_kind = payload.get("detail_event_kind") if isinstance(payload, dict) else None
+            if (
+                isinstance(detail_event_kind, str)
+                and detail_event_kind
+                and detail_event_kind not in event_kinds
+            ):
+                event_kinds.append(detail_event_kind)
+        return event_kinds
+
+    def _collect_current_session_skill_names(
+        self,
+        *,
+        kernel: ProjectCoreSkillKernelSurface,
+        detail_receipts: list[dict[str, Any]],
+        core_receipts: list[dict[str, Any]],
+    ) -> list[str]:
+        skill_contracts = {item.skill_name: item for item in kernel.skill_contracts}
+        detail_event_to_skill = {
+            item.detail_event_kind: item.skill_name for item in kernel.skill_contracts
+        }
+        detected_skill_names: set[str] = set()
+
+        for receipt in core_receipts:
+            payload = receipt.get("payload")
+            skill_name = payload.get("skill_name") if isinstance(payload, dict) else None
+            if isinstance(skill_name, str) and skill_name in skill_contracts:
+                detected_skill_names.add(skill_name)
+
+        for receipt in detail_receipts:
+            event_kind = receipt.get("event_kind")
+            if isinstance(event_kind, str) and event_kind in detail_event_to_skill:
+                detected_skill_names.add(detail_event_to_skill[event_kind])
+                continue
+            object_ref = receipt.get("object_ref")
+            object_id = object_ref.get("id") if isinstance(object_ref, dict) else None
+            if isinstance(object_id, str) and object_id in skill_contracts:
+                detected_skill_names.add(object_id)
+
+        return [skill_name for skill_name in kernel.skills if skill_name in detected_skill_names]
+
+    def _load_kernel_usage_counts(
+        self,
+        *,
+        kernel_id: str,
+        kernel_skills: list[str],
+    ) -> dict[str, int]:
+        usage_counts = {skill_name: 0 for skill_name in kernel_skills}
+        summary = load_surface(self.workspace, "aoa-stats.core_skill_application_summary.min")
+        for item in summary.get("skills", []):
+            if not isinstance(item, dict):
+                continue
+            if item.get("kernel_id") != kernel_id:
+                continue
+            skill_name = item.get("skill_name")
+            application_count = item.get("application_count")
+            if isinstance(skill_name, str) and skill_name in usage_counts and isinstance(application_count, int):
+                usage_counts[skill_name] = application_count
+        return usage_counts
+
+    def _resolve_kernel_next_step(
+        self,
+        *,
+        kernel: ProjectCoreSkillKernelSurface,
+        detail_receipts: list[dict[str, Any]],
+        current_session_skill_names: list[str],
+        current_detail_event_kinds: list[str],
+        missing_kernel_skill_names: list[str],
+    ) -> tuple[
+        Literal["invoke-core-skill", "shift-to-owner-layer", "hold"],
+        str | None,
+        str | None,
+        str,
+    ]:
+        detail_event_kind_set = set(current_detail_event_kinds)
+        quest_receipt = self._latest_detail_receipt(
+            detail_receipts, event_kind="quest_promotion_receipt"
+        )
+        if quest_receipt is not None:
+            payload = quest_receipt.get("payload")
+            owner_repo = payload.get("owner_repo") if isinstance(payload, dict) else None
+            return (
+                "shift-to-owner-layer",
+                None,
+                owner_repo if isinstance(owner_repo, str) else None,
+                "Current closeout already finished with quest promotion, so the next honest move is owner-layer follow-through.",
+            )
+
+        if "progression_delta_receipt" in detail_event_kind_set:
+            return self._invoke_core_skill_brief(
+                "aoa-quest-harvest",
+                "Progression has been recorded for this session, so the next core step is final quest triage.",
+            )
+        if "repair_cycle_receipt" in detail_event_kind_set:
+            return self._invoke_core_skill_brief(
+                "aoa-session-progression-lift",
+                "Repair has landed but progression has not, so the next core step is explicit progression lift.",
+            )
+        if "skill_run_receipt" in detail_event_kind_set:
+            return self._invoke_core_skill_brief(
+                "aoa-session-self-repair",
+                "Diagnosis has landed but repair has not, so the next core step is bounded self-repair.",
+            )
+        automation_receipt = self._latest_detail_receipt(
+            detail_receipts, event_kind="automation_candidate_receipt"
+        )
+        if automation_receipt is not None:
+            payload = automation_receipt.get("payload")
+            checkpoint_required = (
+                payload.get("checkpoint_required") if isinstance(payload, dict) else None
+            )
+            if checkpoint_required is True:
+                return self._invoke_core_skill_brief(
+                    "aoa-session-self-diagnose",
+                    "Automation scan raised a checkpoint-required candidate, so the next core step is self-diagnosis.",
+                )
+        if "decision_fork_receipt" in detail_event_kind_set:
+            return self._invoke_core_skill_brief(
+                "aoa-session-self-diagnose",
+                "Route forks have been captured without diagnosis yet, so the next core step is self-diagnosis.",
+            )
+        if "automation_candidate_receipt" in detail_event_kind_set:
+            return self._invoke_core_skill_brief(
+                "aoa-session-route-forks",
+                "Automation candidates exist without a fork decision yet, so the next core step is route selection.",
+            )
+        if "harvest_packet_receipt" in detail_event_kind_set:
+            return self._invoke_core_skill_brief(
+                "aoa-automation-opportunity-scan",
+                "Harvest has landed without automation classification yet, so the next core step is automation opportunity scan.",
+            )
+
+        if missing_kernel_skill_names:
+            highest_index = max(
+                (kernel.skills.index(skill_name) for skill_name in current_session_skill_names),
+                default=-1,
+            )
+            later_missing = [
+                skill_name
+                for skill_name in kernel.skills[highest_index + 1 :]
+                if skill_name in missing_kernel_skill_names
+            ]
+            target_skill = later_missing[0] if later_missing else missing_kernel_skill_names[0]
+            return self._invoke_core_skill_brief(
+                target_skill,
+                "Current closeout only covers part of the project-core kernel, so the next honest move is the next missing core skill in canonical order.",
+            )
+
+        return (
+            "hold",
+            None,
+            None,
+            "Current closeout already covers the full kernel without an unresolved next-step rule, so the honest next move is to hold.",
+        )
+
+    def _invoke_core_skill_brief(
+        self, skill_name: str, reason: str
+    ) -> tuple[Literal["invoke-core-skill"], str, None, str]:
+        return (
+            "invoke-core-skill",
+            skill_name,
+            None,
+            reason,
+        )
+
+    def _latest_detail_receipt(
+        self,
+        detail_receipts: list[dict[str, Any]],
+        *,
+        event_kind: str,
+    ) -> dict[str, Any] | None:
+        matching = [
+            receipt
+            for receipt in detail_receipts
+            if receipt.get("event_kind") == event_kind
+        ]
+        if not matching:
+            return None
+        return max(
+            matching,
+            key=lambda receipt: (
+                str(receipt.get("observed_at", "")),
+                str(receipt.get("event_id", "")),
+            ),
+        )
 
     def _archive_manifest(self, manifest_path: Path, destination_dir: Path) -> Path:
         destination_dir.mkdir(parents=True, exist_ok=True)

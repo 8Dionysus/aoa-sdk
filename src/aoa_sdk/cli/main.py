@@ -7,6 +7,7 @@ import typer
 
 from ..closeout import CloseoutAPI
 from ..compatibility import CompatibilityAPI
+from ..models import KernelNextStepBrief
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
 
@@ -36,6 +37,20 @@ def _workspace_payload(workspace: Workspace) -> dict[str, Any]:
         "manifest": str(workspace.manifest_path) if workspace.manifest_path else None,
         "repos": repos,
     }
+
+
+def _print_kernel_next_brief(brief: KernelNextStepBrief | None, *, indent: str = "") -> None:
+    if brief is None:
+        return
+    typer.echo(f"{indent}kernel_next:")
+    typer.echo(f"{indent}  action: {brief.suggested_action}")
+    if brief.suggested_skill_name is not None:
+        typer.echo(f"{indent}  skill: {brief.suggested_skill_name}")
+    if brief.suggested_owner_repo is not None:
+        typer.echo(f"{indent}  owner_repo: {brief.suggested_owner_repo}")
+    if brief.missing_kernel_skill_names:
+        typer.echo(f"{indent}  missing: {', '.join(brief.missing_kernel_skill_names)}")
+    typer.echo(f"{indent}  reason: {brief.reason}")
 
 
 @app.command()
@@ -149,6 +164,7 @@ def closeout_run(
             f"stats: refreshed {report.stats_refresh.receipt_count or 'unknown'} receipts "
             f"from {report.stats_refresh.source_count or 'unknown'} sources"
         )
+    _print_kernel_next_brief(report.kernel_next_step_brief)
     if report_output:
         typer.echo(f"report: {report_output}")
 
@@ -332,6 +348,7 @@ def closeout_process_inbox(
             typer.echo(f"{item.status}: {summary}")
             if item.report_path:
                 typer.echo(f"  report: {item.report_path}")
+            _print_kernel_next_brief(item.kernel_next_step_brief, indent="  ")
             if item.error:
                 typer.echo(f"  error: {item.error}")
 

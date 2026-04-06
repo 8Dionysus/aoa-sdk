@@ -275,6 +275,13 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="schema_version",
         supported_versions=[1],
     ),
+    "aoa-skills.project_core_skill_kernel.min": SurfaceCompatibilityRule(
+        surface_id="aoa-skills.project_core_skill_kernel.min",
+        repo="aoa-skills",
+        relative_path="generated/project_core_skill_kernel.min.json",
+        version_field="schema_version",
+        supported_versions=[1],
+    ),
     "aoa-stats.object_summary.min": SurfaceCompatibilityRule(
         surface_id="aoa-stats.object_summary.min",
         repo="aoa-stats",
