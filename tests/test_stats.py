@@ -9,7 +9,9 @@ from aoa_sdk import AoASDK
 def install_stats_fixture(workspace_root: Path) -> Path:
     repo = workspace_root / "aoa-stats"
     generated = repo / "generated"
+    state_generated = repo / "state" / "generated"
     generated.mkdir(parents=True, exist_ok=True)
+    state_generated.mkdir(parents=True, exist_ok=True)
     (repo / "README.md").write_text("# aoa-stats\n", encoding="utf-8")
 
     generated_from = {
@@ -142,6 +144,50 @@ def install_stats_fixture(workspace_root: Path) -> Path:
     for name, payload in surfaces.items():
         (generated / name).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
+    live_surfaces = dict(surfaces)
+    live_generated_from = {
+        "receipt_input_paths": [
+            "aoa-skills/.aoa/live_receipts/session-harvest-family.jsonl",
+            "aoa-evals/.aoa/live_receipts/eval-result-receipts.jsonl",
+        ],
+        "total_receipts": 3,
+        "latest_observed_at": "2026-04-05T11:05:00Z",
+    }
+    live_automation = dict(live_surfaces["automation_pipeline_summary.min.json"])
+    live_automation["generated_from"] = live_generated_from
+    live_automation["pipelines"] = [
+        {
+            "pipeline_ref": "pipeline:test",
+            "candidate_count": 2,
+            "seed_ready_count": 1,
+            "checkpoint_required_count": 1,
+            "deterministic_ready_count": 2,
+            "reversible_ready_count": 2,
+            "next_artifact_hints": ["repair-prompt", "seed-pack"],
+            "evidence_ref_count": 2,
+            "latest_observed_at": "2026-04-05T11:05:00Z",
+        }
+    ]
+    live_catalog = dict(live_surfaces["summary_surface_catalog.min.json"])
+    live_catalog["generated_from"] = live_generated_from
+    live_object_summary = dict(live_surfaces["object_summary.min.json"])
+    live_object_summary["generated_from"] = live_generated_from
+    live_repeated = dict(live_surfaces["repeated_window_summary.min.json"])
+    live_repeated["generated_from"] = live_generated_from
+    live_route = dict(live_surfaces["route_progression_summary.min.json"])
+    live_route["generated_from"] = live_generated_from
+    live_fork = dict(live_surfaces["fork_calibration_summary.min.json"])
+    live_fork["generated_from"] = live_generated_from
+    for name, payload in {
+        "object_summary.min.json": live_object_summary,
+        "repeated_window_summary.min.json": live_repeated,
+        "route_progression_summary.min.json": live_route,
+        "fork_calibration_summary.min.json": live_fork,
+        "automation_pipeline_summary.min.json": live_automation,
+        "summary_surface_catalog.min.json": live_catalog,
+    }.items():
+        (state_generated / name).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
     return repo
 
 
@@ -150,7 +196,7 @@ def test_stats_api_reads_generated_surfaces(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     assert sdk.workspace.has_repo("aoa-stats")
-    assert sdk.stats.generated_from().total_receipts == 2
+    assert sdk.stats.generated_from().total_receipts == 3
     assert len(sdk.stats.object_summary(repo="aoa-skills")) == 1
     assert sdk.stats.automation_pipelines("pipeline:test").seed_ready_count == 1
     assert sdk.stats.route_progression("route:test").latest_verdict == "advance"
@@ -163,6 +209,10 @@ def test_stats_compatibility_checks_green_when_repo_is_present(workspace_root: P
     report = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-stats")}
 
     assert report["aoa-stats.object_summary.min"].compatible is True
+    assert (
+        report["aoa-stats.object_summary.min"].resolved_relative_path
+        == "state/generated/object_summary.min.json"
+    )
     assert (
         report["aoa-stats.automation_pipeline_summary.min"].detected_version
         == "aoa_stats_automation_pipeline_summary_v1"
