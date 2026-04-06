@@ -97,9 +97,16 @@ Minimum validation for code or topology changes:
 python -m pytest -q
 python -m ruff check .
 aoa workspace inspect /srv/aoa-sdk
+aoa compatibility check /srv/aoa-sdk
+aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
 ```
 
-When compatibility logic changes, also run the documented compatibility check from `README.md`.
+When release or CI-facing surfaces change, also run:
+
+```bash
+python -m mypy src
+python -m build
+```
 
 ### REPORT
 
