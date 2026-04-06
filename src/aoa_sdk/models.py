@@ -696,6 +696,16 @@ class StatsObjectSummaryEntry(BaseModel):
     automation_candidate_counts: StatsAutomationCandidateCounts
 
 
+class StatsCoreSkillApplication(BaseModel):
+    kernel_id: str
+    skill_name: str
+    application_count: int
+    latest_observed_at: str
+    latest_session_ref: str
+    latest_run_ref: str
+    detail_event_kind_counts: dict[str, int] = Field(default_factory=dict)
+
+
 class StatsRepeatedWindow(BaseModel):
     window_id: str
     window_date: str

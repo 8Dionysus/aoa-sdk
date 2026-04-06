@@ -95,6 +95,7 @@ feed_output.write_text(json.dumps(receipts, indent=2) + "\\n", encoding="utf-8")
             "generated_from": {
                 "receipt_input_paths": [
                     "aoa-skills/.aoa/live_receipts/session-harvest-family.jsonl",
+                    "aoa-skills/.aoa/live_receipts/core-skill-applications.jsonl",
                     "aoa-evals/.aoa/live_receipts/eval-result-receipts.jsonl",
                     "aoa-playbooks/.aoa/live_receipts/playbook-receipts.jsonl",
                     "aoa-techniques/.aoa/live_receipts/technique-receipts.jsonl",
@@ -126,6 +127,10 @@ print(f"[summaries] {summary_dir}")
         publisher_script_template.replace("__LOG_NAME__", "session-harvest-family.jsonl").replace("__LABEL__", "session"),
         encoding="utf-8",
     )
+    (skills_root / "scripts" / "publish_core_skill_receipts.py").write_text(
+        publisher_script_template.replace("__LOG_NAME__", "core-skill-applications.jsonl").replace("__LABEL__", "core skill"),
+        encoding="utf-8",
+    )
     (evals_root / "scripts" / "publish_live_receipts.py").write_text(
         publisher_script_template.replace("__LOG_NAME__", "eval-result-receipts.jsonl").replace("__LABEL__", "eval"),
         encoding="utf-8",
@@ -151,6 +156,12 @@ print(f"[summaries] {summary_dir}")
                 "name": "skills-live-log",
                 "repo": "aoa-skills",
                 "relative_path": ".aoa/live_receipts/session-harvest-family.jsonl",
+                "required": True,
+            },
+            {
+                "name": "skills-core-kernel-live-log",
+                "repo": "aoa-skills",
+                "relative_path": ".aoa/live_receipts/core-skill-applications.jsonl",
                 "required": True,
             },
             {
@@ -207,6 +218,24 @@ print(f"[summaries] {summary_dir}")
         "evidence_refs": ["tmp/HARVEST_PACKET.json"],
         "payload": {"route_ref": "route:test-closeout"},
     }
+    core_skill_receipt = {
+        "event_kind": "core_skill_application_receipt",
+        "event_id": "event-core-skill-001",
+        "observed_at": "2026-04-06T18:00:01Z",
+        "run_ref": "run-skill-001",
+        "session_ref": "session:test-closeout",
+        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+        "evidence_refs": ["tmp/HARVEST_PACKET_RECEIPT.json"],
+        "payload": {
+            "kernel_id": "project-core-session-growth-v1",
+            "skill_name": "aoa-session-donor-harvest",
+            "application_stage": "finish",
+            "detail_event_kind": "harvest_packet_receipt",
+            "detail_receipt_ref": "tmp/HARVEST_PACKET_RECEIPT.json",
+            "route_ref": "route:test-closeout",
+        },
+    }
     eval_receipt = {
         "event_kind": "eval_result_receipt",
         "event_id": "event-eval-001",
@@ -252,11 +281,15 @@ print(f"[summaries] {summary_dir}")
         "payload": {"target_kind": "decision"},
     }
     skill_receipt_path = receipts_dir / "skill.json"
+    core_skill_receipt_path = receipts_dir / "skill-core.json"
     eval_receipt_path = receipts_dir / "eval.json"
     playbook_receipt_path = receipts_dir / "playbook.json"
     technique_receipt_path = receipts_dir / "technique.json"
     memo_receipt_path = receipts_dir / "memo.json"
     skill_receipt_path.write_text(json.dumps(skill_receipt, indent=2) + "\n", encoding="utf-8")
+    core_skill_receipt_path.write_text(
+        json.dumps(core_skill_receipt, indent=2) + "\n", encoding="utf-8"
+    )
     eval_receipt_path.write_text(json.dumps(eval_receipt, indent=2) + "\n", encoding="utf-8")
     playbook_receipt_path.write_text(json.dumps(playbook_receipt, indent=2) + "\n", encoding="utf-8")
     technique_receipt_path.write_text(json.dumps(technique_receipt, indent=2) + "\n", encoding="utf-8")
@@ -273,6 +306,10 @@ print(f"[summaries] {summary_dir}")
             {
                 "publisher": "aoa-skills.session-harvest-family",
                 "input_paths": ["receipts/skill.json"],
+            },
+            {
+                "publisher": "aoa-skills.core-kernel-applications",
+                "input_paths": ["receipts/skill-core.json"],
             },
             {
                 "publisher": "aoa-evals.eval-result",
@@ -309,6 +346,10 @@ print(f"[summaries] {summary_dir}")
                 "input_paths": ["../manifests/receipts/skill.json"],
             },
             {
+                "publisher": "aoa-skills.core-kernel-applications",
+                "input_paths": ["../manifests/receipts/skill-core.json"],
+            },
+            {
                 "publisher": "aoa-evals.eval-result",
                 "input_paths": ["../manifests/receipts/eval.json"],
             },
@@ -343,11 +384,13 @@ print(f"[summaries] {summary_dir}")
         "built_manifest_path": manifest_dir / "closeout-build-001.json",
         "queue_manifest_path": queue_manifest_path,
         "skill_receipt_path": skill_receipt_path,
+        "core_skill_receipt_path": core_skill_receipt_path,
         "eval_receipt_path": eval_receipt_path,
         "playbook_receipt_path": playbook_receipt_path,
         "technique_receipt_path": technique_receipt_path,
         "memo_receipt_path": memo_receipt_path,
         "skill_log_path": skills_root / ".aoa" / "live_receipts" / "session-harvest-family.jsonl",
+        "core_skill_log_path": skills_root / ".aoa" / "live_receipts" / "core-skill-applications.jsonl",
         "eval_log_path": evals_root / ".aoa" / "live_receipts" / "eval-result-receipts.jsonl",
         "playbook_log_path": playbooks_root / ".aoa" / "live_receipts" / "playbook-receipts.jsonl",
         "technique_log_path": techniques_root / ".aoa" / "live_receipts" / "technique-receipts.jsonl",
@@ -366,14 +409,16 @@ def test_closeout_api_run_publishes_receipts_and_refreshes_stats(workspace_root:
     report = sdk.closeout.run(fixture["manifest_path"])
 
     assert report.closeout_id == "closeout-test-001"
-    assert len(report.publisher_runs) == 5
+    assert len(report.publisher_runs) == 6
     assert report.publisher_runs[0].appended_count == 1
     assert report.publisher_runs[1].appended_count == 1
     assert report.publisher_runs[2].appended_count == 1
     assert report.publisher_runs[3].appended_count == 1
     assert report.publisher_runs[4].appended_count == 1
-    assert report.stats_refresh.receipt_count == 5
+    assert report.publisher_runs[5].appended_count == 1
+    assert report.stats_refresh.receipt_count == 6
     assert fixture["skill_log_path"].exists()
+    assert fixture["core_skill_log_path"].exists()
     assert fixture["eval_log_path"].exists()
     assert fixture["playbook_log_path"].exists()
     assert fixture["technique_log_path"].exists()
@@ -430,7 +475,11 @@ def test_closeout_api_submit_reviewed_builds_request_and_manifest(workspace_root
     report = sdk.closeout.submit_reviewed(
         fixture["reviewed_artifact_path"],
         session_ref="session:test-submit-reviewed",
-        receipt_paths=[fixture["skill_receipt_path"], fixture["eval_receipt_path"]],
+        receipt_paths=[
+            fixture["skill_receipt_path"],
+            fixture["core_skill_receipt_path"],
+            fixture["eval_receipt_path"],
+        ],
         audit_refs=[fixture["route_summary_path"]],
         closeout_id="closeout-submit-001",
         enqueue=False,
@@ -441,6 +490,7 @@ def test_closeout_api_submit_reviewed_builds_request_and_manifest(workspace_root
     assert report.closeout_id == "closeout-submit-001"
     assert report.detected_publishers == [
         "aoa-evals.eval-result",
+        "aoa-skills.core-kernel-applications",
         "aoa-skills.session-harvest-family",
     ]
     assert request_path == workspace_root / "aoa-sdk" / ".aoa" / "closeout" / "requests" / "closeout-submit-001.request.json"

@@ -283,6 +283,14 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="schema_version",
         supported_versions=["aoa_stats_object_summary_v1"],
     ),
+    "aoa-stats.core_skill_application_summary.min": SurfaceCompatibilityRule(
+        surface_id="aoa-stats.core_skill_application_summary.min",
+        repo="aoa-stats",
+        relative_path="generated/core_skill_application_summary.min.json",
+        preferred_relative_paths=["state/generated/core_skill_application_summary.min.json"],
+        version_field="schema_version",
+        supported_versions=["aoa_stats_core_skill_application_summary_v1"],
+    ),
     "aoa-stats.repeated_window_summary.min": SurfaceCompatibilityRule(
         surface_id="aoa-stats.repeated_window_summary.min",
         repo="aoa-stats",

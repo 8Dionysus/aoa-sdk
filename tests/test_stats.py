@@ -51,6 +51,21 @@ def install_stats_fixture(workspace_root: Path) -> Path:
                 }
             ],
         },
+        "core_skill_application_summary.min.json": {
+            "schema_version": "aoa_stats_core_skill_application_summary_v1",
+            "generated_from": generated_from,
+            "skills": [
+                {
+                    "kernel_id": "project-core-session-growth-v1",
+                    "skill_name": "aoa-session-donor-harvest",
+                    "application_count": 1,
+                    "latest_observed_at": "2026-04-05T10:20:00Z",
+                    "latest_session_ref": "session:test-001",
+                    "latest_run_ref": "run-skill-001",
+                    "detail_event_kind_counts": {"harvest_packet_receipt": 1},
+                }
+            ],
+        },
         "repeated_window_summary.min.json": {
             "schema_version": "aoa_stats_repeated_window_summary_v1",
             "generated_from": generated_from,
@@ -131,6 +146,13 @@ def install_stats_fixture(workspace_root: Path) -> Path:
             "generated_from": generated_from,
             "surfaces": [
                 {
+                    "name": "core_skill_application_summary",
+                    "path": "generated/core_skill_application_summary.min.json",
+                    "schema_ref": "schemas/core-skill-application-summary.schema.json",
+                    "primary_question": "Which project-core kernel skills are actually finishing and how often, without inferring usage from general receipt volume?",
+                    "derivation_rule": "aggregate core_skill_application_receipt payloads by kernel_id and skill_name",
+                },
+                {
                     "name": "automation_pipeline_summary",
                     "path": "generated/automation_pipeline_summary.min.json",
                     "schema_ref": "schemas/automation-pipeline-summary.schema.json",
@@ -172,6 +194,19 @@ def install_stats_fixture(workspace_root: Path) -> Path:
     live_catalog["generated_from"] = live_generated_from
     live_object_summary = dict(live_surfaces["object_summary.min.json"])
     live_object_summary["generated_from"] = live_generated_from
+    live_core_skill = dict(live_surfaces["core_skill_application_summary.min.json"])
+    live_core_skill["generated_from"] = live_generated_from
+    live_core_skill["skills"] = [
+        {
+            "kernel_id": "project-core-session-growth-v1",
+            "skill_name": "aoa-session-donor-harvest",
+            "application_count": 2,
+            "latest_observed_at": "2026-04-05T11:05:00Z",
+            "latest_session_ref": "session:test-001",
+            "latest_run_ref": "run-skill-002",
+            "detail_event_kind_counts": {"harvest_packet_receipt": 2},
+        }
+    ]
     live_repeated = dict(live_surfaces["repeated_window_summary.min.json"])
     live_repeated["generated_from"] = live_generated_from
     live_route = dict(live_surfaces["route_progression_summary.min.json"])
@@ -180,6 +215,7 @@ def install_stats_fixture(workspace_root: Path) -> Path:
     live_fork["generated_from"] = live_generated_from
     for name, payload in {
         "object_summary.min.json": live_object_summary,
+        "core_skill_application_summary.min.json": live_core_skill,
         "repeated_window_summary.min.json": live_repeated,
         "route_progression_summary.min.json": live_route,
         "fork_calibration_summary.min.json": live_fork,
@@ -198,9 +234,13 @@ def test_stats_api_reads_generated_surfaces(workspace_root: Path) -> None:
     assert sdk.workspace.has_repo("aoa-stats")
     assert sdk.stats.generated_from().total_receipts == 3
     assert len(sdk.stats.object_summary(repo="aoa-skills")) == 1
+    assert sdk.stats.core_skill_applications(skill_name="aoa-session-donor-harvest")[0].application_count == 2
     assert sdk.stats.automation_pipelines("pipeline:test").seed_ready_count == 1
     assert sdk.stats.route_progression("route:test").latest_verdict == "advance"
-    assert sdk.stats.summary_catalog()[0].name == "automation_pipeline_summary"
+    assert {item.name for item in sdk.stats.summary_catalog()} == {
+        "automation_pipeline_summary",
+        "core_skill_application_summary",
+    }
 
 
 def test_stats_compatibility_checks_green_when_repo_is_present(workspace_root: Path) -> None:
@@ -209,9 +249,14 @@ def test_stats_compatibility_checks_green_when_repo_is_present(workspace_root: P
     report = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-stats")}
 
     assert report["aoa-stats.object_summary.min"].compatible is True
+    assert report["aoa-stats.core_skill_application_summary.min"].compatible is True
     assert (
         report["aoa-stats.object_summary.min"].resolved_relative_path
         == "state/generated/object_summary.min.json"
+    )
+    assert (
+        report["aoa-stats.core_skill_application_summary.min"].detected_version
+        == "aoa_stats_core_skill_application_summary_v1"
     )
     assert (
         report["aoa-stats.automation_pipeline_summary.min"].detected_version

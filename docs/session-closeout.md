@@ -23,6 +23,7 @@ reviewed session into:
 4. one inbox file that can be auto-processed by a user-level path watcher
 5. one canonical closeout manifest assembled from a reviewed artifact and ready receipt paths
 6. one canonical request assembled from a reviewed artifact and receipt bundle without hand-authoring JSON
+7. one explicit split between detail skill receipts and generic project-core kernel receipts so one receipt file never mixes publisher families
 
 ## Boundary
 
@@ -52,6 +53,12 @@ reviewed session into:
       "input_paths": [
         "receipts/harvest_packet_receipt.json",
         "receipts/progression_delta_receipt.json"
+      ]
+    },
+    {
+      "publisher": "aoa-skills.core-kernel-applications",
+      "input_paths": [
+        "receipts/core_skill_application_receipt.json"
       ]
     },
     {
@@ -109,6 +116,12 @@ manifest JSON.
       ]
     },
     {
+      "publisher": "aoa-skills.core-kernel-applications",
+      "input_paths": [
+        "receipts/core_skill_application_receipt.json"
+      ]
+    },
+    {
       "publisher": "aoa-evals.eval-result",
       "input_paths": [
         "receipts/eval_result_receipt.json"
@@ -122,6 +135,11 @@ The builder canonicalizes all paths to absolute form, injects the reviewed
 artifact into `audit_refs`, writes the resulting manifest under
 `.aoa/closeout/manifests/`, and can immediately enqueue it for automatic inbox
 processing.
+
+One receipt file must stay inside one publisher family. For kernel skills this
+means detail receipts such as `harvest_packet_receipt` and generic
+`core_skill_application_receipt` receipts live in separate files so the closeout
+spine can route them into separate owner-local logs.
 
 ## Reviewed submission flow
 

@@ -28,16 +28,19 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert report["aoa-playbooks.playbook_review_status.min"].compatible is True
     assert report["aoa-memo.checkpoint_to_memory_contract.example"].compatible is True
     assert report["aoa-stats.object_summary.min"].compatible is True
+    assert report["aoa-stats.core_skill_application_summary.min"].compatible is True
     assert report["aoa-stats.automation_pipeline_summary.min"].compatible is True
     assert report["aoa-kag.kag_registry.min"].compatible is True
     assert report["aoa-kag.tos_zarathustra_route_retrieval_pack.min"].compatible is True
 
     review_status = sdk.playbooks.review_status("AOA-P-0017")
     writeback = sdk.memo.writeback_map("checkpoint_export")
+    core_kernel = sdk.stats.core_skill_applications()
     automation = sdk.stats.automation_pipelines()
 
     assert review_status.gate_verdict == "composition-landed"
     assert writeback.mapping.target_kind == "state_capsule"
+    assert isinstance(core_kernel, list)
     assert automation
     assert any(item.seed_ready_count >= 1 for item in automation)
 
