@@ -23,6 +23,17 @@ from .heuristics import EXPLICIT_LAYER_RULES_BY_TOKEN, HEURISTIC_RULES
 TOKEN_RE = re.compile(r"[a-z0-9_-]+")
 SURFACE_PHASES = {"ingress", "in-flight", "pre-mutation", "closeout"}
 MUTATION_SURFACES = {"none", "code", "repo-config", "infra", "runtime", "public-share"}
+SurfaceSignal = Literal[
+    "explicit-request",
+    "risk-gate",
+    "router-match",
+    "repeated-pattern",
+    "proof-need",
+    "recall-need",
+    "scenario-recurring",
+    "role-posture",
+    "closeout-chain",
+]
 STATE_RANK = {
     "activated": 4,
     "manual-equivalent": 3,
@@ -30,7 +41,7 @@ STATE_RANK = {
     "candidate-later": 1,
 }
 CONFIDENCE_RANK = {"high": 3, "medium": 2, "low": 1}
-SIGNAL_ORDER = [
+SIGNAL_ORDER: list[SurfaceSignal] = [
     "explicit-request",
     "risk-gate",
     "router-match",
@@ -176,7 +187,9 @@ def _derive_skill_surface_items(
 ) -> list[SurfaceOpportunityItem]:
     items: list[SurfaceOpportunityItem] = []
     for item in skill_report.activate_now:
-        signals = ["router-match", *(("closeout-chain",) if closeout_signal else ())]
+        signals: list[SurfaceSignal] = ["router-match"]
+        if closeout_signal:
+            signals.append("closeout-chain")
         items.append(
             SurfaceOpportunityItem(
                 surface_ref=f"aoa-skills:{item.skill_name}",
@@ -208,11 +221,11 @@ def _derive_skill_surface_items(
     for item in fallback_items:
         if item.host_availability.status != "router-only" or not item.host_availability.manual_fallback_allowed:
             continue
-        signals = ["router-match"]
+        fallback_signals: list[SurfaceSignal] = ["router-match"]
         if item in skill_report.must_confirm:
-            signals.append("risk-gate")
+            fallback_signals.append("risk-gate")
         if closeout_signal:
-            signals.append("closeout-chain")
+            fallback_signals.append("closeout-chain")
         items.append(
             SurfaceOpportunityItem(
                 surface_ref=f"aoa-skills:{item.skill_name}",
@@ -222,7 +235,7 @@ def _derive_skill_surface_items(
                 state="manual-equivalent",
                 phase_detected=surface_phase,
                 reason=item.reason,
-                signals=_ordered_signals(signals),
+                signals=_ordered_signals(fallback_signals),
                 confidence="high" if item in skill_report.must_confirm else "medium",
                 execution=SurfaceOpportunityExecutionHint(
                     lane="manual-fallback",
@@ -259,6 +272,9 @@ def _derive_heuristic_items(
                 continue
         elif not tokens.intersection(rule.tokens):
             continue
+        rule_signals: list[SurfaceSignal] = [rule.signal]
+        if closeout_signal:
+            rule_signals.append("closeout-chain")
         items.append(
             SurfaceOpportunityItem(
                 surface_ref=rule.surface_ref,
@@ -268,7 +284,7 @@ def _derive_heuristic_items(
                 state=rule.default_state,
                 phase_detected=surface_phase,
                 reason=rule.reason_template,
-                signals=_ordered_signals([rule.signal, *(("closeout-chain",) if closeout_signal else ())]),
+                signals=_ordered_signals(rule_signals),
                 confidence=rule.confidence,
                 execution=SurfaceOpportunityExecutionHint(
                     lane=rule.execution_lane,
@@ -290,6 +306,9 @@ def _derive_heuristic_items(
         explicit_rule = EXPLICIT_LAYER_RULES_BY_TOKEN.get(token)
         if explicit_rule is None:
             continue
+        explicit_signals: list[SurfaceSignal] = ["explicit-request"]
+        if closeout_signal:
+            explicit_signals.append("closeout-chain")
         items.append(
             SurfaceOpportunityItem(
                 surface_ref=explicit_rule.surface_ref,
@@ -299,7 +318,7 @@ def _derive_heuristic_items(
                 state="candidate-now",
                 phase_detected=surface_phase,
                 reason=f"intent names the {explicit_rule.owner_repo} layer directly; prefer owner-layer-aware routing over silent guessing",
-                signals=_ordered_signals(["explicit-request", *(("closeout-chain",) if closeout_signal else ())]),
+                signals=_ordered_signals(explicit_signals),
                 confidence="high",
                 execution=SurfaceOpportunityExecutionHint(
                     lane="inspect-expand-use",
@@ -445,7 +464,7 @@ def _merge_surface_items(left: SurfaceOpportunityItem, right: SurfaceOpportunity
     )
 
 
-def _ordered_signals(signals: list[str]) -> list[str]:
+def _ordered_signals(signals: list[SurfaceSignal]) -> list[SurfaceSignal]:
     unique = list(dict.fromkeys(signal for signal in signals if signal))
     return sorted(unique, key=lambda signal: SIGNAL_ORDER.index(signal) if signal in SIGNAL_ORDER else len(SIGNAL_ORDER))
 
