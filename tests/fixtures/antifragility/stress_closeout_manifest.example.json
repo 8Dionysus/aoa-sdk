@@ -1,0 +1,20 @@
+{
+  "session_ref": "session:2026-04-07-antifragility-wave-2",
+  "reviewed": true,
+  "stress_bundle": {
+    "source_receipt_refs": [
+      "ATM10-Agent:stressor_receipt_v1#stress:2026-04-07:retrieval-only-fallback"
+    ],
+    "runtime_receipt_refs": [
+      "abyss-stack:service_degradation_receipt_v1#runtime:degrade:langchain-api:2026-04-07T13:19:54Z"
+    ],
+    "routing_hint_refs": [
+      "aoa-routing:stress_navigation_hint_v1#route:stress:atm10-hybrid-query:retrieval-only-fallback"
+    ],
+    "memo_refs": [
+      "aoa-memo:failure_lesson_memory_v1#memo:hybrid-query-reground-first"
+    ]
+  },
+  "next_step_brief": "Keep degraded continuation explicit, verify the bounded path, and do not widen repair or mutation automation.",
+  "allow_empty": false
+}
