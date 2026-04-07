@@ -79,20 +79,15 @@ class RoutingAPI:
             raise ValueError(f"Routing action for {hint.kind!r} does not define a record surface")
 
         surface_id = _surface_id_for(action_repo, surface_file)
-        data = load_surface(self.workspace, surface_id) if surface_id is not None else load_surface_from_path(
-            self.workspace,
-            action_repo,
-            surface_file,
-        )
+        if surface_id is None:
+            raise ValueError(
+                f"Routing action for {hint.kind!r} uses unmapped surface "
+                f"{action_repo}:{surface_file}; add a compatibility rule before exposing it."
+            )
+        data = load_surface(self.workspace, surface_id)
         records = extract_records(data, preferred_keys=("skills", "entries", "items", "bindings", "hints"))
         return find_record(records, field=match_field, value=value)
 
 
 def _surface_id_for(repo: str, surface_file: str) -> str | None:
     return ROUTING_ACTION_SURFACE_IDS.get((repo, surface_file))
-
-
-def load_surface_from_path(workspace, repo: str, surface_file: str):
-    from ..loaders import load_json
-
-    return load_json(workspace.surface_path(repo, surface_file))

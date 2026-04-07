@@ -1,0 +1,51 @@
+{
+  "matrix_version": 1,
+  "profile": "ws02-first-slice",
+  "entries": [
+    {
+      "repo": "aoa-routing",
+      "target_ref": "main",
+      "purpose": "route-directed public surfaces"
+    },
+    {
+      "repo": "aoa-playbooks",
+      "target_ref": "main",
+      "purpose": "activation and federation surface contracts"
+    },
+    {
+      "repo": "aoa-skills",
+      "target_ref": "main",
+      "purpose": "runtime and project-core skill surfaces"
+    },
+    {
+      "repo": "aoa-techniques",
+      "target_ref": "main",
+      "purpose": "technique bridge and promotion readiness surfaces"
+    },
+    {
+      "repo": "aoa-evals",
+      "target_ref": "main",
+      "purpose": "proof-side runtime candidate surfaces"
+    },
+    {
+      "repo": "aoa-memo",
+      "target_ref": "main",
+      "purpose": "memory and writeback compatibility seams"
+    },
+    {
+      "repo": "aoa-agents",
+      "target_ref": "main",
+      "purpose": "runtime seam bindings"
+    },
+    {
+      "repo": "aoa-kag",
+      "target_ref": "main",
+      "purpose": "derived substrate inspect support"
+    },
+    {
+      "repo": "aoa-stats",
+      "target_ref": "main",
+      "purpose": "downstream summary surfaces consumed by closeout flows"
+    }
+  ]
+}

@@ -111,6 +111,18 @@ def test_routing_action_surfaces_are_compatibility_checked(workspace_root: Path)
     assert routed_surface_ids.issubset(available_rule_ids)
 
 
+def test_routing_inspect_rejects_unmapped_action_surface(workspace_root: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    monkeypatch.delitem(
+        ROUTING_ACTION_SURFACE_IDS,
+        ("aoa-skills", "generated/skill_capsules.json"),
+        raising=False,
+    )
+
+    with pytest.raises(ValueError, match="add a compatibility rule before exposing it"):
+        sdk.routing.inspect(kind="skill", id_or_name="aoa-change-protocol")
+
+
 def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surfaces(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 

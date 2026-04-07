@@ -31,6 +31,14 @@ def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
     assert "aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json" in agents
 
 
+def test_readme_lists_sibling_canary_surfaces() -> None:
+    readme = read_text("README.md")
+
+    assert "scripts/sibling_canary_matrix.json" in readme
+    assert "scripts/run_sibling_canary.py" in readme
+    assert ".github/workflows/latest-sibling-canary.yml" in readme
+
+
 def test_blueprint_is_marked_as_direction_surface() -> None:
     blueprint = read_text("docs/blueprint.md")
 

@@ -14,6 +14,8 @@ compatibility policy for every surface it consumes.
 5. Versionless surfaces are allowed only when the rule marks them explicitly as
    `unversioned` and the SDK treats them as strict-shape local-first
    dependencies.
+6. Route-directed public surfaces must resolve through the compatibility map;
+   routed reads must not fall back to raw path loads.
 
 ## Why This Exists
 
@@ -45,6 +47,9 @@ Today that second mode is still needed for
   loader.
 - CLI commands and orchestration helpers should depend only on surfaces already
   covered by the compatibility map.
+- The explicit sibling canary matrix in `scripts/sibling_canary_matrix.json`
+  and the scheduled lane in `.github/workflows/latest-sibling-canary.yml`
+  should stay aligned with the current compatibility surface set.
 
 ## Next Honest Move
 
@@ -54,3 +59,5 @@ The next CLI and orchestration slices should build on:
 - compatibility-checked agents, playbooks, memo, and eval surfaces
 - explicit handling of the remaining versionless upstream surfaces rather than
   silently assuming they are stable
+- scheduled sibling canaries that keep the control plane honest against live
+  sibling repos

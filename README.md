@@ -24,7 +24,7 @@ Use the shortest route by need:
 - machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
 - portable sibling-workspace bootstrap for non-`/srv` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`
 - source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
-- compatibility rules and local checks: `docs/versioning.md`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
+- compatibility rules and local checks: `docs/versioning.md`, `scripts/sibling_canary_matrix.json`, `scripts/run_sibling_canary.py`, `.github/workflows/latest-sibling-canary.yml`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
 - local validation and workspace inspection: `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
@@ -152,6 +152,7 @@ Check consumed surface compatibility across the local workspace:
 ```bash
 aoa compatibility check /srv/aoa-sdk
 aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
+python scripts/run_sibling_canary.py --repo-root . --matrix scripts/sibling_canary_matrix.json
 ```
 
 Run one reviewed session closeout manifest:
