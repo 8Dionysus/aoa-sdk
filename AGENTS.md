@@ -100,6 +100,8 @@ Truth rules for this loop:
 - `aoa skills ...` remains skill-only
 - `manual-equivalent` never becomes `activated`
 - non-skill surfaces never become executable-now in wave one
+- routing shortlist hints stay advisory only
+- `aoa-stats.surface_detection_summary.min` stays descriptive only
 
 ## Contribution doctrine
 

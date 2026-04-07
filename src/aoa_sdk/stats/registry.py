@@ -12,6 +12,7 @@ from ..models import (
     StatsObjectSummaryEntry,
     StatsRepeatedWindow,
     StatsRouteProgression,
+    StatsSurfaceDetectionWindow,
     StatsSummarySurface,
 )
 from ..workspace.discovery import Workspace
@@ -107,6 +108,19 @@ class StatsAPI:
         data = load_surface(self.workspace, "aoa-stats.summary_surface_catalog.min")
         return [StatsSummarySurface.model_validate(item) for item in data.get("surfaces", [])]
 
+    def surface_detection(
+        self,
+        *,
+        window_date: str | None = None,
+    ) -> builtin_list[StatsSurfaceDetectionWindow] | StatsSurfaceDetectionWindow:
+        entries = self._surface_detection_entries()
+        if window_date is None:
+            return entries
+        for entry in entries:
+            if entry.window_date == window_date or entry.window_id == window_date:
+                return entry
+        raise RecordNotFound(f"Unknown stats surface detection window: {window_date}")
+
     def _object_summary_entries(self) -> builtin_list[StatsObjectSummaryEntry]:
         data = load_surface(self.workspace, "aoa-stats.object_summary.min")
         return [StatsObjectSummaryEntry.model_validate(item) for item in data.get("objects", [])]
@@ -130,3 +144,7 @@ class StatsAPI:
     def _automation_pipeline_entries(self) -> builtin_list[StatsAutomationPipeline]:
         data = load_surface(self.workspace, "aoa-stats.automation_pipeline_summary.min")
         return [StatsAutomationPipeline.model_validate(item) for item in data.get("pipelines", [])]
+
+    def _surface_detection_entries(self) -> builtin_list[StatsSurfaceDetectionWindow]:
+        data = load_surface(self.workspace, "aoa-stats.surface_detection_summary.min")
+        return [StatsSurfaceDetectionWindow.model_validate(item) for item in data.get("windows", [])]

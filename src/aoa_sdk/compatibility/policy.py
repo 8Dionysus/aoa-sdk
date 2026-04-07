@@ -20,6 +20,13 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="registry_version",
         supported_versions=[1],
     ),
+    "aoa-routing.owner_layer_shortlist.min": SurfaceCompatibilityRule(
+        surface_id="aoa-routing.owner_layer_shortlist.min",
+        repo="aoa-routing",
+        relative_path="generated/owner_layer_shortlist.min.json",
+        version_field="schema_version",
+        supported_versions=[1],
+    ),
     "aoa-techniques.technique_capsules": SurfaceCompatibilityRule(
         surface_id="aoa-techniques.technique_capsules",
         repo="aoa-techniques",
@@ -406,6 +413,14 @@ SURFACE_COMPATIBILITY_RULES = {
         preferred_relative_paths=["state/generated/automation_pipeline_summary.min.json"],
         version_field="schema_version",
         supported_versions=["aoa_stats_automation_pipeline_summary_v1"],
+    ),
+    "aoa-stats.surface_detection_summary.min": SurfaceCompatibilityRule(
+        surface_id="aoa-stats.surface_detection_summary.min",
+        repo="aoa-stats",
+        relative_path="generated/surface_detection_summary.min.json",
+        preferred_relative_paths=["state/generated/surface_detection_summary.min.json"],
+        version_field="schema_version",
+        supported_versions=["aoa_stats_surface_detection_summary_v1"],
     ),
     "aoa-stats.summary_surface_catalog.min": SurfaceCompatibilityRule(
         surface_id="aoa-stats.summary_surface_catalog.min",

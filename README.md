@@ -15,7 +15,7 @@ Use the shortest route by need:
 - compatibility posture: `docs/versioning.md`
 - release, support, and CI posture: `docs/RELEASE_CI_POSTURE.md`
 - reviewed session closeout orchestration: `docs/session-closeout.md`
-- additive surface detection and reviewed owner-layer handoff: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-heuristics.md`, and `docs/aoa-surface-detection-closeout-handoff.md`
+- additive surface detection and reviewed owner-layer handoff: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-second-wave.md`, `docs/aoa-surface-detection-heuristics.md`, and `docs/aoa-surface-detection-closeout-handoff.md`
 - RPG typed consumer slice: `docs/RPG_SDK_ADDENDUM.md`, `docs/RPG_SURFACE_PATHS.md`, and `src/aoa_sdk/rpg/`
 - federation effects and obligations: `docs/ecosystem-impact.md`
 - seed blueprint and direction surface: `docs/blueprint.md`
@@ -32,6 +32,7 @@ Use the shortest route by need:
 - local validation and workspace inspection: `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - additive owner-layer surface detection without changing `aoa skills ...` meaning: `docs/aoa-surface-detection-first-wave.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
+- second-wave shortlist, receipt-context, and observability seams that stay advisory: `docs/aoa-surface-detection-second-wave.md`, `sdk.routing.owner_layer_shortlist()`, and `sdk.stats.surface_detection()`
 - deterministic first-wave heuristics for proof, recall, recurring routes, role posture, and repeated practice: `docs/aoa-surface-detection-heuristics.md` and `src/aoa_sdk/surfaces/heuristics.py`
 - reviewed-only closeout handoff for surviving surface notes: `docs/aoa-surface-detection-closeout-handoff.md`, `aoa surfaces handoff`, and `docs/session-closeout.md`
 - reviewed session auto-closeout inbox: `docs/session-closeout.md`, `aoa closeout enqueue-current`, `aoa closeout status`, and `scripts/install_closeout_units.py`
@@ -67,7 +68,7 @@ This repository is the source of truth for:
 - phase-aware skill detection and dispatch that only auto-activates `explicit-preferred` foundation skills and keeps `explicit-only` skills in visible confirmation lanes
 - persisted workspace-level ingress and guard reports under `aoa-sdk/.aoa/skill-dispatch/` so outer wrappers and root-level agents can reuse one stable session-start surface
 - default skill runtime session storage under `aoa-sdk/.aoa/skill-runtime-session.json` when the workspace root itself is not the writable owner surface
-- additive first-wave surface detection under `aoa-sdk/.aoa/surface-detection/` that keeps `aoa skills ...` skill-only while surfacing eval, memo, playbook, agent, and technique candidates as non-executable hints or reviewed handoffs
+- additive first-wave and second-wave surface detection under `aoa-sdk/.aoa/surface-detection/` that keeps `aoa skills ...` skill-only while surfacing eval, memo, playbook, agent, and technique candidates as non-executable hints or reviewed handoffs
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own
@@ -127,6 +128,7 @@ surface_report = sdk.surfaces.detect(
     phase="ingress",
     intent_text="verify recurring handoff proof",
 )
+shortlist = sdk.routing.owner_layer_shortlist(signal="scenario-recurring")
 surface_handoff = sdk.surfaces.build_closeout_handoff(
     surface_report,
     session_ref="session:2026-04-07-surface-first-wave",
@@ -136,6 +138,7 @@ playbook = sdk.playbooks.get("bounded-change-safe")
 memory = sdk.memo.recall(mode="semantic", query="charter")
 eval_bundle = sdk.evals.inspect("aoa-bounded-change-quality")
 automation = sdk.stats.automation_pipelines("pipeline:session-growth")
+surface_stats = sdk.stats.surface_detection(window_date="2026-04-05")
 kag = sdk.kag.inspect("AOA-K-0011")
 rpg_build = sdk.rpg.latest_build("AOA-A-0002")
 compatibility = sdk.compatibility.check_all()

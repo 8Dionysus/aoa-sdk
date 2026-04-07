@@ -280,8 +280,9 @@ aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest
   --json
 ```
 
-For the first-wave boundary, heuristics, and target selection rules, use
-`docs/aoa-surface-detection-closeout-handoff.md`.
+For the first-wave boundary, second-wave enrichments, heuristics, and target
+selection rules, use `docs/aoa-surface-detection-closeout-handoff.md` and
+`docs/aoa-surface-detection-second-wave.md`.
 
 The watcher uses `aoa-closeout-inbox.path` to watch
 `.aoa/closeout/inbox/*.json` and runs `aoa-closeout-inbox.service`, which calls

@@ -29,6 +29,33 @@ class RoutingHint(BaseModel):
     actions: dict[str, RouterAction]
 
 
+class RoutingOwnerLayerShortlistHint(BaseModel):
+    shortlist_id: str
+    signal: Literal[
+        "explicit-request",
+        "proof-need",
+        "recall-need",
+        "scenario-recurring",
+        "role-posture",
+        "repeated-pattern",
+        "risk-gate",
+    ]
+    owner_repo: Literal[
+        "aoa-techniques",
+        "aoa-skills",
+        "aoa-evals",
+        "aoa-memo",
+        "aoa-playbooks",
+        "aoa-agents",
+    ]
+    object_kind: Literal["technique", "skill", "eval", "memo", "playbook", "agent"]
+    target_surface: str
+    inspect_surface: str | None = None
+    hint_reason: str
+    confidence: Literal["low", "medium", "high"] = "medium"
+    ambiguity: Literal["clear", "ambiguous"] = "clear"
+
+
 class RegistryEntry(BaseModel):
     kind: str
     id: str
@@ -803,6 +830,25 @@ class StatsAutomationPipeline(BaseModel):
     latest_observed_at: str
 
 
+class StatsSurfaceDetectionWindow(BaseModel):
+    window_id: str
+    window_date: str
+    core_skill_receipt_count: int
+    activated_count: int
+    manual_equivalent_adjacent_count: int
+    candidate_now_count: int
+    candidate_later_count: int
+    owner_layer_ambiguity_count: int
+    adjacent_owner_repo_counts: dict[str, int] = Field(default_factory=dict)
+    handoff_target_counts: dict[str, int] = Field(default_factory=dict)
+    repeated_pattern_signal_count: int
+    promotion_discussion_count: int
+    family_entry_ref_count: int
+    evidence_ref_count: int
+    first_observed_at: str
+    last_observed_at: str
+
+
 class StatsSummarySurface(BaseModel):
     name: str
     path: str
@@ -1033,6 +1079,19 @@ class SurfaceOpportunityExecutionHint(BaseModel):
     host_availability_status: Literal["host-executable", "router-only", "unknown"] | None = None
 
 
+class SurfaceOpportunityReference(BaseModel):
+    role: Literal[
+        "family-entry",
+        "inspect",
+        "runtime-receipt",
+        "skill-report",
+        "closeout-handoff",
+    ]
+    ref: str
+    owner_repo: str | None = None
+    note: str | None = None
+
+
 class SurfaceOpportunityItem(BaseModel):
     surface_ref: str
     display_name: str
@@ -1066,6 +1125,10 @@ class SurfaceOpportunityItem(BaseModel):
     related_skill_names: list[str] = Field(default_factory=list)
     closeout_family_candidates: list[str] = Field(default_factory=list)
     promotion_hint: str | None = None
+    shortlist_hints: list[RoutingOwnerLayerShortlistHint] = Field(default_factory=list)
+    owner_layer_ambiguity_note: str | None = None
+    family_entry_refs: list[SurfaceOpportunityReference] = Field(default_factory=list)
+    evidence_refs: list[SurfaceOpportunityReference] = Field(default_factory=list)
 
 
 class SurfaceDetectionReport(BaseModel):
@@ -1077,6 +1140,7 @@ class SurfaceDetectionReport(BaseModel):
     mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none"
     skill_report_path: str | None = None
     skill_report_included: bool = False
+    shortlist_included: bool = False
     active_skill_names: list[str] = Field(default_factory=list)
     immediate_skill_dispatch: list[str] = Field(default_factory=list)
     items: list[SurfaceOpportunityItem] = Field(default_factory=list)
