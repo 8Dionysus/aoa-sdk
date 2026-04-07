@@ -558,7 +558,15 @@ def _load_core_skill_receipt_contexts(workspace: Workspace) -> dict[str, dict[st
             continue
         sort_key = (str(receipt.get("observed_at") or ""), str(receipt.get("event_id") or ""), line_number)
         existing = latest_by_skill.get(skill_name)
-        if existing is not None and existing.get("_sort_key") >= sort_key:
+        existing_sort_key = existing.get("_sort_key") if existing is not None else None
+        if (
+            isinstance(existing_sort_key, tuple)
+            and len(existing_sort_key) == 3
+            and isinstance(existing_sort_key[0], str)
+            and isinstance(existing_sort_key[1], str)
+            and isinstance(existing_sort_key[2], int)
+            and existing_sort_key >= sort_key
+        ):
             continue
         context = payload.get("surface_detection_context")
         latest_by_skill[skill_name] = {
