@@ -291,6 +291,20 @@ class PlaybookReviewIntake(BaseModel):
     composition_posture: str
 
 
+class PlaybookLandingGovernanceEntry(BaseModel):
+    playbook_id: str
+    playbook_name: str | None = None
+    registry_status: str | None = None
+    in_registry: bool
+    in_review_packet_contracts: bool
+    in_review_intake: bool
+    in_review_status: bool
+    in_composition_manifest: bool
+    gate_verdict: str | None = None
+    landing_passed: bool
+    blockers: list[str] = Field(default_factory=list)
+
+
 class MemoSurface(BaseModel):
     id: str
     name: str
@@ -501,6 +515,31 @@ class MemoWritebackIntakeTarget(BaseModel):
     runtime_refs: list[str] = Field(default_factory=list)
     owner_review_refs: list[str] = Field(default_factory=list)
     intake_posture: str
+
+
+class MemoWritebackGovernanceTarget(BaseModel):
+    runtime_surface: str
+    target_kind: str | None = None
+    writeback_class: str | None = None
+    requires_human_review: bool | None = None
+    review_state_default: str | None = None
+    intake_posture: str | None = None
+    in_writeback_targets: bool
+    in_writeback_intake: bool
+    governance_passed: bool
+    blockers: list[str] = Field(default_factory=list)
+
+
+class TechniquePromotionReadinessEntry(BaseModel):
+    technique_id: str
+    technique_name: str
+    status: str
+    export_ready: bool
+    review_required: bool
+    has_canonical_readiness_note: bool
+    has_adverse_effects_review: bool
+    readiness_passed: bool
+    blockers: list[str] = Field(default_factory=list)
 
 
 class PhaseBinding(BaseModel):

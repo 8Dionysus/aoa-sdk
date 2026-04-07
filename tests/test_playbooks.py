@@ -18,6 +18,7 @@ def test_playbooks_local_read_path(workspace_root: Path) -> None:
     review_status = sdk.playbooks.review_status("bounded-change-safe")
     review_packet_contract = sdk.playbooks.review_packet_contract("bounded-change-safe")
     review_intake = sdk.playbooks.review_intake("bounded-change-safe")
+    landing_governance = sdk.playbooks.landing_governance("bounded-change-safe")
 
     assert [item.name for item in listed] == ["bounded-change-safe", "restartable-inquiry-loop"]
     assert registry_entry.name == "bounded-change-safe"
@@ -37,3 +38,6 @@ def test_playbooks_local_read_path(workspace_root: Path) -> None:
     assert review_intake.gate_verdict == "composition-landed"
     assert review_intake.review_outcome_targets.gate_reviews == ["docs/gate-reviews/bounded-change-safe.md"]
     assert "memo_candidate" in review_intake.accepted_packet_kinds
+    assert landing_governance.playbook_id == "AOA-P-0011"
+    assert landing_governance.landing_passed is True
+    assert landing_governance.in_composition_manifest is True

@@ -26,7 +26,10 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert report["aoa-techniques.technique_sections.full"].compatible is True
     assert report["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
     assert report["aoa-playbooks.playbook_review_status.min"].compatible is True
+    assert report["aoa-playbooks.playbook_landing_governance.min"].compatible is True
     assert report["aoa-memo.checkpoint_to_memory_contract.example"].compatible is True
+    assert report["aoa-memo.runtime_writeback_governance.min"].compatible is True
+    assert report["aoa-techniques.technique_promotion_readiness.min"].compatible is True
     assert report["aoa-skills.project_core_skill_kernel.min"].compatible is True
     assert report["aoa-skills.project_core_outer_ring.min"].compatible is True
     assert report["aoa-skills.project_core_outer_ring_readiness.min"].compatible is True
@@ -39,7 +42,11 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert report["aoa-kag.tos_zarathustra_route_retrieval_pack.min"].compatible is True
 
     review_status = sdk.playbooks.review_status("AOA-P-0017")
+    landing_governance = sdk.playbooks.landing_governance("AOA-P-0017")
     writeback = sdk.memo.writeback_map("checkpoint_export")
+    writeback_governance = sdk.memo.writeback_governance("checkpoint_export")
+    technique_readiness = sdk.techniques.promotion_readiness("AOA-T-0001")
+    technique_readiness_entries = sdk.techniques.promotion_readiness()
     outer_ring = sdk.skills.project_core_outer_ring()
     outer_ring_readiness = sdk.skills.project_core_outer_ring_readiness()
     risk_ring = sdk.skills.project_risk_guard_ring()
@@ -48,7 +55,11 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     automation = sdk.stats.automation_pipelines()
 
     assert review_status.gate_verdict == "composition-landed"
+    assert landing_governance.landing_passed is True
     assert writeback.mapping.target_kind == "state_capsule"
+    assert writeback_governance.governance_passed is True
+    assert technique_readiness.readiness_passed is True
+    assert len(technique_readiness_entries) >= 90
     assert outer_ring.ring_id == "project-core-engineering-ring-v1"
     assert len(outer_ring.skills) == 10
     assert len(outer_ring_readiness) == 10

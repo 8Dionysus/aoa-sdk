@@ -12,6 +12,7 @@ from ..models import (
     PlaybookFederationSurface,
     PlaybookFailure,
     PlaybookHandoffContract,
+    PlaybookLandingGovernanceEntry,
     PlaybookReviewIntake,
     PlaybookReviewPacketContract,
     PlaybookReviewStatus,
@@ -161,6 +162,22 @@ class PlaybooksAPI:
                 return entry
         raise RecordNotFound(f"No review intake for playbook: {playbook_id_or_name}")
 
+    def landing_governance(
+        self,
+        playbook_id_or_name: str | None = None,
+    ) -> builtin_list[PlaybookLandingGovernanceEntry] | PlaybookLandingGovernanceEntry:
+        entries = self._landing_governance_entries()
+        if playbook_id_or_name is None:
+            return entries
+        needle = playbook_id_or_name.casefold()
+        for entry in entries:
+            names = {entry.playbook_id.casefold()}
+            if entry.playbook_name is not None:
+                names.add(entry.playbook_name.casefold())
+            if needle in names:
+                return entry
+        raise RecordNotFound(f"No landing governance entry for playbook: {playbook_id_or_name}")
+
     def _registry(self) -> builtin_list[PlaybookCard]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_registry.min")
         return [PlaybookCard.model_validate(item) for item in data.get("playbooks", [])]
@@ -200,3 +217,7 @@ class PlaybooksAPI:
     def _review_intake_entries(self) -> builtin_list[PlaybookReviewIntake]:
         data = load_surface(self.workspace, "aoa-playbooks.playbook_review_intake.min")
         return [PlaybookReviewIntake.model_validate(item) for item in data.get("playbooks", [])]
+
+    def _landing_governance_entries(self) -> builtin_list[PlaybookLandingGovernanceEntry]:
+        data = load_surface(self.workspace, "aoa-playbooks.playbook_landing_governance.min")
+        return [PlaybookLandingGovernanceEntry.model_validate(item) for item in data.get("playbooks", [])]

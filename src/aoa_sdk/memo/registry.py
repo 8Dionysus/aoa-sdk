@@ -16,6 +16,7 @@ from ..models import (
     MemoWritebackRule,
     MemoWritebackIntakeTarget,
     MemoWritebackTarget,
+    MemoWritebackGovernanceTarget,
 )
 from ..workspace.discovery import Workspace
 
@@ -194,6 +195,22 @@ class MemoAPI:
                 return entry
         raise RecordNotFound(f"Unknown memo writeback intake runtime surface: {runtime_surface}")
 
+    def writeback_governance(
+        self,
+        runtime_surface: str | None = None,
+    ) -> builtin_list[MemoWritebackGovernanceTarget] | MemoWritebackGovernanceTarget:
+        entries = self._writeback_governance_entries()
+        if runtime_surface is None:
+            return entries
+        for entry in entries:
+            if entry.runtime_surface == runtime_surface:
+                return entry
+        raise RecordNotFound(f"Unknown memo writeback governance runtime surface: {runtime_surface}")
+
     def _writeback_intake_entries(self) -> builtin_list[MemoWritebackIntakeTarget]:
         data = load_surface(self.workspace, "aoa-memo.runtime_writeback_intake.min")
         return [MemoWritebackIntakeTarget.model_validate(item) for item in data.get("targets", [])]
+
+    def _writeback_governance_entries(self) -> builtin_list[MemoWritebackGovernanceTarget]:
+        data = load_surface(self.workspace, "aoa-memo.runtime_writeback_governance.min")
+        return [MemoWritebackGovernanceTarget.model_validate(item) for item in data.get("targets", [])]
