@@ -241,3 +241,63 @@ def test_closeout_process_inbox_prints_kernel_next_brief(workspace_root: Path) -
     assert result.exit_code == 0
     assert "kernel_next:" in result.stdout
     assert "skill: aoa-automation-opportunity-scan" in result.stdout
+
+
+def test_skills_detect_can_emit_json(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "detect",
+            str(workspace_root / "aoa-sdk"),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--phase",
+            "ingress",
+            "--intent-text",
+            "plan verify a bounded change",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["foundation_id"] == "project-foundation-v1"
+    assert payload["activate_now"][0]["skill_name"] == "aoa-change-protocol"
+
+
+def test_skills_dispatch_can_emit_json(workspace_root: Path) -> None:
+    runner = CliRunner()
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "dispatch",
+            str(workspace_root / "aoa-sdk"),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--phase",
+            "pre-mutation",
+            "--intent-text",
+            "plan verify a bounded change",
+            "--mutation-surface",
+            "runtime",
+            "--session-file",
+            str(session_file),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["activate_now"][0]["skill_name"] == "aoa-change-protocol"
+    assert [item["skill_name"] for item in payload["must_confirm"]] == [
+        "aoa-approval-gate-check",
+        "aoa-dry-run-first",
+        "aoa-local-stack-bringup",
+        "aoa-safe-infra-change",
+    ]

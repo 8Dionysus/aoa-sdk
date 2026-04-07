@@ -31,10 +31,14 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert report["aoa-memo.runtime_writeback_governance.min"].compatible is True
     assert report["aoa-techniques.technique_promotion_readiness.min"].compatible is True
     assert report["aoa-skills.project_core_skill_kernel.min"].compatible is True
+    assert report["aoa-skills.project_foundation_profile.min"].compatible is True
     assert report["aoa-skills.project_core_outer_ring.min"].compatible is True
     assert report["aoa-skills.project_core_outer_ring_readiness.min"].compatible is True
     assert report["aoa-skills.project_risk_guard_ring.min"].compatible is True
     assert report["aoa-skills.project_risk_guard_ring_governance.min"].compatible is True
+    assert report["aoa-skills.tiny_router_candidate_bands"].compatible is True
+    assert report["aoa-skills.tiny_router_capsules.min"].compatible is True
+    assert report["aoa-skills.skill_trigger_collision_matrix"].compatible is True
     assert report["aoa-stats.object_summary.min"].compatible is True
     assert report["aoa-stats.core_skill_application_summary.min"].compatible is True
     assert report["aoa-stats.automation_pipeline_summary.min"].compatible is True
@@ -47,6 +51,7 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     writeback_governance = sdk.memo.writeback_governance("checkpoint_export")
     technique_readiness = sdk.techniques.promotion_readiness("AOA-T-0001")
     technique_readiness_entries = sdk.techniques.promotion_readiness()
+    foundation = sdk.skills.project_foundation()
     outer_ring = sdk.skills.project_core_outer_ring()
     outer_ring_readiness = sdk.skills.project_core_outer_ring_readiness()
     risk_ring = sdk.skills.project_risk_guard_ring()
@@ -60,6 +65,8 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert writeback_governance.governance_passed is True
     assert technique_readiness.readiness_passed is True
     assert len(technique_readiness_entries) >= 90
+    assert foundation.foundation_id == "project-foundation-v1"
+    assert len(foundation.skills) == 22
     assert outer_ring.ring_id == "project-core-engineering-ring-v1"
     assert len(outer_ring.skills) == 10
     assert len(outer_ring_readiness) == 10

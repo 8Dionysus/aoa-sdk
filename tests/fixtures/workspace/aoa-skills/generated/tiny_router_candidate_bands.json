@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "profile": "codex-facing-wave-9-tiny-router-inputs",
+  "band_count": 2,
+  "bands": [
+    {
+      "id": "decision-doc-authority",
+      "summary": "Decision records, source-of-truth authority, and canonical documentation surfaces.",
+      "cues": [
+        "adr",
+        "decision note",
+        "source of truth",
+        "canonical file"
+      ],
+      "skills": [
+        "aoa-source-of-truth-check"
+      ],
+      "manual_only_skills": [],
+      "overlay_skills": []
+    },
+    {
+      "id": "change-validation",
+      "summary": "Scoped change execution and explicit verification.",
+      "cues": [
+        "bounded change",
+        "plan apply verify report",
+        "explicit verification"
+      ],
+      "skills": [
+        "aoa-change-protocol"
+      ],
+      "manual_only_skills": [],
+      "overlay_skills": []
+    }
+  ]
+}

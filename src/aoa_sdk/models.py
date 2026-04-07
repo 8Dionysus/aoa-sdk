@@ -922,6 +922,42 @@ class ProjectRiskGuardRingGovernanceSurface(BaseModel):
     skills: list[ProjectRiskGuardRingGovernanceEntry] = Field(default_factory=list)
 
 
+class ProjectFoundationProfileSurface(BaseModel):
+    schema_version: int
+    source_config: str | None = None
+    foundation_id: str
+    owner_repo: str
+    description: str | None = None
+    canonical_install_profile: str
+    kernel_id: str
+    outer_ring_id: str
+    risk_ring_id: str
+    skill_count: int | None = None
+    skills: list[str] = Field(default_factory=list)
+    kernel_skills: list[str] = Field(default_factory=list)
+    outer_ring_skills: list[str] = Field(default_factory=list)
+    risk_ring_skills: list[str] = Field(default_factory=list)
+
+
+class SkillDispatchItem(BaseModel):
+    skill_name: str
+    layer: Literal["kernel", "outer-ring", "risk-ring"]
+    collision_family: str | None = None
+    reason: str
+
+
+class SkillDetectionReport(BaseModel):
+    phase: Literal["ingress", "pre-mutation", "closeout"]
+    repo_root: str
+    foundation_id: str
+    activate_now: list[SkillDispatchItem] = Field(default_factory=list)
+    must_confirm: list[SkillDispatchItem] = Field(default_factory=list)
+    suggest_next: list[SkillDispatchItem] = Field(default_factory=list)
+    blocked_actions: list[str] = Field(default_factory=list)
+    closeout_chain: KernelNextStepBrief | None = None
+    reasoning: list[str] = Field(default_factory=list)
+
+
 class KernelNextStepBrief(BaseModel):
     kernel_id: str
     current_session_skill_names: list[str] = Field(default_factory=list)

@@ -37,6 +37,26 @@ def test_project_core_outer_ring_reads(workspace_root: Path) -> None:
     assert all(entry.readiness_passed for entry in readiness)
 
 
+def test_project_foundation_reads(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    foundation = sdk.skills.project_foundation()
+
+    assert foundation.foundation_id == "project-foundation-v1"
+    assert foundation.canonical_install_profile == "repo-project-foundation"
+    assert foundation.skill_count == 22
+    assert foundation.skills[:3] == [
+        "aoa-session-donor-harvest",
+        "aoa-automation-opportunity-scan",
+        "aoa-session-route-forks",
+    ]
+    assert foundation.skills[-3:] == [
+        "aoa-local-stack-bringup",
+        "aoa-safe-infra-change",
+        "aoa-sanitized-share",
+    ]
+
+
 def test_project_risk_guard_ring_reads(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
@@ -80,3 +100,63 @@ def test_activate_and_manage_session(workspace_root: Path, tmp_path: Path) -> No
     assert session.active_skills[0].activation_count == 2
     assert packet["active_skill_packets"][0]["name"] == "aoa-change-protocol"
     assert cleared.active_skills == []
+
+
+def test_detect_and_dispatch_ingress(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+
+    report = sdk.skills.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="plan verify a bounded change",
+    )
+    dispatch_report = sdk.skills.dispatch(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="plan verify a bounded change",
+        session_file=str(session_file),
+    )
+    session = sdk.skills.session_status(str(session_file))
+
+    assert [item.skill_name for item in report.activate_now] == ["aoa-change-protocol"]
+    assert report.must_confirm == []
+    assert dispatch_report.activate_now[0].skill_name == "aoa-change-protocol"
+    assert session.active_skills[0].name == "aoa-change-protocol"
+
+
+def test_detect_pre_mutation_raises_risk_gates_without_auto_running_them(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.skills.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="pre-mutation",
+        intent_text="plan verify a bounded change",
+        mutation_surface="runtime",
+    )
+
+    assert [item.skill_name for item in report.activate_now] == ["aoa-change-protocol"]
+    assert [item.skill_name for item in report.must_confirm] == [
+        "aoa-approval-gate-check",
+        "aoa-dry-run-first",
+        "aoa-local-stack-bringup",
+        "aoa-safe-infra-change",
+    ]
+    assert "mutation_without_explicit_risk_confirmation" in report.blocked_actions
+
+
+def test_detect_closeout_reuses_kernel_brief(workspace_root: Path) -> None:
+    from tests.test_closeout import install_closeout_fixture
+
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.skills.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="closeout",
+        closeout_path=str(fixture["manifest_path"]),
+    )
+
+    assert report.closeout_chain is not None
+    assert report.closeout_chain.suggested_skill_name == "aoa-automation-opportunity-scan"
+    assert [item.skill_name for item in report.must_confirm] == ["aoa-automation-opportunity-scan"]

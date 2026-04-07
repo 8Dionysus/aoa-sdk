@@ -31,8 +31,10 @@ Use the shortest route by need:
 - reviewed session manifest assembly: `docs/session-closeout.md` and `aoa closeout build-manifest`
 - reviewed session request assembly from receipt bundles or audit-only reviewed artifacts: `docs/session-closeout.md` and `aoa closeout submit-reviewed`
 - kernel-aware next-step brief after reviewed closeout: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
+- project foundation structure and layer order: `sdk.skills.project_foundation()` and the `aoa-skills` generated foundation surface
 - project-core outer-ring structure and readiness: `sdk.skills.project_core_outer_ring()`, `sdk.skills.project_core_outer_ring_readiness()`, and the `aoa-skills` generated project-core ring surfaces
 - project risk guard ring structure and governance: `sdk.skills.project_risk_guard_ring()`, `sdk.skills.project_risk_guard_ring_governance()`, and the `aoa-skills` generated risk-ring surfaces
+- phase-aware skill detection and safe auto-dispatch: `aoa skills detect`, `aoa skills dispatch`, and `src/aoa_sdk/skills/detector.py`
 
 ## What `aoa-sdk` owns
 
@@ -48,8 +50,10 @@ This repository is the source of truth for:
 - canonical request assembly from reviewed artifacts plus receipt bundles before manifest/enqueue
 - separate closeout routing for skill-detail receipts and generic project-core kernel skill-application receipts
 - kernel-aware next-step brief generation based on `aoa-skills.project_core_skill_kernel.min` and refreshed `aoa-stats.core_skill_application_summary.min`
+- typed readability for the baseline project foundation from `aoa-skills.project_foundation_profile.min`
 - typed readability for the static project-core engineering outer ring from `aoa-skills.project_core_outer_ring.min` and `aoa-skills.project_core_outer_ring_readiness.min`
 - typed readability for the static project risk guard ring from `aoa-skills.project_risk_guard_ring.min` and `aoa-skills.project_risk_guard_ring_governance.min`
+- phase-aware skill detection and dispatch that only auto-activates `explicit-preferred` foundation skills and keeps `explicit-only` skills in visible confirmation lanes
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own
@@ -91,8 +95,14 @@ preview = sdk.skills.disclose("aoa-change-protocol")
 activation = sdk.skills.activate("aoa-change-protocol")
 outer_ring = sdk.skills.project_core_outer_ring()
 outer_ring_readiness = sdk.skills.project_core_outer_ring_readiness()
+foundation = sdk.skills.project_foundation()
 risk_ring = sdk.skills.project_risk_guard_ring()
 risk_ring_governance = sdk.skills.project_risk_guard_ring_governance()
+dispatch = sdk.skills.detect(
+    repo_root="/srv/aoa-sdk",
+    phase="ingress",
+    intent_text="plan verify a bounded change",
+)
 verify_binding = sdk.agents.binding_for_phase("verify")
 playbook = sdk.playbooks.get("bounded-change-safe")
 memory = sdk.memo.recall(mode="semantic", query="charter")
@@ -151,6 +161,13 @@ aoa closeout build-manifest /srv/path/to/closeout.request.json --root /srv/aoa-s
 aoa closeout enqueue-current /srv/path/to/closeout.json --root /srv/aoa-sdk --json
 aoa closeout status /srv/aoa-sdk --json
 python scripts/install_closeout_units.py --overwrite --enable
+```
+
+Inspect one phase-aware foundation detection pass:
+
+```bash
+aoa skills detect /srv/aoa-sdk --phase ingress --intent-text "plan verify a bounded change" --root /srv/aoa-sdk --json
+aoa skills dispatch /srv/aoa-sdk --phase pre-mutation --intent-text "refresh generated contracts" --mutation-surface repo-config --root /srv/aoa-sdk --json
 ```
 
 Install for development:

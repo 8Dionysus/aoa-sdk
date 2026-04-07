@@ -5,9 +5,10 @@ from typing import Any
 
 import typer
 
+from ..api import AoASDK
 from ..closeout import CloseoutAPI
 from ..compatibility import CompatibilityAPI
-from ..models import KernelNextStepBrief
+from ..models import KernelNextStepBrief, SkillDetectionReport, SkillDispatchItem
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
 
@@ -15,10 +16,12 @@ app = typer.Typer(help="AoA SDK CLI")
 workspace_app = typer.Typer(help="Inspect workspace topology")
 compatibility_app = typer.Typer(help="Inspect compatibility of consumed surfaces")
 closeout_app = typer.Typer(help="Run bounded reviewed-session closeout orchestration")
+skills_app = typer.Typer(help="Read project skill layers and run phase-aware skill detection/dispatch")
 
 app.add_typer(workspace_app, name="workspace")
 app.add_typer(compatibility_app, name="compatibility")
 app.add_typer(closeout_app, name="closeout")
+app.add_typer(skills_app, name="skills")
 
 
 def _workspace_payload(workspace: Workspace) -> dict[str, Any]:
@@ -51,6 +54,31 @@ def _print_kernel_next_brief(brief: KernelNextStepBrief | None, *, indent: str =
     if brief.missing_kernel_skill_names:
         typer.echo(f"{indent}  missing: {', '.join(brief.missing_kernel_skill_names)}")
     typer.echo(f"{indent}  reason: {brief.reason}")
+
+
+def _print_skill_items(label: str, items: list[SkillDispatchItem]) -> None:
+    typer.echo(f"{label}:")
+    if not items:
+        typer.echo("  - none")
+        return
+    for item in items:
+        family = item.collision_family or "none"
+        typer.echo(f"  - {item.skill_name} [{item.layer} / {family}]")
+        typer.echo(f"    reason: {item.reason}")
+
+
+def _print_skill_detection_report(report: SkillDetectionReport) -> None:
+    typer.echo(f"phase: {report.phase}")
+    typer.echo(f"repo_root: {report.repo_root}")
+    typer.echo(f"foundation_id: {report.foundation_id}")
+    _print_skill_items("activate_now", report.activate_now)
+    _print_skill_items("must_confirm", report.must_confirm)
+    _print_skill_items("suggest_next", report.suggest_next)
+    typer.echo(f"blocked_actions: {', '.join(report.blocked_actions) if report.blocked_actions else 'none'}")
+    _print_kernel_next_brief(report.closeout_chain)
+    typer.echo("reasoning:")
+    for line in report.reasoning:
+        typer.echo(f"  - {line}")
 
 
 @app.command()
@@ -121,6 +149,76 @@ def compatibility_check(
 
     if not payload["compatible"]:
         raise typer.Exit(code=1)
+
+
+@skills_app.command("detect")
+def skills_detect(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as task context."),
+    phase: str = typer.Option(..., "--phase", help="Detection phase: ingress, pre-mutation, or closeout."),
+    intent_text: str = typer.Option("", "--intent-text", help="Intent text used for tiny-router style matching."),
+    mutation_surface: str = typer.Option(
+        "none",
+        "--mutation-surface",
+        help="Mutation class: none, code, repo-config, infra, runtime, or public-share.",
+    ),
+    closeout_path: str | None = typer.Option(
+        None,
+        "--closeout-path",
+        help="Optional closeout report or manifest path when phase=closeout.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    sdk_report = AoASDK.from_workspace(root).skills.detect(
+        repo_root=repo_root,
+        phase=phase,  # type: ignore[arg-type]
+        intent_text=intent_text,
+        mutation_surface=mutation_surface,  # type: ignore[arg-type]
+        closeout_path=closeout_path,
+    )
+    payload = sdk_report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_skill_detection_report(sdk_report)
+
+
+@skills_app.command("dispatch")
+def skills_dispatch(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as task context."),
+    phase: str = typer.Option(..., "--phase", help="Dispatch phase: ingress, pre-mutation, or closeout."),
+    intent_text: str = typer.Option("", "--intent-text", help="Intent text used for tiny-router style matching."),
+    mutation_surface: str = typer.Option(
+        "none",
+        "--mutation-surface",
+        help="Mutation class: none, code, repo-config, infra, runtime, or public-share.",
+    ),
+    closeout_path: str | None = typer.Option(
+        None,
+        "--closeout-path",
+        help="Optional closeout report or manifest path when phase=closeout.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file. Defaults to the canonical session contract path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    sdk_report = AoASDK.from_workspace(root).skills.dispatch(
+        repo_root=repo_root,
+        phase=phase,  # type: ignore[arg-type]
+        intent_text=intent_text,
+        mutation_surface=mutation_surface,  # type: ignore[arg-type]
+        closeout_path=closeout_path,
+        session_file=session_file,
+    )
+    payload = sdk_report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_skill_detection_report(sdk_report)
 
 
 @closeout_app.command("run")

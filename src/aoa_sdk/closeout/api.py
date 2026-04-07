@@ -12,6 +12,7 @@ import sys
 from typing import Any, Literal
 
 from ..compatibility import load_surface
+from ..errors import SurfaceNotFound
 from ..loaders import load_json, write_json
 from ..models import (
     CloseoutBuildReport,
@@ -897,7 +898,10 @@ class CloseoutAPI:
         kernel_skills: list[str],
     ) -> dict[str, int]:
         usage_counts = {skill_name: 0 for skill_name in kernel_skills}
-        summary = load_surface(self.workspace, "aoa-stats.core_skill_application_summary.min")
+        try:
+            summary = load_surface(self.workspace, "aoa-stats.core_skill_application_summary.min")
+        except SurfaceNotFound:
+            return usage_counts
         for item in summary.get("skills", []):
             if not isinstance(item, dict):
                 continue
