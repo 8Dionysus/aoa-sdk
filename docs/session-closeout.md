@@ -259,6 +259,30 @@ reviewed manifests as soon as they land in the canonical inbox:
 python /srv/aoa-sdk/scripts/install_closeout_units.py --overwrite --enable
 ```
 
+## Surface detection handoff
+
+First-wave surface detection is a separate, additive seam.
+
+- `aoa closeout run` does not auto-run `aoa surfaces handoff`
+- `aoa surfaces handoff` is reviewed-only and writes into `.aoa/surface-detection/`
+- surviving surface notes keep their truth labels; the handoff does not promote
+  anything by itself
+
+Use the separate handoff when a reviewed session should preserve surface
+observations for the session-growth kernel without pretending those owner-layer
+candidates were activated:
+
+```bash
+aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json \
+  --session-ref session:2026-04-07-surface-first-wave \
+  --reviewed \
+  --root /srv/aoa-sdk \
+  --json
+```
+
+For the first-wave boundary, heuristics, and target selection rules, use
+`docs/aoa-surface-detection-closeout-handoff.md`.
+
 The watcher uses `aoa-closeout-inbox.path` to watch
 `.aoa/closeout/inbox/*.json` and runs `aoa-closeout-inbox.service`, which calls
 the bounded inbox processor script under `scripts/process_closeout_inbox.py`.

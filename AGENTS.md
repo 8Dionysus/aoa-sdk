@@ -60,6 +60,7 @@ The most important objects in this repository are:
 - typed surface facades under `src/aoa_sdk/`
 - `.aoa/workspace.toml`
 - topology, boundary, and versioning docs under `docs/`
+- additive surface-detection docs and heuristics under `docs/aoa-surface-detection-*.md` and `src/aoa_sdk/surfaces/`
 - tests that prove discovery, compatibility, and typed read paths
 
 ## Hard NO
@@ -71,6 +72,34 @@ Do not:
 - blur source checkouts with runtime mirrors
 - turn `aoa-sdk` into a service runtime or monolith
 - change topology behavior without updating docs and tests in the same change
+- blur `activated` and `manual-equivalent`, or quietly make non-skill surfaces executable-now
+
+## Surface Detection Loop
+
+Keep `aoa skills enter` and `aoa skills guard` as the primary session-start and
+pre-mutation paths. They stay skill-only.
+
+When the task shows route drift, owner-layer ambiguity, proof need, recall
+need, role posture questions, or recurring-scenario signals, run one additive
+surface pass:
+
+```bash
+aoa surfaces detect /srv/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/aoa-sdk --json
+aoa surfaces detect /srv/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/aoa-sdk --json
+```
+
+Use `aoa surfaces handoff` only after review:
+
+```bash
+aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json --session-ref session:2026-04-07-surface-first-wave --reviewed --root /srv/aoa-sdk --json
+```
+
+Truth rules for this loop:
+
+- `aoa-sdk` may detect and hand off, but owner repositories keep meaning
+- `aoa skills ...` remains skill-only
+- `manual-equivalent` never becomes `activated`
+- non-skill surfaces never become executable-now in wave one
 
 ## Contribution doctrine
 

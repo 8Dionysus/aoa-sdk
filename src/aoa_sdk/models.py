@@ -1016,6 +1016,99 @@ class SkillDetectionReport(BaseModel):
     reasoning: list[str] = Field(default_factory=list)
 
 
+class SurfaceOpportunityExecutionHint(BaseModel):
+    lane: Literal[
+        "skill-dispatch",
+        "inspect-expand-use",
+        "manual-fallback",
+        "closeout-harvest",
+        "defer",
+    ]
+    executable_now: bool = False
+    requires_confirmation: bool = False
+    existing_command: str | None = None
+    existing_surface: str | None = None
+    manual_fallback_allowed: bool = False
+    manual_fallback_note: str | None = None
+    host_availability_status: Literal["host-executable", "router-only", "unknown"] | None = None
+
+
+class SurfaceOpportunityItem(BaseModel):
+    surface_ref: str
+    display_name: str
+    object_kind: Literal["technique", "skill", "eval", "memo", "playbook", "agent"]
+    owner_repo: Literal[
+        "aoa-techniques",
+        "aoa-skills",
+        "aoa-evals",
+        "aoa-memo",
+        "aoa-playbooks",
+        "aoa-agents",
+    ]
+    state: Literal["activated", "manual-equivalent", "candidate-now", "candidate-later"]
+    phase_detected: Literal["ingress", "in-flight", "pre-mutation", "closeout"]
+    reason: str
+    signals: list[
+        Literal[
+            "explicit-request",
+            "risk-gate",
+            "router-match",
+            "repeated-pattern",
+            "proof-need",
+            "recall-need",
+            "scenario-recurring",
+            "role-posture",
+            "closeout-chain",
+        ]
+    ] = Field(default_factory=list)
+    confidence: Literal["low", "medium", "high"] = "medium"
+    execution: SurfaceOpportunityExecutionHint
+    related_skill_names: list[str] = Field(default_factory=list)
+    closeout_family_candidates: list[str] = Field(default_factory=list)
+    promotion_hint: str | None = None
+
+
+class SurfaceDetectionReport(BaseModel):
+    schema_version: int = 1
+    repo_root: str
+    workspace_root: str
+    phase: Literal["ingress", "in-flight", "pre-mutation", "closeout"]
+    intent_text: str = ""
+    mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none"
+    skill_report_path: str | None = None
+    skill_report_included: bool = False
+    active_skill_names: list[str] = Field(default_factory=list)
+    immediate_skill_dispatch: list[str] = Field(default_factory=list)
+    items: list[SurfaceOpportunityItem] = Field(default_factory=list)
+    closeout_followups: list[str] = Field(default_factory=list)
+    owner_layer_notes: list[str] = Field(default_factory=list)
+    actionability_gaps: list[str] = Field(default_factory=list)
+
+
+class SurfaceCloseoutHandoffTarget(BaseModel):
+    skill_name: Literal[
+        "aoa-session-donor-harvest",
+        "aoa-automation-opportunity-scan",
+        "aoa-session-route-forks",
+        "aoa-session-self-diagnose",
+        "aoa-session-self-repair",
+        "aoa-session-progression-lift",
+        "aoa-quest-harvest",
+    ]
+    why: str
+    triggered_by: list[str] = Field(default_factory=list)
+
+
+class SurfaceCloseoutHandoff(BaseModel):
+    schema_version: int = 1
+    session_ref: str
+    reviewed: bool
+    surface_detection_report_ref: str
+    surviving_items: list[SurfaceOpportunityItem] = Field(default_factory=list)
+    handoff_targets: list[SurfaceCloseoutHandoffTarget] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+
 class KernelNextStepBrief(BaseModel):
     kernel_id: str
     current_session_skill_names: list[str] = Field(default_factory=list)
