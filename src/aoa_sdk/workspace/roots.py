@@ -15,6 +15,27 @@ KNOWN_REPOS = (
     "abyss-stack",
 )
 
+WORKSPACE_REQUIRED_REPOS = (
+    "8Dionysus",
+    "Agents-of-Abyss",
+    "Tree-of-Sophia",
+    "Dionysus",
+    "aoa-agents",
+    "aoa-evals",
+    "aoa-kag",
+    "aoa-memo",
+    "aoa-playbooks",
+    "aoa-routing",
+    "aoa-sdk",
+    "aoa-skills",
+    "aoa-stats",
+    "aoa-techniques",
+)
+
+WORKSPACE_OPTIONAL_REPOS = (
+    "abyss-stack",
+)
+
 CORE_FEDERATION_REPOS = (
     "aoa-routing",
     "aoa-skills",

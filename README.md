@@ -22,6 +22,7 @@ Use the shortest route by need:
 ## Route by need
 
 - machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
+- portable sibling-workspace bootstrap for non-`/srv` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`
 - source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
 - compatibility rules and local checks: `docs/versioning.md`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
@@ -133,6 +134,13 @@ Inspect the resolved workspace layout:
 ```bash
 aoa workspace inspect /srv/aoa-sdk
 aoa workspace inspect /srv/aoa-sdk --json
+```
+
+Plan or apply one portable sibling-workspace bootstrap:
+
+```bash
+aoa workspace bootstrap /work/my-aoa --json
+aoa workspace bootstrap /work/my-aoa --execute --json
 ```
 
 Check consumed surface compatibility across the local workspace:
