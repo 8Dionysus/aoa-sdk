@@ -47,6 +47,8 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-evals.runtime_candidate_intake.min"].compatible is True
     assert report["aoa-skills.project_core_skill_kernel.min"].detected_version == 1
     assert report["aoa-skills.project_core_skill_kernel.min"].compatible is True
+    assert report["aoa-skills.project_foundation_profile.min"].detected_version == 1
+    assert report["aoa-skills.project_foundation_profile.min"].compatible is True
     assert report["aoa-skills.project_core_outer_ring.min"].detected_version == 1
     assert report["aoa-skills.project_core_outer_ring.min"].compatible is True
     assert report["aoa-skills.project_core_outer_ring_readiness.min"].detected_version == 1
@@ -55,6 +57,12 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-skills.project_risk_guard_ring.min"].compatible is True
     assert report["aoa-skills.project_risk_guard_ring_governance.min"].detected_version == 1
     assert report["aoa-skills.project_risk_guard_ring_governance.min"].compatible is True
+    assert report["aoa-skills.tiny_router_candidate_bands"].detected_version == 1
+    assert report["aoa-skills.tiny_router_candidate_bands"].compatible is True
+    assert report["aoa-skills.tiny_router_capsules.min"].detected_version == 1
+    assert report["aoa-skills.tiny_router_capsules.min"].compatible is True
+    assert report["aoa-skills.skill_trigger_collision_matrix"].detected_version == 1
+    assert report["aoa-skills.skill_trigger_collision_matrix"].compatible is True
     assert report["aoa-kag.kag_registry.min"].detected_version == 1
     assert report["aoa-kag.federation_spine.min"].compatible is True
 

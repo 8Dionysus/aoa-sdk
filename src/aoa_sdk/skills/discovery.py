@@ -6,12 +6,14 @@ from typing import Literal
 from ..compatibility import load_surface
 from ..loaders import extract_records
 from ..models import (
+    ProjectFoundationProfileSurface,
     ProjectRiskGuardRingGovernanceEntry,
     ProjectRiskGuardRingGovernanceSurface,
     ProjectRiskGuardRingSurface,
     ProjectCoreOuterRingReadinessEntry,
     ProjectCoreOuterRingReadinessSurface,
     ProjectCoreOuterRingSurface,
+    SkillDetectionReport,
     SkillActivationRequest,
     SkillCard,
     SkillDisclosure,
@@ -19,6 +21,7 @@ from ..models import (
 )
 from ..workspace.discovery import Workspace
 from .activation import activate_skill
+from .detector import detect_skills, dispatch_skills, load_project_foundation
 from .disclosure import disclose_skill
 from .session import compact_session, deactivate_session_skill, ensure_session, load_session, save_session
 
@@ -131,6 +134,9 @@ class SkillsAPI:
     def compact(self, session_file: str) -> dict:
         return compact_session(load_session(self.workspace, session_file))
 
+    def project_foundation(self) -> ProjectFoundationProfileSurface:
+        return load_project_foundation(self.workspace)
+
     def project_core_outer_ring(self) -> ProjectCoreOuterRingSurface:
         data = load_surface(self.workspace, "aoa-skills.project_core_outer_ring.min")
         return ProjectCoreOuterRingSurface.model_validate(data)
@@ -148,3 +154,41 @@ class SkillsAPI:
         data = load_surface(self.workspace, "aoa-skills.project_risk_guard_ring_governance.min")
         governance = ProjectRiskGuardRingGovernanceSurface.model_validate(data)
         return governance.skills
+
+    def detect(
+        self,
+        *,
+        repo_root: str,
+        phase: Literal["ingress", "pre-mutation", "closeout"],
+        intent_text: str = "",
+        mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
+        closeout_path: str | None = None,
+    ) -> SkillDetectionReport:
+        return detect_skills(
+            self.workspace,
+            repo_root=repo_root,
+            phase=phase,
+            intent_text=intent_text,
+            mutation_surface=mutation_surface,
+            closeout_path=closeout_path,
+        )
+
+    def dispatch(
+        self,
+        *,
+        repo_root: str,
+        phase: Literal["ingress", "pre-mutation", "closeout"],
+        intent_text: str = "",
+        mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
+        closeout_path: str | None = None,
+        session_file: str | None = None,
+    ) -> SkillDetectionReport:
+        return dispatch_skills(
+            self.workspace,
+            repo_root=repo_root,
+            phase=phase,
+            intent_text=intent_text,
+            mutation_surface=mutation_surface,
+            closeout_path=closeout_path,
+            session_file=session_file,
+        )

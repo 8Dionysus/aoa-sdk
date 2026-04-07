@@ -1,0 +1,35 @@
+{
+  "matrix_version": 1,
+  "profile": "codex-facing-trigger-collisions",
+  "families": [
+    {
+      "family": "change-execution-vs-test-first",
+      "skills": [
+        "aoa-change-protocol"
+      ]
+    },
+    {
+      "family": "decision-and-doc-authority",
+      "skills": [
+        "aoa-source-of-truth-check"
+      ]
+    },
+    {
+      "family": "quest-harvest-governance",
+      "skills": [
+        "aoa-automation-opportunity-scan"
+      ]
+    },
+    {
+      "family": "safety-and-mutation-gating",
+      "skills": [
+        "aoa-approval-gate-check",
+        "aoa-dry-run-first",
+        "aoa-local-stack-bringup",
+        "aoa-safe-infra-change",
+        "aoa-sanitized-share"
+      ]
+    }
+  ],
+  "cases": []
+}
