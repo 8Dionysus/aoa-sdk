@@ -4,8 +4,14 @@ from typing import Any
 
 from ..compatibility import load_surface
 from ..loaders import extract_records, find_record
-from ..models import RegistryEntry, RoutingHint
-from .hints import hint_for_kind, load_cross_repo_registry, load_routing_hints, rank_registry_entries
+from ..models import RegistryEntry, RoutingHint, RoutingOwnerLayerShortlistHint
+from .hints import (
+    hint_for_kind,
+    load_cross_repo_registry,
+    load_owner_layer_shortlist_hints,
+    load_routing_hints,
+    rank_registry_entries,
+)
 
 
 ROUTING_ACTION_SURFACE_IDS = {
@@ -26,6 +32,19 @@ class RoutingAPI:
 
     def hints(self) -> list[RoutingHint]:
         return load_routing_hints(self.workspace)
+
+    def owner_layer_shortlist(
+        self,
+        *,
+        signal: str | None = None,
+        owner_repo: str | None = None,
+    ) -> list[RoutingOwnerLayerShortlistHint]:
+        entries = load_owner_layer_shortlist_hints(self.workspace)
+        if signal is not None:
+            entries = [entry for entry in entries if entry.signal == signal]
+        if owner_repo is not None:
+            entries = [entry for entry in entries if entry.owner_repo == owner_repo]
+        return entries
 
     def pick(self, *, kind: str, query: str) -> list[RegistryEntry]:
         hint = hint_for_kind(self.workspace, kind)

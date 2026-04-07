@@ -158,6 +158,37 @@ def install_stats_fixture(workspace_root: Path) -> Path:
                     "schema_ref": "schemas/automation-pipeline-summary.schema.json",
                     "primary_question": "How close is a named automation pipeline to seed-ready bounded use?",
                     "derivation_rule": "aggregate automation_candidate_receipt payloads by pipeline_ref and readiness flags",
+                },
+                {
+                    "name": "surface_detection_summary",
+                    "path": "generated/surface_detection_summary.min.json",
+                    "schema_ref": "schemas/surface-detection-summary.schema.json",
+                    "primary_question": "What second-wave surface-detection signals are accumulating without turning stats into routing authority?",
+                    "derivation_rule": "aggregate advisory surface_detection_context payloads on finish-stage core_skill_application_receipt envelopes by observed date",
+                }
+            ],
+        },
+        "surface_detection_summary.min.json": {
+            "schema_version": "aoa_stats_surface_detection_summary_v1",
+            "generated_from": generated_from,
+            "windows": [
+                {
+                    "window_id": "window:2026-04-05",
+                    "window_date": "2026-04-05",
+                    "core_skill_receipt_count": 1,
+                    "activated_count": 1,
+                    "manual_equivalent_adjacent_count": 0,
+                    "candidate_now_count": 1,
+                    "candidate_later_count": 1,
+                    "owner_layer_ambiguity_count": 0,
+                    "adjacent_owner_repo_counts": {"aoa-evals": 1},
+                    "handoff_target_counts": {"aoa-session-donor-harvest": 1},
+                    "repeated_pattern_signal_count": 0,
+                    "promotion_discussion_count": 0,
+                    "family_entry_ref_count": 1,
+                    "evidence_ref_count": 1,
+                    "first_observed_at": "2026-04-05T10:20:00Z",
+                    "last_observed_at": "2026-04-05T10:20:00Z",
                 }
             ],
         },
@@ -192,6 +223,35 @@ def install_stats_fixture(workspace_root: Path) -> Path:
     ]
     live_catalog = dict(live_surfaces["summary_surface_catalog.min.json"])
     live_catalog["generated_from"] = live_generated_from
+    live_surface_detection = dict(live_surfaces["surface_detection_summary.min.json"])
+    live_surface_detection["generated_from"] = live_generated_from
+    live_surface_detection["windows"] = [
+        {
+            "window_id": "window:2026-04-05",
+            "window_date": "2026-04-05",
+            "core_skill_receipt_count": 2,
+            "activated_count": 1,
+            "manual_equivalent_adjacent_count": 1,
+            "candidate_now_count": 2,
+            "candidate_later_count": 3,
+            "owner_layer_ambiguity_count": 1,
+            "adjacent_owner_repo_counts": {
+                "aoa-evals": 1,
+                "aoa-playbooks": 1,
+                "aoa-techniques": 1,
+            },
+            "handoff_target_counts": {
+                "aoa-quest-harvest": 1,
+                "aoa-session-donor-harvest": 2,
+            },
+            "repeated_pattern_signal_count": 1,
+            "promotion_discussion_count": 1,
+            "family_entry_ref_count": 3,
+            "evidence_ref_count": 2,
+            "first_observed_at": "2026-04-05T10:20:00Z",
+            "last_observed_at": "2026-04-05T11:05:00Z",
+        }
+    ]
     live_object_summary = dict(live_surfaces["object_summary.min.json"])
     live_object_summary["generated_from"] = live_generated_from
     live_core_skill = dict(live_surfaces["core_skill_application_summary.min.json"])
@@ -220,6 +280,7 @@ def install_stats_fixture(workspace_root: Path) -> Path:
         "route_progression_summary.min.json": live_route,
         "fork_calibration_summary.min.json": live_fork,
         "automation_pipeline_summary.min.json": live_automation,
+        "surface_detection_summary.min.json": live_surface_detection,
         "summary_surface_catalog.min.json": live_catalog,
     }.items():
         (state_generated / name).write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
@@ -237,9 +298,11 @@ def test_stats_api_reads_generated_surfaces(workspace_root: Path) -> None:
     assert sdk.stats.core_skill_applications(skill_name="aoa-session-donor-harvest")[0].application_count == 2
     assert sdk.stats.automation_pipelines("pipeline:test").seed_ready_count == 1
     assert sdk.stats.route_progression("route:test").latest_verdict == "advance"
+    assert sdk.stats.surface_detection(window_date="2026-04-05").manual_equivalent_adjacent_count == 1
     assert {item.name for item in sdk.stats.summary_catalog()} == {
         "automation_pipeline_summary",
         "core_skill_application_summary",
+        "surface_detection_summary",
     }
 
 
@@ -261,5 +324,9 @@ def test_stats_compatibility_checks_green_when_repo_is_present(workspace_root: P
     assert (
         report["aoa-stats.automation_pipeline_summary.min"].detected_version
         == "aoa_stats_automation_pipeline_summary_v1"
+    )
+    assert (
+        report["aoa-stats.surface_detection_summary.min"].detected_version
+        == "aoa_stats_surface_detection_summary_v1"
     )
     assert report["aoa-stats.summary_surface_catalog.min"].compatible is True

@@ -115,6 +115,16 @@ def _print_surface_items(label: str, items: list[SurfaceOpportunityItem]) -> Non
         )
         typer.echo(f"    ref: {item.surface_ref}")
         typer.echo(f"    reason: {item.reason}")
+        if item.owner_layer_ambiguity_note:
+            typer.echo(f"    ambiguity: {item.owner_layer_ambiguity_note}")
+        if item.shortlist_hints:
+            typer.echo(
+                "    shortlist: "
+                + ", ".join(
+                    f"{hint.owner_repo} ({hint.confidence}/{hint.ambiguity})"
+                    for hint in item.shortlist_hints
+                )
+            )
 
 
 def _print_skill_detection_report(report: SkillDetectionReport) -> None:
@@ -139,6 +149,7 @@ def _print_surface_detection_report(report: SurfaceDetectionReport) -> None:
     typer.echo(f"workspace_root: {report.workspace_root}")
     typer.echo(f"skill_report_path: {report.skill_report_path or 'none'}")
     typer.echo(f"skill_report_included: {'yes' if report.skill_report_included else 'no'}")
+    typer.echo(f"shortlist_included: {'yes' if report.shortlist_included else 'no'}")
     typer.echo(f"active_skill_names: {', '.join(report.active_skill_names) if report.active_skill_names else 'none'}")
     typer.echo(
         "immediate_skill_dispatch: "

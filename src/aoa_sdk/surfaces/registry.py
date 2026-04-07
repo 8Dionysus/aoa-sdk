@@ -1,19 +1,22 @@
 from __future__ import annotations
 
+import json
 import re
 from pathlib import Path
 from typing import Literal
 
-from ..errors import SurfaceNotFound
-from ..loaders import load_json
+from ..errors import RepoNotFound, SurfaceNotFound
 from ..models import (
+    RoutingOwnerLayerShortlistHint,
     SkillDetectionReport,
     SurfaceCloseoutHandoff,
     SurfaceCloseoutHandoffTarget,
     SurfaceDetectionReport,
     SurfaceOpportunityExecutionHint,
     SurfaceOpportunityItem,
+    SurfaceOpportunityReference,
 )
+from ..routing.hints import load_owner_layer_shortlist_hints
 from ..skills.detector import detect_skills
 from ..skills.session import load_session
 from ..workspace.discovery import Workspace
@@ -68,6 +71,7 @@ class SurfacesAPI:
         session_file: str | None = None,
         closeout_path: str | None = None,
         skill_report_path: str | None = None,
+        include_shortlist: bool = True,
     ) -> SurfaceDetectionReport:
         if phase not in SURFACE_PHASES:
             raise ValueError(f"unsupported phase {phase!r}")
@@ -84,12 +88,16 @@ class SurfacesAPI:
             closeout_path=closeout_path,
         )
         active_skill_names = _load_active_skill_names(self.workspace, session_file=session_file)
+        shortlist_hints = _load_shortlist_hints(self.workspace) if include_shortlist else []
+        skill_receipt_contexts = _load_core_skill_receipt_contexts(self.workspace)
         items = _derive_surface_items(
             skill_report=skill_report,
             surface_phase=phase,
             intent_text=intent_text,
             active_skill_names=active_skill_names,
             closeout_signal=phase == "closeout" or skill_report.closeout_chain is not None,
+            shortlist_hints=shortlist_hints,
+            skill_receipt_contexts=skill_receipt_contexts,
         )
         return SurfaceDetectionReport(
             repo_root=skill_report.repo_root,
@@ -99,6 +107,7 @@ class SurfacesAPI:
             mutation_surface=mutation_surface,
             skill_report_path=skill_report_path,
             skill_report_included=True,
+            shortlist_included=bool(shortlist_hints),
             active_skill_names=active_skill_names,
             immediate_skill_dispatch=[item.skill_name for item in skill_report.activate_now],
             items=items,
@@ -139,7 +148,7 @@ def _load_surface_report(report_or_path: SurfaceDetectionReport | str | Path) ->
     if isinstance(report_or_path, SurfaceDetectionReport):
         return report_or_path, "in-memory:surface-detection-report"
 
-    payload = load_json(Path(report_or_path).expanduser().resolve())
+    payload = json.loads(Path(report_or_path).expanduser().resolve().read_text(encoding="utf-8"))
     report_payload = payload.get("report", payload)
     return SurfaceDetectionReport.model_validate(report_payload), str(Path(report_or_path).expanduser().resolve())
 
@@ -159,6 +168,8 @@ def _derive_surface_items(
     intent_text: str,
     active_skill_names: list[str],
     closeout_signal: bool,
+    shortlist_hints: list[RoutingOwnerLayerShortlistHint],
+    skill_receipt_contexts: dict[str, dict[str, object]],
 ) -> list[SurfaceOpportunityItem]:
     items: list[SurfaceOpportunityItem] = []
     items.extend(
@@ -176,7 +187,15 @@ def _derive_surface_items(
             closeout_signal=closeout_signal,
         )
     )
-    return _dedupe_surface_items(items)
+    deduped = _dedupe_surface_items(items)
+    enriched = [
+        _enrich_item_with_shortlist(item, shortlist_hints=shortlist_hints)
+        for item in deduped
+    ]
+    return [
+        _enrich_item_with_skill_receipt_context(item, skill_receipt_contexts=skill_receipt_contexts)
+        for item in enriched
+    ]
 
 
 def _derive_skill_surface_items(
@@ -214,6 +233,11 @@ def _derive_skill_surface_items(
                 related_skill_names=[],
                 closeout_family_candidates=["aoa-session-donor-harvest"],
                 promotion_hint=None,
+                family_entry_refs=_default_family_entry_refs(
+                    owner_repo="aoa-skills",
+                    surface_ref=None,
+                    inspect_surface=f".agents/skills/{item.skill_name}/SKILL.md",
+                ),
             )
         )
 
@@ -250,6 +274,7 @@ def _derive_skill_surface_items(
                 related_skill_names=_related_skill_names(skill_report, item.skill_name),
                 closeout_family_candidates=["aoa-session-donor-harvest"],
                 promotion_hint=None,
+                family_entry_refs=[],
             )
         )
 
@@ -299,6 +324,11 @@ def _derive_heuristic_items(
                 related_skill_names=[],
                 closeout_family_candidates=list(rule.closeout_family_candidates),
                 promotion_hint=rule.promotion_hint,
+                family_entry_refs=_default_family_entry_refs(
+                    owner_repo=rule.owner_repo,
+                    surface_ref=rule.surface_ref,
+                    inspect_surface=rule.existing_surface,
+                ),
             )
         )
 
@@ -333,6 +363,11 @@ def _derive_heuristic_items(
                 related_skill_names=[],
                 closeout_family_candidates=[],
                 promotion_hint=None,
+                family_entry_refs=_default_family_entry_refs(
+                    owner_repo=explicit_rule.owner_repo,
+                    surface_ref=None if explicit_rule.surface_ref.startswith("aoa-skills:") else explicit_rule.surface_ref,
+                    inspect_surface=explicit_rule.existing_surface,
+                ),
             )
         )
 
@@ -365,6 +400,8 @@ def _owner_layer_notes(*, items: list[SurfaceOpportunityItem]) -> list[str]:
         "aoa-sdk stays on the control plane; it may detect and hand off but does not become the source of truth for eval, memo, playbook, technique, or agent meaning",
         "playbook, eval, memo, agent, and technique items remain hints, candidates, or closeout handoffs in wave one; they are not auto-activatable runtime objects here",
     ]
+    if any(item.shortlist_hints for item in items):
+        notes.append("routing shortlist hints stay advisory only; they can sharpen inspection and ambiguity reporting but never overwrite activation truth")
     if any(item.state == "manual-equivalent" for item in items):
         notes.append("manual-equivalent remains distinct from activated all the way through reporting and closeout")
     return notes
@@ -460,6 +497,10 @@ def _merge_surface_items(left: SurfaceOpportunityItem, right: SurfaceOpportunity
             ),
             "promotion_hint": left.promotion_hint or right.promotion_hint,
             "execution": chosen_execution,
+            "shortlist_hints": _dedupe_shortlist_hints([*left.shortlist_hints, *right.shortlist_hints]),
+            "owner_layer_ambiguity_note": left.owner_layer_ambiguity_note or right.owner_layer_ambiguity_note,
+            "family_entry_refs": _dedupe_refs([*left.family_entry_refs, *right.family_entry_refs]),
+            "evidence_refs": _dedupe_refs([*left.evidence_refs, *right.evidence_refs]),
         }
     )
 
@@ -481,3 +522,245 @@ def _related_skill_names(skill_report: SkillDetectionReport, skill_name: str) ->
         if item.skill_name != skill_name and item.host_availability.status == "router-only"
     ]
     return list(dict.fromkeys(related))
+
+
+def _load_shortlist_hints(workspace: Workspace) -> list[RoutingOwnerLayerShortlistHint]:
+    try:
+        return load_owner_layer_shortlist_hints(workspace)
+    except (RepoNotFound, SurfaceNotFound):
+        return []
+
+
+def _load_core_skill_receipt_contexts(workspace: Workspace) -> dict[str, dict[str, object]]:
+    try:
+        receipt_path = workspace.repo_path("aoa-skills") / ".aoa" / "live_receipts" / "core-skill-applications.jsonl"
+    except RepoNotFound:
+        return {}
+    if not receipt_path.exists():
+        return {}
+
+    latest_by_skill: dict[str, dict[str, object]] = {}
+    for line_number, raw_line in enumerate(receipt_path.read_text(encoding="utf-8").splitlines(), start=1):
+        line = raw_line.strip()
+        if not line:
+            continue
+        try:
+            receipt = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(receipt, dict) or receipt.get("event_kind") != "core_skill_application_receipt":
+            continue
+        payload = receipt.get("payload")
+        if not isinstance(payload, dict) or payload.get("application_stage") != "finish":
+            continue
+        skill_name = payload.get("skill_name")
+        if not isinstance(skill_name, str) or not skill_name:
+            continue
+        sort_key = (str(receipt.get("observed_at") or ""), str(receipt.get("event_id") or ""), line_number)
+        existing = latest_by_skill.get(skill_name)
+        if existing is not None and existing.get("_sort_key") >= sort_key:
+            continue
+        context = payload.get("surface_detection_context")
+        latest_by_skill[skill_name] = {
+            "_sort_key": sort_key,
+            "event_id": receipt.get("event_id"),
+            "detail_receipt_ref": payload.get("detail_receipt_ref"),
+            "surface_detection_context": context if isinstance(context, dict) else {},
+        }
+    return latest_by_skill
+
+
+def _default_family_entry_refs(
+    *,
+    owner_repo: str,
+    surface_ref: str | None,
+    inspect_surface: str | None,
+) -> list[SurfaceOpportunityReference]:
+    refs: list[SurfaceOpportunityReference] = []
+    if inspect_surface:
+        refs.append(
+            SurfaceOpportunityReference(
+                role="inspect",
+                ref=inspect_surface,
+                owner_repo=owner_repo,
+                note="stable inspect surface",
+            )
+        )
+    if surface_ref:
+        refs.append(
+            SurfaceOpportunityReference(
+                role="family-entry",
+                ref=surface_ref,
+                owner_repo=owner_repo,
+                note="canonical family entry surface",
+            )
+        )
+    return refs
+
+
+def _enrich_item_with_shortlist(
+    item: SurfaceOpportunityItem,
+    *,
+    shortlist_hints: list[RoutingOwnerLayerShortlistHint],
+) -> SurfaceOpportunityItem:
+    matching = [
+        hint
+        for hint in shortlist_hints
+        if hint.signal in item.signals
+    ]
+    if not matching:
+        return item
+
+    ambiguity_note: str | None = item.owner_layer_ambiguity_note
+    matching_repos = {hint.owner_repo for hint in matching}
+    if ambiguity_note is None and (len(matching_repos) > 1 or any(hint.ambiguity == "ambiguous" for hint in matching)):
+        ambiguity_note = (
+            "routing shortlist keeps "
+            + ", ".join(sorted(matching_repos))
+            + " visible as adjacent owner-layer options until reviewed evidence resolves the ambiguity"
+        )
+
+    shortlist_refs = [
+        *item.family_entry_refs,
+        *[
+            SurfaceOpportunityReference(
+                role="inspect",
+                ref=hint.inspect_surface,
+                owner_repo=hint.owner_repo,
+                note=hint.hint_reason,
+            )
+            for hint in matching
+            if hint.inspect_surface
+        ],
+        *[
+            SurfaceOpportunityReference(
+                role="family-entry",
+                ref=hint.target_surface,
+                owner_repo=hint.owner_repo,
+                note=hint.hint_reason,
+            )
+            for hint in matching
+        ],
+        *[
+            SurfaceOpportunityReference(
+                role="inspect",
+                ref=hint.target_surface,
+                owner_repo=hint.owner_repo,
+                note=hint.hint_reason,
+            )
+            for hint in matching
+            if hint.inspect_surface and hint.inspect_surface != hint.target_surface
+        ],
+    ]
+    return item.model_copy(
+        update={
+            "shortlist_hints": _dedupe_shortlist_hints([*item.shortlist_hints, *matching]),
+            "owner_layer_ambiguity_note": ambiguity_note,
+            "family_entry_refs": _dedupe_refs(shortlist_refs),
+        }
+    )
+
+
+def _enrich_item_with_skill_receipt_context(
+    item: SurfaceOpportunityItem,
+    *,
+    skill_receipt_contexts: dict[str, dict[str, object]],
+) -> SurfaceOpportunityItem:
+    if item.object_kind != "skill" or not item.surface_ref.startswith("aoa-skills:"):
+        return item
+    skill_name = item.surface_ref.split(":", 1)[1]
+    receipt_info = skill_receipt_contexts.get(skill_name)
+    if receipt_info is None:
+        return item
+
+    evidence_refs = list(item.evidence_refs)
+    event_id = receipt_info.get("event_id")
+    if isinstance(event_id, str) and event_id:
+        evidence_refs.append(
+            SurfaceOpportunityReference(
+                role="runtime-receipt",
+                ref=f"repo:aoa-skills/.aoa/live_receipts/core-skill-applications.jsonl#{event_id}",
+                owner_repo="aoa-skills",
+                note="latest finish-stage core skill receipt",
+            )
+        )
+    detail_receipt_ref = receipt_info.get("detail_receipt_ref")
+    if isinstance(detail_receipt_ref, str) and detail_receipt_ref:
+        evidence_refs.append(
+            SurfaceOpportunityReference(
+                role="runtime-receipt",
+                ref=detail_receipt_ref,
+                owner_repo="aoa-skills",
+                note="detail receipt linked from the latest finish-stage core skill receipt",
+            )
+        )
+
+    context = receipt_info.get("surface_detection_context")
+    if not isinstance(context, dict):
+        context = {}
+    if isinstance(context.get("surface_detection_report_ref"), str) and context["surface_detection_report_ref"]:
+        evidence_refs.append(
+            SurfaceOpportunityReference(
+                role="skill-report",
+                ref=context["surface_detection_report_ref"],
+                owner_repo="aoa-sdk",
+                note="reviewed surface detection report captured by the skill-side receipt",
+            )
+        )
+    if isinstance(context.get("surface_closeout_handoff_ref"), str) and context["surface_closeout_handoff_ref"]:
+        evidence_refs.append(
+            SurfaceOpportunityReference(
+                role="closeout-handoff",
+                ref=context["surface_closeout_handoff_ref"],
+                owner_repo="aoa-sdk",
+                note="reviewed surface closeout handoff captured by the skill-side receipt",
+            )
+        )
+
+    family_entry_refs = list(item.family_entry_refs)
+    family_entry_refs.extend(
+        SurfaceOpportunityReference(
+            role="family-entry",
+            ref=ref,
+            note="adjacent owner-layer family entry preserved in the latest core skill receipt",
+        )
+        for ref in context.get("family_entry_refs", [])
+        if isinstance(ref, str) and ref
+    )
+
+    ambiguity_note = item.owner_layer_ambiguity_note
+    if ambiguity_note is None and bool(context.get("owner_layer_ambiguity")):
+        adjacent_owner_repos = [
+            repo
+            for repo in context.get("adjacent_owner_repos", [])
+            if isinstance(repo, str) and repo
+        ]
+        if adjacent_owner_repos:
+            ambiguity_note = (
+                "skill receipt preserved adjacent owner-layer relevance for "
+                + ", ".join(adjacent_owner_repos)
+            )
+
+    return item.model_copy(
+        update={
+            "owner_layer_ambiguity_note": ambiguity_note,
+            "family_entry_refs": _dedupe_refs(family_entry_refs),
+            "evidence_refs": _dedupe_refs(evidence_refs),
+        }
+    )
+
+
+def _dedupe_shortlist_hints(
+    hints: list[RoutingOwnerLayerShortlistHint],
+) -> list[RoutingOwnerLayerShortlistHint]:
+    deduped: dict[str, RoutingOwnerLayerShortlistHint] = {}
+    for hint in hints:
+        deduped[hint.shortlist_id] = hint
+    return list(deduped.values())
+
+
+def _dedupe_refs(refs: list[SurfaceOpportunityReference]) -> list[SurfaceOpportunityReference]:
+    deduped: dict[tuple[str, str], SurfaceOpportunityReference] = {}
+    for ref in refs:
+        deduped[(ref.role, ref.ref)] = ref
+    return list(deduped.values())
