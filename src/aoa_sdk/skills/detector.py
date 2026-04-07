@@ -13,6 +13,7 @@ from ..models import (
     SkillCard,
     SkillDetectionReport,
     SkillDispatchItem,
+    SkillHostAvailability,
 )
 from ..workspace.discovery import Workspace
 from .session import resolve_session_file
@@ -59,6 +60,15 @@ def detect_skills(
     intent_text: str = "",
     mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
     closeout_path: str | Path | None = None,
+    host_available_skills: list[str] | None = None,
+    host_availability_source: Literal[
+        "host-manifest",
+        "host-skill-list",
+        "repo-install",
+        "workspace-install",
+        "user-install",
+        "not-provided",
+    ] = "not-provided",
 ) -> SkillDetectionReport:
     if phase not in PHASES:
         raise ValueError(f"unsupported phase {phase!r}")
@@ -69,6 +79,12 @@ def detect_skills(
     resolved_repo_root = _resolve_repo_root(workspace, repo_root)
     layer_by_skill = _build_layer_map(foundation)
     collision_by_skill = load_collision_families(workspace)
+    host_inventory = _normalize_host_inventory(
+        workspace,
+        resolved_repo_root=resolved_repo_root,
+        host_available_skills=host_available_skills,
+        host_availability_source=host_availability_source,
+    )
 
     if phase == "closeout":
         closeout_chain = _load_closeout_chain(workspace, closeout_path)
@@ -76,12 +92,14 @@ def detect_skills(
             closeout_chain=closeout_chain,
             layer_by_skill=layer_by_skill,
             collision_by_skill=collision_by_skill,
+            host_inventory=host_inventory,
         )
         reasoning = [
             "closeout phase reuses the existing kernel next-step brief instead of rebuilding post-session routing.",
         ]
         if closeout_chain is None:
             reasoning.append("no closeout_chain was available from the supplied path.")
+        reasoning.extend(_host_inventory_reasoning(host_inventory))
         return SkillDetectionReport(
             phase=phase,
             repo_root=str(resolved_repo_root),
@@ -89,6 +107,12 @@ def detect_skills(
             activate_now=[],
             must_confirm=closeout_must_confirm,
             suggest_next=[],
+            host_inventory_provided=host_inventory.is_provided,
+            actionability_gaps=_actionability_gaps(
+                activate_now=[],
+                must_confirm=closeout_must_confirm,
+                suggest_next=[],
+            ),
             blocked_actions=[],
             closeout_chain=closeout_chain,
             reasoning=reasoning,
@@ -117,6 +141,7 @@ def detect_skills(
         reasoning.append(f"top tiny-router band: {top_band_id} (score={top_band_score})")
     else:
         reasoning.append("no tiny-router band scored above zero.")
+    reasoning.extend(_host_inventory_reasoning(host_inventory))
 
     activate_now: list[SkillDispatchItem] = []
     must_confirm: list[SkillDispatchItem] = []
@@ -129,6 +154,7 @@ def detect_skills(
                 mutation_surface=mutation_surface,
                 collision_by_skill=collision_by_skill,
                 layer_by_skill=layer_by_skill,
+                host_inventory=host_inventory,
             )
         )
         blocked_actions.extend(_blocked_actions_for_mutation_surface(mutation_surface))
@@ -150,6 +176,11 @@ def detect_skills(
                 layer=layer_by_skill[skill_name],
                 collision_family=family,
                 reason=f"strong tiny-router match in band {top_band_id} (score={score})",
+                host_availability=_host_availability_for_skill(
+                    skill_name,
+                    host_inventory=host_inventory,
+                    manual_fallback_allowed=False,
+                ),
             )
             if (
                 card.invocation_mode != "explicit-preferred"
@@ -188,18 +219,43 @@ def detect_skills(
                 layer=layer_by_skill[skill_name],
                 collision_family=collision_by_skill.get(skill_name),
                 reason=f"secondary router signal (score={score_by_skill[skill_name]})",
+                host_availability=_host_availability_for_skill(
+                    skill_name,
+                    host_inventory=host_inventory,
+                    manual_fallback_allowed=True,
+                ),
             )
         )
         if len(suggest_next) >= MAX_AUTO_ACTIVATIONS:
             break
+
+    activate_now, demoted_activate_now = _demote_non_executable_activate_now(
+        activate_now,
+        host_inventory=host_inventory,
+    )
+    if demoted_activate_now:
+        must_confirm.extend(demoted_activate_now)
+        reasoning.append(
+            "host inventory demoted one or more auto-activation candidates into must_confirm because they were router-only for this session."
+        )
+
+    must_confirm = _dedupe_items(must_confirm)
+    suggest_next = _dedupe_items(suggest_next)
+    actionability_gaps = _actionability_gaps(
+        activate_now=activate_now,
+        must_confirm=must_confirm,
+        suggest_next=suggest_next,
+    )
 
     return SkillDetectionReport(
         phase=phase,
         repo_root=str(resolved_repo_root),
         foundation_id=foundation.foundation_id,
         activate_now=activate_now,
-        must_confirm=_dedupe_items(must_confirm),
-        suggest_next=_dedupe_items(suggest_next),
+        must_confirm=must_confirm,
+        suggest_next=suggest_next,
+        host_inventory_provided=host_inventory.is_provided,
+        actionability_gaps=actionability_gaps,
         blocked_actions=list(dict.fromkeys(blocked_actions)),
         closeout_chain=None,
         reasoning=reasoning,
@@ -215,6 +271,15 @@ def dispatch_skills(
     mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
     closeout_path: str | Path | None = None,
     session_file: str | Path | None = None,
+    host_available_skills: list[str] | None = None,
+    host_availability_source: Literal[
+        "host-manifest",
+        "host-skill-list",
+        "repo-install",
+        "workspace-install",
+        "user-install",
+        "not-provided",
+    ] = "not-provided",
 ) -> SkillDetectionReport:
     from .discovery import SkillsAPI
 
@@ -225,6 +290,8 @@ def dispatch_skills(
         intent_text=intent_text,
         mutation_surface=mutation_surface,
         closeout_path=closeout_path,
+        host_available_skills=host_available_skills,
+        host_availability_source=host_availability_source,
     )
     if phase == "closeout" or not report.activate_now:
         return report
@@ -333,6 +400,7 @@ def _risk_gate_items(
     mutation_surface: str,
     collision_by_skill: dict[str, str | None],
     layer_by_skill: dict[str, Literal["kernel", "outer-ring", "risk-ring"]],
+    host_inventory: "_HostInventory",
 ) -> list[SkillDispatchItem]:
     required = ["aoa-approval-gate-check", "aoa-dry-run-first"]
     if mutation_surface == "runtime":
@@ -347,6 +415,11 @@ def _risk_gate_items(
             layer=layer_by_skill[skill_name],
             collision_family=collision_by_skill.get(skill_name),
             reason=f"required explicit risk gate for mutation_surface={mutation_surface}",
+            host_availability=_host_availability_for_skill(
+                skill_name,
+                host_inventory=host_inventory,
+                manual_fallback_allowed=True,
+            ),
         )
         for skill_name in required
     ]
@@ -390,6 +463,7 @@ def _closeout_must_confirm(
     closeout_chain: KernelNextStepBrief | None,
     layer_by_skill: dict[str, Literal["kernel", "outer-ring", "risk-ring"]],
     collision_by_skill: dict[str, str | None],
+    host_inventory: "_HostInventory",
 ) -> list[SkillDispatchItem]:
     if closeout_chain is None or closeout_chain.suggested_action != "invoke-core-skill":
         return []
@@ -402,8 +476,189 @@ def _closeout_must_confirm(
             layer=layer_by_skill[skill_name],
             collision_family=collision_by_skill.get(skill_name),
             reason="existing kernel_next_step_brief suggests this as the next explicit post-session step",
+            host_availability=_host_availability_for_skill(
+                skill_name,
+                host_inventory=host_inventory,
+                manual_fallback_allowed=True,
+            ),
         )
     ]
+
+
+class _HostInventory:
+    def __init__(
+        self,
+        *,
+        available_skills: set[str] | None,
+        source: Literal[
+            "host-manifest",
+            "host-skill-list",
+            "repo-install",
+            "workspace-install",
+            "user-install",
+            "not-provided",
+        ],
+        root: Path | None = None,
+    ) -> None:
+        self.available_skills = available_skills
+        self.source = source
+        self.root = root
+
+    @property
+    def is_provided(self) -> bool:
+        return self.available_skills is not None
+
+
+def _normalize_host_inventory(
+    workspace: Workspace,
+    *,
+    resolved_repo_root: Path,
+    host_available_skills: list[str] | None,
+    host_availability_source: Literal[
+        "host-manifest",
+        "host-skill-list",
+        "repo-install",
+        "workspace-install",
+        "user-install",
+        "not-provided",
+    ],
+) -> _HostInventory:
+    if host_available_skills is None:
+        return _discover_host_inventory(workspace, resolved_repo_root=resolved_repo_root)
+    return _HostInventory(
+        available_skills={skill_name for skill_name in host_available_skills if skill_name},
+        source="host-skill-list" if host_availability_source == "not-provided" else host_availability_source,
+    )
+
+
+def _host_inventory_reasoning(host_inventory: _HostInventory) -> list[str]:
+    if not host_inventory.is_provided:
+        return [
+            "no explicit host skill inventory was supplied and no canonical install root with skills was found, so recommendation availability stayed unknown."
+        ]
+    if host_inventory.source in {"repo-install", "workspace-install", "user-install"} and host_inventory.root is not None:
+        return [
+            f"host skill inventory was auto-discovered from {host_inventory.source} at {host_inventory.root} ({len(host_inventory.available_skills or set())} skills)."
+        ]
+    return [f"host skill inventory was supplied via {host_inventory.source} ({len(host_inventory.available_skills or set())} skills)."]
+
+
+def _host_availability_for_skill(
+    skill_name: str,
+    *,
+    host_inventory: _HostInventory,
+    manual_fallback_allowed: bool,
+) -> SkillHostAvailability:
+    if not host_inventory.is_provided:
+        return SkillHostAvailability(
+            status="unknown",
+            source="not-provided",
+            manual_fallback_allowed=False,
+            reason="no host skill inventory was supplied",
+        )
+    if skill_name in (host_inventory.available_skills or set()):
+        return SkillHostAvailability(
+            status="host-executable",
+            source=host_inventory.source,
+            manual_fallback_allowed=False,
+            reason=_inventory_reason_phrase(host_inventory, present=True),
+        )
+    return SkillHostAvailability(
+        status="router-only",
+        source=host_inventory.source,
+        manual_fallback_allowed=manual_fallback_allowed,
+        reason=_inventory_reason_phrase(host_inventory, present=False),
+    )
+
+
+def _discover_host_inventory(
+    workspace: Workspace,
+    *,
+    resolved_repo_root: Path,
+) -> _HostInventory:
+    candidates: list[tuple[Path, Literal["repo-install", "workspace-install", "user-install"]]] = []
+    repo_install_root = resolved_repo_root / ".agents" / "skills"
+    if resolved_repo_root != workspace.federation_root:
+        candidates.append((repo_install_root, "repo-install"))
+    candidates.append((workspace.federation_root / ".agents" / "skills", "workspace-install"))
+    candidates.append((Path.home() / ".agents" / "skills", "user-install"))
+
+    seen: set[Path] = set()
+    for root, source in candidates:
+        resolved_root = root.expanduser().resolve(strict=False)
+        if resolved_root in seen:
+            continue
+        seen.add(resolved_root)
+        available_skills = _installed_skill_names(root)
+        if available_skills:
+            return _HostInventory(
+                available_skills=available_skills,
+                source=source,
+                root=resolved_root,
+            )
+    return _HostInventory(available_skills=None, source="not-provided")
+
+
+def _installed_skill_names(install_root: Path) -> set[str]:
+    if not install_root.is_dir():
+        return set()
+
+    installed: set[str] = set()
+    for child in install_root.iterdir():
+        if child.name.startswith("."):
+            continue
+        if (child / "SKILL.md").is_file():
+            installed.add(child.name)
+    return installed
+
+
+def _inventory_reason_phrase(host_inventory: _HostInventory, *, present: bool) -> str:
+    if host_inventory.source in {"repo-install", "workspace-install", "user-install"}:
+        target = "present in" if present else "not present in"
+        if host_inventory.root is not None:
+            return f"skill is {target} the auto-discovered {host_inventory.source} root at {host_inventory.root}"
+        return f"skill is {target} the auto-discovered {host_inventory.source} root"
+    target = "present in" if present else "not present in"
+    return f"skill is {target} the supplied host inventory"
+
+
+def _demote_non_executable_activate_now(
+    activate_now: list[SkillDispatchItem],
+    *,
+    host_inventory: _HostInventory,
+) -> tuple[list[SkillDispatchItem], list[SkillDispatchItem]]:
+    if not host_inventory.is_provided:
+        return activate_now, []
+    kept: list[SkillDispatchItem] = []
+    demoted: list[SkillDispatchItem] = []
+    for item in activate_now:
+        if item.host_availability.status == "host-executable":
+            kept.append(item)
+            continue
+        demoted.append(
+            item.model_copy(
+                update={
+                    "reason": f"{item.reason}; host inventory is router-only for this skill",
+                    "host_availability": item.host_availability.model_copy(
+                        update={"manual_fallback_allowed": True}
+                    ),
+                }
+            )
+        )
+    return kept, demoted
+
+
+def _actionability_gaps(
+    *,
+    activate_now: list[SkillDispatchItem],
+    must_confirm: list[SkillDispatchItem],
+    suggest_next: list[SkillDispatchItem],
+) -> list[str]:
+    gaps: list[str] = []
+    for item in [*activate_now, *must_confirm, *suggest_next]:
+        if item.host_availability.status == "router-only":
+            gaps.append(item.skill_name)
+    return list(dict.fromkeys(gaps))
 
 
 def _explicit_handle(card: SkillCard) -> str | None:

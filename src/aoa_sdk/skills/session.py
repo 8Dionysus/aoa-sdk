@@ -27,6 +27,8 @@ def _nearest_existing_dir(path: Path) -> Path:
 
 
 def _is_parent_writable(path: Path) -> bool:
+    if path.exists():
+        return path.is_file() and os.access(path, os.W_OK)
     existing = _nearest_existing_dir(path.parent)
     return existing.is_dir() and os.access(existing, os.W_OK | os.X_OK)
 

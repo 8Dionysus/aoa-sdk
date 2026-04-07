@@ -89,8 +89,13 @@ def _print_skill_items(label: str, items: list[SkillDispatchItem]) -> None:
         return
     for item in items:
         family = item.collision_family or "none"
-        typer.echo(f"  - {item.skill_name} [{item.layer} / {family}]")
+        availability = item.host_availability.status
+        typer.echo(f"  - {item.skill_name} [{item.layer} / {family} / {availability}]")
         typer.echo(f"    reason: {item.reason}")
+        host_line = f"{item.host_availability.status} via {item.host_availability.source}"
+        if item.host_availability.manual_fallback_allowed:
+            host_line += "; manual fallback allowed"
+        typer.echo(f"    host: {host_line}")
 
 
 def _print_skill_detection_report(report: SkillDetectionReport) -> None:
@@ -100,11 +105,37 @@ def _print_skill_detection_report(report: SkillDetectionReport) -> None:
     _print_skill_items("activate_now", report.activate_now)
     _print_skill_items("must_confirm", report.must_confirm)
     _print_skill_items("suggest_next", report.suggest_next)
+    typer.echo(f"host_inventory_provided: {'yes' if report.host_inventory_provided else 'no'}")
+    typer.echo(f"actionability_gaps: {', '.join(report.actionability_gaps) if report.actionability_gaps else 'none'}")
     typer.echo(f"blocked_actions: {', '.join(report.blocked_actions) if report.blocked_actions else 'none'}")
     _print_kernel_next_brief(report.closeout_chain)
     typer.echo("reasoning:")
     for line in report.reasoning:
         typer.echo(f"  - {line}")
+
+
+def _resolve_host_available_skills(
+    *,
+    host_skills: list[str],
+    host_skill_manifest: str | None,
+) -> tuple[list[str] | None, str]:
+    if host_skills:
+        return list(dict.fromkeys(skill_name for skill_name in host_skills if skill_name)), "host-skill-list"
+    if host_skill_manifest is None:
+        return None, "not-provided"
+
+    manifest_path = Path(host_skill_manifest).expanduser().resolve()
+    try:
+        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    except OSError as exc:
+        raise typer.BadParameter(f"could not read host skill manifest: {exc}") from exc
+    except json.JSONDecodeError as exc:
+        raise typer.BadParameter(f"host skill manifest is not valid JSON: {exc}") from exc
+
+    skills = payload.get("skills")
+    if not isinstance(skills, list) or not all(isinstance(item, str) and item for item in skills):
+        raise typer.BadParameter("host skill manifest must be a JSON object with a non-empty string list at 'skills'")
+    return list(dict.fromkeys(skills)), "host-manifest"
 
 
 def _resolve_skill_report_path(
@@ -290,15 +321,31 @@ def skills_detect(
         "--closeout-path",
         help="Optional closeout report or manifest path when phase=closeout.",
     ),
+    host_skill: list[str] = typer.Option(
+        None,
+        "--host-skill",
+        help="Repeatable host-visible skill name used to annotate recommendation availability.",
+    ),
+    host_skill_manifest: str | None = typer.Option(
+        None,
+        "--host-skill-manifest",
+        help="Optional JSON manifest with {'skills': [...]} used to annotate host-visible skill availability.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
+    host_available_skills, host_availability_source = _resolve_host_available_skills(
+        host_skills=host_skill,
+        host_skill_manifest=host_skill_manifest,
+    )
     sdk_report = AoASDK.from_workspace(root).skills.detect(
         repo_root=repo_root,
         phase=phase,  # type: ignore[arg-type]
         intent_text=intent_text,
         mutation_surface=mutation_surface,  # type: ignore[arg-type]
         closeout_path=closeout_path,
+        host_available_skills=host_available_skills,
+        host_availability_source=host_availability_source,  # type: ignore[arg-type]
     )
     payload = sdk_report.model_dump(mode="json")
     if json_output:
@@ -327,9 +374,23 @@ def skills_dispatch(
         "--session-file",
         help="Optional skill runtime session file. Defaults to the canonical session contract path.",
     ),
+    host_skill: list[str] = typer.Option(
+        None,
+        "--host-skill",
+        help="Repeatable host-visible skill name used to annotate recommendation availability.",
+    ),
+    host_skill_manifest: str | None = typer.Option(
+        None,
+        "--host-skill-manifest",
+        help="Optional JSON manifest with {'skills': [...]} used to annotate host-visible skill availability.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
+    host_available_skills, host_availability_source = _resolve_host_available_skills(
+        host_skills=host_skill,
+        host_skill_manifest=host_skill_manifest,
+    )
     sdk_report = AoASDK.from_workspace(root).skills.dispatch(
         repo_root=repo_root,
         phase=phase,  # type: ignore[arg-type]
@@ -337,6 +398,8 @@ def skills_dispatch(
         mutation_surface=mutation_surface,  # type: ignore[arg-type]
         closeout_path=closeout_path,
         session_file=session_file,
+        host_available_skills=host_available_skills,
+        host_availability_source=host_availability_source,  # type: ignore[arg-type]
     )
     payload = sdk_report.model_dump(mode="json")
     if json_output:
@@ -359,16 +422,32 @@ def skills_enter(
         "--report-output",
         help="Optional JSON path for the persisted ingress dispatch report.",
     ),
+    host_skill: list[str] = typer.Option(
+        None,
+        "--host-skill",
+        help="Repeatable host-visible skill name used to annotate recommendation availability.",
+    ),
+    host_skill_manifest: str | None = typer.Option(
+        None,
+        "--host-skill-manifest",
+        help="Optional JSON manifest with {'skills': [...]} used to annotate host-visible skill availability.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     workspace = Workspace.discover(root)
+    host_available_skills, host_availability_source = _resolve_host_available_skills(
+        host_skills=host_skill,
+        host_skill_manifest=host_skill_manifest,
+    )
     sdk_report = AoASDK.from_workspace(root).skills.dispatch(
         repo_root=repo_root,
         phase="ingress",
         intent_text=intent_text,
         mutation_surface="none",
         session_file=session_file,
+        host_available_skills=host_available_skills,
+        host_availability_source=host_availability_source,  # type: ignore[arg-type]
     )
     payload = _write_skill_report(
         _resolve_skill_report_path(
@@ -405,16 +484,32 @@ def skills_guard(
         "--report-output",
         help="Optional JSON path for the persisted pre-mutation dispatch report.",
     ),
+    host_skill: list[str] = typer.Option(
+        None,
+        "--host-skill",
+        help="Repeatable host-visible skill name used to annotate recommendation availability.",
+    ),
+    host_skill_manifest: str | None = typer.Option(
+        None,
+        "--host-skill-manifest",
+        help="Optional JSON manifest with {'skills': [...]} used to annotate host-visible skill availability.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     workspace = Workspace.discover(root)
+    host_available_skills, host_availability_source = _resolve_host_available_skills(
+        host_skills=host_skill,
+        host_skill_manifest=host_skill_manifest,
+    )
     sdk_report = AoASDK.from_workspace(root).skills.dispatch(
         repo_root=repo_root,
         phase="pre-mutation",
         intent_text=intent_text,
         mutation_surface=mutation_surface,  # type: ignore[arg-type]
         session_file=session_file,
+        host_available_skills=host_available_skills,
+        host_availability_source=host_availability_source,  # type: ignore[arg-type]
     )
     payload = _write_skill_report(
         _resolve_skill_report_path(
