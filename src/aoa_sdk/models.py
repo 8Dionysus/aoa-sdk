@@ -1005,6 +1005,29 @@ class KernelNextStepBrief(BaseModel):
     stats_surface_ref: str
 
 
+class OwnerFollowThroughBrief(BaseModel):
+    source_kind: Literal["harvest-candidate", "quest-promotion"]
+    unit_ref: str
+    unit_name: str | None = None
+    owner_repo: str
+    next_surface: str
+    suggested_action: Literal["draft-owner-artifact", "author-owner-artifact"]
+    abstraction_shape: str | None = None
+    promotion_verdict: str | None = None
+    nearest_wrong_target: str | None = None
+    reason: str
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
+class CloseoutOwnerHandoff(BaseModel):
+    schema_version: int
+    closeout_id: str
+    session_ref: str
+    manifest_path: str
+    generated_at: datetime
+    items: list[OwnerFollowThroughBrief] = Field(default_factory=list)
+
+
 class CloseoutPublisherBatch(BaseModel):
     publisher: str
     input_paths: list[str] = Field(default_factory=list)
@@ -1106,6 +1129,8 @@ class CloseoutRunReport(BaseModel):
     publisher_runs: list[CloseoutPublisherRun] = Field(default_factory=list)
     stats_refresh: CloseoutStatsRefresh
     kernel_next_step_brief: KernelNextStepBrief | None = None
+    owner_handoff_path: str | None = None
+    owner_follow_through_briefs: list[OwnerFollowThroughBrief] = Field(default_factory=list)
 
 
 class CloseoutInboxItemResult(BaseModel):
@@ -1117,6 +1142,8 @@ class CloseoutInboxItemResult(BaseModel):
     session_ref: str | None = None
     error: str | None = None
     kernel_next_step_brief: KernelNextStepBrief | None = None
+    owner_handoff_path: str | None = None
+    owner_follow_through_briefs: list[OwnerFollowThroughBrief] = Field(default_factory=list)
 
 
 class CloseoutInboxReport(BaseModel):
@@ -1139,15 +1166,18 @@ class CloseoutStatusReport(BaseModel):
     processed_dir: str
     failed_dir: str
     report_dir: str
+    handoff_dir: str
     request_count: int
     manifest_count: int
     pending_manifest_count: int
     processed_manifest_count: int
     failed_manifest_count: int
     report_count: int
+    handoff_count: int
     pending_manifest_paths: list[str] = Field(default_factory=list)
     latest_request_path: str | None = None
     latest_manifest_path: str | None = None
     latest_report_path: str | None = None
+    latest_handoff_path: str | None = None
     latest_processed_manifest_path: str | None = None
     latest_failed_manifest_path: str | None = None

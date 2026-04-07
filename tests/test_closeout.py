@@ -686,6 +686,18 @@ def test_closeout_api_run_returns_shift_to_owner_layer_brief_for_quest_promotion
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     receipts_dir = fixture["skill_receipt_path"].parent
     manifest_dir = fixture["manifest_path"].parent
+    notes_dir = manifest_dir / "notes"
+    triage_path = notes_dir / "QUEST_PROMOTION_TRIAGE.json"
+    triage_path.write_text(
+        json.dumps(
+            {
+                "quest_unit_name": "owner-first capability landing campaign",
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
 
     quest_receipt = {
         "event_kind": "quest_promotion_receipt",
@@ -695,12 +707,13 @@ def test_closeout_api_run_returns_shift_to_owner_layer_brief_for_quest_promotion
         "session_ref": "session:test-closeout-quest",
         "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
         "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
-        "evidence_refs": ["tmp/QUEST_PROMOTION_TRIAGE.json"],
+        "evidence_refs": [{"kind": "quest_triage", "ref": str(triage_path)}],
         "payload": {
             "promotion_verdict": "promote_to_playbook",
             "owner_repo": "aoa-playbooks",
             "next_surface": "playbooks/owner-first-capability-landing/PLAYBOOK.md",
             "nearest_wrong_target": "promote_to_skill",
+            "bounded_unit_ref": "candidate:owner-first-capability-landing-campaign",
         },
     }
     quest_core_receipt = {
@@ -757,6 +770,125 @@ def test_closeout_api_run_returns_shift_to_owner_layer_brief_for_quest_promotion
     assert report.kernel_next_step_brief.suggested_action == "shift-to-owner-layer"
     assert report.kernel_next_step_brief.suggested_skill_name is None
     assert report.kernel_next_step_brief.suggested_owner_repo == "aoa-playbooks"
+    assert report.owner_handoff_path is not None
+    assert Path(report.owner_handoff_path).exists()
+    assert len(report.owner_follow_through_briefs) == 1
+    handoff = report.owner_follow_through_briefs[0]
+    assert handoff.suggested_action == "author-owner-artifact"
+    assert handoff.owner_repo == "aoa-playbooks"
+    assert handoff.next_surface == "playbooks/owner-first-capability-landing/PLAYBOOK.md"
+    assert handoff.unit_name == "owner-first capability landing campaign"
+
+
+def test_closeout_api_run_builds_owner_follow_through_from_harvest_packet(
+    workspace_root: Path,
+) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    receipts_dir = fixture["skill_receipt_path"].parent
+    manifest_dir = fixture["manifest_path"].parent
+    notes_dir = manifest_dir / "notes"
+
+    harvest_packet_path = notes_dir / "HARVEST_PACKET.json"
+    harvest_packet_path.write_text(
+        json.dumps(
+            {
+                "accepted_candidates": [
+                    {
+                        "candidate_ref": "candidate:project-foundation-workspace-landing-route",
+                        "unit_name": "project-foundation workspace landing route",
+                        "abstraction_shape": "playbook",
+                        "owner_repo_recommendation": "aoa-playbooks",
+                        "chosen_next_artifact": "playbooks/project-foundation-workspace-landing/PLAYBOOK.md",
+                        "nearest_wrong_target": "skill",
+                        "owner_reason": "The surviving object is a multi-step route rather than a leaf workflow.",
+                        "evidence_anchors": ["/srv/8Dionysus/docs/WORKSPACE_INSTALL.md"],
+                    }
+                ]
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    harvest_receipt = {
+        "event_kind": "harvest_packet_receipt",
+        "event_id": "event-harvest-002",
+        "observed_at": "2026-04-06T20:00:00Z",
+        "run_ref": "run-harvest-002",
+        "session_ref": "session:test-closeout-harvest-handoff",
+        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+        "evidence_refs": [{"kind": "harvest_packet", "ref": str(harvest_packet_path)}],
+        "payload": {"route_ref": "route:test-harvest-handoff"},
+    }
+    harvest_core_receipt = {
+        "event_kind": "core_skill_application_receipt",
+        "event_id": "event-core-harvest-002",
+        "observed_at": "2026-04-06T20:00:01Z",
+        "run_ref": "run-harvest-002",
+        "session_ref": "session:test-closeout-harvest-handoff",
+        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+        "evidence_refs": [{"kind": "receipt", "ref": "tmp/HARVEST_PACKET_RECEIPT.json"}],
+        "payload": {
+            "kernel_id": "project-core-session-growth-v1",
+            "skill_name": "aoa-session-donor-harvest",
+            "application_stage": "finish",
+            "detail_event_kind": "harvest_packet_receipt",
+            "detail_receipt_ref": "tmp/HARVEST_PACKET_RECEIPT.json",
+            "route_ref": "route:test-harvest-handoff",
+        },
+    }
+    harvest_receipt_path = receipts_dir / "harvest-handoff.json"
+    harvest_core_receipt_path = receipts_dir / "harvest-handoff-core.json"
+    harvest_receipt_path.write_text(
+        json.dumps(harvest_receipt, indent=2) + "\n", encoding="utf-8"
+    )
+    harvest_core_receipt_path.write_text(
+        json.dumps(harvest_core_receipt, indent=2) + "\n", encoding="utf-8"
+    )
+
+    harvest_manifest_path = manifest_dir / "closeout-test-harvest-handoff.json"
+    harvest_manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "closeout_id": "closeout-test-harvest-handoff",
+                "session_ref": "session:test-closeout-harvest-handoff",
+                "reviewed": True,
+                "audit_only": False,
+                "trigger": "reviewed-closeout",
+                "batches": [
+                    {
+                        "publisher": "aoa-skills.session-harvest-family",
+                        "input_paths": [str(harvest_receipt_path)],
+                    },
+                    {
+                        "publisher": "aoa-skills.core-kernel-applications",
+                        "input_paths": [str(harvest_core_receipt_path)],
+                    },
+                ],
+                "audit_refs": [str(harvest_packet_path)],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    report = sdk.closeout.run(harvest_manifest_path)
+
+    assert len(report.owner_follow_through_briefs) == 1
+    handoff = report.owner_follow_through_briefs[0]
+    assert handoff.source_kind == "harvest-candidate"
+    assert handoff.suggested_action == "draft-owner-artifact"
+    assert handoff.owner_repo == "aoa-playbooks"
+    assert handoff.next_surface == "playbooks/project-foundation-workspace-landing/PLAYBOOK.md"
+    assert handoff.unit_name == "project-foundation workspace landing route"
+    assert report.owner_handoff_path is not None
+    assert Path(report.owner_handoff_path).exists()
 
 
 def test_closeout_cli_process_inbox_archives_manifest_and_writes_report(workspace_root: Path) -> None:
@@ -795,6 +927,7 @@ def test_closeout_cli_status_reports_queue_state(workspace_root: Path) -> None:
     assert payload["processed_manifest_count"] == 0
     assert payload["failed_manifest_count"] == 0
     assert payload["report_count"] == 0
+    assert payload["handoff_count"] == 0
     assert payload["pending_manifest_paths"]
     assert payload["latest_request_path"].endswith(
         ".aoa/closeout/requests/closeout-build-001.request.json"

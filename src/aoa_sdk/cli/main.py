@@ -9,7 +9,12 @@ import typer
 from ..api import AoASDK
 from ..closeout import CloseoutAPI
 from ..compatibility import CompatibilityAPI
-from ..models import KernelNextStepBrief, SkillDetectionReport, SkillDispatchItem
+from ..models import (
+    KernelNextStepBrief,
+    OwnerFollowThroughBrief,
+    SkillDetectionReport,
+    SkillDispatchItem,
+)
 from ..workspace.bootstrap import bootstrap_workspace
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
@@ -56,6 +61,25 @@ def _print_kernel_next_brief(brief: KernelNextStepBrief | None, *, indent: str =
     if brief.missing_kernel_skill_names:
         typer.echo(f"{indent}  missing: {', '.join(brief.missing_kernel_skill_names)}")
     typer.echo(f"{indent}  reason: {brief.reason}")
+
+
+def _print_owner_follow_through(
+    briefs: list[OwnerFollowThroughBrief],
+    *,
+    handoff_path: str | None = None,
+    indent: str = "",
+) -> None:
+    if not briefs:
+        return
+    typer.echo(f"{indent}owner_follow_through:")
+    if handoff_path is not None:
+        typer.echo(f"{indent}  handoff: {handoff_path}")
+    for item in briefs:
+        unit_label = item.unit_name or item.unit_ref
+        typer.echo(
+            f"{indent}  - [{item.suggested_action}] {unit_label} -> {item.owner_repo}:{item.next_surface}"
+        )
+        typer.echo(f"{indent}    reason: {item.reason}")
 
 
 def _print_skill_items(label: str, items: list[SkillDispatchItem]) -> None:
@@ -451,6 +475,10 @@ def closeout_run(
             f"from {report.stats_refresh.source_count or 'unknown'} sources"
         )
     _print_kernel_next_brief(report.kernel_next_step_brief)
+    _print_owner_follow_through(
+        report.owner_follow_through_briefs,
+        handoff_path=report.owner_handoff_path,
+    )
     if report_output:
         typer.echo(f"report: {report_output}")
 
@@ -635,6 +663,11 @@ def closeout_process_inbox(
             if item.report_path:
                 typer.echo(f"  report: {item.report_path}")
             _print_kernel_next_brief(item.kernel_next_step_brief, indent="  ")
+            _print_owner_follow_through(
+                item.owner_follow_through_briefs,
+                handoff_path=item.owner_handoff_path,
+                indent="  ",
+            )
             if item.error:
                 typer.echo(f"  error: {item.error}")
 
@@ -681,12 +714,15 @@ def closeout_status(
     typer.echo(f"processed: {report.processed_manifest_count}")
     typer.echo(f"failed: {report.failed_manifest_count}")
     typer.echo(f"reports: {report.report_count}")
+    typer.echo(f"handoffs: {report.handoff_count}")
     if report.latest_request_path:
         typer.echo(f"latest_request: {report.latest_request_path}")
     if report.latest_manifest_path:
         typer.echo(f"latest_manifest: {report.latest_manifest_path}")
     if report.latest_report_path:
         typer.echo(f"latest_report: {report.latest_report_path}")
+    if report.latest_handoff_path:
+        typer.echo(f"latest_handoff: {report.latest_handoff_path}")
     if report.latest_processed_manifest_path:
         typer.echo(f"latest_processed: {report.latest_processed_manifest_path}")
     if report.latest_failed_manifest_path:

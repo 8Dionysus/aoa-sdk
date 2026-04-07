@@ -32,6 +32,7 @@ Use the shortest route by need:
 - reviewed session manifest assembly: `docs/session-closeout.md` and `aoa closeout build-manifest`
 - reviewed session request assembly from receipt bundles or audit-only reviewed artifacts: `docs/session-closeout.md` and `aoa closeout submit-reviewed`
 - kernel-aware next-step brief after reviewed closeout: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
+- persistent owner follow-through handoffs after harvest or quest promotion: `docs/session-closeout.md`, `.aoa/closeout/handoffs/`, `aoa closeout run`, and `aoa closeout process-inbox`
 - workspace session ingress and pre-mutation guard wrappers: `aoa skills enter`, `aoa skills guard`, and `src/aoa_sdk/cli/main.py`
 - project foundation structure and layer order: `sdk.skills.project_foundation()` and the `aoa-skills` generated foundation surface
 - project-core outer-ring structure and readiness: `sdk.skills.project_core_outer_ring()`, `sdk.skills.project_core_outer_ring_readiness()`, and the `aoa-skills` generated project-core ring surfaces

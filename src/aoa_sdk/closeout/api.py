@@ -9,7 +9,7 @@ import re
 import shutil
 import subprocess
 import sys
-from typing import Any, Literal
+from typing import Any, Literal, cast
 
 from ..compatibility import load_surface
 from ..errors import SurfaceNotFound
@@ -21,6 +21,7 @@ from ..models import (
     CloseoutInboxItemResult,
     CloseoutInboxReport,
     CloseoutManifest,
+    CloseoutOwnerHandoff,
     CloseoutPublisherBatch,
     CloseoutPublisherRun,
     CloseoutRunReport,
@@ -28,6 +29,7 @@ from ..models import (
     CloseoutStatsRefresh,
     CloseoutSubmitReviewedReport,
     KernelNextStepBrief,
+    OwnerFollowThroughBrief,
     ProjectCoreSkillKernelSurface,
 )
 from ..workspace.discovery import Workspace
@@ -332,6 +334,23 @@ class CloseoutAPI:
                 manifest=manifest,
             )
         )
+        owner_follow_through_briefs = (
+            []
+            if manifest.audit_only
+            else self._build_owner_follow_through_briefs(
+                manifest_path=resolved_manifest_path,
+                manifest=manifest,
+            )
+        )
+        owner_handoff_path = (
+            None
+            if manifest.audit_only
+            else self._write_owner_handoff(
+                manifest_path=resolved_manifest_path,
+                manifest=manifest,
+                briefs=owner_follow_through_briefs,
+            )
+        )
         report = CloseoutRunReport(
             schema_version=1,
             closeout_id=manifest.closeout_id,
@@ -346,6 +365,8 @@ class CloseoutAPI:
             publisher_runs=publisher_runs,
             stats_refresh=stats_refresh,
             kernel_next_step_brief=kernel_next_step_brief,
+            owner_handoff_path=str(owner_handoff_path) if owner_handoff_path is not None else None,
+            owner_follow_through_briefs=owner_follow_through_briefs,
         )
         if report_output is not None:
             write_json(Path(report_output).expanduser().resolve(), report.model_dump(mode="json"))
@@ -419,11 +440,13 @@ class CloseoutAPI:
         processed = self._resolve_queue_dir(processed_dir, leaf="processed")
         failed = self._resolve_queue_dir(failed_dir, leaf="failed")
         reports = self._resolve_queue_dir(report_dir, leaf="reports")
+        handoffs = self._resolve_queue_dir(None, leaf="handoffs")
 
         inbox.mkdir(parents=True, exist_ok=True)
         processed.mkdir(parents=True, exist_ok=True)
         failed.mkdir(parents=True, exist_ok=True)
         reports.mkdir(parents=True, exist_ok=True)
+        handoffs.mkdir(parents=True, exist_ok=True)
 
         items: list[CloseoutInboxItemResult] = []
         processed_count = 0
@@ -443,6 +466,8 @@ class CloseoutAPI:
                         closeout_id=report.closeout_id,
                         session_ref=report.session_ref,
                         kernel_next_step_brief=report.kernel_next_step_brief,
+                        owner_handoff_path=report.owner_handoff_path,
+                        owner_follow_through_briefs=report.owner_follow_through_briefs,
                     )
                 )
                 processed_count += 1
@@ -488,6 +513,7 @@ class CloseoutAPI:
             "processed": self._resolve_queue_dir(processed_dir, leaf="processed"),
             "failed": self._resolve_queue_dir(failed_dir, leaf="failed"),
             "reports": self._resolve_queue_dir(report_dir, leaf="reports"),
+            "handoffs": self._resolve_queue_dir(None, leaf="handoffs"),
         }
         requests = sorted(queue_paths["requests"].glob("*.json"))
         manifests = sorted(queue_paths["manifests"].glob("*.json"))
@@ -495,6 +521,7 @@ class CloseoutAPI:
         processed_manifests = sorted(queue_paths["processed"].glob("*.json"))
         failed_manifests = sorted(queue_paths["failed"].glob("*.json"))
         reports = sorted(queue_paths["reports"].glob("*.json"))
+        handoffs = sorted(queue_paths["handoffs"].glob("*.json"))
 
         return CloseoutStatusReport(
             schema_version=1,
@@ -505,16 +532,19 @@ class CloseoutAPI:
             processed_dir=str(queue_paths["processed"]),
             failed_dir=str(queue_paths["failed"]),
             report_dir=str(queue_paths["reports"]),
+            handoff_dir=str(queue_paths["handoffs"]),
             request_count=len(requests),
             manifest_count=len(manifests),
             pending_manifest_count=len(pending_manifests),
             processed_manifest_count=len(processed_manifests),
             failed_manifest_count=len(failed_manifests),
             report_count=len(reports),
+            handoff_count=len(handoffs),
             pending_manifest_paths=[str(path) for path in pending_manifests],
             latest_request_path=self._latest_path(requests),
             latest_manifest_path=self._latest_path(manifests),
             latest_report_path=self._latest_path(reports),
+            latest_handoff_path=self._latest_path(handoffs),
             latest_processed_manifest_path=self._latest_path(processed_manifests),
             latest_failed_manifest_path=self._latest_path(failed_manifests),
         )
@@ -532,6 +562,7 @@ class CloseoutAPI:
             "processed": root / "processed",
             "failed": root / "failed",
             "reports": root / "reports",
+            "handoffs": root / "handoffs",
         }
 
     def _validate_build_request(self, request: CloseoutBuildRequest) -> None:
@@ -771,6 +802,262 @@ class CloseoutAPI:
             reason=reason,
             stats_surface_ref=kernel.governance_contract.stats_surface,
         )
+
+    def _build_owner_follow_through_briefs(
+        self,
+        *,
+        manifest_path: Path,
+        manifest: CloseoutManifest,
+    ) -> list[OwnerFollowThroughBrief]:
+        kernel = ProjectCoreSkillKernelSurface.model_validate(
+            load_surface(self.workspace, "aoa-skills.project_core_skill_kernel.min")
+        )
+        detail_receipts, _ = self._load_kernel_receipt_batches(
+            manifest_path=manifest_path,
+            manifest=manifest,
+            kernel=kernel,
+        )
+        briefs_by_key: dict[str, OwnerFollowThroughBrief] = {}
+        for brief in self._build_harvest_follow_through_briefs(
+            manifest_path=manifest_path,
+            detail_receipts=detail_receipts,
+        ):
+            briefs_by_key[self._owner_follow_through_key(brief)] = brief
+        for brief in self._build_quest_follow_through_briefs(
+            manifest_path=manifest_path,
+            detail_receipts=detail_receipts,
+        ):
+            briefs_by_key[self._owner_follow_through_key(brief)] = brief
+        return sorted(
+            briefs_by_key.values(),
+            key=lambda item: (item.owner_repo, item.next_surface, item.unit_ref),
+        )
+
+    def _build_harvest_follow_through_briefs(
+        self,
+        *,
+        manifest_path: Path,
+        detail_receipts: list[dict[str, Any]],
+    ) -> list[OwnerFollowThroughBrief]:
+        briefs: list[OwnerFollowThroughBrief] = []
+        for receipt in detail_receipts:
+            if receipt.get("event_kind") != "harvest_packet_receipt":
+                continue
+            packet_paths = self._resolve_receipt_evidence_paths(
+                manifest_path=manifest_path,
+                evidence_refs=receipt.get("evidence_refs"),
+                preferred_kinds={"harvest_packet"},
+            )
+            for packet_path in packet_paths:
+                try:
+                    packet = load_json(packet_path)
+                except (FileNotFoundError, json.JSONDecodeError, ValueError):
+                    continue
+                if not isinstance(packet, dict):
+                    continue
+                for candidate in packet.get("accepted_candidates", []):
+                    if not isinstance(candidate, dict):
+                        continue
+                    owner_repo = candidate.get("owner_repo_recommendation")
+                    next_surface = candidate.get("chosen_next_artifact")
+                    unit_ref = candidate.get("candidate_ref")
+                    if not all(
+                        isinstance(value, str) and value
+                        for value in (owner_repo, next_surface, unit_ref)
+                    ):
+                        continue
+                    owner_repo_str = cast(str, owner_repo)
+                    next_surface_str = cast(str, next_surface)
+                    unit_ref_str = cast(str, unit_ref)
+                    owner_reason = candidate.get("owner_reason")
+                    reason = (
+                        owner_reason
+                        if isinstance(owner_reason, str) and owner_reason
+                        else "Harvest named this as a reusable owner-layer candidate, so the next honest move is a bounded owner-surface draft."
+                    )
+                    evidence_refs = [str(packet_path)]
+                    evidence_anchors = candidate.get("evidence_anchors")
+                    if isinstance(evidence_anchors, list):
+                        evidence_refs.extend(
+                            anchor
+                            for anchor in evidence_anchors
+                            if isinstance(anchor, str) and anchor
+                        )
+                    briefs.append(
+                        OwnerFollowThroughBrief(
+                            source_kind="harvest-candidate",
+                            unit_ref=unit_ref_str,
+                            unit_name=candidate.get("unit_name")
+                            if isinstance(candidate.get("unit_name"), str)
+                            else None,
+                            owner_repo=owner_repo_str,
+                            next_surface=next_surface_str,
+                            suggested_action="draft-owner-artifact",
+                            abstraction_shape=candidate.get("abstraction_shape")
+                            if isinstance(candidate.get("abstraction_shape"), str)
+                            else None,
+                            nearest_wrong_target=candidate.get("nearest_wrong_target")
+                            if isinstance(candidate.get("nearest_wrong_target"), str)
+                            else None,
+                            reason=reason,
+                            evidence_refs=self._unique_strings(evidence_refs),
+                        )
+                    )
+        return briefs
+
+    def _build_quest_follow_through_briefs(
+        self,
+        *,
+        manifest_path: Path,
+        detail_receipts: list[dict[str, Any]],
+    ) -> list[OwnerFollowThroughBrief]:
+        briefs: list[OwnerFollowThroughBrief] = []
+        for receipt in detail_receipts:
+            if receipt.get("event_kind") != "quest_promotion_receipt":
+                continue
+            payload = receipt.get("payload")
+            if not isinstance(payload, dict):
+                continue
+            owner_repo = payload.get("owner_repo")
+            next_surface = payload.get("next_surface")
+            promotion_verdict = payload.get("promotion_verdict")
+            if not all(
+                isinstance(value, str) and value
+                for value in (owner_repo, next_surface, promotion_verdict)
+            ):
+                continue
+            owner_repo_str = cast(str, owner_repo)
+            next_surface_str = cast(str, next_surface)
+            promotion_verdict_str = cast(str, promotion_verdict)
+            unit_ref = payload.get("bounded_unit_ref")
+            if not isinstance(unit_ref, str) or not unit_ref:
+                event_id = receipt.get("event_id")
+                unit_ref = event_id if isinstance(event_id, str) and event_id else next_surface
+            unit_ref_str = cast(str, unit_ref)
+            briefs.append(
+                OwnerFollowThroughBrief(
+                    source_kind="quest-promotion",
+                    unit_ref=unit_ref_str,
+                    unit_name=self._load_quest_unit_name(
+                        manifest_path=manifest_path,
+                        receipt=receipt,
+                    ),
+                    owner_repo=owner_repo_str,
+                    next_surface=next_surface_str,
+                    suggested_action="author-owner-artifact",
+                    promotion_verdict=promotion_verdict_str,
+                    nearest_wrong_target=payload.get("nearest_wrong_target")
+                    if isinstance(payload.get("nearest_wrong_target"), str)
+                    else None,
+                    reason=(
+                        f"Quest promotion closed with {promotion_verdict_str}, so the next honest move is to author the owner-layer artifact."
+                    ),
+                    evidence_refs=self._extract_evidence_ref_strings(receipt.get("evidence_refs")),
+                )
+            )
+        return briefs
+
+    def _load_quest_unit_name(
+        self,
+        *,
+        manifest_path: Path,
+        receipt: dict[str, Any],
+    ) -> str | None:
+        triage_paths = self._resolve_receipt_evidence_paths(
+            manifest_path=manifest_path,
+            evidence_refs=receipt.get("evidence_refs"),
+            preferred_kinds={"quest_triage"},
+        )
+        for triage_path in triage_paths:
+            try:
+                payload = load_json(triage_path)
+            except (FileNotFoundError, json.JSONDecodeError, ValueError):
+                continue
+            if not isinstance(payload, dict):
+                continue
+            quest_unit_name = payload.get("quest_unit_name")
+            if isinstance(quest_unit_name, str) and quest_unit_name:
+                return quest_unit_name
+        return None
+
+    def _owner_follow_through_key(self, brief: OwnerFollowThroughBrief) -> str:
+        return brief.unit_ref or brief.next_surface
+
+    def _resolve_receipt_evidence_paths(
+        self,
+        *,
+        manifest_path: Path,
+        evidence_refs: Any,
+        preferred_kinds: set[str] | None = None,
+    ) -> list[Path]:
+        resolved: list[Path] = []
+        for item in evidence_refs if isinstance(evidence_refs, list) else []:
+            kind: str | None = None
+            ref: str | None = None
+            if isinstance(item, dict):
+                kind_value = item.get("kind")
+                ref_value = item.get("ref")
+                kind = kind_value if isinstance(kind_value, str) and kind_value else None
+                ref = ref_value if isinstance(ref_value, str) and ref_value else None
+            elif isinstance(item, str) and item:
+                ref = item
+            if ref is None:
+                continue
+            if preferred_kinds is not None and kind is not None and kind not in preferred_kinds:
+                continue
+            path = self._resolve_evidence_path(manifest_path, ref)
+            if path is not None:
+                resolved.append(path)
+        return self._unique_paths(resolved)
+
+    def _extract_evidence_ref_strings(self, evidence_refs: Any) -> list[str]:
+        values: list[str] = []
+        for item in evidence_refs if isinstance(evidence_refs, list) else []:
+            if isinstance(item, dict):
+                ref = item.get("ref")
+                if isinstance(ref, str) and ref:
+                    values.append(ref)
+            elif isinstance(item, str) and item:
+                values.append(item)
+        return self._unique_strings(values)
+
+    def _resolve_evidence_path(self, manifest_path: Path, ref: str) -> Path | None:
+        raw = Path(ref).expanduser()
+        candidates: list[Path] = []
+        if raw.is_absolute():
+            candidates.append(raw.resolve())
+        else:
+            candidates.append((manifest_path.parent / raw).resolve())
+            candidates.append((self.workspace.root / raw).resolve())
+            if raw.parts and raw.parts[0] == "tmp":
+                candidates.append((Path("/") / raw).resolve())
+        for candidate in candidates:
+            if candidate.exists():
+                return candidate
+        return None
+
+    def _write_owner_handoff(
+        self,
+        *,
+        manifest_path: Path,
+        manifest: CloseoutManifest,
+        briefs: list[OwnerFollowThroughBrief],
+    ) -> Path | None:
+        if not briefs:
+            return None
+        handoff_dir = self._resolve_queue_dir(None, leaf="handoffs")
+        handoff_dir.mkdir(parents=True, exist_ok=True)
+        handoff_path = handoff_dir / f"{self._safe_closeout_filename(manifest.closeout_id)}.owner-handoff.json"
+        payload = CloseoutOwnerHandoff(
+            schema_version=1,
+            closeout_id=manifest.closeout_id,
+            session_ref=manifest.session_ref,
+            manifest_path=str(manifest_path),
+            generated_at=datetime.now(timezone.utc),
+            items=briefs,
+        )
+        write_json(handoff_path, payload.model_dump(mode="json"))
+        return handoff_path
 
     def _skipped_stats_refresh(self, reason: str) -> CloseoutStatsRefresh:
         return CloseoutStatsRefresh(
