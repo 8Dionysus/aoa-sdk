@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -18,10 +19,40 @@ def load_session_contract(workspace: Workspace) -> dict[str, Any]:
     return load_surface(workspace, "aoa-skills.runtime_session_contract")
 
 
+def _nearest_existing_dir(path: Path) -> Path:
+    current = path
+    while not current.exists() and current.parent != current:
+        current = current.parent
+    return current if current.exists() else path.parent
+
+
+def _is_parent_writable(path: Path) -> bool:
+    existing = _nearest_existing_dir(path.parent)
+    return existing.is_dir() and os.access(existing, os.W_OK | os.X_OK)
+
+
+def _default_session_path(workspace: Workspace, hint: str) -> Path:
+    relative_hint = Path(hint)
+    candidates: list[Path] = []
+    if workspace.has_repo("aoa-sdk"):
+        candidates.append(workspace.repo_path("aoa-sdk") / relative_hint)
+    candidates.append(workspace.root / relative_hint)
+
+    seen: set[Path] = set()
+    for candidate in candidates:
+        resolved = candidate.resolve(strict=False)
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        if _is_parent_writable(candidate):
+            return candidate
+    return candidates[0]
+
+
 def resolve_session_file(workspace: Workspace, session_file: str | Path | None) -> Path:
     if session_file is None:
         hint = load_session_contract(workspace).get("session_file_hint", ".aoa/skill-runtime-session.json")
-        return workspace.root / hint
+        return _default_session_path(workspace, hint)
 
     path = Path(session_file)
     if path.is_absolute():
