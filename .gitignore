@@ -15,4 +15,5 @@ htmlcov/
 venv/
 
 .aoa/skill-runtime-session.json
+.aoa/skill-dispatch/
 .aoa/closeout/

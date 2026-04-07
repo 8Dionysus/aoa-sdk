@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from pathlib import Path
 from typing import Any
 
 import typer
@@ -79,6 +80,40 @@ def _print_skill_detection_report(report: SkillDetectionReport) -> None:
     typer.echo("reasoning:")
     for line in report.reasoning:
         typer.echo(f"  - {line}")
+
+
+def _resolve_skill_report_path(
+    *,
+    workspace: Workspace,
+    repo_root: str,
+    phase: str,
+    mutation_surface: str = "none",
+    report_output: str | None = None,
+) -> Path:
+    if report_output is not None:
+        return Path(report_output).expanduser().resolve()
+
+    resolved_repo_root = Path(repo_root).expanduser()
+    if not resolved_repo_root.is_absolute():
+        resolved_repo_root = (workspace.root / resolved_repo_root).resolve()
+    else:
+        resolved_repo_root = resolved_repo_root.resolve()
+
+    label = "workspace" if resolved_repo_root == workspace.federation_root else resolved_repo_root.name
+    suffix = phase
+    if phase == "pre-mutation":
+        suffix = f"{phase}-{mutation_surface}"
+    return workspace.repo_path("aoa-sdk") / ".aoa" / "skill-dispatch" / f"{label}.{suffix}.latest.json"
+
+
+def _write_skill_report(path: Path, report: SkillDetectionReport) -> dict[str, Any]:
+    payload = {
+        "report_path": str(path),
+        "report": report.model_dump(mode="json"),
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    return payload
 
 
 @app.command()
@@ -218,6 +253,94 @@ def skills_dispatch(
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
+    _print_skill_detection_report(sdk_report)
+
+
+@skills_app.command("enter")
+def skills_enter(
+    repo_root: str = typer.Argument(".", help="Repository root or workspace root used as task context."),
+    intent_text: str = typer.Option("", "--intent-text", help="Short task summary used for ingress detection."),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file. Defaults to the canonical session contract path.",
+    ),
+    report_output: str | None = typer.Option(
+        None,
+        "--report-output",
+        help="Optional JSON path for the persisted ingress dispatch report.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    workspace = Workspace.discover(root)
+    sdk_report = AoASDK.from_workspace(root).skills.dispatch(
+        repo_root=repo_root,
+        phase="ingress",
+        intent_text=intent_text,
+        mutation_surface="none",
+        session_file=session_file,
+    )
+    payload = _write_skill_report(
+        _resolve_skill_report_path(
+            workspace=workspace,
+            repo_root=repo_root,
+            phase="ingress",
+            report_output=report_output,
+        ),
+        sdk_report,
+    )
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {payload['report_path']}")
+    _print_skill_detection_report(sdk_report)
+
+
+@skills_app.command("guard")
+def skills_guard(
+    repo_root: str = typer.Argument(..., help="Repository root or workspace root used as task context."),
+    intent_text: str = typer.Option("", "--intent-text", help="Short task summary used for pre-mutation detection."),
+    mutation_surface: str = typer.Option(
+        "code",
+        "--mutation-surface",
+        help="Mutation class: code, repo-config, infra, runtime, or public-share.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file. Defaults to the canonical session contract path.",
+    ),
+    report_output: str | None = typer.Option(
+        None,
+        "--report-output",
+        help="Optional JSON path for the persisted pre-mutation dispatch report.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    workspace = Workspace.discover(root)
+    sdk_report = AoASDK.from_workspace(root).skills.dispatch(
+        repo_root=repo_root,
+        phase="pre-mutation",
+        intent_text=intent_text,
+        mutation_surface=mutation_surface,  # type: ignore[arg-type]
+        session_file=session_file,
+    )
+    payload = _write_skill_report(
+        _resolve_skill_report_path(
+            workspace=workspace,
+            repo_root=repo_root,
+            phase="pre-mutation",
+            mutation_surface=mutation_surface,
+            report_output=report_output,
+        ),
+        sdk_report,
+    )
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {payload['report_path']}")
     _print_skill_detection_report(sdk_report)
 
 

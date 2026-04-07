@@ -28,3 +28,9 @@ dev = [
 
 [project.scripts]
 aoa = "aoa_sdk.cli.main:app"
+
+[tool.hatch.build]
+exclude = [
+  "/.agents",
+  "/.aoa",
+]
