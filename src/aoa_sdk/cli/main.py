@@ -132,6 +132,8 @@ def _resolve_host_available_skills(
     except json.JSONDecodeError as exc:
         raise typer.BadParameter(f"host skill manifest is not valid JSON: {exc}") from exc
 
+    if not isinstance(payload, dict):
+        raise typer.BadParameter("host skill manifest must be a JSON object with a non-empty string list at 'skills'")
     skills = payload.get("skills")
     if not isinstance(skills, list) or not all(isinstance(item, str) and item for item in skills):
         raise typer.BadParameter("host skill manifest must be a JSON object with a non-empty string list at 'skills'")
