@@ -14,6 +14,7 @@ from .rpg import RpgAPI
 from .routing.picker import RoutingAPI
 from .skills.discovery import SkillsAPI
 from .stats import StatsAPI
+from .surfaces import SurfacesAPI
 from .techniques import TechniquesAPI
 from .workspace.discovery import Workspace
 
@@ -24,6 +25,7 @@ class AoASDK:
         self.compatibility = CompatibilityAPI(workspace)
         self.routing = RoutingAPI(workspace)
         self.skills = SkillsAPI(workspace)
+        self.surfaces = SurfacesAPI(workspace)
         self.agents = AgentsAPI(workspace)
         self.playbooks = PlaybooksAPI(workspace)
         self.memo = MemoAPI(workspace)

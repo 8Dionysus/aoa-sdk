@@ -15,6 +15,7 @@ Use the shortest route by need:
 - compatibility posture: `docs/versioning.md`
 - release, support, and CI posture: `docs/RELEASE_CI_POSTURE.md`
 - reviewed session closeout orchestration: `docs/session-closeout.md`
+- additive surface detection and reviewed owner-layer handoff: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-heuristics.md`, and `docs/aoa-surface-detection-closeout-handoff.md`
 - RPG typed consumer slice: `docs/RPG_SDK_ADDENDUM.md`, `docs/RPG_SURFACE_PATHS.md`, and `src/aoa_sdk/rpg/`
 - federation effects and obligations: `docs/ecosystem-impact.md`
 - seed blueprint and direction surface: `docs/blueprint.md`
@@ -30,6 +31,9 @@ Use the shortest route by need:
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
 - local validation and workspace inspection: `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
+- additive owner-layer surface detection without changing `aoa skills ...` meaning: `docs/aoa-surface-detection-first-wave.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
+- deterministic first-wave heuristics for proof, recall, recurring routes, role posture, and repeated practice: `docs/aoa-surface-detection-heuristics.md` and `src/aoa_sdk/surfaces/heuristics.py`
+- reviewed-only closeout handoff for surviving surface notes: `docs/aoa-surface-detection-closeout-handoff.md`, `aoa surfaces handoff`, and `docs/session-closeout.md`
 - reviewed session auto-closeout inbox: `docs/session-closeout.md`, `aoa closeout enqueue-current`, `aoa closeout status`, and `scripts/install_closeout_units.py`
 - reviewed session manifest assembly: `docs/session-closeout.md` and `aoa closeout build-manifest`
 - reviewed session request assembly from receipt bundles or audit-only reviewed artifacts: `docs/session-closeout.md` and `aoa closeout submit-reviewed`
@@ -63,12 +67,14 @@ This repository is the source of truth for:
 - phase-aware skill detection and dispatch that only auto-activates `explicit-preferred` foundation skills and keeps `explicit-only` skills in visible confirmation lanes
 - persisted workspace-level ingress and guard reports under `aoa-sdk/.aoa/skill-dispatch/` so outer wrappers and root-level agents can reuse one stable session-start surface
 - default skill runtime session storage under `aoa-sdk/.aoa/skill-runtime-session.json` when the workspace root itself is not the writable owner surface
+- additive first-wave surface detection under `aoa-sdk/.aoa/surface-detection/` that keeps `aoa skills ...` skill-only while surfacing eval, memo, playbook, agent, and technique candidates as non-executable hints or reviewed handoffs
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own
 
 - It does not replace `aoa-routing`.
 - It does not become the source of truth for skills, evals, memo, playbooks, agents, or KAG.
+- It does not make `aoa skills detect/dispatch/enter/guard` mean anything other than skills.
 - It does not become a service runtime or hidden monolith.
 
 The SDK stays on the control plane: load, type, validate, activate, and hand off.
@@ -115,6 +121,15 @@ dispatch = sdk.skills.detect(
     repo_root="/srv/aoa-sdk",
     phase="ingress",
     intent_text="plan verify a bounded change",
+)
+surface_report = sdk.surfaces.detect(
+    repo_root="/srv/aoa-sdk",
+    phase="ingress",
+    intent_text="verify recurring handoff proof",
+)
+surface_handoff = sdk.surfaces.build_closeout_handoff(
+    surface_report,
+    session_ref="session:2026-04-07-surface-first-wave",
 )
 verify_binding = sdk.agents.binding_for_phase("verify")
 playbook = sdk.playbooks.get("bounded-change-safe")
@@ -196,6 +211,19 @@ Start one workspace session and persist the ingress/guard reports:
 ```bash
 aoa skills enter /srv --intent-text "plan a cross-repo change" --root /srv --json
 aoa skills guard /srv/aoa-sdk --intent-text "regenerate compatibility surfaces" --mutation-surface repo-config --root /srv --json
+```
+
+Run one additive surface-detection pass without changing the skill-only lane:
+
+```bash
+aoa surfaces detect /srv/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/aoa-sdk --json
+aoa surfaces detect /srv/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/aoa-sdk --json
+```
+
+Build one reviewed-only closeout handoff from a persisted surface report:
+
+```bash
+aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json --session-ref session:2026-04-07-surface-first-wave --reviewed --root /srv/aoa-sdk --json
 ```
 
 Install for development:

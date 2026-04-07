@@ -39,6 +39,34 @@ def test_readme_lists_sibling_canary_surfaces() -> None:
     assert ".github/workflows/latest-sibling-canary.yml" in readme
 
 
+def test_surface_detection_routes_are_documented_as_additive_and_skill_only() -> None:
+    readme = read_text("README.md")
+
+    assert "docs/aoa-surface-detection-first-wave.md" in readme
+    assert "docs/aoa-surface-detection-heuristics.md" in readme
+    assert "docs/aoa-surface-detection-closeout-handoff.md" in readme
+    assert "It does not make `aoa skills detect/dispatch/enter/guard` mean anything other than skills." in readme
+    assert "aoa surfaces detect /srv/aoa-sdk --phase ingress" in readme
+    assert "aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json" in readme
+
+
+def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:
+    agents = read_text("AGENTS.md")
+
+    assert "## Surface Detection Loop" in agents
+    assert "aoa surfaces detect /srv/aoa-sdk --phase ingress" in agents
+    assert "aoa skills ...` remains skill-only" in agents
+    assert "manual-equivalent` never becomes `activated`" in agents
+
+
+def test_session_closeout_explicitly_keeps_surface_handoff_separate() -> None:
+    closeout = read_text("docs/session-closeout.md")
+
+    assert "`aoa closeout run` does not auto-run `aoa surfaces handoff`" in closeout
+    assert "`aoa surfaces handoff` is reviewed-only" in closeout
+    assert "docs/aoa-surface-detection-closeout-handoff.md" in closeout
+
+
 def test_blueprint_is_marked_as_direction_surface() -> None:
     blueprint = read_text("docs/blueprint.md")
 

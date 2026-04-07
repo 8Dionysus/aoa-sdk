@@ -9,9 +9,13 @@ import typer
 from ..api import AoASDK
 from ..closeout import CloseoutAPI
 from ..compatibility import CompatibilityAPI
+from ..loaders import load_json
 from ..models import (
     KernelNextStepBrief,
     OwnerFollowThroughBrief,
+    SurfaceCloseoutHandoff,
+    SurfaceDetectionReport,
+    SurfaceOpportunityItem,
     SkillDetectionReport,
     SkillDispatchItem,
 )
@@ -24,11 +28,13 @@ workspace_app = typer.Typer(help="Inspect workspace topology")
 compatibility_app = typer.Typer(help="Inspect compatibility of consumed surfaces")
 closeout_app = typer.Typer(help="Run bounded reviewed-session closeout orchestration")
 skills_app = typer.Typer(help="Read project skill layers and run phase-aware skill detection/dispatch")
+surfaces_app = typer.Typer(help="Read additive AoA surface-detection reports and reviewed closeout handoffs")
 
 app.add_typer(workspace_app, name="workspace")
 app.add_typer(compatibility_app, name="compatibility")
 app.add_typer(closeout_app, name="closeout")
 app.add_typer(skills_app, name="skills")
+app.add_typer(surfaces_app, name="surfaces")
 
 
 def _workspace_payload(workspace: Workspace) -> dict[str, Any]:
@@ -98,6 +104,19 @@ def _print_skill_items(label: str, items: list[SkillDispatchItem]) -> None:
         typer.echo(f"    host: {host_line}")
 
 
+def _print_surface_items(label: str, items: list[SurfaceOpportunityItem]) -> None:
+    typer.echo(f"{label}:")
+    if not items:
+        typer.echo("  - none")
+        return
+    for item in items:
+        typer.echo(
+            f"  - {item.display_name} [{item.object_kind} / {item.owner_repo} / {item.state} / {item.execution.lane}]"
+        )
+        typer.echo(f"    ref: {item.surface_ref}")
+        typer.echo(f"    reason: {item.reason}")
+
+
 def _print_skill_detection_report(report: SkillDetectionReport) -> None:
     typer.echo(f"phase: {report.phase}")
     typer.echo(f"repo_root: {report.repo_root}")
@@ -112,6 +131,39 @@ def _print_skill_detection_report(report: SkillDetectionReport) -> None:
     typer.echo("reasoning:")
     for line in report.reasoning:
         typer.echo(f"  - {line}")
+
+
+def _print_surface_detection_report(report: SurfaceDetectionReport) -> None:
+    typer.echo(f"phase: {report.phase}")
+    typer.echo(f"repo_root: {report.repo_root}")
+    typer.echo(f"workspace_root: {report.workspace_root}")
+    typer.echo(f"skill_report_path: {report.skill_report_path or 'none'}")
+    typer.echo(f"skill_report_included: {'yes' if report.skill_report_included else 'no'}")
+    typer.echo(f"active_skill_names: {', '.join(report.active_skill_names) if report.active_skill_names else 'none'}")
+    typer.echo(
+        "immediate_skill_dispatch: "
+        f"{', '.join(report.immediate_skill_dispatch) if report.immediate_skill_dispatch else 'none'}"
+    )
+    _print_surface_items("items", report.items)
+    typer.echo(f"closeout_followups: {', '.join(report.closeout_followups) if report.closeout_followups else 'none'}")
+    typer.echo(f"owner_layer_notes: {', '.join(report.owner_layer_notes) if report.owner_layer_notes else 'none'}")
+    typer.echo(f"actionability_gaps: {', '.join(report.actionability_gaps) if report.actionability_gaps else 'none'}")
+
+
+def _print_surface_handoff(report: SurfaceCloseoutHandoff) -> None:
+    typer.echo(f"session_ref: {report.session_ref}")
+    typer.echo(f"reviewed: {'yes' if report.reviewed else 'no'}")
+    typer.echo(f"surface_detection_report_ref: {report.surface_detection_report_ref}")
+    _print_surface_items("surviving_items", report.surviving_items)
+    typer.echo("handoff_targets:")
+    if not report.handoff_targets:
+        typer.echo("  - none")
+    else:
+        for item in report.handoff_targets:
+            typer.echo(f"  - {item.skill_name}")
+            typer.echo(f"    why: {item.why}")
+            typer.echo(f"    triggered_by: {', '.join(item.triggered_by) if item.triggered_by else 'none'}")
+    typer.echo(f"notes: {', '.join(report.notes) if report.notes else 'none'}")
 
 
 def _resolve_host_available_skills(
@@ -140,6 +192,18 @@ def _resolve_host_available_skills(
     return list(dict.fromkeys(skills)), "host-manifest"
 
 
+def _resolve_context_root(workspace: Workspace, repo_root: str) -> Path:
+    resolved_repo_root = Path(repo_root).expanduser()
+    if not resolved_repo_root.is_absolute():
+        return (workspace.root / resolved_repo_root).resolve()
+    return resolved_repo_root.resolve()
+
+
+def _resolve_context_label(workspace: Workspace, repo_root: str) -> str:
+    resolved_repo_root = _resolve_context_root(workspace, repo_root)
+    return "workspace" if resolved_repo_root == workspace.federation_root else resolved_repo_root.name
+
+
 def _resolve_skill_report_path(
     *,
     workspace: Workspace,
@@ -151,13 +215,7 @@ def _resolve_skill_report_path(
     if report_output is not None:
         return Path(report_output).expanduser().resolve()
 
-    resolved_repo_root = Path(repo_root).expanduser()
-    if not resolved_repo_root.is_absolute():
-        resolved_repo_root = (workspace.root / resolved_repo_root).resolve()
-    else:
-        resolved_repo_root = resolved_repo_root.resolve()
-
-    label = "workspace" if resolved_repo_root == workspace.federation_root else resolved_repo_root.name
+    label = _resolve_context_label(workspace, repo_root)
     suffix = phase
     if phase == "pre-mutation":
         suffix = f"{phase}-{mutation_surface}"
@@ -172,6 +230,57 @@ def _write_skill_report(path: Path, report: SkillDetectionReport) -> dict[str, A
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
     return payload
+
+
+def _resolve_surface_report_path(
+    *,
+    workspace: Workspace,
+    repo_root: str,
+    phase: str,
+    report_output: str | None = None,
+) -> Path:
+    if report_output is not None:
+        return Path(report_output).expanduser().resolve()
+    label = _resolve_context_label(workspace, repo_root)
+    return workspace.repo_path("aoa-sdk") / ".aoa" / "surface-detection" / f"{label}.{phase}.latest.json"
+
+
+def _resolve_surface_handoff_path(
+    *,
+    workspace: Workspace,
+    repo_root: str,
+    report_output: str | None = None,
+) -> Path:
+    if report_output is not None:
+        return Path(report_output).expanduser().resolve()
+    label = _resolve_context_label(workspace, repo_root)
+    return workspace.repo_path("aoa-sdk") / ".aoa" / "surface-detection" / f"{label}.closeout-handoff.latest.json"
+
+
+def _write_surface_report(path: Path, report: SurfaceDetectionReport) -> dict[str, Any]:
+    payload = {
+        "report_path": str(path),
+        "report": report.model_dump(mode="json"),
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    return payload
+
+
+def _write_surface_handoff(path: Path, report: SurfaceCloseoutHandoff) -> dict[str, Any]:
+    payload = {
+        "report_path": str(path),
+        "report": report.model_dump(mode="json"),
+    }
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
+    return payload
+
+
+def _load_surface_detection_report(path: str) -> SurfaceDetectionReport:
+    payload = load_json(Path(path).expanduser().resolve())
+    report_payload = payload.get("report", payload)
+    return SurfaceDetectionReport.model_validate(report_payload)
 
 
 @app.command()
@@ -528,6 +637,107 @@ def skills_guard(
         return
     typer.echo(f"report_path: {payload['report_path']}")
     _print_skill_detection_report(sdk_report)
+
+
+@surfaces_app.command("detect")
+def surfaces_detect(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as task context."),
+    phase: str = typer.Option(..., "--phase", help="Detection phase: ingress, in-flight, pre-mutation, or closeout."),
+    intent_text: str = typer.Option("", "--intent-text", help="Intent text used for additive surface detection."),
+    mutation_surface: str = typer.Option(
+        "none",
+        "--mutation-surface",
+        help="Mutation class: none, code, repo-config, infra, runtime, or public-share.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to read active skill names.",
+    ),
+    closeout_path: str | None = typer.Option(
+        None,
+        "--closeout-path",
+        help="Optional closeout report or manifest path when phase=closeout.",
+    ),
+    skill_report_path: str | None = typer.Option(
+        None,
+        "--skill-report-path",
+        help="Optional reference to an existing persisted skill report used as prelude context.",
+    ),
+    report_output: str | None = typer.Option(
+        None,
+        "--report-output",
+        help="Optional JSON path for the persisted surface-detection report.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    workspace = Workspace.discover(root)
+    report = AoASDK.from_workspace(root).surfaces.detect(
+        repo_root=repo_root,
+        phase=phase,  # type: ignore[arg-type]
+        intent_text=intent_text,
+        mutation_surface=mutation_surface,  # type: ignore[arg-type]
+        session_file=session_file,
+        closeout_path=closeout_path,
+        skill_report_path=skill_report_path,
+    )
+    payload = _write_surface_report(
+        _resolve_surface_report_path(
+            workspace=workspace,
+            repo_root=repo_root,
+            phase=phase,
+            report_output=report_output,
+        ),
+        report,
+    )
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {payload['report_path']}")
+    _print_surface_detection_report(report)
+
+
+@surfaces_app.command("handoff")
+def surfaces_handoff(
+    surface_report: str = typer.Argument(..., help="Path to a persisted surface-detection report."),
+    session_ref: str = typer.Option(..., "--session-ref", help="Canonical session_ref for the reviewed route."),
+    reviewed: bool = typer.Option(
+        True,
+        "--reviewed/--not-reviewed",
+        help="Surface closeout handoff is allowed only for reviewed routes.",
+    ),
+    report_output: str | None = typer.Option(
+        None,
+        "--report-output",
+        help="Optional JSON path for the persisted surface closeout handoff report.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    if not reviewed:
+        raise typer.BadParameter("surface closeout handoff requires reviewed routes; use --reviewed for the real handoff path")
+
+    workspace = Workspace.discover(root)
+    surface_detection_report = _load_surface_detection_report(surface_report)
+    report = AoASDK.from_workspace(root).surfaces.build_closeout_handoff(
+        surface_report,
+        session_ref=session_ref,
+        reviewed=reviewed,
+    )
+    payload = _write_surface_handoff(
+        _resolve_surface_handoff_path(
+            workspace=workspace,
+            repo_root=surface_detection_report.repo_root,
+            report_output=report_output,
+        ),
+        report,
+    )
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {payload['report_path']}")
+    _print_surface_handoff(report)
 
 
 @closeout_app.command("run")
