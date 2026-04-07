@@ -1,0 +1,23 @@
+{
+  "intent_text": "stabilize a degraded hybrid-query path without widening automation",
+  "phase": "pre-mutation",
+  "repo_root": "/srv/aoa-sdk",
+  "mutation_surface": "repo-config",
+  "stress_context": {
+    "active": true,
+    "source_receipt_refs": [
+      "ATM10-Agent:stressor_receipt_v1#stress:2026-04-07:retrieval-only-fallback"
+    ],
+    "routing_hint_refs": [
+      "aoa-routing:stress_navigation_hint_v1#route:stress:atm10-hybrid-query:retrieval-only-fallback"
+    ],
+    "memo_refs": [
+      "aoa-memo:failure_lesson_memory_v1#memo:hybrid-query-reground-first"
+    ],
+    "preferred_posture": "human_review_first",
+    "degraded_surfaces": [
+      "ATM10-Agent:hybrid-query"
+    ],
+    "operator_review_required": true
+  }
+}

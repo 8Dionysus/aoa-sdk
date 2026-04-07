@@ -1,0 +1,21 @@
+{
+  "status": "ok",
+  "dispatch_mode": "stress-aware",
+  "selected_skill_ids": [
+    "aoa-change-protocol"
+  ],
+  "auto_activated_skill_ids": [],
+  "blocked_auto_activation_reasons": [
+    "active stress posture requires human_review_first",
+    "requested mutation surface remains gated while the owner-local degraded surface is unresolved"
+  ],
+  "required_review_steps": [
+    "inspect owner-local source receipt",
+    "inspect owner-local degraded artifact",
+    "run a bounded verify path before mutation"
+  ],
+  "evidence_refs": [
+    "ATM10-Agent:stressor_receipt_v1#stress:2026-04-07:retrieval-only-fallback",
+    "aoa-routing:stress_navigation_hint_v1#route:stress:atm10-hybrid-query:retrieval-only-fallback"
+  ]
+}
