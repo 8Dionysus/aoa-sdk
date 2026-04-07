@@ -301,3 +301,59 @@ def test_skills_dispatch_can_emit_json(workspace_root: Path) -> None:
         "aoa-local-stack-bringup",
         "aoa-safe-infra-change",
     ]
+
+
+def test_skills_enter_writes_ingress_report(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "enter",
+            str(workspace_root),
+            "--root",
+            str(workspace_root),
+            "--intent-text",
+            "plan verify a bounded change",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    report_path = Path(payload["report_path"])
+    assert report_path.exists()
+    assert report_path.name == "workspace.ingress.latest.json"
+    assert payload["report"]["foundation_id"] == "project-foundation-v1"
+
+
+def test_skills_guard_writes_pre_mutation_report(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--root",
+            str(workspace_root),
+            "--intent-text",
+            "refresh generated contracts",
+            "--mutation-surface",
+            "repo-config",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    report_path = Path(payload["report_path"])
+    assert report_path.exists()
+    assert report_path.name == "aoa-sdk.pre-mutation-repo-config.latest.json"
+    assert [item["skill_name"] for item in payload["report"]["must_confirm"]] == [
+        "aoa-approval-gate-check",
+        "aoa-dry-run-first",
+        "aoa-safe-infra-change",
+    ]
