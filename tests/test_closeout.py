@@ -3,6 +3,7 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from aoa_sdk import AoASDK
@@ -601,13 +602,41 @@ def test_closeout_api_build_manifest_can_enqueue_built_manifest(workspace_root: 
     assert Path(report.enqueue_report.queued_manifest_path).exists()
 
 
+def test_closeout_api_build_manifest_keeps_missing_optional_audit_refs(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    build_request_path = fixture["build_request_path"]
+    payload = json.loads(build_request_path.read_text(encoding="utf-8"))
+    payload["audit_refs"].append("../manifests/notes/missing_optional_audit.md")
+    build_request_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+    report = sdk.closeout.build_manifest(build_request_path, enqueue=False, overwrite=True)
+
+    built_manifest = json.loads(Path(report.manifest_path).read_text(encoding="utf-8"))
+    assert built_manifest["audit_refs"] == [
+        str(fixture["reviewed_artifact_path"]),
+        str(fixture["route_summary_path"]),
+        str(
+            (
+                workspace_root
+                / "aoa-sdk"
+                / ".aoa"
+                / "closeout"
+                / "manifests"
+                / "notes"
+                / "missing_optional_audit.md"
+            ).resolve()
+        ),
+    ]
+
+
 def test_closeout_api_submit_reviewed_builds_request_and_manifest(workspace_root: Path) -> None:
     fixture = install_closeout_fixture(workspace_root)
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     report = sdk.closeout.submit_reviewed(
         fixture["reviewed_artifact_path"],
-        session_ref="session:test-submit-reviewed",
+        session_ref="session:test-closeout",
         receipt_paths=[
             fixture["skill_receipt_path"],
             fixture["core_skill_receipt_path"],
@@ -631,6 +660,52 @@ def test_closeout_api_submit_reviewed_builds_request_and_manifest(workspace_root
     assert request_payload["audit_refs"] == [str(fixture["route_summary_path"])]
     assert report.build_report.manifest_path.endswith(".aoa/closeout/manifests/closeout-submit-001.json")
     assert report.build_report.enqueue_report is None
+
+
+def test_closeout_api_submit_reviewed_allows_missing_optional_audit_refs(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    missing_audit_ref = fixture["reviewed_artifact_path"].parent / "missing_audit_ref.md"
+
+    report = sdk.closeout.submit_reviewed(
+        fixture["reviewed_artifact_path"],
+        session_ref="session:test-audit-only-optional-refs",
+        audit_refs=[missing_audit_ref],
+        closeout_id="closeout-audit-only-optional-refs-001",
+        enqueue=False,
+        allow_empty=True,
+    )
+
+    request_payload = json.loads(Path(report.request_path).read_text(encoding="utf-8"))
+    manifest_payload = json.loads(Path(report.build_report.manifest_path).read_text(encoding="utf-8"))
+    assert request_payload["audit_refs"] == [str(missing_audit_ref.resolve())]
+    assert manifest_payload["audit_refs"] == [
+        str(fixture["reviewed_artifact_path"]),
+        str(missing_audit_ref.resolve()),
+    ]
+
+
+def test_closeout_api_submit_reviewed_rejects_mismatched_receipt_session_refs(
+    workspace_root: Path,
+) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    mismatched_receipt_path = fixture["skill_receipt_path"].parent / "skill-mismatch.json"
+    mismatched_receipt = json.loads(fixture["skill_receipt_path"].read_text(encoding="utf-8"))
+    mismatched_receipt["session_ref"] = "session:other-closeout"
+    mismatched_receipt_path.write_text(
+        json.dumps(mismatched_receipt, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="does not match expected"):
+        sdk.closeout.submit_reviewed(
+            fixture["reviewed_artifact_path"],
+            session_ref="session:test-closeout",
+            receipt_paths=[mismatched_receipt_path],
+            closeout_id="closeout-submit-mismatch-001",
+            enqueue=False,
+        )
 
 
 def test_closeout_api_submit_reviewed_can_build_audit_only_closeout(workspace_root: Path) -> None:

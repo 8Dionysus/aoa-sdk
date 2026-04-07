@@ -34,6 +34,8 @@ Use the shortest route by need:
 - kernel-aware next-step brief after reviewed closeout: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - persistent owner follow-through handoffs after harvest or quest promotion: `docs/session-closeout.md`, `.aoa/closeout/handoffs/`, `aoa closeout run`, and `aoa closeout process-inbox`
 - workspace session ingress and pre-mutation guard wrappers: `aoa skills enter`, `aoa skills guard`, and `src/aoa_sdk/cli/main.py`
+- router recommendation versus host skill-availability gap: `docs/skill-runtime-recommendation-gap.md`, `aoa skills enter`, `aoa skills guard`, and `src/aoa_sdk/skills/detector.py`
+- first implementation spec for the recommendation-availability gap: `docs/skill-runtime-recommendation-gap-fix-spec.md`, `src/aoa_sdk/models.py`, `src/aoa_sdk/skills/detector.py`, and `src/aoa_sdk/cli/main.py`
 - project foundation structure and layer order: `sdk.skills.project_foundation()` and the `aoa-skills` generated foundation surface
 - project-core outer-ring structure and readiness: `sdk.skills.project_core_outer_ring()`, `sdk.skills.project_core_outer_ring_readiness()`, and the `aoa-skills` generated project-core ring surfaces
 - project risk guard ring structure and governance: `sdk.skills.project_risk_guard_ring()`, `sdk.skills.project_risk_guard_ring_governance()`, and the `aoa-skills` generated risk-ring surfaces

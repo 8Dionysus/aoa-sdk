@@ -163,6 +163,15 @@ class SkillsAPI:
         intent_text: str = "",
         mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
         closeout_path: str | None = None,
+        host_available_skills: list[str] | None = None,
+        host_availability_source: Literal[
+            "host-manifest",
+            "host-skill-list",
+            "repo-install",
+            "workspace-install",
+            "user-install",
+            "not-provided",
+        ] = "not-provided",
     ) -> SkillDetectionReport:
         return detect_skills(
             self.workspace,
@@ -171,6 +180,8 @@ class SkillsAPI:
             intent_text=intent_text,
             mutation_surface=mutation_surface,
             closeout_path=closeout_path,
+            host_available_skills=host_available_skills,
+            host_availability_source=host_availability_source,
         )
 
     def dispatch(
@@ -182,6 +193,15 @@ class SkillsAPI:
         mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
         closeout_path: str | None = None,
         session_file: str | None = None,
+        host_available_skills: list[str] | None = None,
+        host_availability_source: Literal[
+            "host-manifest",
+            "host-skill-list",
+            "repo-install",
+            "workspace-install",
+            "user-install",
+            "not-provided",
+        ] = "not-provided",
     ) -> SkillDetectionReport:
         return dispatch_skills(
             self.workspace,
@@ -191,4 +211,6 @@ class SkillsAPI:
             mutation_surface=mutation_surface,
             closeout_path=closeout_path,
             session_file=session_file,
+            host_available_skills=host_available_skills,
+            host_availability_source=host_availability_source,
         )

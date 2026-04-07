@@ -100,6 +100,20 @@ class SkillDisclosure(BaseModel):
     collision_family: str | None = None
 
 
+class SkillHostAvailability(BaseModel):
+    status: Literal["host-executable", "router-only", "unknown"]
+    source: Literal[
+        "host-manifest",
+        "host-skill-list",
+        "repo-install",
+        "workspace-install",
+        "user-install",
+        "not-provided",
+    ]
+    manual_fallback_allowed: bool
+    reason: str
+
+
 class SkillActivationRequest(BaseModel):
     skill_name: str
     session_file: str | None = None
@@ -978,6 +992,14 @@ class SkillDispatchItem(BaseModel):
     layer: Literal["kernel", "outer-ring", "risk-ring"]
     collision_family: str | None = None
     reason: str
+    host_availability: SkillHostAvailability = Field(
+        default_factory=lambda: SkillHostAvailability(
+            status="unknown",
+            source="not-provided",
+            manual_fallback_allowed=False,
+            reason="no host skill inventory was supplied",
+        )
+    )
 
 
 class SkillDetectionReport(BaseModel):
@@ -987,6 +1009,8 @@ class SkillDetectionReport(BaseModel):
     activate_now: list[SkillDispatchItem] = Field(default_factory=list)
     must_confirm: list[SkillDispatchItem] = Field(default_factory=list)
     suggest_next: list[SkillDispatchItem] = Field(default_factory=list)
+    host_inventory_provided: bool = False
+    actionability_gaps: list[str] = Field(default_factory=list)
     blocked_actions: list[str] = Field(default_factory=list)
     closeout_chain: KernelNextStepBrief | None = None
     reasoning: list[str] = Field(default_factory=list)

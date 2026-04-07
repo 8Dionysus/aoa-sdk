@@ -165,7 +165,10 @@ class CloseoutAPI:
 
         batches_by_publisher: dict[str, list[str]] = {}
         for receipt_path in resolved_receipt_paths:
-            publisher = self._publisher_for_receipt_path(receipt_path)
+            publisher = self._publisher_for_receipt_path(
+                receipt_path,
+                expected_session_ref=session_ref,
+            )
             batches_by_publisher.setdefault(publisher, []).append(str(receipt_path))
         audit_only = not resolved_receipt_paths
 
@@ -193,10 +196,10 @@ class CloseoutAPI:
                 )
                 for publisher, paths in sorted(batches_by_publisher.items())
             ],
-            audit_refs=[
-                str(self._resolve_existing_path(reviewed_artifact, str(path)))
-                for path in (audit_refs or [])
-            ],
+            audit_refs=self._resolve_optional_paths(
+                reviewed_artifact,
+                [str(path) for path in (audit_refs or [])],
+            ),
             notes=notes,
         )
         write_json(request_path, build_request.model_dump(mode="json"))
@@ -243,12 +246,7 @@ class CloseoutAPI:
         audit_refs = self._unique_strings(
             [
                 str(reviewed_artifact_path),
-                *[
-                    str(path)
-                    for path in self._resolve_input_paths(
-                        resolved_request_path, request.audit_refs
-                    )
-                ],
+                *self._resolve_optional_paths(resolved_request_path, request.audit_refs),
             ]
         )
         manifest = CloseoutManifest(
@@ -643,12 +641,32 @@ class CloseoutAPI:
                     collected.append(candidate)
         return self._unique_paths(collected)
 
-    def _publisher_for_receipt_path(self, receipt_path: Path) -> str:
+    def _publisher_for_receipt_path(
+        self,
+        receipt_path: Path,
+        *,
+        expected_session_ref: str | None = None,
+    ) -> str:
         publisher: str | None = None
+        detected_session_ref: str | None = None
         for receipt in self._load_receipt_file(receipt_path):
             event_kind = receipt.get("event_kind")
             if not isinstance(event_kind, str) or not event_kind:
                 raise ValueError(f"{receipt_path}: receipt is missing a non-empty event_kind")
+            session_ref = receipt.get("session_ref")
+            if not isinstance(session_ref, str) or not session_ref:
+                raise ValueError(f"{receipt_path}: receipt is missing a non-empty session_ref")
+            if detected_session_ref is None:
+                detected_session_ref = session_ref
+            elif session_ref != detected_session_ref:
+                raise ValueError(
+                    f"{receipt_path}: mixed session_ref values are not supported in one receipt file"
+                )
+            if expected_session_ref is not None and session_ref != expected_session_ref:
+                raise ValueError(
+                    f"{receipt_path}: receipt session_ref {session_ref!r} does not match expected "
+                    f"{expected_session_ref!r}"
+                )
             detected = EVENT_KIND_TO_PUBLISHER.get(event_kind)
             if detected is None:
                 raise ValueError(f"{receipt_path}: unsupported closeout receipt kind {event_kind!r}")
