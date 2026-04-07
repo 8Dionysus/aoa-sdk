@@ -282,3 +282,26 @@ The brief stays bounded:
 
 This keeps the next-step suggestion subordinate to source-owned kernel and
 stats surfaces instead of hard-coding a second hidden router in the SDK.
+
+## Owner follow-through handoff
+
+When a reviewed closeout already reaches owner-layer follow-through, the SDK
+now also writes a persistent owner handoff bundle under:
+
+- `.aoa/closeout/handoffs/`
+
+This handoff stays separate from the kernel brief.
+The kernel brief answers "what core skill comes next, if any?"
+The owner handoff answers "what owner-layer artifact should be drafted or
+authored next?"
+
+The current bounded sources are:
+
+- `harvest_packet_receipt`
+  - when the receipt points to a readable `HARVEST_PACKET`, accepted candidates
+    become `draft-owner-artifact` handoffs
+- `quest_promotion_receipt`
+  - closed promotion verdicts become `author-owner-artifact` handoffs
+
+This gives later sessions one persistent queue-like surface so a strong harvest
+does not stop at "result + analysis" and quietly lose the next authoring move.
