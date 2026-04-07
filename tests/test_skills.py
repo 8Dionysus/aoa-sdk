@@ -125,6 +125,24 @@ def test_detect_and_dispatch_ingress(workspace_root: Path) -> None:
     assert session.active_skills[0].name == "aoa-change-protocol"
 
 
+def test_dispatch_defaults_session_file_to_aoa_sdk_runtime_store_for_workspace_root(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root)
+
+    dispatch_report = sdk.skills.dispatch(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="pre-mutation",
+        intent_text="plan verify a bounded change",
+        mutation_surface="runtime",
+    )
+
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+    workspace_root_session = workspace_root / ".aoa" / "skill-runtime-session.json"
+
+    assert dispatch_report.activate_now[0].skill_name == "aoa-change-protocol"
+    assert session_file.exists()
+    assert not workspace_root_session.exists()
+
+
 def test_detect_pre_mutation_raises_risk_gates_without_auto_running_them(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
