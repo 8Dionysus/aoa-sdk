@@ -465,6 +465,35 @@ def test_skills_enter_writes_ingress_report_with_host_skill_manifest(
     assert payload["report"]["activate_now"][0]["host_availability"]["source"] == "host-manifest"
 
 
+def test_skills_enter_rejects_non_object_host_skill_manifest(
+    workspace_root: Path,
+    tmp_path: Path,
+) -> None:
+    runner = CliRunner()
+    manifest_path = tmp_path / "host-skills.json"
+    manifest_path.write_text("[]\n", encoding="utf-8")
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "enter",
+            str(workspace_root),
+            "--root",
+            str(workspace_root),
+            "--intent-text",
+            "plan verify a bounded change",
+            "--host-skill-manifest",
+            str(manifest_path),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 2
+    assert "host skill manifest must be a JSON object" in result.output
+    assert "AttributeError" not in result.output
+
+
 def test_skills_guard_writes_pre_mutation_report(workspace_root: Path, install_host_skills) -> None:
     install_host_skills(
         workspace_root,
