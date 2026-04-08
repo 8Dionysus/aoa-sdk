@@ -4,7 +4,15 @@ Guidance for coding agents and humans contributing to `aoa-sdk`.
 
 ## Purpose
 
-`aoa-sdk` is the typed Python SDK for the AoA federation. It consumes source-owned surfaces from sibling repositories and exposes a local-first API layer for loading, validating, disclosing, activating, and handing off bounded federation objects.
+`aoa-sdk` is the typed Python SDK for the AoA federation.
+It consumes source-owned surfaces from sibling repositories and exposes a
+local-first API layer for loading, validating, disclosing, activating, and
+handing off bounded federation objects.
+
+It is a control-plane helper layer.
+It may make the federation easier to read and use as growth surfaces mature,
+but it does not become the source of truth for progression doctrine, quest
+meaning, role meaning, or runtime autonomy policy.
 
 ## Owns
 
@@ -15,21 +23,26 @@ This repository is the source of truth for:
 - compatibility checks and versioning posture for consumed local surfaces
 - bounded orchestration helpers that stay subordinate to source-owned meaning
 - CLI inspection surfaces for workspace and compatibility views
+- additive surface-detection and reviewed closeout-handoff helpers that stay subordinate to owner-layer truth
 
 ## Does not own
 
 Do not treat this repository as the source of truth for:
 
 - routing meaning in `aoa-routing`
-- skill, eval, memo, playbook, or agent meaning in sibling repositories
+- skill, eval, memo, playbook, agent, or progression meaning in sibling repositories
 - service runtime behavior
 - hidden workspace heuristics that are not documented and testable
+- quest state, progression state, or checkpoint authority
+- frontend theming or runtime RPG semantics
 
 ## Core rule
 
 Stay on the control plane.
 
-Prefer explicit, manifest-driven, reviewable behavior over magical discovery or one-off path heuristics. Preserve the distinction between source checkouts and deployed runtime mirrors.
+Prefer explicit, manifest-driven, reviewable behavior over magical discovery or
+one-off path heuristics.
+Preserve the distinction between source checkouts and deployed runtime mirrors.
 
 ## Read this first
 
@@ -42,6 +55,13 @@ Before making changes, read in this order:
 5. `.aoa/workspace.toml`
 6. the source files and tests you plan to touch
 
+Then branch by task:
+
+- reviewed closeout handoff or session-growth targets: `docs/aoa-surface-detection-closeout-handoff.md`, `docs/session-growth-checkpoints.md`, and `docs/checkpoint-note-promotion.md`
+- additive surface detection: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-second-wave.md`, and `docs/aoa-surface-detection-heuristics.md`
+- RPG / progression readers: `docs/RPG_SDK_ADDENDUM.md` and `docs/RPG_SURFACE_PATHS.md`
+- release, CI, or compatibility posture: `docs/RELEASE_CI_POSTURE.md` and `docs/ecosystem-impact.md`
+
 If a deeper directory defines its own `AGENTS.md`, follow the nearest one.
 
 ## Workspace topology
@@ -52,6 +72,21 @@ If a deeper directory defines its own `AGENTS.md`, follow the nearest one.
 - If both paths exist, prefer editing `~/src/abyss-stack`.
 - `src/aoa_sdk/workspace/discovery.py`, `.aoa/workspace.toml`, and `docs/workspace-layout.md` must stay aligned.
 
+## Growth posture
+
+`aoa-sdk` may expose typed readers and helpers for reviewed closeout handoff,
+session-growth notes, progression overlays, and adjunct RPG reflection.
+
+Those helpers must remain:
+
+- owner-subordinate
+- reviewable
+- explicit about truth labels
+- explicit about whether a surface is only loaded, only suggested, manually equivalent, or activated
+
+The SDK may help the federation stay legible as it grows.
+It must not silently convert growth vocabulary into live policy.
+
 ## Primary objects
 
 The most important objects in this repository are:
@@ -61,7 +96,7 @@ The most important objects in this repository are:
 - `.aoa/workspace.toml`
 - topology, boundary, and versioning docs under `docs/`
 - additive surface-detection docs and heuristics under `docs/aoa-surface-detection-*.md` and `src/aoa_sdk/surfaces/`
-- tests that prove discovery, compatibility, and typed read paths
+- tests that prove discovery, compatibility, typed read paths, and reviewed handoff shape
 
 ## Hard NO
 
@@ -73,11 +108,16 @@ Do not:
 - turn `aoa-sdk` into a service runtime or monolith
 - change topology behavior without updating docs and tests in the same change
 - blur `activated` and `manual-equivalent`, or quietly make non-skill surfaces executable-now
+- let helper methods mutate quest state, progression state, or checkpoint state
+- auto-promote reviewed closeout handoffs into live activation or routing policy
+- flatten multi-axis progression into one score or one magic readiness flag
+- let convenience helpers hide source refs, truth labels, or owner boundaries
 
 ## Surface Detection Loop
 
 Keep `aoa skills enter` and `aoa skills guard` as the primary session-start and
-pre-mutation paths. They stay skill-only.
+pre-mutation paths.
+They stay skill-only.
 
 When the task shows route drift, owner-layer ambiguity, proof need, recall
 need, role posture questions, or recurring-scenario signals, run one additive
@@ -103,6 +143,8 @@ Truth rules for this loop:
 - `manual-equivalent` never becomes `activated`
 - non-skill surfaces never become executable-now in wave one
 - routing shortlist hints stay advisory only
+- reviewed closeout handoff never auto-runs from `aoa closeout run`
+- surviving items keep their existing truth labels through handoff
 - `aoa-stats.surface_detection_summary.min` stays descriptive only
 
 ## Contribution doctrine
@@ -113,18 +155,20 @@ Use this flow: `PLAN -> DIFF -> VERIFY -> REPORT`
 
 State:
 
-- which typed facade, discovery rule, or compatibility surface is changing
+- which typed facade, discovery rule, compatibility surface, or reviewed handoff helper is changing
 - which sibling repositories are affected
 - whether workspace topology or CLI behavior changes
-- what boundary or compatibility risk exists
+- what boundary, activation, or compatibility risk exists
 
 ### DIFF
 
-Keep the change focused. Prefer config and manifest-driven behavior over special-case code. Preserve local-first ergonomics without stealing ownership from the source repos.
+Keep the change focused.
+Prefer config and manifest-driven behavior over special-case code.
+Preserve local-first ergonomics without stealing ownership from the source repos.
 
 ### VERIFY
 
-Minimum validation for code or topology changes:
+Minimum validation for code, topology, or reviewed-handoff changes:
 
 ```bash
 python -m pytest -q
@@ -141,18 +185,21 @@ python -m mypy src
 python -m build
 ```
 
+Confirm that owner meaning, truth labels, and checkpoint boundaries remain
+legible in the changed helpers.
+
 ### REPORT
 
 Summarize:
 
 - what changed
-- which typed surfaces or topology rules changed
+- which typed surfaces, topology rules, or handoff contracts changed
 - whether compatibility or CLI behavior changed
+- whether any helper posture moved closer to activation or remained reviewed-only
 - what validation you actually ran
 - any remaining follow-up work
 
 ## Validation
 
 Do not claim checks you did not run.
-
 When changing topology behavior, update tests and docs in the same change.
