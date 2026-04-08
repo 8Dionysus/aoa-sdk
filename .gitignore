@@ -17,3 +17,5 @@ venv/
 .aoa/skill-runtime-session.json
 .aoa/skill-dispatch/
 .aoa/closeout/
+.aoa/surface-detection/
+.aoa/session-growth/
