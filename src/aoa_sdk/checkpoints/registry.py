@@ -5,7 +5,7 @@ import re
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 from ..errors import RepoNotFound, SurfaceNotFound
 from ..models import (
@@ -128,6 +128,7 @@ class CheckpointsAPI:
         if not note.candidate_clusters:
             raise SurfaceNotFound("cannot promote an empty checkpoint note")
 
+        new_state: Literal["collecting", "reviewable", "promoted", "closed"]
         if target == "dionysus-note":
             output_refs = _promote_to_dionysus(self.workspace, paths=paths, note=note)
             new_state = "promoted"
@@ -283,19 +284,19 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             next_owner_moves.update(merged_moves)
 
     candidate_clusters: list[SessionCheckpointCluster] = []
-    for cluster in cluster_map.values():
-        review_status = "collecting"
-        if cluster.checkpoint_hits >= 2 or manual_review_requested:
+    for checkpoint_cluster in cluster_map.values():
+        review_status: Literal["collecting", "reviewable", "promoted", "closed"] = "collecting"
+        if checkpoint_cluster.checkpoint_hits >= 2 or manual_review_requested:
             review_status = "reviewable"
         if existing_state == "promoted":
             review_status = "promoted"
         elif existing_state == "closed":
             review_status = "closed"
-        cluster.review_status = review_status  # type: ignore[assignment]
-        candidate_clusters.append(cluster)
-        all_blocked.update(cluster.blocked_by)
-        if cluster.defer_reason:
-            all_blocked.add(cluster.defer_reason)
+        checkpoint_cluster.review_status = review_status
+        candidate_clusters.append(checkpoint_cluster)
+        all_blocked.update(checkpoint_cluster.blocked_by)
+        if checkpoint_cluster.defer_reason:
+            all_blocked.add(checkpoint_cluster.defer_reason)
 
     candidate_clusters.sort(key=lambda item: (-item.checkpoint_hits, item.candidate_id, item.owner_hint))
     recommendation = _derive_promotion_recommendation(
@@ -503,10 +504,12 @@ def _render_dionysus_checkpoint_markdown(payload: dict[str, object]) -> str:
                 ]
             )
     lines.extend(["## Next Owner Moves", ""])
-    for move in payload.get("next_owner_moves", []):
+    next_owner_moves = cast(list[str], payload.get("next_owner_moves", []))
+    for move in next_owner_moves:
         lines.append(f"- {move}")
     lines.extend(["", "## Evidence Refs", ""])
-    for ref in payload.get("evidence_refs", []):
+    evidence_refs = cast(list[str], payload.get("evidence_refs", []))
+    for ref in evidence_refs:
         lines.append(f"- `{ref}`")
     return "\n".join(lines).rstrip() + "\n"
 
