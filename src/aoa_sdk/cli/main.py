@@ -335,6 +335,14 @@ def _write_surface_report(path: Path, report: SurfaceDetectionReport) -> dict[st
     return payload
 
 
+def _merge_checkpoint_note(payload: dict[str, Any], note: SessionCheckpointNote | None) -> dict[str, Any]:
+    if note is None:
+        return payload
+    merged = dict(payload)
+    merged["checkpoint_note"] = note.model_dump(mode="json")
+    return merged
+
+
 def _write_surface_handoff(path: Path, report: SurfaceCloseoutHandoff) -> dict[str, Any]:
     payload = {
         "report_path": str(path),
@@ -488,7 +496,7 @@ def compatibility_check(
 @skills_app.command("detect")
 def skills_detect(
     repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as task context."),
-    phase: str = typer.Option(..., "--phase", help="Detection phase: ingress, pre-mutation, or closeout."),
+    phase: str = typer.Option(..., "--phase", help="Detection phase: ingress, pre-mutation, checkpoint, or closeout."),
     intent_text: str = typer.Option("", "--intent-text", help="Intent text used for tiny-router style matching."),
     mutation_surface: str = typer.Option(
         "none",
@@ -536,7 +544,7 @@ def skills_detect(
 @skills_app.command("dispatch")
 def skills_dispatch(
     repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as task context."),
-    phase: str = typer.Option(..., "--phase", help="Dispatch phase: ingress, pre-mutation, or closeout."),
+    phase: str = typer.Option(..., "--phase", help="Dispatch phase: ingress, pre-mutation, checkpoint, or closeout."),
     intent_text: str = typer.Option("", "--intent-text", help="Intent text used for tiny-router style matching."),
     mutation_surface: str = typer.Option(
         "none",
@@ -601,6 +609,16 @@ def skills_enter(
         "--report-output",
         help="Optional JSON path for the persisted ingress dispatch report.",
     ),
+    checkpoint_kind: str | None = typer.Option(
+        None,
+        "--checkpoint-kind",
+        help="Optional checkpoint kind to append after ingress dispatch: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
+    ),
+    mark_checkpoint_reviewable: bool = typer.Option(
+        False,
+        "--mark-checkpoint-reviewable",
+        help="When used with --checkpoint-kind, mark the appended checkpoint as manually reviewable.",
+    ),
     host_skill: list[str] = typer.Option(
         None,
         "--host-skill",
@@ -615,11 +633,12 @@ def skills_enter(
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     workspace = Workspace.discover(root)
+    sdk = AoASDK.from_workspace(root)
     host_available_skills, host_availability_source = _resolve_host_available_skills(
         host_skills=host_skill,
         host_skill_manifest=host_skill_manifest,
     )
-    sdk_report = AoASDK.from_workspace(root).skills.dispatch(
+    sdk_report = sdk.skills.dispatch(
         repo_root=repo_root,
         phase="ingress",
         intent_text=intent_text,
@@ -628,19 +647,32 @@ def skills_enter(
         host_available_skills=host_available_skills,
         host_availability_source=host_availability_source,  # type: ignore[arg-type]
     )
-    payload = _write_skill_report(
-        _resolve_skill_report_path(
-            workspace=workspace,
-            repo_root=repo_root,
-            phase="ingress",
-            report_output=report_output,
-        ),
-        sdk_report,
+    report_path = _resolve_skill_report_path(
+        workspace=workspace,
+        repo_root=repo_root,
+        phase="ingress",
+        report_output=report_output,
     )
+    payload = _write_skill_report(report_path, sdk_report)
+    checkpoint_note: SessionCheckpointNote | None = None
+    if checkpoint_kind is not None:
+        checkpoint_note = sdk.checkpoints.append(
+            repo_root=repo_root,
+            checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
+            intent_text=intent_text,
+            mutation_surface="none",
+            session_file=session_file,
+            skill_report_path=str(report_path),
+            manual_review_requested=mark_checkpoint_reviewable,
+        )
+        payload = _merge_checkpoint_note(payload, checkpoint_note)
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     typer.echo(f"report_path: {payload['report_path']}")
+    if checkpoint_note is not None:
+        typer.echo(f"checkpoint_note_state: {checkpoint_note.state}")
+        typer.echo(f"checkpoint_recommendation: {checkpoint_note.promotion_recommendation}")
     _print_skill_detection_report(sdk_report)
 
 
@@ -663,6 +695,16 @@ def skills_guard(
         "--report-output",
         help="Optional JSON path for the persisted pre-mutation dispatch report.",
     ),
+    checkpoint_kind: str | None = typer.Option(
+        None,
+        "--checkpoint-kind",
+        help="Optional checkpoint kind to append after guard dispatch: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
+    ),
+    mark_checkpoint_reviewable: bool = typer.Option(
+        False,
+        "--mark-checkpoint-reviewable",
+        help="When used with --checkpoint-kind, mark the appended checkpoint as manually reviewable.",
+    ),
     host_skill: list[str] = typer.Option(
         None,
         "--host-skill",
@@ -677,11 +719,12 @@ def skills_guard(
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     workspace = Workspace.discover(root)
+    sdk = AoASDK.from_workspace(root)
     host_available_skills, host_availability_source = _resolve_host_available_skills(
         host_skills=host_skill,
         host_skill_manifest=host_skill_manifest,
     )
-    sdk_report = AoASDK.from_workspace(root).skills.dispatch(
+    sdk_report = sdk.skills.dispatch(
         repo_root=repo_root,
         phase="pre-mutation",
         intent_text=intent_text,
@@ -690,20 +733,33 @@ def skills_guard(
         host_available_skills=host_available_skills,
         host_availability_source=host_availability_source,  # type: ignore[arg-type]
     )
-    payload = _write_skill_report(
-        _resolve_skill_report_path(
-            workspace=workspace,
-            repo_root=repo_root,
-            phase="pre-mutation",
-            mutation_surface=mutation_surface,
-            report_output=report_output,
-        ),
-        sdk_report,
+    report_path = _resolve_skill_report_path(
+        workspace=workspace,
+        repo_root=repo_root,
+        phase="pre-mutation",
+        mutation_surface=mutation_surface,
+        report_output=report_output,
     )
+    payload = _write_skill_report(report_path, sdk_report)
+    checkpoint_note: SessionCheckpointNote | None = None
+    if checkpoint_kind is not None:
+        checkpoint_note = sdk.checkpoints.append(
+            repo_root=repo_root,
+            checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
+            intent_text=intent_text,
+            mutation_surface=mutation_surface,  # type: ignore[arg-type]
+            session_file=session_file,
+            skill_report_path=str(report_path),
+            manual_review_requested=mark_checkpoint_reviewable,
+        )
+        payload = _merge_checkpoint_note(payload, checkpoint_note)
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     typer.echo(f"report_path: {payload['report_path']}")
+    if checkpoint_note is not None:
+        typer.echo(f"checkpoint_note_state: {checkpoint_note.state}")
+        typer.echo(f"checkpoint_recommendation: {checkpoint_note.promotion_recommendation}")
     _print_skill_detection_report(sdk_report)
 
 
@@ -742,11 +798,26 @@ def surfaces_detect(
         "--checkpoint-kind",
         help="Optional checkpoint kind when phase=checkpoint: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
     ),
+    append_note: bool = typer.Option(
+        False,
+        "--append-note",
+        help="When phase=checkpoint, append the detected checkpoint note into aoa-sdk local session-growth storage.",
+    ),
+    mark_checkpoint_reviewable: bool = typer.Option(
+        False,
+        "--mark-checkpoint-reviewable",
+        help="When used with --append-note, mark the appended checkpoint as manually reviewable.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     workspace = Workspace.discover(root)
-    report = AoASDK.from_workspace(root).surfaces.detect(
+    sdk = AoASDK.from_workspace(root)
+    if append_note and phase != "checkpoint":
+        raise typer.BadParameter("--append-note is only valid when --phase checkpoint")
+    if append_note and checkpoint_kind is None:
+        raise typer.BadParameter("--append-note requires --checkpoint-kind")
+    report = sdk.surfaces.detect(
         repo_root=repo_root,
         phase=phase,  # type: ignore[arg-type]
         intent_text=intent_text,
@@ -756,19 +827,34 @@ def surfaces_detect(
         skill_report_path=skill_report_path,
         checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
     )
-    payload = _write_surface_report(
-        _resolve_surface_report_path(
-            workspace=workspace,
-            repo_root=repo_root,
-            phase=phase,
-            report_output=report_output,
-        ),
-        report,
+    report_path = _resolve_surface_report_path(
+        workspace=workspace,
+        repo_root=repo_root,
+        phase=phase,
+        report_output=report_output,
     )
+    payload = _write_surface_report(report_path, report)
+    checkpoint_note: SessionCheckpointNote | None = None
+    if append_note:
+        checkpoint_note = sdk.checkpoints.append(
+            repo_root=repo_root,
+            checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
+            intent_text=intent_text,
+            mutation_surface=mutation_surface,  # type: ignore[arg-type]
+            session_file=session_file,
+            skill_report_path=skill_report_path,
+            surface_report=report,
+            surface_report_path=str(report_path),
+            manual_review_requested=mark_checkpoint_reviewable,
+        )
+        payload = _merge_checkpoint_note(payload, checkpoint_note)
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     typer.echo(f"report_path: {payload['report_path']}")
+    if checkpoint_note is not None:
+        typer.echo(f"checkpoint_note_state: {checkpoint_note.state}")
+        typer.echo(f"checkpoint_recommendation: {checkpoint_note.promotion_recommendation}")
     _print_surface_detection_report(report)
 
 

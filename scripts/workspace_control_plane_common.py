@@ -46,6 +46,15 @@ ROUTE_SPECS = (
             "docs/aoa-surface-detection-closeout-handoff.md",
         ],
     },
+    {
+        "route_id": "checkpoint-growth",
+        "need": "capture reviewable mid-session checkpoint notes without mistaking them for harvest verdicts",
+        "surface_ref": "docs/session-growth-checkpoints.md",
+        "verification_refs": [
+            "docs/checkpoint-note-promotion.md",
+            "src/aoa_sdk/checkpoints/registry.py",
+        ],
+    },
 )
 
 

@@ -36,7 +36,7 @@ Use the shortest route by need:
 - local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - additive owner-layer surface detection without changing `aoa skills ...` meaning: `docs/aoa-surface-detection-first-wave.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
-- checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, and `aoa checkpoint append/status/promote`
+- checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, `aoa checkpoint append/status/promote`, and the explicit `--checkpoint-kind` / `--append-note` bridges on `aoa skills ...` and `aoa surfaces detect`
 - second-wave shortlist, receipt-context, and observability seams that stay advisory: `docs/aoa-surface-detection-second-wave.md`, `sdk.routing.owner_layer_shortlist()`, and `sdk.stats.surface_detection()`
 - antifragility stress-context doctrine and fixtures that stay narrowing-only: `docs/antifragility-control-plane.md`, `docs/antifragility-closeout-seam.md`, `tests/fixtures/antifragility/stress_dispatch_input.example.json`, `tests/fixtures/antifragility/stress_dispatch_result.example.json`, and `tests/fixtures/antifragility/stress_closeout_manifest.example.json`
 - via negativa pruning checklist: `docs/VIA_NEGATIVA_CHECKLIST.md`
@@ -53,7 +53,7 @@ Use the shortest route by need:
 - project foundation structure and layer order: `sdk.skills.project_foundation()` and the `aoa-skills` generated foundation surface
 - project-core outer-ring structure and readiness: `sdk.skills.project_core_outer_ring()`, `sdk.skills.project_core_outer_ring_readiness()`, and the `aoa-skills` generated project-core ring surfaces
 - project risk guard ring structure and governance: `sdk.skills.project_risk_guard_ring()`, `sdk.skills.project_risk_guard_ring_governance()`, and the `aoa-skills` generated risk-ring surfaces
-- phase-aware skill detection and safe auto-dispatch: `aoa skills detect`, `aoa skills dispatch`, and `src/aoa_sdk/skills/detector.py`
+- phase-aware skill detection and safe auto-dispatch: `aoa skills detect`, `aoa skills dispatch`, and `src/aoa_sdk/skills/detector.py` with `ingress`, `pre-mutation`, `checkpoint`, and `closeout` phases
 
 ## What `aoa-sdk` owns
 
@@ -77,6 +77,7 @@ This repository is the source of truth for:
 - default skill runtime session storage under `aoa-sdk/.aoa/skill-runtime-session.json` when the workspace root itself is not the writable owner surface
 - additive first-wave and second-wave surface detection under `aoa-sdk/.aoa/surface-detection/` that keeps `aoa skills ...` skill-only while surfacing eval, memo, playbook, agent, and technique candidates as non-executable hints or reviewed handoffs
 - local checkpoint-note capture under `aoa-sdk/.aoa/session-growth/current/` that keeps mid-session growth work below harvest-verdict authority until reviewed promotion
+- explicit checkpoint-note bridges from `aoa skills enter`, `aoa skills guard`, and `aoa surfaces detect --phase checkpoint` when `--checkpoint-kind` or `--append-note` is requested
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own
@@ -143,6 +144,11 @@ checkpoint_report = sdk.surfaces.detect(
     phase="checkpoint",
     checkpoint_kind="commit",
     intent_text="recurring owner follow-through after green verify",
+)
+checkpoint_skill_report = sdk.skills.detect(
+    repo_root="/srv/aoa-sdk",
+    phase="checkpoint",
+    intent_text="plan verify a bounded change",
 )
 checkpoint_note = sdk.checkpoints.status(repo_root="/srv/aoa-sdk")
 shortlist = sdk.routing.owner_layer_shortlist(signal="scenario-recurring")
@@ -223,6 +229,7 @@ Inspect one phase-aware foundation detection pass:
 
 ```bash
 aoa skills detect /srv/aoa-sdk --phase ingress --intent-text "plan verify a bounded change" --root /srv/aoa-sdk --json
+aoa skills detect /srv/aoa-sdk --phase checkpoint --intent-text "plan verify a bounded change" --root /srv/aoa-sdk --json
 aoa skills dispatch /srv/aoa-sdk --phase pre-mutation --intent-text "refresh generated contracts" --mutation-surface repo-config --root /srv/aoa-sdk --json
 ```
 
@@ -231,6 +238,7 @@ Start one workspace session and persist the ingress/guard reports:
 ```bash
 aoa skills enter /srv --intent-text "plan a cross-repo change" --root /srv --json
 aoa skills guard /srv/aoa-sdk --intent-text "regenerate compatibility surfaces" --mutation-surface repo-config --root /srv --json
+aoa skills guard /srv/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green --root /srv --json
 ```
 
 Run one additive surface-detection pass without changing the skill-only lane:
@@ -239,6 +247,7 @@ Run one additive surface-detection pass without changing the skill-only lane:
 aoa surfaces detect /srv/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/aoa-sdk --json
 aoa surfaces detect /srv/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/aoa-sdk --json
 aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 ```
 
 Capture or promote one checkpoint-aware local note:

@@ -120,6 +120,9 @@ Do not:
 Keep `aoa skills enter` and `aoa skills guard` as the primary session-start and
 pre-mutation paths.
 They stay skill-only.
+If you want them to leave behind one local checkpoint note, opt in with
+`--checkpoint-kind`; do not treat that explicit side effect as a change to
+skill ownership semantics.
 
 When the task shows route drift, owner-layer ambiguity, proof need, recall
 need, role posture questions, or recurring-scenario signals, run one additive
@@ -129,6 +132,8 @@ surface pass:
 aoa surfaces detect /srv/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/aoa-sdk --json
 aoa surfaces detect /srv/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/aoa-sdk --json
 aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa skills guard /srv/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green --root /srv/aoa-sdk --json
 ```
 
 Use `aoa surfaces handoff` only after review:

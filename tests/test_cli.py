@@ -429,6 +429,32 @@ def test_skills_enter_writes_ingress_report(workspace_root: Path, install_host_s
     assert payload["report"]["activate_now"][0]["host_availability"]["source"] == "workspace-install"
 
 
+def test_skills_detect_supports_checkpoint_phase(workspace_root: Path, install_host_skills) -> None:
+    install_host_skills(workspace_root, ["aoa-change-protocol"])
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "detect",
+            str(workspace_root / "aoa-sdk"),
+            "--phase",
+            "checkpoint",
+            "--intent-text",
+            "plan verify a bounded change",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["phase"] == "checkpoint"
+    assert payload["activate_now"][0]["skill_name"] == "aoa-change-protocol"
+
+
 def test_skills_enter_writes_ingress_report_with_host_skill_manifest(
     workspace_root: Path,
     tmp_path: Path,

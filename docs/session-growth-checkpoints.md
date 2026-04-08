@@ -7,6 +7,7 @@ existing session-harvest family into an automatic runtime authority.
 ## Boundary
 
 - `aoa surfaces detect --phase checkpoint` stays additive and read-only
+- `aoa skills enter` and `aoa skills guard` stay skill-first by default; they only append a local checkpoint note when `--checkpoint-kind` is supplied explicitly
 - `aoa checkpoint append` writes only local note state under `.aoa/`
 - checkpoint capture does not emit `HARVEST_PACKET`
 - checkpoint capture does not emit `CORE_SKILL_APPLICATION_RECEIPT`
@@ -31,7 +32,10 @@ The JSON and Markdown files are rebuilt snapshots for current review.
 ## Commands
 
 ```bash
+aoa skills detect /srv/aoa-sdk --phase checkpoint --intent-text "plan verify a bounded change" --root /srv/aoa-sdk --json
 aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa skills guard /srv/aoa-sdk --intent-text "recurring owner follow-through after green verify" --mutation-surface code --checkpoint-kind verify_green --root /srv/aoa-sdk --json
 aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 aoa checkpoint status /srv/aoa-sdk --root /srv/aoa-sdk --json
 ```

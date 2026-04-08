@@ -242,6 +242,33 @@ def test_detect_closeout_reuses_kernel_brief(workspace_root: Path, install_host_
     assert report.must_confirm[0].host_availability.source == "workspace-install"
 
 
+def test_detect_and_dispatch_checkpoint(
+    workspace_root: Path,
+    install_host_skills,
+) -> None:
+    install_host_skills(workspace_root, ["aoa-change-protocol"])
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
+
+    report = sdk.skills.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="checkpoint",
+        intent_text="plan verify a bounded change",
+    )
+    dispatch_report = sdk.skills.dispatch(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="checkpoint",
+        intent_text="plan verify a bounded change",
+        session_file=str(session_file),
+    )
+    session = sdk.skills.session_status(str(session_file))
+
+    assert [item.skill_name for item in report.activate_now] == ["aoa-change-protocol"]
+    assert report.phase == "checkpoint"
+    assert dispatch_report.phase == "checkpoint"
+    assert session.active_skills[0].name == "aoa-change-protocol"
+
+
 def test_detect_demotes_activate_now_when_host_inventory_marks_skill_router_only(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 

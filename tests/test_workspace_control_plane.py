@@ -25,6 +25,7 @@ def test_build_payload_stays_runtime_surface_only() -> None:
         "workspace-topology",
         "compatibility-posture",
         "surface-detection",
+        "checkpoint-growth",
     ]
 
 

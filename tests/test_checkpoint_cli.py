@@ -104,3 +104,64 @@ def test_checkpoint_cli_append_status_and_promote_handoff(workspace_root: Path) 
     assert status_payload["state"] == "reviewable"
     assert promote_payload["target"] == "harvest-handoff"
     assert handoff_path.exists()
+
+
+def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path, install_host_skills) -> None:
+    install_host_skills(workspace_root, ["aoa-change-protocol"])
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--intent-text",
+            "plan verify a bounded change",
+            "--mutation-surface",
+            "code",
+            "--checkpoint-kind",
+            "verify_green",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["checkpoint_note"]["state"] in {"collecting", "reviewable"}
+    note_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "checkpoint-note.json"
+    assert note_path.exists()
+
+
+def test_surfaces_detect_cli_can_append_checkpoint_note(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "surfaces",
+            "detect",
+            str(workspace_root / "aoa-sdk"),
+            "--phase",
+            "checkpoint",
+            "--checkpoint-kind",
+            "commit",
+            "--append-note",
+            "--intent-text",
+            "recurring workflow needs better handoff proof and recall",
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["report"]["phase"] == "checkpoint"
+    assert payload["checkpoint_note"]["promotion_recommendation"] in {
+        "local_note",
+        "dionysus_note",
+        "harvest_handoff",
+    }

@@ -13,6 +13,7 @@ from ..models import (
     SessionCheckpointHistoryEntry,
     SessionCheckpointNote,
     SessionCheckpointPromotion,
+    SurfaceDetectionReport,
 )
 from ..surfaces import SurfacesAPI
 from ..workspace.discovery import Workspace
@@ -55,6 +56,8 @@ class CheckpointsAPI:
         mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
         session_file: str | None = None,
         skill_report_path: str | None = None,
+        surface_report: SurfaceDetectionReport | None = None,
+        surface_report_path: str | None = None,
         manual_review_requested: bool = False,
     ) -> SessionCheckpointNote:
         paths = _checkpoint_paths(self.workspace, repo_root)
@@ -63,7 +66,7 @@ class CheckpointsAPI:
             if existing.state == "closed":
                 _archive_current_checkpoint(paths)
 
-        report = self._surfaces.detect(
+        report = surface_report or self._surfaces.detect(
             repo_root=repo_root,
             phase="checkpoint",
             intent_text=intent_text,
@@ -72,11 +75,22 @@ class CheckpointsAPI:
             skill_report_path=skill_report_path,
             checkpoint_kind=checkpoint_kind,
         )
-        paths.surface_report.parent.mkdir(parents=True, exist_ok=True)
-        paths.surface_report.write_text(
+        if report.phase != "checkpoint":
+            raise ValueError("checkpoint append requires a checkpoint-phase surface report")
+        if report.checkpoint_kind != checkpoint_kind:
+            raise ValueError(
+                "checkpoint append requires surface_report.checkpoint_kind to match checkpoint_kind"
+            )
+        report_path = (
+            Path(surface_report_path).expanduser().resolve()
+            if surface_report_path is not None
+            else paths.surface_report
+        )
+        report_path.parent.mkdir(parents=True, exist_ok=True)
+        report_path.write_text(
             json.dumps(
                 {
-                    "report_path": str(paths.surface_report),
+                    "report_path": str(report_path),
                     "report": report.model_dump(mode="json"),
                 },
                 indent=2,
@@ -92,7 +106,7 @@ class CheckpointsAPI:
             "history_entry": SessionCheckpointHistoryEntry(
                 checkpoint_kind=checkpoint_kind,
                 observed_at=datetime.now(UTC),
-                report_ref=str(paths.surface_report),
+                report_ref=str(report_path),
                 intent_text=intent_text,
                 checkpoint_should_capture=report.checkpoint_should_capture,
                 blocked_by=list(report.blocked_by),

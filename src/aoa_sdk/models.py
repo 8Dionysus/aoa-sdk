@@ -1064,7 +1064,7 @@ class SkillDispatchItem(BaseModel):
 
 
 class SkillDetectionReport(BaseModel):
-    phase: Literal["ingress", "pre-mutation", "closeout"]
+    phase: Literal["ingress", "pre-mutation", "checkpoint", "closeout"]
     repo_root: str
     foundation_id: str
     activate_now: list[SkillDispatchItem] = Field(default_factory=list)

@@ -55,7 +55,10 @@ def test_surface_detection_routes_are_documented_as_additive_and_skill_only() ->
     assert "docs/checkpoint-note-promotion.md" in readme
     assert "It does not make `aoa skills detect/dispatch/enter/guard` mean anything other than skills." in readme
     assert "aoa surfaces detect /srv/aoa-sdk --phase ingress" in readme
+    assert "aoa skills detect /srv/aoa-sdk --phase checkpoint" in readme
     assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint" in readme
+    assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in readme
+    assert "aoa skills guard /srv/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in readme
     assert "aoa checkpoint append /srv/aoa-sdk" in readme
     assert "aoa checkpoint promote /srv/aoa-sdk --target dionysus-note" in readme
     assert "aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json" in readme
@@ -68,6 +71,8 @@ def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:
     assert "## Surface Detection Loop" in agents
     assert "aoa surfaces detect /srv/aoa-sdk --phase ingress" in agents
     assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint" in agents
+    assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in agents
+    assert "aoa skills guard /srv/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in agents
     assert "aoa skills ...` remains skill-only" in agents
     assert "checkpoint notes stay lower-authority than harvest verdicts" in agents
     assert "manual-equivalent` never becomes `activated`" in agents

@@ -28,7 +28,7 @@ def main() -> int:
 
     routes = current_payload.get("routes")
     if not isinstance(routes, list) or len(routes) != len(ROUTE_SPECS):
-        raise SystemExit("generated/workspace_control_plane.min.json must publish exactly three control-plane routes")
+        raise SystemExit("generated/workspace_control_plane.min.json must publish exactly four control-plane routes")
 
     for route, spec in zip(routes, ROUTE_SPECS, strict=True):
         if not isinstance(route, dict):

@@ -22,7 +22,7 @@ from .session import resolve_session_file
 TOKEN_RE = re.compile(r"[a-z0-9_-]+")
 STRONG_MATCH_MIN_SCORE = 4
 MAX_AUTO_ACTIVATIONS = 3
-PHASES = {"ingress", "pre-mutation", "closeout"}
+PHASES = {"ingress", "pre-mutation", "checkpoint", "closeout"}
 MUTATION_SURFACES = {"none", "code", "repo-config", "infra", "runtime", "public-share"}
 
 
@@ -56,7 +56,7 @@ def detect_skills(
     workspace: Workspace,
     *,
     repo_root: str | Path,
-    phase: Literal["ingress", "pre-mutation", "closeout"],
+    phase: Literal["ingress", "pre-mutation", "checkpoint", "closeout"],
     intent_text: str = "",
     mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
     closeout_path: str | Path | None = None,
@@ -137,6 +137,10 @@ def detect_skills(
         f"phase: {phase}",
         f"mutation_surface: {mutation_surface}",
     ]
+    if phase == "checkpoint":
+        reasoning.append(
+            "checkpoint phase stays mid-session and reviewable; any checkpoint note remains a separate explicit artifact."
+        )
     if top_band_id is not None:
         reasoning.append(f"top tiny-router band: {top_band_id} (score={top_band_score})")
     else:
@@ -266,7 +270,7 @@ def dispatch_skills(
     workspace: Workspace,
     *,
     repo_root: str | Path,
-    phase: Literal["ingress", "pre-mutation", "closeout"],
+    phase: Literal["ingress", "pre-mutation", "checkpoint", "closeout"],
     intent_text: str = "",
     mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
     closeout_path: str | Path | None = None,

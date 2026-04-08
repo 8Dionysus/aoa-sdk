@@ -90,7 +90,7 @@ class SurfacesAPI:
         if mutation_surface not in MUTATION_SURFACES:
             raise ValueError(f"unsupported mutation_surface {mutation_surface!r}")
 
-        skill_phase = phase if phase not in {"in-flight", "checkpoint"} else "ingress"
+        skill_phase = phase if phase != "in-flight" else "ingress"
         skill_report = detect_skills(
             self.workspace,
             repo_root=repo_root,
@@ -303,7 +303,13 @@ def _derive_skill_surface_items(
                     lane="manual-fallback",
                     executable_now=False,
                     requires_confirmation=item in skill_report.must_confirm,
-                    existing_command="aoa skills guard" if surface_phase == "pre-mutation" else "aoa skills detect",
+                    existing_command=(
+                        "aoa skills guard"
+                        if surface_phase == "pre-mutation"
+                        else "aoa skills detect --phase checkpoint"
+                        if surface_phase == "checkpoint"
+                        else "aoa skills detect"
+                    ),
                     existing_surface=None,
                     manual_fallback_allowed=True,
                     manual_fallback_note="keep the distinction visible: the same discipline was followed manually, not claimed as a real activation",
