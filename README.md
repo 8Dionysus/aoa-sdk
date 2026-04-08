@@ -11,6 +11,7 @@ This repository was seeded from the `Dionysus` starter artifacts on 2026-03-31. 
 Use the shortest route by need:
 
 - ownership and scope: `docs/boundaries.md`
+- compact control-plane capsule: `generated/workspace_control_plane.min.json`
 - workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
 - compatibility posture: `docs/versioning.md`
 - release, support, and CI posture: `docs/RELEASE_CI_POSTURE.md`
@@ -25,13 +26,14 @@ Use the shortest route by need:
 
 ## Route by need
 
+- compact control-plane capsule for low-context routing: `generated/workspace_control_plane.min.json`
 - machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
 - portable sibling-workspace bootstrap for non-`/srv` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`
 - source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
 - compatibility rules and local checks: `docs/versioning.md`, `scripts/sibling_canary_matrix.json`, `scripts/run_sibling_canary.py`, `.github/workflows/latest-sibling-canary.yml`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
 - public support, release scope, and CI tiers: `docs/RELEASE_CI_POSTURE.md`
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
-- local validation and workspace inspection: `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
+- local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - additive owner-layer surface detection without changing `aoa skills ...` meaning: `docs/aoa-surface-detection-first-wave.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
 - checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, and `aoa checkpoint append/status/promote`
@@ -95,6 +97,8 @@ For the shortest statement of what the SDK publicly supports, what an SDK releas
 Use this read-only/current-state battery:
 
 ```bash
+python scripts/build_workspace_control_plane.py --check
+python scripts/validate_workspace_control_plane.py
 python -m pytest -q
 python -m ruff check .
 aoa workspace inspect /srv/aoa-sdk

@@ -27,6 +27,27 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="schema_version",
         supported_versions=[1],
     ),
+    "aoa-sdk.workspace_control_plane.min": SurfaceCompatibilityRule(
+        surface_id="aoa-sdk.workspace_control_plane.min",
+        repo="aoa-sdk",
+        relative_path="generated/workspace_control_plane.min.json",
+        version_field="schema_version",
+        supported_versions=["aoa_sdk_workspace_control_plane_v1"],
+    ),
+    "Dionysus.seed_route_map.min": SurfaceCompatibilityRule(
+        surface_id="Dionysus.seed_route_map.min",
+        repo="Dionysus",
+        relative_path="generated/seed_route_map.min.json",
+        version_field="schema_version",
+        supported_versions=["dionysus_seed_route_map_v1"],
+    ),
+    "abyss-stack.diagnostic_surface_catalog.min": SurfaceCompatibilityRule(
+        surface_id="abyss-stack.diagnostic_surface_catalog.min",
+        repo="abyss-stack",
+        relative_path="generated/diagnostic_surface_catalog.min.json",
+        version_field="schema_version",
+        supported_versions=["abyss_stack_diagnostic_surface_catalog_v1"],
+    ),
     "aoa-techniques.technique_capsules": SurfaceCompatibilityRule(
         surface_id="aoa-techniques.technique_capsules",
         repo="aoa-techniques",

@@ -19,6 +19,7 @@ meaning, role meaning, or runtime autonomy policy.
 This repository is the source of truth for:
 
 - typed SDK facades over consumed federation surfaces
+- the compact owner-owned control-plane capsule at `generated/workspace_control_plane.min.json`
 - workspace discovery and topology resolution
 - compatibility checks and versioning posture for consumed local surfaces
 - bounded orchestration helpers that stay subordinate to source-owned meaning
@@ -94,6 +95,7 @@ The most important objects in this repository are:
 - workspace discovery and topology code under `src/aoa_sdk/workspace/`
 - typed surface facades under `src/aoa_sdk/`
 - `.aoa/workspace.toml`
+- `generated/workspace_control_plane.min.json`
 - topology, boundary, and versioning docs under `docs/`
 - additive surface-detection docs and heuristics under `docs/aoa-surface-detection-*.md` and `src/aoa_sdk/surfaces/`
 - tests that prove discovery, compatibility, typed read paths, and reviewed handoff shape
@@ -171,6 +173,8 @@ Preserve local-first ergonomics without stealing ownership from the source repos
 Minimum validation for code, topology, or reviewed-handoff changes:
 
 ```bash
+python scripts/build_workspace_control_plane.py --check
+python scripts/validate_workspace_control_plane.py
 python -m pytest -q
 python -m ruff check .
 aoa workspace inspect /srv/aoa-sdk

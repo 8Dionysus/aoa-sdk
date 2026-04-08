@@ -47,8 +47,23 @@ class RoutingOwnerLayerShortlistHint(BaseModel):
         "aoa-memo",
         "aoa-playbooks",
         "aoa-agents",
+        "aoa-sdk",
+        "aoa-stats",
+        "Dionysus",
+        "8Dionysus",
+        "abyss-stack",
     ]
-    object_kind: Literal["technique", "skill", "eval", "memo", "playbook", "agent"]
+    object_kind: Literal[
+        "technique",
+        "skill",
+        "eval",
+        "memo",
+        "playbook",
+        "agent",
+        "seed",
+        "runtime_surface",
+        "orientation_surface",
+    ]
     target_surface: str
     inspect_surface: str | None = None
     hint_reason: str

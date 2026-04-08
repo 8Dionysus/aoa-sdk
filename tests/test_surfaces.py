@@ -298,6 +298,101 @@ def test_surface_detect_consumes_owner_layer_shortlist_without_changing_truth(
     }
 
 
+def test_surface_detect_accepts_runtime_seed_and_profile_shortlist_hints(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    shortlist_path = workspace_root / "aoa-routing" / "generated" / "owner_layer_shortlist.min.json"
+    shortlist_path.parent.mkdir(parents=True, exist_ok=True)
+    shortlist_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "hints": [
+                    {
+                        "shortlist_id": "explicit-request.sdk.primary",
+                        "signal": "explicit-request",
+                        "owner_repo": "aoa-sdk",
+                        "object_kind": "runtime_surface",
+                        "target_surface": "aoa-sdk.workspace_control_plane.min",
+                        "inspect_surface": "aoa-sdk.workspace_control_plane.min",
+                        "hint_reason": "control plane route should stay capsule-first",
+                        "confidence": "high",
+                        "ambiguity": "clear",
+                    },
+                    {
+                        "shortlist_id": "explicit-request.stats.primary",
+                        "signal": "explicit-request",
+                        "owner_repo": "aoa-stats",
+                        "object_kind": "runtime_surface",
+                        "target_surface": "aoa-stats.summary_surface_catalog.min",
+                        "inspect_surface": "aoa-stats.summary_surface_catalog.min",
+                        "hint_reason": "stats route should stay owner-owned",
+                        "confidence": "high",
+                        "ambiguity": "clear",
+                    },
+                    {
+                        "shortlist_id": "explicit-request.seed.primary",
+                        "signal": "explicit-request",
+                        "owner_repo": "Dionysus",
+                        "object_kind": "seed",
+                        "target_surface": "Dionysus.seed_route_map.min",
+                        "inspect_surface": "Dionysus.seed_route_map.min",
+                        "hint_reason": "seed route should stay capsule-first",
+                        "confidence": "high",
+                        "ambiguity": "clear",
+                    },
+                    {
+                        "shortlist_id": "explicit-request.runtime.primary",
+                        "signal": "explicit-request",
+                        "owner_repo": "abyss-stack",
+                        "object_kind": "runtime_surface",
+                        "target_surface": "abyss-stack.diagnostic_surface_catalog.min",
+                        "inspect_surface": "abyss-stack.diagnostic_surface_catalog.min",
+                        "hint_reason": "runtime route should stay source-owned",
+                        "confidence": "high",
+                        "ambiguity": "clear",
+                    },
+                    {
+                        "shortlist_id": "explicit-request.profile.primary",
+                        "signal": "explicit-request",
+                        "owner_repo": "8Dionysus",
+                        "object_kind": "orientation_surface",
+                        "target_surface": "8Dionysus.public_route_map.min",
+                        "inspect_surface": "8Dionysus.public_route_map.min",
+                        "hint_reason": "profile route should stay orientation-only",
+                        "confidence": "high",
+                        "ambiguity": "clear",
+                    },
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="skill control plane seed runtime profile route drift",
+    )
+
+    assert report.shortlist_included is True
+    owner_repos = {
+        hint.owner_repo
+        for item in report.items
+        for hint in item.shortlist_hints
+    }
+    assert owner_repos >= {
+        "aoa-sdk",
+        "aoa-stats",
+        "Dionysus",
+        "abyss-stack",
+        "8Dionysus",
+    }
+
+
 def test_surface_detect_enriches_skill_items_from_core_receipt_context(
     workspace_root: Path,
 ) -> None:

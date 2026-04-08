@@ -14,6 +14,8 @@ def test_readme_lists_full_current_state_battery() -> None:
     readme = read_text("README.md")
 
     commands = [
+        "python scripts/build_workspace_control_plane.py --check",
+        "python scripts/validate_workspace_control_plane.py",
         "python -m pytest -q",
         "python -m ruff check .",
         "aoa workspace inspect /srv/aoa-sdk",
@@ -27,6 +29,8 @@ def test_readme_lists_full_current_state_battery() -> None:
 def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
     agents = read_text("AGENTS.md")
 
+    assert "python scripts/build_workspace_control_plane.py --check" in agents
+    assert "python scripts/validate_workspace_control_plane.py" in agents
     assert "aoa compatibility check /srv/aoa-sdk" in agents
     assert "aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json" in agents
 
@@ -34,6 +38,7 @@ def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
 def test_readme_lists_sibling_canary_surfaces() -> None:
     readme = read_text("README.md")
 
+    assert "generated/workspace_control_plane.min.json" in readme
     assert "scripts/sibling_canary_matrix.json" in readme
     assert "scripts/run_sibling_canary.py" in readme
     assert ".github/workflows/latest-sibling-canary.yml" in readme

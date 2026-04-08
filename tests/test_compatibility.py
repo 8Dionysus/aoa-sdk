@@ -1,3 +1,4 @@
+import json
 import re
 from pathlib import Path
 
@@ -13,10 +14,30 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_compatibility_report_includes_versioned_and_unversioned_surfaces(workspace_root: Path) -> None:
+    dionysus_surface = workspace_root / "Dionysus" / "generated" / "seed_route_map.min.json"
+    dionysus_surface.parent.mkdir(parents=True, exist_ok=True)
+    dionysus_surface.write_text(
+        json.dumps(
+            {
+                "schema_version": "dionysus_seed_route_map_v1",
+                "owner_repo": "Dionysus",
+                "surface_kind": "seed",
+                "authority_ref": "docs/codex/planting-protocol.md",
+                "next_live_seed_ref": "seed_expansion/example.md#seed",
+                "routes": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     report = {entry.surface_id: entry for entry in sdk.compatibility.check_all()}
 
+    assert report["aoa-sdk.workspace_control_plane.min"].compatible is True
+    assert report["Dionysus.seed_route_map.min"].compatible is True
+    assert report["abyss-stack.diagnostic_surface_catalog.min"].compatible is True
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatibility_mode == "unversioned"
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatible is True
     assert report["aoa-playbooks.playbook_federation_surfaces.min"].compatibility_mode == "unversioned"
