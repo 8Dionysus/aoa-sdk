@@ -13,6 +13,8 @@ from ..loaders import load_json
 from ..models import (
     KernelNextStepBrief,
     OwnerFollowThroughBrief,
+    SessionCheckpointNote,
+    SessionCheckpointPromotion,
     SurfaceCloseoutHandoff,
     SurfaceDetectionReport,
     SurfaceOpportunityItem,
@@ -29,12 +31,14 @@ compatibility_app = typer.Typer(help="Inspect compatibility of consumed surfaces
 closeout_app = typer.Typer(help="Run bounded reviewed-session closeout orchestration")
 skills_app = typer.Typer(help="Read project skill layers and run phase-aware skill detection/dispatch")
 surfaces_app = typer.Typer(help="Read additive AoA surface-detection reports and reviewed closeout handoffs")
+checkpoint_app = typer.Typer(help="Capture checkpoint-aware session-growth notes and reviewed promotions")
 
 app.add_typer(workspace_app, name="workspace")
 app.add_typer(compatibility_app, name="compatibility")
 app.add_typer(closeout_app, name="closeout")
 app.add_typer(skills_app, name="skills")
 app.add_typer(surfaces_app, name="surfaces")
+app.add_typer(checkpoint_app, name="checkpoint")
 
 
 def _workspace_payload(workspace: Workspace) -> dict[str, Any]:
@@ -155,6 +159,22 @@ def _print_surface_detection_report(report: SurfaceDetectionReport) -> None:
         "immediate_skill_dispatch: "
         f"{', '.join(report.immediate_skill_dispatch) if report.immediate_skill_dispatch else 'none'}"
     )
+    if report.phase == "checkpoint":
+        typer.echo(f"checkpoint_kind: {report.checkpoint_kind or 'none'}")
+        typer.echo(f"checkpoint_should_capture: {'yes' if report.checkpoint_should_capture else 'no'}")
+        typer.echo(f"promotion_recommendation: {report.promotion_recommendation}")
+        typer.echo(f"blocked_by: {', '.join(report.blocked_by) if report.blocked_by else 'none'}")
+        typer.echo("candidate_clusters:")
+        if not report.candidate_clusters:
+            typer.echo("  - none")
+        else:
+            for cluster in report.candidate_clusters:
+                typer.echo(
+                    f"  - {cluster.display_name} [{cluster.candidate_kind} / {cluster.owner_hint} / {cluster.confidence}]"
+                )
+                typer.echo(f"    candidate_id: {cluster.candidate_id}")
+                if cluster.blocked_by:
+                    typer.echo(f"    blocked_by: {', '.join(cluster.blocked_by)}")
     _print_surface_items("items", report.items)
     typer.echo(f"closeout_followups: {', '.join(report.closeout_followups) if report.closeout_followups else 'none'}")
     typer.echo(f"owner_layer_notes: {', '.join(report.owner_layer_notes) if report.owner_layer_notes else 'none'}")
@@ -165,7 +185,16 @@ def _print_surface_handoff(report: SurfaceCloseoutHandoff) -> None:
     typer.echo(f"session_ref: {report.session_ref}")
     typer.echo(f"reviewed: {'yes' if report.reviewed else 'no'}")
     typer.echo(f"surface_detection_report_ref: {report.surface_detection_report_ref}")
+    typer.echo(f"checkpoint_note_ref: {report.checkpoint_note_ref or 'none'}")
     _print_surface_items("surviving_items", report.surviving_items)
+    typer.echo("surviving_checkpoint_clusters:")
+    if not report.surviving_checkpoint_clusters:
+        typer.echo("  - none")
+    else:
+        for cluster in report.surviving_checkpoint_clusters:
+            typer.echo(
+                f"  - {cluster.display_name} [{cluster.candidate_kind} / {cluster.owner_hint} / {cluster.review_status}]"
+            )
     typer.echo("handoff_targets:")
     if not report.handoff_targets:
         typer.echo("  - none")
@@ -175,6 +204,34 @@ def _print_surface_handoff(report: SurfaceCloseoutHandoff) -> None:
             typer.echo(f"    why: {item.why}")
             typer.echo(f"    triggered_by: {', '.join(item.triggered_by) if item.triggered_by else 'none'}")
     typer.echo(f"notes: {', '.join(report.notes) if report.notes else 'none'}")
+
+
+def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
+    typer.echo(f"session_ref: {note.session_ref}")
+    typer.echo(f"state: {note.state}")
+    typer.echo(f"review_status: {note.review_status}")
+    typer.echo(f"promotion_recommendation: {note.promotion_recommendation}")
+    typer.echo(f"repo_scope: {', '.join(note.repo_scope) if note.repo_scope else 'none'}")
+    typer.echo(f"blocked_by: {', '.join(note.blocked_by) if note.blocked_by else 'none'}")
+    typer.echo("candidate_clusters:")
+    if not note.candidate_clusters:
+        typer.echo("  - none")
+        return
+    for cluster in note.candidate_clusters:
+        typer.echo(
+            f"  - {cluster.display_name} [{cluster.candidate_kind} / {cluster.owner_hint} / hits={cluster.checkpoint_hits} / {cluster.review_status}]"
+        )
+        typer.echo(f"    candidate_id: {cluster.candidate_id}")
+        if cluster.blocked_by:
+            typer.echo(f"    blocked_by: {', '.join(cluster.blocked_by)}")
+
+
+def _print_checkpoint_promotion(promotion: SessionCheckpointPromotion) -> None:
+    typer.echo(f"session_ref: {promotion.session_ref}")
+    typer.echo(f"target: {promotion.target}")
+    typer.echo(f"resulting_state: {promotion.resulting_state}")
+    typer.echo(f"source_note_ref: {promotion.source_note_ref}")
+    typer.echo(f"output_refs: {', '.join(promotion.output_refs) if promotion.output_refs else 'none'}")
 
 
 def _resolve_host_available_skills(
@@ -653,7 +710,7 @@ def skills_guard(
 @surfaces_app.command("detect")
 def surfaces_detect(
     repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as task context."),
-    phase: str = typer.Option(..., "--phase", help="Detection phase: ingress, in-flight, pre-mutation, or closeout."),
+    phase: str = typer.Option(..., "--phase", help="Detection phase: ingress, in-flight, pre-mutation, checkpoint, or closeout."),
     intent_text: str = typer.Option("", "--intent-text", help="Intent text used for additive surface detection."),
     mutation_surface: str = typer.Option(
         "none",
@@ -680,6 +737,11 @@ def surfaces_detect(
         "--report-output",
         help="Optional JSON path for the persisted surface-detection report.",
     ),
+    checkpoint_kind: str | None = typer.Option(
+        None,
+        "--checkpoint-kind",
+        help="Optional checkpoint kind when phase=checkpoint: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
@@ -692,6 +754,7 @@ def surfaces_detect(
         session_file=session_file,
         closeout_path=closeout_path,
         skill_report_path=skill_report_path,
+        checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
     )
     payload = _write_surface_report(
         _resolve_surface_report_path(
@@ -749,6 +812,90 @@ def surfaces_handoff(
         return
     typer.echo(f"report_path: {payload['report_path']}")
     _print_surface_handoff(report)
+
+
+@checkpoint_app.command("append")
+def checkpoint_append(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    kind: str = typer.Option(
+        ...,
+        "--kind",
+        help="Checkpoint kind: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
+    ),
+    intent_text: str = typer.Option("", "--intent-text", help="Intent text used for checkpoint-aware surface detection."),
+    mutation_surface: str = typer.Option(
+        "none",
+        "--mutation-surface",
+        help="Mutation class: none, code, repo-config, infra, runtime, or public-share.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to read active skill names.",
+    ),
+    skill_report_path: str | None = typer.Option(
+        None,
+        "--skill-report-path",
+        help="Optional reference to an existing persisted skill report used as prelude context.",
+    ),
+    mark_reviewable: bool = typer.Option(
+        False,
+        "--mark-reviewable",
+        help="Mark this checkpoint as manually reviewable even if repeat density is still low.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    note = AoASDK.from_workspace(root).checkpoints.append(
+        repo_root=repo_root,
+        checkpoint_kind=kind,  # type: ignore[arg-type]
+        intent_text=intent_text,
+        mutation_surface=mutation_surface,  # type: ignore[arg-type]
+        session_file=session_file,
+        skill_report_path=skill_report_path,
+        manual_review_requested=mark_reviewable,
+    )
+    payload = note.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_note(note)
+
+
+@checkpoint_app.command("status")
+def checkpoint_status(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    note = AoASDK.from_workspace(root).checkpoints.status(repo_root=repo_root)
+    payload = note.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_note(note)
+
+
+@checkpoint_app.command("promote")
+def checkpoint_promote(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    target: str = typer.Option(
+        ...,
+        "--target",
+        help="Promotion target: dionysus-note or harvest-handoff.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    promotion = AoASDK.from_workspace(root).checkpoints.promote(
+        repo_root=repo_root,
+        target=target,  # type: ignore[arg-type]
+    )
+    payload = promotion.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_promotion(promotion)
 
 
 @closeout_app.command("run")

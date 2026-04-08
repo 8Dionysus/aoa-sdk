@@ -12,6 +12,8 @@ The second wave adds three bounded enrichments around the existing
 - richer `surface_detection_context` references preserved from
   `aoa-skills` core-skill receipts
 - descriptive observability from `aoa-stats.surface_detection_summary.min`
+- reviewed checkpoint-note preservation through local session-growth notes and
+  closeout handoff references
 
 ## What Changes
 
@@ -33,6 +35,7 @@ typed advisory read. It is not a verdict engine.
 ## Hard Invariants
 
 - `aoa skills ...` stays skill-only
+- checkpoint notes remain local reviewed notes until explicit promotion
 - `manual-equivalent` never becomes `activated`
 - non-skill items never enter `immediate_skill_dispatch`
 - routing shortlist hints are advisory only

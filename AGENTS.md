@@ -86,6 +86,7 @@ surface pass:
 ```bash
 aoa surfaces detect /srv/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/aoa-sdk --json
 aoa surfaces detect /srv/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/aoa-sdk --json
+aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 ```
 
 Use `aoa surfaces handoff` only after review:
@@ -98,6 +99,7 @@ Truth rules for this loop:
 
 - `aoa-sdk` may detect and hand off, but owner repositories keep meaning
 - `aoa skills ...` remains skill-only
+- checkpoint notes stay lower-authority than harvest verdicts and core receipts
 - `manual-equivalent` never becomes `activated`
 - non-skill surfaces never become executable-now in wave one
 - routing shortlist hints stay advisory only

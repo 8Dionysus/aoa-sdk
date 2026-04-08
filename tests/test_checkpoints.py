@@ -1,0 +1,136 @@
+from __future__ import annotations
+
+from pathlib import Path
+
+from aoa_sdk import AoASDK
+
+
+def test_surface_detect_checkpoint_phase_emits_candidate_clusters(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="checkpoint",
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+
+    assert report.phase == "checkpoint"
+    assert report.checkpoint_kind == "commit"
+    assert report.checkpoint_should_capture is True
+    assert report.candidate_clusters
+    assert report.promotion_recommendation in {"local_note", "dionysus_note"}
+    assert {cluster.candidate_kind for cluster in report.candidate_clusters} >= {"route", "proof", "recall"}
+
+
+def test_checkpoint_status_becomes_reviewable_after_repeat(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    first = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    second = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+
+    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    assert first.state == "collecting"
+    assert second.state == "reviewable"
+    assert (note_dir / "checkpoint-note.jsonl").exists()
+    assert (note_dir / "checkpoint-note.json").exists()
+    assert (note_dir / "checkpoint-note.md").exists()
+    route_cluster = next(cluster for cluster in second.candidate_clusters if cluster.candidate_kind == "route")
+    assert route_cluster.checkpoint_hits == 2
+    assert route_cluster.review_status == "reviewable"
+
+
+def test_checkpoint_promote_writes_dionysus_snapshot_and_updates_note(workspace_root: Path) -> None:
+    dionysus_root = workspace_root / "Dionysus"
+    (dionysus_root / "reports" / "ecosystem-audits").mkdir(parents=True, exist_ok=True)
+    (dionysus_root / "README.md").write_text("# Dionysus\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+
+    promotion = sdk.checkpoints.promote(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        target="dionysus-note",
+    )
+
+    promoted_json = list((dionysus_root / "reports" / "ecosystem-audits").glob("*.aoa-sdk.checkpoint-note.json"))
+    promoted_md = list((dionysus_root / "reports" / "ecosystem-audits").glob("*.aoa-sdk.checkpoint-note.md"))
+    note = sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
+
+    assert promotion.target == "dionysus-note"
+    assert promoted_json
+    assert promoted_md
+    assert note.state == "promoted"
+    assert any("repo:Dionysus/reports/ecosystem-audits/" in ref for ref in promotion.output_refs)
+
+
+def test_checkpoint_promote_harvest_handoff_closes_note(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+
+    promotion = sdk.checkpoints.promote(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        target="harvest-handoff",
+    )
+
+    handoff_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "harvest-handoff.json"
+    note = sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
+
+    assert promotion.target == "harvest-handoff"
+    assert handoff_path.exists()
+    assert note.state == "closed"
+    assert promotion.output_refs == [str(handoff_path)]
+
+
+def test_surface_closeout_handoff_links_checkpoint_note(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="closeout",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+
+    handoff = sdk.surfaces.build_closeout_handoff(
+        report,
+        session_ref="session:test-checkpoint-closeout-handoff",
+    )
+
+    assert handoff.checkpoint_note_ref is not None
+    assert handoff.surviving_checkpoint_clusters
+    assert any(target.skill_name == "aoa-session-donor-harvest" for target in handoff.handoff_targets)

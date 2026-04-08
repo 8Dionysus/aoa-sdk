@@ -4,6 +4,7 @@ from pathlib import Path
 
 from .compatibility import CompatibilityAPI
 from .closeout import CloseoutAPI
+from .checkpoints import CheckpointsAPI
 from .evals import EvalsAPI
 from .agents.phase_bindings import AgentsAPI
 from .governed_runs import GovernedRunsAPI
@@ -23,6 +24,7 @@ class AoASDK:
     def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
         self.compatibility = CompatibilityAPI(workspace)
+        self.checkpoints = CheckpointsAPI(workspace)
         self.routing = RoutingAPI(workspace)
         self.skills = SkillsAPI(workspace)
         self.surfaces = SurfacesAPI(workspace)
