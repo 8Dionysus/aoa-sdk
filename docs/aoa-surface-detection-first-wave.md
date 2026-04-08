@@ -9,6 +9,8 @@ move source ownership away from sibling repositories.
 - `aoa skills detect`, `aoa skills dispatch`, `aoa skills enter`, and
   `aoa skills guard` stay skill-only
 - `aoa surfaces detect` is additive and read-only
+- `phase=checkpoint` may recommend local note capture, but it does not emit
+  harvest verdicts or receipts
 - only `skills` may appear in `immediate_skill_dispatch`
 - `eval`, `memo`, `playbook`, `agent`, and `technique` surfaces stay hints,
   candidates, or reviewed closeout handoffs in wave one
@@ -20,6 +22,8 @@ move source ownership away from sibling repositories.
 
 - repo and workspace context
 - the requested surface phase, including `in-flight`
+- optional checkpoint metadata and checkpoint candidate clusters when the phase
+  is `checkpoint`
 - the referenced skill prelude path when one was supplied
 - current active skill names from the runtime session file when present
 - `immediate_skill_dispatch` copied from the skill prelude only
@@ -39,6 +43,8 @@ aoa-sdk/.aoa/surface-detection/{label}.{phase}.latest.json
 - `ingress`, `pre-mutation`, and `closeout` call the matching skill phase
 - `in-flight` reuses ingress scoring without changing the skill detector's
   public phase enum
+- `checkpoint` also reuses ingress scoring and then adds local note-oriented
+  checkpoint clustering
 - the surface layer never calls `skills.dispatch`
 
 ## Truth rules
@@ -56,6 +62,7 @@ aoa-sdk/.aoa/surface-detection/{label}.{phase}.latest.json
 aoa surfaces detect /srv/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/aoa-sdk --json
 aoa surfaces detect /srv/aoa-sdk --phase in-flight --intent-text "recall prior proof" --root /srv/aoa-sdk --json
 aoa surfaces detect /srv/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/aoa-sdk --json
+aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 ```
 
 Use `docs/aoa-surface-detection-heuristics.md` for the deterministic ruleset and

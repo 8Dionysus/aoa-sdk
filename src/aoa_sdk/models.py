@@ -1105,7 +1105,7 @@ class SurfaceOpportunityItem(BaseModel):
         "aoa-agents",
     ]
     state: Literal["activated", "manual-equivalent", "candidate-now", "candidate-later"]
-    phase_detected: Literal["ingress", "in-flight", "pre-mutation", "closeout"]
+    phase_detected: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"]
     reason: str
     signals: list[
         Literal[
@@ -1135,18 +1135,105 @@ class SurfaceDetectionReport(BaseModel):
     schema_version: int = 1
     repo_root: str
     workspace_root: str
-    phase: Literal["ingress", "in-flight", "pre-mutation", "closeout"]
+    phase: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"]
     intent_text: str = ""
     mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none"
+    checkpoint_kind: Literal[
+        "manual",
+        "commit",
+        "verify_green",
+        "pr_opened",
+        "pr_merged",
+        "pause",
+        "owner_followthrough",
+    ] | None = None
     skill_report_path: str | None = None
     skill_report_included: bool = False
     shortlist_included: bool = False
     active_skill_names: list[str] = Field(default_factory=list)
     immediate_skill_dispatch: list[str] = Field(default_factory=list)
     items: list[SurfaceOpportunityItem] = Field(default_factory=list)
+    checkpoint_should_capture: bool = False
+    candidate_clusters: list["CheckpointCandidateCluster"] = Field(default_factory=list)
+    promotion_recommendation: Literal["none", "local_note", "dionysus_note", "harvest_handoff"] = "none"
+    blocked_by: list[str] = Field(default_factory=list)
     closeout_followups: list[str] = Field(default_factory=list)
     owner_layer_notes: list[str] = Field(default_factory=list)
     actionability_gaps: list[str] = Field(default_factory=list)
+
+
+class CheckpointCandidateCluster(BaseModel):
+    candidate_id: str
+    candidate_kind: str
+    owner_hint: str
+    display_name: str
+    source_surface_ref: str
+    evidence_refs: list[str] = Field(default_factory=list)
+    confidence: Literal["low", "medium", "high"] = "medium"
+    promote_if: list[str] = Field(default_factory=list)
+    defer_reason: str | None = None
+    blocked_by: list[str] = Field(default_factory=list)
+    next_owner_moves: list[str] = Field(default_factory=list)
+
+
+class SessionCheckpointHistoryEntry(BaseModel):
+    checkpoint_kind: Literal[
+        "manual",
+        "commit",
+        "verify_green",
+        "pr_opened",
+        "pr_merged",
+        "pause",
+        "owner_followthrough",
+    ]
+    observed_at: datetime
+    report_ref: str | None = None
+    intent_text: str = ""
+    checkpoint_should_capture: bool = False
+    blocked_by: list[str] = Field(default_factory=list)
+    candidate_clusters: list[CheckpointCandidateCluster] = Field(default_factory=list)
+    manual_review_requested: bool = False
+
+
+class SessionCheckpointCluster(BaseModel):
+    candidate_id: str
+    candidate_kind: str
+    owner_hint: str
+    display_name: str
+    source_surface_ref: str
+    checkpoint_hits: int
+    evidence_refs: list[str] = Field(default_factory=list)
+    confidence: Literal["low", "medium", "high"] = "medium"
+    review_status: Literal["collecting", "reviewable", "promoted", "closed"] = "collecting"
+    promote_if: list[str] = Field(default_factory=list)
+    defer_reason: str | None = None
+    blocked_by: list[str] = Field(default_factory=list)
+    next_owner_moves: list[str] = Field(default_factory=list)
+
+
+class SessionCheckpointNote(BaseModel):
+    schema_version: int = 1
+    contract_type: Literal["session_checkpoint_note_v1"] = "session_checkpoint_note_v1"
+    session_ref: str
+    state: Literal["collecting", "reviewable", "promoted", "closed"] = "collecting"
+    repo_scope: list[str] = Field(default_factory=list)
+    checkpoint_history: list[SessionCheckpointHistoryEntry] = Field(default_factory=list)
+    candidate_clusters: list[SessionCheckpointCluster] = Field(default_factory=list)
+    promotion_recommendation: Literal["none", "local_note", "dionysus_note", "harvest_handoff"] = "none"
+    blocked_by: list[str] = Field(default_factory=list)
+    review_status: Literal["unreviewed", "reviewed"] = "unreviewed"
+    evidence_refs: list[str] = Field(default_factory=list)
+    next_owner_moves: list[str] = Field(default_factory=list)
+
+
+class SessionCheckpointPromotion(BaseModel):
+    schema_version: int = 1
+    session_ref: str
+    target: Literal["dionysus-note", "harvest-handoff"]
+    promoted_at: datetime
+    source_note_ref: str
+    output_refs: list[str] = Field(default_factory=list)
+    resulting_state: Literal["collecting", "reviewable", "promoted", "closed"]
 
 
 class SurfaceCloseoutHandoffTarget(BaseModel):
@@ -1168,7 +1255,9 @@ class SurfaceCloseoutHandoff(BaseModel):
     session_ref: str
     reviewed: bool
     surface_detection_report_ref: str
+    checkpoint_note_ref: str | None = None
     surviving_items: list[SurfaceOpportunityItem] = Field(default_factory=list)
+    surviving_checkpoint_clusters: list[SessionCheckpointCluster] = Field(default_factory=list)
     handoff_targets: list[SurfaceCloseoutHandoffTarget] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
 

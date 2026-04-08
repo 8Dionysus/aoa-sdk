@@ -25,6 +25,8 @@ reviewed session into:
 6. one canonical request assembled from a reviewed artifact and receipt bundle without hand-authoring JSON
 7. one explicit split between detail skill receipts and generic project-core kernel receipts so one receipt file never mixes publisher families
 8. one kernel-aware next-step brief in the closeout report after owner-local publication and stats refresh
+9. one optional reviewed reference back to a local checkpoint note when the
+   session already accumulated checkpoint-aware pre-harvest context
 
 ## Boundary
 
@@ -251,6 +253,10 @@ The queue layout is:
 `aoa closeout status` now discloses both request and manifest surfaces so an
 operator can tell whether the seam is failing before or after manifest
 assembly.
+
+When a local checkpoint note exists, reviewed surface closeout handoff may also
+preserve `checkpoint_note_ref` and `surviving_checkpoint_clusters` so closeout
+does not have to reconstruct checkpoint survivors from raw append history.
 
 Install the user-level inbox watcher when the machine should auto-process new
 reviewed manifests as soon as they land in the canonical inbox:

@@ -7,7 +7,10 @@ from typing import Literal
 
 from ..errors import RepoNotFound, SurfaceNotFound
 from ..models import (
+    CheckpointCandidateCluster,
     RoutingOwnerLayerShortlistHint,
+    SessionCheckpointCluster,
+    SessionCheckpointNote,
     SkillDetectionReport,
     SurfaceCloseoutHandoff,
     SurfaceCloseoutHandoffTarget,
@@ -24,7 +27,7 @@ from .heuristics import EXPLICIT_LAYER_RULES_BY_TOKEN, HEURISTIC_RULES
 
 
 TOKEN_RE = re.compile(r"[a-z0-9_-]+")
-SURFACE_PHASES = {"ingress", "in-flight", "pre-mutation", "closeout"}
+SURFACE_PHASES = {"ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"}
 MUTATION_SURFACES = {"none", "code", "repo-config", "infra", "runtime", "public-share"}
 SurfaceSignal = Literal[
     "explicit-request",
@@ -65,20 +68,29 @@ class SurfacesAPI:
         self,
         *,
         repo_root: str,
-        phase: Literal["ingress", "in-flight", "pre-mutation", "closeout"],
+        phase: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"],
         intent_text: str = "",
         mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
         session_file: str | None = None,
         closeout_path: str | None = None,
         skill_report_path: str | None = None,
         include_shortlist: bool = True,
+        checkpoint_kind: Literal[
+            "manual",
+            "commit",
+            "verify_green",
+            "pr_opened",
+            "pr_merged",
+            "pause",
+            "owner_followthrough",
+        ] | None = None,
     ) -> SurfaceDetectionReport:
         if phase not in SURFACE_PHASES:
             raise ValueError(f"unsupported phase {phase!r}")
         if mutation_surface not in MUTATION_SURFACES:
             raise ValueError(f"unsupported mutation_surface {mutation_surface!r}")
 
-        skill_phase = phase if phase != "in-flight" else "ingress"
+        skill_phase = phase if phase not in {"in-flight", "checkpoint"} else "ingress"
         skill_report = detect_skills(
             self.workspace,
             repo_root=repo_root,
@@ -99,19 +111,35 @@ class SurfacesAPI:
             shortlist_hints=shortlist_hints,
             skill_receipt_contexts=skill_receipt_contexts,
         )
+        candidate_clusters = _derive_checkpoint_candidate_clusters(
+            items=items,
+            checkpoint_kind=checkpoint_kind,
+        ) if phase == "checkpoint" else []
+        blocked_by = _checkpoint_blocked_by(candidate_clusters) if phase == "checkpoint" else []
+        checkpoint_should_capture = bool(candidate_clusters) or (
+            phase == "checkpoint" and checkpoint_kind in {"manual", "pause"} and bool(items)
+        )
         return SurfaceDetectionReport(
             repo_root=skill_report.repo_root,
             workspace_root=str(self.workspace.federation_root),
             phase=phase,
             intent_text=intent_text,
             mutation_surface=mutation_surface,
+            checkpoint_kind=checkpoint_kind,
             skill_report_path=skill_report_path,
             skill_report_included=True,
             shortlist_included=bool(shortlist_hints),
             active_skill_names=active_skill_names,
             immediate_skill_dispatch=[item.skill_name for item in skill_report.activate_now],
             items=items,
-            closeout_followups=_derive_closeout_followups(items=items),
+            checkpoint_should_capture=checkpoint_should_capture,
+            candidate_clusters=candidate_clusters,
+            promotion_recommendation=_checkpoint_promotion_recommendation(
+                candidate_clusters=candidate_clusters,
+                checkpoint_kind=checkpoint_kind,
+            ) if phase == "checkpoint" else "none",
+            blocked_by=blocked_by,
+            closeout_followups=_derive_closeout_followups(items=items, surface_phase=phase),
             owner_layer_notes=_owner_layer_notes(items=items),
             actionability_gaps=list(skill_report.actionability_gaps),
         )
@@ -128,18 +156,28 @@ class SurfacesAPI:
 
         report, report_ref = _load_surface_report(report_or_path)
         surviving_items = [item for item in report.items if item.state != "activated"]
+        checkpoint_note = _load_current_checkpoint_note(self.workspace, report.repo_root)
+        surviving_checkpoint_clusters = checkpoint_note.candidate_clusters if checkpoint_note is not None else []
         return SurfaceCloseoutHandoff(
             session_ref=session_ref,
             reviewed=reviewed,
             surface_detection_report_ref=report_ref,
+            checkpoint_note_ref=_checkpoint_note_ref(self.workspace, report.repo_root, checkpoint_note),
             surviving_items=surviving_items,
+            surviving_checkpoint_clusters=surviving_checkpoint_clusters,
             handoff_targets=_derive_closeout_handoff_targets(
                 surviving_items=surviving_items,
+                surviving_checkpoint_clusters=surviving_checkpoint_clusters,
                 actionability_gaps=report.actionability_gaps,
             ),
             notes=[
                 "use the session-growth kernel only after reviewed run, closure, or pause",
                 "do not let donor-harvest or automation scan become hidden live routing authority",
+                *(
+                    ["preserve the checkpoint note as reviewed pre-harvest context instead of replaying raw append history"]
+                    if checkpoint_note is not None
+                    else []
+                ),
             ],
         )
 
@@ -164,7 +202,7 @@ def _load_active_skill_names(workspace: Workspace, *, session_file: str | None) 
 def _derive_surface_items(
     *,
     skill_report: SkillDetectionReport,
-    surface_phase: Literal["ingress", "in-flight", "pre-mutation", "closeout"],
+    surface_phase: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"],
     intent_text: str,
     active_skill_names: list[str],
     closeout_signal: bool,
@@ -201,7 +239,7 @@ def _derive_surface_items(
 def _derive_skill_surface_items(
     *,
     skill_report: SkillDetectionReport,
-    surface_phase: Literal["ingress", "in-flight", "pre-mutation", "closeout"],
+    surface_phase: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"],
     closeout_signal: bool,
 ) -> list[SurfaceOpportunityItem]:
     items: list[SurfaceOpportunityItem] = []
@@ -284,7 +322,7 @@ def _derive_skill_surface_items(
 def _derive_heuristic_items(
     *,
     intent_text: str,
-    surface_phase: Literal["ingress", "in-flight", "pre-mutation", "closeout"],
+    surface_phase: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"],
     active_skill_names: list[str],
     closeout_signal: bool,
 ) -> list[SurfaceOpportunityItem]:
@@ -378,16 +416,23 @@ def _repeated_pattern_detected(
     *,
     tokens: set[str],
     active_skill_names: list[str],
-    phase: Literal["ingress", "in-flight", "pre-mutation", "closeout"],
+    phase: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"],
 ) -> bool:
     repeated_tokens = {"repeat", "repeated", "again", "pattern", "recurring"}
-    return bool(tokens.intersection(repeated_tokens)) and (phase == "closeout" or bool(active_skill_names))
+    return bool(tokens.intersection(repeated_tokens)) and (phase in {"closeout", "checkpoint"} or bool(active_skill_names))
 
 
-def _derive_closeout_followups(*, items: list[SurfaceOpportunityItem]) -> list[str]:
+def _derive_closeout_followups(
+    *,
+    items: list[SurfaceOpportunityItem],
+    surface_phase: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"],
+) -> list[str]:
     followups: list[str] = []
     if items:
-        followups.append("bundle surviving notes into a reviewed closeout handoff before any promotion decision")
+        if surface_phase == "checkpoint":
+            followups.append("append the surviving checkpoint candidates into the local reviewed note before any promotion decision")
+        else:
+            followups.append("bundle surviving notes into a reviewed closeout handoff before any promotion decision")
     if any(item.object_kind == "playbook" for item in items):
         followups.append("route recurring-route evidence through aoa-automation-opportunity-scan before naming automation authority")
     if any(item.object_kind in {"playbook", "technique"} and item.promotion_hint for item in items):
@@ -410,15 +455,17 @@ def _owner_layer_notes(*, items: list[SurfaceOpportunityItem]) -> list[str]:
 def _derive_closeout_handoff_targets(
     *,
     surviving_items: list[SurfaceOpportunityItem],
+    surviving_checkpoint_clusters: list[SessionCheckpointCluster],
     actionability_gaps: list[str],
 ) -> list[SurfaceCloseoutHandoffTarget]:
     targets: list[SurfaceCloseoutHandoffTarget] = []
-    if surviving_items:
+    checkpoint_triggered_by = [f"checkpoint:{cluster.candidate_id}" for cluster in surviving_checkpoint_clusters]
+    if surviving_items or surviving_checkpoint_clusters:
         targets.append(
             SurfaceCloseoutHandoffTarget(
                 skill_name="aoa-session-donor-harvest",
                 why="bundle the surviving bounded notes into a reviewable harvest packet instead of leaving them as session residue",
-                triggered_by=[item.surface_ref for item in surviving_items],
+                triggered_by=[*([item.surface_ref for item in surviving_items]), *checkpoint_triggered_by],
             )
         )
     playbook_items = [item for item in surviving_items if item.object_kind == "playbook"]
@@ -772,3 +819,163 @@ def _dedupe_refs(refs: list[SurfaceOpportunityReference]) -> list[SurfaceOpportu
     for ref in refs:
         deduped[(ref.role, ref.ref)] = ref
     return list(deduped.values())
+
+
+def _derive_checkpoint_candidate_clusters(
+    *,
+    items: list[SurfaceOpportunityItem],
+    checkpoint_kind: Literal[
+        "manual",
+        "commit",
+        "verify_green",
+        "pr_opened",
+        "pr_merged",
+        "pause",
+        "owner_followthrough",
+    ] | None,
+) -> list[CheckpointCandidateCluster]:
+    clusters: list[CheckpointCandidateCluster] = []
+    for item in items:
+        if item.state == "activated":
+            continue
+        evidence_refs = _dedupe_strings(
+            [
+                *[ref.ref for ref in item.family_entry_refs],
+                *[ref.ref for ref in item.evidence_refs],
+                item.surface_ref,
+            ]
+        )
+        blocked_by: list[str] = []
+        if item.owner_layer_ambiguity_note:
+            blocked_by.append("owner-ambiguity")
+        if len(evidence_refs) < 2 or item.confidence == "low":
+            blocked_by.append("thin-evidence")
+        if item.state == "manual-equivalent" and "risk-gate" in item.signals:
+            blocked_by.append("requires-reviewed-route")
+        candidate_kind = _candidate_kind_for_item(item)
+        defer_reason = None
+        if "owner-ambiguity" in blocked_by:
+            defer_reason = "owner ambiguity still exceeds checkpoint-note promotion authority"
+        elif "thin-evidence" in blocked_by:
+            defer_reason = "thin evidence should stay local until another checkpoint confirms the same candidate"
+        promote_if = _dedupe_strings(
+            [
+                item.promotion_hint or "",
+                "repeat the same owner hint across another reviewed checkpoint",
+                *(
+                    ["owner follow-through already exists"]
+                    if checkpoint_kind == "owner_followthrough"
+                    else []
+                ),
+            ]
+        )
+        next_owner_moves = _dedupe_strings(
+            [
+                "append the candidate into the local checkpoint note",
+                *(
+                    ["promote the reviewed note into Dionysus when the evidence stays stable"]
+                    if "owner-ambiguity" not in blocked_by
+                    else []
+                ),
+            ]
+        )
+        clusters.append(
+            CheckpointCandidateCluster(
+                candidate_id=f"candidate:{candidate_kind}:{_slugify(item.surface_ref)}",
+                candidate_kind=candidate_kind,
+                owner_hint=item.owner_repo,
+                display_name=item.display_name,
+                source_surface_ref=item.surface_ref,
+                evidence_refs=evidence_refs,
+                confidence=item.confidence,
+                promote_if=promote_if,
+                defer_reason=defer_reason,
+                blocked_by=blocked_by,
+                next_owner_moves=next_owner_moves,
+            )
+        )
+    return clusters
+
+
+def _candidate_kind_for_item(item: SurfaceOpportunityItem) -> str:
+    if item.object_kind == "playbook":
+        return "route"
+    if item.object_kind == "technique":
+        return "pattern"
+    if item.object_kind == "eval":
+        return "proof"
+    if item.object_kind == "memo":
+        return "recall"
+    if item.object_kind == "agent":
+        return "role"
+    if item.object_kind == "skill":
+        return "risk"
+    return item.object_kind
+
+
+def _checkpoint_blocked_by(clusters: list[CheckpointCandidateCluster]) -> list[str]:
+    return _dedupe_strings([blocked for cluster in clusters for blocked in cluster.blocked_by])
+
+
+def _checkpoint_promotion_recommendation(
+    *,
+    candidate_clusters: list[CheckpointCandidateCluster],
+    checkpoint_kind: Literal[
+        "manual",
+        "commit",
+        "verify_green",
+        "pr_opened",
+        "pr_merged",
+        "pause",
+        "owner_followthrough",
+    ] | None,
+) -> Literal["none", "local_note", "dionysus_note", "harvest_handoff"]:
+    if not candidate_clusters:
+        return "none"
+    if checkpoint_kind == "owner_followthrough" and any("owner-ambiguity" not in cluster.blocked_by for cluster in candidate_clusters):
+        return "harvest_handoff"
+    if any(len(cluster.evidence_refs) >= 3 and "owner-ambiguity" not in cluster.blocked_by for cluster in candidate_clusters):
+        return "dionysus_note"
+    return "local_note"
+
+
+def _load_current_checkpoint_note(workspace: Workspace, repo_root: str) -> SessionCheckpointNote | None:
+    try:
+        sdk_root = workspace.repo_path("aoa-sdk")
+    except RepoNotFound:
+        return None
+    note_path = sdk_root / ".aoa" / "session-growth" / "current" / _context_label(workspace, repo_root) / "checkpoint-note.json"
+    if not note_path.exists():
+        return None
+    try:
+        return SessionCheckpointNote.model_validate_json(note_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _checkpoint_note_ref(workspace: Workspace, repo_root: str, note: SessionCheckpointNote | None) -> str | None:
+    if note is None:
+        return None
+    try:
+        sdk_root = workspace.repo_path("aoa-sdk")
+    except RepoNotFound:
+        return None
+    note_path = sdk_root / ".aoa" / "session-growth" / "current" / _context_label(workspace, repo_root) / "checkpoint-note.json"
+    return str(note_path) if note_path.exists() else None
+
+
+def _context_label(workspace: Workspace, repo_root: str) -> str:
+    resolved = Path(repo_root).expanduser()
+    if not resolved.is_absolute():
+        resolved = (workspace.root / resolved).resolve()
+    else:
+        resolved = resolved.resolve()
+    return "workspace" if resolved == workspace.federation_root else resolved.name
+
+
+def _slugify(value: str) -> str:
+    return re.sub(r"[^a-z0-9]+", "-", value.casefold()).strip("-")
+
+
+def _dedupe_strings(values: list[str]) -> list[str]:
+    return list(dict.fromkeys(value for value in values if value))

@@ -24,7 +24,9 @@ aoa-sdk/.aoa/surface-detection/{label}.closeout-handoff.latest.json
 - `session_ref`
 - `reviewed`
 - `surface_detection_report_ref`
+- optional `checkpoint_note_ref`
 - `surviving_items`
+- optional `surviving_checkpoint_clusters`
 - `handoff_targets`
 - `notes`
 
@@ -43,6 +45,8 @@ All seven session-growth targets remain valid schema values:
 The generator only auto-emits targets when the signals are explicit:
 
 - `aoa-session-donor-harvest` for any surviving non-activated items
+- `aoa-session-donor-harvest` also stays valid when the surviving reviewed
+  object is a checkpoint note cluster rather than only a surface item
 - `aoa-automation-opportunity-scan` for surviving playbook-shaped recurring
   route items
 - `aoa-session-self-diagnose` for router-only risk-gate honesty notes or
