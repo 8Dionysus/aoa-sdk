@@ -29,6 +29,8 @@ CHECKPOINT_KINDS = (
 )
 PROMOTION_TARGETS = ("dionysus-note", "harvest-handoff")
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
+IGNORABLE_UNTRACKED_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
+IGNORABLE_UNTRACKED_SUFFIXES = (".pyc", ".pyo", ".pyd")
 
 
 class CheckpointsAPI:
@@ -525,8 +527,40 @@ def _ensure_repo_not_dirty(repo_root: Path, *, repo_name: str) -> None:
     )
     if result.returncode != 0:
         return
-    if result.stdout.strip():
+    meaningful_lines = [
+        line
+        for line in result.stdout.splitlines()
+        if line.strip() and not _is_ignorable_untracked_status(line, repo_root=repo_root)
+    ]
+    if meaningful_lines:
         raise SurfaceNotFound(f"{repo_name} is dirty; keep the reviewed promotion on the local checkpoint note for now")
+
+
+def _is_ignorable_untracked_status(line: str, *, repo_root: Path) -> bool:
+    if not line.startswith("?? "):
+        return False
+    raw_path = line[3:].strip()
+    candidate = repo_root / raw_path.rstrip("/\\")
+    if candidate.is_dir():
+        return _directory_contains_only_ignorable_cache(candidate)
+    return _is_ignorable_cache_path(raw_path)
+
+
+def _directory_contains_only_ignorable_cache(directory: Path) -> bool:
+    for path in directory.rglob("*"):
+        if path.is_dir():
+            continue
+        if not _is_ignorable_cache_path(str(path.relative_to(directory))):
+            return False
+    return True
+
+
+def _is_ignorable_cache_path(raw_path: str) -> bool:
+    normalized = raw_path.replace("\\", "/")
+    parts = [part for part in normalized.split("/") if part]
+    if any(part in IGNORABLE_UNTRACKED_DIRS for part in parts):
+        return True
+    return normalized.endswith(IGNORABLE_UNTRACKED_SUFFIXES)
 
 
 def _date_from_session_ref(session_ref: str) -> str | None:
