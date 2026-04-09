@@ -409,7 +409,7 @@ def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: P
                 "observed_at": "2026-04-09T12:00:00Z",
                 "run_ref": "run-existing-harvest",
                 "session_ref": "session:test-checkpoint-closeout-execute",
-                "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+                "actor_ref": "aoa-skills:aoa-session-donor-harvest",
                 "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
                 "evidence_refs": [{"kind": "reviewed_artifact", "ref": str(reviewed_artifact)}],
                 "payload": {"route_ref": "route:test-checkpoint-closeout-execute"},
@@ -478,6 +478,20 @@ def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(w
     assert report.produced_receipt_refs
     for path in [*report.produced_artifact_refs, *report.produced_receipt_refs]:
         assert Path(path).exists()
+    receipt_payloads = {
+        Path(path).name: json.loads(Path(path).read_text(encoding="utf-8"))
+        for path in report.produced_receipt_refs
+    }
+    assert receipt_payloads["HARVEST_PACKET_RECEIPT.json"]["actor_ref"] == "aoa-skills:aoa-session-donor-harvest"
+    assert (
+        receipt_payloads["PROGRESSION_DELTA_RECEIPT.json"]["actor_ref"]
+        == "aoa-skills:aoa-session-progression-lift"
+    )
+    assert receipt_payloads["QUEST_PROMOTION_RECEIPT.json"]["actor_ref"] == "aoa-skills:aoa-quest-harvest"
+    assert (
+        receipt_payloads["CORE_SKILL_APPLICATION_RECEIPT.harvest.json"]["actor_ref"]
+        == "aoa-skills:aoa-session-donor-harvest"
+    )
     execution_report_path = (
         workspace_root
         / "aoa-sdk"

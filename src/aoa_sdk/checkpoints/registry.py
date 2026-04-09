@@ -1082,7 +1082,7 @@ def _build_donor_harvest_outputs(
         **_observed_timestamp_fields(),
         "run_ref": run_ref,
         "session_ref": context.session_ref,
-        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+        "actor_ref": _skill_actor_ref("aoa-session-donor-harvest"),
         "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
         "evidence_refs": [
             {"kind": "harvest_packet", "ref": str(packet_path), "role": "primary"},
@@ -1204,7 +1204,7 @@ def _build_progression_lift_outputs(
         **_observed_timestamp_fields(),
         "run_ref": run_ref,
         "session_ref": context.session_ref,
-        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-progression-lift"},
+        "actor_ref": _skill_actor_ref("aoa-session-progression-lift"),
         "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-progression-lift"},
         "evidence_refs": [
             {"kind": "progression_packet", "ref": str(packet_path), "role": "primary"},
@@ -1345,7 +1345,7 @@ def _build_quest_harvest_outputs(
         **_observed_timestamp_fields(),
         "run_ref": run_ref,
         "session_ref": context.session_ref,
-        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
+        "actor_ref": _skill_actor_ref("aoa-quest-harvest"),
         "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
         "evidence_refs": [
             {"kind": "quest_triage", "ref": str(triage_path), "role": "primary"},
@@ -1614,7 +1614,7 @@ def _build_core_skill_receipt(
         **_observed_timestamp_fields(),
         "run_ref": run_ref,
         "session_ref": session_ref,
-        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": skill_name},
+        "actor_ref": _skill_actor_ref(skill_name),
         "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": skill_name},
         "evidence_refs": [{"kind": "receipt", "ref": detail_receipt_ref}],
         "payload": {
@@ -1640,6 +1640,16 @@ def _build_core_skill_receipt(
             },
         },
     }
+
+
+def _skill_actor_ref(
+    skill_name: Literal[
+        "aoa-session-donor-harvest",
+        "aoa-session-progression-lift",
+        "aoa-quest-harvest",
+    ],
+) -> str:
+    return f"aoa-skills:{skill_name}"
 
 
 def _safe_name(value: str) -> str:
