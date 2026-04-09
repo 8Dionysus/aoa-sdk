@@ -335,7 +335,7 @@ def _print_checkpoint_capture(result: CheckpointCaptureResult | None) -> None:
         )
     if result.captured_at is not None:
         typer.echo(
-            "checkpoint_capture_at: "
+            "checkpoint_capture_at_canonical_utc: "
             + _format_dual_timestamp(
                 utc_value=result.captured_at,
                 local_value=result.captured_at_local,
@@ -378,7 +378,7 @@ def _print_checkpoint_promotion(promotion: SessionCheckpointPromotion) -> None:
     typer.echo(f"session_ref: {promotion.session_ref}")
     typer.echo(f"target: {promotion.target}")
     typer.echo(
-        "promoted_at: "
+        "promoted_at_canonical_utc: "
         + _format_dual_timestamp(
             utc_value=promotion.promoted_at,
             local_value=promotion.promoted_at_local,
@@ -394,7 +394,7 @@ def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
     typer.echo(f"session_ref: {context.session_ref}")
     typer.echo(f"orchestrator_skill_name: {context.orchestrator_skill_name}")
     typer.echo(
-        "built_at: "
+        "built_at_canonical_utc: "
         + _format_dual_timestamp(
             utc_value=context.built_at,
             local_value=context.built_at_local,
@@ -431,7 +431,7 @@ def _print_closeout_execution_report(report: CheckpointCloseoutExecutionReport) 
     typer.echo(f"session_ref: {report.session_ref}")
     typer.echo(f"orchestrator_skill_name: {report.orchestrator_skill_name}")
     typer.echo(
-        "executed_at: "
+        "executed_at_canonical_utc: "
         + _format_dual_timestamp(
             utc_value=report.executed_at,
             local_value=report.executed_at_local,

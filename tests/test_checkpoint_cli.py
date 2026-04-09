@@ -452,6 +452,76 @@ def test_checkpoint_build_closeout_context_cli_emits_json(workspace_root: Path) 
     ]
 
 
+def test_checkpoint_human_cli_marks_canonical_utc_labels(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    guard = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--intent-text",
+            "commit bounded patch",
+            "--mutation-surface",
+            "code",
+            "--root",
+            str(workspace_root),
+        ],
+    )
+    assert guard.exit_code == 0
+    assert "checkpoint_capture_at_canonical_utc:" in guard.stdout
+    assert "(local " in guard.stdout
+
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-closeout-human.md"
+    reviewed_artifact.parent.mkdir(parents=True, exist_ok=True)
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                "Session ref: `session:test-checkpoint-human-cli`",
+                "",
+                "- verify green completed",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    context_result = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "build-closeout-context",
+            str(workspace_root / "aoa-sdk"),
+            "--reviewed-artifact",
+            str(reviewed_artifact),
+            "--root",
+            str(workspace_root),
+        ],
+    )
+    assert context_result.exit_code == 0
+    assert "built_at_canonical_utc:" in context_result.stdout
+    assert "(local " in context_result.stdout
+
+    execution_result = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "execute-closeout-chain",
+            str(workspace_root / "aoa-sdk"),
+            "--reviewed-artifact",
+            str(reviewed_artifact),
+            "--root",
+            str(workspace_root),
+        ],
+    )
+    assert execution_result.exit_code == 0
+    assert "executed_at_canonical_utc:" in execution_result.stdout
+    assert "(local " in execution_result.stdout
+
+
 def test_checkpoint_execute_closeout_chain_cli_emits_execution_report(workspace_root: Path) -> None:
     runner = CliRunner()
     reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-closeout-exec.md"
