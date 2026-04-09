@@ -3,11 +3,12 @@ from __future__ import annotations
 import json
 import re
 from pathlib import Path
-from typing import Literal
+from typing import Literal, cast
 
 from ..errors import RepoNotFound, SurfaceNotFound
 from ..models import (
     CheckpointCandidateCluster,
+    ProgressionAxisSignal,
     RoutingOwnerLayerShortlistHint,
     SessionCheckpointCluster,
     SessionCheckpointNote,
@@ -170,6 +171,9 @@ class SurfacesAPI:
         checkpoint_harvest_candidates = [
             cluster for cluster in surviving_checkpoint_clusters if "harvest" in cluster.session_end_targets
         ]
+        checkpoint_progression_candidates = [
+            cluster for cluster in surviving_checkpoint_clusters if "progression" in cluster.session_end_targets
+        ]
         checkpoint_upgrade_candidates = [
             cluster for cluster in surviving_checkpoint_clusters if "upgrade" in cluster.session_end_targets
         ]
@@ -181,12 +185,18 @@ class SurfacesAPI:
             surviving_items=surviving_items,
             surviving_checkpoint_clusters=surviving_checkpoint_clusters,
             checkpoint_harvest_candidates=checkpoint_harvest_candidates,
+            checkpoint_progression_candidates=checkpoint_progression_candidates,
             checkpoint_upgrade_candidates=checkpoint_upgrade_candidates,
+            checkpoint_progression_axes=(
+                list(checkpoint_note.progression_axis_signals) if checkpoint_note is not None else []
+            ),
             stats_refresh_recommended=checkpoint_note.stats_refresh_recommended if checkpoint_note is not None else False,
             handoff_targets=_derive_closeout_handoff_targets(
                 surviving_items=surviving_items,
                 surviving_checkpoint_clusters=surviving_checkpoint_clusters,
                 checkpoint_harvest_candidates=checkpoint_harvest_candidates,
+                checkpoint_progression_candidates=checkpoint_progression_candidates,
+                checkpoint_progression_axes=list(checkpoint_note.progression_axis_signals) if checkpoint_note is not None else [],
                 checkpoint_upgrade_candidates=checkpoint_upgrade_candidates,
                 actionability_gaps=report.actionability_gaps,
             ),
@@ -517,7 +527,13 @@ def _derive_explicit_mutation_growth_clusters(
             source_surface_ref=f"aoa-sdk:checkpoint_auto_capture.{checkpoint_kind}",
             evidence_refs=evidence_refs,
             confidence="high" if checkpoint_kind == "verify_green" else "medium",
-            session_end_targets=["harvest"],
+            session_end_targets=["harvest", "progression"],
+            progression_axis_signals=_progression_axis_signals_for_explicit_growth(
+                candidate_id=f"candidate:growth:{_slugify(f'{context_label}-{checkpoint_kind}-{mutation_surface}')}",
+                checkpoint_kind=checkpoint_kind,
+                blocked_by=blocked_by,
+                evidence_refs=evidence_refs,
+            ),
             promote_if=promote_if,
             defer_reason=defer_reason,
             blocked_by=blocked_by,
@@ -561,6 +577,61 @@ def _explicit_mutation_growth_evidence_refs(
     for item in [*skill_report.activate_now, *skill_report.must_confirm, *skill_report.suggest_next]:
         refs.append(f"aoa-skills:{item.skill_name}")
     return _dedupe_strings(refs)
+
+
+def _progression_axis_signals_for_explicit_growth(
+    *,
+    candidate_id: str,
+    checkpoint_kind: Literal["commit", "verify_green"],
+    blocked_by: list[str],
+    evidence_refs: list[str],
+) -> list[ProgressionAxisSignal]:
+    templates: list[tuple[str, str, str]] = [
+        (
+            "execution_reliability",
+            "advance",
+            "bounded mutation evidence suggests the session improved execution reliability, pending reviewed closeout",
+        ),
+        (
+            "change_legibility",
+            "advance",
+            "the explicit checkpoint seam makes the change easier to narrate and verify later",
+        ),
+    ]
+    if checkpoint_kind == "verify_green":
+        templates.append(
+            (
+                "proof_discipline",
+                "advance",
+                "verify-green evidence strengthens proof discipline for the bounded mutation seam",
+            )
+        )
+    signals: list[ProgressionAxisSignal] = []
+    for axis, movement, why in templates:
+        signals.append(
+            ProgressionAxisSignal(
+                axis=cast(
+                    Literal[
+                        "boundary_integrity",
+                        "execution_reliability",
+                        "change_legibility",
+                        "review_sharpness",
+                        "proof_discipline",
+                        "provenance_hygiene",
+                        "deep_readiness",
+                    ],
+                    axis,
+                ),
+                movement=cast(
+                    Literal["advance", "hold", "reanchor", "downgrade"],
+                    _adjust_progression_movement(movement=movement, blocked_by=blocked_by),
+                ),
+                why=why,
+                evidence_refs=list(evidence_refs),
+                candidate_ids=[candidate_id],
+            )
+        )
+    return signals
 
 
 def _repeated_pattern_detected(
@@ -617,6 +688,8 @@ def _derive_closeout_handoff_targets(
     surviving_items: list[SurfaceOpportunityItem],
     surviving_checkpoint_clusters: list[SessionCheckpointCluster],
     checkpoint_harvest_candidates: list[SessionCheckpointCluster],
+    checkpoint_progression_candidates: list[SessionCheckpointCluster],
+    checkpoint_progression_axes: list[ProgressionAxisSignal],
     checkpoint_upgrade_candidates: list[SessionCheckpointCluster],
     actionability_gaps: list[str],
 ) -> list[SurfaceCloseoutHandoffTarget]:
@@ -628,6 +701,17 @@ def _derive_closeout_handoff_targets(
                 skill_name="aoa-session-donor-harvest",
                 why="bundle the surviving bounded notes into a reviewable harvest packet instead of leaving them as session residue",
                 triggered_by=[*([item.surface_ref for item in surviving_items]), *checkpoint_triggered_by],
+            )
+        )
+    if checkpoint_progression_candidates or checkpoint_progression_axes:
+        targets.append(
+            SurfaceCloseoutHandoffTarget(
+                skill_name="aoa-session-progression-lift",
+                why="reviewed closeout should turn provisional checkpoint axis movement into one explicit progression delta before any final quest verdict",
+                triggered_by=[
+                    *[f"checkpoint-progression:{cluster.candidate_id}" for cluster in checkpoint_progression_candidates],
+                    *[f"checkpoint-axis:{signal.axis}" for signal in checkpoint_progression_axes],
+                ],
             )
         )
     playbook_items = [item for item in surviving_items if item.object_kind == "playbook"]
@@ -669,7 +753,7 @@ def _derive_closeout_handoff_targets(
         targets.append(
             SurfaceCloseoutHandoffTarget(
                 skill_name="aoa-quest-harvest",
-                why="checkpoint-marked upgrade candidates should be reviewed once at closeout instead of getting promoted during the session",
+                why="checkpoint-marked upgrade candidates should be reviewed after progression lift, not promoted during the session",
                 triggered_by=[f"checkpoint-upgrade:{cluster.candidate_id}" for cluster in checkpoint_upgrade_candidates],
             )
         )
@@ -1060,6 +1144,12 @@ def _derive_checkpoint_candidate_clusters(
                 evidence_refs=evidence_refs,
                 confidence=item.confidence,
                 session_end_targets=_session_end_targets_for_candidate_kind(candidate_kind),
+                progression_axis_signals=_progression_axis_signals_for_item(
+                    item,
+                    candidate_kind=candidate_kind,
+                    blocked_by=blocked_by,
+                    evidence_refs=evidence_refs,
+                ),
                 promote_if=promote_if,
                 defer_reason=defer_reason,
                 blocked_by=blocked_by,
@@ -1085,11 +1175,145 @@ def _candidate_kind_for_item(item: SurfaceOpportunityItem) -> str:
     return item.object_kind
 
 
-def _session_end_targets_for_candidate_kind(candidate_kind: str) -> list[Literal["harvest", "upgrade"]]:
-    targets: list[Literal["harvest", "upgrade"]] = ["harvest"]
+def _session_end_targets_for_candidate_kind(candidate_kind: str) -> list[Literal["harvest", "progression", "upgrade"]]:
+    targets: list[Literal["harvest", "progression", "upgrade"]] = ["harvest", "progression"]
     if candidate_kind in {"route", "pattern", "proof", "recall", "role"}:
         targets.append("upgrade")
     return targets
+
+
+def _progression_axis_signals_for_item(
+    item: SurfaceOpportunityItem,
+    *,
+    candidate_kind: str,
+    blocked_by: list[str],
+    evidence_refs: list[str],
+) -> list[ProgressionAxisSignal]:
+    templates: list[tuple[str, str, str]]
+    if candidate_kind == "route":
+        templates = [
+            (
+                "change_legibility",
+                "advance",
+                "recurring-route evidence makes this session easier to hand off and review honestly",
+            ),
+            (
+                "deep_readiness",
+                "advance",
+                "repeated route evidence hints that the route may be ready for a stronger reusable shape later",
+            ),
+        ]
+    elif candidate_kind == "pattern":
+        templates = [
+            (
+                "deep_readiness",
+                "advance",
+                "pattern-shaped evidence suggests the route is approaching reusable technique form",
+            ),
+            (
+                "review_sharpness",
+                "advance",
+                "named pattern evidence sharpens later reviewed interpretation",
+            ),
+        ]
+    elif candidate_kind == "proof":
+        templates = [
+            (
+                "proof_discipline",
+                "advance",
+                "proof-shaped evidence strengthens the session's reviewed basis",
+            ),
+            (
+                "review_sharpness",
+                "advance",
+                "explicit proof artifacts sharpen later closeout judgment",
+            ),
+        ]
+    elif candidate_kind == "recall":
+        templates = [
+            (
+                "provenance_hygiene",
+                "advance",
+                "recall surfaces preserve route memory and attribution for later review",
+            ),
+            (
+                "change_legibility",
+                "advance",
+                "memo-shaped recall makes the route easier to narrate without replaying raw history",
+            ),
+        ]
+    elif candidate_kind == "role":
+        templates = [
+            (
+                "boundary_integrity",
+                "hold",
+                "role-posture evidence exists, but owner boundaries should stay explicit until reviewed closeout",
+            ),
+            (
+                "deep_readiness",
+                "advance",
+                "role evidence may reflect deeper readiness once it is reviewed in owner context",
+            ),
+        ]
+    elif candidate_kind == "risk":
+        templates = [
+            (
+                "boundary_integrity",
+                "reanchor",
+                "risk-gated evidence says progression must stay bounded and reviewed",
+            ),
+            (
+                "proof_discipline",
+                "hold",
+                "risk-shaped signals should hold until reviewed proof confirms the same concern",
+            ),
+        ]
+    else:
+        templates = [
+            (
+                "change_legibility",
+                "hold",
+                "checkpoint evidence exists, but the progression claim should stay provisional until reviewed closeout",
+            )
+        ]
+    signals: list[ProgressionAxisSignal] = []
+    for axis, movement, why in templates:
+        signals.append(
+            ProgressionAxisSignal(
+                axis=cast(
+                    Literal[
+                        "boundary_integrity",
+                        "execution_reliability",
+                        "change_legibility",
+                        "review_sharpness",
+                        "proof_discipline",
+                        "provenance_hygiene",
+                        "deep_readiness",
+                    ],
+                    axis,
+                ),
+                movement=cast(
+                    Literal["advance", "hold", "reanchor", "downgrade"],
+                    _adjust_progression_movement(movement=movement, blocked_by=blocked_by),
+                ),
+                why=why,
+                evidence_refs=list(evidence_refs),
+                candidate_ids=[f"candidate:{candidate_kind}:{_slugify(item.surface_ref)}"],
+            )
+        )
+    return signals
+
+
+def _adjust_progression_movement(
+    *,
+    movement: str,
+    blocked_by: list[str],
+) -> str:
+    if movement in {"reanchor", "downgrade"}:
+        return movement
+    if "owner-ambiguity" in blocked_by or "thin-evidence" in blocked_by or "requires-reviewed-route" in blocked_by:
+        return "hold"
+    return movement
 
 
 def _checkpoint_blocked_by(clusters: list[CheckpointCandidateCluster]) -> list[str]:

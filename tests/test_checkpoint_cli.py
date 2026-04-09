@@ -130,6 +130,9 @@ def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path) -> N
     assert payload["checkpoint_capture"]["mode"] == "auto"
     assert payload["checkpoint_capture"]["appended"] is True
     assert payload["checkpoint_capture"]["checkpoint_kind"] == "commit"
+    assert payload["checkpoint_capture"]["session_end_skill_targets"]
+    assert payload["checkpoint_capture"]["stats_refresh_recommended"] is True
+    assert payload["checkpoint_capture"]["session_end_next_honest_move"]
     assert payload["checkpoint_note"]["state"] in {"collecting", "reviewable"}
     note_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "checkpoint-note.json"
     assert note_path.exists()
@@ -188,7 +191,60 @@ def test_skills_guard_reports_no_checkpoint_signal_when_auto_capture_skips(works
     assert payload["checkpoint_capture"]["mode"] == "auto"
     assert payload["checkpoint_capture"]["appended"] is False
     assert payload["checkpoint_capture"]["reason"] == "no_checkpoint_signal"
+    assert payload["checkpoint_capture"]["session_end_skill_targets"] == []
+    assert payload["checkpoint_capture"]["stats_refresh_recommended"] is False
     assert "checkpoint_note" not in payload
+
+
+def test_skills_guard_reports_existing_session_end_targets_even_when_skip_occurs(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    first = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--intent-text",
+            "recurring workflow needs better handoff proof and recall",
+            "--mutation-surface",
+            "code",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert first.exit_code == 0
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--intent-text",
+            "refresh generated contracts",
+            "--mutation-surface",
+            "code",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["checkpoint_capture"]["appended"] is False
+    assert payload["checkpoint_capture"]["reason"] == "no_checkpoint_signal"
+    assert [target["skill_name"] for target in payload["checkpoint_capture"]["session_end_skill_targets"]] == [
+        "aoa-session-donor-harvest",
+        "aoa-session-progression-lift",
+        "aoa-quest-harvest",
+    ]
+    assert payload["checkpoint_capture"]["progression_axis_signals"]
+    assert payload["checkpoint_capture"]["stats_refresh_recommended"] is True
+    assert payload["checkpoint_capture"]["session_end_next_honest_move"]
+    assert payload["checkpoint_note"]["session_end_recommendation"] == "harvest_progression_and_upgrade"
 
 
 def test_skills_guard_auto_captures_explicit_commit_growth(workspace_root: Path) -> None:

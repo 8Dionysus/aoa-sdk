@@ -67,7 +67,11 @@ def test_surface_detection_routes_are_documented_as_additive_and_skill_only() ->
     assert "aoa checkpoint promote /srv/aoa-sdk --target dionysus-note" in readme
     assert "aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json" in readme
     assert "sdk.stats.surface_detection()" in readme
-    assert "carries harvest and upgrade candidates through the session" in readme
+    assert "carries harvest, progression, and upgrade candidates through the session" in readme
+    assert "checkpoint_capture.session_end_skill_targets" in readme
+    assert "checkpoint_capture.progression_axis_signals" in readme
+    assert "checkpoint_capture.session_end_next_honest_move" in readme
+    assert "aoa-session-progression-lift" in readme
 
 
 def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:
@@ -83,7 +87,11 @@ def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:
     assert 'aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json' in agents
     assert "aoa skills ...` remains skill-only" in agents
     assert "checkpoint notes stay lower-authority than harvest verdicts" in agents
-    assert "session-local ledger for harvest and upgrade candidates" in agents
+    assert "session-local ledger for harvest, progression, and" in agents
+    assert "checkpoint_capture.session_end_skill_targets" in agents
+    assert "checkpoint_capture.progression_axis_signals" in agents
+    assert "checkpoint_capture.session_end_next_honest_move" in agents
+    assert "aoa-session-progression-lift" in agents
     assert "manual-equivalent` never becomes `activated`" in agents
     assert "routing shortlist hints stay advisory only" in agents
 
@@ -101,9 +109,13 @@ def test_session_closeout_explicitly_keeps_surface_handoff_separate() -> None:
 def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
     checkpoints = read_text("docs/session-growth-checkpoints.md")
 
-    assert "carry harvest and upgrade candidates through the end of the session" in checkpoints
+    assert "carry harvest, progression, and upgrade candidates through the end of the session" in checkpoints
     assert "candidate movement and stats refresh stay end-of-session decisions" in checkpoints
     assert "the final stats-refresh hint" in checkpoints
+    assert "checkpoint_capture.session_end_skill_targets" in checkpoints
+    assert "checkpoint_capture.progression_axis_signals" in checkpoints
+    assert "checkpoint_capture.session_end_next_honest_move" in checkpoints
+    assert "aoa-session-progression-lift" in checkpoints
 
 
 def test_blueprint_is_marked_as_direction_surface() -> None:

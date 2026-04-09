@@ -125,9 +125,16 @@ surface detection finds a real growth signal.
 Explicit `commit` and `verify-green` intents on a real mutation surface also
 count as growth seams for that local note, even when recurring-route heuristics
 stay quiet.
-Treat that note as the session-local ledger for harvest and upgrade candidates
-until reviewed closeout; do not move candidates or stats mid-session just
+Treat that note as the session-local ledger for harvest, progression, and
+upgrade candidates until reviewed closeout; it should also carry provisional
+multi-axis progression evidence for `aoa-session-progression-lift`.
+Do not move candidates or stats mid-session just
 because the note became reviewable.
+Expect `aoa skills enter` and `aoa skills guard` to expose that reviewed-closeout
+plan directly in `checkpoint_capture.session_end_skill_targets` and
+`checkpoint_capture.session_end_next_honest_move`, with
+`checkpoint_capture.progression_axis_signals` showing the provisional axis
+movement that should be lifted only at reviewed closeout.
 Use `--no-auto-checkpoint` when you need the skill lane to stay read-only apart
 from its persisted report, and use `--checkpoint-kind` when one explicit
 checkpoint event matters.

@@ -10,6 +10,8 @@ from typing import Literal, cast
 from ..errors import RepoNotFound, SurfaceNotFound
 from ..models import (
     CheckpointCaptureResult,
+    ProgressionAxisSignal,
+    SessionEndSkillTarget,
     SessionCheckpointCluster,
     SessionCheckpointHistoryEntry,
     SessionCheckpointNote,
@@ -151,23 +153,42 @@ class CheckpointsAPI:
                 skill_report_path=skill_report_path,
                 manual_review_requested=manual_review_requested,
             )
+            session_end_targets = _derive_session_end_skill_targets(note)
             return CheckpointCaptureResult(
                 mode="explicit",
                 attempted=True,
                 appended=True,
                 checkpoint_kind=checkpoint_kind,
                 reason="explicit_request",
+                note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root),
+                session_end_skill_targets=session_end_targets,
+                session_end_next_honest_move=_derive_session_end_next_honest_move(
+                    note=note,
+                    session_end_targets=session_end_targets,
+                ),
+                progression_axis_signals=list(note.progression_axis_signals),
+                stats_refresh_recommended=note.stats_refresh_recommended,
                 note=note,
             )
 
         if not auto_capture:
+            current_note = _load_runtime_checkpoint_note(self, repo_root=repo_root)
+            session_end_targets = _derive_session_end_skill_targets(current_note)
             return CheckpointCaptureResult(
                 mode="auto",
                 attempted=False,
                 appended=False,
                 checkpoint_kind=None,
                 reason="auto_disabled",
-                note=None,
+                note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root) if current_note is not None else None,
+                session_end_skill_targets=session_end_targets,
+                session_end_next_honest_move=_derive_session_end_next_honest_move(
+                    note=current_note,
+                    session_end_targets=session_end_targets,
+                ),
+                progression_axis_signals=list(current_note.progression_axis_signals) if current_note is not None else [],
+                stats_refresh_recommended=current_note.stats_refresh_recommended if current_note is not None else False,
+                note=current_note,
             )
 
         inferred_kind = _infer_auto_checkpoint_kind(intent_text=intent_text)
@@ -181,13 +202,23 @@ class CheckpointsAPI:
             checkpoint_kind=inferred_kind,
         )
         if not report.checkpoint_should_capture:
+            current_note = _load_runtime_checkpoint_note(self, repo_root=repo_root)
+            session_end_targets = _derive_session_end_skill_targets(current_note)
             return CheckpointCaptureResult(
                 mode="auto",
                 attempted=True,
                 appended=False,
                 checkpoint_kind=inferred_kind,
                 reason="no_checkpoint_signal",
-                note=None,
+                note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root) if current_note is not None else None,
+                session_end_skill_targets=session_end_targets,
+                session_end_next_honest_move=_derive_session_end_next_honest_move(
+                    note=current_note,
+                    session_end_targets=session_end_targets,
+                ),
+                progression_axis_signals=list(current_note.progression_axis_signals) if current_note is not None else [],
+                stats_refresh_recommended=current_note.stats_refresh_recommended if current_note is not None else False,
+                note=current_note,
             )
 
         note = self.append(
@@ -200,12 +231,21 @@ class CheckpointsAPI:
             surface_report=report,
             manual_review_requested=manual_review_requested,
         )
+        session_end_targets = _derive_session_end_skill_targets(note)
         return CheckpointCaptureResult(
             mode="auto",
             attempted=True,
             appended=True,
             checkpoint_kind=inferred_kind,
             reason="checkpoint_signal",
+            note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root),
+            session_end_skill_targets=session_end_targets,
+            session_end_next_honest_move=_derive_session_end_next_honest_move(
+                note=note,
+                session_end_targets=session_end_targets,
+            ),
+            progression_axis_signals=list(note.progression_axis_signals),
+            stats_refresh_recommended=note.stats_refresh_recommended,
             note=note,
         )
 
@@ -283,6 +323,10 @@ def _checkpoint_paths(workspace: Workspace, repo_root: str) -> _CheckpointPaths:
     current_dir = sdk_root / ".aoa" / "session-growth" / "current" / repo_label
     surface_report = sdk_root / ".aoa" / "surface-detection" / f"{repo_label}.checkpoint.latest.json"
     return _CheckpointPaths(root=sdk_root, repo_label=repo_label, current_dir=current_dir, surface_report=surface_report)
+
+
+def _checkpoint_note_ref_for_capture(workspace: Workspace, repo_root: str) -> str:
+    return str(_checkpoint_paths(workspace, repo_root).note_json)
 
 
 def _resolve_context_root(workspace: Workspace, repo_root: str) -> Path:
@@ -402,12 +446,20 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
                 if cluster.session_end_targets
                 else _legacy_session_end_targets_for_candidate_kind(cluster.candidate_kind)
             )
+            cluster_progression_axis_signals = (
+                list(cluster.progression_axis_signals)
+                if cluster.progression_axis_signals
+                else _legacy_progression_axis_signals_for_cluster(cluster)
+            )
             merged_evidence = _dedupe_strings([*(existing.evidence_refs if existing else []), *cluster.evidence_refs])
             merged_moves = _dedupe_strings([*(existing.next_owner_moves if existing else []), *cluster.next_owner_moves])
             merged_promote_if = _dedupe_strings([*(existing.promote_if if existing else []), *cluster.promote_if])
             merged_blocked = _dedupe_strings([*(existing.blocked_by if existing else []), *cluster.blocked_by])
             merged_session_end_targets = _dedupe_session_end_targets(
                 [*(existing.session_end_targets if existing else []), *cluster_session_end_targets]
+            )
+            merged_progression_axis_signals = _merge_progression_axis_signals(
+                [*(existing.progression_axis_signals if existing else []), *cluster_progression_axis_signals]
             )
             confidence = _max_confidence(existing.confidence if existing else None, cluster.confidence)
             checkpoint_hits = (existing.checkpoint_hits if existing else 0) + 1
@@ -421,6 +473,7 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
                 evidence_refs=merged_evidence,
                 confidence=confidence,
                 session_end_targets=merged_session_end_targets,
+                progression_axis_signals=merged_progression_axis_signals,
                 promote_if=merged_promote_if,
                 defer_reason=cluster.defer_reason or (existing.defer_reason if existing else None),
                 blocked_by=merged_blocked,
@@ -448,9 +501,13 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
     harvest_candidate_ids = [
         cluster.candidate_id for cluster in candidate_clusters if "harvest" in cluster.session_end_targets
     ]
+    progression_candidate_ids = [
+        cluster.candidate_id for cluster in candidate_clusters if "progression" in cluster.session_end_targets
+    ]
     upgrade_candidate_ids = [
         cluster.candidate_id for cluster in candidate_clusters if "upgrade" in cluster.session_end_targets
     ]
+    progression_axis_signals = _aggregate_progression_axis_signals(candidate_clusters)
     stats_refresh_recommended = bool(candidate_clusters)
     recommendation = _derive_promotion_recommendation(
         candidate_clusters=candidate_clusters,
@@ -473,10 +530,13 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
         carry_until_session_closeout=state not in {"promoted", "closed"},
         session_end_recommendation=_derive_session_end_recommendation(
             harvest_candidate_ids=harvest_candidate_ids,
+            progression_candidate_ids=progression_candidate_ids,
             upgrade_candidate_ids=upgrade_candidate_ids,
         ),
         harvest_candidate_ids=harvest_candidate_ids,
+        progression_candidate_ids=progression_candidate_ids,
         upgrade_candidate_ids=upgrade_candidate_ids,
+        progression_axis_signals=progression_axis_signals,
         stats_refresh_recommended=stats_refresh_recommended,
         blocked_by=sorted(all_blocked),
         review_status="reviewed" if existing_review_status == "reviewed" else "unreviewed",
@@ -495,6 +555,11 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
                     else set()
                 ),
                 *(
+                    {"at reviewed closeout, lift provisional progression axes before any final quest verdict"}
+                    if progression_candidate_ids
+                    else set()
+                ),
+                *(
                     {"at reviewed closeout, review upgrade candidates before any owner-layer promotion"}
                     if upgrade_candidate_ids
                     else set()
@@ -503,6 +568,13 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
         ),
     )
     return note
+
+
+def _load_runtime_checkpoint_note(api: CheckpointsAPI, *, repo_root: str) -> SessionCheckpointNote | None:
+    try:
+        return api.status(repo_root=repo_root)
+    except SurfaceNotFound:
+        return None
 
 
 def _derive_promotion_recommendation(
@@ -550,9 +622,9 @@ def _max_confidence(left: str | None, right: str) -> Literal["low", "medium", "h
 
 
 def _dedupe_session_end_targets(
-    values: list[Literal["harvest", "upgrade"]],
-) -> list[Literal["harvest", "upgrade"]]:
-    deduped: list[Literal["harvest", "upgrade"]] = []
+    values: list[Literal["harvest", "progression", "upgrade"]],
+) -> list[Literal["harvest", "progression", "upgrade"]]:
+    deduped: list[Literal["harvest", "progression", "upgrade"]] = []
     for value in values:
         if value not in deduped:
             deduped.append(value)
@@ -561,25 +633,337 @@ def _dedupe_session_end_targets(
 
 def _legacy_session_end_targets_for_candidate_kind(
     candidate_kind: str,
-) -> list[Literal["harvest", "upgrade"]]:
-    targets: list[Literal["harvest", "upgrade"]] = ["harvest"]
+) -> list[Literal["harvest", "progression", "upgrade"]]:
+    targets: list[Literal["harvest", "progression", "upgrade"]] = ["harvest", "progression"]
     if candidate_kind in {"route", "pattern", "proof", "recall", "role"}:
         targets.append("upgrade")
     return targets
 
 
+def _legacy_progression_axis_signals_for_cluster(
+    cluster: SessionCheckpointHistoryEntry | SessionCheckpointCluster | object,
+) -> list[ProgressionAxisSignal]:
+    candidate_kind = getattr(cluster, "candidate_kind", None)
+    source_surface_ref = getattr(cluster, "source_surface_ref", None)
+    blocked_by = getattr(cluster, "blocked_by", None)
+    evidence_refs = getattr(cluster, "evidence_refs", None)
+    candidate_id = getattr(cluster, "candidate_id", None)
+    if not isinstance(candidate_kind, str) or not isinstance(source_surface_ref, str):
+        return []
+    return _progression_axis_signals_for_candidate(
+        candidate_kind=candidate_kind,
+        source_surface_ref=source_surface_ref,
+        blocked_by=list(blocked_by) if isinstance(blocked_by, list) else [],
+        evidence_refs=list(evidence_refs) if isinstance(evidence_refs, list) else [],
+        candidate_id=candidate_id if isinstance(candidate_id, str) else None,
+    )
+
+
+def _progression_axis_signals_for_candidate(
+    *,
+    candidate_kind: str,
+    source_surface_ref: str,
+    blocked_by: list[str],
+    evidence_refs: list[str],
+    candidate_id: str | None,
+) -> list[ProgressionAxisSignal]:
+    templates: list[tuple[str, str, str]]
+    if candidate_kind == "growth":
+        templates = [
+            (
+                "execution_reliability",
+                "advance",
+                "bounded mutation evidence suggests the session improved execution reliability, subject to reviewed closeout confirmation",
+            ),
+            (
+                "change_legibility",
+                "advance",
+                "the checkpoint seam makes the change easier to narrate and verify later",
+            ),
+        ]
+        if source_surface_ref.endswith("verify_green"):
+            templates.append(
+                (
+                    "proof_discipline",
+                    "advance",
+                    "verify-green evidence strengthens proof discipline for the bounded change",
+                )
+            )
+    elif candidate_kind == "route":
+        templates = [
+            (
+                "change_legibility",
+                "advance",
+                "recurring-route evidence makes the session easier to hand off and replay honestly",
+            ),
+            (
+                "deep_readiness",
+                "advance",
+                "repeated route evidence hints that the session may be maturing into a reusable pattern",
+            ),
+        ]
+    elif candidate_kind == "pattern":
+        templates = [
+            (
+                "deep_readiness",
+                "advance",
+                "pattern evidence suggests the route is approaching reusable technique shape",
+            ),
+            (
+                "review_sharpness",
+                "advance",
+                "naming the pattern sharpens later reviewed interpretation",
+            ),
+        ]
+    elif candidate_kind == "proof":
+        templates = [
+            (
+                "proof_discipline",
+                "advance",
+                "proof-shaped evidence strengthens the session's reviewed basis",
+            ),
+            (
+                "review_sharpness",
+                "advance",
+                "explicit proof evidence sharpens reviewed closeout judgment",
+            ),
+        ]
+    elif candidate_kind == "recall":
+        templates = [
+            (
+                "provenance_hygiene",
+                "advance",
+                "recall surfaces preserve attribution and route memory for later review",
+            ),
+            (
+                "change_legibility",
+                "advance",
+                "memo-shaped recall makes the session easier to narrate without replaying raw history",
+            ),
+        ]
+    elif candidate_kind == "role":
+        templates = [
+            (
+                "boundary_integrity",
+                "hold",
+                "role-posture evidence exists, but owner boundaries should stay explicit until reviewed closeout",
+            ),
+            (
+                "deep_readiness",
+                "advance",
+                "owner-role evidence may reflect deeper readiness once it is reviewed in context",
+            ),
+        ]
+    elif candidate_kind == "risk":
+        templates = [
+            (
+                "boundary_integrity",
+                "reanchor",
+                "risk-gated checkpoint evidence says progression must stay bounded and reviewed",
+            ),
+            (
+                "proof_discipline",
+                "hold",
+                "risk-shaped evidence should hold until the reviewed route confirms the same concern",
+            ),
+        ]
+    else:
+        templates = [
+            (
+                "change_legibility",
+                "hold",
+                "checkpoint evidence exists, but the progression claim should stay provisional until reviewed closeout",
+            )
+        ]
+
+    signals: list[ProgressionAxisSignal] = []
+    for axis, movement, why in templates:
+        adjusted = _adjust_progression_movement(movement=movement, blocked_by=blocked_by)
+        signals.append(
+            ProgressionAxisSignal(
+                axis=cast(
+                    Literal[
+                        "boundary_integrity",
+                        "execution_reliability",
+                        "change_legibility",
+                        "review_sharpness",
+                        "proof_discipline",
+                        "provenance_hygiene",
+                        "deep_readiness",
+                    ],
+                    axis,
+                ),
+                movement=cast(Literal["advance", "hold", "reanchor", "downgrade"], adjusted),
+                why=why,
+                evidence_refs=list(evidence_refs),
+                candidate_ids=[candidate_id] if candidate_id is not None else [],
+            )
+        )
+    return signals
+
+
+def _adjust_progression_movement(
+    *,
+    movement: str,
+    blocked_by: list[str],
+) -> str:
+    if movement in {"reanchor", "downgrade"}:
+        return movement
+    if "owner-ambiguity" in blocked_by or "thin-evidence" in blocked_by or "requires-reviewed-route" in blocked_by:
+        return "hold"
+    return movement
+
+
+def _merge_progression_axis_signals(values: list[ProgressionAxisSignal]) -> list[ProgressionAxisSignal]:
+    merged: dict[str, ProgressionAxisSignal] = {}
+    order: list[str] = []
+    for value in values:
+        existing = merged.get(value.axis)
+        if existing is None:
+            merged[value.axis] = value.model_copy(
+                update={
+                    "evidence_refs": _dedupe_strings(value.evidence_refs),
+                    "candidate_ids": _dedupe_strings(value.candidate_ids),
+                }
+            )
+            order.append(value.axis)
+            continue
+        merged[value.axis] = existing.model_copy(
+            update={
+                "movement": _more_cautious_progression_movement(existing.movement, value.movement),
+                "why": existing.why if existing.why == value.why else existing.why,
+                "evidence_refs": _dedupe_strings([*existing.evidence_refs, *value.evidence_refs]),
+                "candidate_ids": _dedupe_strings([*existing.candidate_ids, *value.candidate_ids]),
+            }
+        )
+    return [merged[axis] for axis in order]
+
+
+def _aggregate_progression_axis_signals(
+    candidate_clusters: list[SessionCheckpointCluster],
+) -> list[ProgressionAxisSignal]:
+    axis_payloads: dict[str, ProgressionAxisSignal] = {}
+    order: list[str] = []
+    for cluster in candidate_clusters:
+        cluster_signals = (
+            list(cluster.progression_axis_signals)
+            if cluster.progression_axis_signals
+            else _legacy_progression_axis_signals_for_cluster(cluster)
+        )
+        for signal in cluster_signals:
+            existing = axis_payloads.get(signal.axis)
+            if existing is None:
+                axis_payloads[signal.axis] = signal.model_copy(
+                    update={
+                        "candidate_ids": _dedupe_strings([cluster.candidate_id, *signal.candidate_ids]),
+                        "evidence_refs": _dedupe_strings(signal.evidence_refs),
+                    }
+                )
+                order.append(signal.axis)
+                continue
+            combined_candidate_ids = _dedupe_strings(
+                [*existing.candidate_ids, cluster.candidate_id, *signal.candidate_ids]
+            )
+            axis_payloads[signal.axis] = existing.model_copy(
+                update={
+                    "movement": _more_cautious_progression_movement(existing.movement, signal.movement),
+                    "why": (
+                        "multiple checkpoint candidates touched this axis during the session; progression-lift should review the combined evidence at closeout"
+                        if set(combined_candidate_ids) != set(existing.candidate_ids)
+                        else existing.why
+                    ),
+                    "candidate_ids": combined_candidate_ids,
+                    "evidence_refs": _dedupe_strings([*existing.evidence_refs, *signal.evidence_refs]),
+                }
+            )
+    return [axis_payloads[axis] for axis in order]
+
+
+def _more_cautious_progression_movement(left: str, right: str) -> str:
+    rank = {"advance": 1, "hold": 2, "reanchor": 3, "downgrade": 4}
+    return left if rank[left] >= rank[right] else right
+
+
 def _derive_session_end_recommendation(
     *,
     harvest_candidate_ids: list[str],
+    progression_candidate_ids: list[str],
     upgrade_candidate_ids: list[str],
-) -> Literal["hold", "harvest", "upgrade", "harvest_and_upgrade"]:
+) -> Literal[
+    "hold",
+    "harvest",
+    "progression",
+    "upgrade",
+    "harvest_and_progression",
+    "progression_and_upgrade",
+    "harvest_and_upgrade",
+    "harvest_progression_and_upgrade",
+]:
+    if harvest_candidate_ids and progression_candidate_ids and upgrade_candidate_ids:
+        return "harvest_progression_and_upgrade"
+    if harvest_candidate_ids and progression_candidate_ids:
+        return "harvest_and_progression"
+    if progression_candidate_ids and upgrade_candidate_ids:
+        return "progression_and_upgrade"
     if harvest_candidate_ids and upgrade_candidate_ids:
         return "harvest_and_upgrade"
+    if progression_candidate_ids:
+        return "progression"
     if upgrade_candidate_ids:
         return "upgrade"
     if harvest_candidate_ids:
         return "harvest"
     return "hold"
+
+
+def _derive_session_end_skill_targets(note: SessionCheckpointNote | None) -> list[SessionEndSkillTarget]:
+    if note is None:
+        return []
+
+    targets: list[SessionEndSkillTarget] = []
+    if note.harvest_candidate_ids:
+        targets.append(
+            SessionEndSkillTarget(
+                skill_name="aoa-session-donor-harvest",
+                why="reviewed closeout should bundle checkpoint-led harvest candidates into one honest harvest handoff before any stats movement",
+                candidate_ids=list(note.harvest_candidate_ids),
+            )
+        )
+    if note.progression_candidate_ids:
+        targets.append(
+            SessionEndSkillTarget(
+                skill_name="aoa-session-progression-lift",
+                why="reviewed closeout should turn provisional checkpoint axis movement into one explicit multi-axis progression delta before any final quest verdict",
+                candidate_ids=list(note.progression_candidate_ids),
+            )
+        )
+    if note.upgrade_candidate_ids:
+        targets.append(
+            SessionEndSkillTarget(
+                skill_name="aoa-quest-harvest",
+                why="reviewed closeout should evaluate checkpoint-led upgrade candidates only after progression lift has gathered the final multi-axis verdict",
+                candidate_ids=list(note.upgrade_candidate_ids),
+            )
+        )
+    return targets
+
+
+def _derive_session_end_next_honest_move(
+    *,
+    note: SessionCheckpointNote | None,
+    session_end_targets: list[SessionEndSkillTarget],
+) -> str | None:
+    if note is None or not session_end_targets:
+        return None
+
+    skill_names = [target.skill_name for target in session_end_targets]
+    if note.stats_refresh_recommended:
+        return (
+            "At reviewed closeout, raise "
+            + ", ".join(skill_names)
+            + " and refresh stats only after the reviewed handoff is assembled."
+        )
+    return "At reviewed closeout, raise " + ", ".join(skill_names) + "."
 
 
 def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label: str) -> str:
@@ -602,6 +986,21 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
     if note.harvest_candidate_ids:
         lines.extend(["", "## Harvest Candidates", ""])
         lines.extend(f"- `{candidate_id}`" for candidate_id in note.harvest_candidate_ids)
+    if note.progression_candidate_ids:
+        lines.extend(["", "## Progression Candidates", ""])
+        lines.extend(f"- `{candidate_id}`" for candidate_id in note.progression_candidate_ids)
+    if note.progression_axis_signals:
+        lines.extend(["", "## Provisional Progression Axes", ""])
+        for signal in note.progression_axis_signals:
+            lines.append(
+                f"- `{signal.axis}` -> `{signal.movement}`"
+                + (
+                    f" from {', '.join(f'`{candidate_id}`' for candidate_id in signal.candidate_ids)}"
+                    if signal.candidate_ids
+                    else ""
+                )
+            )
+            lines.append(f"  - {signal.why}")
     if note.upgrade_candidate_ids:
         lines.extend(["", "## Upgrade Candidates", ""])
         lines.extend(f"- `{candidate_id}`" for candidate_id in note.upgrade_candidate_ids)
@@ -623,6 +1022,12 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
                 f"- session-end targets: {', '.join(f'`{target}`' for target in cluster.session_end_targets) or '`none`'}",
             ]
         )
+        if cluster.progression_axis_signals:
+            lines.append("- provisional progression axes:")
+            lines.extend(
+                f"  - `{signal.axis}` -> `{signal.movement}`: {signal.why}"
+                for signal in cluster.progression_axis_signals
+            )
         if cluster.blocked_by:
             lines.append("- blocked by: " + ", ".join(f"`{item}`" for item in cluster.blocked_by))
         if cluster.defer_reason:
@@ -692,7 +1097,9 @@ def _write_harvest_handoff(*, paths: _CheckpointPaths, note: SessionCheckpointNo
         "source_note_ref": str(paths.note_json),
         "candidate_clusters": [cluster.model_dump(mode="json") for cluster in note.candidate_clusters],
         "harvest_candidate_ids": note.harvest_candidate_ids,
+        "progression_candidate_ids": note.progression_candidate_ids,
         "upgrade_candidate_ids": note.upgrade_candidate_ids,
+        "progression_axis_signals": [signal.model_dump(mode="json") for signal in note.progression_axis_signals],
         "stats_refresh_recommended": note.stats_refresh_recommended,
         "session_end_recommendation": note.session_end_recommendation,
         "next_owner_moves": note.next_owner_moves,

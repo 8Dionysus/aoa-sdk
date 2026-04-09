@@ -207,6 +207,22 @@ def _print_surface_handoff(report: SurfaceCloseoutHandoff) -> None:
     else:
         for cluster in report.checkpoint_harvest_candidates:
             typer.echo(f"  - {cluster.display_name} [{cluster.candidate_id}]")
+    typer.echo("checkpoint_progression_candidates:")
+    if not report.checkpoint_progression_candidates:
+        typer.echo("  - none")
+    else:
+        for cluster in report.checkpoint_progression_candidates:
+            typer.echo(f"  - {cluster.display_name} [{cluster.candidate_id}]")
+    typer.echo("checkpoint_progression_axes:")
+    if not report.checkpoint_progression_axes:
+        typer.echo("  - none")
+    else:
+        for signal in report.checkpoint_progression_axes:
+            typer.echo(f"  - {signal.axis} -> {signal.movement}")
+            typer.echo(
+                "    candidate_ids: "
+                f"{', '.join(signal.candidate_ids) if signal.candidate_ids else 'none'}"
+            )
     typer.echo("checkpoint_upgrade_candidates:")
     if not report.checkpoint_upgrade_candidates:
         typer.echo("  - none")
@@ -236,9 +252,24 @@ def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
         f"{', '.join(note.harvest_candidate_ids) if note.harvest_candidate_ids else 'none'}"
     )
     typer.echo(
+        "progression_candidate_ids: "
+        f"{', '.join(note.progression_candidate_ids) if note.progression_candidate_ids else 'none'}"
+    )
+    typer.echo(
         "upgrade_candidate_ids: "
         f"{', '.join(note.upgrade_candidate_ids) if note.upgrade_candidate_ids else 'none'}"
     )
+    typer.echo("progression_axis_signals:")
+    if not note.progression_axis_signals:
+        typer.echo("  - none")
+    else:
+        for signal in note.progression_axis_signals:
+            typer.echo(f"  - {signal.axis} -> {signal.movement}")
+            typer.echo(f"    why: {signal.why}")
+            typer.echo(
+                "    candidate_ids: "
+                f"{', '.join(signal.candidate_ids) if signal.candidate_ids else 'none'}"
+            )
     typer.echo(f"stats_refresh_recommended: {'yes' if note.stats_refresh_recommended else 'no'}")
     typer.echo(f"repo_scope: {', '.join(note.repo_scope) if note.repo_scope else 'none'}")
     typer.echo(f"blocked_by: {', '.join(note.blocked_by) if note.blocked_by else 'none'}")
@@ -266,13 +297,36 @@ def _print_checkpoint_capture(result: CheckpointCaptureResult | None) -> None:
         typer.echo(
             f"checkpoint_capture: appended ({result.mode}, kind={result.checkpoint_kind}, reason={result.reason})"
         )
-        return
-    if not result.attempted:
+    elif not result.attempted:
         typer.echo("checkpoint_capture: disabled")
-        return
-    typer.echo(
-        f"checkpoint_capture: skipped ({result.mode}, kind={result.checkpoint_kind or 'none'}, reason={result.reason})"
-    )
+    else:
+        typer.echo(
+            f"checkpoint_capture: skipped ({result.mode}, kind={result.checkpoint_kind or 'none'}, reason={result.reason})"
+        )
+    if result.note_ref:
+        typer.echo(f"checkpoint_note_ref: {result.note_ref}")
+    if result.progression_axis_signals:
+        typer.echo("progression_axis_signals:")
+        for signal in result.progression_axis_signals:
+            typer.echo(f"  - {signal.axis} -> {signal.movement}")
+            typer.echo(
+                "    candidate_ids: "
+                f"{', '.join(signal.candidate_ids) if signal.candidate_ids else 'none'}"
+            )
+    if result.session_end_skill_targets:
+        typer.echo("session_end_skill_targets:")
+        for target in result.session_end_skill_targets:
+            typer.echo(f"  - {target.skill_name} [{target.phase}]")
+            typer.echo(f"    why: {target.why}")
+            typer.echo(
+                "    candidate_ids: "
+                f"{', '.join(target.candidate_ids) if target.candidate_ids else 'none'}"
+            )
+    else:
+        typer.echo("session_end_skill_targets: none")
+    typer.echo(f"stats_refresh_recommended: {'yes' if result.stats_refresh_recommended else 'no'}")
+    if result.session_end_next_honest_move:
+        typer.echo(f"session_end_next_honest_move: {result.session_end_next_honest_move}")
 
 
 def _print_checkpoint_promotion(promotion: SessionCheckpointPromotion) -> None:

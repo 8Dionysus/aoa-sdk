@@ -46,11 +46,17 @@ def test_checkpoint_status_becomes_reviewable_after_repeat(workspace_root: Path)
     route_cluster = next(cluster for cluster in second.candidate_clusters if cluster.candidate_kind == "route")
     assert route_cluster.checkpoint_hits == 2
     assert route_cluster.review_status == "reviewable"
-    assert route_cluster.session_end_targets == ["harvest", "upgrade"]
+    assert route_cluster.session_end_targets == ["harvest", "progression", "upgrade"]
+    assert {signal.axis for signal in route_cluster.progression_axis_signals} == {
+        "change_legibility",
+        "deep_readiness",
+    }
     assert second.carry_until_session_closeout is True
-    assert second.session_end_recommendation == "harvest_and_upgrade"
+    assert second.session_end_recommendation == "harvest_progression_and_upgrade"
     assert second.harvest_candidate_ids
+    assert second.progression_candidate_ids
     assert second.upgrade_candidate_ids
+    assert second.progression_axis_signals
     assert second.stats_refresh_recommended is True
 
 
@@ -126,10 +132,58 @@ def test_capture_from_skill_phase_auto_appends_for_explicit_commit_intent(worksp
     assert capture.checkpoint_kind == "commit"
     assert capture.note is not None
     growth_cluster = next(cluster for cluster in capture.note.candidate_clusters if cluster.candidate_kind == "growth")
-    assert growth_cluster.session_end_targets == ["harvest"]
+    assert growth_cluster.session_end_targets == ["harvest", "progression"]
+    assert {signal.axis for signal in growth_cluster.progression_axis_signals} == {
+        "execution_reliability",
+        "change_legibility",
+    }
     assert capture.note.harvest_candidate_ids == [growth_cluster.candidate_id]
+    assert capture.note.progression_candidate_ids == [growth_cluster.candidate_id]
     assert capture.note.upgrade_candidate_ids == []
+    assert [target.skill_name for target in capture.session_end_skill_targets] == [
+        "aoa-session-donor-harvest",
+        "aoa-session-progression-lift",
+    ]
+    assert capture.progression_axis_signals
+    assert capture.stats_refresh_recommended is True
+    assert capture.session_end_next_honest_move is not None
     assert (note_dir / "checkpoint-note.json").exists()
+
+
+def test_capture_from_skill_phase_reports_existing_session_end_targets_when_skip_has_live_note(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+
+    capture = sdk.checkpoints.capture_from_skill_phase(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="pre-mutation",
+        intent_text="refresh generated contracts",
+        mutation_surface="code",
+    )
+
+    assert capture.appended is False
+    assert capture.reason == "no_checkpoint_signal"
+    assert capture.note is not None
+    assert capture.note_ref is not None
+    assert [target.skill_name for target in capture.session_end_skill_targets] == [
+        "aoa-session-donor-harvest",
+        "aoa-session-progression-lift",
+        "aoa-quest-harvest",
+    ]
+    assert capture.progression_axis_signals
+    assert capture.stats_refresh_recommended is True
+    assert capture.session_end_next_honest_move is not None
 
 
 def test_checkpoint_promote_writes_dionysus_snapshot_and_updates_note(workspace_root: Path) -> None:
@@ -218,7 +272,10 @@ def test_surface_closeout_handoff_links_checkpoint_note(workspace_root: Path) ->
     assert handoff.checkpoint_note_ref is not None
     assert handoff.surviving_checkpoint_clusters
     assert handoff.checkpoint_harvest_candidates
+    assert handoff.checkpoint_progression_candidates
     assert handoff.checkpoint_upgrade_candidates
+    assert handoff.checkpoint_progression_axes
     assert handoff.stats_refresh_recommended is True
     assert any(target.skill_name == "aoa-session-donor-harvest" for target in handoff.handoff_targets)
+    assert any(target.skill_name == "aoa-session-progression-lift" for target in handoff.handoff_targets)
     assert any(target.skill_name == "aoa-quest-harvest" for target in handoff.handoff_targets)

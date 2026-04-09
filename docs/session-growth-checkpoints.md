@@ -16,7 +16,8 @@ existing session-harvest family into an automatic runtime authority.
 - checkpoint capture does not emit `CORE_SKILL_APPLICATION_RECEIPT`
 - promotion remains explicit through `aoa checkpoint promote`
 - full harvest still belongs to the existing reviewed closeout path
-- checkpoint notes carry harvest and upgrade candidates through the end of the session
+- checkpoint notes carry harvest, progression, and upgrade candidates through the end of the session
+- checkpoint notes keep provisional multi-axis movement for `boundary_integrity`, `execution_reliability`, `change_legibility`, `review_sharpness`, `proof_discipline`, `provenance_hygiene`, and `deep_readiness`
 - candidate movement and stats refresh stay end-of-session decisions, not mid-session auto-promotion
 
 ## Local storage
@@ -36,8 +37,15 @@ The JSON and Markdown files are rebuilt snapshots for current review.
 Those rebuilt snapshots now act as the session-local ledger for:
 
 - harvest candidates that should be bundled at reviewed closeout
+- progression candidates and provisional axis movement that should feed `aoa-session-progression-lift` only at reviewed closeout
 - upgrade candidates that should be reviewed once at closeout before any owner-layer promotion
 - the final stats-refresh hint that belongs to the same reviewed closeout moment
+
+`aoa skills enter` and `aoa skills guard` also surface that ledger directly in
+their runtime JSON under `checkpoint_capture.session_end_skill_targets`,
+`checkpoint_capture.progression_axis_signals`,
+`checkpoint_capture.session_end_next_honest_move`, and
+`checkpoint_capture.stats_refresh_recommended`.
 
 ## Commands
 
@@ -66,3 +74,7 @@ Checkpoint notes stay below harvest verdict authority. They exist to preserve
 good mid-session candidates until reviewed promotion is honest.
 They should be carried through the session and only moved, harvested, or paired
 with stats refresh from the final reviewed closeout path.
+When progression evidence exists, reviewed closeout should raise
+`aoa-session-progression-lift` before `aoa-quest-harvest`, so the final
+multi-axis verdict is gathered once from the carried checkpoint evidence instead
+of being guessed mid-session.
