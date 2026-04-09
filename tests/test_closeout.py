@@ -855,6 +855,212 @@ def test_closeout_api_run_returns_shift_to_owner_layer_brief_for_quest_promotion
     assert handoff.unit_name == "owner-first capability landing campaign"
 
 
+def test_closeout_api_run_surfaces_workflow_follow_through_for_reanchor_progression(
+    workspace_root: Path,
+) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    receipts_dir = fixture["skill_receipt_path"].parent
+    manifest_dir = fixture["manifest_path"].parent
+    notes_dir = manifest_dir / "notes"
+
+    triage_path = notes_dir / "QUEST_PROMOTION_TRIAGE.reanchor.json"
+    triage_path.write_text(
+        json.dumps({"quest_unit_name": "route still needs a bounded follow-through quest"}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    progression_packet_path = notes_dir / "PROGRESSION_DELTA.reanchor.json"
+    progression_packet_path.write_text(
+        json.dumps(
+            {
+                "verdict": "reanchor",
+                "axis_deltas": {"boundary_integrity": -1, "execution_reliability": 1},
+                "cautions": ["boundary drift still needs reread before the next mutation-heavy loop"],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    progression_receipt = {
+        "event_kind": "progression_delta_receipt",
+        "event_id": "event-progression-reanchor-001",
+        "observed_at": "2026-04-06T19:00:00Z",
+        "run_ref": "run-progression-reanchor-001",
+        "session_ref": "session:test-closeout-reanchor-workflow",
+        "actor_ref": "aoa-skills:aoa-session-progression-lift",
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-progression-lift"},
+        "evidence_refs": [{"kind": "progression_packet", "ref": str(progression_packet_path)}],
+        "payload": {
+            "verdict": "reanchor",
+            "axis_deltas": {"boundary_integrity": -1, "execution_reliability": 1},
+            "cautions": ["boundary drift still needs reread before the next mutation-heavy loop"],
+        },
+    }
+    quest_receipt = {
+        "event_kind": "quest_promotion_receipt",
+        "event_id": "event-quest-reanchor-001",
+        "observed_at": "2026-04-06T19:00:01Z",
+        "run_ref": "run-quest-reanchor-001",
+        "session_ref": "session:test-closeout-reanchor-workflow",
+        "actor_ref": "aoa-skills:aoa-quest-harvest",
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
+        "evidence_refs": [{"kind": "quest_triage", "ref": str(triage_path)}],
+        "payload": {
+            "promotion_verdict": "keep_open_quest",
+            "owner_repo": "aoa-playbooks",
+            "next_surface": "quests/test-closeout-reanchor-workflow-followup/QUEST.md",
+            "nearest_wrong_target": "promote_to_skill",
+            "bounded_unit_ref": "candidate:route:aoa-playbooks-playbook-registry-min",
+        },
+    }
+    quest_core_receipt = {
+        "event_kind": "core_skill_application_receipt",
+        "event_id": "event-core-quest-reanchor-001",
+        "observed_at": "2026-04-06T19:00:02Z",
+        "run_ref": "run-quest-reanchor-001",
+        "session_ref": "session:test-closeout-reanchor-workflow",
+        "actor_ref": "aoa-skills:aoa-quest-harvest",
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
+        "evidence_refs": ["tmp/QUEST_PROMOTION_RECEIPT.json"],
+        "payload": {
+            "kernel_id": "project-core-session-growth-v1",
+            "skill_name": "aoa-quest-harvest",
+            "application_stage": "finish",
+            "detail_event_kind": "quest_promotion_receipt",
+            "detail_receipt_ref": "tmp/QUEST_PROMOTION_RECEIPT.json",
+        },
+    }
+    progression_receipt_path = receipts_dir / "progression-reanchor.json"
+    quest_receipt_path = receipts_dir / "quest-reanchor.json"
+    quest_core_receipt_path = receipts_dir / "quest-reanchor-core.json"
+    progression_receipt_path.write_text(json.dumps(progression_receipt, indent=2) + "\n", encoding="utf-8")
+    quest_receipt_path.write_text(json.dumps(quest_receipt, indent=2) + "\n", encoding="utf-8")
+    quest_core_receipt_path.write_text(json.dumps(quest_core_receipt, indent=2) + "\n", encoding="utf-8")
+
+    manifest_path = manifest_dir / "closeout-test-reanchor-workflow.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "closeout_id": "closeout-test-reanchor-workflow",
+                "session_ref": "session:test-closeout-reanchor-workflow",
+                "reviewed": True,
+                "trigger": "reviewed-closeout",
+                "batches": [
+                    {
+                        "publisher": "aoa-skills.session-harvest-family",
+                        "input_paths": [
+                            str(progression_receipt_path),
+                            str(quest_receipt_path),
+                        ],
+                    },
+                    {
+                        "publisher": "aoa-skills.core-kernel-applications",
+                        "input_paths": [str(quest_core_receipt_path)],
+                    },
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    report = sdk.closeout.run(manifest_path)
+
+    assert any(
+        brief.skill_name == "aoa-session-self-diagnose"
+        for brief in report.workflow_follow_through_briefs
+    )
+    diagnose_brief = next(
+        brief
+        for brief in report.workflow_follow_through_briefs
+        if brief.skill_name == "aoa-session-self-diagnose"
+    )
+    assert "reanchor" in diagnose_brief.reason
+    assert report.owner_handoff_path is not None
+    handoff_payload = json.loads(Path(report.owner_handoff_path).read_text(encoding="utf-8"))
+    assert any(
+        item["skill_name"] == "aoa-session-self-diagnose"
+        for item in handoff_payload["workflow_items"]
+    )
+
+
+def test_closeout_api_run_surfaces_self_repair_when_diagnosis_exists_without_repair(
+    workspace_root: Path,
+) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    receipts_dir = fixture["skill_receipt_path"].parent
+    manifest_dir = fixture["manifest_path"].parent
+    notes_dir = manifest_dir / "notes"
+
+    diagnosis_packet_path = notes_dir / "DIAGNOSIS_PACKET.json"
+    diagnosis_packet_path.write_text(
+        json.dumps({"diagnosis_types": ["boundary-drift", "workflow-gap"]}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    diagnosis_receipt = {
+        "event_kind": "skill_run_receipt",
+        "event_id": "event-diagnosis-001",
+        "observed_at": "2026-04-06T19:10:00Z",
+        "run_ref": "run-diagnosis-001",
+        "session_ref": "session:test-closeout-diagnosis-gap",
+        "actor_ref": "aoa-skills:aoa-session-self-diagnose",
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-self-diagnose"},
+        "evidence_refs": [{"kind": "diagnosis_packet", "ref": str(diagnosis_packet_path)}],
+        "payload": {"diagnosis_types": ["boundary-drift", "workflow-gap"]},
+    }
+    diagnosis_receipt_path = receipts_dir / "diagnosis-gap.json"
+    diagnosis_receipt_path.write_text(
+        json.dumps(diagnosis_receipt, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    manifest_path = manifest_dir / "closeout-test-diagnosis-gap.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "closeout_id": "closeout-test-diagnosis-gap",
+                "session_ref": "session:test-closeout-diagnosis-gap",
+                "reviewed": True,
+                "trigger": "reviewed-closeout",
+                "batches": [
+                    {
+                        "publisher": "aoa-skills.session-harvest-family",
+                        "input_paths": [str(diagnosis_receipt_path)],
+                    }
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    report = sdk.closeout.run(manifest_path)
+
+    assert any(
+        brief.skill_name == "aoa-session-self-repair"
+        for brief in report.workflow_follow_through_briefs
+    )
+    repair_brief = next(
+        brief
+        for brief in report.workflow_follow_through_briefs
+        if brief.skill_name == "aoa-session-self-repair"
+    )
+    assert "no repair_cycle_receipt landed yet" in repair_brief.reason
+    assert report.owner_handoff_path is not None
+    handoff_payload = json.loads(Path(report.owner_handoff_path).read_text(encoding="utf-8"))
+    assert any(
+        item["skill_name"] == "aoa-session-self-repair"
+        for item in handoff_payload["workflow_items"]
+    )
+
+
 def test_closeout_api_run_builds_owner_follow_through_from_harvest_packet(
     workspace_root: Path,
 ) -> None:

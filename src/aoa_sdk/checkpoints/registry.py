@@ -57,7 +57,7 @@ ALLOWED_OWNER_REPOS = {
 }
 DEFAULT_OWNER_BY_CANDIDATE_KIND = {
     "route": "aoa-playbooks",
-    "pattern": "aoa-skills",
+    "pattern": "aoa-techniques",
     "proof": "aoa-evals",
     "recall": "aoa-memo",
     "role": "aoa-agents",

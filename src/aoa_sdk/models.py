@@ -1468,6 +1468,15 @@ class OwnerFollowThroughBrief(BaseModel):
     evidence_refs: list[str] = Field(default_factory=list)
 
 
+class WorkflowFollowThroughBrief(BaseModel):
+    source_kind: Literal["kernel-next-step", "progression-caution", "diagnosis-gap"]
+    skill_name: str
+    suggested_action: Literal["invoke-core-skill"]
+    phase: Literal["post-closeout"] = "post-closeout"
+    reason: str
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
 class CloseoutOwnerHandoff(BaseModel):
     schema_version: int
     closeout_id: str
@@ -1475,6 +1484,7 @@ class CloseoutOwnerHandoff(BaseModel):
     manifest_path: str
     generated_at: datetime
     items: list[OwnerFollowThroughBrief] = Field(default_factory=list)
+    workflow_items: list[WorkflowFollowThroughBrief] = Field(default_factory=list)
 
 
 class CloseoutPublisherBatch(BaseModel):
@@ -1580,6 +1590,7 @@ class CloseoutRunReport(BaseModel):
     kernel_next_step_brief: KernelNextStepBrief | None = None
     owner_handoff_path: str | None = None
     owner_follow_through_briefs: list[OwnerFollowThroughBrief] = Field(default_factory=list)
+    workflow_follow_through_briefs: list[WorkflowFollowThroughBrief] = Field(default_factory=list)
 
 
 class CloseoutInboxItemResult(BaseModel):
@@ -1593,6 +1604,7 @@ class CloseoutInboxItemResult(BaseModel):
     kernel_next_step_brief: KernelNextStepBrief | None = None
     owner_handoff_path: str | None = None
     owner_follow_through_briefs: list[OwnerFollowThroughBrief] = Field(default_factory=list)
+    workflow_follow_through_briefs: list[WorkflowFollowThroughBrief] = Field(default_factory=list)
 
 
 class CloseoutInboxReport(BaseModel):
