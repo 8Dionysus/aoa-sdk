@@ -1201,6 +1201,7 @@ class CheckpointCandidateCluster(BaseModel):
     source_surface_ref: str
     evidence_refs: list[str] = Field(default_factory=list)
     confidence: Literal["low", "medium", "high"] = "medium"
+    session_end_targets: list[Literal["harvest", "upgrade"]] = Field(default_factory=list)
     promote_if: list[str] = Field(default_factory=list)
     defer_reason: str | None = None
     blocked_by: list[str] = Field(default_factory=list)
@@ -1236,6 +1237,7 @@ class SessionCheckpointCluster(BaseModel):
     evidence_refs: list[str] = Field(default_factory=list)
     confidence: Literal["low", "medium", "high"] = "medium"
     review_status: Literal["collecting", "reviewable", "promoted", "closed"] = "collecting"
+    session_end_targets: list[Literal["harvest", "upgrade"]] = Field(default_factory=list)
     promote_if: list[str] = Field(default_factory=list)
     defer_reason: str | None = None
     blocked_by: list[str] = Field(default_factory=list)
@@ -1251,6 +1253,11 @@ class SessionCheckpointNote(BaseModel):
     checkpoint_history: list[SessionCheckpointHistoryEntry] = Field(default_factory=list)
     candidate_clusters: list[SessionCheckpointCluster] = Field(default_factory=list)
     promotion_recommendation: Literal["none", "local_note", "dionysus_note", "harvest_handoff"] = "none"
+    carry_until_session_closeout: bool = True
+    session_end_recommendation: Literal["hold", "harvest", "upgrade", "harvest_and_upgrade"] = "hold"
+    harvest_candidate_ids: list[str] = Field(default_factory=list)
+    upgrade_candidate_ids: list[str] = Field(default_factory=list)
+    stats_refresh_recommended: bool = False
     blocked_by: list[str] = Field(default_factory=list)
     review_status: Literal["unreviewed", "reviewed"] = "unreviewed"
     evidence_refs: list[str] = Field(default_factory=list)
@@ -1307,6 +1314,9 @@ class SurfaceCloseoutHandoff(BaseModel):
     checkpoint_note_ref: str | None = None
     surviving_items: list[SurfaceOpportunityItem] = Field(default_factory=list)
     surviving_checkpoint_clusters: list[SessionCheckpointCluster] = Field(default_factory=list)
+    checkpoint_harvest_candidates: list[SessionCheckpointCluster] = Field(default_factory=list)
+    checkpoint_upgrade_candidates: list[SessionCheckpointCluster] = Field(default_factory=list)
+    stats_refresh_recommended: bool = False
     handoff_targets: list[SurfaceCloseoutHandoffTarget] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
 

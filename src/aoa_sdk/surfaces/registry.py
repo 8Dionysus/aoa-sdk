@@ -167,6 +167,12 @@ class SurfacesAPI:
         surviving_items = [item for item in report.items if item.state != "activated"]
         checkpoint_note = _load_current_checkpoint_note(self.workspace, report.repo_root)
         surviving_checkpoint_clusters = checkpoint_note.candidate_clusters if checkpoint_note is not None else []
+        checkpoint_harvest_candidates = [
+            cluster for cluster in surviving_checkpoint_clusters if "harvest" in cluster.session_end_targets
+        ]
+        checkpoint_upgrade_candidates = [
+            cluster for cluster in surviving_checkpoint_clusters if "upgrade" in cluster.session_end_targets
+        ]
         return SurfaceCloseoutHandoff(
             session_ref=session_ref,
             reviewed=reviewed,
@@ -174,14 +180,24 @@ class SurfacesAPI:
             checkpoint_note_ref=_checkpoint_note_ref(self.workspace, report.repo_root, checkpoint_note),
             surviving_items=surviving_items,
             surviving_checkpoint_clusters=surviving_checkpoint_clusters,
+            checkpoint_harvest_candidates=checkpoint_harvest_candidates,
+            checkpoint_upgrade_candidates=checkpoint_upgrade_candidates,
+            stats_refresh_recommended=checkpoint_note.stats_refresh_recommended if checkpoint_note is not None else False,
             handoff_targets=_derive_closeout_handoff_targets(
                 surviving_items=surviving_items,
                 surviving_checkpoint_clusters=surviving_checkpoint_clusters,
+                checkpoint_harvest_candidates=checkpoint_harvest_candidates,
+                checkpoint_upgrade_candidates=checkpoint_upgrade_candidates,
                 actionability_gaps=report.actionability_gaps,
             ),
             notes=[
                 "use the session-growth kernel only after reviewed run, closure, or pause",
                 "do not let donor-harvest or automation scan become hidden live routing authority",
+                *(
+                    ["checkpoint candidates stayed local until reviewed closeout; move candidates and stats only from the final handoff"]
+                    if checkpoint_note is not None and checkpoint_note.carry_until_session_closeout
+                    else []
+                ),
                 *(
                     ["preserve the checkpoint note as reviewed pre-harvest context instead of replaying raw append history"]
                     if checkpoint_note is not None
@@ -484,6 +500,7 @@ def _derive_explicit_mutation_growth_clusters(
     ]
     next_owner_moves = [
         "append the explicit mutation seam into the local checkpoint note",
+        "carry the explicit mutation seam through reviewed session closeout before moving candidates or stats",
         (
             "review the same bounded mutation again after verify-green before promoting it"
             if checkpoint_kind == "commit"
@@ -500,6 +517,7 @@ def _derive_explicit_mutation_growth_clusters(
             source_surface_ref=f"aoa-sdk:checkpoint_auto_capture.{checkpoint_kind}",
             evidence_refs=evidence_refs,
             confidence="high" if checkpoint_kind == "verify_green" else "medium",
+            session_end_targets=["harvest"],
             promote_if=promote_if,
             defer_reason=defer_reason,
             blocked_by=blocked_by,
@@ -598,6 +616,8 @@ def _derive_closeout_handoff_targets(
     *,
     surviving_items: list[SurfaceOpportunityItem],
     surviving_checkpoint_clusters: list[SessionCheckpointCluster],
+    checkpoint_harvest_candidates: list[SessionCheckpointCluster],
+    checkpoint_upgrade_candidates: list[SessionCheckpointCluster],
     actionability_gaps: list[str],
 ) -> list[SurfaceCloseoutHandoffTarget]:
     targets: list[SurfaceCloseoutHandoffTarget] = []
@@ -643,6 +663,14 @@ def _derive_closeout_handoff_targets(
                 skill_name="aoa-quest-harvest",
                 why="playbook-versus-technique promotion questions should stay reviewed closeout decisions rather than live-session guesses",
                 triggered_by=[item.surface_ref for item in promotion_items],
+            )
+        )
+    elif checkpoint_upgrade_candidates:
+        targets.append(
+            SurfaceCloseoutHandoffTarget(
+                skill_name="aoa-quest-harvest",
+                why="checkpoint-marked upgrade candidates should be reviewed once at closeout instead of getting promoted during the session",
+                triggered_by=[f"checkpoint-upgrade:{cluster.candidate_id}" for cluster in checkpoint_upgrade_candidates],
             )
         )
     return targets
@@ -1014,6 +1042,7 @@ def _derive_checkpoint_candidate_clusters(
         next_owner_moves = _dedupe_strings(
             [
                 "append the candidate into the local checkpoint note",
+                "carry the candidate through reviewed session closeout before moving candidates or stats",
                 *(
                     ["promote the reviewed note into Dionysus when the evidence stays stable"]
                     if "owner-ambiguity" not in blocked_by
@@ -1030,6 +1059,7 @@ def _derive_checkpoint_candidate_clusters(
                 source_surface_ref=item.surface_ref,
                 evidence_refs=evidence_refs,
                 confidence=item.confidence,
+                session_end_targets=_session_end_targets_for_candidate_kind(candidate_kind),
                 promote_if=promote_if,
                 defer_reason=defer_reason,
                 blocked_by=blocked_by,
@@ -1053,6 +1083,13 @@ def _candidate_kind_for_item(item: SurfaceOpportunityItem) -> str:
     if item.object_kind == "skill":
         return "risk"
     return item.object_kind
+
+
+def _session_end_targets_for_candidate_kind(candidate_kind: str) -> list[Literal["harvest", "upgrade"]]:
+    targets: list[Literal["harvest", "upgrade"]] = ["harvest"]
+    if candidate_kind in {"route", "pattern", "proof", "recall", "role"}:
+        targets.append("upgrade")
+    return targets
 
 
 def _checkpoint_blocked_by(clusters: list[CheckpointCandidateCluster]) -> list[str]:

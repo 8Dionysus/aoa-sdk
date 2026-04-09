@@ -125,6 +125,9 @@ surface detection finds a real growth signal.
 Explicit `commit` and `verify-green` intents on a real mutation surface also
 count as growth seams for that local note, even when recurring-route heuristics
 stay quiet.
+Treat that note as the session-local ledger for harvest and upgrade candidates
+until reviewed closeout; do not move candidates or stats mid-session just
+because the note became reviewable.
 Use `--no-auto-checkpoint` when you need the skill lane to stay read-only apart
 from its persisted report, and use `--checkpoint-kind` when one explicit
 checkpoint event matters.

@@ -16,6 +16,8 @@ existing session-harvest family into an automatic runtime authority.
 - checkpoint capture does not emit `CORE_SKILL_APPLICATION_RECEIPT`
 - promotion remains explicit through `aoa checkpoint promote`
 - full harvest still belongs to the existing reviewed closeout path
+- checkpoint notes carry harvest and upgrade candidates through the end of the session
+- candidate movement and stats refresh stay end-of-session decisions, not mid-session auto-promotion
 
 ## Local storage
 
@@ -31,6 +33,11 @@ aoa-sdk/.aoa/session-growth/current/<repo-label>/
 
 The JSONL file is append-only checkpoint history.
 The JSON and Markdown files are rebuilt snapshots for current review.
+Those rebuilt snapshots now act as the session-local ledger for:
+
+- harvest candidates that should be bundled at reviewed closeout
+- upgrade candidates that should be reviewed once at closeout before any owner-layer promotion
+- the final stats-refresh hint that belongs to the same reviewed closeout moment
 
 ## Commands
 
@@ -57,3 +64,5 @@ handoff that can feed the explicit session-harvest family later.
 
 Checkpoint notes stay below harvest verdict authority. They exist to preserve
 good mid-session candidates until reviewed promotion is honest.
+They should be carried through the session and only moved, harvested, or paired
+with stats refresh from the final reviewed closeout path.

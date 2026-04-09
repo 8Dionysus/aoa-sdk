@@ -397,10 +397,18 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             repo_scope.add(cluster.owner_hint)
             key = (cluster.candidate_id, cluster.owner_hint)
             existing = cluster_map.get(key)
+            cluster_session_end_targets = (
+                list(cluster.session_end_targets)
+                if cluster.session_end_targets
+                else _legacy_session_end_targets_for_candidate_kind(cluster.candidate_kind)
+            )
             merged_evidence = _dedupe_strings([*(existing.evidence_refs if existing else []), *cluster.evidence_refs])
             merged_moves = _dedupe_strings([*(existing.next_owner_moves if existing else []), *cluster.next_owner_moves])
             merged_promote_if = _dedupe_strings([*(existing.promote_if if existing else []), *cluster.promote_if])
             merged_blocked = _dedupe_strings([*(existing.blocked_by if existing else []), *cluster.blocked_by])
+            merged_session_end_targets = _dedupe_session_end_targets(
+                [*(existing.session_end_targets if existing else []), *cluster_session_end_targets]
+            )
             confidence = _max_confidence(existing.confidence if existing else None, cluster.confidence)
             checkpoint_hits = (existing.checkpoint_hits if existing else 0) + 1
             cluster_map[key] = SessionCheckpointCluster(
@@ -412,6 +420,7 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
                 checkpoint_hits=checkpoint_hits,
                 evidence_refs=merged_evidence,
                 confidence=confidence,
+                session_end_targets=merged_session_end_targets,
                 promote_if=merged_promote_if,
                 defer_reason=cluster.defer_reason or (existing.defer_reason if existing else None),
                 blocked_by=merged_blocked,
@@ -436,6 +445,13 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             all_blocked.add(checkpoint_cluster.defer_reason)
 
     candidate_clusters.sort(key=lambda item: (-item.checkpoint_hits, item.candidate_id, item.owner_hint))
+    harvest_candidate_ids = [
+        cluster.candidate_id for cluster in candidate_clusters if "harvest" in cluster.session_end_targets
+    ]
+    upgrade_candidate_ids = [
+        cluster.candidate_id for cluster in candidate_clusters if "upgrade" in cluster.session_end_targets
+    ]
+    stats_refresh_recommended = bool(candidate_clusters)
     recommendation = _derive_promotion_recommendation(
         candidate_clusters=candidate_clusters,
         has_owner_followthrough=has_owner_followthrough,
@@ -454,10 +470,37 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
         checkpoint_history=entries,
         candidate_clusters=candidate_clusters,
         promotion_recommendation=recommendation,
+        carry_until_session_closeout=state not in {"promoted", "closed"},
+        session_end_recommendation=_derive_session_end_recommendation(
+            harvest_candidate_ids=harvest_candidate_ids,
+            upgrade_candidate_ids=upgrade_candidate_ids,
+        ),
+        harvest_candidate_ids=harvest_candidate_ids,
+        upgrade_candidate_ids=upgrade_candidate_ids,
+        stats_refresh_recommended=stats_refresh_recommended,
         blocked_by=sorted(all_blocked),
         review_status="reviewed" if existing_review_status == "reviewed" else "unreviewed",
         evidence_refs=sorted(all_evidence),
-        next_owner_moves=sorted(next_owner_moves),
+        next_owner_moves=sorted(
+            {
+                *next_owner_moves,
+                *(
+                    {"carry the checkpoint note through the end of the session before moving candidates or stats"}
+                    if candidate_clusters
+                    else set()
+                ),
+                *(
+                    {"at reviewed closeout, bundle harvest candidates before refreshing stats"}
+                    if harvest_candidate_ids
+                    else set()
+                ),
+                *(
+                    {"at reviewed closeout, review upgrade candidates before any owner-layer promotion"}
+                    if upgrade_candidate_ids
+                    else set()
+                ),
+            }
+        ),
     )
     return note
 
@@ -506,6 +549,39 @@ def _max_confidence(left: str | None, right: str) -> Literal["low", "medium", "h
     return left if rank[left] >= rank[right] else right  # type: ignore[return-value]
 
 
+def _dedupe_session_end_targets(
+    values: list[Literal["harvest", "upgrade"]],
+) -> list[Literal["harvest", "upgrade"]]:
+    deduped: list[Literal["harvest", "upgrade"]] = []
+    for value in values:
+        if value not in deduped:
+            deduped.append(value)
+    return deduped
+
+
+def _legacy_session_end_targets_for_candidate_kind(
+    candidate_kind: str,
+) -> list[Literal["harvest", "upgrade"]]:
+    targets: list[Literal["harvest", "upgrade"]] = ["harvest"]
+    if candidate_kind in {"route", "pattern", "proof", "recall", "role"}:
+        targets.append("upgrade")
+    return targets
+
+
+def _derive_session_end_recommendation(
+    *,
+    harvest_candidate_ids: list[str],
+    upgrade_candidate_ids: list[str],
+) -> Literal["hold", "harvest", "upgrade", "harvest_and_upgrade"]:
+    if harvest_candidate_ids and upgrade_candidate_ids:
+        return "harvest_and_upgrade"
+    if upgrade_candidate_ids:
+        return "upgrade"
+    if harvest_candidate_ids:
+        return "harvest"
+    return "hold"
+
+
 def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label: str) -> str:
     lines = [
         "# Session Checkpoint Note",
@@ -515,11 +591,20 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
         f"State: `{note.state}`",
         f"Review status: `{note.review_status}`",
         f"Promotion recommendation: `{note.promotion_recommendation}`",
+        f"Carry until session closeout: `{'yes' if note.carry_until_session_closeout else 'no'}`",
+        f"Session-end recommendation: `{note.session_end_recommendation}`",
+        f"Stats refresh recommended at closeout: `{'yes' if note.stats_refresh_recommended else 'no'}`",
         "",
         "## Repo Scope",
         "",
     ]
     lines.extend(f"- `{scope}`" for scope in note.repo_scope)
+    if note.harvest_candidate_ids:
+        lines.extend(["", "## Harvest Candidates", ""])
+        lines.extend(f"- `{candidate_id}`" for candidate_id in note.harvest_candidate_ids)
+    if note.upgrade_candidate_ids:
+        lines.extend(["", "## Upgrade Candidates", ""])
+        lines.extend(f"- `{candidate_id}`" for candidate_id in note.upgrade_candidate_ids)
     lines.extend(["", "## Candidate Clusters", ""])
     if not note.candidate_clusters:
         lines.append("- none")
@@ -535,6 +620,7 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
                 f"- confidence: `{cluster.confidence}`",
                 f"- review status: `{cluster.review_status}`",
                 f"- source surface: `{cluster.source_surface_ref}`",
+                f"- session-end targets: {', '.join(f'`{target}`' for target in cluster.session_end_targets) or '`none`'}",
             ]
         )
         if cluster.blocked_by:
@@ -605,6 +691,10 @@ def _write_harvest_handoff(*, paths: _CheckpointPaths, note: SessionCheckpointNo
         "session_ref": note.session_ref,
         "source_note_ref": str(paths.note_json),
         "candidate_clusters": [cluster.model_dump(mode="json") for cluster in note.candidate_clusters],
+        "harvest_candidate_ids": note.harvest_candidate_ids,
+        "upgrade_candidate_ids": note.upgrade_candidate_ids,
+        "stats_refresh_recommended": note.stats_refresh_recommended,
+        "session_end_recommendation": note.session_end_recommendation,
         "next_owner_moves": note.next_owner_moves,
     }
     paths.harvest_handoff.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")

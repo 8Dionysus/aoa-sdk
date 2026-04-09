@@ -46,6 +46,12 @@ def test_checkpoint_status_becomes_reviewable_after_repeat(workspace_root: Path)
     route_cluster = next(cluster for cluster in second.candidate_clusters if cluster.candidate_kind == "route")
     assert route_cluster.checkpoint_hits == 2
     assert route_cluster.review_status == "reviewable"
+    assert route_cluster.session_end_targets == ["harvest", "upgrade"]
+    assert second.carry_until_session_closeout is True
+    assert second.session_end_recommendation == "harvest_and_upgrade"
+    assert second.harvest_candidate_ids
+    assert second.upgrade_candidate_ids
+    assert second.stats_refresh_recommended is True
 
 
 def test_capture_from_skill_phase_auto_appends_only_when_growth_signal_exists(workspace_root: Path) -> None:
@@ -119,7 +125,10 @@ def test_capture_from_skill_phase_auto_appends_for_explicit_commit_intent(worksp
     assert capture.reason == "checkpoint_signal"
     assert capture.checkpoint_kind == "commit"
     assert capture.note is not None
-    assert any(cluster.candidate_kind == "growth" for cluster in capture.note.candidate_clusters)
+    growth_cluster = next(cluster for cluster in capture.note.candidate_clusters if cluster.candidate_kind == "growth")
+    assert growth_cluster.session_end_targets == ["harvest"]
+    assert capture.note.harvest_candidate_ids == [growth_cluster.candidate_id]
+    assert capture.note.upgrade_candidate_ids == []
     assert (note_dir / "checkpoint-note.json").exists()
 
 
@@ -208,4 +217,8 @@ def test_surface_closeout_handoff_links_checkpoint_note(workspace_root: Path) ->
 
     assert handoff.checkpoint_note_ref is not None
     assert handoff.surviving_checkpoint_clusters
+    assert handoff.checkpoint_harvest_candidates
+    assert handoff.checkpoint_upgrade_candidates
+    assert handoff.stats_refresh_recommended is True
     assert any(target.skill_name == "aoa-session-donor-harvest" for target in handoff.handoff_targets)
+    assert any(target.skill_name == "aoa-quest-harvest" for target in handoff.handoff_targets)

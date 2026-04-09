@@ -187,6 +187,7 @@ def _print_surface_handoff(report: SurfaceCloseoutHandoff) -> None:
     typer.echo(f"reviewed: {'yes' if report.reviewed else 'no'}")
     typer.echo(f"surface_detection_report_ref: {report.surface_detection_report_ref}")
     typer.echo(f"checkpoint_note_ref: {report.checkpoint_note_ref or 'none'}")
+    typer.echo(f"stats_refresh_recommended: {'yes' if report.stats_refresh_recommended else 'no'}")
     _print_surface_items("surviving_items", report.surviving_items)
     typer.echo("surviving_checkpoint_clusters:")
     if not report.surviving_checkpoint_clusters:
@@ -196,6 +197,22 @@ def _print_surface_handoff(report: SurfaceCloseoutHandoff) -> None:
             typer.echo(
                 f"  - {cluster.display_name} [{cluster.candidate_kind} / {cluster.owner_hint} / {cluster.review_status}]"
             )
+            typer.echo(
+                "    session_end_targets: "
+                f"{', '.join(cluster.session_end_targets) if cluster.session_end_targets else 'none'}"
+            )
+    typer.echo("checkpoint_harvest_candidates:")
+    if not report.checkpoint_harvest_candidates:
+        typer.echo("  - none")
+    else:
+        for cluster in report.checkpoint_harvest_candidates:
+            typer.echo(f"  - {cluster.display_name} [{cluster.candidate_id}]")
+    typer.echo("checkpoint_upgrade_candidates:")
+    if not report.checkpoint_upgrade_candidates:
+        typer.echo("  - none")
+    else:
+        for cluster in report.checkpoint_upgrade_candidates:
+            typer.echo(f"  - {cluster.display_name} [{cluster.candidate_id}]")
     typer.echo("handoff_targets:")
     if not report.handoff_targets:
         typer.echo("  - none")
@@ -212,6 +229,17 @@ def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
     typer.echo(f"state: {note.state}")
     typer.echo(f"review_status: {note.review_status}")
     typer.echo(f"promotion_recommendation: {note.promotion_recommendation}")
+    typer.echo(f"carry_until_session_closeout: {'yes' if note.carry_until_session_closeout else 'no'}")
+    typer.echo(f"session_end_recommendation: {note.session_end_recommendation}")
+    typer.echo(
+        "harvest_candidate_ids: "
+        f"{', '.join(note.harvest_candidate_ids) if note.harvest_candidate_ids else 'none'}"
+    )
+    typer.echo(
+        "upgrade_candidate_ids: "
+        f"{', '.join(note.upgrade_candidate_ids) if note.upgrade_candidate_ids else 'none'}"
+    )
+    typer.echo(f"stats_refresh_recommended: {'yes' if note.stats_refresh_recommended else 'no'}")
     typer.echo(f"repo_scope: {', '.join(note.repo_scope) if note.repo_scope else 'none'}")
     typer.echo(f"blocked_by: {', '.join(note.blocked_by) if note.blocked_by else 'none'}")
     typer.echo("candidate_clusters:")
@@ -223,6 +251,10 @@ def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
             f"  - {cluster.display_name} [{cluster.candidate_kind} / {cluster.owner_hint} / hits={cluster.checkpoint_hits} / {cluster.review_status}]"
         )
         typer.echo(f"    candidate_id: {cluster.candidate_id}")
+        typer.echo(
+            "    session_end_targets: "
+            f"{', '.join(cluster.session_end_targets) if cluster.session_end_targets else 'none'}"
+        )
         if cluster.blocked_by:
             typer.echo(f"    blocked_by: {', '.join(cluster.blocked_by)}")
 

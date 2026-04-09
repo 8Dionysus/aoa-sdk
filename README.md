@@ -76,7 +76,7 @@ This repository is the source of truth for:
 - persisted workspace-level ingress and guard reports under `aoa-sdk/.aoa/skill-dispatch/` so outer wrappers and root-level agents can reuse one stable session-start surface
 - default skill runtime session storage under `aoa-sdk/.aoa/skill-runtime-session.json` when the workspace root itself is not the writable owner surface
 - additive first-wave and second-wave surface detection under `aoa-sdk/.aoa/surface-detection/` that keeps `aoa skills ...` skill-only while surfacing eval, memo, playbook, agent, and technique candidates as non-executable hints or reviewed handoffs
-- local checkpoint-note capture under `aoa-sdk/.aoa/session-growth/current/` that keeps mid-session growth work below harvest-verdict authority until reviewed promotion
+- local checkpoint-note capture under `aoa-sdk/.aoa/session-growth/current/` that keeps mid-session growth work below harvest-verdict authority until reviewed promotion, carries harvest and upgrade candidates through the session, and leaves candidate movement plus stats refresh to reviewed closeout
 - default auto checkpoint bridge from `aoa skills enter` and `aoa skills guard` when checkpoint-phase detection sees a real growth signal, plus explicit `--checkpoint-kind` / `--append-note` overrides
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
