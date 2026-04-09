@@ -30,6 +30,8 @@ aoa-sdk/.aoa/session-growth/current/<repo-label>/
   checkpoint-note.json
   checkpoint-note.md
   harvest-handoff.json
+  closeout-context.json
+  closeout-execution-report.json
 ```
 
 The JSONL file is append-only checkpoint history.
@@ -46,6 +48,10 @@ their runtime JSON under `checkpoint_capture.session_end_skill_targets`,
 `checkpoint_capture.progression_axis_signals`,
 `checkpoint_capture.session_end_next_honest_move`, and
 `checkpoint_capture.stats_refresh_recommended`.
+At reviewed closeout the explicit bridge skill is
+`aoa-checkpoint-closeout-bridge`: it builds `closeout-context.json`, rereads
+the reviewed artifact, and then executes donor harvest, progression lift, and
+quest harvest in order without refreshing stats inside the bridge itself.
 
 ## Commands
 
@@ -59,6 +65,8 @@ aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --i
 aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 aoa skills guard /srv/aoa-sdk --intent-text "recurring owner follow-through after green verify" --mutation-surface code --checkpoint-kind verify_green --root /srv/aoa-sdk --json
 aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa checkpoint build-closeout-context /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
+aoa checkpoint execute-closeout-chain /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
 aoa checkpoint status /srv/aoa-sdk --root /srv/aoa-sdk --json
 ```
 
@@ -78,3 +86,5 @@ When progression evidence exists, reviewed closeout should raise
 `aoa-session-progression-lift` before `aoa-quest-harvest`, so the final
 multi-axis verdict is gathered once from the carried checkpoint evidence instead
 of being guessed mid-session.
+That reviewed closeout path should be driven through
+`aoa-checkpoint-closeout-bridge`, not by silently widening `aoa closeout run`.

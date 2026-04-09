@@ -9,6 +9,8 @@ pretending those candidates were activated during the live route.
 - `sdk.surfaces.build_closeout_handoff(...)` requires `reviewed=True`
 - `aoa surfaces handoff` refuses `--not-reviewed`
 - the handoff does not auto-run from `aoa closeout run`
+- the handoff may feed `aoa-checkpoint-closeout-bridge`, but that bridge must
+  still reread the reviewed artifact and any receipt evidence
 - surviving items keep their existing truth labels
 
 Persisted handoffs land under:

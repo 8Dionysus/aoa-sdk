@@ -135,6 +135,10 @@ plan directly in `checkpoint_capture.session_end_skill_targets` and
 `checkpoint_capture.session_end_next_honest_move`, with
 `checkpoint_capture.progression_axis_signals` showing the provisional axis
 movement that should be lifted only at reviewed closeout.
+Use `aoa-checkpoint-closeout-bridge` for the explicit reviewed-closeout chain:
+build one `closeout-context.json` bundle, reread the reviewed artifact, and
+then run donor harvest, progression lift, and quest harvest in that order.
+Do not turn `aoa closeout run` into the hidden runtime for that chain.
 Use `--no-auto-checkpoint` when you need the skill lane to stay read-only apart
 from its persisted report, and use `--checkpoint-kind` when one explicit
 checkpoint event matters.

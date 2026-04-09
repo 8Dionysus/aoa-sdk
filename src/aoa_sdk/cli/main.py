@@ -11,6 +11,8 @@ from ..closeout import CloseoutAPI
 from ..compatibility import CompatibilityAPI
 from ..loaders import load_json
 from ..models import (
+    CheckpointCloseoutContext,
+    CheckpointCloseoutExecutionReport,
     CheckpointCaptureResult,
     KernelNextStepBrief,
     OwnerFollowThroughBrief,
@@ -335,6 +337,74 @@ def _print_checkpoint_promotion(promotion: SessionCheckpointPromotion) -> None:
     typer.echo(f"resulting_state: {promotion.resulting_state}")
     typer.echo(f"source_note_ref: {promotion.source_note_ref}")
     typer.echo(f"output_refs: {', '.join(promotion.output_refs) if promotion.output_refs else 'none'}")
+
+
+def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
+    typer.echo(f"session_ref: {context.session_ref}")
+    typer.echo(f"orchestrator_skill_name: {context.orchestrator_skill_name}")
+    typer.echo(f"repo_root: {context.repo_root}")
+    typer.echo(f"reviewed_artifact_ref: {context.reviewed_artifact_ref}")
+    typer.echo(f"checkpoint_note_ref: {context.checkpoint_note_ref or 'none'}")
+    typer.echo(f"surface_handoff_ref: {context.surface_handoff_ref or 'none'}")
+    typer.echo(f"receipt_refs: {', '.join(context.receipt_refs) if context.receipt_refs else 'none'}")
+    typer.echo(f"repo_scope: {', '.join(context.repo_scope) if context.repo_scope else 'none'}")
+    typer.echo(
+        "candidate_map: "
+        f"harvest={len(context.candidate_map.harvest_candidate_ids)}, "
+        f"progression={len(context.candidate_map.progression_candidate_ids)}, "
+        f"upgrade={len(context.candidate_map.upgrade_candidate_ids)}"
+    )
+    typer.echo("ordered_skill_plan:")
+    if not context.ordered_skill_plan:
+        typer.echo("  - none")
+    else:
+        for target in context.ordered_skill_plan:
+            typer.echo(f"  - {target.skill_name}")
+            typer.echo(
+                "    candidate_ids: "
+                f"{', '.join(target.candidate_ids) if target.candidate_ids else 'none'}"
+            )
+            typer.echo(f"    why: {target.why}")
+    typer.echo(f"notes: {', '.join(context.notes) if context.notes else 'none'}")
+
+
+def _print_closeout_execution_report(report: CheckpointCloseoutExecutionReport) -> None:
+    typer.echo(f"session_ref: {report.session_ref}")
+    typer.echo(f"orchestrator_skill_name: {report.orchestrator_skill_name}")
+    typer.echo(f"context_ref: {report.context_ref}")
+    typer.echo(f"reviewed_artifact_ref: {report.reviewed_artifact_ref}")
+    typer.echo(f"checkpoint_note_ref: {report.checkpoint_note_ref or 'none'}")
+    typer.echo(f"surface_handoff_ref: {report.surface_handoff_ref or 'none'}")
+    typer.echo("executed_skills:")
+    if not report.executed_skills:
+        typer.echo("  - none")
+    else:
+        for item in report.executed_skills:
+            typer.echo(f"  - {item.skill_name}")
+            typer.echo(f"    reason: {item.reason}")
+            typer.echo(
+                "    artifact_refs: "
+                f"{', '.join(item.artifact_refs) if item.artifact_refs else 'none'}"
+            )
+            typer.echo(
+                "    receipt_refs: "
+                f"{', '.join(item.receipt_refs) if item.receipt_refs else 'none'}"
+            )
+    typer.echo("skipped_skills:")
+    if not report.skipped_skills:
+        typer.echo("  - none")
+    else:
+        for item in report.skipped_skills:
+            typer.echo(f"  - {item.skill_name}: {item.reason}")
+    typer.echo(
+        "produced_artifact_refs: "
+        f"{', '.join(report.produced_artifact_refs) if report.produced_artifact_refs else 'none'}"
+    )
+    typer.echo(
+        "produced_receipt_refs: "
+        f"{', '.join(report.produced_receipt_refs) if report.produced_receipt_refs else 'none'}"
+    )
+    typer.echo(f"final_stop_reason: {report.final_stop_reason}")
 
 
 def _resolve_host_available_skills(
@@ -1107,6 +1177,98 @@ def checkpoint_promote(
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     _print_checkpoint_promotion(promotion)
+
+
+@checkpoint_app.command("build-closeout-context")
+def checkpoint_build_closeout_context(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the closeout context."),
+    reviewed_artifact: str = typer.Option(
+        ...,
+        "--reviewed-artifact",
+        help="Reviewed session artifact that the explicit closeout chain must reread.",
+    ),
+    session_ref: str | None = typer.Option(
+        None,
+        "--session-ref",
+        help="Optional explicit session_ref override when it cannot be derived from the reviewed artifact, receipts, or local note.",
+    ),
+    receipt_path: list[str] = typer.Option(
+        None,
+        "--receipt-path",
+        help="Receipt JSON or JSONL file that should be included in the closeout evidence bundle. Repeat for multiple files.",
+    ),
+    receipt_dir: list[str] = typer.Option(
+        None,
+        "--receipt-dir",
+        help="Directory whose JSON or JSONL receipts should be included in the closeout evidence bundle. Repeat for multiple directories.",
+    ),
+    surface_handoff_path: str | None = typer.Option(
+        None,
+        "--surface-handoff-path",
+        help="Optional reviewed surface handoff path. Defaults to the latest local reviewed handoff for the repo label.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    context = AoASDK.from_workspace(root).checkpoints.build_closeout_context(
+        repo_root=repo_root,
+        reviewed_artifact_path=reviewed_artifact,
+        session_ref=session_ref,
+        receipt_paths=receipt_path or [],
+        receipt_dirs=receipt_dir or [],
+        surface_handoff_path=surface_handoff_path,
+    )
+    payload = context.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_closeout_context(context)
+
+
+@checkpoint_app.command("execute-closeout-chain")
+def checkpoint_execute_closeout_chain(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the closeout context."),
+    reviewed_artifact: str = typer.Option(
+        ...,
+        "--reviewed-artifact",
+        help="Reviewed session artifact that the explicit closeout chain must reread.",
+    ),
+    session_ref: str | None = typer.Option(
+        None,
+        "--session-ref",
+        help="Optional explicit session_ref override when it cannot be derived from the reviewed artifact, receipts, or local note.",
+    ),
+    receipt_path: list[str] = typer.Option(
+        None,
+        "--receipt-path",
+        help="Receipt JSON or JSONL file that should be included in the closeout evidence bundle. Repeat for multiple files.",
+    ),
+    receipt_dir: list[str] = typer.Option(
+        None,
+        "--receipt-dir",
+        help="Directory whose JSON or JSONL receipts should be included in the closeout evidence bundle. Repeat for multiple directories.",
+    ),
+    surface_handoff_path: str | None = typer.Option(
+        None,
+        "--surface-handoff-path",
+        help="Optional reviewed surface handoff path. Defaults to the latest local reviewed handoff for the repo label.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    report = AoASDK.from_workspace(root).checkpoints.execute_closeout_chain(
+        repo_root=repo_root,
+        reviewed_artifact_path=reviewed_artifact,
+        session_ref=session_ref,
+        receipt_paths=receipt_path or [],
+        receipt_dirs=receipt_dir or [],
+        surface_handoff_path=surface_handoff_path,
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_closeout_execution_report(report)
 
 
 @closeout_app.command("run")

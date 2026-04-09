@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 from pathlib import Path
 
 from aoa_sdk import AoASDK
@@ -143,6 +144,7 @@ def test_capture_from_skill_phase_auto_appends_for_explicit_commit_intent(worksp
     assert [target.skill_name for target in capture.session_end_skill_targets] == [
         "aoa-session-donor-harvest",
         "aoa-session-progression-lift",
+        "aoa-quest-harvest",
     ]
     assert capture.progression_axis_signals
     assert capture.stats_refresh_recommended is True
@@ -279,3 +281,144 @@ def test_surface_closeout_handoff_links_checkpoint_note(workspace_root: Path) ->
     assert any(target.skill_name == "aoa-session-donor-harvest" for target in handoff.handoff_targets)
     assert any(target.skill_name == "aoa-session-progression-lift" for target in handoff.handoff_targets)
     assert any(target.skill_name == "aoa-quest-harvest" for target in handoff.handoff_targets)
+
+
+def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-session.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                "Session ref: `session:test-checkpoint-closeout-execute`",
+                "",
+                "- boundary review completed",
+                "- verify green completed",
+                "- repeated route evidence remained visible",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    jsonl_path = note_dir / "checkpoint-note.jsonl"
+    jsonl_lines = []
+    for raw_line in jsonl_path.read_text(encoding="utf-8").splitlines():
+        payload = json.loads(raw_line)
+        payload["session_ref"] = "session:test-checkpoint-closeout-execute"
+        jsonl_lines.append(json.dumps(payload))
+    jsonl_path.write_text("\n".join(jsonl_lines) + "\n", encoding="utf-8")
+    sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="closeout",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    handoff = sdk.surfaces.build_closeout_handoff(
+        report,
+        session_ref="session:test-checkpoint-closeout-execute",
+    )
+    handoff_path = workspace_root / "aoa-sdk" / ".aoa" / "surface-detection" / "aoa-sdk.closeout-handoff.latest.json"
+    handoff_path.write_text(
+        json.dumps({"report_path": str(handoff_path), "report": handoff.model_dump(mode="json")}, indent=2)
+        + "\n",
+        encoding="utf-8",
+    )
+
+    receipt_path = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-receipt.json"
+    receipt_path.write_text(
+        json.dumps(
+            {
+                "event_kind": "harvest_packet_receipt",
+                "event_id": "evt-existing-harvest",
+                "observed_at": "2026-04-09T12:00:00Z",
+                "run_ref": "run-existing-harvest",
+                "session_ref": "session:test-checkpoint-closeout-execute",
+                "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+                "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+                "evidence_refs": [{"kind": "reviewed_artifact", "ref": str(reviewed_artifact)}],
+                "payload": {"route_ref": "route:test-checkpoint-closeout-execute"},
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    context = sdk.checkpoints.build_closeout_context(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        reviewed_artifact_path=str(reviewed_artifact),
+        receipt_paths=[str(receipt_path)],
+    )
+
+    assert context.session_ref == "session:test-checkpoint-closeout-execute"
+    assert context.checkpoint_note_ref is not None
+    assert context.surface_handoff_ref is not None
+    assert context.receipt_refs == [str(receipt_path.resolve())]
+    assert [target.skill_name for target in context.ordered_skill_plan] == [
+        "aoa-session-donor-harvest",
+        "aoa-session-progression-lift",
+        "aoa-quest-harvest",
+    ]
+    assert (note_dir / "closeout-context.json").exists()
+
+
+def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-session-no-note.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                "Session ref: `session:test-closeout-without-note`",
+                "",
+                "- verify green completed",
+                "- boundary and provenance review completed",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    report = sdk.checkpoints.execute_closeout_chain(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        reviewed_artifact_path=str(reviewed_artifact),
+    )
+
+    assert report.session_ref == "session:test-closeout-without-note"
+    assert report.checkpoint_note_ref is None
+    assert report.surface_handoff_ref is None
+    assert [step.skill_name for step in report.executed_skills] == [
+        "aoa-session-donor-harvest",
+        "aoa-session-progression-lift",
+        "aoa-quest-harvest",
+    ]
+    assert report.skipped_skills == []
+    assert report.produced_artifact_refs
+    assert report.produced_receipt_refs
+    for path in [*report.produced_artifact_refs, *report.produced_receipt_refs]:
+        assert Path(path).exists()
+    execution_report_path = (
+        workspace_root
+        / "aoa-sdk"
+        / ".aoa"
+        / "session-growth"
+        / "current"
+        / "aoa-sdk"
+        / "closeout-execution-report.json"
+    )
+    assert execution_report_path.exists()

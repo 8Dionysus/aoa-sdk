@@ -4,6 +4,9 @@
 not invent skill meaning or proof logic. It only coordinates already-owned
 publisher scripts and the existing `aoa-stats` refresh loop through one
 manifest-driven handoff.
+The explicit checkpoint-to-closeout bridge now sits beside this seam and
+prepares local reviewed-closeout artifacts and receipts without publishing them
+or refreshing stats on its own.
 
 ## Why this exists
 
@@ -39,6 +42,8 @@ reviewed session into:
   writes one deterministic next-step brief into each non-audit closeout report.
 - It does not silently invoke Codex skill reasoning, rewrite proof meaning, or
   replace source-owned truth.
+- `aoa closeout run` does not auto-run `aoa-checkpoint-closeout-bridge`.
+- `aoa surfaces handoff` is reviewed-only and remains separate from this closeout runner.
 
 ## Manifest shape
 
@@ -189,6 +194,26 @@ the stats refresh step on purpose.
 
 ## Commands
 
+Build one explicit checkpoint-to-closeout evidence bundle without publishing
+anything yet:
+
+```bash
+aoa checkpoint build-closeout-context /srv/aoa-sdk \
+  --reviewed-artifact /srv/path/to/reviewed_session_artifact.md \
+  --root /srv/aoa-sdk \
+  --json
+```
+
+Execute the explicit reviewed-closeout skill chain without publishing or
+refreshing stats:
+
+```bash
+aoa checkpoint execute-closeout-chain /srv/aoa-sdk \
+  --reviewed-artifact /srv/path/to/reviewed_session_artifact.md \
+  --root /srv/aoa-sdk \
+  --json
+```
+
 Run one manifest directly:
 
 ```bash
@@ -257,6 +282,9 @@ assembly.
 When a local checkpoint note exists, reviewed surface closeout handoff may also
 preserve `checkpoint_note_ref` and `surviving_checkpoint_clusters` so closeout
 does not have to reconstruct checkpoint survivors from raw append history.
+The explicit `aoa-checkpoint-closeout-bridge` should consume those reviewed
+surfaces as hints, but it must still reread the reviewed artifact and any
+receipt evidence before donor harvest, progression lift, and quest harvest run.
 
 Install the user-level inbox watcher when the machine should auto-process new
 reviewed manifests as soon as they land in the canonical inbox:

@@ -37,6 +37,7 @@ Use the shortest route by need:
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - additive owner-layer surface detection without changing `aoa skills ...` meaning: `docs/aoa-surface-detection-first-wave.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
 - checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, `aoa checkpoint append/status/promote`, the auto checkpoint bridge on `aoa skills enter/guard`, and the explicit `--checkpoint-kind` / `--append-note` overrides
+- explicit checkpoint-to-closeout bridge orchestration: `docs/session-growth-checkpoints.md`, `docs/session-closeout.md`, `aoa checkpoint build-closeout-context`, and `aoa checkpoint execute-closeout-chain`
 - second-wave shortlist, receipt-context, and observability seams that stay advisory: `docs/aoa-surface-detection-second-wave.md`, `sdk.routing.owner_layer_shortlist()`, and `sdk.stats.surface_detection()`
 - antifragility stress-context doctrine and fixtures that stay narrowing-only: `docs/antifragility-control-plane.md`, `docs/antifragility-closeout-seam.md`, `tests/fixtures/antifragility/stress_dispatch_input.example.json`, `tests/fixtures/antifragility/stress_dispatch_result.example.json`, and `tests/fixtures/antifragility/stress_closeout_manifest.example.json`
 - via negativa pruning checklist: `docs/VIA_NEGATIVA_CHECKLIST.md`
@@ -79,6 +80,7 @@ This repository is the source of truth for:
 - local checkpoint-note capture under `aoa-sdk/.aoa/session-growth/current/` that keeps mid-session growth work below harvest-verdict authority until reviewed promotion, carries harvest, progression, and upgrade candidates through the session, records provisional progression-axis movement, and leaves candidate movement plus stats refresh to reviewed closeout
 - `aoa skills enter` and `aoa skills guard` now expose the pending reviewed-closeout skill-family plan through `checkpoint_capture.session_end_skill_targets`, `checkpoint_capture.progression_axis_signals`, and `checkpoint_capture.session_end_next_honest_move`
 - reviewed closeout can now raise `aoa-session-progression-lift` from the checkpoint ledger before `aoa-quest-harvest`, so multi-axis progression stays evidence-backed and end-of-session only
+- reviewed closeout can now build one `closeout-context.json` bundle and execute the explicit `aoa-checkpoint-closeout-bridge` chain without turning `aoa closeout run` into a hidden skill runner
 - default auto checkpoint bridge from `aoa skills enter` and `aoa skills guard` when checkpoint-phase detection sees a real growth signal, plus explicit `--checkpoint-kind` / `--append-note` overrides
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
@@ -153,6 +155,14 @@ checkpoint_skill_report = sdk.skills.detect(
     intent_text="plan verify a bounded change",
 )
 checkpoint_note = sdk.checkpoints.status(repo_root="/srv/aoa-sdk")
+closeout_context = sdk.checkpoints.build_closeout_context(
+    repo_root="/srv/aoa-sdk",
+    reviewed_artifact_path="/srv/path/to/reviewed_session_artifact.md",
+)
+closeout_execution = sdk.checkpoints.execute_closeout_chain(
+    repo_root="/srv/aoa-sdk",
+    reviewed_artifact_path="/srv/path/to/reviewed_session_artifact.md",
+)
 shortlist = sdk.routing.owner_layer_shortlist(signal="scenario-recurring")
 surface_handoff = sdk.surfaces.build_closeout_handoff(
     surface_report,
@@ -260,6 +270,8 @@ Capture or promote one checkpoint-aware local note:
 
 ```bash
 aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa checkpoint build-closeout-context /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
+aoa checkpoint execute-closeout-chain /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
 aoa checkpoint status /srv/aoa-sdk --root /srv/aoa-sdk --json
 aoa checkpoint promote /srv/aoa-sdk --target dionysus-note --root /srv/aoa-sdk --json
 ```

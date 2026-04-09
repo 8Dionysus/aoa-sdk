@@ -8,14 +8,20 @@ from pathlib import Path
 from typing import Literal, cast
 
 from ..errors import RepoNotFound, SurfaceNotFound
+from ..loaders import load_json, write_json
 from ..models import (
+    CheckpointCloseoutContext,
+    CheckpointCloseoutExecutionReport,
     CheckpointCaptureResult,
+    CloseoutContextCandidateMap,
+    CloseoutExecutionStep,
     ProgressionAxisSignal,
     SessionEndSkillTarget,
     SessionCheckpointCluster,
     SessionCheckpointHistoryEntry,
     SessionCheckpointNote,
     SessionCheckpointPromotion,
+    SurfaceCloseoutHandoff,
     SurfaceDetectionReport,
 )
 from ..surfaces import SurfacesAPI
@@ -33,8 +39,55 @@ CHECKPOINT_KINDS = (
 )
 PROMOTION_TARGETS = ("dionysus-note", "harvest-handoff")
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
+SESSION_REF_RE = re.compile(r'"session_ref"\s*:\s*"([^"]+)"|session_ref:\s*`?([^`\s]+)`?|Session ref:\s*`?([^`\n]+)`?')
 IGNORABLE_UNTRACKED_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 IGNORABLE_UNTRACKED_SUFFIXES = (".pyc", ".pyo", ".pyd")
+SESSION_END_SKILL_ORDER = (
+    "aoa-session-donor-harvest",
+    "aoa-session-progression-lift",
+    "aoa-quest-harvest",
+)
+ALLOWED_OWNER_REPOS = {
+    "aoa-techniques",
+    "aoa-skills",
+    "aoa-evals",
+    "aoa-memo",
+    "aoa-playbooks",
+    "aoa-agents",
+}
+DEFAULT_OWNER_BY_CANDIDATE_KIND = {
+    "route": "aoa-playbooks",
+    "pattern": "aoa-skills",
+    "proof": "aoa-evals",
+    "recall": "aoa-memo",
+    "role": "aoa-agents",
+    "risk": "aoa-evals",
+    "growth": "aoa-skills",
+}
+ABSTRACTION_SHAPE_BY_OWNER = {
+    "aoa-techniques": "technique",
+    "aoa-skills": "skill",
+    "aoa-evals": "eval",
+    "aoa-memo": "memo",
+    "aoa-playbooks": "playbook",
+    "aoa-agents": "agent",
+}
+DEFAULT_ARTIFACT_BY_OWNER = {
+    "aoa-techniques": "techniques/{slug}/TECHNIQUE.md",
+    "aoa-skills": "skills/{slug}/SKILL.md",
+    "aoa-evals": "evals/{slug}/EVAL.md",
+    "aoa-memo": "memo/{slug}.md",
+    "aoa-playbooks": "playbooks/{slug}/PLAYBOOK.md",
+    "aoa-agents": "agents/{slug}/AGENT.md",
+}
+QUEST_PROMOTION_VERDICT_BY_OWNER = {
+    "aoa-skills": "promote_to_skill",
+    "aoa-evals": "promote_to_eval",
+    "aoa-memo": "promote_to_memo",
+    "aoa-playbooks": "promote_to_playbook",
+    "aoa-agents": "promote_to_agent",
+    "aoa-techniques": "promote_to_technique",
+}
 
 
 class CheckpointsAPI:
@@ -304,6 +357,212 @@ class CheckpointsAPI:
             resulting_state=new_state,
         )
 
+    def build_closeout_context(
+        self,
+        *,
+        repo_root: str,
+        reviewed_artifact_path: str,
+        session_ref: str | None = None,
+        receipt_paths: list[str] | None = None,
+        receipt_dirs: list[str] | None = None,
+        surface_handoff_path: str | None = None,
+    ) -> CheckpointCloseoutContext:
+        paths = _checkpoint_paths(self.workspace, repo_root)
+        reviewed_artifact = Path(reviewed_artifact_path).expanduser().resolve()
+        if not reviewed_artifact.exists():
+            raise FileNotFoundError(f"missing reviewed artifact: {reviewed_artifact}")
+
+        note = _load_runtime_checkpoint_note(self, repo_root=repo_root)
+        handoff = _load_reviewed_surface_handoff(
+            workspace=self.workspace,
+            repo_root=repo_root,
+            handoff_path=surface_handoff_path,
+        )
+        collected_receipt_paths = _collect_receipt_paths(
+            receipt_paths=receipt_paths or [],
+            receipt_dirs=receipt_dirs or [],
+        )
+        resolved_session_ref = _resolve_closeout_session_ref(
+            explicit_session_ref=session_ref,
+            checkpoint_note=note,
+            surface_handoff=handoff,
+            reviewed_artifact=reviewed_artifact,
+            receipt_paths=collected_receipt_paths,
+        )
+
+        notes: list[str] = []
+        note_ref: str | None = None
+        if note is not None and note.session_ref == resolved_session_ref:
+            note_ref = str(paths.note_json)
+        elif note is not None:
+            notes.append(
+                "ignored the local checkpoint note because its session_ref did not match the reviewed closeout session"
+            )
+            note = None
+
+        handoff_ref: str | None = None
+        if handoff is not None and handoff.session_ref == resolved_session_ref:
+            handoff_ref = str(
+                _surface_handoff_path(self.workspace, repo_root, override=surface_handoff_path)
+            )
+        elif handoff is not None:
+            notes.append(
+                "ignored the reviewed surface closeout handoff because its session_ref did not match the reviewed closeout session"
+            )
+            handoff = None
+
+        repo_scope = _dedupe_strings(
+            [
+                paths.repo_label,
+                *(note.repo_scope if note is not None else []),
+                *(
+                    cluster.owner_hint
+                    for cluster in (handoff.surviving_checkpoint_clusters if handoff is not None else [])
+                ),
+            ]
+        )
+        candidate_map = CloseoutContextCandidateMap(
+            harvest_candidate_ids=list(note.harvest_candidate_ids) if note is not None else [],
+            progression_candidate_ids=list(note.progression_candidate_ids) if note is not None else [],
+            upgrade_candidate_ids=list(note.upgrade_candidate_ids) if note is not None else [],
+        )
+        ordered_skill_plan = _derive_closeout_skill_plan(note=note, handoff=handoff)
+        if note is None:
+            notes.append("no matching local checkpoint note was available; the reviewed artifact becomes the primary execution source")
+        if handoff is None:
+            notes.append("no matching reviewed surface closeout handoff was available; closeout will reread the reviewed artifact without a reviewed surface shortlist")
+        if not collected_receipt_paths:
+            notes.append("no prior receipt refs were supplied; closeout execution will rely on the reviewed artifact and any local checkpoint evidence only")
+
+        context = CheckpointCloseoutContext(
+            session_ref=resolved_session_ref,
+            repo_root=str(_resolve_context_root(self.workspace, repo_root)),
+            reviewed_artifact_ref=str(reviewed_artifact),
+            checkpoint_note_ref=note_ref,
+            surface_handoff_ref=handoff_ref,
+            receipt_refs=[str(path) for path in collected_receipt_paths],
+            repo_scope=repo_scope,
+            candidate_map=candidate_map,
+            progression_axis_signals=list(note.progression_axis_signals) if note is not None else [],
+            ordered_skill_plan=ordered_skill_plan,
+            notes=notes,
+        )
+        write_json(paths.closeout_context, context.model_dump(mode="json"))
+        return context
+
+    def execute_closeout_chain(
+        self,
+        *,
+        repo_root: str,
+        reviewed_artifact_path: str,
+        session_ref: str | None = None,
+        receipt_paths: list[str] | None = None,
+        receipt_dirs: list[str] | None = None,
+        surface_handoff_path: str | None = None,
+    ) -> CheckpointCloseoutExecutionReport:
+        context = self.build_closeout_context(
+            repo_root=repo_root,
+            reviewed_artifact_path=reviewed_artifact_path,
+            session_ref=session_ref,
+            receipt_paths=receipt_paths,
+            receipt_dirs=receipt_dirs,
+            surface_handoff_path=surface_handoff_path,
+        )
+        paths = _checkpoint_paths(self.workspace, repo_root)
+        execution_dir = paths.closeout_artifacts / _safe_name(context.session_ref)
+        execution_dir.mkdir(parents=True, exist_ok=True)
+
+        reviewed_artifact_path_obj = Path(context.reviewed_artifact_ref)
+        reviewed_artifact_evidence = _read_reviewed_artifact(reviewed_artifact_path_obj)
+        note = _load_context_checkpoint_note(context)
+        handoff = _load_context_surface_handoff(context)
+        receipt_payloads = _load_receipt_payloads(context.receipt_refs)
+        shortlisted_clusters = _closeout_candidate_clusters(note=note, handoff=handoff)
+
+        executed_steps: list[CloseoutExecutionStep] = []
+        produced_artifact_refs: list[str] = []
+        produced_receipt_refs: list[str] = []
+
+        donor_outputs = _build_donor_harvest_outputs(
+            context=context,
+            reviewed_artifact=reviewed_artifact_path_obj,
+            reviewed_artifact_evidence=reviewed_artifact_evidence,
+            shortlisted_clusters=shortlisted_clusters,
+            receipt_payloads=receipt_payloads,
+            output_dir=execution_dir,
+        )
+        executed_steps.append(
+            CloseoutExecutionStep(
+                skill_name="aoa-session-donor-harvest",
+                status="executed",
+                reason="reviewed closeout begins by rereading the full reviewed artifact and packaging bounded donor outputs before any progression or quest verdict",
+                artifact_refs=donor_outputs["artifact_refs"],
+                receipt_refs=donor_outputs["receipt_refs"],
+            )
+        )
+        produced_artifact_refs.extend(donor_outputs["artifact_refs"])
+        produced_receipt_refs.extend(donor_outputs["receipt_refs"])
+
+        progression_outputs = _build_progression_lift_outputs(
+            context=context,
+            reviewed_artifact=reviewed_artifact_path_obj,
+            reviewed_artifact_evidence=reviewed_artifact_evidence,
+            donor_packet=donor_outputs["packet"],
+            shortlisted_clusters=shortlisted_clusters,
+            receipt_payloads=receipt_payloads,
+            output_dir=execution_dir,
+        )
+        executed_steps.append(
+            CloseoutExecutionStep(
+                skill_name="aoa-session-progression-lift",
+                status="executed",
+                reason="reviewed closeout rereads the reviewed artifact plus donor packet and checkpoint axis hints before settling the multi-axis progression verdict",
+                artifact_refs=progression_outputs["artifact_refs"],
+                receipt_refs=progression_outputs["receipt_refs"],
+            )
+        )
+        produced_artifact_refs.extend(progression_outputs["artifact_refs"])
+        produced_receipt_refs.extend(progression_outputs["receipt_refs"])
+
+        quest_outputs = _build_quest_harvest_outputs(
+            context=context,
+            reviewed_artifact=reviewed_artifact_path_obj,
+            reviewed_artifact_evidence=reviewed_artifact_evidence,
+            donor_packet=donor_outputs["packet"],
+            progression_packet=progression_outputs["packet"],
+            shortlisted_clusters=shortlisted_clusters,
+            receipt_payloads=receipt_payloads,
+            output_dir=execution_dir,
+        )
+        executed_steps.append(
+            CloseoutExecutionStep(
+                skill_name="aoa-quest-harvest",
+                status="executed",
+                reason="reviewed closeout only performs final quest triage after donor harvest and progression lift have reread the session evidence",
+                artifact_refs=quest_outputs["artifact_refs"],
+                receipt_refs=quest_outputs["receipt_refs"],
+            )
+        )
+        produced_artifact_refs.extend(quest_outputs["artifact_refs"])
+        produced_receipt_refs.extend(quest_outputs["receipt_refs"])
+
+        report = CheckpointCloseoutExecutionReport(
+            session_ref=context.session_ref,
+            reviewed_artifact_ref=context.reviewed_artifact_ref,
+            checkpoint_note_ref=context.checkpoint_note_ref,
+            surface_handoff_ref=context.surface_handoff_ref,
+            context_ref=str(paths.closeout_context),
+            executed_skills=executed_steps,
+            skipped_skills=[],
+            produced_artifact_refs=_dedupe_strings(produced_artifact_refs),
+            produced_receipt_refs=_dedupe_strings(produced_receipt_refs),
+            final_stop_reason=(
+                "Reviewed closeout chain finished under aoa-checkpoint-closeout-bridge; owner-local publication and stats refresh remain downstream steps."
+            ),
+        )
+        write_json(paths.closeout_execution_report, report.model_dump(mode="json"))
+        return report
+
 
 class _CheckpointPaths:
     def __init__(self, *, root: Path, repo_label: str, current_dir: Path, surface_report: Path) -> None:
@@ -314,6 +573,9 @@ class _CheckpointPaths:
         self.note_json = current_dir / "checkpoint-note.json"
         self.note_md = current_dir / "checkpoint-note.md"
         self.harvest_handoff = current_dir / "harvest-handoff.json"
+        self.closeout_context = current_dir / "closeout-context.json"
+        self.closeout_execution_report = current_dir / "closeout-execution-report.json"
+        self.closeout_artifacts = current_dir / "reviewed-closeout"
         self.surface_report = surface_report
 
 
@@ -389,9 +651,855 @@ def _archive_current_checkpoint(paths: _CheckpointPaths) -> None:
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     archive_dir = archive_root / f"{paths.repo_label}-{timestamp}"
     archive_dir.mkdir(parents=True, exist_ok=True)
-    for source in (paths.jsonl, paths.note_json, paths.note_md, paths.harvest_handoff):
+    for source in (
+        paths.jsonl,
+        paths.note_json,
+        paths.note_md,
+        paths.harvest_handoff,
+        paths.closeout_context,
+        paths.closeout_execution_report,
+    ):
         if source.exists():
             source.rename(archive_dir / source.name)
+    if paths.closeout_artifacts.exists():
+        paths.closeout_artifacts.rename(archive_dir / paths.closeout_artifacts.name)
+
+
+def _surface_handoff_path(workspace: Workspace, repo_root: str, *, override: str | None = None) -> Path:
+    if override is not None:
+        return Path(override).expanduser().resolve()
+    label = _resolve_context_label(workspace, repo_root)
+    return workspace.repo_path("aoa-sdk") / ".aoa" / "surface-detection" / f"{label}.closeout-handoff.latest.json"
+
+
+def _load_reviewed_surface_handoff(
+    *,
+    workspace: Workspace,
+    repo_root: str,
+    handoff_path: str | None,
+) -> SurfaceCloseoutHandoff | None:
+    path = _surface_handoff_path(workspace, repo_root, override=handoff_path)
+    if not path.exists():
+        return None
+    payload = load_json(path)
+    report_payload = payload.get("report", payload) if isinstance(payload, dict) else payload
+    handoff = SurfaceCloseoutHandoff.model_validate(report_payload)
+    if not handoff.reviewed:
+        return None
+    return handoff
+
+
+def _collect_receipt_paths(*, receipt_paths: list[str], receipt_dirs: list[str]) -> list[Path]:
+    collected: list[Path] = []
+    for item in receipt_paths:
+        path = Path(item).expanduser().resolve()
+        if not path.exists():
+            raise FileNotFoundError(f"missing closeout receipt input: {path}")
+        if not path.is_file():
+            raise ValueError(f"receipt path must be a file: {path}")
+        collected.append(path)
+    for item in receipt_dirs:
+        directory = Path(item).expanduser().resolve()
+        if not directory.exists():
+            raise FileNotFoundError(f"missing closeout receipt directory: {directory}")
+        if not directory.is_dir():
+            raise ValueError(f"receipt directory must be a directory: {directory}")
+        for candidate in sorted(directory.iterdir()):
+            if candidate.is_file() and candidate.suffix in {".json", ".jsonl"}:
+                collected.append(candidate.resolve())
+    unique: list[Path] = []
+    seen: set[Path] = set()
+    for path in collected:
+        if path in seen:
+            continue
+        seen.add(path)
+        unique.append(path)
+    return unique
+
+
+def _resolve_closeout_session_ref(
+    *,
+    explicit_session_ref: str | None,
+    checkpoint_note: SessionCheckpointNote | None,
+    surface_handoff: SurfaceCloseoutHandoff | None,
+    reviewed_artifact: Path,
+    receipt_paths: list[Path],
+) -> str:
+    artifact_session_ref = _session_ref_from_reviewed_artifact(reviewed_artifact)
+    receipt_session_refs = {
+        session_ref
+        for session_ref in (_session_ref_from_receipt_file(path) for path in receipt_paths)
+        if session_ref is not None
+    }
+    if len(receipt_session_refs) > 1:
+        raise ValueError("receipt inputs contain multiple session_ref values; build one closeout context per session")
+    receipt_session_ref = next(iter(receipt_session_refs), None)
+
+    chosen = explicit_session_ref or artifact_session_ref or (
+        surface_handoff.session_ref if surface_handoff is not None else None
+    ) or receipt_session_ref or (checkpoint_note.session_ref if checkpoint_note is not None else None)
+    if chosen is None or not chosen.strip():
+        raise ValueError(
+            "could not derive session_ref from the reviewed artifact, receipt inputs, reviewed handoff, or checkpoint note; pass --session-ref explicitly"
+        )
+
+    if explicit_session_ref is not None and artifact_session_ref is not None and artifact_session_ref != explicit_session_ref:
+        raise ValueError(
+            f"reviewed artifact session_ref {artifact_session_ref!r} does not match explicit session_ref {explicit_session_ref!r}"
+        )
+    if receipt_session_ref is not None and receipt_session_ref != chosen:
+        raise ValueError(
+            f"receipt session_ref {receipt_session_ref!r} does not match the resolved closeout session {chosen!r}"
+        )
+    return chosen
+
+
+def _session_ref_from_reviewed_artifact(path: Path) -> str | None:
+    try:
+        if path.suffix == ".json":
+            payload = load_json(path)
+            if isinstance(payload, dict):
+                session_ref = payload.get("session_ref")
+                if isinstance(session_ref, str) and session_ref:
+                    return session_ref
+    except Exception:
+        pass
+    try:
+        text = path.read_text(encoding="utf-8")
+    except OSError:
+        return None
+    match = SESSION_REF_RE.search(text)
+    if match is None:
+        return None
+    return next((group.strip() for group in match.groups() if isinstance(group, str) and group.strip()), None)
+
+
+def _session_ref_from_receipt_file(path: Path) -> str | None:
+    payloads = _load_receipt_payloads([str(path)])
+    session_refs = {
+        value
+        for value in (
+            payload.get("session_ref") if isinstance(payload.get("session_ref"), str) else None
+            for payload in payloads
+        )
+        if value is not None
+    }
+    if len(session_refs) > 1:
+        raise ValueError(f"{path}: mixed session_ref values are not supported in one receipt input")
+    return next(iter(session_refs), None)
+
+
+def _load_context_checkpoint_note(context: CheckpointCloseoutContext) -> SessionCheckpointNote | None:
+    if context.checkpoint_note_ref is None:
+        return None
+    return SessionCheckpointNote.model_validate(load_json(context.checkpoint_note_ref))
+
+
+def _load_context_surface_handoff(context: CheckpointCloseoutContext) -> SurfaceCloseoutHandoff | None:
+    if context.surface_handoff_ref is None:
+        return None
+    payload = load_json(context.surface_handoff_ref)
+    report_payload = payload.get("report", payload) if isinstance(payload, dict) else payload
+    return SurfaceCloseoutHandoff.model_validate(report_payload)
+
+
+def _load_receipt_payloads(receipt_refs: list[str]) -> list[dict[str, object]]:
+    receipts: list[dict[str, object]] = []
+    for ref in receipt_refs:
+        path = Path(ref).expanduser().resolve()
+        if not path.exists():
+            raise FileNotFoundError(f"missing closeout receipt input: {path}")
+        if path.suffix == ".jsonl":
+            for line_number, raw_line in enumerate(path.read_text(encoding="utf-8").splitlines(), start=1):
+                line = raw_line.strip()
+                if not line:
+                    continue
+                payload = json.loads(line)
+                if not isinstance(payload, dict):
+                    raise ValueError(f"{path}:{line_number}: receipt must be an object")
+                receipts.append(payload)
+            continue
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(payload, dict):
+            receipts.append(payload)
+            continue
+        if not isinstance(payload, list):
+            raise ValueError(f"{path}: receipt payload must be an object or list")
+        for index, item in enumerate(payload):
+            if not isinstance(item, dict):
+                raise ValueError(f"{path}[{index}]: receipt must be an object")
+            receipts.append(item)
+    return receipts
+
+
+def _read_reviewed_artifact(path: Path) -> dict[str, object]:
+    try:
+        raw_text = path.read_text(encoding="utf-8")
+    except OSError as exc:
+        raise FileNotFoundError(f"could not read reviewed artifact: {path}") from exc
+    payload: object | None = None
+    if path.suffix == ".json":
+        try:
+            payload = load_json(path)
+        except Exception:
+            payload = None
+    return {
+        "text": raw_text,
+        "payload": payload,
+        "tokens": set(re.findall(r"[a-z0-9_:-]+", raw_text.lower())),
+    }
+
+
+def _closeout_candidate_clusters(
+    *,
+    note: SessionCheckpointNote | None,
+    handoff: SurfaceCloseoutHandoff | None,
+) -> list[SessionCheckpointCluster]:
+    deduped: dict[tuple[str, str], SessionCheckpointCluster] = {}
+    order: list[tuple[str, str]] = []
+    for cluster in [
+        *(handoff.surviving_checkpoint_clusters if handoff is not None else []),
+        *(note.candidate_clusters if note is not None else []),
+    ]:
+        key = (cluster.candidate_id, cluster.owner_hint)
+        if key not in deduped:
+            deduped[key] = cluster
+            order.append(key)
+    return [deduped[key] for key in order]
+
+
+def _derive_closeout_skill_plan(
+    *,
+    note: SessionCheckpointNote | None,
+    handoff: SurfaceCloseoutHandoff | None,
+) -> list[SessionEndSkillTarget]:
+    candidate_ids = _dedupe_strings(
+        [
+            *(cluster.candidate_id for cluster in (note.candidate_clusters if note is not None else [])),
+            *(cluster.candidate_id for cluster in (handoff.surviving_checkpoint_clusters if handoff is not None else [])),
+        ]
+    )
+    if not candidate_ids:
+        return []
+    return [
+        SessionEndSkillTarget(
+            skill_name="aoa-session-donor-harvest",
+            why="reviewed closeout should start with donor harvest so checkpoint hints become one bounded packet rooted in the reread session artifact",
+            candidate_ids=list(note.harvest_candidate_ids) if note is not None and note.harvest_candidate_ids else candidate_ids,
+        ),
+        SessionEndSkillTarget(
+            skill_name="aoa-session-progression-lift",
+            why="reviewed closeout should reread the reviewed artifact and donor packet before lifting one final multi-axis progression delta",
+            candidate_ids=list(note.progression_candidate_ids) if note is not None and note.progression_candidate_ids else candidate_ids,
+        ),
+        SessionEndSkillTarget(
+            skill_name="aoa-quest-harvest",
+            why="reviewed closeout should only reach final quest triage after donor harvest and progression lift have both completed",
+            candidate_ids=list(note.upgrade_candidate_ids) if note is not None else [],
+        ),
+    ]
+
+
+def _build_donor_harvest_outputs(
+    *,
+    context: CheckpointCloseoutContext,
+    reviewed_artifact: Path,
+    reviewed_artifact_evidence: dict[str, object],
+    shortlisted_clusters: list[SessionCheckpointCluster],
+    receipt_payloads: list[dict[str, object]],
+    output_dir: Path,
+) -> dict[str, object]:
+    accepted_candidates = [
+        _build_accepted_candidate(cluster=cluster, reviewed_artifact=reviewed_artifact)
+        for cluster in shortlisted_clusters
+    ]
+    deferred_candidates = (
+        [
+            {
+                "candidate_ref": f"candidate:hold:{_safe_name(context.session_ref)}",
+                "why": "no matching checkpoint or reviewed handoff candidates survived into the explicit closeout bundle",
+                "evidence_anchors": [str(reviewed_artifact)],
+            }
+        ]
+        if not accepted_candidates
+        else []
+    )
+    owner_layer_distribution: dict[str, int] = {}
+    extract_counts: dict[str, int] = {}
+    for candidate in accepted_candidates:
+        owner_repo = cast(str, candidate["owner_repo_recommendation"])
+        abstraction_shape = cast(str, candidate["abstraction_shape"])
+        owner_layer_distribution[owner_repo] = owner_layer_distribution.get(owner_repo, 0) + 1
+        extract_counts[abstraction_shape] = extract_counts.get(abstraction_shape, 0) + 1
+
+    packet = {
+        "artifact_kind": "harvest_packet",
+        "session_ref": context.session_ref,
+        "route_ref": "route:checkpoint-closeout-bridge",
+        "owner_repo": "aoa-skills",
+        "reviewed_artifact_ref": str(reviewed_artifact),
+        "checkpoint_note_ref": context.checkpoint_note_ref,
+        "surface_handoff_ref": context.surface_handoff_ref,
+        "accepted_candidates": accepted_candidates,
+        "deferred_candidates": deferred_candidates,
+        "extract_counts": extract_counts,
+        "promotion_candidates": len(accepted_candidates),
+        "deferrals": len(deferred_candidates),
+        "owner_layer_distribution": owner_layer_distribution,
+        "evidence_density": "reviewed",
+    }
+    packet_path = output_dir / "HARVEST_PACKET.json"
+    write_json(packet_path, packet)
+
+    run_ref = f"run-{_safe_name(context.session_ref)}-closeout-bridge"
+    receipt = {
+        "event_kind": "harvest_packet_receipt",
+        "event_id": f"evt-{_safe_name(context.session_ref)}-harvest",
+        "observed_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        "run_ref": run_ref,
+        "session_ref": context.session_ref,
+        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+        "evidence_refs": [
+            {"kind": "harvest_packet", "ref": str(packet_path), "role": "primary"},
+            {"kind": "reviewed_artifact", "ref": str(reviewed_artifact), "role": "reviewed-source"},
+            {
+                "kind": "skill_contract",
+                "ref": "repo:aoa-skills/skills/aoa-session-donor-harvest/SKILL.md",
+                "role": "contract",
+            },
+        ],
+        "payload": {
+            "route_ref": "route:checkpoint-closeout-bridge",
+            "extract_counts": extract_counts,
+            "owner_layer_distribution": owner_layer_distribution,
+            "promotion_candidates": len(accepted_candidates),
+            "deferrals": len(deferred_candidates),
+            "evidence_density": "reviewed",
+        },
+    }
+    receipt_path = output_dir / "HARVEST_PACKET_RECEIPT.json"
+    write_json(receipt_path, receipt)
+
+    core_receipt = _build_core_skill_receipt(
+        session_ref=context.session_ref,
+        run_ref=run_ref,
+        skill_name="aoa-session-donor-harvest",
+        detail_event_kind="harvest_packet_receipt",
+        detail_receipt_ref=str(receipt_path),
+        route_ref="route:checkpoint-closeout-bridge",
+        repo_scope=context.repo_scope,
+        handoff_targets=[target.skill_name for target in context.ordered_skill_plan],
+        repeated_pattern_signal=bool(shortlisted_clusters),
+        promotion_discussion_required=bool(context.candidate_map.upgrade_candidate_ids),
+        candidate_now=len(accepted_candidates),
+        candidate_later=len(context.candidate_map.upgrade_candidate_ids),
+        surface_detection_report_ref=context.surface_handoff_ref,
+        detail_to_closeout_ref=context.reviewed_artifact_ref,
+    )
+    core_receipt_path = output_dir / "CORE_SKILL_APPLICATION_RECEIPT.harvest.json"
+    write_json(core_receipt_path, core_receipt)
+
+    return {
+        "packet": packet,
+        "artifact_refs": [str(packet_path)],
+        "receipt_refs": [str(receipt_path), str(core_receipt_path)],
+        "reviewed_tokens": reviewed_artifact_evidence.get("tokens", set()),
+        "receipt_payloads": receipt_payloads,
+    }
+
+
+def _build_progression_lift_outputs(
+    *,
+    context: CheckpointCloseoutContext,
+    reviewed_artifact: Path,
+    reviewed_artifact_evidence: dict[str, object],
+    donor_packet: dict[str, object],
+    shortlisted_clusters: list[SessionCheckpointCluster],
+    receipt_payloads: list[dict[str, object]],
+    output_dir: Path,
+) -> dict[str, object]:
+    base_signals = list(context.progression_axis_signals)
+    derived_signals = _progression_signals_from_reviewed_artifact(
+        reviewed_artifact=reviewed_artifact,
+        reviewed_artifact_evidence=reviewed_artifact_evidence,
+        candidate_ids=_dedupe_strings(
+            [
+                *context.candidate_map.harvest_candidate_ids,
+                *context.candidate_map.progression_candidate_ids,
+                *context.candidate_map.upgrade_candidate_ids,
+            ]
+        ),
+    )
+    merged_signals = _merge_progression_axis_signals([*base_signals, *derived_signals])
+    axis_deltas = {
+        signal.axis: _axis_delta_for_movement(signal.movement)
+        for signal in merged_signals
+    }
+    verdict = _progression_verdict(
+        merged_signals=merged_signals,
+        accepted_candidates=donor_packet.get("accepted_candidates", []),
+    )
+    cautions = _progression_cautions(
+        context=context,
+        merged_signals=merged_signals,
+        shortlisted_clusters=shortlisted_clusters,
+        receipt_payloads=receipt_payloads,
+    )
+    packet = {
+        "artifact_kind": "progression_delta",
+        "session_ref": context.session_ref,
+        "route_ref": "route:checkpoint-closeout-bridge",
+        "scope": "session_scoped",
+        "verdict": verdict,
+        "axis_deltas": axis_deltas,
+        "cautions": cautions,
+        "reviewed_artifact_ref": str(reviewed_artifact),
+        "candidate_ids": _dedupe_strings(
+            [
+                *context.candidate_map.progression_candidate_ids,
+                *context.candidate_map.harvest_candidate_ids,
+            ]
+        ),
+    }
+    packet_path = output_dir / "PROGRESSION_DELTA.json"
+    write_json(packet_path, packet)
+
+    run_ref = f"run-{_safe_name(context.session_ref)}-closeout-bridge"
+    receipt = {
+        "event_kind": "progression_delta_receipt",
+        "event_id": f"evt-{_safe_name(context.session_ref)}-progression",
+        "observed_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        "run_ref": run_ref,
+        "session_ref": context.session_ref,
+        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-progression-lift"},
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-progression-lift"},
+        "evidence_refs": [
+            {"kind": "progression_packet", "ref": str(packet_path), "role": "primary"},
+            {"kind": "reviewed_artifact", "ref": str(reviewed_artifact), "role": "reviewed-source"},
+            {
+                "kind": "skill_contract",
+                "ref": "repo:aoa-skills/skills/aoa-session-progression-lift/SKILL.md",
+                "role": "contract",
+            },
+        ],
+        "payload": {
+            "route_ref": "route:checkpoint-closeout-bridge",
+            "scope": "session_scoped",
+            "verdict": verdict,
+            "axis_deltas": axis_deltas,
+            "cautions": cautions,
+        },
+    }
+    receipt_path = output_dir / "PROGRESSION_DELTA_RECEIPT.json"
+    write_json(receipt_path, receipt)
+
+    core_receipt = _build_core_skill_receipt(
+        session_ref=context.session_ref,
+        run_ref=run_ref,
+        skill_name="aoa-session-progression-lift",
+        detail_event_kind="progression_delta_receipt",
+        detail_receipt_ref=str(receipt_path),
+        route_ref="route:checkpoint-closeout-bridge",
+        repo_scope=context.repo_scope,
+        handoff_targets=[target.skill_name for target in context.ordered_skill_plan],
+        repeated_pattern_signal=bool(shortlisted_clusters),
+        promotion_discussion_required=bool(context.candidate_map.upgrade_candidate_ids),
+        candidate_now=len(context.candidate_map.progression_candidate_ids),
+        candidate_later=len(context.candidate_map.upgrade_candidate_ids),
+        surface_detection_report_ref=context.surface_handoff_ref,
+        detail_to_closeout_ref=context.reviewed_artifact_ref,
+    )
+    core_receipt_path = output_dir / "CORE_SKILL_APPLICATION_RECEIPT.progression.json"
+    write_json(core_receipt_path, core_receipt)
+
+    return {
+        "packet": packet,
+        "artifact_refs": [str(packet_path)],
+        "receipt_refs": [str(receipt_path), str(core_receipt_path)],
+    }
+
+
+def _build_quest_harvest_outputs(
+    *,
+    context: CheckpointCloseoutContext,
+    reviewed_artifact: Path,
+    reviewed_artifact_evidence: dict[str, object],
+    donor_packet: dict[str, object],
+    progression_packet: dict[str, object],
+    shortlisted_clusters: list[SessionCheckpointCluster],
+    receipt_payloads: list[dict[str, object]],
+    output_dir: Path,
+) -> dict[str, object]:
+    accepted_candidates = donor_packet.get("accepted_candidates", [])
+    candidate = accepted_candidates[0] if isinstance(accepted_candidates, list) and accepted_candidates else None
+    candidate_ref = candidate.get("candidate_ref") if isinstance(candidate, dict) else None
+    progression_verdict = progression_packet.get("verdict")
+    can_promote = isinstance(candidate, dict) and progression_verdict in {"advance", "hold"}
+    if can_promote:
+        owner_repo = cast(str, candidate["owner_repo_recommendation"])
+        next_surface = cast(str, candidate["chosen_next_artifact"])
+        promotion_verdict = QUEST_PROMOTION_VERDICT_BY_OWNER.get(owner_repo, "keep_open_quest")
+        nearest_wrong_target = candidate.get("nearest_wrong_target") if isinstance(candidate.get("nearest_wrong_target"), str) else "promote_to_skill"
+        repeat_shape = cast(str, candidate.get("abstraction_shape", "route"))
+        bounded_unit_ref = cast(str, candidate_ref)
+        quest_unit_name = (
+            candidate.get("unit_name")
+            if isinstance(candidate.get("unit_name"), str)
+            else f"reviewed closeout candidate {bounded_unit_ref}"
+        )
+    else:
+        owner_repo = "aoa-playbooks"
+        next_surface = f"quests/{_safe_name(context.session_ref)}-followup/QUEST.md"
+        promotion_verdict = "keep_open_quest"
+        nearest_wrong_target = "promote_to_skill"
+        repeat_shape = "route"
+        bounded_unit_ref = (
+            cast(str, candidate_ref)
+            if isinstance(candidate_ref, str) and candidate_ref
+            else f"quest:{_safe_name(context.session_ref)}"
+        )
+        quest_unit_name = f"reviewed closeout follow-through for {context.session_ref}"
+
+    triage = {
+        "artifact_kind": "quest_triage",
+        "session_ref": context.session_ref,
+        "quest_unit_name": quest_unit_name,
+        "reviewed_artifact_ref": str(reviewed_artifact),
+        "candidate_ref": bounded_unit_ref,
+        "promotion_verdict": promotion_verdict,
+        "repeat_shape": repeat_shape,
+        "notes": _quest_triage_notes(
+            context=context,
+            reviewed_artifact_evidence=reviewed_artifact_evidence,
+            shortlisted_clusters=shortlisted_clusters,
+            receipt_payloads=receipt_payloads,
+        ),
+    }
+    triage_path = output_dir / "QUEST_TRIAGE.json"
+    write_json(triage_path, triage)
+
+    packet = {
+        "artifact_kind": "quest_promotion",
+        "session_ref": context.session_ref,
+        "promotion_verdict": promotion_verdict,
+        "owner_repo": owner_repo,
+        "next_surface": next_surface,
+        "nearest_wrong_target": nearest_wrong_target,
+        "repeat_shape": repeat_shape,
+        "bounded_unit_ref": bounded_unit_ref,
+    }
+    packet_path = output_dir / "QUEST_PROMOTION.json"
+    write_json(packet_path, packet)
+
+    run_ref = f"run-{_safe_name(context.session_ref)}-closeout-bridge"
+    receipt = {
+        "event_kind": "quest_promotion_receipt",
+        "event_id": f"evt-{_safe_name(context.session_ref)}-quest",
+        "observed_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        "run_ref": run_ref,
+        "session_ref": context.session_ref,
+        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
+        "evidence_refs": [
+            {"kind": "quest_triage", "ref": str(triage_path), "role": "primary"},
+            {"kind": "quest_promotion", "ref": str(packet_path), "role": "promotion"},
+            {"kind": "reviewed_artifact", "ref": str(reviewed_artifact), "role": "reviewed-source"},
+            {
+                "kind": "skill_contract",
+                "ref": "repo:aoa-skills/skills/aoa-quest-harvest/SKILL.md",
+                "role": "contract",
+            },
+        ],
+        "payload": {
+            "promotion_verdict": promotion_verdict,
+            "owner_repo": owner_repo,
+            "next_surface": next_surface,
+            "nearest_wrong_target": nearest_wrong_target,
+            "repeat_shape": repeat_shape,
+            "bounded_unit_ref": bounded_unit_ref,
+        },
+    }
+    receipt_path = output_dir / "QUEST_PROMOTION_RECEIPT.json"
+    write_json(receipt_path, receipt)
+
+    core_receipt = _build_core_skill_receipt(
+        session_ref=context.session_ref,
+        run_ref=run_ref,
+        skill_name="aoa-quest-harvest",
+        detail_event_kind="quest_promotion_receipt",
+        detail_receipt_ref=str(receipt_path),
+        route_ref="route:checkpoint-closeout-bridge",
+        repo_scope=context.repo_scope,
+        handoff_targets=[target.skill_name for target in context.ordered_skill_plan],
+        repeated_pattern_signal=bool(shortlisted_clusters),
+        promotion_discussion_required=bool(context.candidate_map.upgrade_candidate_ids),
+        candidate_now=len(context.candidate_map.upgrade_candidate_ids),
+        candidate_later=0,
+        surface_detection_report_ref=context.surface_handoff_ref,
+        detail_to_closeout_ref=context.reviewed_artifact_ref,
+    )
+    core_receipt_path = output_dir / "CORE_SKILL_APPLICATION_RECEIPT.quest.json"
+    write_json(core_receipt_path, core_receipt)
+
+    return {
+        "packet": packet,
+        "artifact_refs": [str(triage_path), str(packet_path)],
+        "receipt_refs": [str(receipt_path), str(core_receipt_path)],
+    }
+
+
+def _build_accepted_candidate(*, cluster: SessionCheckpointCluster, reviewed_artifact: Path) -> dict[str, object]:
+    owner_repo = (
+        cluster.owner_hint
+        if cluster.owner_hint in ALLOWED_OWNER_REPOS
+        else DEFAULT_OWNER_BY_CANDIDATE_KIND.get(cluster.candidate_kind, "aoa-skills")
+    )
+    abstraction_shape = ABSTRACTION_SHAPE_BY_OWNER[owner_repo]
+    slug = _safe_name(cluster.display_name or cluster.candidate_id)
+    next_surface = DEFAULT_ARTIFACT_BY_OWNER[owner_repo].format(slug=slug)
+    return {
+        "candidate_ref": cluster.candidate_id,
+        "unit_name": cluster.display_name,
+        "abstraction_shape": abstraction_shape,
+        "owner_repo_recommendation": owner_repo,
+        "chosen_next_artifact": next_surface,
+        "nearest_wrong_target": _nearest_wrong_target(owner_repo),
+        "owner_reason": _owner_reason(cluster=cluster, owner_repo=owner_repo),
+        "evidence_anchors": _dedupe_strings([str(reviewed_artifact), *cluster.evidence_refs]),
+    }
+
+
+def _owner_reason(*, cluster: SessionCheckpointCluster, owner_repo: str) -> str:
+    reasons = {
+        "aoa-playbooks": "The surviving reviewed unit is still route-shaped, so the next honest owner surface is a playbook rather than a leaf skill.",
+        "aoa-skills": "The surviving reviewed unit looks like a bounded executable workflow, so the next honest owner surface is a skill contract.",
+        "aoa-evals": "The surviving reviewed unit looks proof- or verdict-shaped, so the next honest owner surface is an eval contract.",
+        "aoa-memo": "The surviving reviewed unit looks recall-shaped, so the next honest owner surface is a memo or writeback surface.",
+        "aoa-agents": "The surviving reviewed unit looks actor- or role-shaped, so the next honest owner surface is an agent boundary contract.",
+        "aoa-techniques": "The surviving reviewed unit looks like reusable practice meaning, so the next honest owner surface is a technique contract.",
+    }
+    return reasons.get(
+        owner_repo,
+        f"The reviewed checkpoint candidate {cluster.candidate_id} survived closeout with enough shape to draft the next owner artifact.",
+    )
+
+
+def _nearest_wrong_target(owner_repo: str) -> str:
+    nearest = {
+        "aoa-playbooks": "skill",
+        "aoa-skills": "playbook",
+        "aoa-evals": "skill",
+        "aoa-memo": "eval",
+        "aoa-agents": "skill",
+        "aoa-techniques": "skill",
+    }
+    return nearest.get(owner_repo, "skill")
+
+
+def _progression_signals_from_reviewed_artifact(
+    *,
+    reviewed_artifact: Path,
+    reviewed_artifact_evidence: dict[str, object],
+    candidate_ids: list[str],
+) -> list[ProgressionAxisSignal]:
+    text = cast(str, reviewed_artifact_evidence.get("text") or "")
+    lowered = text.lower()
+    templates: list[tuple[str, tuple[str, ...], str]] = [
+        (
+            "boundary_integrity",
+            ("boundary", "scope", "owner layer", "owner-layer", "charter"),
+            "the reviewed artifact explicitly revisits boundaries, scope, or ownership and should feed a final boundary-integrity reread",
+        ),
+        (
+            "execution_reliability",
+            ("implemented", "executed", "ran", "green", "verified"),
+            "the reviewed artifact carries real execution or verify-green evidence that should count toward execution reliability",
+        ),
+        (
+            "change_legibility",
+            ("patch", "diff", "change", "commit", "refactor"),
+            "the reviewed artifact names concrete changes clearly enough to improve change legibility at reviewed closeout",
+        ),
+        (
+            "review_sharpness",
+            ("review", "audit", "finding", "risk", "gap"),
+            "the reviewed artifact preserves explicit review language that should sharpen the final progression reread",
+        ),
+        (
+            "proof_discipline",
+            ("proof", "validate", "verification", "test", "schema"),
+            "the reviewed artifact cites proof or validation work that should inform final proof-discipline judgment",
+        ),
+        (
+            "provenance_hygiene",
+            ("source of truth", "authority", "provenance", "canonical"),
+            "the reviewed artifact keeps provenance and authority visible, which should influence provenance hygiene at closeout",
+        ),
+        (
+            "deep_readiness",
+            ("architecture", "wave", "phase", "bridge", "kernel"),
+            "the reviewed artifact shows deeper structural understanding that should be reconsidered during progression lift",
+        ),
+    ]
+    evidence_refs = [str(reviewed_artifact)]
+    signals: list[ProgressionAxisSignal] = []
+    for axis, keywords, why in templates:
+        if not any(keyword in lowered for keyword in keywords):
+            continue
+        signals.append(
+            ProgressionAxisSignal(
+                axis=cast(
+                    Literal[
+                        "boundary_integrity",
+                        "execution_reliability",
+                        "change_legibility",
+                        "review_sharpness",
+                        "proof_discipline",
+                        "provenance_hygiene",
+                        "deep_readiness",
+                    ],
+                    axis,
+                ),
+                movement="advance",
+                why=why,
+                evidence_refs=evidence_refs,
+                candidate_ids=list(candidate_ids),
+            )
+        )
+    return signals
+
+
+def _axis_delta_for_movement(movement: str) -> int:
+    return {
+        "advance": 1,
+        "hold": 0,
+        "reanchor": -1,
+        "downgrade": -2,
+    }[movement]
+
+
+def _progression_verdict(
+    *,
+    merged_signals: list[ProgressionAxisSignal],
+    accepted_candidates: object,
+) -> str:
+    if not merged_signals:
+        return "hold"
+    movements = [signal.movement for signal in merged_signals]
+    if "downgrade" in movements:
+        return "downgrade"
+    if "reanchor" in movements:
+        return "reanchor"
+    if sum(1 for movement in movements if movement == "advance") >= 2 and isinstance(accepted_candidates, list):
+        return "advance" if accepted_candidates else "hold"
+    return "hold"
+
+
+def _progression_cautions(
+    *,
+    context: CheckpointCloseoutContext,
+    merged_signals: list[ProgressionAxisSignal],
+    shortlisted_clusters: list[SessionCheckpointCluster],
+    receipt_payloads: list[dict[str, object]],
+) -> list[str]:
+    cautions: list[str] = []
+    if context.checkpoint_note_ref is None:
+        cautions.append("no checkpoint note was available, so progression relies on the reviewed artifact and any prior receipts only")
+    if context.surface_handoff_ref is None:
+        cautions.append("no reviewed surface handoff was available, so owner-layer shortlist cues remained minimal")
+    if not shortlisted_clusters:
+        cautions.append("no reviewed checkpoint candidates survived into closeout, so progression remains cautious and session-scoped")
+    if not receipt_payloads:
+        cautions.append("no prior receipt refs were provided to widen the reviewed evidence set")
+    if not merged_signals:
+        cautions.append("no durable axis movement was strong enough to survive reviewed reread, so the honest progression verdict is hold")
+    return cautions
+
+
+def _quest_triage_notes(
+    *,
+    context: CheckpointCloseoutContext,
+    reviewed_artifact_evidence: dict[str, object],
+    shortlisted_clusters: list[SessionCheckpointCluster],
+    receipt_payloads: list[dict[str, object]],
+) -> list[str]:
+    notes: list[str] = []
+    if shortlisted_clusters:
+        notes.append("quest triage started from checkpoint and reviewed-handoff shortlists but reread the reviewed artifact before deciding any promotion target")
+    else:
+        notes.append("quest triage had no checkpoint shortlist and therefore relied on the reviewed artifact alone")
+    if receipt_payloads:
+        notes.append("prior receipt refs stayed evidence inputs, not replacement authority")
+    if "repeat" in cast(set[str], reviewed_artifact_evidence.get("tokens") or set()):
+        notes.append("the reviewed artifact still names repeated work, so keep-open-quest remains a meaningful option even without promotion")
+    return notes
+
+
+def _build_core_skill_receipt(
+    *,
+    session_ref: str,
+    run_ref: str,
+    skill_name: Literal[
+        "aoa-session-donor-harvest",
+        "aoa-session-progression-lift",
+        "aoa-quest-harvest",
+    ],
+    detail_event_kind: Literal[
+        "harvest_packet_receipt",
+        "progression_delta_receipt",
+        "quest_promotion_receipt",
+    ],
+    detail_receipt_ref: str,
+    route_ref: str,
+    repo_scope: list[str],
+    handoff_targets: list[str],
+    repeated_pattern_signal: bool,
+    promotion_discussion_required: bool,
+    candidate_now: int,
+    candidate_later: int,
+    surface_detection_report_ref: str | None,
+    detail_to_closeout_ref: str,
+) -> dict[str, object]:
+    adjacent_owner_repos = [repo for repo in repo_scope if repo in ALLOWED_OWNER_REPOS]
+    return {
+        "event_kind": "core_skill_application_receipt",
+        "event_id": f"evt-core-{_safe_name(session_ref)}-{skill_name.replace('aoa-', '')}",
+        "observed_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        "run_ref": run_ref,
+        "session_ref": session_ref,
+        "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": skill_name},
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": skill_name},
+        "evidence_refs": [{"kind": "receipt", "ref": detail_receipt_ref}],
+        "payload": {
+            "kernel_id": "project-core-session-growth-v1",
+            "skill_name": skill_name,
+            "application_stage": "finish",
+            "detail_event_kind": detail_event_kind,
+            "detail_receipt_ref": detail_receipt_ref,
+            "route_ref": route_ref,
+            "surface_detection_context": {
+                "activation_truth": "manual-equivalent-adjacent",
+                "adjacent_owner_repos": adjacent_owner_repos,
+                "owner_layer_ambiguity": len(set(adjacent_owner_repos)) > 1,
+                "detail_to_closeout_ref": detail_to_closeout_ref,
+                "surface_closeout_handoff_ref": surface_detection_report_ref,
+                "candidate_counts": {
+                    "candidate_now": candidate_now,
+                    "candidate_later": candidate_later,
+                },
+                "suggested_handoff_targets": handoff_targets,
+                "repeated_pattern_signal": repeated_pattern_signal,
+                "promotion_discussion_required": promotion_discussion_required,
+            },
+        },
+    }
+
+
+def _safe_name(value: str) -> str:
+    normalized = re.sub(r"[^a-zA-Z0-9._-]+", "-", value.strip())
+    normalized = normalized.strip("-._")
+    return normalized or "session"
 
 
 def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
@@ -917,35 +2025,27 @@ def _derive_session_end_recommendation(
 
 
 def _derive_session_end_skill_targets(note: SessionCheckpointNote | None) -> list[SessionEndSkillTarget]:
-    if note is None:
+    if note is None or not note.candidate_clusters:
         return []
 
-    targets: list[SessionEndSkillTarget] = []
-    if note.harvest_candidate_ids:
-        targets.append(
-            SessionEndSkillTarget(
-                skill_name="aoa-session-donor-harvest",
-                why="reviewed closeout should bundle checkpoint-led harvest candidates into one honest harvest handoff before any stats movement",
-                candidate_ids=list(note.harvest_candidate_ids),
-            )
-        )
-    if note.progression_candidate_ids:
-        targets.append(
-            SessionEndSkillTarget(
-                skill_name="aoa-session-progression-lift",
-                why="reviewed closeout should turn provisional checkpoint axis movement into one explicit multi-axis progression delta before any final quest verdict",
-                candidate_ids=list(note.progression_candidate_ids),
-            )
-        )
-    if note.upgrade_candidate_ids:
-        targets.append(
-            SessionEndSkillTarget(
-                skill_name="aoa-quest-harvest",
-                why="reviewed closeout should evaluate checkpoint-led upgrade candidates only after progression lift has gathered the final multi-axis verdict",
-                candidate_ids=list(note.upgrade_candidate_ids),
-            )
-        )
-    return targets
+    all_candidate_ids = [cluster.candidate_id for cluster in note.candidate_clusters]
+    return [
+        SessionEndSkillTarget(
+            skill_name="aoa-session-donor-harvest",
+            why="reviewed closeout should start from donor harvest so checkpoint-led hints are reread against the full reviewed artifact before any later verdict",
+            candidate_ids=list(note.harvest_candidate_ids or all_candidate_ids),
+        ),
+        SessionEndSkillTarget(
+            skill_name="aoa-session-progression-lift",
+            why="reviewed closeout should gather one final multi-axis progression delta after donor harvest rereads the reviewed artifact",
+            candidate_ids=list(note.progression_candidate_ids or all_candidate_ids),
+        ),
+        SessionEndSkillTarget(
+            skill_name="aoa-quest-harvest",
+            why="reviewed closeout should keep final quest triage last, after donor harvest and progression lift have both completed",
+            candidate_ids=list(note.upgrade_candidate_ids),
+        ),
+    ]
 
 
 def _derive_session_end_next_honest_move(
@@ -959,11 +2059,11 @@ def _derive_session_end_next_honest_move(
     skill_names = [target.skill_name for target in session_end_targets]
     if note.stats_refresh_recommended:
         return (
-            "At reviewed closeout, raise "
+            "At reviewed closeout, run aoa-checkpoint-closeout-bridge so it raises "
             + ", ".join(skill_names)
             + " and refresh stats only after the reviewed handoff is assembled."
         )
-    return "At reviewed closeout, raise " + ", ".join(skill_names) + "."
+    return "At reviewed closeout, run aoa-checkpoint-closeout-bridge and raise " + ", ".join(skill_names) + "."
 
 
 def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label: str) -> str:

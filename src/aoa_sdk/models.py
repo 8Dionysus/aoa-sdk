@@ -1337,6 +1337,63 @@ class SessionEndSkillTarget(BaseModel):
     candidate_ids: list[str] = Field(default_factory=list)
 
 
+class CloseoutContextCandidateMap(BaseModel):
+    harvest_candidate_ids: list[str] = Field(default_factory=list)
+    progression_candidate_ids: list[str] = Field(default_factory=list)
+    upgrade_candidate_ids: list[str] = Field(default_factory=list)
+
+
+class CheckpointCloseoutContext(BaseModel):
+    schema_version: int = 1
+    context_type: Literal["checkpoint_closeout_context_v1"] = "checkpoint_closeout_context_v1"
+    orchestrator_skill_name: Literal["aoa-checkpoint-closeout-bridge"] = (
+        "aoa-checkpoint-closeout-bridge"
+    )
+    session_ref: str
+    repo_root: str
+    reviewed_artifact_ref: str
+    checkpoint_note_ref: str | None = None
+    surface_handoff_ref: str | None = None
+    receipt_refs: list[str] = Field(default_factory=list)
+    repo_scope: list[str] = Field(default_factory=list)
+    candidate_map: CloseoutContextCandidateMap = Field(default_factory=CloseoutContextCandidateMap)
+    progression_axis_signals: list[ProgressionAxisSignal] = Field(default_factory=list)
+    ordered_skill_plan: list[SessionEndSkillTarget] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+
+class CloseoutExecutionStep(BaseModel):
+    skill_name: Literal[
+        "aoa-session-donor-harvest",
+        "aoa-session-progression-lift",
+        "aoa-quest-harvest",
+    ]
+    status: Literal["executed", "skipped"]
+    reason: str
+    artifact_refs: list[str] = Field(default_factory=list)
+    receipt_refs: list[str] = Field(default_factory=list)
+
+
+class CheckpointCloseoutExecutionReport(BaseModel):
+    schema_version: int = 1
+    report_type: Literal["checkpoint_closeout_execution_report_v1"] = (
+        "checkpoint_closeout_execution_report_v1"
+    )
+    orchestrator_skill_name: Literal["aoa-checkpoint-closeout-bridge"] = (
+        "aoa-checkpoint-closeout-bridge"
+    )
+    session_ref: str
+    reviewed_artifact_ref: str
+    checkpoint_note_ref: str | None = None
+    surface_handoff_ref: str | None = None
+    context_ref: str
+    executed_skills: list[CloseoutExecutionStep] = Field(default_factory=list)
+    skipped_skills: list[CloseoutExecutionStep] = Field(default_factory=list)
+    produced_artifact_refs: list[str] = Field(default_factory=list)
+    produced_receipt_refs: list[str] = Field(default_factory=list)
+    final_stop_reason: str
+
+
 class SurfaceCloseoutHandoffTarget(BaseModel):
     skill_name: Literal[
         "aoa-session-donor-harvest",
