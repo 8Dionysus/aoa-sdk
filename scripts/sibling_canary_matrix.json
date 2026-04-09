@@ -5,7 +5,7 @@
     {
       "repo": "aoa-routing",
       "target_ref": "main",
-      "purpose": "route-directed public surfaces"
+      "purpose": "route-directed public surfaces plus federation capsule ABI"
     },
     {
       "repo": "aoa-playbooks",
@@ -46,6 +46,21 @@
       "repo": "aoa-stats",
       "target_ref": "main",
       "purpose": "downstream summary surfaces consumed by closeout flows"
+    },
+    {
+      "repo": "Dionysus",
+      "target_ref": "main",
+      "purpose": "seed-entry capsule compatibility and low-context route posture"
+    },
+    {
+      "repo": "8Dionysus",
+      "target_ref": "main",
+      "purpose": "public orientation capsule compatibility"
+    },
+    {
+      "repo": "abyss-stack",
+      "target_ref": "main",
+      "purpose": "runtime diagnostic capsule compatibility"
     }
   ]
 }

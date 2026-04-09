@@ -19,11 +19,13 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     dionysus_surface.write_text(
         json.dumps(
             {
-                "schema_version": "dionysus_seed_route_map_v1",
+                "schema_version": "dionysus_seed_route_map_v2",
+                "schema_ref": "schemas/seed-route-map.schema.json",
                 "owner_repo": "Dionysus",
                 "surface_kind": "seed",
                 "authority_ref": "docs/codex/planting-protocol.md",
                 "next_live_seed_ref": "seed_expansion/example.md#seed",
+                "validation_refs": ["scripts/validate_seed_route_map.py"],
                 "routes": [],
             }
         )
@@ -36,7 +38,10 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     report = {entry.surface_id: entry for entry in sdk.compatibility.check_all()}
 
     assert report["aoa-sdk.workspace_control_plane.min"].compatible is True
+    assert report["aoa-routing.federation_entrypoints.min"].compatible is True
+    assert report["aoa-routing.return_navigation_hints.min"].compatible is True
     assert report["Dionysus.seed_route_map.min"].compatible is True
+    assert report["8Dionysus.public_route_map.min"].compatible is True
     assert report["abyss-stack.diagnostic_surface_catalog.min"].compatible is True
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatibility_mode == "unversioned"
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatible is True
@@ -151,8 +156,11 @@ def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surf
     kag_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-kag")}
     memo_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-memo")}
     technique_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-techniques")}
+    routing_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-routing")}
 
     assert playbook_checks["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
+    assert routing_checks["aoa-routing.federation_entrypoints.min"].compatible is True
+    assert routing_checks["aoa-routing.return_navigation_hints.min"].compatible is True
     assert playbook_checks["aoa-playbooks.playbook_automation_seeds"].detected_version == 1
     assert playbook_checks["aoa-playbooks.playbook_composition_manifest"].compatible is True
     assert playbook_checks["aoa-playbooks.playbook_review_status.min"].detected_version == 1

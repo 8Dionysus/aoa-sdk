@@ -61,7 +61,7 @@ def test_workspace_bootstrap_reports_missing_repos(workspace_root: Path) -> None
 
     assert result.exit_code == 1
     payload = json.loads(result.stdout)
-    assert "8Dionysus" in payload["missing_required_repos"]
+    assert payload["missing_required_repos"] == ["Tree-of-Sophia", "Dionysus"]
     assert payload["ready"] is False
     assert payload["executed"] is False
 

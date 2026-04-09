@@ -24,6 +24,8 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert sdk.workspace.repo_origins["abyss-stack"] == "manifest:repos.abyss-stack.preferred"
     assert report["aoa-techniques.technique_capsules"].compatible is True
     assert report["aoa-techniques.technique_sections.full"].compatible is True
+    assert report["aoa-routing.federation_entrypoints.min"].compatible is True
+    assert report["aoa-routing.return_navigation_hints.min"].compatible is True
     assert report["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
     assert report["aoa-playbooks.playbook_review_status.min"].compatible is True
     assert report["aoa-playbooks.playbook_landing_governance.min"].compatible is True
@@ -42,6 +44,9 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert report["aoa-stats.object_summary.min"].compatible is True
     assert report["aoa-stats.core_skill_application_summary.min"].compatible is True
     assert report["aoa-stats.automation_pipeline_summary.min"].compatible is True
+    assert report["8Dionysus.public_route_map.min"].compatible is True
+    assert report["Dionysus.seed_route_map.min"].compatible is True
+    assert report["abyss-stack.diagnostic_surface_catalog.min"].compatible is True
     assert report["aoa-kag.kag_registry.min"].compatible is True
     assert report["aoa-kag.tos_zarathustra_route_retrieval_pack.min"].compatible is True
 

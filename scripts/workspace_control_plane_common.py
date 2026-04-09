@@ -6,16 +6,28 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+from jsonschema import Draft202012Validator
+
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 WORKSPACE_CONTROL_PLANE_PATH = REPO_ROOT / "generated" / "workspace_control_plane.min.json"
+SCHEMA_REF = "schemas/workspace-control-plane.schema.json"
+VALIDATION_REFS = (
+    "scripts/build_workspace_control_plane.py",
+    "scripts/validate_workspace_control_plane.py",
+    "tests/test_workspace_control_plane.py",
+    "tests/test_compatibility.py",
+)
+FORBIDDEN_LOW_CONTEXT_PREFIXES = ("src/", "scripts/")
 
 SURFACE_PAYLOAD = {
-    "schema_version": "aoa_sdk_workspace_control_plane_v1",
+    "schema_version": "aoa_sdk_workspace_control_plane_v2",
+    "schema_ref": SCHEMA_REF,
     "owner_repo": "aoa-sdk",
     "surface_kind": "runtime_surface",
     "authority_ref": "docs/boundaries.md",
     "workspace_manifest_ref": ".aoa/workspace.toml",
+    "validation_refs": list(VALIDATION_REFS),
 }
 
 ROUTE_SPECS = (
@@ -25,7 +37,7 @@ ROUTE_SPECS = (
         "surface_ref": "docs/workspace-layout.md",
         "verification_refs": [
             ".aoa/workspace.toml",
-            "src/aoa_sdk/workspace/discovery.py",
+            "docs/versioning.md",
         ],
     },
     {
@@ -34,7 +46,7 @@ ROUTE_SPECS = (
         "surface_ref": "docs/versioning.md",
         "verification_refs": [
             "docs/RELEASE_CI_POSTURE.md",
-            "scripts/sibling_canary_matrix.json",
+            "schemas/workspace-control-plane.schema.json",
         ],
     },
     {
@@ -52,7 +64,7 @@ ROUTE_SPECS = (
         "surface_ref": "docs/session-growth-checkpoints.md",
         "verification_refs": [
             "docs/checkpoint-note-promotion.md",
-            "src/aoa_sdk/checkpoints/registry.py",
+            "docs/versioning.md",
         ],
     },
 )
@@ -65,15 +77,44 @@ def resolve_ref(value: str) -> Path:
     return target
 
 
+def validate_low_context_ref(value: str, location: str) -> Path:
+    for prefix in FORBIDDEN_LOW_CONTEXT_PREFIXES:
+        if value.startswith(prefix):
+            raise ValueError(f"{location} must not point to implementation path '{value}'")
+    return resolve_ref(value)
+
+
+def load_schema() -> dict[str, object]:
+    schema_path = resolve_ref(SCHEMA_REF)
+    return json.loads(schema_path.read_text(encoding="utf-8"))
+
+
+def validate_payload_schema(payload: dict[str, object]) -> None:
+    validator = Draft202012Validator(load_schema())
+    errors = sorted(validator.iter_errors(payload), key=lambda error: list(error.absolute_path))
+    if not errors:
+        return
+    error = errors[0]
+    path = "".join(f"[{item}]" if isinstance(item, int) else f".{item}" for item in error.absolute_path)
+    if path.startswith("."):
+        path = path[1:]
+    if path:
+        raise ValueError(f"schema violation at '{path}': {error.message}")
+    raise ValueError(f"schema violation: {error.message}")
+
+
 def build_payload() -> dict[str, object]:
     resolve_ref(SURFACE_PAYLOAD["authority_ref"])
     resolve_ref(SURFACE_PAYLOAD["workspace_manifest_ref"])
+    resolve_ref(SURFACE_PAYLOAD["schema_ref"])
+    for ref in SURFACE_PAYLOAD["validation_refs"]:
+        resolve_ref(ref)
 
     routes: list[dict[str, object]] = []
     for spec in ROUTE_SPECS:
-        resolve_ref(spec["surface_ref"])
+        validate_low_context_ref(spec["surface_ref"], f"route:{spec['route_id']}.surface_ref")
         for ref in spec["verification_refs"]:
-            resolve_ref(ref)
+            validate_low_context_ref(ref, f"route:{spec['route_id']}.verification_refs")
         routes.append(
             {
                 "route_id": spec["route_id"],
@@ -83,10 +124,12 @@ def build_payload() -> dict[str, object]:
             }
         )
 
-    return {
+    payload = {
         **SURFACE_PAYLOAD,
         "routes": routes,
     }
+    validate_payload_schema(payload)
+    return payload
 
 
 def render_payload(payload: dict[str, object]) -> str:

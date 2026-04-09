@@ -18,7 +18,8 @@ from workspace_control_plane_common import (  # noqa: E402
 def test_build_payload_stays_runtime_surface_only() -> None:
     payload = build_payload()
 
-    assert payload["schema_version"] == "aoa_sdk_workspace_control_plane_v1"
+    assert payload["schema_version"] == "aoa_sdk_workspace_control_plane_v2"
+    assert payload["schema_ref"] == "schemas/workspace-control-plane.schema.json"
     assert payload["owner_repo"] == "aoa-sdk"
     assert payload["surface_kind"] == "runtime_surface"
     assert [route["route_id"] for route in payload["routes"]] == [
@@ -40,6 +41,12 @@ def test_surface_keeps_expected_refs() -> None:
 
     assert payload["authority_ref"] == SURFACE_PAYLOAD["authority_ref"]
     assert payload["workspace_manifest_ref"] == SURFACE_PAYLOAD["workspace_manifest_ref"]
+    assert payload["validation_refs"] == SURFACE_PAYLOAD["validation_refs"]
     assert [route["surface_ref"] for route in payload["routes"]] == [
         spec["surface_ref"] for spec in ROUTE_SPECS
     ]
+    assert all(
+        not ref.startswith(("src/", "scripts/"))
+        for route in payload["routes"]
+        for ref in [route["surface_ref"], *route["verification_refs"]]
+    )

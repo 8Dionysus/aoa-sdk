@@ -1,4 +1,5 @@
 KNOWN_REPOS = (
+    "8Dionysus",
     "aoa-sdk",
     "aoa-routing",
     "aoa-skills",

@@ -36,6 +36,15 @@ The compatibility layer distinguishes two modes:
 - `unversioned`: accept the surface only as a strict-shape local-first
   dependency and report that no version negotiation is available
 
+For the current federation-facing route-map capsules, compatibility should also
+mean:
+
+- the public surface is schema-backed in the owner repo
+- low-context route fields stay on docs, manifests, generated JSON, or schema
+  contracts instead of `src/*` or `scripts/*`
+- owner-local builders and validators remain visible only as validation support,
+  not as the public capsule path
+
 Today that second mode is still needed for
 `aoa-playbooks/generated/playbook_activation_surfaces.min.json`.
 
