@@ -25,21 +25,23 @@ SURFACE_COMPATIBILITY_RULES = {
         repo="aoa-routing",
         relative_path="generated/owner_layer_shortlist.min.json",
         version_field="schema_version",
-        supported_versions=[1],
+        supported_versions=[1, "aoa_routing_owner_layer_shortlist_v2"],
     ),
     "aoa-routing.federation_entrypoints.min": SurfaceCompatibilityRule(
         surface_id="aoa-routing.federation_entrypoints.min",
         repo="aoa-routing",
         relative_path="generated/federation_entrypoints.min.json",
-        version_field="version",
-        supported_versions=[1],
+        version_field="schema_version",
+        legacy_version_fields=["version"],
+        supported_versions=[1, "aoa_routing_federation_entrypoints_v2"],
     ),
     "aoa-routing.return_navigation_hints.min": SurfaceCompatibilityRule(
         surface_id="aoa-routing.return_navigation_hints.min",
         repo="aoa-routing",
         relative_path="generated/return_navigation_hints.min.json",
-        version_field="version",
-        supported_versions=[1],
+        version_field="schema_version",
+        legacy_version_fields=["version"],
+        supported_versions=[1, "aoa_routing_return_navigation_hints_v2"],
     ),
     "aoa-sdk.workspace_control_plane.min": SurfaceCompatibilityRule(
         surface_id="aoa-sdk.workspace_control_plane.min",
@@ -470,7 +472,10 @@ SURFACE_COMPATIBILITY_RULES = {
         relative_path="generated/summary_surface_catalog.min.json",
         preferred_relative_paths=["state/generated/summary_surface_catalog.min.json"],
         version_field="schema_version",
-        supported_versions=["aoa_stats_summary_surface_catalog_v1"],
+        supported_versions=[
+            "aoa_stats_summary_surface_catalog_v1",
+            "aoa_stats_summary_surface_catalog_v2",
+        ],
     ),
     "aoa-kag.kag_registry.min": SurfaceCompatibilityRule(
         surface_id="aoa-kag.kag_registry.min",
@@ -589,7 +594,13 @@ def _evaluate_data(
             reason="Versioned surface must load as a JSON object.",
         )
 
-    if rule.version_field not in data:
+    version_field = None
+    for candidate in (rule.version_field, *rule.legacy_version_fields):
+        if candidate is not None and candidate in data:
+            version_field = candidate
+            break
+
+    if version_field is None:
         return SurfaceCompatibilityCheck(
             surface_id=rule.surface_id,
             repo=rule.repo,
@@ -599,15 +610,24 @@ def _evaluate_data(
             version_field=rule.version_field,
             supported_versions=rule.supported_versions,
             compatible=False,
-            reason=f"Missing version field {rule.version_field!r}.",
+            reason=(
+                f"Missing version field {rule.version_field!r}."
+                if not rule.legacy_version_fields
+                else (
+                    f"Missing version fields {([rule.version_field, *rule.legacy_version_fields])!r}."
+                )
+            ),
         )
 
-    detected_version = data[rule.version_field]
+    detected_version = data[version_field]
     compatible = detected_version in rule.supported_versions
     reason = (
-        f"Detected supported version {detected_version!r}."
+        f"Detected supported version {detected_version!r} via {version_field!r}."
         if compatible
-        else f"Detected unsupported version {detected_version!r}; supported versions: {rule.supported_versions!r}."
+        else (
+            f"Detected unsupported version {detected_version!r} via {version_field!r}; "
+            f"supported versions: {rule.supported_versions!r}."
+        )
     )
     return SurfaceCompatibilityCheck(
         surface_id=rule.surface_id,
@@ -615,7 +635,7 @@ def _evaluate_data(
         relative_path=rule.relative_path,
         resolved_relative_path=resolved_relative_path,
         compatibility_mode="versioned",
-        version_field=rule.version_field,
+        version_field=version_field,
         supported_versions=rule.supported_versions,
         detected_version=detected_version,
         compatible=compatible,

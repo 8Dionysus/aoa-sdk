@@ -45,6 +45,16 @@ mean:
 - owner-local builders and validators remain visible only as validation support,
   not as the public capsule path
 
+For the current routing and stats ABI normalization wave, compatibility also
+uses a bounded dual-read posture:
+
+- v2 `schema_version` envelopes are canonical for emitted routing federation
+  surfaces and the `aoa-stats` summary surface catalog
+- legacy v1 payloads remain readable during transition when they still appear
+  in generated or `state/generated` overrides
+- when both shapes are available, the SDK should prefer the v2 override path
+  without dropping the normal `state/generated/*` precedence rules
+
 Today that second mode is still needed for
 `aoa-playbooks/generated/playbook_activation_surfaces.min.json`.
 

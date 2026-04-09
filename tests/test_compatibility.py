@@ -40,6 +40,7 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-sdk.workspace_control_plane.min"].compatible is True
     assert report["aoa-routing.federation_entrypoints.min"].compatible is True
     assert report["aoa-routing.return_navigation_hints.min"].compatible is True
+    assert report["aoa-routing.owner_layer_shortlist.min"].compatible is True
     assert report["Dionysus.seed_route_map.min"].compatible is True
     assert report["8Dionysus.public_route_map.min"].compatible is True
     assert report["abyss-stack.diagnostic_surface_catalog.min"].compatible is True
@@ -161,6 +162,7 @@ def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surf
     assert playbook_checks["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
     assert routing_checks["aoa-routing.federation_entrypoints.min"].compatible is True
     assert routing_checks["aoa-routing.return_navigation_hints.min"].compatible is True
+    assert routing_checks["aoa-routing.owner_layer_shortlist.min"].compatible is True
     assert playbook_checks["aoa-playbooks.playbook_automation_seeds"].detected_version == 1
     assert playbook_checks["aoa-playbooks.playbook_composition_manifest"].compatible is True
     assert playbook_checks["aoa-playbooks.playbook_review_status.min"].detected_version == 1
@@ -180,3 +182,40 @@ def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surf
     assert technique_checks["aoa-techniques.technique_promotion_readiness.min"].compatible is True
     assert kag_checks["aoa-kag.kag_registry.min"].detected_version == 1
     assert kag_checks["aoa-kag.tos_zarathustra_route_retrieval_pack.min"].compatible is True
+
+
+def test_compatibility_accepts_legacy_and_v2_stats_and_routing_capsules(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    stats_catalog = workspace_root / "aoa-stats" / "generated" / "summary_surface_catalog.min.json"
+    stats_catalog.write_text(
+        json.dumps(
+            {
+                "schema_version": "aoa_stats_summary_surface_catalog_v1",
+                "generated_from": {
+                    "receipt_input_paths": ["receipts.json"],
+                    "total_receipts": 1,
+                    "latest_observed_at": "2026-04-05T10:35:00Z",
+                },
+                "surfaces": [
+                    {
+                        "name": "core_skill_application_summary",
+                        "path": "generated/core_skill_application_summary.min.json",
+                        "schema_ref": "schemas/core-skill-application-summary.schema.json",
+                        "primary_question": "Which project-core kernel skills are actually finishing and how often, without inferring usage from general receipt volume?",
+                        "derivation_rule": "aggregate core_skill_application_receipt payloads by kernel_id and skill_name",
+                    }
+                ],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    federation = workspace_root / "aoa-routing" / "generated" / "federation_entrypoints.min.json"
+    federation.write_text('{"version":1}\n', encoding="utf-8")
+    returns = workspace_root / "aoa-routing" / "generated" / "return_navigation_hints.min.json"
+    returns.write_text('{"version":1}\n', encoding="utf-8")
+
+    assert sdk.compatibility.check("aoa-stats.summary_surface_catalog.min").compatible is True
+    assert sdk.compatibility.check("aoa-routing.federation_entrypoints.min").compatible is True
+    assert sdk.compatibility.check("aoa-routing.return_navigation_hints.min").compatible is True

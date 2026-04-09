@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field
+from pydantic import BaseModel, Field, model_validator
 
 class SurfaceRef(BaseModel):
     repo: str
@@ -89,6 +89,7 @@ class SurfaceCompatibilityRule(BaseModel):
     relative_path: str
     preferred_relative_paths: list[str] = Field(default_factory=list)
     version_field: str | None = None
+    legacy_version_fields: list[str] = Field(default_factory=list)
     supported_versions: list[int | str] = Field(default_factory=list)
     notes: str = ""
 
@@ -866,10 +867,25 @@ class StatsSurfaceDetectionWindow(BaseModel):
 
 class StatsSummarySurface(BaseModel):
     name: str
-    path: str
+    surface_ref: str
+    path: str | None = None
     schema_ref: str
     primary_question: str
     derivation_rule: str
+
+    @model_validator(mode="before")
+    @classmethod
+    def _normalize_legacy_path(cls, value: object) -> object:
+        if not isinstance(value, dict):
+            return value
+        payload = dict(value)
+        surface_ref = payload.get("surface_ref")
+        legacy_path = payload.get("path")
+        if not isinstance(surface_ref, str) and isinstance(legacy_path, str):
+            payload["surface_ref"] = legacy_path
+        if "path" not in payload and isinstance(legacy_path, str):
+            payload["path"] = legacy_path
+        return payload
 
 
 class ProjectCoreKernelGovernanceContract(BaseModel):

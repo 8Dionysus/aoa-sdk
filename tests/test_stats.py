@@ -222,7 +222,30 @@ def install_stats_fixture(workspace_root: Path) -> Path:
         }
     ]
     live_catalog = dict(live_surfaces["summary_surface_catalog.min.json"])
-    live_catalog["generated_from"] = live_generated_from
+    live_catalog.update(
+        {
+            "schema_version": "aoa_stats_summary_surface_catalog_v2",
+            "schema_ref": "schemas/summary-surface-catalog.schema.json",
+            "owner_repo": "aoa-stats",
+            "surface_kind": "runtime_surface",
+            "authority_ref": "docs/ARCHITECTURE.md",
+            "generated_from": live_generated_from,
+            "validation_refs": [
+                "scripts/build_views.py",
+                "scripts/validate_repo.py",
+                "tests/test_summary_surface_catalog.py",
+            ],
+            "surfaces": [
+                {
+                    **entry,
+                    "surface_ref": entry["path"],
+                }
+                for entry in live_catalog["surfaces"]
+            ],
+        }
+    )
+    for entry in live_catalog["surfaces"]:
+        entry.pop("path", None)
     live_surface_detection = dict(live_surfaces["surface_detection_summary.min.json"])
     live_surface_detection["generated_from"] = live_generated_from
     live_surface_detection["windows"] = [
@@ -304,6 +327,11 @@ def test_stats_api_reads_generated_surfaces(workspace_root: Path) -> None:
         "core_skill_application_summary",
         "surface_detection_summary",
     }
+    assert {item.surface_ref for item in sdk.stats.summary_catalog()} == {
+        "generated/automation_pipeline_summary.min.json",
+        "generated/core_skill_application_summary.min.json",
+        "generated/surface_detection_summary.min.json",
+    }
 
 
 def test_stats_compatibility_checks_green_when_repo_is_present(workspace_root: Path) -> None:
@@ -330,3 +358,29 @@ def test_stats_compatibility_checks_green_when_repo_is_present(workspace_root: P
         == "aoa_stats_surface_detection_summary_v1"
     )
     assert report["aoa-stats.summary_surface_catalog.min"].compatible is True
+    assert (
+        report["aoa-stats.summary_surface_catalog.min"].resolved_relative_path
+        == "state/generated/summary_surface_catalog.min.json"
+    )
+    assert (
+        report["aoa-stats.summary_surface_catalog.min"].detected_version
+        == "aoa_stats_summary_surface_catalog_v2"
+    )
+
+
+def test_stats_catalog_legacy_v1_remains_readable_without_state_override(workspace_root: Path) -> None:
+    install_stats_fixture(workspace_root)
+    legacy_catalog = workspace_root / "aoa-stats" / "state" / "generated" / "summary_surface_catalog.min.json"
+    legacy_catalog.unlink()
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.compatibility.check("aoa-stats.summary_surface_catalog.min")
+    assert report.compatible is True
+    assert report.resolved_relative_path == "generated/summary_surface_catalog.min.json"
+    assert report.detected_version == "aoa_stats_summary_surface_catalog_v1"
+    assert [item.surface_ref for item in sdk.stats.summary_catalog()] == [
+        "generated/core_skill_application_summary.min.json",
+        "generated/automation_pipeline_summary.min.json",
+        "generated/surface_detection_summary.min.json",
+    ]
