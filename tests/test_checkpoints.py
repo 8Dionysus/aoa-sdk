@@ -186,6 +186,30 @@ def test_capture_from_skill_phase_reports_existing_session_end_targets_when_skip
     assert capture.progression_axis_signals
     assert capture.stats_refresh_recommended is True
     assert capture.session_end_next_honest_move is not None
+    assert capture.harvest_candidate_ids
+    assert capture.progression_candidate_ids
+
+
+def test_detect_surfaces_checkpoint_bridge_when_runtime_note_exists(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+
+    report = sdk.skills.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="review the current checkpoint note and name the honest next closeout step",
+    )
+
+    assert any(item.skill_name == "aoa-checkpoint-closeout-bridge" for item in report.must_confirm)
 
 
 def test_checkpoint_promote_writes_dionysus_snapshot_and_updates_note(workspace_root: Path) -> None:

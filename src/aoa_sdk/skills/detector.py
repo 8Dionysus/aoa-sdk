@@ -6,10 +6,13 @@ from typing import Any, Literal
 
 from ..closeout import CloseoutAPI
 from ..compatibility import load_surface
+from ..errors import SurfaceNotFound
 from ..loaders import load_json
 from ..models import (
+    CheckpointCaptureResult,
     KernelNextStepBrief,
     ProjectFoundationProfileSurface,
+    SessionCheckpointNote,
     SkillCard,
     SkillDetectionReport,
     SkillDispatchItem,
@@ -241,6 +244,20 @@ def detect_skills(
         must_confirm.extend(demoted_activate_now)
         reasoning.append(
             "host inventory demoted one or more auto-activation candidates into must_confirm because they were router-only for this session."
+        )
+
+    checkpoint_bridge_item = _checkpoint_bridge_must_confirm(
+        workspace=workspace,
+        repo_root=str(resolved_repo_root),
+        checkpoint_note=None,
+        layer_by_skill=layer_by_skill,
+        collision_by_skill=collision_by_skill,
+        host_inventory=host_inventory,
+    )
+    if checkpoint_bridge_item is not None:
+        must_confirm.append(checkpoint_bridge_item)
+        reasoning.append(
+            "runtime checkpoint note already carries a reviewed-closeout chain, so aoa-checkpoint-closeout-bridge was surfaced as the next explicit closeout skill."
         )
 
     must_confirm = _dedupe_items(must_confirm)
@@ -487,6 +504,122 @@ def _closeout_must_confirm(
             ),
         )
     ]
+
+
+def enrich_report_with_checkpoint_bridge(
+    workspace: Workspace,
+    *,
+    report: SkillDetectionReport,
+    repo_root: str | Path,
+    checkpoint_capture: CheckpointCaptureResult | None = None,
+    host_available_skills: list[str] | None = None,
+    host_availability_source: Literal[
+        "host-manifest",
+        "host-skill-list",
+        "repo-install",
+        "workspace-install",
+        "user-install",
+        "not-provided",
+    ] = "not-provided",
+) -> SkillDetectionReport:
+    if report.phase not in {"ingress", "pre-mutation", "checkpoint"}:
+        return report
+
+    foundation = load_project_foundation(workspace)
+    layer_by_skill = _build_layer_map(foundation)
+    collision_by_skill = load_collision_families(workspace)
+    resolved_repo_root = _resolve_repo_root(workspace, repo_root)
+    host_inventory = _normalize_host_inventory(
+        workspace,
+        resolved_repo_root=resolved_repo_root,
+        host_available_skills=host_available_skills,
+        host_availability_source=host_availability_source,
+    )
+    checkpoint_note = checkpoint_capture.note if checkpoint_capture is not None else None
+    bridge_item = _checkpoint_bridge_must_confirm(
+        workspace=workspace,
+        repo_root=str(resolved_repo_root),
+        checkpoint_note=checkpoint_note,
+        layer_by_skill=layer_by_skill,
+        collision_by_skill=collision_by_skill,
+        host_inventory=host_inventory,
+    )
+    if bridge_item is None:
+        return report
+
+    if bridge_item.skill_name in {
+        *(item.skill_name for item in report.activate_now),
+        *(item.skill_name for item in report.must_confirm),
+        *(item.skill_name for item in report.suggest_next),
+    }:
+        return report
+
+    updated = report.model_copy(deep=True)
+    updated.must_confirm.append(bridge_item)
+    updated.must_confirm = _dedupe_items(updated.must_confirm)
+    updated.actionability_gaps = _actionability_gaps(
+        activate_now=updated.activate_now,
+        must_confirm=updated.must_confirm,
+        suggest_next=updated.suggest_next,
+    )
+    updated.reasoning.append(
+        "checkpoint note already carries reviewed-closeout candidates, so aoa-checkpoint-closeout-bridge was added as an explicit pending closeout step."
+    )
+    return updated
+
+
+def _checkpoint_bridge_must_confirm(
+    *,
+    workspace: Workspace,
+    repo_root: str,
+    checkpoint_note: SessionCheckpointNote | None,
+    layer_by_skill: dict[str, Literal["kernel", "outer-ring", "risk-ring"]],
+    collision_by_skill: dict[str, str | None],
+    host_inventory: "_HostInventory",
+) -> SkillDispatchItem | None:
+    skill_name = "aoa-checkpoint-closeout-bridge"
+    if skill_name not in layer_by_skill:
+        return None
+
+    note = checkpoint_note or _load_runtime_checkpoint_note(workspace, repo_root=repo_root)
+    if note is None or not note.carry_until_session_closeout:
+        return None
+
+    candidate_ids = list(
+        dict.fromkeys(
+            [
+                *note.harvest_candidate_ids,
+                *note.progression_candidate_ids,
+                *note.upgrade_candidate_ids,
+            ]
+        )
+    )
+    if not candidate_ids:
+        return None
+
+    return SkillDispatchItem(
+        skill_name=skill_name,
+        layer=layer_by_skill[skill_name],
+        collision_family=collision_by_skill.get(skill_name),
+        reason=(
+            "checkpoint note already queued a reviewed-closeout chain from "
+            f"{len(candidate_ids)} candidate(s); explicit bridge execution still requires a reviewed artifact"
+        ),
+        host_availability=_host_availability_for_skill(
+            skill_name,
+            host_inventory=host_inventory,
+            manual_fallback_allowed=True,
+        ),
+    )
+
+
+def _load_runtime_checkpoint_note(workspace: Workspace, *, repo_root: str) -> SessionCheckpointNote | None:
+    from ..checkpoints import CheckpointsAPI
+
+    try:
+        return CheckpointsAPI(workspace).status(repo_root=repo_root)
+    except SurfaceNotFound:
+        return None
 
 
 class _HostInventory:

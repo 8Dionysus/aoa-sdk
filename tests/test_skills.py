@@ -45,11 +45,11 @@ def test_project_foundation_reads(workspace_root: Path) -> None:
 
     assert foundation.foundation_id == "project-foundation-v1"
     assert foundation.canonical_install_profile == "repo-project-foundation"
-    assert foundation.skill_count == 22
+    assert foundation.skill_count == 23
     assert foundation.skills[:3] == [
         "aoa-session-donor-harvest",
+        "aoa-checkpoint-closeout-bridge",
         "aoa-automation-opportunity-scan",
-        "aoa-session-route-forks",
     ]
     assert foundation.skills[-3:] == [
         "aoa-local-stack-bringup",

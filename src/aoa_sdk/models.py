@@ -1321,6 +1321,9 @@ class CheckpointCaptureResult(BaseModel):
     note_ref: str | None = None
     session_end_skill_targets: list["SessionEndSkillTarget"] = Field(default_factory=list)
     session_end_next_honest_move: str | None = None
+    harvest_candidate_ids: list[str] = Field(default_factory=list)
+    progression_candidate_ids: list[str] = Field(default_factory=list)
+    upgrade_candidate_ids: list[str] = Field(default_factory=list)
     progression_axis_signals: list[ProgressionAxisSignal] = Field(default_factory=list)
     stats_refresh_recommended: bool = False
     note: SessionCheckpointNote | None = None

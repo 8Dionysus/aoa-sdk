@@ -83,6 +83,7 @@ def test_workspace_bootstrap_execute_installs_foundation_and_agents(workspace_ro
     assert payload["agents_file"]["action"] == "write"
     assert (workspace_root / "AGENTS.md").exists()
     assert (workspace_root / ".agents" / "skills" / "aoa-change-protocol").is_symlink()
+    assert (workspace_root / ".agents" / "skills" / "aoa-checkpoint-closeout-bridge").is_symlink()
 
 
 def test_compatibility_check_can_emit_repo_filtered_json(workspace_root: Path) -> None:

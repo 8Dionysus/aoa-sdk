@@ -130,9 +130,12 @@ def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path) -> N
     assert payload["checkpoint_capture"]["mode"] == "auto"
     assert payload["checkpoint_capture"]["appended"] is True
     assert payload["checkpoint_capture"]["checkpoint_kind"] == "commit"
+    assert payload["checkpoint_capture"]["harvest_candidate_ids"]
+    assert payload["checkpoint_capture"]["progression_candidate_ids"]
     assert payload["checkpoint_capture"]["session_end_skill_targets"]
     assert payload["checkpoint_capture"]["stats_refresh_recommended"] is True
     assert payload["checkpoint_capture"]["session_end_next_honest_move"]
+    assert any(item["skill_name"] == "aoa-checkpoint-closeout-bridge" for item in payload["report"]["must_confirm"])
     assert payload["checkpoint_note"]["state"] in {"collecting", "reviewable"}
     note_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "checkpoint-note.json"
     assert note_path.exists()

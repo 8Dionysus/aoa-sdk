@@ -33,6 +33,36 @@
       ]
     },
     {
+      "name": "aoa-checkpoint-closeout-bridge",
+      "display_name": "AoA Checkpoint Closeout Bridge",
+      "description": "Bridge provisional checkpoint evidence into one explicit reviewed closeout execution chain without turning notes into final harvest, progression, or quest authority.",
+      "short_description": "Bridge checkpoints into reviewed closeout",
+      "path": ".agents/skills/aoa-checkpoint-closeout-bridge/SKILL.md",
+      "trust_posture": "portable-core",
+      "invocation_mode": "explicit-preferred",
+      "allow_implicit_invocation": true,
+      "mutation_surface": "none",
+      "recommended_install_scopes": [
+        "repo",
+        "user"
+      ],
+      "explicit_handles": {
+        "codex": {
+          "mention": "$aoa-checkpoint-closeout-bridge",
+          "browser": "/skills"
+        }
+      },
+      "keywords": [
+        "checkpoint",
+        "closeout",
+        "bridge",
+        "reviewed",
+        "harvest",
+        "progression",
+        "quest"
+      ]
+    },
+    {
       "name": "aoa-source-of-truth-check",
       "display_name": "AoA Source Of Truth Check",
       "description": "Check source-of-truth boundaries before editing, transplanting, or reporting.",

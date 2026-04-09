@@ -24,6 +24,7 @@ from ..models import (
     SkillDetectionReport,
     SkillDispatchItem,
 )
+from ..skills.detector import enrich_report_with_checkpoint_bridge
 from ..workspace.bootstrap import bootstrap_workspace
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
@@ -307,6 +308,12 @@ def _print_checkpoint_capture(result: CheckpointCaptureResult | None) -> None:
         )
     if result.note_ref:
         typer.echo(f"checkpoint_note_ref: {result.note_ref}")
+    typer.echo(
+        "checkpoint_candidate_ids:"
+        f" harvest={', '.join(result.harvest_candidate_ids) if result.harvest_candidate_ids else 'none'};"
+        f" progression={', '.join(result.progression_candidate_ids) if result.progression_candidate_ids else 'none'};"
+        f" upgrade={', '.join(result.upgrade_candidate_ids) if result.upgrade_candidate_ids else 'none'}"
+    )
     if result.progression_axis_signals:
         typer.echo("progression_axis_signals:")
         for signal in result.progression_axis_signals:
@@ -853,6 +860,15 @@ def skills_enter(
         manual_review_requested=mark_checkpoint_reviewable,
         auto_capture=auto_checkpoint,
     )
+    sdk_report = enrich_report_with_checkpoint_bridge(
+        workspace,
+        report=sdk_report,
+        repo_root=repo_root,
+        checkpoint_capture=checkpoint_capture,
+        host_available_skills=host_available_skills,
+        host_availability_source=host_availability_source,  # type: ignore[arg-type]
+    )
+    payload = _write_skill_report(report_path, sdk_report)
     payload = _merge_checkpoint_capture(payload, checkpoint_capture)
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
@@ -946,6 +962,15 @@ def skills_guard(
         manual_review_requested=mark_checkpoint_reviewable,
         auto_capture=auto_checkpoint,
     )
+    sdk_report = enrich_report_with_checkpoint_bridge(
+        workspace,
+        report=sdk_report,
+        repo_root=repo_root,
+        checkpoint_capture=checkpoint_capture,
+        host_available_skills=host_available_skills,
+        host_availability_source=host_availability_source,  # type: ignore[arg-type]
+    )
+    payload = _write_skill_report(report_path, sdk_report)
     payload = _merge_checkpoint_capture(payload, checkpoint_capture)
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
