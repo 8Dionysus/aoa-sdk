@@ -24,6 +24,7 @@ from ..models import (
     SurfaceOpportunityItem,
     SkillDetectionReport,
     SkillDispatchItem,
+    WorkflowFollowThroughBrief,
 )
 from ..skills.detector import enrich_report_with_checkpoint_bridge
 from ..workspace.bootstrap import bootstrap_workspace
@@ -94,6 +95,19 @@ def _print_owner_follow_through(
         typer.echo(
             f"{indent}  - [{item.suggested_action}] {unit_label} -> {item.owner_repo}:{item.next_surface}"
         )
+        typer.echo(f"{indent}    reason: {item.reason}")
+
+
+def _print_workflow_follow_through(
+    briefs: list[WorkflowFollowThroughBrief],
+    *,
+    indent: str = "",
+) -> None:
+    if not briefs:
+        return
+    typer.echo(f"{indent}workflow_follow_through:")
+    for item in briefs:
+        typer.echo(f"{indent}  - [{item.suggested_action}] {item.skill_name}")
         typer.echo(f"{indent}    reason: {item.reason}")
 
 
@@ -1402,6 +1416,7 @@ def closeout_run(
         report.owner_follow_through_briefs,
         handoff_path=report.owner_handoff_path,
     )
+    _print_workflow_follow_through(report.workflow_follow_through_briefs)
     if report_output:
         typer.echo(f"report: {report_output}")
 
@@ -1589,6 +1604,10 @@ def closeout_process_inbox(
             _print_owner_follow_through(
                 item.owner_follow_through_briefs,
                 handoff_path=item.owner_handoff_path,
+                indent="  ",
+            )
+            _print_workflow_follow_through(
+                item.workflow_follow_through_briefs,
                 indent="  ",
             )
             if item.error:

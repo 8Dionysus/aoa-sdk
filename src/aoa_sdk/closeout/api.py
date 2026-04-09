@@ -31,6 +31,7 @@ from ..models import (
     KernelNextStepBrief,
     OwnerFollowThroughBrief,
     ProjectCoreSkillKernelSurface,
+    WorkflowFollowThroughBrief,
 )
 from ..workspace.discovery import Workspace
 
@@ -340,6 +341,15 @@ class CloseoutAPI:
                 manifest=manifest,
             )
         )
+        workflow_follow_through_briefs = (
+            []
+            if manifest.audit_only
+            else self._build_workflow_follow_through_briefs(
+                manifest_path=resolved_manifest_path,
+                manifest=manifest,
+                kernel_next_step_brief=kernel_next_step_brief,
+            )
+        )
         owner_handoff_path = (
             None
             if manifest.audit_only
@@ -347,6 +357,7 @@ class CloseoutAPI:
                 manifest_path=resolved_manifest_path,
                 manifest=manifest,
                 briefs=owner_follow_through_briefs,
+                workflow_briefs=workflow_follow_through_briefs,
             )
         )
         report = CloseoutRunReport(
@@ -365,6 +376,7 @@ class CloseoutAPI:
             kernel_next_step_brief=kernel_next_step_brief,
             owner_handoff_path=str(owner_handoff_path) if owner_handoff_path is not None else None,
             owner_follow_through_briefs=owner_follow_through_briefs,
+            workflow_follow_through_briefs=workflow_follow_through_briefs,
         )
         if report_output is not None:
             write_json(Path(report_output).expanduser().resolve(), report.model_dump(mode="json"))
@@ -466,6 +478,7 @@ class CloseoutAPI:
                         kernel_next_step_brief=report.kernel_next_step_brief,
                         owner_handoff_path=report.owner_handoff_path,
                         owner_follow_through_briefs=report.owner_follow_through_briefs,
+                        workflow_follow_through_briefs=report.workflow_follow_through_briefs,
                     )
                 )
                 processed_count += 1
@@ -851,6 +864,108 @@ class CloseoutAPI:
             key=lambda item: (item.owner_repo, item.next_surface, item.unit_ref),
         )
 
+    def _build_workflow_follow_through_briefs(
+        self,
+        *,
+        manifest_path: Path,
+        manifest: CloseoutManifest,
+        kernel_next_step_brief: KernelNextStepBrief | None,
+    ) -> list[WorkflowFollowThroughBrief]:
+        kernel = ProjectCoreSkillKernelSurface.model_validate(
+            load_surface(self.workspace, "aoa-skills.project_core_skill_kernel.min")
+        )
+        detail_receipts, _ = self._load_kernel_receipt_batches(
+            manifest_path=manifest_path,
+            manifest=manifest,
+            kernel=kernel,
+        )
+        briefs_by_skill: dict[str, WorkflowFollowThroughBrief] = {}
+
+        if (
+            kernel_next_step_brief is not None
+            and kernel_next_step_brief.suggested_action == "invoke-core-skill"
+            and kernel_next_step_brief.suggested_skill_name is not None
+        ):
+            briefs_by_skill[kernel_next_step_brief.suggested_skill_name] = WorkflowFollowThroughBrief(
+                source_kind="kernel-next-step",
+                skill_name=kernel_next_step_brief.suggested_skill_name,
+                suggested_action="invoke-core-skill",
+                reason=kernel_next_step_brief.reason,
+                evidence_refs=[kernel_next_step_brief.stats_surface_ref],
+            )
+
+        progression_receipt = self._latest_detail_receipt(
+            detail_receipts,
+            event_kind="progression_delta_receipt",
+        )
+        if progression_receipt is not None:
+            payload = progression_receipt.get("payload")
+            verdict = payload.get("verdict") if isinstance(payload, dict) else None
+            axis_deltas = payload.get("axis_deltas") if isinstance(payload, dict) else None
+            negative_axes = (
+                sorted(
+                    axis
+                    for axis, delta in axis_deltas.items()
+                    if isinstance(axis, str) and isinstance(delta, int) and delta < 0
+                )
+                if isinstance(axis_deltas, dict)
+                else []
+            )
+            if verdict in {"reanchor", "downgrade"} and "aoa-session-self-diagnose" not in briefs_by_skill:
+                detail = (
+                    f"progression closed with {verdict} and negative axes in {', '.join(negative_axes)}"
+                    if negative_axes
+                    else f"progression closed with {verdict}"
+                )
+                briefs_by_skill["aoa-session-self-diagnose"] = WorkflowFollowThroughBrief(
+                    source_kind="progression-caution",
+                    skill_name="aoa-session-self-diagnose",
+                    suggested_action="invoke-core-skill",
+                    reason=(
+                        f"{detail}, so the next honest workflow move is bounded self-diagnosis before the next mutation-heavy follow-through."
+                    ),
+                    evidence_refs=self._extract_evidence_ref_strings(progression_receipt.get("evidence_refs")),
+                )
+
+        diagnosis_receipt = self._latest_detail_receipt(
+            detail_receipts,
+            event_kind="skill_run_receipt",
+        )
+        repair_receipt = self._latest_detail_receipt(
+            detail_receipts,
+            event_kind="repair_cycle_receipt",
+        )
+        if diagnosis_receipt is not None and repair_receipt is None:
+            payload = diagnosis_receipt.get("payload")
+            diagnosis_types = payload.get("diagnosis_types") if isinstance(payload, dict) else None
+            diagnosis_summary = (
+                ", ".join(item for item in diagnosis_types if isinstance(item, str))
+                if isinstance(diagnosis_types, list)
+                else "an unresolved diagnosis packet"
+            )
+            briefs_by_skill["aoa-session-self-repair"] = WorkflowFollowThroughBrief(
+                source_kind="diagnosis-gap",
+                skill_name="aoa-session-self-repair",
+                suggested_action="invoke-core-skill",
+                reason=(
+                    f"closeout already carries {diagnosis_summary}, but no repair_cycle_receipt landed yet, so the next honest workflow move is bounded self-repair."
+                ),
+                evidence_refs=self._extract_evidence_ref_strings(diagnosis_receipt.get("evidence_refs")),
+            )
+
+        workflow_order = {
+            "aoa-automation-opportunity-scan": 0,
+            "aoa-session-route-forks": 1,
+            "aoa-session-self-diagnose": 2,
+            "aoa-session-self-repair": 3,
+            "aoa-session-progression-lift": 4,
+            "aoa-quest-harvest": 5,
+        }
+        return sorted(
+            briefs_by_skill.values(),
+            key=lambda item: (workflow_order.get(item.skill_name, 99), item.skill_name),
+        )
+
     def _build_harvest_follow_through_briefs(
         self,
         *,
@@ -1060,8 +1175,9 @@ class CloseoutAPI:
         manifest_path: Path,
         manifest: CloseoutManifest,
         briefs: list[OwnerFollowThroughBrief],
+        workflow_briefs: list[WorkflowFollowThroughBrief],
     ) -> Path | None:
-        if not briefs:
+        if not briefs and not workflow_briefs:
             return None
         handoff_dir = self._resolve_queue_dir(None, leaf="handoffs")
         handoff_dir.mkdir(parents=True, exist_ok=True)
@@ -1073,6 +1189,7 @@ class CloseoutAPI:
             manifest_path=str(manifest_path),
             generated_at=datetime.now(timezone.utc),
             items=briefs,
+            workflow_items=workflow_briefs,
         )
         write_json(handoff_path, payload.model_dump(mode="json"))
         return handoff_path

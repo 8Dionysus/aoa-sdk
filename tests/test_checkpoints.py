@@ -409,7 +409,7 @@ def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: P
                 "observed_at": "2026-04-09T12:00:00Z",
                 "run_ref": "run-existing-harvest",
                 "session_ref": "session:test-checkpoint-closeout-execute",
-                "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
+                "actor_ref": "aoa-skills:aoa-session-donor-harvest",
                 "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
                 "evidence_refs": [{"kind": "reviewed_artifact", "ref": str(reviewed_artifact)}],
                 "payload": {"route_ref": "route:test-checkpoint-closeout-execute"},
@@ -478,6 +478,20 @@ def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(w
     assert report.produced_receipt_refs
     for path in [*report.produced_artifact_refs, *report.produced_receipt_refs]:
         assert Path(path).exists()
+    receipt_payloads = {
+        Path(path).name: json.loads(Path(path).read_text(encoding="utf-8"))
+        for path in report.produced_receipt_refs
+    }
+    assert receipt_payloads["HARVEST_PACKET_RECEIPT.json"]["actor_ref"] == "aoa-skills:aoa-session-donor-harvest"
+    assert (
+        receipt_payloads["PROGRESSION_DELTA_RECEIPT.json"]["actor_ref"]
+        == "aoa-skills:aoa-session-progression-lift"
+    )
+    assert receipt_payloads["QUEST_PROMOTION_RECEIPT.json"]["actor_ref"] == "aoa-skills:aoa-quest-harvest"
+    assert (
+        receipt_payloads["CORE_SKILL_APPLICATION_RECEIPT.harvest.json"]["actor_ref"]
+        == "aoa-skills:aoa-session-donor-harvest"
+    )
     execution_report_path = (
         workspace_root
         / "aoa-sdk"
@@ -488,3 +502,76 @@ def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(w
         / "closeout-execution-report.json"
     )
     assert execution_report_path.exists()
+
+
+def test_execute_closeout_chain_routes_pattern_candidates_to_techniques(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-session-pattern.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                "Session ref: `session:test-closeout-pattern-technique`",
+                "",
+                "- repeated bounded discipline showed up across the session",
+                "- technique extraction now looks more honest than direct skill packaging",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir.mkdir(parents=True, exist_ok=True)
+    checkpoint_payload = {
+        "session_ref": "session:test-closeout-pattern-technique",
+        "repo_root": str((workspace_root / "aoa-sdk").resolve()),
+        "repo_label": "aoa-sdk",
+        "history_entry": {
+            "checkpoint_kind": "verify_green",
+            "observed_at": "2026-04-09T12:00:00Z",
+            "report_ref": str(note_dir / "pattern-report.json"),
+            "intent_text": "lift repeated bounded discipline into a reviewed closeout candidate",
+            "checkpoint_should_capture": True,
+            "blocked_by": [],
+            "candidate_clusters": [
+                {
+                    "candidate_id": "candidate:pattern:aoa-techniques-technique-promotion-readiness-min",
+                    "candidate_kind": "pattern",
+                    "owner_hint": "aoa-sdk",
+                    "display_name": "Reusable practice candidate",
+                    "source_surface_ref": "aoa-techniques.technique_promotion_readiness.min",
+                    "evidence_refs": [
+                        "aoa-techniques.technique_promotion_readiness.min",
+                    ],
+                    "confidence": "medium",
+                    "session_end_targets": ["harvest", "progression", "upgrade"],
+                    "progression_axis_signals": [],
+                    "promote_if": ["repeat the same owner hint across another reviewed checkpoint"],
+                    "defer_reason": None,
+                    "blocked_by": [],
+                    "next_owner_moves": [
+                        "carry the candidate through reviewed session closeout before moving candidates or stats"
+                    ],
+                }
+            ],
+            "manual_review_requested": False,
+        },
+    }
+    (note_dir / "checkpoint-note.jsonl").write_text(
+        json.dumps(checkpoint_payload) + "\n",
+        encoding="utf-8",
+    )
+    sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
+
+    report = sdk.checkpoints.execute_closeout_chain(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        reviewed_artifact_path=str(reviewed_artifact),
+    )
+
+    harvest_packet = json.loads(Path(report.produced_artifact_refs[0]).read_text(encoding="utf-8"))
+    accepted_candidate = harvest_packet["accepted_candidates"][0]
+    assert accepted_candidate["owner_repo_recommendation"] == "aoa-techniques"
+    assert accepted_candidate["abstraction_shape"] == "technique"
+    assert accepted_candidate["chosen_next_artifact"].startswith("techniques/")
