@@ -106,8 +106,7 @@ def test_checkpoint_cli_append_status_and_promote_handoff(workspace_root: Path) 
     assert handoff_path.exists()
 
 
-def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path, install_host_skills) -> None:
-    install_host_skills(workspace_root, ["aoa-change-protocol"])
+def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path) -> None:
     runner = CliRunner()
 
     result = runner.invoke(
@@ -117,7 +116,36 @@ def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path, inst
             "guard",
             str(workspace_root / "aoa-sdk"),
             "--intent-text",
-            "plan verify a bounded change",
+            "recurring workflow needs better handoff proof and recall",
+            "--mutation-surface",
+            "code",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["checkpoint_capture"]["mode"] == "auto"
+    assert payload["checkpoint_capture"]["appended"] is True
+    assert payload["checkpoint_capture"]["checkpoint_kind"] == "commit"
+    assert payload["checkpoint_note"]["state"] in {"collecting", "reviewable"}
+    note_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "checkpoint-note.json"
+    assert note_path.exists()
+
+
+def test_skills_guard_explicit_checkpoint_kind_still_wins(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--intent-text",
+            "reviewable verify-green checkpoint",
             "--mutation-surface",
             "code",
             "--checkpoint-kind",
@@ -130,9 +158,65 @@ def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path, inst
 
     assert result.exit_code == 0
     payload = json.loads(result.stdout)
+    assert payload["checkpoint_capture"]["mode"] == "explicit"
+    assert payload["checkpoint_capture"]["appended"] is True
+    assert payload["checkpoint_capture"]["checkpoint_kind"] == "verify_green"
     assert payload["checkpoint_note"]["state"] in {"collecting", "reviewable"}
-    note_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "checkpoint-note.json"
-    assert note_path.exists()
+
+
+def test_skills_guard_reports_no_checkpoint_signal_when_auto_capture_skips(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--intent-text",
+            "refresh generated contracts",
+            "--mutation-surface",
+            "code",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["checkpoint_capture"]["mode"] == "auto"
+    assert payload["checkpoint_capture"]["appended"] is False
+    assert payload["checkpoint_capture"]["reason"] == "no_checkpoint_signal"
+    assert "checkpoint_note" not in payload
+
+
+def test_skills_guard_can_disable_auto_checkpoint(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--intent-text",
+            "recurring workflow needs better handoff proof and recall",
+            "--mutation-surface",
+            "code",
+            "--no-auto-checkpoint",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["checkpoint_capture"]["appended"] is False
+    assert payload["checkpoint_capture"]["reason"] == "auto_disabled"
+    assert payload["checkpoint_capture"]["attempted"] is False
+    assert "checkpoint_note" not in payload
 
 
 def test_surfaces_detect_cli_can_append_checkpoint_note(workspace_root: Path) -> None:

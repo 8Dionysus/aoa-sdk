@@ -48,6 +48,43 @@ def test_checkpoint_status_becomes_reviewable_after_repeat(workspace_root: Path)
     assert route_cluster.review_status == "reviewable"
 
 
+def test_capture_from_skill_phase_auto_appends_only_when_growth_signal_exists(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    capture = sdk.checkpoints.capture_from_skill_phase(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="pre-mutation",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+    )
+
+    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    assert capture.mode == "auto"
+    assert capture.appended is True
+    assert capture.reason == "checkpoint_signal"
+    assert capture.checkpoint_kind == "commit"
+    assert capture.note is not None
+    assert (note_dir / "checkpoint-note.json").exists()
+
+
+def test_capture_from_skill_phase_reports_no_signal_without_writing_note(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    capture = sdk.checkpoints.capture_from_skill_phase(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="plan a cross-repo change",
+        mutation_surface="none",
+    )
+
+    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    assert capture.mode == "auto"
+    assert capture.appended is False
+    assert capture.reason == "no_checkpoint_signal"
+    assert capture.note is None
+    assert not note_dir.exists()
+
+
 def test_checkpoint_promote_writes_dionysus_snapshot_and_updates_note(workspace_root: Path) -> None:
     dionysus_root = workspace_root / "Dionysus"
     (dionysus_root / "reports" / "ecosystem-audits").mkdir(parents=True, exist_ok=True)

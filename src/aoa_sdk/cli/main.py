@@ -11,6 +11,7 @@ from ..closeout import CloseoutAPI
 from ..compatibility import CompatibilityAPI
 from ..loaders import load_json
 from ..models import (
+    CheckpointCaptureResult,
     KernelNextStepBrief,
     OwnerFollowThroughBrief,
     SessionCheckpointNote,
@@ -226,6 +227,22 @@ def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
             typer.echo(f"    blocked_by: {', '.join(cluster.blocked_by)}")
 
 
+def _print_checkpoint_capture(result: CheckpointCaptureResult | None) -> None:
+    if result is None:
+        return
+    if result.appended:
+        typer.echo(
+            f"checkpoint_capture: appended ({result.mode}, kind={result.checkpoint_kind}, reason={result.reason})"
+        )
+        return
+    if not result.attempted:
+        typer.echo("checkpoint_capture: disabled")
+        return
+    typer.echo(
+        f"checkpoint_capture: skipped ({result.mode}, kind={result.checkpoint_kind or 'none'}, reason={result.reason})"
+    )
+
+
 def _print_checkpoint_promotion(promotion: SessionCheckpointPromotion) -> None:
     typer.echo(f"session_ref: {promotion.session_ref}")
     typer.echo(f"target: {promotion.target}")
@@ -340,6 +357,16 @@ def _merge_checkpoint_note(payload: dict[str, Any], note: SessionCheckpointNote 
         return payload
     merged = dict(payload)
     merged["checkpoint_note"] = note.model_dump(mode="json")
+    return merged
+
+
+def _merge_checkpoint_capture(payload: dict[str, Any], result: CheckpointCaptureResult | None) -> dict[str, Any]:
+    if result is None:
+        return payload
+    merged = dict(payload)
+    merged["checkpoint_capture"] = result.model_dump(mode="json", exclude={"note"})
+    if result.note is not None:
+        merged["checkpoint_note"] = result.note.model_dump(mode="json")
     return merged
 
 
@@ -612,12 +639,17 @@ def skills_enter(
     checkpoint_kind: str | None = typer.Option(
         None,
         "--checkpoint-kind",
-        help="Optional checkpoint kind to append after ingress dispatch: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
+        help="Optional explicit checkpoint kind to append after ingress dispatch: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
     ),
     mark_checkpoint_reviewable: bool = typer.Option(
         False,
         "--mark-checkpoint-reviewable",
-        help="When used with --checkpoint-kind, mark the appended checkpoint as manually reviewable.",
+        help="When a checkpoint is appended explicitly or automatically, mark it as manually reviewable.",
+    ),
+    auto_checkpoint: bool = typer.Option(
+        True,
+        "--auto-checkpoint/--no-auto-checkpoint",
+        help="Auto-append one local checkpoint note only when checkpoint-phase surface detection finds a real growth signal.",
     ),
     host_skill: list[str] = typer.Option(
         None,
@@ -654,25 +686,26 @@ def skills_enter(
         report_output=report_output,
     )
     payload = _write_skill_report(report_path, sdk_report)
-    checkpoint_note: SessionCheckpointNote | None = None
-    if checkpoint_kind is not None:
-        checkpoint_note = sdk.checkpoints.append(
-            repo_root=repo_root,
-            checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
-            intent_text=intent_text,
-            mutation_surface="none",
-            session_file=session_file,
-            skill_report_path=str(report_path),
-            manual_review_requested=mark_checkpoint_reviewable,
-        )
-        payload = _merge_checkpoint_note(payload, checkpoint_note)
+    checkpoint_capture = sdk.checkpoints.capture_from_skill_phase(
+        repo_root=repo_root,
+        phase="ingress",
+        intent_text=intent_text,
+        mutation_surface="none",
+        session_file=session_file,
+        skill_report_path=str(report_path),
+        checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
+        manual_review_requested=mark_checkpoint_reviewable,
+        auto_capture=auto_checkpoint,
+    )
+    payload = _merge_checkpoint_capture(payload, checkpoint_capture)
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     typer.echo(f"report_path: {payload['report_path']}")
-    if checkpoint_note is not None:
-        typer.echo(f"checkpoint_note_state: {checkpoint_note.state}")
-        typer.echo(f"checkpoint_recommendation: {checkpoint_note.promotion_recommendation}")
+    _print_checkpoint_capture(checkpoint_capture)
+    if checkpoint_capture.note is not None:
+        typer.echo(f"checkpoint_note_state: {checkpoint_capture.note.state}")
+        typer.echo(f"checkpoint_recommendation: {checkpoint_capture.note.promotion_recommendation}")
     _print_skill_detection_report(sdk_report)
 
 
@@ -698,12 +731,17 @@ def skills_guard(
     checkpoint_kind: str | None = typer.Option(
         None,
         "--checkpoint-kind",
-        help="Optional checkpoint kind to append after guard dispatch: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
+        help="Optional explicit checkpoint kind to append after guard dispatch: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
     ),
     mark_checkpoint_reviewable: bool = typer.Option(
         False,
         "--mark-checkpoint-reviewable",
-        help="When used with --checkpoint-kind, mark the appended checkpoint as manually reviewable.",
+        help="When a checkpoint is appended explicitly or automatically, mark it as manually reviewable.",
+    ),
+    auto_checkpoint: bool = typer.Option(
+        True,
+        "--auto-checkpoint/--no-auto-checkpoint",
+        help="Auto-append one local checkpoint note only when checkpoint-phase surface detection finds a real growth signal.",
     ),
     host_skill: list[str] = typer.Option(
         None,
@@ -741,25 +779,26 @@ def skills_guard(
         report_output=report_output,
     )
     payload = _write_skill_report(report_path, sdk_report)
-    checkpoint_note: SessionCheckpointNote | None = None
-    if checkpoint_kind is not None:
-        checkpoint_note = sdk.checkpoints.append(
-            repo_root=repo_root,
-            checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
-            intent_text=intent_text,
-            mutation_surface=mutation_surface,  # type: ignore[arg-type]
-            session_file=session_file,
-            skill_report_path=str(report_path),
-            manual_review_requested=mark_checkpoint_reviewable,
-        )
-        payload = _merge_checkpoint_note(payload, checkpoint_note)
+    checkpoint_capture = sdk.checkpoints.capture_from_skill_phase(
+        repo_root=repo_root,
+        phase="pre-mutation",
+        intent_text=intent_text,
+        mutation_surface=mutation_surface,  # type: ignore[arg-type]
+        session_file=session_file,
+        skill_report_path=str(report_path),
+        checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
+        manual_review_requested=mark_checkpoint_reviewable,
+        auto_capture=auto_checkpoint,
+    )
+    payload = _merge_checkpoint_capture(payload, checkpoint_capture)
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     typer.echo(f"report_path: {payload['report_path']}")
-    if checkpoint_note is not None:
-        typer.echo(f"checkpoint_note_state: {checkpoint_note.state}")
-        typer.echo(f"checkpoint_recommendation: {checkpoint_note.promotion_recommendation}")
+    _print_checkpoint_capture(checkpoint_capture)
+    if checkpoint_capture.note is not None:
+        typer.echo(f"checkpoint_note_state: {checkpoint_capture.note.state}")
+        typer.echo(f"checkpoint_recommendation: {checkpoint_capture.note.promotion_recommendation}")
     _print_skill_detection_report(sdk_report)
 
 

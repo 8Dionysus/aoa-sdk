@@ -1251,6 +1251,24 @@ class SessionCheckpointPromotion(BaseModel):
     resulting_state: Literal["collecting", "reviewable", "promoted", "closed"]
 
 
+class CheckpointCaptureResult(BaseModel):
+    schema_version: int = 1
+    mode: Literal["auto", "explicit"]
+    attempted: bool = True
+    appended: bool = False
+    checkpoint_kind: Literal[
+        "manual",
+        "commit",
+        "verify_green",
+        "pr_opened",
+        "pr_merged",
+        "pause",
+        "owner_followthrough",
+    ] | None = None
+    reason: Literal["explicit_request", "checkpoint_signal", "no_checkpoint_signal", "auto_disabled"]
+    note: SessionCheckpointNote | None = None
+
+
 class SurfaceCloseoutHandoffTarget(BaseModel):
     skill_name: Literal[
         "aoa-session-donor-harvest",

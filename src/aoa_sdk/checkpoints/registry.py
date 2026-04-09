@@ -9,6 +9,7 @@ from typing import Literal, cast
 
 from ..errors import RepoNotFound, SurfaceNotFound
 from ..models import (
+    CheckpointCaptureResult,
     SessionCheckpointCluster,
     SessionCheckpointHistoryEntry,
     SessionCheckpointNote,
@@ -119,6 +120,95 @@ class CheckpointsAPI:
             handle.write(json.dumps(payload, ensure_ascii=True) + "\n")
         return self.status(repo_root=repo_root)
 
+    def capture_from_skill_phase(
+        self,
+        *,
+        repo_root: str,
+        phase: Literal["ingress", "pre-mutation"],
+        intent_text: str = "",
+        mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
+        session_file: str | None = None,
+        skill_report_path: str | None = None,
+        checkpoint_kind: Literal[
+            "manual",
+            "commit",
+            "verify_green",
+            "pr_opened",
+            "pr_merged",
+            "pause",
+            "owner_followthrough",
+        ] | None = None,
+        manual_review_requested: bool = False,
+        auto_capture: bool = True,
+    ) -> CheckpointCaptureResult:
+        if checkpoint_kind is not None:
+            note = self.append(
+                repo_root=repo_root,
+                checkpoint_kind=checkpoint_kind,
+                intent_text=intent_text,
+                mutation_surface=mutation_surface,
+                session_file=session_file,
+                skill_report_path=skill_report_path,
+                manual_review_requested=manual_review_requested,
+            )
+            return CheckpointCaptureResult(
+                mode="explicit",
+                attempted=True,
+                appended=True,
+                checkpoint_kind=checkpoint_kind,
+                reason="explicit_request",
+                note=note,
+            )
+
+        if not auto_capture:
+            return CheckpointCaptureResult(
+                mode="auto",
+                attempted=False,
+                appended=False,
+                checkpoint_kind=None,
+                reason="auto_disabled",
+                note=None,
+            )
+
+        inferred_kind = _infer_auto_checkpoint_kind(intent_text=intent_text)
+        report = self._surfaces.detect(
+            repo_root=repo_root,
+            phase="checkpoint",
+            intent_text=intent_text,
+            mutation_surface=mutation_surface,
+            session_file=session_file,
+            skill_report_path=skill_report_path,
+            checkpoint_kind=inferred_kind,
+        )
+        if not report.checkpoint_should_capture:
+            return CheckpointCaptureResult(
+                mode="auto",
+                attempted=True,
+                appended=False,
+                checkpoint_kind=inferred_kind,
+                reason="no_checkpoint_signal",
+                note=None,
+            )
+
+        note = self.append(
+            repo_root=repo_root,
+            checkpoint_kind=inferred_kind,
+            intent_text=intent_text,
+            mutation_surface=mutation_surface,
+            session_file=session_file,
+            skill_report_path=skill_report_path,
+            surface_report=report,
+            manual_review_requested=manual_review_requested,
+        )
+        return CheckpointCaptureResult(
+            mode="auto",
+            attempted=True,
+            appended=True,
+            checkpoint_kind=inferred_kind,
+            reason="checkpoint_signal",
+            note=note,
+        )
+
     def status(self, *, repo_root: str) -> SessionCheckpointNote:
         paths = _checkpoint_paths(self.workspace, repo_root)
         if not paths.jsonl.exists():
@@ -217,6 +307,37 @@ def _default_session_ref(paths: _CheckpointPaths, *, existing_note_path: Path | 
             pass
     date_str = datetime.now(UTC).date().isoformat()
     return f"session:{date_str}-{paths.repo_label}-checkpoint-growth"
+
+
+def _infer_auto_checkpoint_kind(
+    *,
+    intent_text: str,
+) -> Literal["manual", "commit", "verify_green", "pr_opened", "pr_merged", "pause", "owner_followthrough"]:
+    normalized = re.sub(r"[\s_-]+", " ", intent_text.strip().lower())
+    if any(token in normalized for token in ("owner follow through", "owner handoff", "follow through")):
+        return "owner_followthrough"
+    if any(token in normalized for token in ("pull request merged", "pr merged", "merged pr", "merge complete")):
+        return "pr_merged"
+    if any(token in normalized for token in ("pull request", "open pr", "pr open", "review thread")):
+        return "pr_opened"
+    if any(
+        token in normalized
+        for token in (
+            "verify green",
+            "green verify",
+            "all green",
+            "tests green",
+            "verified",
+            "verification",
+            "verify",
+        )
+    ):
+        return "verify_green"
+    if any(token in normalized for token in ("resume later", "continue later", "pick up later", "pause")):
+        return "pause"
+    if "checkpoint" in normalized or "commit" in normalized:
+        return "commit"
+    return "commit"
 
 
 def _archive_current_checkpoint(paths: _CheckpointPaths) -> None:
