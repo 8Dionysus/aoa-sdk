@@ -60,6 +60,7 @@ def test_surface_detection_routes_are_documented_as_additive_and_skill_only() ->
     assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in readme
     assert 'aoa skills enter /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --root /srv --json' in readme
     assert 'aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv --json' in readme
+    assert 'aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv --json' in readme
     assert "aoa skills guard /srv/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in readme
     assert 'aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv --json' in readme
     assert "aoa checkpoint append /srv/aoa-sdk" in readme
@@ -76,6 +77,7 @@ def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:
     assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint" in agents
     assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in agents
     assert 'aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/aoa-sdk --json' in agents
+    assert 'aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/aoa-sdk --json' in agents
     assert "aoa skills guard /srv/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in agents
     assert 'aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json' in agents
     assert "aoa skills ...` remains skill-only" in agents

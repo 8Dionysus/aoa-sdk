@@ -122,6 +122,9 @@ pre-mutation paths.
 They stay skill-only.
 By default they may also append one local checkpoint note when checkpoint-phase
 surface detection finds a real growth signal.
+Explicit `commit` and `verify-green` intents on a real mutation surface also
+count as growth seams for that local note, even when recurring-route heuristics
+stay quiet.
 Use `--no-auto-checkpoint` when you need the skill lane to stay read-only apart
 from its persisted report, and use `--checkpoint-kind` when one explicit
 checkpoint event matters.
@@ -137,6 +140,7 @@ aoa surfaces detect /srv/aoa-sdk --phase pre-mutation --intent-text "prove and r
 aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/aoa-sdk --json
+aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/aoa-sdk --json
 aoa skills guard /srv/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green --root /srv/aoa-sdk --json
 aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json
 ```

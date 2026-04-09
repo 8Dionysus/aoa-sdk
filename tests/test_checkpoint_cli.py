@@ -191,6 +191,33 @@ def test_skills_guard_reports_no_checkpoint_signal_when_auto_capture_skips(works
     assert "checkpoint_note" not in payload
 
 
+def test_skills_guard_auto_captures_explicit_commit_growth(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--intent-text",
+            "commit bounded patch",
+            "--mutation-surface",
+            "code",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["checkpoint_capture"]["mode"] == "auto"
+    assert payload["checkpoint_capture"]["appended"] is True
+    assert payload["checkpoint_capture"]["checkpoint_kind"] == "commit"
+    assert any(cluster["candidate_kind"] == "growth" for cluster in payload["checkpoint_note"]["candidate_clusters"])
+
+
 def test_skills_guard_can_disable_auto_checkpoint(workspace_root: Path) -> None:
     runner = CliRunner()
 

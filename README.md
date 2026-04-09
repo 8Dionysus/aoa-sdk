@@ -240,6 +240,7 @@ aoa skills enter /srv --intent-text "plan a cross-repo change" --root /srv --jso
 aoa skills enter /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --root /srv --json
 aoa skills guard /srv/aoa-sdk --intent-text "regenerate compatibility surfaces" --mutation-surface repo-config --root /srv --json
 aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv --json
+aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv --json
 aoa skills guard /srv/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green --root /srv --json
 aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv --json
 ```

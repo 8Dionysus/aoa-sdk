@@ -115,6 +115,15 @@ class SurfacesAPI:
             items=items,
             checkpoint_kind=checkpoint_kind,
         ) if phase == "checkpoint" else []
+        if phase == "checkpoint" and not candidate_clusters:
+            candidate_clusters = _derive_explicit_mutation_growth_clusters(
+                workspace=self.workspace,
+                repo_root=repo_root,
+                mutation_surface=mutation_surface,
+                intent_text=intent_text,
+                checkpoint_kind=checkpoint_kind,
+                skill_report=skill_report,
+            )
         blocked_by = _checkpoint_blocked_by(candidate_clusters) if phase == "checkpoint" else []
         checkpoint_should_capture = bool(candidate_clusters) or (
             phase == "checkpoint" and checkpoint_kind in {"manual", "pause"} and bool(items)
@@ -418,6 +427,124 @@ def _derive_heuristic_items(
     return items
 
 
+def _derive_explicit_mutation_growth_clusters(
+    *,
+    workspace: Workspace,
+    repo_root: str,
+    mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"],
+    intent_text: str,
+    checkpoint_kind: Literal[
+        "manual",
+        "commit",
+        "verify_green",
+        "pr_opened",
+        "pr_merged",
+        "pause",
+        "owner_followthrough",
+    ] | None,
+    skill_report: SkillDetectionReport,
+) -> list[CheckpointCandidateCluster]:
+    if checkpoint_kind not in {"commit", "verify_green"}:
+        return []
+    if mutation_surface == "none":
+        return []
+    if not _intent_explicitly_requests_checkpoint_kind(
+        intent_text=intent_text,
+        checkpoint_kind=checkpoint_kind,
+    ):
+        return []
+
+    context_label = _surface_context_label(workspace, repo_root)
+    evidence_refs = _explicit_mutation_growth_evidence_refs(
+        skill_report=skill_report,
+        mutation_surface=mutation_surface,
+        context_label=context_label,
+    )
+    if len(evidence_refs) < 2:
+        return []
+
+    blocked_by: list[str] = []
+    defer_reason: str | None = None
+    if context_label == "workspace":
+        blocked_by.append("owner-ambiguity")
+        defer_reason = "workspace-wide mutation growth still needs owner review before promotion beyond the local note"
+
+    display_name = (
+        "Verify-green growth seam"
+        if checkpoint_kind == "verify_green"
+        else "Commit growth seam"
+    )
+    promote_if = [
+        (
+            "keep the same bounded mutation seam stable through a reviewed verify-green pass"
+            if checkpoint_kind == "verify_green"
+            else "pair this explicit commit seam with one reviewed verify-green checkpoint before promotion"
+        ),
+        "repeat the same bounded mutation seam across another reviewed checkpoint before promoting beyond the local note",
+    ]
+    next_owner_moves = [
+        "append the explicit mutation seam into the local checkpoint note",
+        (
+            "review the same bounded mutation again after verify-green before promoting it"
+            if checkpoint_kind == "commit"
+            else "confirm the verify-green seam still points to the same bounded owner context"
+        ),
+    ]
+
+    return [
+        CheckpointCandidateCluster(
+            candidate_id=f"candidate:growth:{_slugify(f'{context_label}-{checkpoint_kind}-{mutation_surface}')}",
+            candidate_kind="growth",
+            owner_hint=context_label,
+            display_name=display_name,
+            source_surface_ref=f"aoa-sdk:checkpoint_auto_capture.{checkpoint_kind}",
+            evidence_refs=evidence_refs,
+            confidence="high" if checkpoint_kind == "verify_green" else "medium",
+            promote_if=promote_if,
+            defer_reason=defer_reason,
+            blocked_by=blocked_by,
+            next_owner_moves=next_owner_moves,
+        )
+    ]
+
+
+def _intent_explicitly_requests_checkpoint_kind(
+    *,
+    intent_text: str,
+    checkpoint_kind: Literal["commit", "verify_green"],
+) -> bool:
+    normalized = re.sub(r"[\s_-]+", " ", intent_text.strip().lower())
+    if checkpoint_kind == "verify_green":
+        return any(
+            token in normalized
+            for token in (
+                "verify green",
+                "green verify",
+                "all green",
+                "tests green",
+                "verified",
+                "verification",
+                "verify",
+            )
+        )
+    return "checkpoint" in normalized or "commit" in normalized
+
+
+def _explicit_mutation_growth_evidence_refs(
+    *,
+    skill_report: SkillDetectionReport,
+    mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"],
+    context_label: str,
+) -> list[str]:
+    refs = [
+        f"context:{context_label}",
+        f"mutation_surface:{mutation_surface}",
+    ]
+    for item in [*skill_report.activate_now, *skill_report.must_confirm, *skill_report.suggest_next]:
+        refs.append(f"aoa-skills:{item.skill_name}")
+    return _dedupe_strings(refs)
+
+
 def _repeated_pattern_detected(
     *,
     tokens: set[str],
@@ -426,6 +553,15 @@ def _repeated_pattern_detected(
 ) -> bool:
     repeated_tokens = {"repeat", "repeated", "again", "pattern", "recurring"}
     return bool(tokens.intersection(repeated_tokens)) and (phase in {"closeout", "checkpoint"} or bool(active_skill_names))
+
+
+def _surface_context_label(workspace: Workspace, repo_root: str) -> str:
+    resolved = Path(repo_root).expanduser()
+    if not resolved.is_absolute():
+        resolved = (workspace.root / resolved).resolve()
+    else:
+        resolved = resolved.resolve()
+    return "workspace" if resolved == workspace.federation_root else resolved.name
 
 
 def _derive_closeout_followups(

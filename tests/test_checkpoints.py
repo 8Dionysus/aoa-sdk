@@ -85,6 +85,44 @@ def test_capture_from_skill_phase_reports_no_signal_without_writing_note(workspa
     assert not note_dir.exists()
 
 
+def test_surface_detect_checkpoint_phase_emits_growth_cluster_for_explicit_commit_intent(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="checkpoint",
+        checkpoint_kind="commit",
+        intent_text="commit bounded patch",
+        mutation_surface="code",
+    )
+
+    assert report.checkpoint_should_capture is True
+    growth_cluster = next(cluster for cluster in report.candidate_clusters if cluster.candidate_kind == "growth")
+    assert growth_cluster.owner_hint == "aoa-sdk"
+    assert growth_cluster.source_surface_ref == "aoa-sdk:checkpoint_auto_capture.commit"
+    assert "mutation_surface:code" in growth_cluster.evidence_refs
+
+
+def test_capture_from_skill_phase_auto_appends_for_explicit_commit_intent(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    capture = sdk.checkpoints.capture_from_skill_phase(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="pre-mutation",
+        intent_text="commit bounded patch",
+        mutation_surface="code",
+    )
+
+    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    assert capture.mode == "auto"
+    assert capture.appended is True
+    assert capture.reason == "checkpoint_signal"
+    assert capture.checkpoint_kind == "commit"
+    assert capture.note is not None
+    assert any(cluster.candidate_kind == "growth" for cluster in capture.note.candidate_clusters)
+    assert (note_dir / "checkpoint-note.json").exists()
+
+
 def test_checkpoint_promote_writes_dionysus_snapshot_and_updates_note(workspace_root: Path) -> None:
     dionysus_root = workspace_root / "Dionysus"
     (dionysus_root / "reports" / "ecosystem-audits").mkdir(parents=True, exist_ok=True)
