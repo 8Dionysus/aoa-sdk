@@ -82,6 +82,7 @@ This repository is the source of truth for:
 - reviewed closeout can now raise `aoa-session-progression-lift` from the checkpoint ledger before `aoa-quest-harvest`, so multi-axis progression stays evidence-backed and end-of-session only
 - reviewed closeout can now build one `closeout-context.json` bundle and execute the explicit `aoa-checkpoint-closeout-bridge` chain without turning `aoa closeout run` into a hidden skill runner
 - default auto checkpoint bridge from `aoa skills enter` and `aoa skills guard` when checkpoint-phase detection sees a real growth signal, plus explicit `--checkpoint-kind` / `--append-note` overrides
+- checkpoint and explicit closeout surfaces keep canonical machine timestamps in UTC while also publishing local companion fields such as `observed_at_local`, `captured_at_local`, `built_at_local`, `executed_at_local`, and their matching `*_tz` labels for human review
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
 
 ## What it does not own

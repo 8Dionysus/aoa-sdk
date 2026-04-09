@@ -43,6 +43,12 @@ Those rebuilt snapshots now act as the session-local ledger for:
 - upgrade candidates that should be reviewed once at closeout before any owner-layer promotion
 - the final stats-refresh hint that belongs to the same reviewed closeout moment
 
+Machine-facing timestamps stay canonical in UTC with the usual `Z` suffix.
+For human review the same checkpoint and explicit closeout surfaces now also
+publish local companion fields such as `observed_at_local`, `captured_at_local`,
+`built_at_local`, `executed_at_local`, and matching `*_tz` labels so local
+operators do not need to mentally convert reviewed session times.
+
 `aoa skills enter` and `aoa skills guard` also surface that ledger directly in
 their runtime JSON under `checkpoint_capture.session_end_skill_targets`,
 `checkpoint_capture.progression_axis_signals`,
