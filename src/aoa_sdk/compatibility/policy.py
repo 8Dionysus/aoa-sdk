@@ -64,6 +64,20 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="schema_version",
         supported_versions=["8dionysus_public_route_map_v2"],
     ),
+    "Agents-of-Abyss.center_entry_map.min": SurfaceCompatibilityRule(
+        surface_id="Agents-of-Abyss.center_entry_map.min",
+        repo="Agents-of-Abyss",
+        relative_path="generated/center_entry_map.min.json",
+        version_field="schema_version",
+        supported_versions=["aoa_center_entry_map_v1"],
+    ),
+    "Tree-of-Sophia.root_entry_map.min": SurfaceCompatibilityRule(
+        surface_id="Tree-of-Sophia.root_entry_map.min",
+        repo="Tree-of-Sophia",
+        relative_path="generated/root_entry_map.min.json",
+        version_field="schema_version",
+        supported_versions=["tos_root_entry_map_v1"],
+    ),
     "abyss-stack.diagnostic_surface_catalog.min": SurfaceCompatibilityRule(
         surface_id="abyss-stack.diagnostic_surface_catalog.min",
         repo="abyss-stack",

@@ -13,7 +13,54 @@ from aoa_sdk.routing.picker import ROUTING_ACTION_SURFACE_IDS
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
+def seed_center_capsule_fixtures(workspace_root: Path) -> None:
+    aoa_root = workspace_root / "Agents-of-Abyss"
+    aoa_center = aoa_root / "generated" / "center_entry_map.min.json"
+    aoa_center.parent.mkdir(parents=True, exist_ok=True)
+    aoa_center.write_text(
+        json.dumps(
+            {
+                "schema_version": "aoa_center_entry_map_v1",
+                "schema_ref": "schemas/center-entry-map.schema.json",
+                "owner_repo": "Agents-of-Abyss",
+                "surface_kind": "center_entry_map",
+                "authority_ref": "CHARTER.md",
+                "public_root_ref": "README.md",
+                "registry_ref": "generated/ecosystem_registry.min.json",
+                "supporting_inventory_ref": "generated/federation_supporting_inventory.min.json",
+                "validation_refs": ["scripts/build_center_entry_map.py"],
+                "routes": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    tos_root = workspace_root / "Tree-of-Sophia"
+    tos_map = tos_root / "generated" / "root_entry_map.min.json"
+    tos_map.parent.mkdir(parents=True, exist_ok=True)
+    tos_map.write_text(
+        json.dumps(
+            {
+                "schema_version": "tos_root_entry_map_v1",
+                "schema_ref": "schemas/root-entry-map.schema.json",
+                "owner_repo": "Tree-of-Sophia",
+                "surface_kind": "root_entry_map",
+                "authority_ref": "CHARTER.md",
+                "public_root_ref": "README.md",
+                "current_tiny_entry_ref": "examples/tos_tiny_entry_route.example.json",
+                "export_ref": "generated/kag_export.min.json",
+                "validation_refs": ["scripts/build_root_entry_map.py"],
+                "routes": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def test_compatibility_report_includes_versioned_and_unversioned_surfaces(workspace_root: Path) -> None:
+    seed_center_capsule_fixtures(workspace_root)
     dionysus_surface = workspace_root / "Dionysus" / "generated" / "seed_route_map.min.json"
     dionysus_surface.parent.mkdir(parents=True, exist_ok=True)
     dionysus_surface.write_text(
@@ -43,6 +90,8 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-routing.owner_layer_shortlist.min"].compatible is True
     assert report["Dionysus.seed_route_map.min"].compatible is True
     assert report["8Dionysus.public_route_map.min"].compatible is True
+    assert report["Agents-of-Abyss.center_entry_map.min"].compatible is True
+    assert report["Tree-of-Sophia.root_entry_map.min"].compatible is True
     assert report["abyss-stack.diagnostic_surface_catalog.min"].compatible is True
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatibility_mode == "unversioned"
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatible is True
@@ -151,6 +200,7 @@ def test_routing_inspect_rejects_unmapped_action_surface(workspace_root: Path, m
 
 
 def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surfaces(workspace_root: Path) -> None:
+    seed_center_capsule_fixtures(workspace_root)
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     playbook_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-playbooks")}
@@ -158,11 +208,19 @@ def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surf
     memo_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-memo")}
     technique_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-techniques")}
     routing_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-routing")}
+    aoa_center_checks = {
+        entry.surface_id: entry for entry in sdk.compatibility.check_repo("Agents-of-Abyss")
+    }
+    tos_checks = {
+        entry.surface_id: entry for entry in sdk.compatibility.check_repo("Tree-of-Sophia")
+    }
 
     assert playbook_checks["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
     assert routing_checks["aoa-routing.federation_entrypoints.min"].compatible is True
     assert routing_checks["aoa-routing.return_navigation_hints.min"].compatible is True
     assert routing_checks["aoa-routing.owner_layer_shortlist.min"].compatible is True
+    assert aoa_center_checks["Agents-of-Abyss.center_entry_map.min"].compatible is True
+    assert tos_checks["Tree-of-Sophia.root_entry_map.min"].compatible is True
     assert playbook_checks["aoa-playbooks.playbook_automation_seeds"].detected_version == 1
     assert playbook_checks["aoa-playbooks.playbook_composition_manifest"].compatible is True
     assert playbook_checks["aoa-playbooks.playbook_review_status.min"].detected_version == 1
