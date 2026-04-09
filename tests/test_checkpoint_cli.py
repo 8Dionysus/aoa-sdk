@@ -1,4 +1,5 @@
 import json
+from datetime import datetime
 from pathlib import Path
 
 from typer.testing import CliRunner
@@ -102,7 +103,11 @@ def test_checkpoint_cli_append_status_and_promote_handoff(workspace_root: Path) 
     promote_payload = json.loads(promote.stdout)
     handoff_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "harvest-handoff.json"
     assert status_payload["state"] == "reviewable"
+    assert status_payload["checkpoint_history"][-1]["observed_at_local"]
+    assert status_payload["checkpoint_history"][-1]["observed_tz"]
     assert promote_payload["target"] == "harvest-handoff"
+    assert promote_payload["promoted_at_local"]
+    assert promote_payload["promoted_tz"]
     assert handoff_path.exists()
 
 
@@ -130,6 +135,8 @@ def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path) -> N
     assert payload["checkpoint_capture"]["mode"] == "auto"
     assert payload["checkpoint_capture"]["appended"] is True
     assert payload["checkpoint_capture"]["checkpoint_kind"] == "commit"
+    assert payload["checkpoint_capture"]["captured_at_local"]
+    assert payload["checkpoint_capture"]["captured_tz"]
     assert payload["checkpoint_capture"]["harvest_candidate_ids"]
     assert payload["checkpoint_capture"]["progression_candidate_ids"]
     assert payload["checkpoint_capture"]["session_end_skill_targets"]
@@ -167,6 +174,8 @@ def test_skills_guard_explicit_checkpoint_kind_still_wins(workspace_root: Path) 
     assert payload["checkpoint_capture"]["mode"] == "explicit"
     assert payload["checkpoint_capture"]["appended"] is True
     assert payload["checkpoint_capture"]["checkpoint_kind"] == "verify_green"
+    assert payload["checkpoint_capture"]["captured_at_local"]
+    assert payload["checkpoint_capture"]["captured_tz"]
     assert payload["checkpoint_note"]["state"] in {"collecting", "reviewable"}
 
 
@@ -250,6 +259,46 @@ def test_skills_guard_reports_existing_session_end_targets_even_when_skip_occurs
     assert payload["checkpoint_note"]["session_end_recommendation"] == "harvest_progression_and_upgrade"
 
 
+def test_checkpoint_status_cli_backfills_local_timestamp_for_legacy_history_entry(workspace_root: Path) -> None:
+    runner = CliRunner()
+    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir.mkdir(parents=True, exist_ok=True)
+    legacy_payload = {
+        "session_ref": "session:2026-04-09-aoa-sdk-checkpoint-growth",
+        "repo_root": str(workspace_root / "aoa-sdk"),
+        "repo_label": "aoa-sdk",
+        "history_entry": {
+            "checkpoint_kind": "commit",
+            "observed_at": "2026-04-09T17:54:04Z",
+            "report_ref": str(note_dir / "legacy-report.json"),
+            "intent_text": "legacy checkpoint",
+            "checkpoint_should_capture": False,
+            "blocked_by": [],
+            "candidate_clusters": [],
+            "manual_review_requested": False,
+        },
+    }
+    (note_dir / "checkpoint-note.jsonl").write_text(json.dumps(legacy_payload) + "\n", encoding="utf-8")
+
+    result = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "status",
+            str(workspace_root / "aoa-sdk"),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    expected_local = datetime.fromisoformat("2026-04-09T17:54:04+00:00").astimezone().isoformat()
+    assert payload["checkpoint_history"][0]["observed_at_local"] == expected_local
+    assert payload["checkpoint_history"][0]["observed_tz"]
+
+
 def test_skills_guard_auto_captures_explicit_commit_growth(workspace_root: Path) -> None:
     runner = CliRunner()
 
@@ -274,6 +323,8 @@ def test_skills_guard_auto_captures_explicit_commit_growth(workspace_root: Path)
     assert payload["checkpoint_capture"]["mode"] == "auto"
     assert payload["checkpoint_capture"]["appended"] is True
     assert payload["checkpoint_capture"]["checkpoint_kind"] == "commit"
+    assert payload["checkpoint_capture"]["captured_at_local"]
+    assert payload["checkpoint_capture"]["captured_tz"]
     assert any(cluster["candidate_kind"] == "growth" for cluster in payload["checkpoint_note"]["candidate_clusters"])
 
 
@@ -391,12 +442,84 @@ def test_checkpoint_build_closeout_context_cli_emits_json(workspace_root: Path) 
     payload = json.loads(result.stdout)
     assert payload["session_ref"] == session_ref
     assert payload["orchestrator_skill_name"] == "aoa-checkpoint-closeout-bridge"
+    assert payload["built_at_local"]
+    assert payload["built_tz"]
     assert payload["ordered_skill_plan"]
     assert [item["skill_name"] for item in payload["ordered_skill_plan"]] == [
         "aoa-session-donor-harvest",
         "aoa-session-progression-lift",
         "aoa-quest-harvest",
     ]
+
+
+def test_checkpoint_human_cli_marks_canonical_utc_labels(workspace_root: Path) -> None:
+    runner = CliRunner()
+
+    guard = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--intent-text",
+            "commit bounded patch",
+            "--mutation-surface",
+            "code",
+            "--root",
+            str(workspace_root),
+        ],
+    )
+    assert guard.exit_code == 0
+    assert "checkpoint_capture_at_canonical_utc:" in guard.stdout
+    assert "(local " in guard.stdout
+
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-closeout-human.md"
+    reviewed_artifact.parent.mkdir(parents=True, exist_ok=True)
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                "Session ref: `session:test-checkpoint-human-cli`",
+                "",
+                "- verify green completed",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    context_result = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "build-closeout-context",
+            str(workspace_root / "aoa-sdk"),
+            "--reviewed-artifact",
+            str(reviewed_artifact),
+            "--root",
+            str(workspace_root),
+        ],
+    )
+    assert context_result.exit_code == 0
+    assert "built_at_canonical_utc:" in context_result.stdout
+    assert "(local " in context_result.stdout
+
+    execution_result = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "execute-closeout-chain",
+            str(workspace_root / "aoa-sdk"),
+            "--reviewed-artifact",
+            str(reviewed_artifact),
+            "--root",
+            str(workspace_root),
+        ],
+    )
+    assert execution_result.exit_code == 0
+    assert "executed_at_canonical_utc:" in execution_result.stdout
+    assert "(local " in execution_result.stdout
 
 
 def test_checkpoint_execute_closeout_chain_cli_emits_execution_report(workspace_root: Path) -> None:
@@ -436,6 +559,8 @@ def test_checkpoint_execute_closeout_chain_cli_emits_execution_report(workspace_
     payload = json.loads(result.stdout)
     assert payload["session_ref"] == "session:test-checkpoint-execute-cli"
     assert payload["orchestrator_skill_name"] == "aoa-checkpoint-closeout-bridge"
+    assert payload["executed_at_local"]
+    assert payload["executed_tz"]
     assert [item["skill_name"] for item in payload["executed_skills"]] == [
         "aoa-session-donor-harvest",
         "aoa-session-progression-lift",

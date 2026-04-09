@@ -90,6 +90,53 @@ QUEST_PROMOTION_VERDICT_BY_OWNER = {
 }
 
 
+def _local_timestamp_parts(now_utc: datetime | None = None) -> tuple[datetime, str, str]:
+    canonical_utc = now_utc or datetime.now(UTC)
+    local_now = canonical_utc.astimezone()
+    local_tz = local_now.tzname() or local_now.strftime("%z")
+    return canonical_utc, local_now.isoformat(), local_tz
+
+
+def _coerce_datetime(value: datetime | str | None) -> datetime | None:
+    if value is None:
+        return None
+    if isinstance(value, datetime):
+        return value
+    normalized = value.strip()
+    if normalized.endswith("Z"):
+        normalized = normalized[:-1] + "+00:00"
+    return datetime.fromisoformat(normalized)
+
+
+def _with_local_timestamp_fallback(
+    *,
+    utc_value: datetime | str | None,
+    local_value: str | None,
+    tz_name: str | None,
+) -> tuple[str | None, str | None]:
+    if local_value is not None and tz_name is not None:
+        return local_value, tz_name
+    parsed = _coerce_datetime(utc_value)
+    if parsed is None:
+        return local_value, tz_name
+    local_now = parsed.astimezone()
+    return local_value or local_now.isoformat(), tz_name or local_now.tzname() or local_now.strftime("%z")
+
+
+def _utc_timestamp(now_utc: datetime | None = None) -> str:
+    canonical_utc = now_utc or datetime.now(UTC)
+    return canonical_utc.isoformat().replace("+00:00", "Z")
+
+
+def _observed_timestamp_fields(now_utc: datetime | None = None) -> dict[str, str]:
+    canonical_utc, observed_at_local, observed_tz = _local_timestamp_parts(now_utc)
+    return {
+        "observed_at": _utc_timestamp(canonical_utc),
+        "observed_at_local": observed_at_local,
+        "observed_tz": observed_tz,
+    }
+
+
 class CheckpointsAPI:
     def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
@@ -155,13 +202,16 @@ class CheckpointsAPI:
             + "\n",
             encoding="utf-8",
         )
+        observed_at, observed_at_local, observed_tz = _local_timestamp_parts()
         payload = {
             "session_ref": _default_session_ref(paths, existing_note_path=paths.note_json if paths.note_json.exists() else None),
             "repo_root": str(_resolve_context_root(self.workspace, repo_root)),
             "repo_label": paths.repo_label,
             "history_entry": SessionCheckpointHistoryEntry(
                 checkpoint_kind=checkpoint_kind,
-                observed_at=datetime.now(UTC),
+                observed_at=observed_at,
+                observed_at_local=observed_at_local,
+                observed_tz=observed_tz,
                 report_ref=str(report_path),
                 intent_text=intent_text,
                 checkpoint_should_capture=report.checkpoint_should_capture,
@@ -197,6 +247,7 @@ class CheckpointsAPI:
         auto_capture: bool = True,
     ) -> CheckpointCaptureResult:
         if checkpoint_kind is not None:
+            captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
             note = self.append(
                 repo_root=repo_root,
                 checkpoint_kind=checkpoint_kind,
@@ -212,6 +263,9 @@ class CheckpointsAPI:
                 attempted=True,
                 appended=True,
                 checkpoint_kind=checkpoint_kind,
+                captured_at=captured_at,
+                captured_at_local=captured_at_local,
+                captured_tz=captured_tz,
                 reason="explicit_request",
                 note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root),
                 session_end_skill_targets=session_end_targets,
@@ -228,6 +282,7 @@ class CheckpointsAPI:
             )
 
         if not auto_capture:
+            captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
             current_note = _load_runtime_checkpoint_note(self, repo_root=repo_root)
             session_end_targets = _derive_session_end_skill_targets(current_note)
             return CheckpointCaptureResult(
@@ -235,6 +290,9 @@ class CheckpointsAPI:
                 attempted=False,
                 appended=False,
                 checkpoint_kind=None,
+                captured_at=captured_at,
+                captured_at_local=captured_at_local,
+                captured_tz=captured_tz,
                 reason="auto_disabled",
                 note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root) if current_note is not None else None,
                 session_end_skill_targets=session_end_targets,
@@ -261,6 +319,7 @@ class CheckpointsAPI:
             checkpoint_kind=inferred_kind,
         )
         if not report.checkpoint_should_capture:
+            captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
             current_note = _load_runtime_checkpoint_note(self, repo_root=repo_root)
             session_end_targets = _derive_session_end_skill_targets(current_note)
             return CheckpointCaptureResult(
@@ -268,6 +327,9 @@ class CheckpointsAPI:
                 attempted=True,
                 appended=False,
                 checkpoint_kind=inferred_kind,
+                captured_at=captured_at,
+                captured_at_local=captured_at_local,
+                captured_tz=captured_tz,
                 reason="no_checkpoint_signal",
                 note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root) if current_note is not None else None,
                 session_end_skill_targets=session_end_targets,
@@ -294,11 +356,15 @@ class CheckpointsAPI:
             manual_review_requested=manual_review_requested,
         )
         session_end_targets = _derive_session_end_skill_targets(note)
+        captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
         return CheckpointCaptureResult(
             mode="auto",
             attempted=True,
             appended=True,
             checkpoint_kind=inferred_kind,
+            captured_at=captured_at,
+            captured_at_local=captured_at_local,
+            captured_tz=captured_tz,
             reason="checkpoint_signal",
             note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root),
             session_end_skill_targets=session_end_targets,
@@ -363,7 +429,9 @@ class CheckpointsAPI:
         return SessionCheckpointPromotion(
             session_ref=note.session_ref,
             target=target,
-            promoted_at=datetime.now(UTC),
+            promoted_at=(promoted_parts := _local_timestamp_parts())[0],
+            promoted_at_local=promoted_parts[1],
+            promoted_tz=promoted_parts[2],
             source_note_ref=str(paths.note_json),
             output_refs=output_refs,
             resulting_state=new_state,
@@ -446,8 +514,12 @@ class CheckpointsAPI:
         if not collected_receipt_paths:
             notes.append("no prior receipt refs were supplied; closeout execution will rely on the reviewed artifact and any local checkpoint evidence only")
 
+        built_at, built_at_local, built_tz = _local_timestamp_parts()
         context = CheckpointCloseoutContext(
             session_ref=resolved_session_ref,
+            built_at=built_at,
+            built_at_local=built_at_local,
+            built_tz=built_tz,
             repo_root=str(_resolve_context_root(self.workspace, repo_root)),
             reviewed_artifact_ref=str(reviewed_artifact),
             checkpoint_note_ref=note_ref,
@@ -558,8 +630,12 @@ class CheckpointsAPI:
         produced_artifact_refs.extend(quest_outputs["artifact_refs"])
         produced_receipt_refs.extend(quest_outputs["receipt_refs"])
 
+        executed_at, executed_at_local, executed_tz = _local_timestamp_parts()
         report = CheckpointCloseoutExecutionReport(
             session_ref=context.session_ref,
+            executed_at=executed_at,
+            executed_at_local=executed_at_local,
+            executed_tz=executed_tz,
             reviewed_artifact_ref=context.reviewed_artifact_ref,
             checkpoint_note_ref=context.checkpoint_note_ref,
             surface_handoff_ref=context.surface_handoff_ref,
@@ -967,7 +1043,7 @@ def _build_donor_harvest_outputs(
     receipt = {
         "event_kind": "harvest_packet_receipt",
         "event_id": f"evt-{_safe_name(context.session_ref)}-harvest",
-        "observed_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        **_observed_timestamp_fields(),
         "run_ref": run_ref,
         "session_ref": context.session_ref,
         "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-donor-harvest"},
@@ -1081,7 +1157,7 @@ def _build_progression_lift_outputs(
     receipt = {
         "event_kind": "progression_delta_receipt",
         "event_id": f"evt-{_safe_name(context.session_ref)}-progression",
-        "observed_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        **_observed_timestamp_fields(),
         "run_ref": run_ref,
         "session_ref": context.session_ref,
         "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-progression-lift"},
@@ -1208,7 +1284,7 @@ def _build_quest_harvest_outputs(
     receipt = {
         "event_kind": "quest_promotion_receipt",
         "event_id": f"evt-{_safe_name(context.session_ref)}-quest",
-        "observed_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        **_observed_timestamp_fields(),
         "run_ref": run_ref,
         "session_ref": context.session_ref,
         "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-quest-harvest"},
@@ -1477,7 +1553,7 @@ def _build_core_skill_receipt(
     return {
         "event_kind": "core_skill_application_receipt",
         "event_id": f"evt-core-{_safe_name(session_ref)}-{skill_name.replace('aoa-', '')}",
-        "observed_at": datetime.now(UTC).isoformat().replace("+00:00", "Z"),
+        **_observed_timestamp_fields(),
         "run_ref": run_ref,
         "session_ref": session_ref,
         "actor_ref": {"repo": "aoa-skills", "kind": "skill", "id": skill_name},
@@ -1526,6 +1602,18 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
         if session_ref is None and isinstance(payload.get("session_ref"), str):
             session_ref = payload["session_ref"]
         entry = SessionCheckpointHistoryEntry.model_validate(payload["history_entry"])
+        observed_at_local, observed_tz = _with_local_timestamp_fallback(
+            utc_value=entry.observed_at,
+            local_value=entry.observed_at_local,
+            tz_name=entry.observed_tz,
+        )
+        if observed_at_local != entry.observed_at_local or observed_tz != entry.observed_tz:
+            entry = entry.model_copy(
+                update={
+                    "observed_at_local": observed_at_local,
+                    "observed_tz": observed_tz,
+                }
+            )
         entries.append(entry)
     if session_ref is None:
         session_ref = _default_session_ref(paths, existing_note_path=None)
@@ -2156,8 +2244,19 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
         lines.append("")
     lines.extend(["## Checkpoint History", ""])
     for entry in note.checkpoint_history:
+        observed_at = entry.observed_at.isoformat().replace("+00:00", "Z")
+        observed_at_local, observed_tz = _with_local_timestamp_fallback(
+            utc_value=entry.observed_at,
+            local_value=entry.observed_at_local,
+            tz_name=entry.observed_tz,
+        )
+        if observed_at_local:
+            observed_at += f" (local {observed_at_local}"
+            if observed_tz:
+                observed_at += f" {observed_tz}"
+            observed_at += ")"
         lines.append(
-            f"- `{entry.checkpoint_kind}` at `{entry.observed_at.isoformat()}` -> "
+            f"- `{entry.checkpoint_kind}` at `{observed_at}` -> "
             + (", ".join(cluster.candidate_id for cluster in entry.candidate_clusters) or "no surviving candidates")
         )
     if note.blocked_by:

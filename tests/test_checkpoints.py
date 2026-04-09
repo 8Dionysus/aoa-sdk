@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 
 from aoa_sdk import AoASDK
@@ -59,6 +60,9 @@ def test_checkpoint_status_becomes_reviewable_after_repeat(workspace_root: Path)
     assert second.upgrade_candidate_ids
     assert second.progression_axis_signals
     assert second.stats_refresh_recommended is True
+    assert second.checkpoint_history[-1].observed_at_local is not None
+    assert second.checkpoint_history[-1].observed_at_local.endswith(("-00:00", "-01:00", "-02:00", "-03:00", "-04:00", "-05:00", "-06:00", "-07:00", "-08:00", "-09:00", "-10:00", "-11:00", "-12:00", "+00:00", "+01:00", "+02:00", "+03:00", "+04:00", "+05:00", "+06:00", "+07:00", "+08:00", "+09:00", "+10:00", "+11:00", "+12:00", "+13:00", "+14:00"))
+    assert second.checkpoint_history[-1].observed_tz
 
 
 def test_capture_from_skill_phase_auto_appends_only_when_growth_signal_exists(workspace_root: Path) -> None:
@@ -149,6 +153,9 @@ def test_capture_from_skill_phase_auto_appends_for_explicit_commit_intent(worksp
     assert capture.progression_axis_signals
     assert capture.stats_refresh_recommended is True
     assert capture.session_end_next_honest_move is not None
+    assert capture.captured_at is not None
+    assert capture.captured_at_local is not None
+    assert capture.captured_tz
     assert (note_dir / "checkpoint-note.json").exists()
 
 
@@ -188,6 +195,37 @@ def test_capture_from_skill_phase_reports_existing_session_end_targets_when_skip
     assert capture.session_end_next_honest_move is not None
     assert capture.harvest_candidate_ids
     assert capture.progression_candidate_ids
+
+
+def test_checkpoint_status_backfills_local_timestamp_for_legacy_history_entry(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir.mkdir(parents=True, exist_ok=True)
+    legacy_payload = {
+        "session_ref": "session:2026-04-09-aoa-sdk-checkpoint-growth",
+        "repo_root": str(workspace_root / "aoa-sdk"),
+        "repo_label": "aoa-sdk",
+        "history_entry": {
+            "checkpoint_kind": "commit",
+            "observed_at": "2026-04-09T17:54:04Z",
+            "report_ref": str(note_dir / "legacy-report.json"),
+            "intent_text": "legacy checkpoint",
+            "checkpoint_should_capture": False,
+            "blocked_by": [],
+            "candidate_clusters": [],
+            "manual_review_requested": False,
+        },
+    }
+    (note_dir / "checkpoint-note.jsonl").write_text(json.dumps(legacy_payload) + "\n", encoding="utf-8")
+
+    note = sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
+
+    expected_local = datetime.fromisoformat("2026-04-09T17:54:04+00:00").astimezone().isoformat()
+    assert note.checkpoint_history[0].observed_at_local == expected_local
+    assert note.checkpoint_history[0].observed_tz
+    rebuilt = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
+    assert rebuilt["checkpoint_history"][0]["observed_at_local"] == expected_local
+    assert rebuilt["checkpoint_history"][0]["observed_tz"]
 
 
 def test_detect_surfaces_checkpoint_bridge_when_runtime_note_exists(workspace_root: Path) -> None:
@@ -389,6 +427,8 @@ def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: P
     )
 
     assert context.session_ref == "session:test-checkpoint-closeout-execute"
+    assert context.built_at_local is not None
+    assert context.built_tz
     assert context.checkpoint_note_ref is not None
     assert context.surface_handoff_ref is not None
     assert context.receipt_refs == [str(receipt_path.resolve())]
@@ -432,6 +472,8 @@ def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(w
         "aoa-quest-harvest",
     ]
     assert report.skipped_skills == []
+    assert report.executed_at_local is not None
+    assert report.executed_tz
     assert report.produced_artifact_refs
     assert report.produced_receipt_refs
     for path in [*report.produced_artifact_refs, *report.produced_receipt_refs]:

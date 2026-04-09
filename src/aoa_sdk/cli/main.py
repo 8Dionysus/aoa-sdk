@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime
 from pathlib import Path
 from typing import Any
 
@@ -293,6 +294,32 @@ def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
             typer.echo(f"    blocked_by: {', '.join(cluster.blocked_by)}")
 
 
+def _format_dual_timestamp(
+    *,
+    utc_value: object,
+    local_value: str | None,
+    tz_name: str | None,
+) -> str:
+    if isinstance(utc_value, datetime):
+        parsed_utc = utc_value
+        canonical = utc_value.isoformat().replace("+00:00", "Z")
+    else:
+        canonical = str(utc_value)
+        try:
+            normalized = canonical[:-1] + "+00:00" if canonical.endswith("Z") else canonical
+            parsed_utc = datetime.fromisoformat(normalized)
+        except ValueError:
+            parsed_utc = None
+    if not local_value and parsed_utc is not None:
+        local_now = parsed_utc.astimezone()
+        local_value = local_now.isoformat()
+        tz_name = tz_name or local_now.tzname() or local_now.strftime("%z")
+    if not local_value:
+        return canonical
+    suffix = f" {tz_name}" if tz_name else ""
+    return f"{canonical} (local {local_value}{suffix})"
+
+
 def _print_checkpoint_capture(result: CheckpointCaptureResult | None) -> None:
     if result is None:
         return
@@ -305,6 +332,15 @@ def _print_checkpoint_capture(result: CheckpointCaptureResult | None) -> None:
     else:
         typer.echo(
             f"checkpoint_capture: skipped ({result.mode}, kind={result.checkpoint_kind or 'none'}, reason={result.reason})"
+        )
+    if result.captured_at is not None:
+        typer.echo(
+            "checkpoint_capture_at_canonical_utc: "
+            + _format_dual_timestamp(
+                utc_value=result.captured_at,
+                local_value=result.captured_at_local,
+                tz_name=result.captured_tz,
+            )
         )
     if result.note_ref:
         typer.echo(f"checkpoint_note_ref: {result.note_ref}")
@@ -341,6 +377,14 @@ def _print_checkpoint_capture(result: CheckpointCaptureResult | None) -> None:
 def _print_checkpoint_promotion(promotion: SessionCheckpointPromotion) -> None:
     typer.echo(f"session_ref: {promotion.session_ref}")
     typer.echo(f"target: {promotion.target}")
+    typer.echo(
+        "promoted_at_canonical_utc: "
+        + _format_dual_timestamp(
+            utc_value=promotion.promoted_at,
+            local_value=promotion.promoted_at_local,
+            tz_name=promotion.promoted_tz,
+        )
+    )
     typer.echo(f"resulting_state: {promotion.resulting_state}")
     typer.echo(f"source_note_ref: {promotion.source_note_ref}")
     typer.echo(f"output_refs: {', '.join(promotion.output_refs) if promotion.output_refs else 'none'}")
@@ -349,6 +393,14 @@ def _print_checkpoint_promotion(promotion: SessionCheckpointPromotion) -> None:
 def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
     typer.echo(f"session_ref: {context.session_ref}")
     typer.echo(f"orchestrator_skill_name: {context.orchestrator_skill_name}")
+    typer.echo(
+        "built_at_canonical_utc: "
+        + _format_dual_timestamp(
+            utc_value=context.built_at,
+            local_value=context.built_at_local,
+            tz_name=context.built_tz,
+        )
+    )
     typer.echo(f"repo_root: {context.repo_root}")
     typer.echo(f"reviewed_artifact_ref: {context.reviewed_artifact_ref}")
     typer.echo(f"checkpoint_note_ref: {context.checkpoint_note_ref or 'none'}")
@@ -378,6 +430,14 @@ def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
 def _print_closeout_execution_report(report: CheckpointCloseoutExecutionReport) -> None:
     typer.echo(f"session_ref: {report.session_ref}")
     typer.echo(f"orchestrator_skill_name: {report.orchestrator_skill_name}")
+    typer.echo(
+        "executed_at_canonical_utc: "
+        + _format_dual_timestamp(
+            utc_value=report.executed_at,
+            local_value=report.executed_at_local,
+            tz_name=report.executed_tz,
+        )
+    )
     typer.echo(f"context_ref: {report.context_ref}")
     typer.echo(f"reviewed_artifact_ref: {report.reviewed_artifact_ref}")
     typer.echo(f"checkpoint_note_ref: {report.checkpoint_note_ref or 'none'}")

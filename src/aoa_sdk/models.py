@@ -1220,6 +1220,8 @@ class SessionCheckpointHistoryEntry(BaseModel):
         "owner_followthrough",
     ]
     observed_at: datetime
+    observed_at_local: str | None = None
+    observed_tz: str | None = None
     report_ref: str | None = None
     intent_text: str = ""
     checkpoint_should_capture: bool = False
@@ -1298,6 +1300,8 @@ class SessionCheckpointPromotion(BaseModel):
     session_ref: str
     target: Literal["dionysus-note", "harvest-handoff"]
     promoted_at: datetime
+    promoted_at_local: str | None = None
+    promoted_tz: str | None = None
     source_note_ref: str
     output_refs: list[str] = Field(default_factory=list)
     resulting_state: Literal["collecting", "reviewable", "promoted", "closed"]
@@ -1317,6 +1321,9 @@ class CheckpointCaptureResult(BaseModel):
         "pause",
         "owner_followthrough",
     ] | None = None
+    captured_at: datetime | None = None
+    captured_at_local: str | None = None
+    captured_tz: str | None = None
     reason: Literal["explicit_request", "checkpoint_signal", "no_checkpoint_signal", "auto_disabled"]
     note_ref: str | None = None
     session_end_skill_targets: list["SessionEndSkillTarget"] = Field(default_factory=list)
@@ -1353,6 +1360,9 @@ class CheckpointCloseoutContext(BaseModel):
         "aoa-checkpoint-closeout-bridge"
     )
     session_ref: str
+    built_at: datetime
+    built_at_local: str | None = None
+    built_tz: str | None = None
     repo_root: str
     reviewed_artifact_ref: str
     checkpoint_note_ref: str | None = None
@@ -1386,6 +1396,9 @@ class CheckpointCloseoutExecutionReport(BaseModel):
         "aoa-checkpoint-closeout-bridge"
     )
     session_ref: str
+    executed_at: datetime
+    executed_at_local: str | None = None
+    executed_tz: str | None = None
     reviewed_artifact_ref: str
     checkpoint_note_ref: str | None = None
     surface_handoff_ref: str | None = None
