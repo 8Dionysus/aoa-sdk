@@ -472,11 +472,12 @@ def _derive_explicit_mutation_growth_clusters(
 ) -> list[CheckpointCandidateCluster]:
     if checkpoint_kind not in {"commit", "verify_green"}:
         return []
+    explicit_checkpoint_kind = cast(Literal["commit", "verify_green"], checkpoint_kind)
     if mutation_surface == "none":
         return []
     if not _intent_explicitly_requests_checkpoint_kind(
         intent_text=intent_text,
-        checkpoint_kind=checkpoint_kind,
+        checkpoint_kind=explicit_checkpoint_kind,
     ):
         return []
 
@@ -497,13 +498,13 @@ def _derive_explicit_mutation_growth_clusters(
 
     display_name = (
         "Verify-green growth seam"
-        if checkpoint_kind == "verify_green"
+        if explicit_checkpoint_kind == "verify_green"
         else "Commit growth seam"
     )
     promote_if = [
         (
             "keep the same bounded mutation seam stable through a reviewed verify-green pass"
-            if checkpoint_kind == "verify_green"
+            if explicit_checkpoint_kind == "verify_green"
             else "pair this explicit commit seam with one reviewed verify-green checkpoint before promotion"
         ),
         "repeat the same bounded mutation seam across another reviewed checkpoint before promoting beyond the local note",
@@ -513,24 +514,24 @@ def _derive_explicit_mutation_growth_clusters(
         "carry the explicit mutation seam through reviewed session closeout before moving candidates or stats",
         (
             "review the same bounded mutation again after verify-green before promoting it"
-            if checkpoint_kind == "commit"
+            if explicit_checkpoint_kind == "commit"
             else "confirm the verify-green seam still points to the same bounded owner context"
         ),
     ]
 
     return [
         CheckpointCandidateCluster(
-            candidate_id=f"candidate:growth:{_slugify(f'{context_label}-{checkpoint_kind}-{mutation_surface}')}",
+            candidate_id=f"candidate:growth:{_slugify(f'{context_label}-{explicit_checkpoint_kind}-{mutation_surface}')}",
             candidate_kind="growth",
             owner_hint=context_label,
             display_name=display_name,
-            source_surface_ref=f"aoa-sdk:checkpoint_auto_capture.{checkpoint_kind}",
+            source_surface_ref=f"aoa-sdk:checkpoint_auto_capture.{explicit_checkpoint_kind}",
             evidence_refs=evidence_refs,
-            confidence="high" if checkpoint_kind == "verify_green" else "medium",
+            confidence="high" if explicit_checkpoint_kind == "verify_green" else "medium",
             session_end_targets=["harvest", "progression"],
             progression_axis_signals=_progression_axis_signals_for_explicit_growth(
-                candidate_id=f"candidate:growth:{_slugify(f'{context_label}-{checkpoint_kind}-{mutation_surface}')}",
-                checkpoint_kind=checkpoint_kind,
+                candidate_id=f"candidate:growth:{_slugify(f'{context_label}-{explicit_checkpoint_kind}-{mutation_surface}')}",
+                checkpoint_kind=explicit_checkpoint_kind,
                 blocked_by=blocked_by,
                 evidence_refs=evidence_refs,
             ),

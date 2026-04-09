@@ -5,7 +5,7 @@ import re
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal, cast
+from typing import Literal, TypedDict, cast
 
 from ..errors import RepoNotFound, SurfaceNotFound
 from ..loaders import load_json, write_json
@@ -90,6 +90,26 @@ QUEST_PROMOTION_VERDICT_BY_OWNER = {
 }
 
 
+class DonorHarvestOutputs(TypedDict):
+    packet: dict[str, object]
+    artifact_refs: list[str]
+    receipt_refs: list[str]
+    reviewed_tokens: set[str]
+    receipt_payloads: list[dict[str, object]]
+
+
+class ProgressionLiftOutputs(TypedDict):
+    packet: dict[str, object]
+    artifact_refs: list[str]
+    receipt_refs: list[str]
+
+
+class QuestHarvestOutputs(TypedDict):
+    packet: dict[str, object]
+    artifact_refs: list[str]
+    receipt_refs: list[str]
+
+
 def _local_timestamp_parts(now_utc: datetime | None = None) -> tuple[datetime, str, str]:
     canonical_utc = now_utc or datetime.now(UTC)
     local_now = canonical_utc.astimezone()
@@ -121,6 +141,21 @@ def _with_local_timestamp_fallback(
         return local_value, tz_name
     local_now = parsed.astimezone()
     return local_value or local_now.isoformat(), tz_name or local_now.tzname() or local_now.strftime("%z")
+
+
+def _dict_records(value: object) -> list[dict[str, object]]:
+    if not isinstance(value, list):
+        return []
+    records: list[dict[str, object]] = []
+    for item in value:
+        if isinstance(item, dict):
+            records.append(cast(dict[str, object], item))
+    return records
+
+
+def _string_field(mapping: dict[str, object], key: str) -> str | None:
+    value = mapping.get(key)
+    return value if isinstance(value, str) else None
 
 
 def _utc_timestamp(now_utc: datetime | None = None) -> str:
@@ -874,7 +909,8 @@ def _session_ref_from_receipt_file(path: Path) -> str | None:
     }
     if len(session_refs) > 1:
         raise ValueError(f"{path}: mixed session_ref values are not supported in one receipt input")
-    return next(iter(session_refs), None)
+    session_ref = next(iter(session_refs), None)
+    return session_ref if isinstance(session_ref, str) else None
 
 
 def _load_context_checkpoint_note(context: CheckpointCloseoutContext) -> SessionCheckpointNote | None:
@@ -996,7 +1032,7 @@ def _build_donor_harvest_outputs(
     shortlisted_clusters: list[SessionCheckpointCluster],
     receipt_payloads: list[dict[str, object]],
     output_dir: Path,
-) -> dict[str, object]:
+) -> DonorHarvestOutputs:
     accepted_candidates = [
         _build_accepted_candidate(cluster=cluster, reviewed_artifact=reviewed_artifact)
         for cluster in shortlisted_clusters
@@ -1088,11 +1124,19 @@ def _build_donor_harvest_outputs(
     core_receipt_path = output_dir / "CORE_SKILL_APPLICATION_RECEIPT.harvest.json"
     write_json(core_receipt_path, core_receipt)
 
+    reviewed_tokens_value = reviewed_artifact_evidence.get("tokens")
+    reviewed_tokens = (
+        reviewed_tokens_value
+        if isinstance(reviewed_tokens_value, set)
+        and all(isinstance(token, str) for token in reviewed_tokens_value)
+        else set()
+    )
+
     return {
-        "packet": packet,
+        "packet": cast(dict[str, object], packet),
         "artifact_refs": [str(packet_path)],
         "receipt_refs": [str(receipt_path), str(core_receipt_path)],
-        "reviewed_tokens": reviewed_artifact_evidence.get("tokens", set()),
+        "reviewed_tokens": reviewed_tokens,
         "receipt_payloads": receipt_payloads,
     }
 
@@ -1106,7 +1150,7 @@ def _build_progression_lift_outputs(
     shortlisted_clusters: list[SessionCheckpointCluster],
     receipt_payloads: list[dict[str, object]],
     output_dir: Path,
-) -> dict[str, object]:
+) -> ProgressionLiftOutputs:
     base_signals = list(context.progression_axis_signals)
     derived_signals = _progression_signals_from_reviewed_artifact(
         reviewed_artifact=reviewed_artifact,
@@ -1202,7 +1246,7 @@ def _build_progression_lift_outputs(
     write_json(core_receipt_path, core_receipt)
 
     return {
-        "packet": packet,
+        "packet": cast(dict[str, object], packet),
         "artifact_refs": [str(packet_path)],
         "receipt_refs": [str(receipt_path), str(core_receipt_path)],
     }
@@ -1218,24 +1262,38 @@ def _build_quest_harvest_outputs(
     shortlisted_clusters: list[SessionCheckpointCluster],
     receipt_payloads: list[dict[str, object]],
     output_dir: Path,
-) -> dict[str, object]:
-    accepted_candidates = donor_packet.get("accepted_candidates", [])
-    candidate = accepted_candidates[0] if isinstance(accepted_candidates, list) and accepted_candidates else None
-    candidate_ref = candidate.get("candidate_ref") if isinstance(candidate, dict) else None
-    progression_verdict = progression_packet.get("verdict")
-    can_promote = isinstance(candidate, dict) and progression_verdict in {"advance", "hold"}
+) -> QuestHarvestOutputs:
+    accepted_candidates = _dict_records(donor_packet.get("accepted_candidates", []))
+    candidate = accepted_candidates[0] if accepted_candidates else None
+    candidate_ref = _string_field(candidate, "candidate_ref") if candidate is not None else None
+    progression_verdict_value = progression_packet.get("verdict")
+    progression_verdict = (
+        progression_verdict_value if isinstance(progression_verdict_value, str) else None
+    )
+    owner_repo_value = (
+        _string_field(candidate, "owner_repo_recommendation") if candidate is not None else None
+    )
+    next_surface_value = (
+        _string_field(candidate, "chosen_next_artifact") if candidate is not None else None
+    )
+    can_promote = (
+        candidate is not None
+        and progression_verdict in {"advance", "hold"}
+        and owner_repo_value is not None
+        and next_surface_value is not None
+    )
     if can_promote:
-        owner_repo = cast(str, candidate["owner_repo_recommendation"])
-        next_surface = cast(str, candidate["chosen_next_artifact"])
+        assert candidate is not None
+        assert owner_repo_value is not None
+        assert next_surface_value is not None
+        owner_repo = owner_repo_value
+        next_surface = next_surface_value
         promotion_verdict = QUEST_PROMOTION_VERDICT_BY_OWNER.get(owner_repo, "keep_open_quest")
-        nearest_wrong_target = candidate.get("nearest_wrong_target") if isinstance(candidate.get("nearest_wrong_target"), str) else "promote_to_skill"
-        repeat_shape = cast(str, candidate.get("abstraction_shape", "route"))
-        bounded_unit_ref = cast(str, candidate_ref)
-        quest_unit_name = (
-            candidate.get("unit_name")
-            if isinstance(candidate.get("unit_name"), str)
-            else f"reviewed closeout candidate {bounded_unit_ref}"
-        )
+        nearest_wrong_target = _string_field(candidate, "nearest_wrong_target") or "promote_to_skill"
+        repeat_shape = _string_field(candidate, "abstraction_shape") or "route"
+        bounded_unit_ref = candidate_ref or f"quest:{_safe_name(context.session_ref)}"
+        unit_name = _string_field(candidate, "unit_name")
+        quest_unit_name = unit_name or f"reviewed closeout candidate {bounded_unit_ref}"
     else:
         owner_repo = "aoa-playbooks"
         next_surface = f"quests/{_safe_name(context.session_ref)}-followup/QUEST.md"
@@ -1331,7 +1389,7 @@ def _build_quest_harvest_outputs(
     write_json(core_receipt_path, core_receipt)
 
     return {
-        "packet": packet,
+        "packet": cast(dict[str, object], packet),
         "artifact_refs": [str(triage_path), str(packet_path)],
         "receipt_refs": [str(receipt_path), str(core_receipt_path)],
     }
