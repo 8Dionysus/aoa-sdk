@@ -2,9 +2,27 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from aoa_sdk.cli.main import app
+
+
+@pytest.fixture(autouse=True)
+def _clear_codex_thread_id(monkeypatch) -> None:
+    monkeypatch.delenv("CODEX_THREAD_ID", raising=False)
+
+
+def _checkpoint_note_dir(
+    workspace_root: Path,
+    *,
+    repo_label: str,
+    runtime_session_id: str | None = None,
+) -> Path:
+    current_root = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current"
+    if runtime_session_id is None:
+        return current_root / repo_label
+    return current_root / runtime_session_id / repo_label
 
 
 def test_surfaces_detect_cli_supports_checkpoint_phase(workspace_root: Path) -> None:
@@ -101,7 +119,14 @@ def test_checkpoint_cli_append_status_and_promote_handoff(workspace_root: Path) 
     assert promote.exit_code == 0
     status_payload = json.loads(status.stdout)
     promote_payload = json.loads(promote.stdout)
-    handoff_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "harvest-handoff.json"
+    handoff_path = (
+        _checkpoint_note_dir(
+            workspace_root,
+            repo_label="aoa-sdk",
+            runtime_session_id=status_payload["runtime_session_id"],
+        )
+        / "harvest-handoff.json"
+    )
     assert status_payload["state"] == "reviewable"
     assert status_payload["checkpoint_history"][-1]["observed_at_local"]
     assert status_payload["checkpoint_history"][-1]["observed_tz"]
@@ -144,7 +169,14 @@ def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path) -> N
     assert payload["checkpoint_capture"]["session_end_next_honest_move"]
     assert any(item["skill_name"] == "aoa-checkpoint-closeout-bridge" for item in payload["report"]["must_confirm"])
     assert payload["checkpoint_note"]["state"] in {"collecting", "reviewable"}
-    note_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "checkpoint-note.json"
+    note_path = (
+        _checkpoint_note_dir(
+            workspace_root,
+            repo_label="aoa-sdk",
+            runtime_session_id=payload["checkpoint_note"]["runtime_session_id"],
+        )
+        / "checkpoint-note.json"
+    )
     assert note_path.exists()
 
 
@@ -343,8 +375,11 @@ def test_checkpoint_status_cli_hides_stale_current_note_for_changed_runtime_sess
     )
 
     assert status.exit_code != 0
-    assert "no active checkpoint note exists yet" in status.stdout or "no active checkpoint note exists yet" in str(
-        status.exception
+    assert (
+        "no active checkpoint note exists yet" in status.stdout
+        or "no active checkpoint note exists yet" in str(status.exception)
+        or "no checkpoint note exists yet" in status.stdout
+        or "no checkpoint note exists yet" in str(status.exception)
     )
 
 
@@ -522,6 +557,20 @@ def test_checkpoint_human_cli_marks_canonical_utc_labels(workspace_root: Path) -
     assert "checkpoint_capture_at_canonical_utc:" in guard.stdout
     assert "(local " in guard.stdout
 
+    status_result = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "status",
+            str(workspace_root / "aoa-sdk"),
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert status_result.exit_code == 0
+    status_payload = json.loads(status_result.stdout)
+
     reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-closeout-human.md"
     reviewed_artifact.parent.mkdir(parents=True, exist_ok=True)
     reviewed_artifact.write_text(
@@ -529,7 +578,7 @@ def test_checkpoint_human_cli_marks_canonical_utc_labels(workspace_root: Path) -
             [
                 "# Reviewed Session Artifact",
                 "",
-                "Session ref: `session:test-checkpoint-human-cli`",
+                f"Session ref: `{status_payload['session_ref']}`",
                 "",
                 "- verify green completed",
             ]

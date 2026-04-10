@@ -10,6 +10,23 @@ from aoa_sdk import AoASDK
 from aoa_sdk.errors import SurfaceNotFound
 
 
+@pytest.fixture(autouse=True)
+def _clear_codex_thread_id(monkeypatch) -> None:
+    monkeypatch.delenv("CODEX_THREAD_ID", raising=False)
+
+
+def _checkpoint_note_dir(
+    workspace_root: Path,
+    *,
+    repo_label: str,
+    runtime_session_id: str | None = None,
+) -> Path:
+    current_root = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current"
+    if runtime_session_id is None:
+        return current_root / repo_label
+    return current_root / runtime_session_id / repo_label
+
+
 def _write_runtime_session_file(path: Path, *, session_id: str) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
@@ -174,7 +191,11 @@ def test_checkpoint_status_becomes_reviewable_after_repeat(workspace_root: Path)
         intent_text="recurring workflow needs better handoff proof and recall",
     )
 
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=second.runtime_session_id,
+    )
     assert first.state == "collecting"
     assert second.state == "reviewable"
     assert (note_dir / "checkpoint-note.jsonl").exists()
@@ -210,7 +231,11 @@ def test_capture_from_skill_phase_auto_appends_only_when_growth_signal_exists(wo
         mutation_surface="code",
     )
 
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=capture.note.runtime_session_id if capture.note is not None else None,
+    )
     assert capture.mode == "auto"
     assert capture.appended is True
     assert capture.reason == "checkpoint_signal"
@@ -265,7 +290,11 @@ def test_capture_from_skill_phase_auto_appends_for_explicit_commit_intent(worksp
         mutation_surface="code",
     )
 
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=capture.note.runtime_session_id if capture.note is not None else None,
+    )
     assert capture.mode == "auto"
     assert capture.appended is True
     assert capture.reason == "checkpoint_signal"
@@ -382,13 +411,23 @@ def test_checkpoint_append_rotates_when_runtime_session_changes(workspace_root: 
         session_file=str(session_file),
     )
 
+    first_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=first.runtime_session_id,
+    )
+    second_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=second.runtime_session_id,
+    )
     archive_dirs = sorted((workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "archive").glob("aoa-sdk-*"))
 
     assert second.session_ref != first.session_ref
     assert second.runtime_session_id == "runtime-session-two"
-    assert archive_dirs
-    archived_note = json.loads((archive_dirs[-1] / "checkpoint-note.json").read_text(encoding="utf-8"))
-    assert archived_note["session_ref"] == first.session_ref
+    assert (first_note_dir / "checkpoint-note.json").exists()
+    assert (second_note_dir / "checkpoint-note.json").exists()
+    assert not archive_dirs
 
 
 def test_checkpoint_append_rotates_promoted_note_into_fresh_checkpoint_cycle(workspace_root: Path) -> None:
@@ -459,12 +498,21 @@ def test_checkpoint_status_archives_stale_current_note_when_runtime_session_chan
             session_file=str(session_file),
         )
 
+    first_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=first.runtime_session_id,
+    )
+    second_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-two",
+    )
     archive_dirs = sorted((workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "archive").glob("aoa-sdk-*"))
 
-    assert archive_dirs
-    archived_note = json.loads((archive_dirs[-1] / "checkpoint-note.json").read_text(encoding="utf-8"))
-    assert archived_note["session_ref"] == first.session_ref
-    assert not (workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "checkpoint-note.json").exists()
+    assert not archive_dirs
+    assert (first_note_dir / "checkpoint-note.json").exists()
+    assert not (second_note_dir / "checkpoint-note.json").exists()
 
 
 def test_capture_from_skill_phase_does_not_reuse_stale_current_note(workspace_root: Path) -> None:
@@ -501,6 +549,59 @@ def test_capture_from_skill_phase_does_not_reuse_stale_current_note(workspace_ro
     assert capture.stats_refresh_recommended is False
 
 
+def test_checkpoint_parallel_runtime_sessions_keep_independent_current_ledgers(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.delenv("CODEX_THREAD_ID", raising=False)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file_one = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "parallel-session-one.json",
+        session_id="runtime-session-one",
+    )
+    session_file_two = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "parallel-session-two.json",
+        session_id="runtime-session-two",
+    )
+
+    first = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="commit bounded patch",
+        session_file=str(session_file_one),
+    )
+    second = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="commit bounded patch",
+        session_file=str(session_file_two),
+    )
+
+    first_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-one",
+    )
+    second_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-two",
+    )
+
+    assert first.runtime_session_id == "runtime-session-one"
+    assert second.runtime_session_id == "runtime-session-two"
+    assert (first_note_dir / "checkpoint-note.json").exists()
+    assert (second_note_dir / "checkpoint-note.json").exists()
+    assert sdk.checkpoints.status(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(session_file_one),
+    ).runtime_session_id == "runtime-session-one"
+    assert sdk.checkpoints.status(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(session_file_two),
+    ).runtime_session_id == "runtime-session-two"
+
+
 def test_checkpoint_status_backfills_local_timestamp_for_legacy_history_entry(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
@@ -523,11 +624,16 @@ def test_checkpoint_status_backfills_local_timestamp_for_legacy_history_entry(wo
     (note_dir / "checkpoint-note.jsonl").write_text(json.dumps(legacy_payload) + "\n", encoding="utf-8")
 
     note = sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
+    rebuilt_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=note.runtime_session_id,
+    )
 
     expected_local = datetime.fromisoformat("2026-04-09T17:54:04+00:00").astimezone().isoformat()
     assert note.checkpoint_history[0].observed_at_local == expected_local
     assert note.checkpoint_history[0].observed_tz
-    rebuilt = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
+    rebuilt = json.loads((rebuilt_note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
     assert rebuilt["checkpoint_history"][0]["observed_at_local"] == expected_local
     assert rebuilt["checkpoint_history"][0]["observed_tz"]
 
@@ -660,7 +766,7 @@ def test_checkpoint_promote_harvest_handoff_closes_note(workspace_root: Path) ->
         checkpoint_kind="commit",
         intent_text="recurring workflow needs better handoff proof and recall",
     )
-    sdk.checkpoints.append(
+    note = sdk.checkpoints.append(
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="verify_green",
         intent_text="recurring workflow needs better handoff proof and recall",
@@ -671,7 +777,14 @@ def test_checkpoint_promote_harvest_handoff_closes_note(workspace_root: Path) ->
         target="harvest-handoff",
     )
 
-    handoff_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "harvest-handoff.json"
+    handoff_path = (
+        _checkpoint_note_dir(
+            workspace_root,
+            repo_label="aoa-sdk",
+            runtime_session_id=note.runtime_session_id,
+        )
+        / "harvest-handoff.json"
+    )
 
     assert promotion.target == "harvest-handoff"
     assert promotion.resulting_state == "closed"
@@ -740,12 +853,16 @@ def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: P
         checkpoint_kind="commit",
         intent_text="recurring workflow needs better handoff proof and recall",
     )
-    sdk.checkpoints.append(
+    note = sdk.checkpoints.append(
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="verify_green",
         intent_text="recurring workflow needs better handoff proof and recall",
     )
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=note.runtime_session_id,
+    )
     jsonl_path = note_dir / "checkpoint-note.jsonl"
     jsonl_lines = []
     for raw_line in jsonl_path.read_text(encoding="utf-8").splitlines():
@@ -841,10 +958,14 @@ def test_build_closeout_context_aggregates_runtime_session_notes_across_repo_lab
         encoding="utf-8",
     )
 
-    route_note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    route_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=runtime_session_id,
+    )
     _write_checkpoint_history_entry(
         note_dir=route_note_dir,
-        session_ref="session:test-aoa-sdk-ledger",
+        session_ref="session:test-runtime-fan-in-closeout",
         runtime_session_id=runtime_session_id,
         repo_root=workspace_root / "aoa-sdk",
         repo_label="aoa-sdk",
@@ -871,7 +992,11 @@ def test_build_closeout_context_aggregates_runtime_session_notes_across_repo_lab
         defer_reason="owner ambiguity still exceeds checkpoint-note promotion authority",
     )
 
-    recall_note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-memo"
+    recall_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-memo",
+        runtime_session_id=runtime_session_id,
+    )
     _write_checkpoint_history_entry(
         note_dir=recall_note_dir,
         session_ref="session:test-aoa-memo-ledger",
@@ -939,6 +1064,64 @@ def test_build_closeout_context_aggregates_runtime_session_notes_across_repo_lab
     }
     assert any("aggregated runtime-session checkpoint notes" in note for note in context.notes)
     assert any("Codex rollout trace" in note for note in context.notes)
+
+
+def test_build_closeout_context_fails_when_repo_root_checkpoint_session_mismatches_reviewed_artifact(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.delenv("CODEX_THREAD_ID", raising=False)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    runtime_session_id = "runtime-session-mismatch"
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "test-runtime-session-mismatch.json",
+        session_id=runtime_session_id,
+    )
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-runtime-mismatch.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                "Session ref: `session:test-reviewed-artifact`",
+                "",
+                "- closeout should fail closed when the repo-root checkpoint note belongs to another session",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    route_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=runtime_session_id,
+    )
+    _write_checkpoint_history_entry(
+        note_dir=route_note_dir,
+        session_ref="session:test-other-checkpoint-session",
+        runtime_session_id=runtime_session_id,
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-min",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Recurring route candidate",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=["aoa-playbooks.playbook_registry.min"],
+        progression_axis_signals=[],
+    )
+    sdk.checkpoints.status(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(session_file),
+    )
+
+    with pytest.raises(ValueError, match="repo-root checkpoint session_ref"):
+        sdk.checkpoints.build_closeout_context(
+            repo_root=str(workspace_root / "aoa-sdk"),
+            reviewed_artifact_path=str(reviewed_artifact),
+            session_file=str(session_file),
+        )
 
 
 def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(workspace_root: Path) -> None:
@@ -1037,9 +1220,14 @@ def test_execute_closeout_chain_uses_aggregated_runtime_session_notes(
         encoding="utf-8",
     )
 
+    route_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=runtime_session_id,
+    )
     _write_checkpoint_history_entry(
-        note_dir=workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk",
-        session_ref="session:test-aoa-sdk-exec-ledger",
+        note_dir=route_note_dir,
+        session_ref="session:test-runtime-fan-in-execute",
         runtime_session_id=runtime_session_id,
         repo_root=workspace_root / "aoa-sdk",
         repo_label="aoa-sdk",
@@ -1065,8 +1253,13 @@ def test_execute_closeout_chain_uses_aggregated_runtime_session_notes(
         promote_if=["repeat the same owner hint across another reviewed checkpoint"],
         defer_reason="owner ambiguity still exceeds checkpoint-note promotion authority",
     )
+    recall_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-memo",
+        runtime_session_id=runtime_session_id,
+    )
     _write_checkpoint_history_entry(
-        note_dir=workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-memo",
+        note_dir=recall_note_dir,
         session_ref="session:test-aoa-memo-exec-ledger",
         runtime_session_id=runtime_session_id,
         repo_root=workspace_root / "aoa-memo",
@@ -1165,8 +1358,12 @@ def test_execute_closeout_chain_uses_codex_session_trace_as_closeout_evidence(
         encoding="utf-8",
     )
     _write_checkpoint_history_entry(
-        note_dir=workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk",
-        session_ref="session:test-runtime-trace-ledger",
+        note_dir=_checkpoint_note_dir(
+            workspace_root,
+            repo_label="aoa-sdk",
+            runtime_session_id="runtime-session-trace",
+        ),
+        session_ref="session:test-runtime-trace-closeout",
         runtime_session_id="runtime-session-trace",
         repo_root=workspace_root / "aoa-sdk",
         repo_label="aoa-sdk",

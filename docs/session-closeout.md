@@ -205,9 +205,11 @@ aoa checkpoint build-closeout-context /srv/aoa-sdk \
 ```
 
 When a matching active runtime session exists, this builder aggregates every
-repo-scoped checkpoint ledger under `aoa-sdk/.aoa/session-growth/current/`
-that shares that runtime-session identity before it derives the closeout
-candidate map. The reviewed artifact remains the primary reread source.
+repo-scoped checkpoint ledger under
+`aoa-sdk/.aoa/session-growth/current/<runtime-session-id>/` before it derives
+the closeout candidate map. The reviewed artifact remains the primary reread
+source, and the repo-root checkpoint note must still match the resolved
+reviewed session or the closeout fails closed.
 When the active runtime session also exposes a live Codex rollout path, the
 builder now binds that session trace into the context so reviewed closeout can
 reread the whole runtime thread instead of only the reviewed artifact plus one

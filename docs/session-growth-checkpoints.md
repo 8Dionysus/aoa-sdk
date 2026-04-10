@@ -25,7 +25,7 @@ existing session-harvest family into an automatic runtime authority.
 Checkpoint state lives under:
 
 ```text
-aoa-sdk/.aoa/session-growth/current/<repo-label>/
+aoa-sdk/.aoa/session-growth/current/<runtime-session-id>/<repo-label>/
   checkpoint-note.jsonl
   checkpoint-note.json
   checkpoint-note.md
@@ -34,26 +34,32 @@ aoa-sdk/.aoa/session-growth/current/<repo-label>/
   closeout-execution-report.json
 ```
 
-`current/<repo-label>/` is the live ledger for one active checkpoint session in
-that repo scope, not a date bucket.
+When no runtime session is available yet, the legacy unscoped fallback remains
+`current/<repo-label>/`.
+With an active runtime session, `current/<runtime-session-id>/<repo-label>/` is
+the live ledger for that repo scope inside one specific session, not a date
+bucket.
 The checkpoint `session_ref` is minted uniquely when a new ledger starts and
 now includes a high-resolution timestamp plus the current runtime-session
 identity suffix when available, so many same-day sessions do not collapse into
 one daily label.
-When a later append sees a different runtime session, or sees a note already
-ended as `closed` or `promoted`, the previous `current` ledger is archived
-under `aoa-sdk/.aoa/session-growth/archive/` before the new session begins.
-When `CODEX_THREAD_ID` is present, that runtime session store now rotates on
-Codex thread boundaries instead of persisting blindly across multiple threads.
+When a note already ended as `closed` or `promoted`, that runtime-scoped
+`current` ledger is archived under `aoa-sdk/.aoa/session-growth/archive/`
+before the next cycle begins.
+When `CODEX_THREAD_ID` is present, the default runtime session store now lives
+under `aoa-sdk/.aoa/skill-runtime-sessions/<codex-thread>.json`, so parallel
+Codex threads no longer mutate the same singleton session file.
 If you use a non-default runtime session file, pass the same `--session-file`
 to `aoa checkpoint status`, `aoa checkpoint promote`,
 `aoa checkpoint build-closeout-context`, and
 `aoa checkpoint execute-closeout-chain` so those commands resolve the same
 active checkpoint session.
-At reviewed closeout, the builder aggregates every `current/<repo-label>/`
-checkpoint ledger that matches the same active runtime-session identity before
-it derives the closeout candidate map. This keeps one narrow repo-scoped note
-from silently standing in for the whole session.
+At reviewed closeout, the builder aggregates every checkpoint ledger under the
+same active runtime-session scope before it derives the closeout candidate map.
+The repo-root checkpoint note must still agree with the resolved reviewed
+session for the closeout to proceed. This keeps one narrow repo-scoped note
+from silently standing in for the whole session and blocks cross-session
+mismatch when parallel work is in flight.
 
 The JSONL file is append-only checkpoint history.
 The JSON and Markdown files are rebuilt snapshots for current review.

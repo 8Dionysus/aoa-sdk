@@ -203,10 +203,15 @@ class CheckpointsAPI:
         surface_report_path: str | None = None,
         manual_review_requested: bool = False,
     ) -> SessionCheckpointNote:
-        paths = _checkpoint_paths(self.workspace, repo_root)
         runtime_session_id, runtime_session_created_at = _ensure_checkpoint_runtime_session(
             workspace=self.workspace,
             session_file=session_file,
+        )
+        paths = _resolve_runtime_checkpoint_paths(
+            self.workspace,
+            repo_root=repo_root,
+            runtime_session_id=runtime_session_id,
+            migrate_legacy=True,
         )
         existing_note = _load_checkpoint_note(paths.note_json) if paths.note_json.exists() else None
         if paths.note_json.exists():
@@ -325,7 +330,11 @@ class CheckpointsAPI:
                 captured_at_local=captured_at_local,
                 captured_tz=captured_tz,
                 reason="explicit_request",
-                note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root),
+                note_ref=_checkpoint_note_ref_for_capture(
+                    self.workspace,
+                    repo_root,
+                    runtime_session_id=note.runtime_session_id,
+                ),
                 session_end_skill_targets=session_end_targets,
                 session_end_next_honest_move=_derive_session_end_next_honest_move(
                     note=note,
@@ -352,7 +361,15 @@ class CheckpointsAPI:
                 captured_at_local=captured_at_local,
                 captured_tz=captured_tz,
                 reason="auto_disabled",
-                note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root) if current_note is not None else None,
+                note_ref=(
+                    _checkpoint_note_ref_for_capture(
+                        self.workspace,
+                        repo_root,
+                        runtime_session_id=current_note.runtime_session_id,
+                    )
+                    if current_note is not None
+                    else None
+                ),
                 session_end_skill_targets=session_end_targets,
                 session_end_next_honest_move=_derive_session_end_next_honest_move(
                     note=current_note,
@@ -389,7 +406,15 @@ class CheckpointsAPI:
                 captured_at_local=captured_at_local,
                 captured_tz=captured_tz,
                 reason="no_checkpoint_signal",
-                note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root) if current_note is not None else None,
+                note_ref=(
+                    _checkpoint_note_ref_for_capture(
+                        self.workspace,
+                        repo_root,
+                        runtime_session_id=current_note.runtime_session_id,
+                    )
+                    if current_note is not None
+                    else None
+                ),
                 session_end_skill_targets=session_end_targets,
                 session_end_next_honest_move=_derive_session_end_next_honest_move(
                     note=current_note,
@@ -424,7 +449,11 @@ class CheckpointsAPI:
             captured_at_local=captured_at_local,
             captured_tz=captured_tz,
             reason="checkpoint_signal",
-            note_ref=_checkpoint_note_ref_for_capture(self.workspace, repo_root),
+            note_ref=_checkpoint_note_ref_for_capture(
+                self.workspace,
+                repo_root,
+                runtime_session_id=note.runtime_session_id,
+            ),
             session_end_skill_targets=session_end_targets,
             session_end_next_honest_move=_derive_session_end_next_honest_move(
                 note=note,
@@ -439,15 +468,20 @@ class CheckpointsAPI:
         )
 
     def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:
-        paths = _checkpoint_paths(self.workspace, repo_root)
-        if not paths.jsonl.exists():
-            raise SurfaceNotFound(f"no checkpoint note exists yet for {paths.repo_label}")
-
-        note = _build_checkpoint_note(paths)
         runtime_session_id, _ = _ensure_checkpoint_runtime_session(
             workspace=self.workspace,
             session_file=session_file,
         )
+        paths = _resolve_runtime_checkpoint_paths(
+            self.workspace,
+            repo_root=repo_root,
+            runtime_session_id=runtime_session_id,
+            migrate_legacy=True,
+        )
+        if not paths.jsonl.exists():
+            raise SurfaceNotFound(f"no checkpoint note exists yet for {paths.repo_label}")
+
+        note = _build_checkpoint_note(paths)
         if _should_hide_current_checkpoint_note(note, runtime_session_id=runtime_session_id):
             _archive_current_checkpoint(paths)
             raise SurfaceNotFound(f"no active checkpoint note exists yet for {paths.repo_label}")
@@ -466,8 +500,13 @@ class CheckpointsAPI:
         if target not in PROMOTION_TARGETS:
             raise ValueError(f"unsupported target {target!r}")
 
-        paths = _checkpoint_paths(self.workspace, repo_root)
         note = self.status(repo_root=repo_root, session_file=session_file)
+        paths = _resolve_runtime_checkpoint_paths(
+            self.workspace,
+            repo_root=repo_root,
+            runtime_session_id=note.runtime_session_id,
+            migrate_legacy=True,
+        )
         if not note.candidate_clusters:
             raise SurfaceNotFound("cannot promote an empty checkpoint note")
 
@@ -514,11 +553,21 @@ class CheckpointsAPI:
         surface_handoff_path: str | None = None,
         session_file: str | None = None,
     ) -> CheckpointCloseoutContext:
-        paths = _checkpoint_paths(self.workspace, repo_root)
         reviewed_artifact = Path(reviewed_artifact_path).expanduser().resolve()
         if not reviewed_artifact.exists():
             raise FileNotFoundError(f"missing reviewed artifact: {reviewed_artifact}")
 
+        runtime_session_metadata = _load_checkpoint_runtime_session(
+            workspace=self.workspace,
+            session_file=session_file,
+        )
+        active_runtime_session_id = cast(str | None, runtime_session_metadata["runtime_session_id"])
+        paths = _resolve_runtime_checkpoint_paths(
+            self.workspace,
+            repo_root=repo_root,
+            runtime_session_id=active_runtime_session_id,
+            migrate_legacy=True,
+        )
         note = _load_runtime_checkpoint_note(self, repo_root=repo_root, session_file=session_file)
         handoff = _load_reviewed_surface_handoff(
             workspace=self.workspace,
@@ -536,9 +585,9 @@ class CheckpointsAPI:
             reviewed_artifact=reviewed_artifact,
             receipt_paths=collected_receipt_paths,
         )
-        runtime_session_metadata = _load_checkpoint_runtime_session(
-            workspace=self.workspace,
-            session_file=session_file,
+        _validate_repo_root_closeout_scope(
+            checkpoint_note=note,
+            resolved_session_ref=resolved_session_ref,
         )
         note_records = _load_runtime_checkpoint_notes_for_closeout(
             self,
@@ -794,10 +843,21 @@ class CheckpointsAPI:
 
 
 class _CheckpointPaths:
-    def __init__(self, *, root: Path, repo_label: str, current_dir: Path, surface_report: Path) -> None:
+    def __init__(
+        self,
+        *,
+        root: Path,
+        repo_label: str,
+        current_dir: Path,
+        surface_report: Path,
+        runtime_session_id: str | None,
+        runtime_scope_key: str | None,
+    ) -> None:
         self.root = root
         self.repo_label = repo_label
         self.current_dir = current_dir
+        self.runtime_session_id = runtime_session_id
+        self.runtime_scope_key = runtime_scope_key
         self.jsonl = current_dir / "checkpoint-note.jsonl"
         self.note_json = current_dir / "checkpoint-note.json"
         self.note_md = current_dir / "checkpoint-note.md"
@@ -808,20 +868,113 @@ class _CheckpointPaths:
         self.surface_report = surface_report
 
 
-def _checkpoint_paths(workspace: Workspace, repo_root: str) -> _CheckpointPaths:
+def _checkpoint_current_root(workspace: Workspace) -> Path:
+    return workspace.repo_path("aoa-sdk") / ".aoa" / "session-growth" / "current"
+
+
+def _checkpoint_runtime_scope_key(runtime_session_id: str | None) -> str | None:
+    if runtime_session_id is None:
+        return None
+    return _safe_name(runtime_session_id)
+
+
+def _checkpoint_paths(
+    workspace: Workspace,
+    repo_root: str,
+    *,
+    runtime_session_id: str | None = None,
+) -> _CheckpointPaths:
     repo_label = _resolve_context_label(workspace, repo_root)
-    return _checkpoint_paths_for_label(workspace, repo_label)
+    return _checkpoint_paths_for_label(workspace, repo_label, runtime_session_id=runtime_session_id)
 
 
-def _checkpoint_paths_for_label(workspace: Workspace, repo_label: str) -> _CheckpointPaths:
+def _checkpoint_paths_for_label(
+    workspace: Workspace,
+    repo_label: str,
+    *,
+    runtime_session_id: str | None = None,
+) -> _CheckpointPaths:
     sdk_root = workspace.repo_path("aoa-sdk")
-    current_dir = sdk_root / ".aoa" / "session-growth" / "current" / repo_label
+    current_root = _checkpoint_current_root(workspace)
+    runtime_scope_key = _checkpoint_runtime_scope_key(runtime_session_id)
+    current_dir = (
+        current_root / runtime_scope_key / repo_label
+        if runtime_scope_key is not None
+        else current_root / repo_label
+    )
     surface_report = sdk_root / ".aoa" / "surface-detection" / f"{repo_label}.checkpoint.latest.json"
-    return _CheckpointPaths(root=sdk_root, repo_label=repo_label, current_dir=current_dir, surface_report=surface_report)
+    return _CheckpointPaths(
+        root=sdk_root,
+        repo_label=repo_label,
+        current_dir=current_dir,
+        surface_report=surface_report,
+        runtime_session_id=runtime_session_id,
+        runtime_scope_key=runtime_scope_key,
+    )
 
 
-def _checkpoint_note_ref_for_capture(workspace: Workspace, repo_root: str) -> str:
-    return str(_checkpoint_paths(workspace, repo_root).note_json)
+def _resolve_runtime_checkpoint_paths(
+    workspace: Workspace,
+    *,
+    repo_root: str,
+    runtime_session_id: str | None,
+    migrate_legacy: bool = False,
+) -> _CheckpointPaths:
+    repo_label = _resolve_context_label(workspace, repo_root)
+    return _resolve_runtime_checkpoint_paths_for_label(
+        workspace,
+        repo_label=repo_label,
+        runtime_session_id=runtime_session_id,
+        migrate_legacy=migrate_legacy,
+    )
+
+
+def _resolve_runtime_checkpoint_paths_for_label(
+    workspace: Workspace,
+    *,
+    repo_label: str,
+    runtime_session_id: str | None,
+    migrate_legacy: bool = False,
+) -> _CheckpointPaths:
+    scoped_paths = _checkpoint_paths_for_label(
+        workspace,
+        repo_label,
+        runtime_session_id=runtime_session_id,
+    )
+    if runtime_session_id is None:
+        return scoped_paths
+
+    legacy_paths = _checkpoint_paths_for_label(workspace, repo_label, runtime_session_id=None)
+    if scoped_paths.current_dir == legacy_paths.current_dir or scoped_paths.jsonl.exists():
+        return scoped_paths
+    if not legacy_paths.jsonl.exists():
+        return scoped_paths
+
+    legacy_note = _load_checkpoint_note(legacy_paths.note_json)
+    if legacy_note is None:
+        legacy_note = _build_checkpoint_note(legacy_paths)
+    if legacy_note.runtime_session_id not in {None, runtime_session_id}:
+        return scoped_paths
+    if migrate_legacy:
+        _move_current_checkpoint(source_paths=legacy_paths, target_paths=scoped_paths)
+        return scoped_paths
+    return legacy_paths
+
+
+def _checkpoint_note_ref_for_capture(
+    workspace: Workspace,
+    repo_root: str,
+    *,
+    runtime_session_id: str | None,
+) -> str:
+    return str(
+        _resolve_runtime_checkpoint_paths(
+            workspace,
+            repo_root=repo_root,
+            runtime_session_id=runtime_session_id,
+            migrate_legacy=False,
+        ).note_json
+    )
 
 
 def _resolve_context_root(workspace: Workspace, repo_root: str) -> Path:
@@ -955,7 +1108,12 @@ def _infer_auto_checkpoint_kind(
 def _archive_current_checkpoint(paths: _CheckpointPaths) -> None:
     archive_root = paths.root / ".aoa" / "session-growth" / "archive"
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
-    archive_dir = archive_root / f"{paths.repo_label}-{timestamp}"
+    archive_stem = (
+        f"{paths.repo_label}-{paths.runtime_scope_key}-{timestamp}"
+        if paths.runtime_scope_key is not None
+        else f"{paths.repo_label}-{timestamp}"
+    )
+    archive_dir = archive_root / archive_stem
     archive_dir.mkdir(parents=True, exist_ok=True)
     for source in (
         paths.jsonl,
@@ -969,6 +1127,45 @@ def _archive_current_checkpoint(paths: _CheckpointPaths) -> None:
             source.rename(archive_dir / source.name)
     if paths.closeout_artifacts.exists():
         paths.closeout_artifacts.rename(archive_dir / paths.closeout_artifacts.name)
+
+
+def _move_current_checkpoint(*, source_paths: _CheckpointPaths, target_paths: _CheckpointPaths) -> None:
+    if source_paths.current_dir == target_paths.current_dir:
+        return
+    if not source_paths.current_dir.exists():
+        return
+    target_paths.current_dir.parent.mkdir(parents=True, exist_ok=True)
+    if not target_paths.current_dir.exists():
+        source_paths.current_dir.rename(target_paths.current_dir)
+        return
+    for source, target in (
+        (source_paths.jsonl, target_paths.jsonl),
+        (source_paths.note_json, target_paths.note_json),
+        (source_paths.note_md, target_paths.note_md),
+        (source_paths.harvest_handoff, target_paths.harvest_handoff),
+        (source_paths.closeout_context, target_paths.closeout_context),
+        (source_paths.closeout_execution_report, target_paths.closeout_execution_report),
+    ):
+        if source.exists():
+            source.rename(target)
+    if source_paths.closeout_artifacts.exists():
+        source_paths.closeout_artifacts.rename(target_paths.closeout_artifacts)
+
+
+def _validate_repo_root_closeout_scope(
+    *,
+    checkpoint_note: SessionCheckpointNote | None,
+    resolved_session_ref: str,
+) -> None:
+    if checkpoint_note is None:
+        return
+    if checkpoint_note.session_ref == resolved_session_ref:
+        return
+    raise ValueError(
+        "repo-root checkpoint session_ref "
+        f"{checkpoint_note.session_ref!r} does not match resolved closeout session {resolved_session_ref!r}; "
+        "use the matching reviewed artifact/session ref or the matching session file for that runtime session"
+    )
 
 
 def _surface_handoff_path(workspace: Workspace, repo_root: str, *, override: str | None = None) -> Path:
@@ -2068,6 +2265,8 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
                 }
             )
         entries.append(entry)
+    if runtime_session_id is None:
+        runtime_session_id = paths.runtime_session_id
     if session_ref is None:
         session_ref = _default_session_ref(
             paths,
@@ -2260,17 +2459,40 @@ def _load_runtime_checkpoint_notes_for_closeout(
     resolved_session_ref: str,
     primary_note: SessionCheckpointNote | None,
 ) -> list[tuple[_CheckpointPaths, SessionCheckpointNote]]:
-    current_root = api.workspace.repo_path("aoa-sdk") / ".aoa" / "session-growth" / "current"
+    current_root = _checkpoint_current_root(api.workspace)
     if not current_root.exists():
         return []
 
     runtime_session_id = primary_note.runtime_session_id if primary_note is not None else None
     records: list[tuple[_CheckpointPaths, SessionCheckpointNote]] = []
+    candidate_paths: list[_CheckpointPaths] = []
+    seen_dirs: set[Path] = set()
+    if runtime_session_id is not None:
+        scope_root = current_root / cast(str, _checkpoint_runtime_scope_key(runtime_session_id))
+        if scope_root.exists():
+            for current_dir in sorted(path for path in scope_root.iterdir() if path.is_dir()):
+                paths = _checkpoint_paths_for_label(
+                    api.workspace,
+                    current_dir.name,
+                    runtime_session_id=runtime_session_id,
+                )
+                seen_dirs.add(paths.current_dir)
+                candidate_paths.append(paths)
     for current_dir in sorted(path for path in current_root.iterdir() if path.is_dir()):
-        paths = _checkpoint_paths_for_label(api.workspace, current_dir.name)
+        if not (current_dir / "checkpoint-note.jsonl").exists():
+            continue
+        paths = _checkpoint_paths_for_label(api.workspace, current_dir.name, runtime_session_id=None)
+        if paths.current_dir in seen_dirs:
+            continue
+        candidate_paths.append(paths)
+        seen_dirs.add(paths.current_dir)
+
+    for paths in candidate_paths:
         if not paths.jsonl.exists():
             continue
         note = _build_checkpoint_note(paths)
+        if runtime_session_id is not None and note.runtime_session_id not in {None, runtime_session_id}:
+            continue
         if _should_hide_current_checkpoint_note(note, runtime_session_id=runtime_session_id):
             _archive_current_checkpoint(paths)
             continue
@@ -2296,8 +2518,11 @@ def _checkpoint_note_matches_closeout_scope(
     resolved_session_ref: str,
     runtime_session_id: str | None,
 ) -> bool:
-    if runtime_session_id is not None and note.runtime_session_id == runtime_session_id:
-        return True
+    if runtime_session_id is not None:
+        if note.runtime_session_id == runtime_session_id:
+            return True
+        if note.runtime_session_id is not None:
+            return False
     return note.session_ref == resolved_session_ref
 
 
@@ -2799,7 +3024,7 @@ def _promote_to_dionysus(workspace: Workspace, *, paths: _CheckpointPaths, note:
     stem = f"{date_str}.{session_slug}.{paths.repo_label}.checkpoint-note"
     json_path = audits_dir / f"{stem}.json"
     md_path = audits_dir / f"{stem}.md"
-    source_note_ref = f"repo:aoa-sdk/.aoa/session-growth/current/{paths.repo_label}/checkpoint-note.json"
+    source_note_ref = f"repo:aoa-sdk/{paths.note_json.relative_to(paths.root).as_posix()}"
     payload = {
         "schema_version": 1,
         "note_type": "checkpoint_note",
