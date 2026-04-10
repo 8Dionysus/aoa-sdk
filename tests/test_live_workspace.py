@@ -6,21 +6,17 @@ import pytest
 
 from aoa_sdk import AoASDK
 from aoa_sdk.errors import IncompatibleSurfaceVersion, SurfaceNotFound
+from aoa_sdk.workspace.config import load_workspace_config, resolve_pattern
 
 
-LIVE_WORKSPACE_ROOT = Path("/srv/aoa-sdk")
-LIVE_ABYSS_STACK_SOURCE = Path("~/src/abyss-stack").expanduser().resolve()
+LIVE_WORKSPACE_ROOT = Path(__file__).resolve().parents[1]
 
 
-@pytest.mark.skipif(
-    not LIVE_WORKSPACE_ROOT.exists() or not LIVE_ABYSS_STACK_SOURCE.exists(),
-    reason="live /srv workspace or ~/src/abyss-stack source checkout is unavailable",
-)
 def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green() -> None:
-    sdk = AoASDK.from_workspace(LIVE_WORKSPACE_ROOT)
+    sdk, expected_abyss_stack_source = _live_sdk_or_skip()
     report = {entry.surface_id: entry for entry in sdk.compatibility.check_all()}
 
-    assert sdk.workspace.repo_path("abyss-stack") == LIVE_ABYSS_STACK_SOURCE
+    assert sdk.workspace.repo_path("abyss-stack") == expected_abyss_stack_source
     assert sdk.workspace.repo_origins["abyss-stack"] == "manifest:repos.abyss-stack.preferred"
     assert report["aoa-techniques.technique_capsules"].compatible is True
     assert report["aoa-techniques.technique_sections.full"].compatible is True
@@ -85,12 +81,8 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert any(item.seed_ready_count >= 1 for item in automation)
 
 
-@pytest.mark.skipif(
-    not LIVE_WORKSPACE_ROOT.exists() or not LIVE_ABYSS_STACK_SOURCE.exists(),
-    reason="live /srv workspace or ~/src/abyss-stack source checkout is unavailable",
-)
 def test_live_workspace_rpg_slice_reports_missing_future_transport_surfaces_honestly() -> None:
-    sdk = AoASDK.from_workspace(LIVE_WORKSPACE_ROOT)
+    sdk, expected_abyss_stack_source = _live_sdk_or_skip()
     report = {entry.surface_id: entry for entry in sdk.rpg.compatibility.check_all()}
 
     expected_surface_ids = {
@@ -102,7 +94,7 @@ def test_live_workspace_rpg_slice_reports_missing_future_transport_surfaces_hone
     }
 
     assert expected_surface_ids <= set(report)
-    assert sdk.workspace.repo_path("abyss-stack") == LIVE_ABYSS_STACK_SOURCE
+    assert sdk.workspace.repo_path("abyss-stack") == expected_abyss_stack_source
     loaders = {
         "Agents-of-Abyss.dual_vocabulary_overlay": sdk.rpg.vocabulary,
         "abyss-stack.rpg_build_snapshots": sdk.rpg.builds,
@@ -117,3 +109,19 @@ def test_live_workspace_rpg_slice_reports_missing_future_transport_surfaces_hone
         else:
             with pytest.raises((SurfaceNotFound, IncompatibleSurfaceVersion)):
                 loaders[surface_id]()
+
+
+def _live_sdk_or_skip() -> tuple[AoASDK, Path]:
+    if not LIVE_WORKSPACE_ROOT.exists():
+        pytest.skip("live aoa-sdk workspace checkout is unavailable")
+
+    config = load_workspace_config(LIVE_WORKSPACE_ROOT)
+    repo_config = config.repo_configs.get("abyss-stack")
+    if repo_config is None or not repo_config.preferred:
+        pytest.skip("abyss-stack preferred source checkout is not declared in the workspace manifest")
+
+    expected_abyss_stack_source = resolve_pattern(repo_config.preferred[0], config)
+    if not expected_abyss_stack_source.exists():
+        pytest.skip("preferred abyss-stack source checkout is unavailable")
+
+    return AoASDK.from_workspace(LIVE_WORKSPACE_ROOT), expected_abyss_stack_source

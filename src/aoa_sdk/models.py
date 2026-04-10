@@ -91,6 +91,8 @@ class SurfaceCompatibilityRule(BaseModel):
     version_field: str | None = None
     legacy_version_fields: list[str] = Field(default_factory=list)
     supported_versions: list[int | str] = Field(default_factory=list)
+    expected_json_kind: Literal["object", "array", "any"] = "object"
+    required_top_level_keys: list[str] = Field(default_factory=list)
     notes: str = ""
 
 

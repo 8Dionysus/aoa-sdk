@@ -203,6 +203,7 @@ SURFACE_COMPATIBILITY_RULES = {
         relative_path="generated/playbook_activation_surfaces.min.json",
         version_field=None,
         supported_versions=[],
+        expected_json_kind="array",
         notes="Versionless list surface; treated as strict-shape local-first dependency.",
     ),
     "aoa-playbooks.playbook_federation_surfaces.min": SurfaceCompatibilityRule(
@@ -211,6 +212,7 @@ SURFACE_COMPATIBILITY_RULES = {
         relative_path="generated/playbook_federation_surfaces.min.json",
         version_field=None,
         supported_versions=[],
+        expected_json_kind="array",
         notes="Versionless list surface; treated as strict-shape local-first dependency.",
     ),
     "aoa-playbooks.playbook_handoff_contracts": SurfaceCompatibilityRule(
@@ -324,6 +326,7 @@ SURFACE_COMPATIBILITY_RULES = {
         relative_path="examples/checkpoint_to_memory_contract.example.json",
         version_field=None,
         supported_versions=[],
+        required_top_level_keys=["contract_type", "contract_id", "mapping_rules"],
         notes="Unversioned example contract; treated as strict-shape local-first dependency.",
     ),
     "aoa-memo.runtime_writeback_targets.min": SurfaceCompatibilityRule(
@@ -582,6 +585,20 @@ def _evaluate_data(
     *,
     resolved_relative_path: str,
 ) -> SurfaceCompatibilityCheck:
+    shape_error = _surface_shape_error(rule, data)
+    if shape_error is not None:
+        return SurfaceCompatibilityCheck(
+            surface_id=rule.surface_id,
+            repo=rule.repo,
+            relative_path=rule.relative_path,
+            resolved_relative_path=resolved_relative_path,
+            compatibility_mode="unversioned" if rule.version_field is None else "versioned",
+            version_field=rule.version_field,
+            supported_versions=rule.supported_versions,
+            compatible=False,
+            reason=shape_error,
+        )
+
     if rule.version_field is None:
         return SurfaceCompatibilityCheck(
             surface_id=rule.surface_id,
@@ -593,19 +610,6 @@ def _evaluate_data(
             supported_versions=[],
             compatible=True,
             reason=rule.notes or "Unversioned surface accepted under strict-shape local-first policy.",
-        )
-
-    if not isinstance(data, dict):
-        return SurfaceCompatibilityCheck(
-            surface_id=rule.surface_id,
-            repo=rule.repo,
-            relative_path=rule.relative_path,
-            resolved_relative_path=resolved_relative_path,
-            compatibility_mode="versioned",
-            version_field=rule.version_field,
-            supported_versions=rule.supported_versions,
-            compatible=False,
-            reason="Versioned surface must load as a JSON object.",
         )
 
     version_field = None
@@ -655,6 +659,22 @@ def _evaluate_data(
         compatible=compatible,
         reason=reason,
     )
+
+
+def _surface_shape_error(rule: SurfaceCompatibilityRule, data) -> str | None:
+    if rule.expected_json_kind == "object" and not isinstance(data, dict):
+        return "Surface must load as a JSON object."
+    if rule.expected_json_kind == "array" and not isinstance(data, list):
+        return "Surface must load as a JSON array."
+
+    if rule.required_top_level_keys:
+        if not isinstance(data, dict):
+            return "Surface must load as a JSON object with required top-level keys."
+        missing = [key for key in rule.required_top_level_keys if key not in data]
+        if missing:
+            return f"Missing required top-level keys: {missing!r}."
+
+    return None
 
 
 def load_surface(workspace: Workspace, surface_id: str):

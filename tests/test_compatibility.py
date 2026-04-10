@@ -277,3 +277,36 @@ def test_compatibility_accepts_legacy_and_v2_stats_and_routing_capsules(workspac
     assert sdk.compatibility.check("aoa-stats.summary_surface_catalog.min").compatible is True
     assert sdk.compatibility.check("aoa-routing.federation_entrypoints.min").compatible is True
     assert sdk.compatibility.check("aoa-routing.return_navigation_hints.min").compatible is True
+
+
+def test_unversioned_checkpoint_writeback_contract_requires_required_keys(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    contract_path = workspace_root / "aoa-memo" / "examples" / "checkpoint_to_memory_contract.example.json"
+    contract_path.write_text(
+        json.dumps(
+            {
+                "contract_type": "checkpoint_to_memory_contract",
+                "mapping_rules": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    check = sdk.compatibility.check("aoa-memo.checkpoint_to_memory_contract.example")
+
+    assert check.compatibility_mode == "unversioned"
+    assert check.compatible is False
+    assert "contract_id" in check.reason
+
+
+def test_unversioned_playbook_surfaces_require_json_arrays(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    activation_path = workspace_root / "aoa-playbooks" / "generated" / "playbook_activation_surfaces.min.json"
+    activation_path.write_text(json.dumps({"unexpected": "object"}) + "\n", encoding="utf-8")
+
+    check = sdk.compatibility.check("aoa-playbooks.playbook_activation_surfaces.min")
+
+    assert check.compatibility_mode == "unversioned"
+    assert check.compatible is False
+    assert "JSON array" in check.reason
