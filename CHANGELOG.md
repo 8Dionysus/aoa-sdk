@@ -6,6 +6,37 @@ The format is intentionally simple and human-first.
 
 ## [Unreleased]
 
+## [0.2.0] - 2026-04-10
+
+### Added
+
+- workspace control-plane capsule plus compatibility tracking for center/root
+  entry capsules and routing/stats ABI v2
+- a first-class checkpoint lane with auto-captured skill-phase and
+  commit-growth checkpoints, progression carry-through, and closeout execution
+  bridging
+- thread-aware Codex session tracing and runtime-identity scoping for
+  checkpoint closeout
+
+### Changed
+
+- hardened checkpoint typing, registry guardrails, actor refs, and local-time
+  reporting across CLI and generated outputs
+- expanded docs, tests, and dev extras around checkpoint closeout and
+  control-plane validation
+
+### Included in this release
+
+- control-plane and typed-consumer expansion across `src/`, `schemas/`,
+  `generated/`, `scripts/`, and `systemd/`, including RPG and `aoa-stats`
+  consumer slices, reviewed closeout submission flows, closeout publishers and
+  watchers, surface detection, and the workspace control-plane capsule
+- workspace, checkpoint, and operator surfaces across `docs/`, `README.md`,
+  `AGENTS.md`, `.agents/`, `.github/`, `tests/`, and `pyproject.toml`,
+  including portable bootstrap and ingress wrappers, foundation skill
+  detection, via negativa and antifragility doctrine, and thread-aware
+  checkpoint-closeout hardening
+
 ## [0.1.0] - 2026-04-01
 
 First public baseline release of `aoa-sdk` as the typed Python SDK for the AoA federation.

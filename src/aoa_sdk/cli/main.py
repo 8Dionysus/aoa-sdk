@@ -639,7 +639,7 @@ def _load_surface_detection_report(path: str) -> SurfaceDetectionReport:
 
 @app.command()
 def version() -> None:
-    print("aoa-sdk 0.1.0")
+    print("aoa-sdk 0.2.0")
 
 
 @workspace_app.command("inspect")
