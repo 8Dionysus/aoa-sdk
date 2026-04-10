@@ -2,6 +2,8 @@ import json
 import sqlite3
 from pathlib import Path
 
+import pytest
+
 from aoa_sdk import AoASDK
 
 
@@ -31,6 +33,11 @@ def _install_codex_thread_store(
         conn.commit()
     finally:
         conn.close()
+
+
+@pytest.fixture(autouse=True)
+def _clear_codex_thread_id(monkeypatch) -> None:
+    monkeypatch.delenv("CODEX_THREAD_ID", raising=False)
 
 
 def test_discover_and_disclose_skills(workspace_root: Path) -> None:
@@ -180,6 +187,37 @@ def test_dispatch_defaults_session_file_to_aoa_sdk_runtime_store_for_workspace_r
     assert dispatch_report.activate_now[0].skill_name == "aoa-change-protocol"
     assert session_file.exists()
     assert not workspace_root_session.exists()
+
+
+def test_dispatch_defaults_to_thread_scoped_runtime_store_when_codex_thread_is_available(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root)
+    rollout_path = workspace_root / ".codex" / "sessions" / "thread-default.jsonl"
+    _install_codex_thread_store(
+        workspace_root,
+        thread_id="thread-default",
+        rollout_path=rollout_path,
+        title="Thread Scoped Default",
+        first_user_message="thread scoped runtime session",
+    )
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-default")
+
+    dispatch_report = sdk.skills.dispatch(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="plan verify a bounded change",
+    )
+
+    thread_scoped_session = (
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-default.json"
+    )
+    legacy_session = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+
+    assert dispatch_report.activate_now[0].skill_name == "aoa-change-protocol"
+    assert thread_scoped_session.exists()
+    assert not legacy_session.exists()
 
 
 def test_dispatch_falls_back_to_workspace_root_when_aoa_sdk_session_file_is_read_only(

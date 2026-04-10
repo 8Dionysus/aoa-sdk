@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import re
 import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
@@ -34,12 +35,35 @@ def _is_parent_writable(path: Path) -> bool:
     return existing.is_dir() and os.access(existing, os.W_OK | os.X_OK)
 
 
-def _default_session_path(workspace: Workspace, hint: str) -> Path:
+def _safe_storage_name(value: str) -> str:
+    normalized = re.sub(r"[^a-zA-Z0-9._-]+", "-", value.strip())
+    normalized = normalized.strip("-._")
+    return normalized or "session"
+
+
+def _thread_scoped_session_path(candidate: Path, thread_id: str) -> Path:
+    suffix = candidate.suffix or ".json"
+    return candidate.parent / "skill-runtime-sessions" / f"{_safe_storage_name(thread_id)}{suffix}"
+
+
+def _default_session_path(
+    workspace: Workspace,
+    hint: str,
+    *,
+    thread_context: dict[str, Any] | None = None,
+) -> Path:
     relative_hint = Path(hint)
     candidates: list[Path] = []
     if workspace.has_repo("aoa-sdk"):
         candidates.append(workspace.repo_path("aoa-sdk") / relative_hint)
     candidates.append(workspace.root / relative_hint)
+    thread_id = (
+        thread_context.get("codex_thread_id")
+        if isinstance(thread_context, dict)
+        else None
+    )
+    if isinstance(thread_id, str) and thread_id.strip():
+        candidates = [_thread_scoped_session_path(candidate, thread_id.strip()) for candidate in candidates]
 
     seen: set[Path] = set()
     for candidate in candidates:
@@ -55,7 +79,11 @@ def _default_session_path(workspace: Workspace, hint: str) -> Path:
 def resolve_session_file(workspace: Workspace, session_file: str | Path | None) -> Path:
     if session_file is None:
         hint = load_session_contract(workspace).get("session_file_hint", ".aoa/skill-runtime-session.json")
-        return _default_session_path(workspace, hint)
+        return _default_session_path(
+            workspace,
+            hint,
+            thread_context=resolve_codex_thread_context(),
+        )
 
     path = Path(session_file)
     if path.is_absolute():

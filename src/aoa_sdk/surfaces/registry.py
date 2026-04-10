@@ -1358,17 +1358,14 @@ def _checkpoint_promotion_recommendation(
 
 
 def _load_current_checkpoint_note(workspace: Workspace, repo_root: str) -> SessionCheckpointNote | None:
-    try:
-        sdk_root = workspace.repo_path("aoa-sdk")
-    except RepoNotFound:
-        return None
-    note_path = sdk_root / ".aoa" / "session-growth" / "current" / _context_label(workspace, repo_root) / "checkpoint-note.json"
-    if not note_path.exists():
-        return None
-    try:
-        return SessionCheckpointNote.model_validate_json(note_path.read_text(encoding="utf-8"))
-    except Exception:
-        return None
+    for note_path in _candidate_checkpoint_note_paths(workspace, repo_root):
+        if not note_path.exists():
+            continue
+        try:
+            return SessionCheckpointNote.model_validate_json(note_path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+    return None
 
 
 def _closeout_surviving_checkpoint_clusters(
@@ -1386,12 +1383,46 @@ def _closeout_surviving_checkpoint_clusters(
 def _checkpoint_note_ref(workspace: Workspace, repo_root: str, note: SessionCheckpointNote | None) -> str | None:
     if note is None:
         return None
+    for note_path in _candidate_checkpoint_note_paths(
+        workspace,
+        repo_root,
+        runtime_session_id=note.runtime_session_id,
+    ):
+        if note_path.exists():
+            return str(note_path)
+    return None
+
+
+def _candidate_checkpoint_note_paths(
+    workspace: Workspace,
+    repo_root: str,
+    *,
+    runtime_session_id: str | None = None,
+) -> list[Path]:
     try:
         sdk_root = workspace.repo_path("aoa-sdk")
     except RepoNotFound:
+        return []
+    current_root = sdk_root / ".aoa" / "session-growth" / "current"
+    label = _context_label(workspace, repo_root)
+    resolved_runtime_session_id = runtime_session_id or _active_runtime_session_id(workspace)
+    paths: list[Path] = []
+    if isinstance(resolved_runtime_session_id, str) and resolved_runtime_session_id.strip():
+        scope_name = _session_scope_name(resolved_runtime_session_id)
+        paths.append(current_root / scope_name / label / "checkpoint-note.json")
+    paths.append(current_root / label / "checkpoint-note.json")
+    return paths
+
+
+def _active_runtime_session_id(workspace: Workspace) -> str | None:
+    try:
+        return load_session(workspace, None).session_id
+    except Exception:
         return None
-    note_path = sdk_root / ".aoa" / "session-growth" / "current" / _context_label(workspace, repo_root) / "checkpoint-note.json"
-    return str(note_path) if note_path.exists() else None
+
+
+def _session_scope_name(value: str) -> str:
+    return re.sub(r"[^a-zA-Z0-9._-]+", "-", value.strip()).strip("-._") or "session"
 
 
 def _context_label(workspace: Workspace, repo_root: str) -> str:
