@@ -8,7 +8,10 @@ import pytest
 
 from aoa_sdk.release.api import (
     ReleaseAPI,
+    ReleaseAuditRepoReport,
+    ReleaseAuditResult,
     _parse_latest_release,
+    _git_fetch_origin,
     build_release_body,
     validate_release_body,
 )
@@ -254,6 +257,85 @@ def test_cadence_marks_repo_due_when_public_surface_drift_exists(tmp_path: Path,
 
     assert result.repo_reports[0].due is True
     assert "public-surface drift" in result.repo_reports[0].blocked_reason
+
+
+def test_git_fetch_origin_times_out_fail_closed(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    repo_root = tmp_path / "repo"
+    remote_root = tmp_path / "origin.git"
+    _init_repo(repo_root, remote_root)
+    original_run = subprocess.run
+
+    def fake_run(
+        command: list[str],
+        *,
+        cwd: Path,
+        env: dict[str, str] | None = None,
+        check: bool = False,
+        capture_output: bool = True,
+        text: bool = True,
+        timeout: float | None = None,
+    ) -> subprocess.CompletedProcess[str]:
+        if command[:5] == ["git", "-C", str(repo_root), "fetch", "--tags"]:
+            raise subprocess.TimeoutExpired(command, timeout)
+        return original_run(
+            command,
+            cwd=cwd,
+            env=env,
+            check=check,
+            capture_output=capture_output,
+            text=text,
+            timeout=timeout,
+        )
+
+    monkeypatch.setattr("aoa_sdk.release.api.subprocess.run", fake_run)
+
+    passed, detail = _git_fetch_origin(repo_root)
+
+    assert passed is False
+    assert "timed out" in detail
+
+
+def test_publish_dry_run_skips_postpublish_audit(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:
+    workspace_root = tmp_path / "workspace"
+    repo_root = workspace_root / "Agents-of-Abyss"
+    remote_root = tmp_path / "aoa-origin.git"
+    _init_repo(repo_root, remote_root)
+    _write_release_surfaces(repo_root, repo_name="Agents-of-Abyss", version="0.2.0")
+    _commit_and_push(repo_root, "0.2.0")
+
+    api = ReleaseAPI(_workspace_for("Agents-of-Abyss", repo_root, workspace_root))
+    release = _parse_latest_release((repo_root / "CHANGELOG.md").read_text(encoding="utf-8"))
+
+    preflight = ReleaseAuditResult(
+        workspace_root=str(workspace_root),
+        phase="preflight",
+        strict=True,
+        passed=True,
+        repo_reports=[
+            ReleaseAuditRepoReport(
+                repo="Agents-of-Abyss",
+                repo_root=str(repo_root),
+                phase="preflight",
+                passed=True,
+                expected_version=release.version,
+                latest_tag=release.tag,
+                checks=[],
+            )
+        ],
+    )
+
+    monkeypatch.setattr(api, "audit", lambda **kwargs: preflight)
+    monkeypatch.setattr(api, "_publish_repo", lambda *args, **kwargs: (["reuse existing tag v0.2.0"], "https://example.invalid/release"))
+
+    def fail_postpublish(*args: object, **kwargs: object) -> object:
+        raise AssertionError("dry-run publish should not call postpublish audit")
+
+    monkeypatch.setattr(api, "_audit_postpublish", fail_postpublish)
+
+    result = api.publish(workspace_root=workspace_root, repo="Agents-of-Abyss", dry_run=True)
+
+    assert result.passed is True
+    assert result.repo_reports[0].postpublish_passed is False
 
 
 @pytest.mark.parametrize(

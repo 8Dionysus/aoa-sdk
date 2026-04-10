@@ -25,6 +25,8 @@ PACKAGE_VERSION_FILES = {
     "aoa-sdk": ("pyproject.toml", "src/aoa_sdk/cli/main.py"),
 }
 ReleaseAuditPhase = Literal["preflight", "postpublish", "cadence"]
+REMOTE_COMMAND_TIMEOUT_SECONDS = 60.0
+PUBLISH_COMMAND_TIMEOUT_SECONDS = 120.0
 
 
 class ReleaseCheck(BaseModel):
@@ -93,6 +95,7 @@ def _run(
     cwd: Path,
     env: dict[str, str] | None = None,
     check: bool = False,
+    timeout: float | None = None,
 ) -> subprocess.CompletedProcess[str]:
     return subprocess.run(
         command,
@@ -101,6 +104,7 @@ def _run(
         check=check,
         capture_output=True,
         text=True,
+        timeout=timeout,
     )
 
 
@@ -139,7 +143,15 @@ def _git_returncode(repo_root: Path, *args: str) -> int:
 def _git_fetch_origin(repo_root: Path) -> tuple[bool, str]:
     if _git_returncode(repo_root, "remote", "get-url", "origin") != 0:
         return False, "missing git remote origin"
-    completed = _run(["git", "-C", str(repo_root), "fetch", "--tags", "origin"], cwd=repo_root, check=False)
+    try:
+        completed = _run(
+            ["git", "-C", str(repo_root), "fetch", "--tags", "origin"],
+            cwd=repo_root,
+            check=False,
+            timeout=REMOTE_COMMAND_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        return False, f"git fetch origin timed out after {int(REMOTE_COMMAND_TIMEOUT_SECONDS)}s"
     if completed.returncode != 0:
         detail = _strip(completed.stderr) or _strip(completed.stdout) or "git fetch origin failed"
         return False, detail
@@ -244,22 +256,30 @@ def validate_release_body(repo: str, release: ParsedReleaseSection, body: str) -
 
 
 def _gh_release_view(repo: str, tag: str, *, cwd: Path) -> dict[str, Any] | None:
-    completed = _run(
-        ["gh", "release", "view", tag, "--repo", _github_repo_slug(repo), "--json", "tagName,body,url,publishedAt"],
-        cwd=cwd,
-        check=False,
-    )
+    try:
+        completed = _run(
+            ["gh", "release", "view", tag, "--repo", _github_repo_slug(repo), "--json", "tagName,body,url,publishedAt"],
+            cwd=cwd,
+            check=False,
+            timeout=REMOTE_COMMAND_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        return None
     if completed.returncode != 0:
         return None
     return json.loads(completed.stdout)
 
 
 def _gh_release_list(repo: str, *, cwd: Path) -> list[dict[str, Any]]:
-    completed = _run(
-        ["gh", "release", "list", "--repo", _github_repo_slug(repo), "--limit", "10", "--json", "tagName,isLatest"],
-        cwd=cwd,
-        check=False,
-    )
+    try:
+        completed = _run(
+            ["gh", "release", "list", "--repo", _github_repo_slug(repo), "--limit", "10", "--json", "tagName,isLatest"],
+            cwd=cwd,
+            check=False,
+            timeout=REMOTE_COMMAND_TIMEOUT_SECONDS,
+        )
+    except subprocess.TimeoutExpired:
+        return []
     if completed.returncode != 0:
         return []
     return json.loads(completed.stdout)
@@ -424,8 +444,10 @@ class ReleaseAPI:
         for repo_name in selected:
             repo_root = self.workspace.repo_path(repo_name)
             release = self._read_release(repo_root)
+            repo_preflight = preflight_by_repo[repo_name]
             actions, release_url = self._publish_repo(repo_name, repo_root, release, dry_run=dry_run)
-            postpublish = self._audit_postpublish(repo_name, repo_root)
+            postpublish = None if dry_run else self._audit_postpublish(repo_name, repo_root)
+            publish_passed = repo_preflight.passed if dry_run else repo_preflight.passed and postpublish is not None and postpublish.passed
             repo_reports.append(
                 ReleasePublishRepoReport(
                     repo=repo_name,
@@ -433,9 +455,9 @@ class ReleaseAPI:
                     tag=release.tag,
                     version=release.version,
                     dry_run=dry_run,
-                    passed=preflight_by_repo[repo_name].passed and (dry_run or postpublish.passed),
-                    postpublish_passed=postpublish.passed if not dry_run else False,
-                    release_url=release_url or postpublish.release_url,
+                    passed=publish_passed,
+                    postpublish_passed=postpublish.passed if postpublish is not None else False,
+                    release_url=release_url or (postpublish.release_url if postpublish is not None else None),
                     actions=actions,
                 )
             )
@@ -636,12 +658,16 @@ class ReleaseAPI:
 
         remote_tag_exists = False
         if fetched:
-            remote_tag = _run(
-                ["git", "-C", str(repo_root), "ls-remote", "--tags", "origin", f"refs/tags/{release.tag}"],
-                cwd=repo_root,
-                check=False,
-            )
-            remote_tag_exists = bool(remote_tag.stdout.strip())
+            try:
+                remote_tag = _run(
+                    ["git", "-C", str(repo_root), "ls-remote", "--tags", "origin", f"refs/tags/{release.tag}"],
+                    cwd=repo_root,
+                    check=False,
+                    timeout=REMOTE_COMMAND_TIMEOUT_SECONDS,
+                )
+                remote_tag_exists = bool(remote_tag.stdout.strip())
+            except subprocess.TimeoutExpired:
+                remote_tag_exists = False
         checks.append(
             ReleaseCheck(
                 name="remote-tag",
@@ -780,10 +806,20 @@ class ReleaseAPI:
 
         if tag_commit is None:
             _run(["git", "-C", str(repo_root), "tag", "-a", release.tag, "-m", release.tag, head_commit], cwd=repo_root, check=True)
-            _run(["git", "-C", str(repo_root), "push", "origin", f"refs/tags/{release.tag}"], cwd=repo_root, check=True)
+            _run(
+                ["git", "-C", str(repo_root), "push", "origin", f"refs/tags/{release.tag}"],
+                cwd=repo_root,
+                check=True,
+                timeout=PUBLISH_COMMAND_TIMEOUT_SECONDS,
+            )
         elif tag_commit != head_commit:
             _run(["git", "-C", str(repo_root), "tag", "-fa", release.tag, "-m", release.tag, head_commit], cwd=repo_root, check=True)
-            _run(["git", "-C", str(repo_root), "push", "--force", "origin", f"refs/tags/{release.tag}"], cwd=repo_root, check=True)
+            _run(
+                ["git", "-C", str(repo_root), "push", "--force", "origin", f"refs/tags/{release.tag}"],
+                cwd=repo_root,
+                check=True,
+                timeout=PUBLISH_COMMAND_TIMEOUT_SECONDS,
+            )
 
         notes = build_release_body(repo, release)
         with tempfile.NamedTemporaryFile("w", encoding="utf-8", suffix=".md", delete=False) as handle:
@@ -807,6 +843,7 @@ class ReleaseAPI:
                     ],
                     cwd=repo_root,
                     check=True,
+                    timeout=PUBLISH_COMMAND_TIMEOUT_SECONDS,
                 )
             else:
                 _run(
@@ -825,6 +862,7 @@ class ReleaseAPI:
                     ],
                     cwd=repo_root,
                     check=True,
+                    timeout=PUBLISH_COMMAND_TIMEOUT_SECONDS,
                 )
         finally:
             Path(notes_path).unlink(missing_ok=True)
