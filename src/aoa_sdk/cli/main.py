@@ -319,6 +319,9 @@ def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
     typer.echo(f"promotion_recommendation: {note.promotion_recommendation}")
     typer.echo(f"carry_until_session_closeout: {'yes' if note.carry_until_session_closeout else 'no'}")
     typer.echo(f"session_end_recommendation: {note.session_end_recommendation}")
+    typer.echo(f"agent_review_status: {note.agent_review_status}")
+    if note.agent_review_pending_refs:
+        typer.echo(f"agent_review_pending_refs: {', '.join(note.agent_review_pending_refs)}")
     typer.echo(
         "harvest_candidate_ids: "
         f"{', '.join(note.harvest_candidate_ids) if note.harvest_candidate_ids else 'none'}"
@@ -446,8 +449,10 @@ def _print_checkpoint_after_commit_report(report: CheckpointAfterCommitReport) -
     commit_label = report.commit_short_sha or report.commit_ref
     if report.status == "captured":
         typer.echo(
-            f"post_commit_checkpoint: captured commit={commit_label} note={report.note_ref} report={report.report_path}"
+            f"post_commit_checkpoint: captured commit={commit_label} agent_review={report.agent_review_status} note={report.note_ref} report={report.report_path}"
         )
+        if report.agent_review_command is not None:
+            typer.echo(f"post_commit_checkpoint_review: required command={report.agent_review_command}")
         return
     if report.status == "skipped_no_active_session":
         typer.echo(
@@ -1513,6 +1518,80 @@ def checkpoint_after_commit(
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     _print_checkpoint_after_commit_report(report)
+
+
+@checkpoint_app.command("review-note")
+def checkpoint_review_note(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    commit_ref: str = typer.Option("HEAD", "--commit-ref", help="Committed git ref being reviewed."),
+    summary: str = typer.Option(..., "--summary", help="Agent-authored summary for this checkpoint review."),
+    finding: list[str] = typer.Option(
+        None,
+        "--finding",
+        help="Agent-authored finding to carry into the session checkpoint note. Repeat for multiple findings.",
+    ),
+    candidate_note: list[str] = typer.Option(
+        None,
+        "--candidate-note",
+        help="Agent-authored candidate note naming what/why/owner/where. Repeat for multiple notes.",
+    ),
+    stats_hint: list[str] = typer.Option(
+        None,
+        "--stats-hint",
+        help="Agent-authored stats hint to verify at reviewed closeout. Repeat for multiple hints.",
+    ),
+    mechanic_hint: list[str] = typer.Option(
+        None,
+        "--mechanic-hint",
+        help="Agent-authored mechanism or workflow hint to revisit at closeout. Repeat for multiple hints.",
+    ),
+    closeout_question: list[str] = typer.Option(
+        None,
+        "--closeout-question",
+        help="Question the agent should answer when rereading the full session at closeout. Repeat for multiple questions.",
+    ),
+    evidence_ref: list[str] = typer.Option(
+        None,
+        "--evidence-ref",
+        help="Evidence reference the agent used while reviewing this checkpoint. Repeat for multiple refs.",
+    ),
+    next_owner_move: list[str] = typer.Option(
+        None,
+        "--next-owner-move",
+        help="Deferred owner move to consider only at reviewed closeout. Repeat for multiple moves.",
+    ),
+    applied_skill: list[str] = typer.Option(
+        None,
+        "--applied-skill",
+        help="Skill the agent actually used while writing this review note. Repeat for multiple skills.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    note = AoASDK.from_workspace(root).checkpoints.review_note(
+        repo_root=repo_root,
+        commit_ref=commit_ref,
+        summary=summary,
+        findings=finding or [],
+        candidate_notes=candidate_note or [],
+        stats_hints=stats_hint or [],
+        mechanic_hints=mechanic_hint or [],
+        closeout_questions=closeout_question or [],
+        evidence_refs=evidence_ref or [],
+        next_owner_moves=next_owner_move or [],
+        applied_skill_names=applied_skill or [],
+        session_file=session_file,
+    )
+    payload = note.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_note(note)
 
 
 @checkpoint_app.command("install-hook")

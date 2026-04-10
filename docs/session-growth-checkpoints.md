@@ -13,6 +13,7 @@ existing session-harvest family into an automatic runtime authority.
 - use `--checkpoint-kind` to override the inferred checkpoint kind when one explicit checkpoint event matters
 - `aoa checkpoint mark` is the agent-facing way to record an explicit milestone, and `aoa checkpoint append` remains the lower-level append surface; both write only local note state under `.aoa/`
 - plain `git commit` can trigger one active-session-only checkpoint pass through the installed `post-commit` hook and `aoa checkpoint after-commit`; when no active session file already exists, that path exits as `skipped_no_active_session` and does not mint a fresh session just to emit noise
+- a captured post-commit checkpoint starts with `agent_review=pending`; the Codex agent must then apply the checkpoint skill protocol and run `aoa checkpoint review-note` to record real intermediate findings, candidate notes, stats hints, mechanic hints, closeout questions, and evidence refs in the note
 - checkpoint capture does not emit `HARVEST_PACKET`
 - checkpoint capture does not emit `CORE_SKILL_APPLICATION_RECEIPT`
 - promotion remains explicit through `aoa checkpoint promote`
@@ -68,6 +69,8 @@ The JSONL file is append-only checkpoint history.
 The JSON and Markdown files are rebuilt snapshots for current review.
 `post-commit-report.json` is the trigger/audit artifact for one plain-commit
 capture pass; it is not the authoritative checkpoint ledger.
+It records whether the agent-authored review is still `pending` or already
+`reviewed`.
 When capture skips because no active session file exists, or fails before a
 runtime-scoped note is available, the latest fallback status artifact is
 written under `aoa-sdk/.aoa/session-growth/post-commit-status/<repo>.latest.json`.
@@ -77,6 +80,7 @@ Those rebuilt snapshots now act as the session-local ledger for:
 - progression candidates and provisional axis movement that should feed `aoa-session-progression-lift` only at reviewed closeout
 - upgrade candidates that should be reviewed once at closeout before any owner-layer promotion
 - the final stats-refresh hint that belongs to the same reviewed closeout moment
+- agent-authored intermediate review notes for each commit checkpoint, including what changed, why it matters, where it belongs, and which questions the final closeout must reread against the full session
 
 Machine-facing timestamps stay canonical in UTC with the usual `Z` suffix.
 For human review the same checkpoint and explicit closeout surfaces now also
@@ -122,6 +126,7 @@ aoa skills guard /srv/aoa-sdk --intent-text "recurring owner follow-through afte
 aoa checkpoint mark /srv/aoa-sdk --kind pr_opened --intent-text "opened PR after protected main rejected direct push" --mutation-surface public-share --root /srv/aoa-sdk --json
 aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
+aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --summary "agent-reviewed checkpoint notes for this commit" --finding "what changed and why it matters" --candidate-note "candidate, owner, and where it should be revisited" --stats-hint "stats to refresh only after reviewed closeout" --mechanic-hint "workflow mechanism to retain" --closeout-question "what to verify when rereading the full session" --applied-skill aoa-change-protocol --root /srv --json
 aoa checkpoint install-hook --repo aoa-sdk --root /srv --json
 aoa checkpoint hook-status --repo aoa-sdk --root /srv --json
 aoa checkpoint build-closeout-context /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json

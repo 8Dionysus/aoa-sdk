@@ -353,19 +353,69 @@ def test_after_commit_captures_reviewable_note_and_surface_context(
     assert report.checkpoint_kind == "commit"
     assert report.mutation_surface == "code"
     assert report.manual_review_requested is True
+    assert report.agent_review_required is True
+    assert report.agent_review_status == "pending"
+    assert report.agent_review_command is not None
     assert Path(report.report_path).exists()
     assert Path(report.skill_report_path).exists()
     assert Path(report.surface_report_path).exists()
     assert Path(report.note_ref).exists()
     assert note_payload["state"] == "reviewable"
+    assert note_payload["agent_review_status"] == "pending"
+    assert note_payload["agent_review_required"] is True
+    assert note_payload["agent_review_pending_refs"] == [commit_sha]
     assert note_payload["checkpoint_history"][-1]["checkpoint_kind"] == "commit"
     assert note_payload["checkpoint_history"][-1]["manual_review_requested"] is True
+    assert note_payload["checkpoint_history"][-1]["agent_review_status"] == "pending"
     assert skill_payload["report"]["phase"] == "checkpoint"
     assert skill_payload["report"]["activate_now"][0]["skill_name"] == "aoa-change-protocol"
     assert surface_payload["report"]["phase"] == "checkpoint"
     assert "aoa-change-protocol" in surface_payload["report"]["active_skill_names"]
     assert session_payload["active_skills"][0]["name"] == "aoa-change-protocol"
     assert any(entry["name"] == "aoa-change-protocol" for entry in session_payload["activation_log"])
+
+
+def test_checkpoint_review_note_adds_agent_authored_checkpoint_review(workspace_root: Path) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(repo_root, subject="plan verify a bounded change")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-agent-review",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    captured = sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+
+    note = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        summary="Agent reviewed the post-commit checkpoint and confirmed the hook/review seam is the candidate.",
+        findings=["what: post-commit hook now records a pending checkpoint review; why: prevents silent commit checkpoints"],
+        candidate_notes=["where: aoa-sdk owns the control-plane review-note command and hook template"],
+        stats_hints=["stats: refresh session-growth automation counters only after reviewed closeout"],
+        mechanic_hints=["mechanic: commit is not complete for the agent until review-note is written"],
+        closeout_questions=["did the full session confirm the hook/review split or reveal missing candidate types?"],
+        evidence_refs=[captured.report_path],
+        next_owner_moves=["carry the agent-authored review into closeout before stats refresh"],
+        applied_skill_names=["aoa-change-protocol"],
+        session_file=str(session_file),
+    )
+    report_payload = json.loads(Path(captured.report_path).read_text(encoding="utf-8"))
+
+    assert note.agent_review_status == "reviewed"
+    assert note.agent_review_required is False
+    assert note.agent_reviews
+    assert note.agent_reviews[-1].commit_sha == commit_sha
+    assert note.agent_reviews[-1].summary.startswith("Agent reviewed")
+    assert note.agent_reviews[-1].findings
+    assert note.agent_reviews[-1].stats_hints
+    assert note.checkpoint_history[-1].agent_review_status == "reviewed"
+    assert report_payload["agent_review_status"] == "reviewed"
+    assert report_payload["agent_review_ref"] == note.agent_reviews[-1].review_id
 
 
 def test_after_commit_failure_writes_artifact_without_corrupting_checkpoint_state(workspace_root: Path) -> None:

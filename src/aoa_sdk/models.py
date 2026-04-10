@@ -1216,6 +1216,33 @@ class CheckpointCandidateCluster(BaseModel):
     next_owner_moves: list[str] = Field(default_factory=list)
 
 
+class SessionCheckpointAgentReview(BaseModel):
+    schema_version: int = 1
+    review_type: Literal["agent_post_commit_checkpoint_review_v1"] = (
+        "agent_post_commit_checkpoint_review_v1"
+    )
+    review_id: str
+    reviewed_at: datetime
+    reviewed_at_local: str | None = None
+    reviewed_tz: str | None = None
+    repo_root: str
+    repo_label: str
+    commit_ref: str
+    commit_sha: str | None = None
+    commit_short_sha: str | None = None
+    commit_subject: str | None = None
+    summary: str
+    applied_skill_names: list[str] = Field(default_factory=list)
+    findings: list[str] = Field(default_factory=list)
+    candidate_notes: list[str] = Field(default_factory=list)
+    stats_hints: list[str] = Field(default_factory=list)
+    mechanic_hints: list[str] = Field(default_factory=list)
+    closeout_questions: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    next_owner_moves: list[str] = Field(default_factory=list)
+    defer_until_closeout: bool = True
+
+
 class SessionCheckpointHistoryEntry(BaseModel):
     checkpoint_kind: Literal[
         "manual",
@@ -1235,6 +1262,10 @@ class SessionCheckpointHistoryEntry(BaseModel):
     blocked_by: list[str] = Field(default_factory=list)
     candidate_clusters: list[CheckpointCandidateCluster] = Field(default_factory=list)
     manual_review_requested: bool = False
+    commit_sha: str | None = None
+    commit_short_sha: str | None = None
+    agent_review_status: Literal["not_required", "pending", "reviewed"] = "not_required"
+    agent_review_ref: str | None = None
 
 
 class SessionCheckpointCluster(BaseModel):
@@ -1298,6 +1329,10 @@ class SessionCheckpointNote(BaseModel):
     upgrade_candidate_ids: list[str] = Field(default_factory=list)
     progression_axis_signals: list[ProgressionAxisSignal] = Field(default_factory=list)
     stats_refresh_recommended: bool = False
+    agent_review_status: Literal["none", "pending", "reviewed"] = "none"
+    agent_review_required: bool = False
+    agent_review_pending_refs: list[str] = Field(default_factory=list)
+    agent_reviews: list[SessionCheckpointAgentReview] = Field(default_factory=list)
     blocked_by: list[str] = Field(default_factory=list)
     review_status: Literal["unreviewed", "reviewed"] = "unreviewed"
     evidence_refs: list[str] = Field(default_factory=list)
@@ -1370,6 +1405,10 @@ class CheckpointAfterCommitReport(BaseModel):
     skill_report_path: str | None = None
     surface_report_path: str | None = None
     note_ref: str | None = None
+    agent_review_required: bool = False
+    agent_review_status: Literal["not_required", "pending", "reviewed"] = "not_required"
+    agent_review_command: str | None = None
+    agent_review_ref: str | None = None
     error_text: str | None = None
 
 

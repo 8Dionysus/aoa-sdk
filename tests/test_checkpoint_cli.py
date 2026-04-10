@@ -798,6 +798,66 @@ def test_checkpoint_after_commit_cli_reports_skip_without_active_session(workspa
     assert payload["changed_paths"] == ["README.md"]
 
 
+def test_checkpoint_review_note_cli_records_agent_authored_review(workspace_root: Path) -> None:
+    runner = CliRunner()
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-cli-review",
+    )
+    _git_commit(repo_root, subject="plan verify a bounded change")
+    captured = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "after-commit",
+            str(repo_root),
+            "--commit-ref",
+            "HEAD",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert captured.exit_code == 0
+
+    reviewed = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "review-note",
+            str(repo_root),
+            "--commit-ref",
+            "HEAD",
+            "--summary",
+            "Agent reviewed checkpoint output and recorded deferred closeout notes.",
+            "--finding",
+            "what: checkpoint requires agent-authored review after hook capture",
+            "--candidate-note",
+            "where: aoa-sdk owns the review-note command",
+            "--stats-hint",
+            "stats: refresh only after reviewed closeout",
+            "--mechanic-hint",
+            "mechanic: hook records pending, agent records reviewed",
+            "--closeout-question",
+            "did the final session reread confirm this candidate?",
+            "--applied-skill",
+            "aoa-change-protocol",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert reviewed.exit_code == 0
+    payload = json.loads(reviewed.stdout)
+    assert payload["agent_review_status"] == "reviewed"
+    assert payload["agent_reviews"][-1]["summary"].startswith("Agent reviewed")
+    assert payload["agent_reviews"][-1]["findings"]
+    assert payload["agent_reviews"][-1]["stats_hints"]
+
+
 def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(workspace_root: Path) -> None:
     runner = CliRunner()
     repo_root = workspace_root / "aoa-sdk"
@@ -909,5 +969,6 @@ def test_post_commit_hook_runs_after_real_git_commit(workspace_root: Path) -> No
     )
 
     assert "post_commit_checkpoint: captured" in combined_output
+    assert "agent_review=pending" in combined_output
     assert (note_dir / "checkpoint-note.json").exists()
     assert (note_dir / "post-commit-report.json").exists()
