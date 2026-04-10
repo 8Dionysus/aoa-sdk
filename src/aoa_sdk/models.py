@@ -184,6 +184,11 @@ class SkillSession(BaseModel):
     session_id: str
     created_at: datetime
     updated_at: datetime
+    codex_thread_id: str | None = None
+    codex_rollout_path: str | None = None
+    codex_thread_title: str | None = None
+    codex_first_user_message: str | None = None
+    codex_thread_updated_at: datetime | None = None
     active_skills: list[ActiveSkillRecord] = Field(default_factory=list)
     activation_log: list[dict[str, Any]] = Field(default_factory=list)
 
@@ -1369,7 +1374,11 @@ class CheckpointCloseoutContext(BaseModel):
     built_tz: str | None = None
     repo_root: str
     reviewed_artifact_ref: str
+    runtime_session_id: str | None = None
+    session_trace_ref: str | None = None
+    session_trace_thread_id: str | None = None
     checkpoint_note_ref: str | None = None
+    checkpoint_note_refs: list[str] = Field(default_factory=list)
     surface_handoff_ref: str | None = None
     receipt_refs: list[str] = Field(default_factory=list)
     repo_scope: list[str] = Field(default_factory=list)
@@ -1404,7 +1413,11 @@ class CheckpointCloseoutExecutionReport(BaseModel):
     executed_at_local: str | None = None
     executed_tz: str | None = None
     reviewed_artifact_ref: str
+    runtime_session_id: str | None = None
+    session_trace_ref: str | None = None
+    session_trace_thread_id: str | None = None
     checkpoint_note_ref: str | None = None
+    checkpoint_note_refs: list[str] = Field(default_factory=list)
     surface_handoff_ref: str | None = None
     context_ref: str
     executed_skills: list[CloseoutExecutionStep] = Field(default_factory=list)

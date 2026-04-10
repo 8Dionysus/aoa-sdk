@@ -10,6 +10,138 @@ from aoa_sdk import AoASDK
 from aoa_sdk.errors import SurfaceNotFound
 
 
+def _write_runtime_session_file(path: Path, *, session_id: str) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "schema_version": 1,
+        "profile": "aoa-sdk",
+        "session_id": session_id,
+        "created_at": "2026-04-10T14:00:00Z",
+        "updated_at": "2026-04-10T14:00:00Z",
+        "codex_thread_id": "thread-closeout",
+        "codex_rollout_path": str((path.parent / "runtime-trace.jsonl").resolve()),
+        "active_skills": [],
+        "activation_log": [],
+    }
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
+def _write_rollout_trace(
+    path: Path,
+    *,
+    user_message: str = "fix the closeout path",
+    assistant_message: str = "implemented the patch and verified the tests",
+    tool_call_arguments: str = "{\"cmd\":\"python -m pytest -q\"}",
+    tool_output: str = "24 passed",
+) -> Path:
+    path.parent.mkdir(parents=True, exist_ok=True)
+    records = [
+        {
+            "timestamp": "2026-04-10T14:00:00Z",
+            "type": "event_msg",
+            "payload": {"type": "user_message", "message": user_message},
+        },
+        {
+            "timestamp": "2026-04-10T14:00:01Z",
+            "type": "response_item",
+            "payload": {
+                "type": "message",
+                "role": "assistant",
+                "content": [{"type": "output_text", "text": assistant_message}],
+            },
+        },
+        {
+            "timestamp": "2026-04-10T14:00:02Z",
+            "type": "response_item",
+            "payload": {
+                "type": "function_call",
+                "name": "exec_command",
+                "arguments": tool_call_arguments,
+            },
+        },
+        {
+            "timestamp": "2026-04-10T14:00:03Z",
+            "type": "response_item",
+            "payload": {
+                "type": "function_call_output",
+                "call_id": "call-1",
+                "output": tool_output,
+            },
+        },
+    ]
+    path.write_text(
+        "\n".join(json.dumps(record) for record in records) + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
+def _write_checkpoint_history_entry(
+    *,
+    note_dir: Path,
+    session_ref: str,
+    runtime_session_id: str,
+    repo_root: Path,
+    repo_label: str,
+    candidate_id: str,
+    candidate_kind: str,
+    owner_hint: str,
+    display_name: str,
+    source_surface_ref: str,
+    evidence_refs: list[str],
+    progression_axis_signals: list[dict[str, object]],
+    checkpoint_kind: str = "verify_green",
+    observed_at: str = "2026-04-10T14:00:00Z",
+    intent_text: str = "reviewed closeout candidate survived this runtime session",
+    blocked_by: list[str] | None = None,
+    promote_if: list[str] | None = None,
+    next_owner_moves: list[str] | None = None,
+    defer_reason: str | None = None,
+) -> None:
+    note_dir.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "session_ref": session_ref,
+        "runtime_session_id": runtime_session_id,
+        "runtime_session_created_at": "2026-04-10T13:55:00Z",
+        "repo_root": str(repo_root.resolve()),
+        "repo_label": repo_label,
+        "history_entry": {
+            "checkpoint_kind": checkpoint_kind,
+            "observed_at": observed_at,
+            "report_ref": str(note_dir / f"{repo_label}-report.json"),
+            "intent_text": intent_text,
+            "checkpoint_should_capture": True,
+            "blocked_by": blocked_by or [],
+            "candidate_clusters": [
+                {
+                    "candidate_id": candidate_id,
+                    "candidate_kind": candidate_kind,
+                    "owner_hint": owner_hint,
+                    "display_name": display_name,
+                    "source_surface_ref": source_surface_ref,
+                    "evidence_refs": evidence_refs,
+                    "confidence": "medium",
+                    "session_end_targets": ["harvest", "progression", "upgrade"],
+                    "progression_axis_signals": progression_axis_signals,
+                    "promote_if": promote_if or [],
+                    "defer_reason": defer_reason,
+                    "blocked_by": blocked_by or [],
+                    "next_owner_moves": next_owner_moves
+                    or [
+                        "carry the candidate through reviewed session closeout before moving candidates or stats"
+                    ],
+                }
+            ],
+            "manual_review_requested": False,
+        },
+    }
+    (note_dir / "checkpoint-note.jsonl").write_text(
+        json.dumps(payload) + "\n",
+        encoding="utf-8",
+    )
+
+
 def test_surface_detect_checkpoint_phase_emits_candidate_clusters(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
@@ -679,6 +811,136 @@ def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: P
     assert (note_dir / "closeout-context.json").exists()
 
 
+def test_build_closeout_context_aggregates_runtime_session_notes_across_repo_labels(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.delenv("CODEX_THREAD_ID", raising=False)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    runtime_session_id = "runtime-session-shared"
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "test-runtime-session.json",
+        session_id=runtime_session_id,
+    )
+    rollout_path = _write_rollout_trace(
+        workspace_root / "aoa-sdk" / ".aoa" / "runtime-trace.jsonl",
+        assistant_message="reviewed the route and recall work, then verified the patch",
+    )
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-runtime-fan-in.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                "Session ref: `session:test-runtime-fan-in-closeout`",
+                "",
+                "- the full runtime session should reread route and recall evidence together",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    route_note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    _write_checkpoint_history_entry(
+        note_dir=route_note_dir,
+        session_ref="session:test-aoa-sdk-ledger",
+        runtime_session_id=runtime_session_id,
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-min",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Recurring route candidate",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=[
+            "aoa-playbooks.playbook_registry.min",
+            "aoa-techniques.technique_promotion_readiness.min",
+        ],
+        progression_axis_signals=[
+            {
+                "axis": "change_legibility",
+                "movement": "hold",
+                "why": "route evidence should survive the runtime-session fan-in",
+                "evidence_refs": ["aoa-playbooks.playbook_registry.min"],
+                "candidate_ids": ["candidate:route:aoa-playbooks-playbook-registry-min"],
+            }
+        ],
+        blocked_by=["owner-ambiguity"],
+        promote_if=["repeat the same owner hint across another reviewed checkpoint"],
+        defer_reason="owner ambiguity still exceeds checkpoint-note promotion authority",
+    )
+
+    recall_note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-memo"
+    _write_checkpoint_history_entry(
+        note_dir=recall_note_dir,
+        session_ref="session:test-aoa-memo-ledger",
+        runtime_session_id=runtime_session_id,
+        repo_root=workspace_root / "aoa-memo",
+        repo_label="aoa-memo",
+        candidate_id="candidate:recall:aoa-memo-memory-catalog-min",
+        candidate_kind="recall",
+        owner_hint="aoa-memo",
+        display_name="Memo semantic recall",
+        source_surface_ref="aoa-memo.memory_catalog.min",
+        evidence_refs=["aoa-memo.memory_catalog.min"],
+        progression_axis_signals=[
+            {
+                "axis": "provenance_hygiene",
+                "movement": "hold",
+                "why": "recall evidence should survive the runtime-session fan-in",
+                "evidence_refs": ["aoa-memo.memory_catalog.min"],
+                "candidate_ids": ["candidate:recall:aoa-memo-memory-catalog-min"],
+            }
+        ],
+        blocked_by=["thin-evidence"],
+        promote_if=["write back only bounded, provenance-aware memory; memory is not proof"],
+        defer_reason="thin evidence should stay local until another checkpoint confirms the same candidate",
+    )
+
+    sdk.checkpoints.status(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(session_file),
+    )
+    sdk.checkpoints.status(
+        repo_root=str(workspace_root / "aoa-memo"),
+        session_file=str(session_file),
+    )
+
+    context = sdk.checkpoints.build_closeout_context(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        reviewed_artifact_path=str(reviewed_artifact),
+        session_file=str(session_file),
+    )
+
+    assert context.session_ref == "session:test-runtime-fan-in-closeout"
+    assert context.runtime_session_id == runtime_session_id
+    assert context.session_trace_ref == str(rollout_path.resolve())
+    assert context.session_trace_thread_id == "thread-closeout"
+    assert context.checkpoint_note_ref == str((route_note_dir / "checkpoint-note.json").resolve())
+    assert {
+        Path(ref).parent.name for ref in context.checkpoint_note_refs
+    } == {"aoa-sdk", "aoa-memo"}
+    assert set(context.candidate_map.harvest_candidate_ids) == {
+        "candidate:route:aoa-playbooks-playbook-registry-min",
+        "candidate:recall:aoa-memo-memory-catalog-min",
+    }
+    assert set(context.candidate_map.progression_candidate_ids) == {
+        "candidate:route:aoa-playbooks-playbook-registry-min",
+        "candidate:recall:aoa-memo-memory-catalog-min",
+    }
+    assert set(context.candidate_map.upgrade_candidate_ids) == {
+        "candidate:route:aoa-playbooks-playbook-registry-min",
+        "candidate:recall:aoa-memo-memory-catalog-min",
+    }
+    assert {"aoa-sdk", "aoa-memo", "aoa-playbooks"} <= set(context.repo_scope)
+    assert {"change_legibility", "provenance_hygiene"} <= {
+        signal.axis for signal in context.progression_axis_signals
+    }
+    assert any("aggregated runtime-session checkpoint notes" in note for note in context.notes)
+    assert any("Codex rollout trace" in note for note in context.notes)
+
+
 def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-session-no-note.md"
@@ -741,6 +1003,208 @@ def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(w
         / "closeout-execution-report.json"
     )
     assert execution_report_path.exists()
+
+
+def test_execute_closeout_chain_uses_aggregated_runtime_session_notes(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.delenv("CODEX_THREAD_ID", raising=False)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    runtime_session_id = "runtime-session-execute-shared"
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "test-runtime-session-exec.json",
+        session_id=runtime_session_id,
+    )
+    rollout_path = _write_rollout_trace(
+        workspace_root / "aoa-sdk" / ".aoa" / "runtime-trace.jsonl",
+        assistant_message="reviewed the repeated route, implemented the patch, and verified the test surface",
+        tool_output="verified green after patch review",
+    )
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-runtime-fan-in-exec.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                "Session ref: `session:test-runtime-fan-in-execute`",
+                "",
+                "- route evidence stayed repeated across the session",
+                "- recall evidence stayed provenance-aware across the session",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    _write_checkpoint_history_entry(
+        note_dir=workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk",
+        session_ref="session:test-aoa-sdk-exec-ledger",
+        runtime_session_id=runtime_session_id,
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-min",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Recurring route candidate",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=[
+            "aoa-playbooks.playbook_registry.min",
+            "aoa-techniques.technique_promotion_readiness.min",
+        ],
+        progression_axis_signals=[
+            {
+                "axis": "change_legibility",
+                "movement": "hold",
+                "why": "route evidence should stay visible at closeout",
+                "evidence_refs": ["aoa-playbooks.playbook_registry.min"],
+                "candidate_ids": ["candidate:route:aoa-playbooks-playbook-registry-min"],
+            }
+        ],
+        blocked_by=["owner-ambiguity"],
+        promote_if=["repeat the same owner hint across another reviewed checkpoint"],
+        defer_reason="owner ambiguity still exceeds checkpoint-note promotion authority",
+    )
+    _write_checkpoint_history_entry(
+        note_dir=workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-memo",
+        session_ref="session:test-aoa-memo-exec-ledger",
+        runtime_session_id=runtime_session_id,
+        repo_root=workspace_root / "aoa-memo",
+        repo_label="aoa-memo",
+        candidate_id="candidate:recall:aoa-memo-memory-catalog-min",
+        candidate_kind="recall",
+        owner_hint="aoa-memo",
+        display_name="Memo semantic recall",
+        source_surface_ref="aoa-memo.memory_catalog.min",
+        evidence_refs=["aoa-memo.memory_catalog.min"],
+        progression_axis_signals=[
+            {
+                "axis": "provenance_hygiene",
+                "movement": "hold",
+                "why": "recall evidence should stay visible at closeout",
+                "evidence_refs": ["aoa-memo.memory_catalog.min"],
+                "candidate_ids": ["candidate:recall:aoa-memo-memory-catalog-min"],
+            }
+        ],
+        blocked_by=["thin-evidence"],
+        promote_if=["write back only bounded, provenance-aware memory; memory is not proof"],
+        defer_reason="thin evidence should stay local until another checkpoint confirms the same candidate",
+    )
+
+    sdk.checkpoints.status(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(session_file),
+    )
+    sdk.checkpoints.status(
+        repo_root=str(workspace_root / "aoa-memo"),
+        session_file=str(session_file),
+    )
+
+    report = sdk.checkpoints.execute_closeout_chain(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        reviewed_artifact_path=str(reviewed_artifact),
+        session_file=str(session_file),
+    )
+
+    assert report.runtime_session_id == runtime_session_id
+    assert report.session_trace_ref == str(rollout_path.resolve())
+    assert report.session_trace_thread_id == "thread-closeout"
+    assert {
+        Path(ref).parent.name for ref in report.checkpoint_note_refs
+    } == {"aoa-sdk", "aoa-memo"}
+
+    harvest_packet_path = next(
+        Path(path) for path in report.produced_artifact_refs if path.endswith("HARVEST_PACKET.json")
+    )
+    harvest_packet = json.loads(harvest_packet_path.read_text(encoding="utf-8"))
+    assert {item["owner_repo_recommendation"] for item in harvest_packet["accepted_candidates"]} == {
+        "aoa-playbooks",
+        "aoa-memo",
+    }
+
+    progression_packet_path = next(
+        Path(path) for path in report.produced_artifact_refs if path.endswith("PROGRESSION_DELTA.json")
+    )
+    progression_packet = json.loads(progression_packet_path.read_text(encoding="utf-8"))
+    assert set(progression_packet["candidate_ids"]) == {
+        "candidate:route:aoa-playbooks-playbook-registry-min",
+        "candidate:recall:aoa-memo-memory-catalog-min",
+    }
+    assert progression_packet["session_trace_ref"] == str(rollout_path.resolve())
+
+
+def test_execute_closeout_chain_uses_codex_session_trace_as_closeout_evidence(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    monkeypatch.delenv("CODEX_THREAD_ID", raising=False)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "test-runtime-session-trace.json",
+        session_id="runtime-session-trace",
+    )
+    rollout_path = _write_rollout_trace(
+        workspace_root / "aoa-sdk" / ".aoa" / "runtime-trace.jsonl",
+        user_message="fix the boundary and provenance issues before closeout",
+        assistant_message="implemented the patch change, verified the tests, and completed the review with clear boundary notes",
+        tool_call_arguments="{\"cmd\":\"python -m pytest -q tests/test_checkpoints.py\"}",
+        tool_output="24 passed; verification complete",
+    )
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-runtime-trace.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                "Session ref: `session:test-runtime-trace-closeout`",
+                "",
+                "- one bounded candidate survived",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    _write_checkpoint_history_entry(
+        note_dir=workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk",
+        session_ref="session:test-runtime-trace-ledger",
+        runtime_session_id="runtime-session-trace",
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-min",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Recurring route candidate",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=["aoa-playbooks.playbook_registry.min"],
+        progression_axis_signals=[],
+        blocked_by=["owner-ambiguity"],
+        defer_reason="owner ambiguity still exceeds checkpoint-note promotion authority",
+    )
+
+    sdk.checkpoints.status(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(session_file),
+    )
+
+    report = sdk.checkpoints.execute_closeout_chain(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        reviewed_artifact_path=str(reviewed_artifact),
+        session_file=str(session_file),
+    )
+
+    progression_packet_path = next(
+        Path(path) for path in report.produced_artifact_refs if path.endswith("PROGRESSION_DELTA.json")
+    )
+    progression_packet = json.loads(progression_packet_path.read_text(encoding="utf-8"))
+
+    assert report.session_trace_ref == str(rollout_path.resolve())
+    assert progression_packet["session_trace_ref"] == str(rollout_path.resolve())
+    assert progression_packet["verdict"] == "advance"
+    assert progression_packet["axis_deltas"]["boundary_integrity"] == 1
+    assert progression_packet["axis_deltas"]["execution_reliability"] == 1
+    assert progression_packet["axis_deltas"]["review_sharpness"] == 1
+    assert progression_packet["axis_deltas"]["proof_discipline"] == 1
+    assert progression_packet["axis_deltas"]["provenance_hygiene"] == 1
 
 
 def test_execute_closeout_chain_routes_pattern_candidates_to_techniques(workspace_root: Path) -> None:

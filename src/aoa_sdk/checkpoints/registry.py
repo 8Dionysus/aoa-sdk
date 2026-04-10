@@ -44,6 +44,9 @@ SESSION_REF_RE = re.compile(r'"session_ref"\s*:\s*"([^"]+)"|session_ref:\s*`?([^
 SESSION_REF_TIMESTAMP_FORMAT = "%Y-%m-%dT%H-%M-%S-%fZ"
 IGNORABLE_UNTRACKED_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 IGNORABLE_UNTRACKED_SUFFIXES = (".pyc", ".pyo", ".pyd")
+CODEX_TRACE_TEXT_ITEM_TYPES = {"input_text", "output_text"}
+CODEX_TRACE_MAX_CHARS = 120_000
+CODEX_TRACE_MAX_CHUNK_CHARS = 3_000
 SESSION_END_SKILL_ORDER = (
     "aoa-session-donor-harvest",
     "aoa-session-progression-lift",
@@ -533,16 +536,45 @@ class CheckpointsAPI:
             reviewed_artifact=reviewed_artifact,
             receipt_paths=collected_receipt_paths,
         )
+        runtime_session_metadata = _load_checkpoint_runtime_session(
+            workspace=self.workspace,
+            session_file=session_file,
+        )
+        note_records = _load_runtime_checkpoint_notes_for_closeout(
+            self,
+            repo_root=repo_root,
+            resolved_session_ref=resolved_session_ref,
+            primary_note=note,
+        )
+        aggregated_notes = [candidate_note for _, candidate_note in note_records]
+        aggregated_note_refs = [str(candidate_paths.note_json) for candidate_paths, _ in note_records]
+        runtime_session_id = next(
+            (
+                candidate_note.runtime_session_id
+                for candidate_note in aggregated_notes
+                if candidate_note.runtime_session_id is not None
+            ),
+            (
+                note.runtime_session_id
+                if note is not None and note.runtime_session_id is not None
+                else cast(str | None, runtime_session_metadata["runtime_session_id"])
+            ),
+        )
+        session_trace_ref = cast(str | None, runtime_session_metadata["session_trace_ref"])
+        session_trace_thread_id = cast(str | None, runtime_session_metadata["session_trace_thread_id"])
 
         notes: list[str] = []
         note_ref: str | None = None
-        if note is not None and note.session_ref == resolved_session_ref:
+        if str(paths.note_json) in aggregated_note_refs:
             note_ref = str(paths.note_json)
         elif note is not None:
             notes.append(
                 "ignored the local checkpoint note because its session_ref did not match the reviewed closeout session"
             )
-            note = None
+        if len(aggregated_note_refs) > 1:
+            notes.append(
+                "aggregated runtime-session checkpoint notes across repo labels before building the reviewed closeout context"
+            )
 
         handoff_ref: str | None = None
         if handoff is not None and handoff.session_ref == resolved_session_ref:
@@ -558,7 +590,7 @@ class CheckpointsAPI:
         repo_scope = _dedupe_strings(
             [
                 paths.repo_label,
-                *(note.repo_scope if note is not None else []),
+                *(scope for candidate_note in aggregated_notes for scope in candidate_note.repo_scope),
                 *(
                     cluster.owner_hint
                     for cluster in (handoff.surviving_checkpoint_clusters if handoff is not None else [])
@@ -566,15 +598,37 @@ class CheckpointsAPI:
             ]
         )
         candidate_map = CloseoutContextCandidateMap(
-            harvest_candidate_ids=list(note.harvest_candidate_ids) if note is not None else [],
-            progression_candidate_ids=list(note.progression_candidate_ids) if note is not None else [],
-            upgrade_candidate_ids=list(note.upgrade_candidate_ids) if note is not None else [],
+            harvest_candidate_ids=_dedupe_strings(
+                [
+                    candidate_id
+                    for candidate_note in aggregated_notes
+                    for candidate_id in candidate_note.harvest_candidate_ids
+                ]
+            ),
+            progression_candidate_ids=_dedupe_strings(
+                [
+                    candidate_id
+                    for candidate_note in aggregated_notes
+                    for candidate_id in candidate_note.progression_candidate_ids
+                ]
+            ),
+            upgrade_candidate_ids=_dedupe_strings(
+                [
+                    candidate_id
+                    for candidate_note in aggregated_notes
+                    for candidate_id in candidate_note.upgrade_candidate_ids
+                ]
+            ),
         )
-        ordered_skill_plan = _derive_closeout_skill_plan(note=note, handoff=handoff)
-        if note is None:
+        ordered_skill_plan = _derive_closeout_skill_plan(notes=aggregated_notes, handoff=handoff)
+        if not aggregated_notes:
             notes.append("no matching local checkpoint note was available; the reviewed artifact becomes the primary execution source")
         if handoff is None:
             notes.append("no matching reviewed surface closeout handoff was available; closeout will reread the reviewed artifact without a reviewed surface shortlist")
+        if session_trace_ref is None:
+            notes.append("no live Codex rollout trace was available from the active runtime session; closeout will rely on the reviewed artifact plus checkpoint evidence only")
+        else:
+            notes.append("bound closeout evidence to the live Codex rollout trace referenced by the active runtime session")
         if not collected_receipt_paths:
             notes.append("no prior receipt refs were supplied; closeout execution will rely on the reviewed artifact and any local checkpoint evidence only")
 
@@ -586,12 +640,22 @@ class CheckpointsAPI:
             built_tz=built_tz,
             repo_root=str(_resolve_context_root(self.workspace, repo_root)),
             reviewed_artifact_ref=str(reviewed_artifact),
+            runtime_session_id=runtime_session_id,
+            session_trace_ref=session_trace_ref,
+            session_trace_thread_id=session_trace_thread_id,
             checkpoint_note_ref=note_ref,
+            checkpoint_note_refs=aggregated_note_refs,
             surface_handoff_ref=handoff_ref,
             receipt_refs=[str(path) for path in collected_receipt_paths],
             repo_scope=repo_scope,
             candidate_map=candidate_map,
-            progression_axis_signals=list(note.progression_axis_signals) if note is not None else [],
+            progression_axis_signals=_merge_progression_axis_signals(
+                [
+                    signal
+                    for candidate_note in aggregated_notes
+                    for signal in candidate_note.progression_axis_signals
+                ]
+            ),
             ordered_skill_plan=ordered_skill_plan,
             notes=notes,
         )
@@ -623,11 +687,18 @@ class CheckpointsAPI:
         execution_dir.mkdir(parents=True, exist_ok=True)
 
         reviewed_artifact_path_obj = Path(context.reviewed_artifact_ref)
-        reviewed_artifact_evidence = _read_reviewed_artifact(reviewed_artifact_path_obj)
-        note = _load_context_checkpoint_note(context)
+        reviewed_artifact_evidence = _merge_closeout_evidence(
+            primary=_read_reviewed_artifact(reviewed_artifact_path_obj),
+            secondary=(
+                _read_session_trace(Path(context.session_trace_ref).expanduser().resolve())
+                if context.session_trace_ref is not None
+                else None
+            ),
+        )
+        notes = _load_context_checkpoint_notes(context)
         handoff = _load_context_surface_handoff(context)
         receipt_payloads = _load_receipt_payloads(context.receipt_refs)
-        shortlisted_clusters = _closeout_candidate_clusters(note=note, handoff=handoff)
+        shortlisted_clusters = _closeout_candidate_clusters(notes=notes, handoff=handoff)
 
         executed_steps: list[CloseoutExecutionStep] = []
         produced_artifact_refs: list[str] = []
@@ -703,7 +774,11 @@ class CheckpointsAPI:
             executed_at_local=executed_at_local,
             executed_tz=executed_tz,
             reviewed_artifact_ref=context.reviewed_artifact_ref,
+            runtime_session_id=context.runtime_session_id,
+            session_trace_ref=context.session_trace_ref,
+            session_trace_thread_id=context.session_trace_thread_id,
             checkpoint_note_ref=context.checkpoint_note_ref,
+            checkpoint_note_refs=list(context.checkpoint_note_refs),
             surface_handoff_ref=context.surface_handoff_ref,
             context_ref=str(paths.closeout_context),
             executed_skills=executed_steps,
@@ -735,6 +810,10 @@ class _CheckpointPaths:
 
 def _checkpoint_paths(workspace: Workspace, repo_root: str) -> _CheckpointPaths:
     repo_label = _resolve_context_label(workspace, repo_root)
+    return _checkpoint_paths_for_label(workspace, repo_label)
+
+
+def _checkpoint_paths_for_label(workspace: Workspace, repo_label: str) -> _CheckpointPaths:
     sdk_root = workspace.repo_path("aoa-sdk")
     current_dir = sdk_root / ".aoa" / "session-growth" / "current" / repo_label
     surface_report = sdk_root / ".aoa" / "surface-detection" / f"{repo_label}.checkpoint.latest.json"
@@ -769,14 +848,36 @@ def _ensure_checkpoint_runtime_session(
     workspace: Workspace,
     session_file: str | None,
 ) -> tuple[str | None, datetime | None]:
+    metadata = _load_checkpoint_runtime_session(workspace=workspace, session_file=session_file)
+    return (
+        cast(str | None, metadata["runtime_session_id"]),
+        cast(datetime | None, metadata["runtime_session_created_at"]),
+    )
+
+
+def _load_checkpoint_runtime_session(
+    *,
+    workspace: Workspace,
+    session_file: str | None,
+) -> dict[str, str | datetime | None]:
     try:
         session_path, runtime_session = ensure_session(workspace, session_file)
         if not session_path.exists():
             session_path.parent.mkdir(parents=True, exist_ok=True)
             save_session(session_path, runtime_session)
-        return runtime_session.session_id, runtime_session.created_at.astimezone(UTC)
+        return {
+            "runtime_session_id": runtime_session.session_id,
+            "runtime_session_created_at": runtime_session.created_at.astimezone(UTC),
+            "session_trace_ref": runtime_session.codex_rollout_path,
+            "session_trace_thread_id": runtime_session.codex_thread_id,
+        }
     except Exception:
-        return None, None
+        return {
+            "runtime_session_id": None,
+            "runtime_session_created_at": None,
+            "session_trace_ref": None,
+            "session_trace_thread_id": None,
+        }
 
 
 def _should_rotate_checkpoint_note(
@@ -1001,6 +1102,19 @@ def _load_context_checkpoint_note(context: CheckpointCloseoutContext) -> Session
     return SessionCheckpointNote.model_validate(load_json(context.checkpoint_note_ref))
 
 
+def _load_context_checkpoint_notes(context: CheckpointCloseoutContext) -> list[SessionCheckpointNote]:
+    note_refs = _dedupe_strings(
+        [
+            *(context.checkpoint_note_refs or []),
+            *([context.checkpoint_note_ref] if context.checkpoint_note_ref is not None else []),
+        ]
+    )
+    notes: list[SessionCheckpointNote] = []
+    for ref in note_refs:
+        notes.append(SessionCheckpointNote.model_validate(load_json(ref)))
+    return notes
+
+
 def _load_context_surface_handoff(context: CheckpointCloseoutContext) -> SurfaceCloseoutHandoff | None:
     if context.surface_handoff_ref is None:
         return None
@@ -1052,20 +1166,151 @@ def _read_reviewed_artifact(path: Path) -> dict[str, object]:
     return {
         "text": raw_text,
         "payload": payload,
+        "ref": str(path),
         "tokens": set(re.findall(r"[a-z0-9_:-]+", raw_text.lower())),
+    }
+
+
+def _read_session_trace(path: Path) -> dict[str, object]:
+    if not path.exists():
+        raise FileNotFoundError(f"missing Codex session trace: {path}")
+    chunks: list[str] = []
+    total_chars = 0
+    for raw_line in path.read_text(encoding="utf-8").splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        try:
+            payload = json.loads(line)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(payload, dict):
+            continue
+        extracted = _extract_codex_trace_entry(payload)
+        if extracted is None:
+            continue
+        normalized = re.sub(r"\s+", " ", extracted).strip()
+        if not normalized:
+            continue
+        clipped = normalized[:CODEX_TRACE_MAX_CHUNK_CHARS]
+        if total_chars + len(clipped) > CODEX_TRACE_MAX_CHARS:
+            remaining = CODEX_TRACE_MAX_CHARS - total_chars
+            if remaining <= 0:
+                break
+            clipped = clipped[:remaining]
+        chunks.append(clipped)
+        total_chars += len(clipped)
+        if total_chars >= CODEX_TRACE_MAX_CHARS:
+            break
+    text = "\n".join(chunks)
+    return {
+        "text": text,
+        "ref": str(path),
+        "tokens": set(re.findall(r"[a-z0-9_:-]+", text.lower())),
+    }
+
+
+def _extract_codex_trace_entry(record: dict[str, object]) -> str | None:
+    record_type = record.get("type")
+    payload = record.get("payload")
+    if not isinstance(payload, dict):
+        return None
+    if record_type == "event_msg" and payload.get("type") == "user_message":
+        message = payload.get("message")
+        return f"user: {message}" if isinstance(message, str) and message.strip() else None
+    if record_type != "response_item":
+        return None
+
+    payload_type = payload.get("type")
+    if payload_type == "message" and payload.get("role") == "assistant":
+        text = _flatten_codex_content_text(payload.get("content"))
+        return f"assistant: {text}" if text else None
+    if payload_type == "function_call":
+        name = payload.get("name")
+        arguments = payload.get("arguments")
+        parts = []
+        if isinstance(name, str) and name.strip():
+            parts.append(name.strip())
+        if isinstance(arguments, str) and arguments.strip():
+            parts.append(arguments.strip())
+        return f"tool_call: {' '.join(parts)}" if parts else None
+    if payload_type == "custom_tool_call":
+        name = payload.get("name")
+        input_value = payload.get("input")
+        parts = []
+        if isinstance(name, str) and name.strip():
+            parts.append(name.strip())
+        if isinstance(input_value, str) and input_value.strip():
+            parts.append(input_value.strip())
+        return f"tool_call: {' '.join(parts)}" if parts else None
+    if payload_type in {"function_call_output", "custom_tool_call_output", "tool_search_output"}:
+        output = payload.get("output")
+        return f"tool_output: {output}" if isinstance(output, str) and output.strip() else None
+    return None
+
+
+def _flatten_codex_content_text(content: object) -> str:
+    if not isinstance(content, list):
+        return ""
+    parts: list[str] = []
+    for item in content:
+        if not isinstance(item, dict):
+            continue
+        if item.get("type") not in CODEX_TRACE_TEXT_ITEM_TYPES:
+            continue
+        text = item.get("text")
+        if isinstance(text, str) and text.strip():
+            parts.append(text.strip())
+    return "\n".join(parts)
+
+
+def _merge_closeout_evidence(
+    *,
+    primary: dict[str, object],
+    secondary: dict[str, object] | None,
+) -> dict[str, object]:
+    if secondary is None:
+        return primary
+    texts = [
+        text
+        for text in (
+            primary.get("text"),
+            secondary.get("text"),
+        )
+        if isinstance(text, str) and text.strip()
+    ]
+    tokens: set[str] = set()
+    for source in (primary, secondary):
+        source_tokens = source.get("tokens")
+        if isinstance(source_tokens, set) and all(isinstance(token, str) for token in source_tokens):
+            tokens.update(source_tokens)
+    refs = [
+        ref
+        for ref in (
+            primary.get("ref"),
+            secondary.get("ref"),
+        )
+        if isinstance(ref, str) and ref.strip()
+    ]
+    return {
+        "text": "\n\n".join(texts),
+        "payload": primary.get("payload"),
+        "ref": primary.get("ref"),
+        "refs": refs,
+        "tokens": tokens,
     }
 
 
 def _closeout_candidate_clusters(
     *,
-    note: SessionCheckpointNote | None,
+    notes: list[SessionCheckpointNote],
     handoff: SurfaceCloseoutHandoff | None,
 ) -> list[SessionCheckpointCluster]:
     deduped: dict[tuple[str, str], SessionCheckpointCluster] = {}
     order: list[tuple[str, str]] = []
     for cluster in [
         *(handoff.surviving_checkpoint_clusters if handoff is not None else []),
-        *(note.candidate_clusters if note is not None else []),
+        *(cluster for note in notes for cluster in note.candidate_clusters),
     ]:
         key = (cluster.candidate_id, cluster.owner_hint)
         if key not in deduped:
@@ -1076,32 +1321,41 @@ def _closeout_candidate_clusters(
 
 def _derive_closeout_skill_plan(
     *,
-    note: SessionCheckpointNote | None,
+    notes: list[SessionCheckpointNote],
     handoff: SurfaceCloseoutHandoff | None,
 ) -> list[SessionEndSkillTarget]:
     candidate_ids = _dedupe_strings(
         [
-            *(cluster.candidate_id for cluster in (note.candidate_clusters if note is not None else [])),
+            *(cluster.candidate_id for note in notes for cluster in note.candidate_clusters),
             *(cluster.candidate_id for cluster in (handoff.surviving_checkpoint_clusters if handoff is not None else [])),
         ]
     )
     if not candidate_ids:
         return []
+    harvest_candidate_ids = _dedupe_strings(
+        [candidate_id for note in notes for candidate_id in note.harvest_candidate_ids]
+    )
+    progression_candidate_ids = _dedupe_strings(
+        [candidate_id for note in notes for candidate_id in note.progression_candidate_ids]
+    )
+    upgrade_candidate_ids = _dedupe_strings(
+        [candidate_id for note in notes for candidate_id in note.upgrade_candidate_ids]
+    )
     return [
         SessionEndSkillTarget(
             skill_name="aoa-session-donor-harvest",
             why="reviewed closeout should start with donor harvest so checkpoint hints become one bounded packet rooted in the reread session artifact",
-            candidate_ids=list(note.harvest_candidate_ids) if note is not None and note.harvest_candidate_ids else candidate_ids,
+            candidate_ids=harvest_candidate_ids or candidate_ids,
         ),
         SessionEndSkillTarget(
             skill_name="aoa-session-progression-lift",
             why="reviewed closeout should reread the reviewed artifact and donor packet before lifting one final multi-axis progression delta",
-            candidate_ids=list(note.progression_candidate_ids) if note is not None and note.progression_candidate_ids else candidate_ids,
+            candidate_ids=progression_candidate_ids or candidate_ids,
         ),
         SessionEndSkillTarget(
             skill_name="aoa-quest-harvest",
             why="reviewed closeout should only reach final quest triage after donor harvest and progression lift have both completed",
-            candidate_ids=list(note.upgrade_candidate_ids) if note is not None else [],
+            candidate_ids=upgrade_candidate_ids,
         ),
     ]
 
@@ -1116,7 +1370,11 @@ def _build_donor_harvest_outputs(
     output_dir: Path,
 ) -> DonorHarvestOutputs:
     accepted_candidates = [
-        _build_accepted_candidate(cluster=cluster, reviewed_artifact=reviewed_artifact)
+        _build_accepted_candidate(
+            cluster=cluster,
+            reviewed_artifact=reviewed_artifact,
+            session_trace_ref=context.session_trace_ref,
+        )
         for cluster in shortlisted_clusters
     ]
     deferred_candidates = (
@@ -1124,7 +1382,12 @@ def _build_donor_harvest_outputs(
             {
                 "candidate_ref": f"candidate:hold:{_safe_name(context.session_ref)}",
                 "why": "no matching checkpoint or reviewed handoff candidates survived into the explicit closeout bundle",
-                "evidence_anchors": [str(reviewed_artifact)],
+                "evidence_anchors": _dedupe_strings(
+                    [
+                        str(reviewed_artifact),
+                        *([context.session_trace_ref] if context.session_trace_ref is not None else []),
+                    ]
+                ),
             }
         ]
         if not accepted_candidates
@@ -1144,6 +1407,8 @@ def _build_donor_harvest_outputs(
         "route_ref": "route:checkpoint-closeout-bridge",
         "owner_repo": "aoa-skills",
         "reviewed_artifact_ref": str(reviewed_artifact),
+        "session_trace_ref": context.session_trace_ref,
+        "session_trace_thread_id": context.session_trace_thread_id,
         "checkpoint_note_ref": context.checkpoint_note_ref,
         "surface_handoff_ref": context.surface_handoff_ref,
         "accepted_candidates": accepted_candidates,
@@ -1169,6 +1434,11 @@ def _build_donor_harvest_outputs(
         "evidence_refs": [
             {"kind": "harvest_packet", "ref": str(packet_path), "role": "primary"},
             {"kind": "reviewed_artifact", "ref": str(reviewed_artifact), "role": "reviewed-source"},
+            *(
+                [{"kind": "session_trace", "ref": context.session_trace_ref, "role": "runtime-trace"}]
+                if context.session_trace_ref is not None
+                else []
+            ),
             {
                 "kind": "skill_contract",
                 "ref": "repo:aoa-skills/skills/aoa-session-donor-harvest/SKILL.md",
@@ -1269,6 +1539,8 @@ def _build_progression_lift_outputs(
         "axis_deltas": axis_deltas,
         "cautions": cautions,
         "reviewed_artifact_ref": str(reviewed_artifact),
+        "session_trace_ref": context.session_trace_ref,
+        "session_trace_thread_id": context.session_trace_thread_id,
         "candidate_ids": _dedupe_strings(
             [
                 *context.candidate_map.progression_candidate_ids,
@@ -1291,6 +1563,11 @@ def _build_progression_lift_outputs(
         "evidence_refs": [
             {"kind": "progression_packet", "ref": str(packet_path), "role": "primary"},
             {"kind": "reviewed_artifact", "ref": str(reviewed_artifact), "role": "reviewed-source"},
+            *(
+                [{"kind": "session_trace", "ref": context.session_trace_ref, "role": "runtime-trace"}]
+                if context.session_trace_ref is not None
+                else []
+            ),
             {
                 "kind": "skill_contract",
                 "ref": "repo:aoa-skills/skills/aoa-session-progression-lift/SKILL.md",
@@ -1394,6 +1671,8 @@ def _build_quest_harvest_outputs(
         "session_ref": context.session_ref,
         "quest_unit_name": quest_unit_name,
         "reviewed_artifact_ref": str(reviewed_artifact),
+        "session_trace_ref": context.session_trace_ref,
+        "session_trace_thread_id": context.session_trace_thread_id,
         "candidate_ref": bounded_unit_ref,
         "promotion_verdict": promotion_verdict,
         "repeat_shape": repeat_shape,
@@ -1416,6 +1695,8 @@ def _build_quest_harvest_outputs(
         "nearest_wrong_target": nearest_wrong_target,
         "repeat_shape": repeat_shape,
         "bounded_unit_ref": bounded_unit_ref,
+        "session_trace_ref": context.session_trace_ref,
+        "session_trace_thread_id": context.session_trace_thread_id,
     }
     packet_path = output_dir / "QUEST_PROMOTION.json"
     write_json(packet_path, packet)
@@ -1433,6 +1714,11 @@ def _build_quest_harvest_outputs(
             {"kind": "quest_triage", "ref": str(triage_path), "role": "primary"},
             {"kind": "quest_promotion", "ref": str(packet_path), "role": "promotion"},
             {"kind": "reviewed_artifact", "ref": str(reviewed_artifact), "role": "reviewed-source"},
+            *(
+                [{"kind": "session_trace", "ref": context.session_trace_ref, "role": "runtime-trace"}]
+                if context.session_trace_ref is not None
+                else []
+            ),
             {
                 "kind": "skill_contract",
                 "ref": "repo:aoa-skills/skills/aoa-quest-harvest/SKILL.md",
@@ -1477,7 +1763,12 @@ def _build_quest_harvest_outputs(
     }
 
 
-def _build_accepted_candidate(*, cluster: SessionCheckpointCluster, reviewed_artifact: Path) -> dict[str, object]:
+def _build_accepted_candidate(
+    *,
+    cluster: SessionCheckpointCluster,
+    reviewed_artifact: Path,
+    session_trace_ref: str | None,
+) -> dict[str, object]:
     owner_repo = (
         cluster.owner_hint
         if cluster.owner_hint in ALLOWED_OWNER_REPOS
@@ -1494,7 +1785,13 @@ def _build_accepted_candidate(*, cluster: SessionCheckpointCluster, reviewed_art
         "chosen_next_artifact": next_surface,
         "nearest_wrong_target": _nearest_wrong_target(owner_repo),
         "owner_reason": _owner_reason(cluster=cluster, owner_repo=owner_repo),
-        "evidence_anchors": _dedupe_strings([str(reviewed_artifact), *cluster.evidence_refs]),
+        "evidence_anchors": _dedupe_strings(
+            [
+                str(reviewed_artifact),
+                *([session_trace_ref] if session_trace_ref is not None else []),
+                *cluster.evidence_refs,
+            ]
+        ),
     }
 
 
@@ -1954,6 +2251,54 @@ def _load_runtime_checkpoint_note(
         return api.status(repo_root=repo_root, session_file=session_file)
     except SurfaceNotFound:
         return None
+
+
+def _load_runtime_checkpoint_notes_for_closeout(
+    api: CheckpointsAPI,
+    *,
+    repo_root: str,
+    resolved_session_ref: str,
+    primary_note: SessionCheckpointNote | None,
+) -> list[tuple[_CheckpointPaths, SessionCheckpointNote]]:
+    current_root = api.workspace.repo_path("aoa-sdk") / ".aoa" / "session-growth" / "current"
+    if not current_root.exists():
+        return []
+
+    runtime_session_id = primary_note.runtime_session_id if primary_note is not None else None
+    records: list[tuple[_CheckpointPaths, SessionCheckpointNote]] = []
+    for current_dir in sorted(path for path in current_root.iterdir() if path.is_dir()):
+        paths = _checkpoint_paths_for_label(api.workspace, current_dir.name)
+        if not paths.jsonl.exists():
+            continue
+        note = _build_checkpoint_note(paths)
+        if _should_hide_current_checkpoint_note(note, runtime_session_id=runtime_session_id):
+            _archive_current_checkpoint(paths)
+            continue
+        if not _checkpoint_note_matches_closeout_scope(
+            note,
+            resolved_session_ref=resolved_session_ref,
+            runtime_session_id=runtime_session_id,
+        ):
+            continue
+        paths.note_json.parent.mkdir(parents=True, exist_ok=True)
+        paths.note_json.write_text(note.model_dump_json(indent=2) + "\n", encoding="utf-8")
+        paths.note_md.write_text(
+            _render_checkpoint_note_markdown(note, repo_label=paths.repo_label),
+            encoding="utf-8",
+        )
+        records.append((paths, note))
+    return records
+
+
+def _checkpoint_note_matches_closeout_scope(
+    note: SessionCheckpointNote,
+    *,
+    resolved_session_ref: str,
+    runtime_session_id: str | None,
+) -> bool:
+    if runtime_session_id is not None and note.runtime_session_id == runtime_session_id:
+        return True
+    return note.session_ref == resolved_session_ref
 
 
 def _derive_promotion_recommendation(

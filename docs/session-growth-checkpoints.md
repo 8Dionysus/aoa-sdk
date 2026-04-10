@@ -43,11 +43,17 @@ one daily label.
 When a later append sees a different runtime session, or sees a note already
 ended as `closed` or `promoted`, the previous `current` ledger is archived
 under `aoa-sdk/.aoa/session-growth/archive/` before the new session begins.
+When `CODEX_THREAD_ID` is present, that runtime session store now rotates on
+Codex thread boundaries instead of persisting blindly across multiple threads.
 If you use a non-default runtime session file, pass the same `--session-file`
 to `aoa checkpoint status`, `aoa checkpoint promote`,
 `aoa checkpoint build-closeout-context`, and
 `aoa checkpoint execute-closeout-chain` so those commands resolve the same
 active checkpoint session.
+At reviewed closeout, the builder aggregates every `current/<repo-label>/`
+checkpoint ledger that matches the same active runtime-session identity before
+it derives the closeout candidate map. This keeps one narrow repo-scoped note
+from silently standing in for the whole session.
 
 The JSONL file is append-only checkpoint history.
 The JSON and Markdown files are rebuilt snapshots for current review.
@@ -73,6 +79,12 @@ At reviewed closeout the explicit bridge skill is
 `aoa-checkpoint-closeout-bridge`: it builds `closeout-context.json`, rereads
 the reviewed artifact, and then executes donor harvest, progression lift, and
 quest harvest in order without refreshing stats inside the bridge itself.
+That runtime-session fan-in narrows attention honestly, but it still does not
+replace rereading the reviewed artifact itself.
+When the active runtime session also carries a live Codex rollout path,
+closeout now binds that rollout trace into the context and rereads it beside
+the reviewed artifact so one narrow checkpoint ledger does not stand in for the
+whole runtime thread.
 
 ## Commands
 

@@ -417,7 +417,14 @@ def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
     )
     typer.echo(f"repo_root: {context.repo_root}")
     typer.echo(f"reviewed_artifact_ref: {context.reviewed_artifact_ref}")
+    typer.echo(f"runtime_session_id: {context.runtime_session_id or 'none'}")
+    typer.echo(f"session_trace_ref: {context.session_trace_ref or 'none'}")
+    typer.echo(f"session_trace_thread_id: {context.session_trace_thread_id or 'none'}")
     typer.echo(f"checkpoint_note_ref: {context.checkpoint_note_ref or 'none'}")
+    typer.echo(
+        "checkpoint_note_refs: "
+        f"{', '.join(context.checkpoint_note_refs) if context.checkpoint_note_refs else 'none'}"
+    )
     typer.echo(f"surface_handoff_ref: {context.surface_handoff_ref or 'none'}")
     typer.echo(f"receipt_refs: {', '.join(context.receipt_refs) if context.receipt_refs else 'none'}")
     typer.echo(f"repo_scope: {', '.join(context.repo_scope) if context.repo_scope else 'none'}")
@@ -454,7 +461,14 @@ def _print_closeout_execution_report(report: CheckpointCloseoutExecutionReport) 
     )
     typer.echo(f"context_ref: {report.context_ref}")
     typer.echo(f"reviewed_artifact_ref: {report.reviewed_artifact_ref}")
+    typer.echo(f"runtime_session_id: {report.runtime_session_id or 'none'}")
+    typer.echo(f"session_trace_ref: {report.session_trace_ref or 'none'}")
+    typer.echo(f"session_trace_thread_id: {report.session_trace_thread_id or 'none'}")
     typer.echo(f"checkpoint_note_ref: {report.checkpoint_note_ref or 'none'}")
+    typer.echo(
+        "checkpoint_note_refs: "
+        f"{', '.join(report.checkpoint_note_refs) if report.checkpoint_note_refs else 'none'}"
+    )
     typer.echo(f"surface_handoff_ref: {report.surface_handoff_ref or 'none'}")
     typer.echo("executed_skills:")
     if not report.executed_skills:

@@ -1,7 +1,36 @@
 import json
+import sqlite3
 from pathlib import Path
 
 from aoa_sdk import AoASDK
+
+
+def _install_codex_thread_store(
+    home: Path,
+    *,
+    thread_id: str,
+    rollout_path: Path,
+    title: str = "Thread Title",
+    first_user_message: str = "First user message",
+    updated_at: int = 1_712_759_040,
+) -> None:
+    codex_root = home / ".codex"
+    codex_root.mkdir(parents=True, exist_ok=True)
+    rollout_path.parent.mkdir(parents=True, exist_ok=True)
+    rollout_path.write_text("", encoding="utf-8")
+    db_path = codex_root / "state_5.sqlite"
+    conn = sqlite3.connect(db_path)
+    try:
+        conn.execute(
+            "create table if not exists threads (id text primary key, rollout_path text, title text, first_user_message text, updated_at real)"
+        )
+        conn.execute(
+            "insert or replace into threads (id, rollout_path, title, first_user_message, updated_at) values (?, ?, ?, ?, ?)",
+            (thread_id, str(rollout_path), title, first_user_message, updated_at),
+        )
+        conn.commit()
+    finally:
+        conn.close()
 
 
 def test_discover_and_disclose_skills(workspace_root: Path) -> None:
@@ -184,6 +213,61 @@ def test_dispatch_falls_back_to_workspace_root_when_aoa_sdk_session_file_is_read
     assert dispatch_report.activate_now[0].skill_name == "aoa-change-protocol"
     assert workspace_root_session.exists()
     assert json.loads(session_file.read_text(encoding="utf-8")) == session_payload
+
+
+def test_dispatch_rotates_runtime_session_when_codex_thread_changes(
+    workspace_root: Path,
+    install_host_skills,
+    monkeypatch,
+) -> None:
+    install_host_skills(workspace_root, ["aoa-change-protocol"])
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+
+    first_rollout = workspace_root / ".codex" / "sessions" / "thread-one.jsonl"
+    second_rollout = workspace_root / ".codex" / "sessions" / "thread-two.jsonl"
+    _install_codex_thread_store(
+        workspace_root,
+        thread_id="thread-one",
+        rollout_path=first_rollout,
+        title="Thread One",
+        first_user_message="first task",
+    )
+    _install_codex_thread_store(
+        workspace_root,
+        thread_id="thread-two",
+        rollout_path=second_rollout,
+        title="Thread Two",
+        first_user_message="second task",
+        updated_at=1_712_759_050,
+    )
+
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-one")
+    first_dispatch = sdk.skills.dispatch(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="plan verify a bounded change",
+        session_file=str(session_file),
+    )
+    first_session = sdk.skills.session_status(str(session_file))
+
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-two")
+    second_dispatch = sdk.skills.dispatch(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="plan verify a bounded change",
+        session_file=str(session_file),
+    )
+    second_session = sdk.skills.session_status(str(session_file))
+
+    assert first_dispatch.activate_now[0].skill_name == "aoa-change-protocol"
+    assert second_dispatch.activate_now[0].skill_name == "aoa-change-protocol"
+    assert first_session.codex_thread_id == "thread-one"
+    assert first_session.codex_rollout_path == str(first_rollout.resolve())
+    assert second_session.codex_thread_id == "thread-two"
+    assert second_session.codex_rollout_path == str(second_rollout.resolve())
+    assert second_session.session_id != first_session.session_id
+    assert second_session.active_skills[0].activation_count == 1
 
 
 def test_detect_pre_mutation_raises_risk_gates_without_auto_running_them(

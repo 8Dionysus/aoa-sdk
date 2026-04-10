@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+import sqlite3
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
@@ -67,14 +68,51 @@ def load_session(workspace: Workspace, session_file: str | Path | None) -> Skill
     return SkillSession.model_validate(load_json(path))
 
 
-def ensure_session(workspace: Workspace, session_file: str | Path | None) -> tuple[Path, SkillSession]:
-    path = resolve_session_file(workspace, session_file)
-    if path.exists():
-        return path, load_session(workspace, path)
+def resolve_codex_thread_context() -> dict[str, Any]:
+    thread_id = os.environ.get("CODEX_THREAD_ID")
+    if not isinstance(thread_id, str) or not thread_id.strip():
+        return {}
+    resolved_thread_id = thread_id.strip()
+    context: dict[str, Any] = {"codex_thread_id": resolved_thread_id}
+    state_db = Path.home() / ".codex" / "state_5.sqlite"
+    if not state_db.exists():
+        return context
+    try:
+        conn = sqlite3.connect(state_db)
+        row = conn.execute(
+            "select rollout_path, title, first_user_message, updated_at from threads where id = ?",
+            (resolved_thread_id,),
+        ).fetchone()
+    except sqlite3.Error:
+        return context
+    finally:
+        try:
+            conn.close()
+        except Exception:
+            pass
+    if row is None:
+        return context
+    rollout_path_value, title, first_user_message, updated_at = row
+    if isinstance(rollout_path_value, str) and rollout_path_value.strip():
+        rollout_path = Path(rollout_path_value).expanduser().resolve(strict=False)
+        context["codex_rollout_path"] = str(rollout_path)
+    if isinstance(title, str) and title.strip():
+        context["codex_thread_title"] = title
+    if isinstance(first_user_message, str) and first_user_message.strip():
+        context["codex_first_user_message"] = first_user_message
+    if isinstance(updated_at, int | float):
+        normalized_updated_at = updated_at / 1000 if updated_at > 1_000_000_000_000 else updated_at
+        context["codex_thread_updated_at"] = datetime.fromtimestamp(normalized_updated_at, timezone.utc)
+    return context
 
-    contract = load_session_contract(workspace)
-    now = datetime.now(timezone.utc)
-    session = SkillSession(
+
+def _new_skill_session(
+    contract: dict[str, Any],
+    *,
+    now: datetime,
+    thread_context: dict[str, Any] | None = None,
+) -> SkillSession:
+    return SkillSession(
         schema_version=contract.get("schema_version", 1),
         profile=contract.get("profile", "aoa-sdk"),
         session_id=str(uuid4()),
@@ -82,6 +120,56 @@ def ensure_session(workspace: Workspace, session_file: str | Path | None) -> tup
         updated_at=now,
         active_skills=[],
         activation_log=[],
+        **(thread_context or {}),
+    )
+
+
+def _should_rotate_for_codex_thread(session: SkillSession, thread_context: dict[str, Any]) -> bool:
+    current_thread_id = thread_context.get("codex_thread_id")
+    if not isinstance(current_thread_id, str) or not current_thread_id:
+        return False
+    return session.codex_thread_id != current_thread_id
+
+
+def _apply_codex_thread_context(session: SkillSession, thread_context: dict[str, Any]) -> bool:
+    changed = False
+    for field in (
+        "codex_thread_id",
+        "codex_rollout_path",
+        "codex_thread_title",
+        "codex_first_user_message",
+        "codex_thread_updated_at",
+    ):
+        value = thread_context.get(field)
+        if value is None or getattr(session, field) == value:
+            continue
+        setattr(session, field, value)
+        changed = True
+    return changed
+
+
+def ensure_session(workspace: Workspace, session_file: str | Path | None) -> tuple[Path, SkillSession]:
+    path = resolve_session_file(workspace, session_file)
+    contract = load_session_contract(workspace)
+    thread_context = resolve_codex_thread_context()
+    if path.exists():
+        session = load_session(workspace, path)
+        if _should_rotate_for_codex_thread(session, thread_context):
+            session = _new_skill_session(
+                contract,
+                now=datetime.now(timezone.utc),
+                thread_context=thread_context,
+            )
+            save_session(path, session)
+            return path, session
+        if _apply_codex_thread_context(session, thread_context):
+            save_session(path, session)
+        return path, session
+
+    session = _new_skill_session(
+        contract,
+        now=datetime.now(timezone.utc),
+        thread_context=thread_context,
     )
     return path, session
 

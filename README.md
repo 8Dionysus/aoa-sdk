@@ -81,6 +81,9 @@ This repository is the source of truth for:
 - `aoa skills enter` and `aoa skills guard` now expose the pending reviewed-closeout skill-family plan through `checkpoint_capture.session_end_skill_targets`, `checkpoint_capture.progression_axis_signals`, and `checkpoint_capture.session_end_next_honest_move`
 - reviewed closeout can now raise `aoa-session-progression-lift` from the checkpoint ledger before `aoa-quest-harvest`, so multi-axis progression stays evidence-backed and end-of-session only
 - reviewed closeout can now build one `closeout-context.json` bundle and execute the explicit `aoa-checkpoint-closeout-bridge` chain without turning `aoa closeout run` into a hidden skill runner
+- reviewed closeout now aggregates every repo-scoped checkpoint ledger that shares the active runtime-session identity before it derives the closeout candidate map, so one narrow ledger cannot silently stand in for the whole session
+- the runtime session store is now Codex-thread-aware when `CODEX_THREAD_ID` is available, so a new Codex thread rotates to a fresh session identity instead of silently reusing an older runtime file
+- explicit checkpoint closeout now binds the live Codex rollout trace from that runtime session into `closeout-context.json` and reuses it as additional closeout evidence beside the reviewed artifact
 - default auto checkpoint bridge from `aoa skills enter` and `aoa skills guard` when checkpoint-phase detection sees a real growth signal, plus explicit `--checkpoint-kind` / `--append-note` overrides
 - checkpoint and explicit closeout surfaces keep canonical machine timestamps in UTC while also publishing local companion fields such as `observed_at_local`, `captured_at_local`, `built_at_local`, `executed_at_local`, and their matching `*_tz` labels for human review
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
