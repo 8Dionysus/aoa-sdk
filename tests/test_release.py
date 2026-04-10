@@ -10,7 +10,9 @@ from aoa_sdk.release.api import (
     ReleaseAPI,
     ReleaseAuditRepoReport,
     ReleaseAuditResult,
+    ReleaseRemoteStateUnknownError,
     _parse_latest_release,
+    _gh_release_view,
     _git_fetch_origin,
     build_release_body,
     validate_release_body,
@@ -336,6 +338,126 @@ def test_publish_dry_run_skips_postpublish_audit(tmp_path: Path, monkeypatch: py
 
     assert result.passed is True
     assert result.repo_reports[0].postpublish_passed is False
+
+
+def test_publish_aborts_before_tag_push_when_release_view_times_out(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    workspace_root = tmp_path / "workspace"
+    repo_root = workspace_root / "Agents-of-Abyss"
+    remote_root = tmp_path / "aoa-origin.git"
+    _init_repo(repo_root, remote_root)
+    _write_release_surfaces(repo_root, repo_name="Agents-of-Abyss", version="0.2.0")
+    _commit_and_push(repo_root, "0.2.0")
+    old_tag_commit = subprocess.run(
+        ["git", "-C", str(repo_root), "rev-list", "-n", "1", "v0.2.0"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    (repo_root / "docs" / "AFTER_TAG.md").write_text("new release-prep commit\n", encoding="utf-8")
+    subprocess.run(["git", "-C", str(repo_root), "add", "docs/AFTER_TAG.md"], check=True, capture_output=True, text=True)
+    subprocess.run(["git", "-C", str(repo_root), "commit", "-m", "release prep"], check=True, capture_output=True, text=True)
+    head_commit = subprocess.run(
+        ["git", "-C", str(repo_root), "rev-parse", "HEAD"],
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    assert old_tag_commit != head_commit
+
+    api = ReleaseAPI(_workspace_for("Agents-of-Abyss", repo_root, workspace_root))
+    release = _parse_latest_release((repo_root / "CHANGELOG.md").read_text(encoding="utf-8"))
+    preflight = ReleaseAuditResult(
+        workspace_root=str(workspace_root),
+        phase="preflight",
+        strict=True,
+        passed=True,
+        repo_reports=[
+            ReleaseAuditRepoReport(
+                repo="Agents-of-Abyss",
+                repo_root=str(repo_root),
+                phase="preflight",
+                passed=True,
+                expected_version=release.version,
+                latest_tag=release.tag,
+                checks=[],
+            )
+        ],
+    )
+    original_run = subprocess.run
+
+    def fake_run(
+        command: list[str],
+        *,
+        cwd: Path,
+        env: dict[str, str] | None = None,
+        check: bool = False,
+        capture_output: bool = True,
+        text: bool = True,
+        timeout: float | None = None,
+    ) -> subprocess.CompletedProcess[str]:
+        if command[:3] == ["gh", "release", "view"]:
+            raise subprocess.TimeoutExpired(command, timeout)
+        if command[:4] == ["git", "-C", str(repo_root), "push"]:
+            raise AssertionError("publish must not push tags when remote release state is unknown")
+        if command[:4] == ["git", "-C", str(repo_root), "tag"] and "-fa" in command:
+            raise AssertionError("publish must not move tags when remote release state is unknown")
+        return original_run(
+            command,
+            cwd=cwd,
+            env=env,
+            check=check,
+            capture_output=capture_output,
+            text=text,
+            timeout=timeout,
+        )
+
+    monkeypatch.setattr(api, "audit", lambda **kwargs: preflight)
+    monkeypatch.setattr("aoa_sdk.release.api.subprocess.run", fake_run)
+
+    result = api.publish(workspace_root=workspace_root, repo="Agents-of-Abyss", dry_run=False)
+    tag_after = original_run(
+        ["git", "-C", str(repo_root), "rev-list", "-n", "1", "v0.2.0"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+
+    assert result.passed is False
+    assert result.repo_reports[0].actions == [
+        "GitHub Release lookup for Agents-of-Abyss v0.2.0 timed out after 60s"
+    ]
+    assert tag_after == old_tag_commit
+    assert tag_after != head_commit
+
+
+def test_release_view_timeout_is_distinct_from_missing_release(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    repo_root = tmp_path / "repo"
+    remote_root = tmp_path / "origin.git"
+    _init_repo(repo_root, remote_root)
+
+    def fake_run(
+        command: list[str],
+        *,
+        cwd: Path,
+        env: dict[str, str] | None = None,
+        check: bool = False,
+        capture_output: bool = True,
+        text: bool = True,
+        timeout: float | None = None,
+    ) -> subprocess.CompletedProcess[str]:
+        raise subprocess.TimeoutExpired(command, timeout)
+
+    monkeypatch.setattr("aoa_sdk.release.api.subprocess.run", fake_run)
+
+    with pytest.raises(ReleaseRemoteStateUnknownError, match="timed out"):
+        _gh_release_view("Agents-of-Abyss", "v0.2.0", cwd=repo_root)
 
 
 @pytest.mark.parametrize(

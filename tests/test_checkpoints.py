@@ -1202,14 +1202,14 @@ def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(w
         == "aoa-skills:aoa-session-donor-harvest"
     )
     execution_report_path = (
-        workspace_root
-        / "aoa-sdk"
-        / ".aoa"
-        / "session-growth"
-        / "current"
-        / "aoa-sdk"
+        _checkpoint_note_dir(
+            workspace_root,
+            repo_label="aoa-sdk",
+            runtime_session_id=report.runtime_session_id,
+        )
         / "closeout-execution-report.json"
     )
+    assert report.context_ref == str(execution_report_path.with_name("closeout-context.json"))
     assert execution_report_path.exists()
 
 
@@ -1323,13 +1323,25 @@ def test_execute_closeout_chain_uses_aggregated_runtime_session_notes(
         reviewed_artifact_path=str(reviewed_artifact),
         session_file=str(session_file),
     )
+    scoped_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=runtime_session_id,
+    )
+    legacy_note_dir = _checkpoint_note_dir(workspace_root, repo_label="aoa-sdk")
 
     assert report.runtime_session_id == runtime_session_id
     assert report.session_trace_ref == str(rollout_path.resolve())
     assert report.session_trace_thread_id == "thread-closeout"
+    assert report.context_ref == str(scoped_note_dir / "closeout-context.json")
+    assert (scoped_note_dir / "closeout-context.json").exists()
+    assert (scoped_note_dir / "closeout-execution-report.json").exists()
+    assert not (legacy_note_dir / "closeout-execution-report.json").exists()
     assert {
         Path(ref).parent.name for ref in report.checkpoint_note_refs
     } == {"aoa-sdk", "aoa-memo"}
+    assert all(scoped_note_dir in Path(ref).parents for ref in report.produced_artifact_refs)
+    assert all(scoped_note_dir in Path(ref).parents for ref in report.produced_receipt_refs)
 
     harvest_packet_path = next(
         Path(path) for path in report.produced_artifact_refs if path.endswith("HARVEST_PACKET.json")

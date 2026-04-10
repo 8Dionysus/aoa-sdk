@@ -6,6 +6,15 @@ The format is intentionally simple and human-first.
 
 ## [Unreleased]
 
+### Fixed
+
+- `aoa release publish` now treats GitHub Release lookup timeouts as an unknown remote state and aborts before tag mutation.
+- checkpoint closeout execution now writes reports and reviewed artifacts into the same runtime-session-scoped ledger as the generated closeout context.
+
+### Validation
+
+- `python scripts/release_check.py`
+
 ## [0.2.0] - 2026-04-10
 
 ### Summary
