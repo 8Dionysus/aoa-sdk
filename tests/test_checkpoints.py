@@ -4,7 +4,10 @@ import json
 from datetime import datetime
 from pathlib import Path
 
+import pytest
+
 from aoa_sdk import AoASDK
+from aoa_sdk.errors import SurfaceNotFound
 
 
 def test_surface_detect_checkpoint_phase_emits_candidate_clusters(workspace_root: Path) -> None:
@@ -197,6 +200,175 @@ def test_capture_from_skill_phase_reports_existing_session_end_targets_when_skip
     assert capture.progression_candidate_ids
 
 
+def test_checkpoint_append_session_ref_tracks_runtime_session_identity(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
+
+    first = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="commit bounded patch",
+        session_file=str(session_file),
+    )
+    second = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="verify green for bounded patch",
+        session_file=str(session_file),
+    )
+
+    session_payload = json.loads(session_file.read_text(encoding="utf-8"))
+
+    assert first.session_ref == second.session_ref
+    assert first.runtime_session_id == session_payload["session_id"]
+    assert second.runtime_session_id == session_payload["session_id"]
+    assert session_payload["session_id"][:12] in first.session_ref
+    assert "checkpoint-growth" in first.session_ref
+
+
+def test_checkpoint_append_rotates_when_runtime_session_changes(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
+
+    first = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="commit bounded patch",
+        session_file=str(session_file),
+    )
+
+    session_payload = json.loads(session_file.read_text(encoding="utf-8"))
+    session_payload["session_id"] = "runtime-session-two"
+    session_payload["created_at"] = "2026-04-10T12:00:00Z"
+    session_payload["updated_at"] = "2026-04-10T12:00:00Z"
+    session_file.write_text(json.dumps(session_payload, indent=2) + "\n", encoding="utf-8")
+
+    second = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="commit bounded patch",
+        session_file=str(session_file),
+    )
+
+    archive_dirs = sorted((workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "archive").glob("aoa-sdk-*"))
+
+    assert second.session_ref != first.session_ref
+    assert second.runtime_session_id == "runtime-session-two"
+    assert archive_dirs
+    archived_note = json.loads((archive_dirs[-1] / "checkpoint-note.json").read_text(encoding="utf-8"))
+    assert archived_note["session_ref"] == first.session_ref
+
+
+def test_checkpoint_append_rotates_promoted_note_into_fresh_checkpoint_cycle(workspace_root: Path) -> None:
+    dionysus_root = workspace_root / "Dionysus"
+    (dionysus_root / "reports" / "ecosystem-audits").mkdir(parents=True, exist_ok=True)
+    (dionysus_root / "README.md").write_text("# Dionysus\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
+
+    first = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
+    )
+    sdk.checkpoints.promote(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        target="dionysus-note",
+        session_file=str(session_file),
+    )
+
+    second = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="commit bounded patch",
+        session_file=str(session_file),
+    )
+
+    archive_dirs = sorted((workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "archive").glob("aoa-sdk-*"))
+
+    assert second.session_ref != first.session_ref
+    assert second.runtime_session_id == first.runtime_session_id
+    assert archive_dirs
+    archived_note = json.loads((archive_dirs[-1] / "checkpoint-note.json").read_text(encoding="utf-8"))
+    assert archived_note["state"] == "promoted"
+    assert archived_note["session_ref"] == first.session_ref
+
+
+def test_checkpoint_status_archives_stale_current_note_when_runtime_session_changes(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
+
+    first = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="commit bounded patch",
+        session_file=str(session_file),
+    )
+
+    session_payload = json.loads(session_file.read_text(encoding="utf-8"))
+    session_payload["session_id"] = "runtime-session-two"
+    session_payload["created_at"] = "2026-04-10T12:00:00Z"
+    session_payload["updated_at"] = "2026-04-10T12:00:00Z"
+    session_file.write_text(json.dumps(session_payload, indent=2) + "\n", encoding="utf-8")
+
+    with pytest.raises(SurfaceNotFound):
+        sdk.checkpoints.status(
+            repo_root=str(workspace_root / "aoa-sdk"),
+            session_file=str(session_file),
+        )
+
+    archive_dirs = sorted((workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "archive").glob("aoa-sdk-*"))
+
+    assert archive_dirs
+    archived_note = json.loads((archive_dirs[-1] / "checkpoint-note.json").read_text(encoding="utf-8"))
+    assert archived_note["session_ref"] == first.session_ref
+    assert not (workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "checkpoint-note.json").exists()
+
+
+def test_capture_from_skill_phase_does_not_reuse_stale_current_note(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
+
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
+    )
+
+    session_payload = json.loads(session_file.read_text(encoding="utf-8"))
+    session_payload["session_id"] = "runtime-session-two"
+    session_payload["created_at"] = "2026-04-10T12:00:00Z"
+    session_payload["updated_at"] = "2026-04-10T12:00:00Z"
+    session_file.write_text(json.dumps(session_payload, indent=2) + "\n", encoding="utf-8")
+
+    capture = sdk.checkpoints.capture_from_skill_phase(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="pre-mutation",
+        intent_text="refresh generated contracts",
+        mutation_surface="code",
+        session_file=str(session_file),
+    )
+
+    assert capture.appended is False
+    assert capture.reason == "no_checkpoint_signal"
+    assert capture.note is None
+    assert capture.note_ref is None
+    assert capture.session_end_skill_targets == []
+    assert capture.stats_refresh_recommended is False
+
+
 def test_checkpoint_status_backfills_local_timestamp_for_legacy_history_entry(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
@@ -274,13 +446,14 @@ def test_checkpoint_promote_writes_dionysus_snapshot_and_updates_note(workspace_
 
     promoted_json = list((dionysus_root / "reports" / "ecosystem-audits").glob("*.aoa-sdk.checkpoint-note.json"))
     promoted_md = list((dionysus_root / "reports" / "ecosystem-audits").glob("*.aoa-sdk.checkpoint-note.md"))
-    note = sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
 
     assert promotion.target == "dionysus-note"
+    assert promotion.resulting_state == "promoted"
     assert promoted_json
     assert promoted_md
-    assert note.state == "promoted"
     assert any("repo:Dionysus/reports/ecosystem-audits/" in ref for ref in promotion.output_refs)
+    with pytest.raises(SurfaceNotFound):
+        sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
 
 
 def test_checkpoint_promote_to_dionysus_uses_session_specific_filenames(workspace_root: Path) -> None:
@@ -289,35 +462,53 @@ def test_checkpoint_promote_to_dionysus_uses_session_specific_filenames(workspac
     (dionysus_root / "README.md").write_text("# Dionysus\n", encoding="utf-8")
 
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
     sdk.checkpoints.append(
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="commit",
         intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
     )
     sdk.checkpoints.append(
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="verify_green",
         intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
     )
 
     first = sdk.checkpoints.promote(
         repo_root=str(workspace_root / "aoa-sdk"),
         target="dionysus-note",
+        session_file=str(session_file),
     )
 
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
-    jsonl_path = note_dir / "checkpoint-note.jsonl"
-    updated_lines = []
-    for raw_line in jsonl_path.read_text(encoding="utf-8").splitlines():
-        payload = json.loads(raw_line)
-        payload["session_ref"] = "session:2026-04-09-aoa-sdk-checkpoint-growth-second"
-        updated_lines.append(json.dumps(payload))
-    jsonl_path.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
-    sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
+    session_payload = json.loads(session_file.read_text(encoding="utf-8"))
+    session_payload["session_id"] = "runtime-session-two"
+    session_payload["created_at"] = "2026-04-10T12:00:00Z"
+    session_payload["updated_at"] = "2026-04-10T12:00:00Z"
+    session_file.write_text(json.dumps(session_payload, indent=2) + "\n", encoding="utf-8")
+
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
+    )
 
     second = sdk.checkpoints.promote(
         repo_root=str(workspace_root / "aoa-sdk"),
         target="dionysus-note",
+        session_file=str(session_file),
     )
 
     promoted_json = sorted(
@@ -349,12 +540,13 @@ def test_checkpoint_promote_harvest_handoff_closes_note(workspace_root: Path) ->
     )
 
     handoff_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk" / "harvest-handoff.json"
-    note = sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
 
     assert promotion.target == "harvest-handoff"
+    assert promotion.resulting_state == "closed"
     assert handoff_path.exists()
-    assert note.state == "closed"
     assert promotion.output_refs == [str(handoff_path)]
+    with pytest.raises(SurfaceNotFound):
+        sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
 
 
 def test_surface_closeout_handoff_links_checkpoint_note(workspace_root: Path) -> None:

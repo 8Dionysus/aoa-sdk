@@ -24,6 +24,7 @@ from ..models import (
     SurfaceCloseoutHandoff,
     SurfaceDetectionReport,
 )
+from ..skills.session import ensure_session, save_session
 from ..surfaces import SurfacesAPI
 from ..workspace.discovery import Workspace
 
@@ -40,6 +41,7 @@ CHECKPOINT_KINDS = (
 PROMOTION_TARGETS = ("dionysus-note", "harvest-handoff")
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 SESSION_REF_RE = re.compile(r'"session_ref"\s*:\s*"([^"]+)"|session_ref:\s*`?([^`\s]+)`?|Session ref:\s*`?([^`\n]+)`?')
+SESSION_REF_TIMESTAMP_FORMAT = "%Y-%m-%dT%H-%M-%S-%fZ"
 IGNORABLE_UNTRACKED_DIRS = {"__pycache__", ".pytest_cache", ".mypy_cache", ".ruff_cache"}
 IGNORABLE_UNTRACKED_SUFFIXES = (".pyc", ".pyo", ".pyd")
 SESSION_END_SKILL_ORDER = (
@@ -199,10 +201,18 @@ class CheckpointsAPI:
         manual_review_requested: bool = False,
     ) -> SessionCheckpointNote:
         paths = _checkpoint_paths(self.workspace, repo_root)
+        runtime_session_id, runtime_session_created_at = _ensure_checkpoint_runtime_session(
+            workspace=self.workspace,
+            session_file=session_file,
+        )
+        existing_note = _load_checkpoint_note(paths.note_json) if paths.note_json.exists() else None
         if paths.note_json.exists():
-            existing = SessionCheckpointNote.model_validate_json(paths.note_json.read_text(encoding="utf-8"))
-            if existing.state == "closed":
+            if existing_note is not None and _should_rotate_checkpoint_note(
+                existing_note,
+                runtime_session_id=runtime_session_id,
+            ):
                 _archive_current_checkpoint(paths)
+                existing_note = None
 
         report = surface_report or self._surfaces.detect(
             repo_root=repo_root,
@@ -239,7 +249,17 @@ class CheckpointsAPI:
         )
         observed_at, observed_at_local, observed_tz = _local_timestamp_parts()
         payload = {
-            "session_ref": _default_session_ref(paths, existing_note_path=paths.note_json if paths.note_json.exists() else None),
+            "session_ref": _default_session_ref(
+                paths,
+                existing_note=existing_note,
+                runtime_session_id=runtime_session_id,
+            ),
+            "runtime_session_id": runtime_session_id,
+            "runtime_session_created_at": (
+                runtime_session_created_at.isoformat().replace("+00:00", "Z")
+                if runtime_session_created_at is not None
+                else None
+            ),
             "repo_root": str(_resolve_context_root(self.workspace, repo_root)),
             "repo_label": paths.repo_label,
             "history_entry": SessionCheckpointHistoryEntry(
@@ -258,7 +278,7 @@ class CheckpointsAPI:
         paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
         with paths.jsonl.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(payload, ensure_ascii=True) + "\n")
-        return self.status(repo_root=repo_root)
+        return self.status(repo_root=repo_root, session_file=session_file)
 
     def capture_from_skill_phase(
         self,
@@ -318,7 +338,7 @@ class CheckpointsAPI:
 
         if not auto_capture:
             captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
-            current_note = _load_runtime_checkpoint_note(self, repo_root=repo_root)
+            current_note = _load_runtime_checkpoint_note(self, repo_root=repo_root, session_file=session_file)
             session_end_targets = _derive_session_end_skill_targets(current_note)
             return CheckpointCaptureResult(
                 mode="auto",
@@ -355,7 +375,7 @@ class CheckpointsAPI:
         )
         if not report.checkpoint_should_capture:
             captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
-            current_note = _load_runtime_checkpoint_note(self, repo_root=repo_root)
+            current_note = _load_runtime_checkpoint_note(self, repo_root=repo_root, session_file=session_file)
             session_end_targets = _derive_session_end_skill_targets(current_note)
             return CheckpointCaptureResult(
                 mode="auto",
@@ -415,12 +435,19 @@ class CheckpointsAPI:
             note=note,
         )
 
-    def status(self, *, repo_root: str) -> SessionCheckpointNote:
+    def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:
         paths = _checkpoint_paths(self.workspace, repo_root)
         if not paths.jsonl.exists():
             raise SurfaceNotFound(f"no checkpoint note exists yet for {paths.repo_label}")
 
         note = _build_checkpoint_note(paths)
+        runtime_session_id, _ = _ensure_checkpoint_runtime_session(
+            workspace=self.workspace,
+            session_file=session_file,
+        )
+        if _should_hide_current_checkpoint_note(note, runtime_session_id=runtime_session_id):
+            _archive_current_checkpoint(paths)
+            raise SurfaceNotFound(f"no active checkpoint note exists yet for {paths.repo_label}")
         paths.note_json.parent.mkdir(parents=True, exist_ok=True)
         paths.note_json.write_text(note.model_dump_json(indent=2) + "\n", encoding="utf-8")
         paths.note_md.write_text(_render_checkpoint_note_markdown(note, repo_label=paths.repo_label), encoding="utf-8")
@@ -431,12 +458,13 @@ class CheckpointsAPI:
         *,
         repo_root: str,
         target: Literal["dionysus-note", "harvest-handoff"],
+        session_file: str | None = None,
     ) -> SessionCheckpointPromotion:
         if target not in PROMOTION_TARGETS:
             raise ValueError(f"unsupported target {target!r}")
 
         paths = _checkpoint_paths(self.workspace, repo_root)
-        note = self.status(repo_root=repo_root)
+        note = self.status(repo_root=repo_root, session_file=session_file)
         if not note.candidate_clusters:
             raise SurfaceNotFound("cannot promote an empty checkpoint note")
 
@@ -481,13 +509,14 @@ class CheckpointsAPI:
         receipt_paths: list[str] | None = None,
         receipt_dirs: list[str] | None = None,
         surface_handoff_path: str | None = None,
+        session_file: str | None = None,
     ) -> CheckpointCloseoutContext:
         paths = _checkpoint_paths(self.workspace, repo_root)
         reviewed_artifact = Path(reviewed_artifact_path).expanduser().resolve()
         if not reviewed_artifact.exists():
             raise FileNotFoundError(f"missing reviewed artifact: {reviewed_artifact}")
 
-        note = _load_runtime_checkpoint_note(self, repo_root=repo_root)
+        note = _load_runtime_checkpoint_note(self, repo_root=repo_root, session_file=session_file)
         handoff = _load_reviewed_surface_handoff(
             workspace=self.workspace,
             repo_root=repo_root,
@@ -578,6 +607,7 @@ class CheckpointsAPI:
         receipt_paths: list[str] | None = None,
         receipt_dirs: list[str] | None = None,
         surface_handoff_path: str | None = None,
+        session_file: str | None = None,
     ) -> CheckpointCloseoutExecutionReport:
         context = self.build_closeout_context(
             repo_root=repo_root,
@@ -586,6 +616,7 @@ class CheckpointsAPI:
             receipt_paths=receipt_paths,
             receipt_dirs=receipt_dirs,
             surface_handoff_path=surface_handoff_path,
+            session_file=session_file,
         )
         paths = _checkpoint_paths(self.workspace, repo_root)
         execution_dir = paths.closeout_artifacts / _safe_name(context.session_ref)
@@ -726,16 +757,67 @@ def _resolve_context_label(workspace: Workspace, repo_root: str) -> str:
     return "workspace" if resolved_repo_root == workspace.federation_root else resolved_repo_root.name
 
 
-def _default_session_ref(paths: _CheckpointPaths, *, existing_note_path: Path | None) -> str:
-    if existing_note_path and existing_note_path.exists():
-        try:
-            existing = SessionCheckpointNote.model_validate_json(existing_note_path.read_text(encoding="utf-8"))
-            if existing.session_ref:
-                return existing.session_ref
-        except Exception:
-            pass
-    date_str = datetime.now(UTC).date().isoformat()
-    return f"session:{date_str}-{paths.repo_label}-checkpoint-growth"
+def _load_checkpoint_note(path: Path) -> SessionCheckpointNote | None:
+    try:
+        return SessionCheckpointNote.model_validate_json(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+
+def _ensure_checkpoint_runtime_session(
+    *,
+    workspace: Workspace,
+    session_file: str | None,
+) -> tuple[str | None, datetime | None]:
+    try:
+        session_path, runtime_session = ensure_session(workspace, session_file)
+        if not session_path.exists():
+            session_path.parent.mkdir(parents=True, exist_ok=True)
+            save_session(session_path, runtime_session)
+        return runtime_session.session_id, runtime_session.created_at.astimezone(UTC)
+    except Exception:
+        return None, None
+
+
+def _should_rotate_checkpoint_note(
+    existing_note: SessionCheckpointNote,
+    *,
+    runtime_session_id: str | None,
+) -> bool:
+    if existing_note.state in {"closed", "promoted"}:
+        return True
+    if runtime_session_id is None:
+        return False
+    if existing_note.runtime_session_id is None:
+        return True
+    return existing_note.runtime_session_id != runtime_session_id
+
+
+def _should_hide_current_checkpoint_note(
+    note: SessionCheckpointNote,
+    *,
+    runtime_session_id: str | None,
+) -> bool:
+    if note.state in {"closed", "promoted"}:
+        return True
+    if runtime_session_id is None:
+        return False
+    if note.runtime_session_id is None:
+        return False
+    return note.runtime_session_id != runtime_session_id
+
+
+def _default_session_ref(
+    paths: _CheckpointPaths,
+    *,
+    existing_note: SessionCheckpointNote | None,
+    runtime_session_id: str | None,
+) -> str:
+    if existing_note is not None and existing_note.state not in {"closed", "promoted"} and existing_note.session_ref:
+        return existing_note.session_ref
+    timestamp = datetime.now(UTC).strftime(SESSION_REF_TIMESTAMP_FORMAT)
+    runtime_suffix = f"-{_safe_name(runtime_session_id)[:12]}" if runtime_session_id else ""
+    return f"session:{timestamp}-{paths.repo_label}-checkpoint-growth{runtime_suffix}"
 
 
 def _infer_auto_checkpoint_kind(
@@ -1661,6 +1743,8 @@ def _safe_name(value: str) -> str:
 def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
     entries: list[SessionCheckpointHistoryEntry] = []
     session_ref: str | None = None
+    runtime_session_id: str | None = None
+    runtime_session_created_at: datetime | None = None
     repo_scope: set[str] = {paths.repo_label}
     for raw_line in paths.jsonl.read_text(encoding="utf-8").splitlines():
         line = raw_line.strip()
@@ -1669,6 +1753,10 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
         payload = json.loads(line)
         if session_ref is None and isinstance(payload.get("session_ref"), str):
             session_ref = payload["session_ref"]
+        if runtime_session_id is None and isinstance(payload.get("runtime_session_id"), str):
+            runtime_session_id = payload["runtime_session_id"]
+        if runtime_session_created_at is None:
+            runtime_session_created_at = _coerce_datetime(payload.get("runtime_session_created_at"))
         entry = SessionCheckpointHistoryEntry.model_validate(payload["history_entry"])
         observed_at_local, observed_tz = _with_local_timestamp_fallback(
             utc_value=entry.observed_at,
@@ -1684,7 +1772,11 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             )
         entries.append(entry)
     if session_ref is None:
-        session_ref = _default_session_ref(paths, existing_note_path=None)
+        session_ref = _default_session_ref(
+            paths,
+            existing_note=None,
+            runtime_session_id=runtime_session_id,
+        )
 
     existing_state = "collecting"
     existing_review_status = "unreviewed"
@@ -1697,6 +1789,10 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             existing_review_status = existing_note.review_status
             existing_evidence_refs = list(existing_note.evidence_refs)
             existing_next_owner_moves = list(existing_note.next_owner_moves)
+            if runtime_session_id is None:
+                runtime_session_id = existing_note.runtime_session_id
+            if runtime_session_created_at is None:
+                runtime_session_created_at = existing_note.runtime_session_created_at
         except Exception:
             pass
 
@@ -1798,6 +1894,8 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
 
     note = SessionCheckpointNote(
         session_ref=session_ref,
+        runtime_session_id=runtime_session_id,
+        runtime_session_created_at=runtime_session_created_at,
         state=state,
         repo_scope=sorted(repo_scope),
         checkpoint_history=entries,
@@ -1846,9 +1944,14 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
     return note
 
 
-def _load_runtime_checkpoint_note(api: CheckpointsAPI, *, repo_root: str) -> SessionCheckpointNote | None:
+def _load_runtime_checkpoint_note(
+    api: CheckpointsAPI,
+    *,
+    repo_root: str,
+    session_file: str | None = None,
+) -> SessionCheckpointNote | None:
     try:
-        return api.status(repo_root=repo_root)
+        return api.status(repo_root=repo_root, session_file=session_file)
     except SurfaceNotFound:
         return None
 
@@ -2239,6 +2342,7 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
         "# Session Checkpoint Note",
         "",
         f"Session ref: `{note.session_ref}`",
+        *([f"Runtime session id: `{note.runtime_session_id}`"] if note.runtime_session_id else []),
         f"Repo label: `{repo_label}`",
         f"State: `{note.state}`",
         f"Review status: `{note.review_status}`",

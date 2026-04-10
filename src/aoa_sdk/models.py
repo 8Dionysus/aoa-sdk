@@ -1270,6 +1270,8 @@ class SessionCheckpointNote(BaseModel):
     schema_version: int = 1
     contract_type: Literal["session_checkpoint_note_v1"] = "session_checkpoint_note_v1"
     session_ref: str
+    runtime_session_id: str | None = None
+    runtime_session_created_at: datetime | None = None
     state: Literal["collecting", "reviewable", "promoted", "closed"] = "collecting"
     repo_scope: list[str] = Field(default_factory=list)
     checkpoint_history: list[SessionCheckpointHistoryEntry] = Field(default_factory=list)

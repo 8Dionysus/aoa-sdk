@@ -34,6 +34,21 @@ aoa-sdk/.aoa/session-growth/current/<repo-label>/
   closeout-execution-report.json
 ```
 
+`current/<repo-label>/` is the live ledger for one active checkpoint session in
+that repo scope, not a date bucket.
+The checkpoint `session_ref` is minted uniquely when a new ledger starts and
+now includes a high-resolution timestamp plus the current runtime-session
+identity suffix when available, so many same-day sessions do not collapse into
+one daily label.
+When a later append sees a different runtime session, or sees a note already
+ended as `closed` or `promoted`, the previous `current` ledger is archived
+under `aoa-sdk/.aoa/session-growth/archive/` before the new session begins.
+If you use a non-default runtime session file, pass the same `--session-file`
+to `aoa checkpoint status`, `aoa checkpoint promote`,
+`aoa checkpoint build-closeout-context`, and
+`aoa checkpoint execute-closeout-chain` so those commands resolve the same
+active checkpoint session.
+
 The JSONL file is append-only checkpoint history.
 The JSON and Markdown files are rebuilt snapshots for current review.
 Those rebuilt snapshots now act as the session-local ledger for:

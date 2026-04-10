@@ -1245,10 +1245,15 @@ def checkpoint_append(
 @checkpoint_app.command("status")
 def checkpoint_status(
     repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
-    note = AoASDK.from_workspace(root).checkpoints.status(repo_root=repo_root)
+    note = AoASDK.from_workspace(root).checkpoints.status(repo_root=repo_root, session_file=session_file)
     payload = note.model_dump(mode="json")
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
@@ -1264,12 +1269,18 @@ def checkpoint_promote(
         "--target",
         help="Promotion target: dionysus-note or harvest-handoff.",
     ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     promotion = AoASDK.from_workspace(root).checkpoints.promote(
         repo_root=repo_root,
         target=target,  # type: ignore[arg-type]
+        session_file=session_file,
     )
     payload = promotion.model_dump(mode="json")
     if json_output:
@@ -1306,6 +1317,11 @@ def checkpoint_build_closeout_context(
         "--surface-handoff-path",
         help="Optional reviewed surface handoff path. Defaults to the latest local reviewed handoff for the repo label.",
     ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
@@ -1316,6 +1332,7 @@ def checkpoint_build_closeout_context(
         receipt_paths=receipt_path or [],
         receipt_dirs=receipt_dir or [],
         surface_handoff_path=surface_handoff_path,
+        session_file=session_file,
     )
     payload = context.model_dump(mode="json")
     if json_output:
@@ -1352,6 +1369,11 @@ def checkpoint_execute_closeout_chain(
         "--surface-handoff-path",
         help="Optional reviewed surface handoff path. Defaults to the latest local reviewed handoff for the repo label.",
     ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
@@ -1362,6 +1384,7 @@ def checkpoint_execute_closeout_chain(
         receipt_paths=receipt_path or [],
         receipt_dirs=receipt_dir or [],
         surface_handoff_path=surface_handoff_path,
+        session_file=session_file,
     )
     payload = report.model_dump(mode="json")
     if json_output:

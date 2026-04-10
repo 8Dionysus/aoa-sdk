@@ -299,6 +299,55 @@ def test_checkpoint_status_cli_backfills_local_timestamp_for_legacy_history_entr
     assert payload["checkpoint_history"][0]["observed_tz"]
 
 
+def test_checkpoint_status_cli_hides_stale_current_note_for_changed_runtime_session(workspace_root: Path) -> None:
+    runner = CliRunner()
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
+
+    append = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "append",
+            str(workspace_root / "aoa-sdk"),
+            "--kind",
+            "commit",
+            "--intent-text",
+            "commit bounded patch",
+            "--session-file",
+            str(session_file),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+    assert append.exit_code == 0
+
+    session_payload = json.loads(session_file.read_text(encoding="utf-8"))
+    session_payload["session_id"] = "runtime-session-two"
+    session_payload["created_at"] = "2026-04-10T12:00:00Z"
+    session_payload["updated_at"] = "2026-04-10T12:00:00Z"
+    session_file.write_text(json.dumps(session_payload, indent=2) + "\n", encoding="utf-8")
+
+    status = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "status",
+            str(workspace_root / "aoa-sdk"),
+            "--session-file",
+            str(session_file),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+
+    assert status.exit_code != 0
+    assert "no active checkpoint note exists yet" in status.stdout or "no active checkpoint note exists yet" in str(
+        status.exception
+    )
+
+
 def test_skills_guard_auto_captures_explicit_commit_growth(workspace_root: Path) -> None:
     runner = CliRunner()
 
