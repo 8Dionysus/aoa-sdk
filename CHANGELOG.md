@@ -8,6 +8,20 @@ The format is intentionally simple and human-first.
 
 ## [0.2.0] - 2026-04-10
 
+### Summary
+
+- this release adds a workspace control-plane capsule, first-class checkpoint lanes, closeout bridging, and thread-aware Codex session tracing
+- checkpoint typing, registry guardrails, actor references, local-time reporting, and control-plane validation are hardened across CLI and generated outputs
+- `aoa-sdk` remains the typed control-plane and orchestration layer rather than a runtime owner
+
+### Validation
+
+- `python scripts/release_check.py`
+
+### Notes
+
+- detailed source, schema, generated-surface, and operator-surface coverage for this release remains enumerated below under `Added`, `Changed`, and `Included in this release`
+
 ### Added
 
 - workspace control-plane capsule plus compatibility tracking for center/root
