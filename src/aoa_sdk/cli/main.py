@@ -11,6 +11,7 @@ from ..api import AoASDK
 from ..closeout import CloseoutAPI
 from ..compatibility import CompatibilityAPI
 from ..loaders import load_json
+from ..release.api import ReleaseAuditPhase, ReleaseAuditResult, ReleasePublishResult
 from ..models import (
     CheckpointCloseoutContext,
     CheckpointCloseoutExecutionReport,
@@ -38,6 +39,7 @@ closeout_app = typer.Typer(help="Run bounded reviewed-session closeout orchestra
 skills_app = typer.Typer(help="Read project skill layers and run phase-aware skill detection/dispatch")
 surfaces_app = typer.Typer(help="Read additive AoA surface-detection reports and reviewed closeout handoffs")
 checkpoint_app = typer.Typer(help="Capture checkpoint-aware session-growth notes and reviewed promotions")
+release_app = typer.Typer(help="Audit and publish bounded repository releases")
 
 app.add_typer(workspace_app, name="workspace")
 app.add_typer(compatibility_app, name="compatibility")
@@ -45,6 +47,7 @@ app.add_typer(closeout_app, name="closeout")
 app.add_typer(skills_app, name="skills")
 app.add_typer(surfaces_app, name="surfaces")
 app.add_typer(checkpoint_app, name="checkpoint")
+app.add_typer(release_app, name="release")
 
 
 def _workspace_payload(workspace: Workspace) -> dict[str, Any]:
@@ -256,6 +259,52 @@ def _print_surface_handoff(report: SurfaceCloseoutHandoff) -> None:
             typer.echo(f"    why: {item.why}")
             typer.echo(f"    triggered_by: {', '.join(item.triggered_by) if item.triggered_by else 'none'}")
     typer.echo(f"notes: {', '.join(report.notes) if report.notes else 'none'}")
+
+
+def _release_sdk(root: str) -> AoASDK:
+    candidate = Path(root).expanduser().resolve()
+    sdk_root = candidate if (candidate / "src" / "aoa_sdk").exists() else candidate / "aoa-sdk"
+    if not (sdk_root / "src" / "aoa_sdk").exists():
+        raise typer.BadParameter(f"Could not locate aoa-sdk under {candidate}")
+    return AoASDK.from_workspace(sdk_root)
+
+
+def _print_release_audit(result: ReleaseAuditResult) -> None:
+    typer.echo(f"workspace_root: {result.workspace_root}")
+    typer.echo(f"phase: {result.phase}")
+    typer.echo(f"strict: {'yes' if result.strict else 'no'}")
+    typer.echo(f"passed: {'yes' if result.passed else 'no'}")
+    for report in result.repo_reports:
+        typer.echo(f"{report.repo}: {'pass' if report.passed else 'fail'}")
+        if report.latest_tag:
+            typer.echo(f"  latest_tag: {report.latest_tag}")
+        if report.expected_version:
+            typer.echo(f"  expected_version: {report.expected_version}")
+        if report.commits_since_tag is not None:
+            typer.echo(f"  commits_since_tag: {report.commits_since_tag}")
+        if report.hours_since_release is not None:
+            typer.echo(f"  hours_since_release: {report.hours_since_release:.2f}")
+        if report.due is not None:
+            typer.echo(f"  due: {'yes' if report.due else 'no'}")
+        if report.blocked_reason:
+            typer.echo(f"  blocked_reason: {report.blocked_reason}")
+        for check in report.checks:
+            typer.echo(f"  - {check.name}: {'ok' if check.passed else 'fail'} ({check.detail})")
+
+
+def _print_release_publish(result: ReleasePublishResult) -> None:
+    typer.echo(f"workspace_root: {result.workspace_root}")
+    typer.echo(f"dry_run: {'yes' if result.dry_run else 'no'}")
+    typer.echo(f"passed: {'yes' if result.passed else 'no'}")
+    for report in result.repo_reports:
+        typer.echo(f"{report.repo}: {'pass' if report.passed else 'fail'}")
+        typer.echo(f"  tag: {report.tag}")
+        typer.echo(f"  version: {report.version}")
+        if report.release_url:
+            typer.echo(f"  release_url: {report.release_url}")
+        typer.echo(f"  postpublish_passed: {'yes' if report.postpublish_passed else 'no'}")
+        for action in report.actions:
+            typer.echo(f"  - {action}")
 
 
 def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
@@ -640,6 +689,65 @@ def _load_surface_detection_report(path: str) -> SurfaceDetectionReport:
 @app.command()
 def version() -> None:
     print("aoa-sdk 0.2.0")
+
+
+@release_app.command("audit")
+def release_audit(
+    workspace_root: str = typer.Argument(..., help="Workspace root containing aoa-sdk and sibling owner repos."),
+    phase: ReleaseAuditPhase = typer.Option(
+        "preflight",
+        "--phase",
+        help="Audit phase: preflight, postpublish, or cadence.",
+    ),
+    repo: str | None = typer.Option(None, "--repo", help="One owner repo to audit."),
+    all_repos: bool = typer.Option(False, "--all", help="Audit every owner repo discovered in the workspace."),
+    strict: bool = typer.Option(False, "--strict", help="Exit non-zero when any repo fails the selected phase."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    if phase not in {"preflight", "postpublish", "cadence"}:
+        raise typer.BadParameter("phase must be one of: preflight, postpublish, cadence")
+    sdk = _release_sdk(workspace_root)
+    include_all = all_repos or repo is None
+    result = sdk.release.audit(
+        workspace_root=workspace_root,
+        phase=phase,
+        repo=repo,
+        include_all=include_all,
+        strict=strict,
+    )
+    if json_output:
+        typer.echo(json.dumps(result.model_dump(mode="json"), indent=2, ensure_ascii=True))
+    else:
+        _print_release_audit(result)
+    if strict and not result.passed:
+        raise typer.Exit(1)
+
+
+@release_app.command("publish")
+def release_publish(
+    workspace_root: str = typer.Argument(..., help="Workspace root containing aoa-sdk and sibling owner repos."),
+    repo: str | None = typer.Option(None, "--repo", help="One owner repo to publish."),
+    all_due: bool = typer.Option(False, "--all-due", help="Publish every repo that is currently release-due."),
+    dry_run: bool = typer.Option(False, "--dry-run", help="Report actions without mutating tags or releases."),
+    confirm: bool = typer.Option(False, "--confirm", help="Create or update tags and GitHub Releases."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    if dry_run and confirm:
+        raise typer.BadParameter("choose either --dry-run or --confirm")
+    effective_dry_run = dry_run or not confirm
+    sdk = _release_sdk(workspace_root)
+    result = sdk.release.publish(
+        workspace_root=workspace_root,
+        repo=repo,
+        all_due=all_due,
+        dry_run=effective_dry_run,
+    )
+    if json_output:
+        typer.echo(json.dumps(result.model_dump(mode="json"), indent=2, ensure_ascii=True))
+    else:
+        _print_release_publish(result)
+    if not result.passed:
+        raise typer.Exit(1)
 
 
 @workspace_app.command("inspect")

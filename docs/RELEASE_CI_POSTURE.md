@@ -53,3 +53,14 @@ Use the tiers below when you need to verify a current SDK claim:
 | Tier 3 | live sibling drift detection | `python scripts/run_sibling_canary.py --repo-root . --matrix scripts/sibling_canary_matrix.json`, `.github/workflows/latest-sibling-canary.yml` |
 
 For a repo-scoped compatibility view, use `aoa compatibility check /srv/aoa-sdk --repo <repo> --json`.
+
+## Release audit surface
+
+The SDK also owns the bounded federation release control plane:
+
+- `aoa release audit /srv --phase preflight|postpublish|cadence --all --json`
+- `aoa release publish /srv --repo <repo>|--all-due --dry-run|--confirm --json`
+- `python scripts/release_check.py`
+
+Those helpers verify or publish release surfaces.
+They do not author sibling changelog meaning.

@@ -62,6 +62,7 @@ Then branch by task:
 - additive surface detection: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-second-wave.md`, and `docs/aoa-surface-detection-heuristics.md`
 - RPG / progression readers: `docs/RPG_SDK_ADDENDUM.md` and `docs/RPG_SURFACE_PATHS.md`
 - release, CI, or compatibility posture: `docs/RELEASE_CI_POSTURE.md` and `docs/ecosystem-impact.md`
+- federation release audit or publish work: `docs/RELEASING.md` and `scripts/release_check.py`
 
 If a deeper directory defines its own `AGENTS.md`, follow the nearest one.
 
@@ -215,6 +216,7 @@ When release or CI-facing surfaces change, also run:
 ```bash
 python -m mypy src
 python -m build
+python scripts/release_check.py
 ```
 
 Confirm that owner meaning, truth labels, and checkpoint boundaries remain

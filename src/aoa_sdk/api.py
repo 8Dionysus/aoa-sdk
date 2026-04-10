@@ -11,6 +11,7 @@ from .governed_runs import GovernedRunsAPI
 from .kag import KagAPI
 from .memo import MemoAPI
 from .playbooks import PlaybooksAPI
+from .release import ReleaseAPI
 from .rpg import RpgAPI
 from .routing.picker import RoutingAPI
 from .skills.discovery import SkillsAPI
@@ -38,6 +39,7 @@ class AoASDK:
         self.rpg = RpgAPI(workspace)
         self.governed_runs = GovernedRunsAPI(workspace)
         self.closeout = CloseoutAPI(workspace)
+        self.release = ReleaseAPI(workspace)
 
     @classmethod
     def from_workspace(cls, root: str | Path) -> "AoASDK":

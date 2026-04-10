@@ -16,6 +16,7 @@ Use the shortest route by need:
 - compact control-plane capsule: `generated/workspace_control_plane.min.json`
 - workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
 - compatibility posture: `docs/versioning.md`
+- release protocol and bounded publication path: `docs/RELEASING.md`
 - release, support, and CI posture: `docs/RELEASE_CI_POSTURE.md`
 - reviewed session closeout orchestration: `docs/session-closeout.md`
 - additive surface detection and reviewed owner-layer handoff: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-second-wave.md`, `docs/aoa-surface-detection-heuristics.md`, and `docs/aoa-surface-detection-closeout-handoff.md`
@@ -34,6 +35,7 @@ Use the shortest route by need:
 - source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
 - compatibility rules and local checks: `docs/versioning.md`, `scripts/sibling_canary_matrix.json`, `scripts/run_sibling_canary.py`, `.github/workflows/latest-sibling-canary.yml`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
 - public support, release scope, and CI tiers: `docs/RELEASE_CI_POSTURE.md`
+- bounded federation release audit and publish helper: `docs/RELEASING.md`, `aoa release audit /srv --phase preflight --all --json`, and `aoa release publish /srv --repo aoa-sdk --dry-run --json`
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
 - local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
