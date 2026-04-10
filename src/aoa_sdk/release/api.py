@@ -78,6 +78,10 @@ class ReleasePublishResult(BaseModel):
     repo_reports: list[ReleasePublishRepoReport] = Field(default_factory=list)
 
 
+class ReleaseRemoteStateUnknownError(RuntimeError):
+    pass
+
+
 @dataclass(frozen=True, slots=True)
 class ParsedReleaseSection:
     version: str
@@ -263,8 +267,10 @@ def _gh_release_view(repo: str, tag: str, *, cwd: Path) -> dict[str, Any] | None
             check=False,
             timeout=REMOTE_COMMAND_TIMEOUT_SECONDS,
         )
-    except subprocess.TimeoutExpired:
-        return None
+    except subprocess.TimeoutExpired as exc:
+        raise ReleaseRemoteStateUnknownError(
+            f"GitHub Release lookup for {repo} {tag} timed out after {int(REMOTE_COMMAND_TIMEOUT_SECONDS)}s"
+        ) from exc
     if completed.returncode != 0:
         return None
     return json.loads(completed.stdout)
@@ -445,7 +451,23 @@ class ReleaseAPI:
             repo_root = self.workspace.repo_path(repo_name)
             release = self._read_release(repo_root)
             repo_preflight = preflight_by_repo[repo_name]
-            actions, release_url = self._publish_repo(repo_name, repo_root, release, dry_run=dry_run)
+            try:
+                actions, release_url = self._publish_repo(repo_name, repo_root, release, dry_run=dry_run)
+            except ReleaseRemoteStateUnknownError as exc:
+                repo_reports.append(
+                    ReleasePublishRepoReport(
+                        repo=repo_name,
+                        repo_root=str(repo_root),
+                        tag=release.tag,
+                        version=release.version,
+                        dry_run=dry_run,
+                        passed=False,
+                        postpublish_passed=False,
+                        release_url=None,
+                        actions=[str(exc)],
+                    )
+                )
+                continue
             postpublish = None if dry_run else self._audit_postpublish(repo_name, repo_root)
             publish_passed = repo_preflight.passed if dry_run else repo_preflight.passed and postpublish is not None and postpublish.passed
             repo_reports.append(
@@ -676,12 +698,17 @@ class ReleaseAPI:
             )
         )
 
-        release_view = _gh_release_view(repo, release.tag, cwd=repo_root)
+        release_view_error: str | None = None
+        try:
+            release_view = _gh_release_view(repo, release.tag, cwd=repo_root)
+        except ReleaseRemoteStateUnknownError as exc:
+            release_view = None
+            release_view_error = str(exc)
         checks.append(
             ReleaseCheck(
                 name="github-release",
                 passed=release_view is not None,
-                detail=f"GitHub Release must exist for {release.tag}",
+                detail=release_view_error or f"GitHub Release must exist for {release.tag}",
             )
         )
         release_url = release_view["url"] if release_view else None
@@ -724,7 +751,12 @@ class ReleaseAPI:
         else:
             commits_since_tag = int(_git_stdout(repo_root, "rev-list", "--count", "HEAD"))
 
-        release_view = _gh_release_view(repo, latest_tag, cwd=repo_root) if latest_tag else None
+        release_view_error: str | None = None
+        try:
+            release_view = _gh_release_view(repo, latest_tag, cwd=repo_root) if latest_tag else None
+        except ReleaseRemoteStateUnknownError as exc:
+            release_view = None
+            release_view_error = str(exc)
         release_url = release_view["url"] if release_view else None
         published_at = release_view["publishedAt"] if release_view else None
         hours_since_release: float | None = None
@@ -734,7 +766,7 @@ class ReleaseAPI:
         if latest_tag is not None and commits_since_tag > 15:
             reasons.append(f"{commits_since_tag} commits since {latest_tag}")
         if published_at is None:
-            reasons.append("missing published GitHub release")
+            reasons.append(release_view_error or "missing published GitHub release")
         else:
             published = datetime.fromisoformat(published_at.replace("Z", "+00:00"))
             hours_since_release = (datetime.now(UTC) - published).total_seconds() / 3600

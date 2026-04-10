@@ -751,7 +751,12 @@ class CheckpointsAPI:
             surface_handoff_path=surface_handoff_path,
             session_file=session_file,
         )
-        paths = _checkpoint_paths(self.workspace, repo_root)
+        paths = _resolve_runtime_checkpoint_paths(
+            self.workspace,
+            repo_root=repo_root,
+            runtime_session_id=context.runtime_session_id,
+            migrate_legacy=False,
+        )
         execution_dir = paths.closeout_artifacts / _safe_name(context.session_ref)
         execution_dir.mkdir(parents=True, exist_ok=True)
 
