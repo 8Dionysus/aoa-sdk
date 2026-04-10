@@ -118,14 +118,19 @@ class SurfacesAPI:
             items=items,
             checkpoint_kind=checkpoint_kind,
         ) if phase == "checkpoint" else []
-        if phase == "checkpoint" and not candidate_clusters:
-            candidate_clusters = _derive_explicit_mutation_growth_clusters(
-                workspace=self.workspace,
-                repo_root=repo_root,
-                mutation_surface=mutation_surface,
-                intent_text=intent_text,
-                checkpoint_kind=checkpoint_kind,
-                skill_report=skill_report,
+        if phase == "checkpoint":
+            candidate_clusters = _dedupe_checkpoint_candidate_clusters(
+                [
+                    *candidate_clusters,
+                    *_derive_explicit_mutation_growth_clusters(
+                        workspace=self.workspace,
+                        repo_root=repo_root,
+                        mutation_surface=mutation_surface,
+                        intent_text=intent_text,
+                        checkpoint_kind=checkpoint_kind,
+                        skill_report=skill_report,
+                    ),
+                ]
             )
         blocked_by = _checkpoint_blocked_by(candidate_clusters) if phase == "checkpoint" else []
         checkpoint_should_capture = bool(candidate_clusters) or (
@@ -480,9 +485,18 @@ def _derive_explicit_mutation_growth_clusters(
     ] | None,
     skill_report: SkillDetectionReport,
 ) -> list[CheckpointCandidateCluster]:
-    if checkpoint_kind not in {"commit", "verify_green"}:
+    if checkpoint_kind not in {
+        "commit",
+        "verify_green",
+        "pr_opened",
+        "pr_merged",
+        "owner_followthrough",
+    }:
         return []
-    explicit_checkpoint_kind = cast(Literal["commit", "verify_green"], checkpoint_kind)
+    explicit_checkpoint_kind = cast(
+        Literal["commit", "verify_green", "pr_opened", "pr_merged", "owner_followthrough"],
+        checkpoint_kind,
+    )
     if mutation_surface == "none":
         return []
     if not _intent_explicitly_requests_checkpoint_kind(
@@ -506,41 +520,47 @@ def _derive_explicit_mutation_growth_clusters(
         blocked_by.append("owner-ambiguity")
         defer_reason = "workspace-wide mutation growth still needs owner review before promotion beyond the local note"
 
-    display_name = (
-        "Verify-green growth seam"
-        if explicit_checkpoint_kind == "verify_green"
-        else "Commit growth seam"
-    )
+    display_name_by_kind = {
+        "commit": "Commit growth seam",
+        "verify_green": "Verify-green growth seam",
+        "pr_opened": "PR-opened growth seam",
+        "pr_merged": "PR-merged growth seam",
+        "owner_followthrough": "Owner follow-through growth seam",
+    }
+    review_move_by_kind = {
+        "commit": "review the same bounded mutation again after verify-green before promoting it",
+        "verify_green": "confirm the verify-green seam still points to the same bounded owner context",
+        "pr_opened": "keep the opened PR tied to the reviewed closeout evidence before promotion",
+        "pr_merged": "confirm the merged PR state is reflected in the final reviewed closeout",
+        "owner_followthrough": "route owner follow-through through the reviewed closeout handoff before promotion",
+    }
     promote_if = [
-        (
-            "keep the same bounded mutation seam stable through a reviewed verify-green pass"
-            if explicit_checkpoint_kind == "verify_green"
-            else "pair this explicit commit seam with one reviewed verify-green checkpoint before promotion"
-        ),
+        _promote_hint_for_explicit_checkpoint_kind(explicit_checkpoint_kind),
         "repeat the same bounded mutation seam across another reviewed checkpoint before promoting beyond the local note",
     ]
     next_owner_moves = [
         "append the explicit mutation seam into the local checkpoint note",
         "carry the explicit mutation seam through reviewed session closeout before moving candidates or stats",
-        (
-            "review the same bounded mutation again after verify-green before promoting it"
-            if explicit_checkpoint_kind == "commit"
-            else "confirm the verify-green seam still points to the same bounded owner context"
-        ),
+        review_move_by_kind[explicit_checkpoint_kind],
     ]
+    candidate_id = f"candidate:growth:{_slugify(f'{context_label}-{explicit_checkpoint_kind}-{mutation_surface}')}"
 
     return [
         CheckpointCandidateCluster(
-            candidate_id=f"candidate:growth:{_slugify(f'{context_label}-{explicit_checkpoint_kind}-{mutation_surface}')}",
+            candidate_id=candidate_id,
             candidate_kind="growth",
             owner_hint=context_label,
-            display_name=display_name,
+            display_name=display_name_by_kind[explicit_checkpoint_kind],
             source_surface_ref=f"aoa-sdk:checkpoint_auto_capture.{explicit_checkpoint_kind}",
             evidence_refs=evidence_refs,
-            confidence="high" if explicit_checkpoint_kind == "verify_green" else "medium",
+            confidence=(
+                "high"
+                if explicit_checkpoint_kind in {"verify_green", "pr_merged", "owner_followthrough"}
+                else "medium"
+            ),
             session_end_targets=["harvest", "progression"],
             progression_axis_signals=_progression_axis_signals_for_explicit_growth(
-                candidate_id=f"candidate:growth:{_slugify(f'{context_label}-{explicit_checkpoint_kind}-{mutation_surface}')}",
+                candidate_id=candidate_id,
                 checkpoint_kind=explicit_checkpoint_kind,
                 blocked_by=blocked_by,
                 evidence_refs=evidence_refs,
@@ -553,10 +573,33 @@ def _derive_explicit_mutation_growth_clusters(
     ]
 
 
+def _dedupe_checkpoint_candidate_clusters(
+    clusters: list[CheckpointCandidateCluster],
+) -> list[CheckpointCandidateCluster]:
+    deduped: dict[tuple[str, str], CheckpointCandidateCluster] = {}
+    for cluster in clusters:
+        deduped[(cluster.candidate_id, cluster.owner_hint)] = cluster
+    return list(deduped.values())
+
+
+def _promote_hint_for_explicit_checkpoint_kind(
+    checkpoint_kind: Literal["commit", "verify_green", "pr_opened", "pr_merged", "owner_followthrough"],
+) -> str:
+    if checkpoint_kind == "verify_green":
+        return "keep the same bounded mutation seam stable through a reviewed verify-green pass"
+    if checkpoint_kind == "pr_opened":
+        return "pair this opened PR seam with green checks or merge evidence before promotion"
+    if checkpoint_kind == "pr_merged":
+        return "pair this merged PR seam with reviewed closeout evidence before promotion"
+    if checkpoint_kind == "owner_followthrough":
+        return "owner follow-through already exists; keep promotion gated by reviewed closeout evidence"
+    return "pair this explicit commit seam with one reviewed verify-green checkpoint before promotion"
+
+
 def _intent_explicitly_requests_checkpoint_kind(
     *,
     intent_text: str,
-    checkpoint_kind: Literal["commit", "verify_green"],
+    checkpoint_kind: Literal["commit", "verify_green", "pr_opened", "pr_merged", "owner_followthrough"],
 ) -> bool:
     normalized = re.sub(r"[\s_-]+", " ", intent_text.strip().lower())
     if checkpoint_kind == "verify_green":
@@ -570,6 +613,35 @@ def _intent_explicitly_requests_checkpoint_kind(
                 "verified",
                 "verification",
                 "verify",
+            )
+        )
+    if checkpoint_kind == "pr_opened":
+        padded = f" {normalized} "
+        return (
+            "pull request" in normalized
+            or "review thread" in normalized
+            or (" pr " in padded and any(token in normalized for token in ("open", "opened", "created", "draft")))
+        )
+    if checkpoint_kind == "pr_merged":
+        return any(
+            token in normalized
+            for token in (
+                "pull request merged",
+                "merged pull request",
+                "pr merged",
+                "merged pr",
+                "merge complete",
+            )
+        )
+    if checkpoint_kind == "owner_followthrough":
+        return any(
+            token in normalized
+            for token in (
+                "owner follow through",
+                "owner followthrough",
+                "owner handoff",
+                "follow through",
+                "followthrough",
             )
         )
     return "checkpoint" in normalized or "commit" in normalized
@@ -593,7 +665,7 @@ def _explicit_mutation_growth_evidence_refs(
 def _progression_axis_signals_for_explicit_growth(
     *,
     candidate_id: str,
-    checkpoint_kind: Literal["commit", "verify_green"],
+    checkpoint_kind: Literal["commit", "verify_green", "pr_opened", "pr_merged", "owner_followthrough"],
     blocked_by: list[str],
     evidence_refs: list[str],
 ) -> list[ProgressionAxisSignal]:
@@ -616,6 +688,44 @@ def _progression_axis_signals_for_explicit_growth(
                 "advance",
                 "verify-green evidence strengthens proof discipline for the bounded mutation seam",
             )
+        )
+    if checkpoint_kind == "pr_opened":
+        templates.append(
+            (
+                "review_sharpness",
+                "advance",
+                "opened-PR evidence makes the public review seam explicit for later closeout",
+            )
+        )
+    if checkpoint_kind == "pr_merged":
+        templates.extend(
+            [
+                (
+                    "proof_discipline",
+                    "advance",
+                    "merged-PR evidence strengthens the proof chain for the bounded mutation seam",
+                ),
+                (
+                    "boundary_integrity",
+                    "advance",
+                    "merged public-share evidence confirms the owner boundary reached a reviewed integration point",
+                ),
+            ]
+        )
+    if checkpoint_kind == "owner_followthrough":
+        templates.extend(
+            [
+                (
+                    "provenance_hygiene",
+                    "advance",
+                    "owner follow-through keeps the handoff provenance explicit for reviewed closeout",
+                ),
+                (
+                    "boundary_integrity",
+                    "advance",
+                    "owner follow-through evidence confirms the next owner surface was not guessed silently",
+                ),
+            ]
         )
     signals: list[ProgressionAxisSignal] = []
     for axis, movement, why in templates:

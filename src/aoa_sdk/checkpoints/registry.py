@@ -5,17 +5,21 @@ import re
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Literal, TypedDict, cast
+from typing import Any, Literal, TypedDict, cast
 
 from ..errors import RepoNotFound, SurfaceNotFound
 from ..loaders import load_json, write_json
 from ..models import (
+    CheckpointAfterCommitReport,
     CheckpointCloseoutContext,
     CheckpointCloseoutExecutionReport,
     CheckpointCaptureResult,
+    CheckpointHookInstallResult,
+    CheckpointHookStatus,
     CloseoutContextCandidateMap,
     CloseoutExecutionStep,
     ProgressionAxisSignal,
+    SessionCheckpointAgentReview,
     SessionEndSkillTarget,
     SessionCheckpointCluster,
     SessionCheckpointHistoryEntry,
@@ -24,9 +28,11 @@ from ..models import (
     SurfaceCloseoutHandoff,
     SurfaceDetectionReport,
 )
-from ..skills.session import ensure_session, load_session, resolve_session_file, save_session
+from ..skills.discovery import SkillsAPI
+from ..skills.session import ensure_session, probe_session, resolve_session_file, save_session
 from ..surfaces import SurfacesAPI
 from ..workspace.discovery import Workspace
+from ..workspace.roots import KNOWN_REPOS
 
 
 CHECKPOINT_KINDS = (
@@ -38,6 +44,9 @@ CHECKPOINT_KINDS = (
     "pause",
     "owner_followthrough",
 )
+OWNER_MUTABLE_REPOS = tuple(repo for repo in KNOWN_REPOS if repo != "8Dionysus")
+POST_COMMIT_HOOK_TEMPLATE_VERSION = "aoa-sdk-post-commit-hook-v1"
+POST_COMMIT_HOOK_MARKER = "# aoa-sdk checkpoint post-commit hook v1"
 PROMOTION_TARGETS = ("dionysus-note", "harvest-handoff")
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 SESSION_REF_RE = re.compile(r'"session_ref"\s*:\s*"([^"]+)"|session_ref:\s*`?([^`\s]+)`?|Session ref:\s*`?([^`\n]+)`?')
@@ -209,6 +218,10 @@ class CheckpointsAPI:
         surface_report: SurfaceDetectionReport | None = None,
         surface_report_path: str | None = None,
         manual_review_requested: bool = False,
+        commit_sha: str | None = None,
+        commit_short_sha: str | None = None,
+        agent_review_status: Literal["not_required", "pending", "reviewed"] = "not_required",
+        agent_review_ref: str | None = None,
     ) -> SessionCheckpointNote:
         runtime_session_id, runtime_session_created_at = _ensure_checkpoint_runtime_session(
             workspace=self.workspace,
@@ -288,6 +301,10 @@ class CheckpointsAPI:
                 blocked_by=list(report.blocked_by),
                 candidate_clusters=list(report.candidate_clusters),
                 manual_review_requested=manual_review_requested,
+                commit_sha=commit_sha,
+                commit_short_sha=commit_short_sha,
+                agent_review_status=agent_review_status,
+                agent_review_ref=agent_review_ref,
             ).model_dump(mode="json"),
         }
         paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
@@ -435,6 +452,319 @@ class CheckpointsAPI:
             progression_axis_signals=list(note.progression_axis_signals),
             stats_refresh_recommended=note.stats_refresh_recommended,
             note=note,
+        )
+
+    def after_commit(
+        self,
+        *,
+        repo_root: str,
+        commit_ref: str = "HEAD",
+        session_file: str | None = None,
+    ) -> CheckpointAfterCommitReport:
+        repo_root_path = _resolve_context_root(self.workspace, repo_root)
+        repo_label = _resolve_context_label(self.workspace, repo_root)
+        session_path = resolve_session_file(self.workspace, session_file)
+        runtime_session_id: str | None = None
+        runtime_session_created_at: datetime | None = None
+        skill_report_path: str | None = None
+        surface_report_path: str | None = None
+        note_ref: str | None = None
+        commit_metadata: dict[str, Any] = {
+            "commit_sha": None,
+            "commit_short_sha": None,
+            "commit_subject": None,
+            "commit_body": None,
+            "changed_paths": [],
+        }
+
+        try:
+            session_path, runtime_session = probe_session(self.workspace, session_file)
+            commit_metadata = _read_git_commit_metadata(repo_root_path, commit_ref)
+            captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
+            if runtime_session is None:
+                report_path = _post_commit_status_path(self.workspace, repo_label)
+                report = CheckpointAfterCommitReport(
+                    status="skipped_no_active_session",
+                    repo_root=str(repo_root_path),
+                    repo_label=repo_label,
+                    report_path=str(report_path),
+                    commit_ref=commit_ref,
+                    commit_sha=commit_metadata["commit_sha"],
+                    commit_short_sha=commit_metadata["commit_short_sha"],
+                    commit_subject=commit_metadata["commit_subject"],
+                    commit_body=commit_metadata["commit_body"],
+                    changed_paths=list(commit_metadata["changed_paths"]),
+                    captured_at=captured_at,
+                    captured_at_local=captured_at_local,
+                    captured_tz=captured_tz,
+                    session_file=str(session_path),
+                )
+                _write_after_commit_report(report_path, report)
+                return report
+
+            runtime_session_id = runtime_session.session_id
+            runtime_session_created_at = runtime_session.created_at.astimezone(UTC)
+            paths = _resolve_runtime_checkpoint_paths(
+                self.workspace,
+                repo_root=repo_root,
+                runtime_session_id=runtime_session_id,
+                migrate_legacy=True,
+            )
+            report_path = paths.post_commit_report
+            session_file_ref = str(session_path)
+            intent_text = _after_commit_intent(
+                commit_short_sha=commit_metadata["commit_short_sha"],
+                commit_subject=commit_metadata["commit_subject"],
+            )
+
+            skill_report = SkillsAPI(self.workspace).dispatch(
+                repo_root=repo_root,
+                phase="checkpoint",
+                intent_text=intent_text,
+                mutation_surface="code",
+                session_file=session_file_ref,
+            )
+            skill_report_path = str(_checkpoint_skill_report_path(self.workspace, repo_root))
+            _write_skill_detection_report(
+                Path(skill_report_path),
+                skill_report.model_dump(mode="json"),
+            )
+
+            surface_report = self._surfaces.detect(
+                repo_root=repo_root,
+                phase="checkpoint",
+                intent_text=intent_text,
+                mutation_surface="code",
+                session_file=session_file_ref,
+                skill_report_path=skill_report_path,
+                checkpoint_kind="commit",
+            )
+            surface_report_path = str(paths.surface_report)
+            note = self.append(
+                repo_root=repo_root,
+                checkpoint_kind="commit",
+                intent_text=intent_text,
+                mutation_surface="code",
+                session_file=session_file_ref,
+                skill_report_path=skill_report_path,
+                surface_report=surface_report,
+                surface_report_path=surface_report_path,
+                manual_review_requested=True,
+                commit_sha=commit_metadata["commit_sha"],
+                commit_short_sha=commit_metadata["commit_short_sha"],
+                agent_review_status="pending",
+            )
+            note_ref = _checkpoint_note_ref_for_capture(
+                self.workspace,
+                repo_root,
+                runtime_session_id=note.runtime_session_id,
+            )
+            report = CheckpointAfterCommitReport(
+                status="captured",
+                repo_root=str(repo_root_path),
+                repo_label=repo_label,
+                report_path=str(report_path),
+                commit_ref=commit_ref,
+                commit_sha=commit_metadata["commit_sha"],
+                commit_short_sha=commit_metadata["commit_short_sha"],
+                commit_subject=commit_metadata["commit_subject"],
+                commit_body=commit_metadata["commit_body"],
+                changed_paths=list(commit_metadata["changed_paths"]),
+                captured_at=captured_at,
+                captured_at_local=captured_at_local,
+                captured_tz=captured_tz,
+                session_file=session_file_ref,
+                runtime_session_id=runtime_session_id,
+                runtime_session_created_at=runtime_session_created_at,
+                skill_report_path=skill_report_path,
+                surface_report_path=surface_report_path,
+                note_ref=note_ref,
+                agent_review_required=True,
+                agent_review_status="pending",
+                agent_review_command=_agent_review_command(
+                    repo_root=str(repo_root_path),
+                    commit_ref=commit_metadata["commit_sha"] or commit_ref,
+                    workspace_root=str(self.workspace.federation_root),
+                ),
+            )
+            _write_after_commit_report(report_path, report)
+            return report
+        except Exception as exc:
+            captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
+            report_path = (
+                _resolve_runtime_checkpoint_paths(
+                    self.workspace,
+                    repo_root=repo_root,
+                    runtime_session_id=runtime_session_id,
+                    migrate_legacy=True,
+                ).post_commit_report
+                if runtime_session_id is not None
+                else _post_commit_status_path(self.workspace, repo_label)
+            )
+            report = CheckpointAfterCommitReport(
+                status="failed",
+                repo_root=str(repo_root_path),
+                repo_label=repo_label,
+                report_path=str(report_path),
+                commit_ref=commit_ref,
+                commit_sha=commit_metadata["commit_sha"],
+                commit_short_sha=commit_metadata["commit_short_sha"],
+                commit_subject=commit_metadata["commit_subject"],
+                commit_body=commit_metadata["commit_body"],
+                changed_paths=list(commit_metadata["changed_paths"]),
+                captured_at=captured_at,
+                captured_at_local=captured_at_local,
+                captured_tz=captured_tz,
+                session_file=str(session_path),
+                runtime_session_id=runtime_session_id,
+                runtime_session_created_at=runtime_session_created_at,
+                skill_report_path=skill_report_path,
+                surface_report_path=surface_report_path,
+                note_ref=note_ref,
+                error_text=str(exc),
+            )
+            _write_after_commit_report(report_path, report)
+            if runtime_session_id is not None:
+                _write_after_commit_report(_post_commit_status_path(self.workspace, repo_label), report)
+            return report
+
+    def review_note(
+        self,
+        *,
+        repo_root: str,
+        commit_ref: str = "HEAD",
+        summary: str,
+        findings: list[str] | None = None,
+        candidate_notes: list[str] | None = None,
+        stats_hints: list[str] | None = None,
+        mechanic_hints: list[str] | None = None,
+        closeout_questions: list[str] | None = None,
+        evidence_refs: list[str] | None = None,
+        next_owner_moves: list[str] | None = None,
+        applied_skill_names: list[str] | None = None,
+        session_file: str | None = None,
+    ) -> SessionCheckpointNote:
+        if not summary.strip():
+            raise ValueError("checkpoint agent review requires a non-empty summary")
+
+        session_path, runtime_session = probe_session(self.workspace, session_file)
+        if runtime_session is None:
+            raise SurfaceNotFound("checkpoint agent review requires an existing active runtime session")
+
+        repo_root_path = _resolve_context_root(self.workspace, repo_root)
+        repo_label = _resolve_context_label(self.workspace, repo_root)
+        paths = _resolve_runtime_checkpoint_paths(
+            self.workspace,
+            repo_root=repo_root,
+            runtime_session_id=runtime_session.session_id,
+            migrate_legacy=True,
+        )
+        if not paths.jsonl.exists():
+            raise SurfaceNotFound(f"no checkpoint note exists yet for {paths.repo_label}")
+
+        commit_metadata = _read_git_commit_metadata(repo_root_path, commit_ref)
+        reviewed_at, reviewed_at_local, reviewed_tz = _local_timestamp_parts()
+        review_id = (
+            "agent-review:"
+            f"{_safe_name(commit_metadata['commit_short_sha'] or commit_ref)}:"
+            f"{reviewed_at.strftime('%Y%m%dT%H%M%SZ')}"
+        )
+        review_evidence_refs = _dedupe_strings(
+            [
+                *(evidence_refs or []),
+                str(paths.post_commit_report),
+                str(paths.note_json),
+                str(paths.surface_report),
+                _checkpoint_skill_report_path(self.workspace, repo_root).as_posix(),
+            ]
+        )
+        review = SessionCheckpointAgentReview(
+            review_id=review_id,
+            reviewed_at=reviewed_at,
+            reviewed_at_local=reviewed_at_local,
+            reviewed_tz=reviewed_tz,
+            repo_root=str(repo_root_path),
+            repo_label=repo_label,
+            commit_ref=commit_ref,
+            commit_sha=commit_metadata["commit_sha"],
+            commit_short_sha=commit_metadata["commit_short_sha"],
+            commit_subject=commit_metadata["commit_subject"],
+            summary=summary.strip(),
+            applied_skill_names=_dedupe_strings(applied_skill_names or []),
+            findings=_dedupe_strings(findings or []),
+            candidate_notes=_dedupe_strings(candidate_notes or []),
+            stats_hints=_dedupe_strings(stats_hints or []),
+            mechanic_hints=_dedupe_strings(mechanic_hints or []),
+            closeout_questions=_dedupe_strings(closeout_questions or []),
+            evidence_refs=review_evidence_refs,
+            next_owner_moves=_dedupe_strings(next_owner_moves or []),
+        )
+        payload = {
+            "session_ref": self.peek_status(repo_root=repo_root, session_file=str(session_path)).session_ref,
+            "runtime_session_id": runtime_session.session_id,
+            "runtime_session_created_at": runtime_session.created_at.astimezone(UTC).isoformat().replace("+00:00", "Z"),
+            "repo_root": str(repo_root_path),
+            "repo_label": repo_label,
+            "agent_review": review.model_dump(mode="json"),
+        }
+        paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
+        with paths.jsonl.open("a", encoding="utf-8") as handle:
+            handle.write(json.dumps(payload, ensure_ascii=True) + "\n")
+
+        note = self.status(repo_root=repo_root, session_file=str(session_path))
+        _mark_after_commit_report_reviewed(paths.post_commit_report, review=review)
+        return note
+
+    def hook_status(self, *, repo_name: str) -> CheckpointHookStatus:
+        repo_root = self.workspace.repo_path(repo_name)
+        hook_path = _resolve_git_hook_path(repo_root)
+        template_path = _hook_template_path(self.workspace)
+        rendered = _render_post_commit_hook(self.workspace)
+        status: Literal["missing", "stale", "current"]
+        if not hook_path.exists():
+            status = "missing"
+        else:
+            existing = hook_path.read_text(encoding="utf-8")
+            status = "current" if existing == rendered else "stale"
+        return CheckpointHookStatus(
+            repo=repo_name,
+            repo_root=str(repo_root),
+            hook_path=str(hook_path),
+            template_path=str(template_path),
+            template_version=POST_COMMIT_HOOK_TEMPLATE_VERSION,
+            status=status,
+        )
+
+    def install_hook(
+        self,
+        *,
+        repo_name: str,
+        overwrite: bool = False,
+    ) -> CheckpointHookInstallResult:
+        if repo_name == "8Dionysus":
+            raise ValueError("8Dionysus is read-only and excluded from checkpoint hook mutation")
+        status = self.hook_status(repo_name=repo_name)
+        hook_path = Path(status.hook_path)
+        action: Literal["installed", "updated", "unchanged"]
+        if status.status == "missing":
+            hook_path.parent.mkdir(parents=True, exist_ok=True)
+            hook_path.write_text(_render_post_commit_hook(self.workspace), encoding="utf-8")
+            hook_path.chmod(0o755)
+            action = "installed"
+        elif status.status == "stale" and overwrite:
+            hook_path.write_text(_render_post_commit_hook(self.workspace), encoding="utf-8")
+            hook_path.chmod(0o755)
+            action = "updated"
+        else:
+            action = "unchanged"
+        return CheckpointHookInstallResult(
+            repo=repo_name,
+            repo_root=status.repo_root,
+            hook_path=status.hook_path,
+            template_path=status.template_path,
+            template_version=status.template_version,
+            status_before=status.status,
+            action=action,
         )
 
     def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:
@@ -863,11 +1193,16 @@ class _CheckpointPaths:
         self.closeout_context = current_dir / "closeout-context.json"
         self.closeout_execution_report = current_dir / "closeout-execution-report.json"
         self.closeout_artifacts = current_dir / "reviewed-closeout"
+        self.post_commit_report = current_dir / "post-commit-report.json"
         self.surface_report = surface_report
 
 
 def _checkpoint_current_root(workspace: Workspace) -> Path:
     return workspace.repo_path("aoa-sdk") / ".aoa" / "session-growth" / "current"
+
+
+def _checkpoint_post_commit_status_root(workspace: Workspace) -> Path:
+    return workspace.repo_path("aoa-sdk") / ".aoa" / "session-growth" / "post-commit-status"
 
 
 def _checkpoint_runtime_scope_key(runtime_session_id: str | None) -> str | None:
@@ -973,6 +1308,41 @@ def _checkpoint_note_ref_for_capture(
             migrate_legacy=False,
         ).note_json
     )
+
+
+def _checkpoint_skill_report_path(workspace: Workspace, repo_root: str) -> Path:
+    repo_label = _resolve_context_label(workspace, repo_root)
+    return workspace.repo_path("aoa-sdk") / ".aoa" / "skill-dispatch" / f"{repo_label}.checkpoint.latest.json"
+
+
+def _post_commit_status_path(workspace: Workspace, repo_label: str) -> Path:
+    return _checkpoint_post_commit_status_root(workspace) / f"{repo_label}.latest.json"
+
+
+def _hook_template_path(workspace: Workspace) -> Path:
+    workspace_candidate = workspace.repo_path("aoa-sdk") / "githooks" / "post-commit"
+    if workspace_candidate.exists():
+        return workspace_candidate
+    package_candidate = Path(__file__).resolve().parents[3] / "githooks" / "post-commit"
+    if package_candidate.exists():
+        return package_candidate
+    return workspace_candidate
+
+
+def _write_skill_detection_report(path: Path, report: object) -> None:
+    write_json(
+        path,
+        {
+            "report_path": str(path),
+            "report": report,
+        },
+    )
+
+
+def _write_after_commit_report(path: Path, report: CheckpointAfterCommitReport) -> None:
+    payload = report.model_dump(mode="json")
+    payload["report_path"] = str(path)
+    write_json(path, payload)
 
 
 def _checkpoint_capture_result_without_append(
@@ -1088,34 +1458,43 @@ def _load_checkpoint_runtime_session(
         }
 
 
-def _peek_checkpoint_runtime_session(
+def _probe_checkpoint_runtime_session(
     *,
     workspace: Workspace,
     session_file: str | None,
-) -> dict[str, str | datetime | None]:
+) -> tuple[Path, dict[str, str | datetime | None]]:
+    session_path = resolve_session_file(workspace, session_file)
     try:
-        session_path = resolve_session_file(workspace, session_file)
-        if not session_path.exists():
-            return {
+        session_path, runtime_session = probe_session(workspace, session_file)
+        if runtime_session is None:
+            return session_path, {
                 "runtime_session_id": None,
                 "runtime_session_created_at": None,
                 "session_trace_ref": None,
                 "session_trace_thread_id": None,
             }
-        runtime_session = load_session(workspace, session_path)
-        return {
+        return session_path, {
             "runtime_session_id": runtime_session.session_id,
             "runtime_session_created_at": runtime_session.created_at.astimezone(UTC),
             "session_trace_ref": runtime_session.codex_rollout_path,
             "session_trace_thread_id": runtime_session.codex_thread_id,
         }
     except Exception:
-        return {
+        return session_path, {
             "runtime_session_id": None,
             "runtime_session_created_at": None,
             "session_trace_ref": None,
             "session_trace_thread_id": None,
         }
+
+
+def _peek_checkpoint_runtime_session(
+    *,
+    workspace: Workspace,
+    session_file: str | None,
+) -> dict[str, str | datetime | None]:
+    _, metadata = _probe_checkpoint_runtime_session(workspace=workspace, session_file=session_file)
+    return metadata
 
 
 def _should_rotate_checkpoint_note(
@@ -1205,6 +1584,7 @@ def _archive_current_checkpoint(paths: _CheckpointPaths) -> None:
         paths.note_json,
         paths.note_md,
         paths.harvest_handoff,
+        paths.post_commit_report,
         paths.closeout_context,
         paths.closeout_execution_report,
     ):
@@ -1228,6 +1608,7 @@ def _move_current_checkpoint(*, source_paths: _CheckpointPaths, target_paths: _C
         (source_paths.note_json, target_paths.note_json),
         (source_paths.note_md, target_paths.note_md),
         (source_paths.harvest_handoff, target_paths.harvest_handoff),
+        (source_paths.post_commit_report, target_paths.post_commit_report),
         (source_paths.closeout_context, target_paths.closeout_context),
         (source_paths.closeout_execution_report, target_paths.closeout_execution_report),
     ):
@@ -2410,6 +2791,7 @@ def _safe_name(value: str) -> str:
 
 def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
     entries: list[SessionCheckpointHistoryEntry] = []
+    agent_reviews: list[SessionCheckpointAgentReview] = []
     session_ref: str | None = None
     runtime_session_id: str | None = None
     runtime_session_created_at: datetime | None = None
@@ -2425,6 +2807,22 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             runtime_session_id = payload["runtime_session_id"]
         if runtime_session_created_at is None:
             runtime_session_created_at = _coerce_datetime(payload.get("runtime_session_created_at"))
+        if "agent_review" in payload:
+            review = SessionCheckpointAgentReview.model_validate(payload["agent_review"])
+            reviewed_at_local, reviewed_tz = _with_local_timestamp_fallback(
+                utc_value=review.reviewed_at,
+                local_value=review.reviewed_at_local,
+                tz_name=review.reviewed_tz,
+            )
+            if reviewed_at_local != review.reviewed_at_local or reviewed_tz != review.reviewed_tz:
+                review = review.model_copy(
+                    update={
+                        "reviewed_at_local": reviewed_at_local,
+                        "reviewed_tz": reviewed_tz,
+                    }
+                )
+            agent_reviews.append(review)
+            continue
         entry = SessionCheckpointHistoryEntry.model_validate(payload["history_entry"])
         observed_at_local, observed_tz = _with_local_timestamp_fallback(
             utc_value=entry.observed_at,
@@ -2472,6 +2870,19 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
     next_owner_moves: set[str] = set(existing_next_owner_moves)
     manual_review_requested = False
     has_owner_followthrough = False
+    reviewed_commit_keys = _agent_review_commit_keys(agent_reviews)
+    normalized_entries: list[SessionCheckpointHistoryEntry] = []
+
+    for entry in entries:
+        if entry.agent_review_status == "pending" and _history_entry_review_key(entry) in reviewed_commit_keys:
+            entry = entry.model_copy(
+                update={
+                    "agent_review_status": "reviewed",
+                    "agent_review_ref": reviewed_commit_keys[_history_entry_review_key(entry)],
+                }
+            )
+        normalized_entries.append(entry)
+    entries = normalized_entries
 
     for entry in entries:
         if entry.manual_review_requested:
@@ -2524,6 +2935,10 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             all_evidence.update(merged_evidence)
             next_owner_moves.update(merged_moves)
 
+    for review in agent_reviews:
+        all_evidence.update(review.evidence_refs)
+        next_owner_moves.update(review.next_owner_moves)
+
     candidate_clusters: list[SessionCheckpointCluster] = []
     for checkpoint_cluster in cluster_map.values():
         review_status: Literal["collecting", "reviewable", "promoted", "closed"] = "collecting"
@@ -2551,6 +2966,16 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
     ]
     progression_axis_signals = _aggregate_progression_axis_signals(candidate_clusters)
     stats_refresh_recommended = bool(candidate_clusters)
+    pending_agent_review_refs = [
+        entry.commit_sha or entry.commit_short_sha or entry.intent_text
+        for entry in entries
+        if entry.agent_review_status == "pending"
+    ]
+    agent_review_status: Literal["none", "pending", "reviewed"] = "none"
+    if pending_agent_review_refs:
+        agent_review_status = "pending"
+    elif agent_reviews:
+        agent_review_status = "reviewed"
     recommendation = _derive_promotion_recommendation(
         candidate_clusters=candidate_clusters,
         has_owner_followthrough=has_owner_followthrough,
@@ -2582,6 +3007,10 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
         upgrade_candidate_ids=upgrade_candidate_ids,
         progression_axis_signals=progression_axis_signals,
         stats_refresh_recommended=stats_refresh_recommended,
+        agent_review_status=agent_review_status,
+        agent_review_required=bool(pending_agent_review_refs),
+        agent_review_pending_refs=_dedupe_strings(pending_agent_review_refs),
+        agent_reviews=agent_reviews,
         blocked_by=sorted(all_blocked),
         review_status="reviewed" if existing_review_status == "reviewed" else "unreviewed",
         evidence_refs=sorted(all_evidence),
@@ -3106,6 +3535,7 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
         f"Carry until session closeout: `{'yes' if note.carry_until_session_closeout else 'no'}`",
         f"Session-end recommendation: `{note.session_end_recommendation}`",
         f"Stats refresh recommended at closeout: `{'yes' if note.stats_refresh_recommended else 'no'}`",
+        f"Agent checkpoint review: `{note.agent_review_status}`",
         "",
         "## Repo Scope",
         "",
@@ -3132,6 +3562,33 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
     if note.upgrade_candidate_ids:
         lines.extend(["", "## Upgrade Candidates", ""])
         lines.extend(f"- `{candidate_id}`" for candidate_id in note.upgrade_candidate_ids)
+    if note.agent_reviews:
+        lines.extend(["", "## Agent Checkpoint Reviews", ""])
+        for review in note.agent_reviews:
+            lines.extend(
+                [
+                    f"### {review.commit_short_sha or review.commit_ref}",
+                    "",
+                    f"- review id: `{review.review_id}`",
+                    f"- summary: {review.summary}",
+                    f"- applied skills: {', '.join(f'`{name}`' for name in review.applied_skill_names) or '`none`'}",
+                    f"- defer until closeout: `{'yes' if review.defer_until_closeout else 'no'}`",
+                ]
+            )
+            for label, values in (
+                ("findings", review.findings),
+                ("candidate notes", review.candidate_notes),
+                ("stats hints", review.stats_hints),
+                ("mechanic hints", review.mechanic_hints),
+                ("closeout questions", review.closeout_questions),
+            ):
+                if values:
+                    lines.append(f"- {label}:")
+                    lines.extend(f"  - {value}" for value in values)
+            if review.evidence_refs:
+                lines.append("- evidence refs:")
+                lines.extend(f"  - `{ref}`" for ref in review.evidence_refs)
+            lines.append("")
     lines.extend(["", "## Candidate Clusters", ""])
     if not note.candidate_clusters:
         lines.append("- none")
@@ -3187,6 +3644,8 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
             f"- `{entry.checkpoint_kind}` at `{observed_at}` -> "
             + (", ".join(cluster.candidate_id for cluster in entry.candidate_clusters) or "no surviving candidates")
         )
+        if entry.agent_review_status != "not_required":
+            lines.append(f"  - agent review: `{entry.agent_review_status}`")
     if note.blocked_by:
         lines.extend(["", "## Blocked By", ""])
         lines.extend(f"- `{item}`" for item in note.blocked_by)
@@ -3286,6 +3745,108 @@ def _render_dionysus_checkpoint_markdown(payload: dict[str, object]) -> str:
     for ref in evidence_refs:
         lines.append(f"- `{ref}`")
     return "\n".join(lines).rstrip() + "\n"
+
+
+def _after_commit_intent(*, commit_short_sha: str | None, commit_subject: str | None) -> str:
+    short_sha = (commit_short_sha or "HEAD").strip()
+    subject = re.sub(r"\s+", " ", (commit_subject or "checkpoint").strip())
+    return f"checkpoint commit {short_sha}: {subject}"
+
+
+def _agent_review_command(*, repo_root: str, commit_ref: str, workspace_root: str) -> str:
+    return (
+        f"aoa checkpoint review-note {repo_root} --commit-ref {commit_ref} "
+        f"--root {workspace_root} --summary '<agent checkpoint review>'"
+    )
+
+
+def _history_entry_review_key(entry: SessionCheckpointHistoryEntry) -> str:
+    return entry.commit_sha or entry.commit_short_sha or entry.intent_text
+
+
+def _agent_review_commit_keys(reviews: list[SessionCheckpointAgentReview]) -> dict[str, str]:
+    keys: dict[str, str] = {}
+    for review in reviews:
+        for key in (review.commit_sha, review.commit_short_sha, review.commit_ref):
+            if key:
+                keys[key] = review.review_id
+    return keys
+
+
+def _mark_after_commit_report_reviewed(path: Path, *, review: SessionCheckpointAgentReview) -> None:
+    if not path.exists():
+        return
+    payload = load_json(path)
+    report = CheckpointAfterCommitReport.model_validate(payload)
+    if report.commit_sha and review.commit_sha and report.commit_sha != review.commit_sha:
+        return
+    updated = report.model_copy(
+        update={
+            "agent_review_required": True,
+            "agent_review_status": "reviewed",
+            "agent_review_ref": review.review_id,
+        }
+    )
+    _write_after_commit_report(path, updated)
+
+
+def _run_git(repo_root: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+    result = subprocess.run(
+        ["git", "-C", str(repo_root), *args],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if check and result.returncode != 0:
+        stderr = result.stderr.strip()
+        stdout = result.stdout.strip()
+        detail = stderr or stdout or f"git exited {result.returncode}"
+        raise RuntimeError(f"git {' '.join(args)} failed for {repo_root}: {detail}")
+    return result
+
+
+def _read_git_commit_metadata(repo_root: Path, commit_ref: str) -> dict[str, Any]:
+    show_result = _run_git(repo_root, "show", "-s", "--format=%H%x00%h%x00%s%x00%b", commit_ref)
+    parts = show_result.stdout.split("\x00", 3)
+    while len(parts) < 4:
+        parts.append("")
+    commit_sha, commit_short_sha, commit_subject, commit_body = [part.rstrip("\n") for part in parts[:4]]
+    changed_result = _run_git(
+        repo_root,
+        "show",
+        "--pretty=format:",
+        "--name-only",
+        "--diff-filter=ACDMRTUXB",
+        commit_ref,
+    )
+    changed_paths = [
+        line.strip()
+        for line in changed_result.stdout.splitlines()
+        if line.strip()
+    ]
+    return {
+        "commit_sha": commit_sha,
+        "commit_short_sha": commit_short_sha,
+        "commit_subject": commit_subject,
+        "commit_body": commit_body,
+        "changed_paths": _dedupe_strings(changed_paths),
+    }
+
+
+def _resolve_git_hook_path(repo_root: Path) -> Path:
+    result = _run_git(repo_root, "rev-parse", "--git-path", "hooks/post-commit")
+    raw_path = result.stdout.strip()
+    hook_path = Path(raw_path)
+    if hook_path.is_absolute():
+        return hook_path
+    return (repo_root / hook_path).resolve()
+
+
+def _render_post_commit_hook(workspace: Workspace) -> str:
+    template = _hook_template_path(workspace).read_text(encoding="utf-8")
+    if POST_COMMIT_HOOK_MARKER not in template:
+        raise ValueError("post-commit hook template is missing the aoa-sdk version marker")
+    return template.replace("__AOA_CHECKPOINT_WORKSPACE_ROOT__", str(workspace.federation_root))
 
 
 def _ensure_repo_not_dirty(repo_root: Path, *, repo_name: str) -> None:
