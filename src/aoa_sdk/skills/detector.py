@@ -617,7 +617,7 @@ def _load_runtime_checkpoint_note(workspace: Workspace, *, repo_root: str) -> Se
     from ..checkpoints import CheckpointsAPI
 
     try:
-        return CheckpointsAPI(workspace).status(repo_root=repo_root)
+        return CheckpointsAPI(workspace).peek_status(repo_root=repo_root)
     except SurfaceNotFound:
         return None
 

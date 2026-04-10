@@ -221,6 +221,31 @@ def test_checkpoint_status_becomes_reviewable_after_repeat(workspace_root: Path)
     assert second.checkpoint_history[-1].observed_tz
 
 
+def test_checkpoint_peek_status_does_not_create_runtime_session_file(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+    note_dir = _checkpoint_note_dir(workspace_root, repo_label="aoa-sdk")
+    _write_checkpoint_history_entry(
+        note_dir=note_dir,
+        session_ref="session:test-read-only-peek",
+        runtime_session_id="runtime-session-peek",
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-min",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Recurring route candidate",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=["aoa-playbooks.playbook_registry.min"],
+        progression_axis_signals=[],
+    )
+
+    note = sdk.checkpoints.peek_status(repo_root=str(workspace_root / "aoa-sdk"))
+
+    assert note.session_ref == "session:test-read-only-peek"
+    assert not session_file.exists()
+
+
 def test_capture_from_skill_phase_auto_appends_only_when_growth_signal_exists(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 

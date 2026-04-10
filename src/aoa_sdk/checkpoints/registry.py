@@ -24,7 +24,7 @@ from ..models import (
     SurfaceCloseoutHandoff,
     SurfaceDetectionReport,
 )
-from ..skills.session import ensure_session, save_session
+from ..skills.session import ensure_session, load_session, resolve_session_file, save_session
 from ..surfaces import SurfacesAPI
 from ..workspace.discovery import Workspace
 
@@ -488,6 +488,26 @@ class CheckpointsAPI:
         paths.note_json.parent.mkdir(parents=True, exist_ok=True)
         paths.note_json.write_text(note.model_dump_json(indent=2) + "\n", encoding="utf-8")
         paths.note_md.write_text(_render_checkpoint_note_markdown(note, repo_label=paths.repo_label), encoding="utf-8")
+        return note
+
+    def peek_status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:
+        runtime_session_metadata = _peek_checkpoint_runtime_session(
+            workspace=self.workspace,
+            session_file=session_file,
+        )
+        runtime_session_id = cast(str | None, runtime_session_metadata["runtime_session_id"])
+        paths = _resolve_runtime_checkpoint_paths(
+            self.workspace,
+            repo_root=repo_root,
+            runtime_session_id=runtime_session_id,
+            migrate_legacy=False,
+        )
+        if not paths.jsonl.exists():
+            raise SurfaceNotFound(f"no checkpoint note exists yet for {paths.repo_label}")
+
+        note = _build_checkpoint_note(paths)
+        if _should_hide_current_checkpoint_note(note, runtime_session_id=runtime_session_id):
+            raise SurfaceNotFound(f"no active checkpoint note exists yet for {paths.repo_label}")
         return note
 
     def promote(
@@ -1018,6 +1038,36 @@ def _load_checkpoint_runtime_session(
         if not session_path.exists():
             session_path.parent.mkdir(parents=True, exist_ok=True)
             save_session(session_path, runtime_session)
+        return {
+            "runtime_session_id": runtime_session.session_id,
+            "runtime_session_created_at": runtime_session.created_at.astimezone(UTC),
+            "session_trace_ref": runtime_session.codex_rollout_path,
+            "session_trace_thread_id": runtime_session.codex_thread_id,
+        }
+    except Exception:
+        return {
+            "runtime_session_id": None,
+            "runtime_session_created_at": None,
+            "session_trace_ref": None,
+            "session_trace_thread_id": None,
+        }
+
+
+def _peek_checkpoint_runtime_session(
+    *,
+    workspace: Workspace,
+    session_file: str | None,
+) -> dict[str, str | datetime | None]:
+    try:
+        session_path = resolve_session_file(workspace, session_file)
+        if not session_path.exists():
+            return {
+                "runtime_session_id": None,
+                "runtime_session_created_at": None,
+                "session_trace_ref": None,
+                "session_trace_thread_id": None,
+            }
+        runtime_session = load_session(workspace, session_path)
         return {
             "runtime_session_id": runtime_session.session_id,
             "runtime_session_created_at": runtime_session.created_at.astimezone(UTC),
