@@ -25,6 +25,18 @@ The format is intentionally simple and human-first.
 - expanded docs, tests, and dev extras around checkpoint closeout and
   control-plane validation
 
+### Included in this release
+
+- control-plane and typed-consumer expansion across `src/`, `schemas/`,
+  `generated/`, `scripts/`, and `systemd/`, including RPG and `aoa-stats`
+  consumer slices, reviewed closeout submission flows, closeout publishers and
+  watchers, surface detection, and the workspace control-plane capsule
+- workspace, checkpoint, and operator surfaces across `docs/`, `README.md`,
+  `AGENTS.md`, `.agents/`, `.github/`, `tests/`, and `pyproject.toml`,
+  including portable bootstrap and ingress wrappers, foundation skill
+  detection, via negativa and antifragility doctrine, and thread-aware
+  checkpoint-closeout hardening
+
 ## [0.1.0] - 2026-04-01
 
 First public baseline release of `aoa-sdk` as the typed Python SDK for the AoA federation.
