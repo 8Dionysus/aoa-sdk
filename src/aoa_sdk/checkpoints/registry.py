@@ -93,6 +93,13 @@ QUEST_PROMOTION_VERDICT_BY_OWNER = {
     "aoa-agents": "promote_to_agent",
     "aoa-techniques": "promote_to_technique",
 }
+CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT: dict[str, object] = {
+    "contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
+    "bridge_output": "mechanical_artifact_build",
+    "checkpoint_notes": "focus_hints_only_not_final_authority",
+    "reviewed_artifact": "primary_closeout_evidence",
+    "agent_skill_application": "required_for_final_session_analysis",
+}
 
 
 class DonorHarvestOutputs(TypedDict):
@@ -349,38 +356,25 @@ class CheckpointsAPI:
             )
 
         if not auto_capture:
-            captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
-            current_note = _load_runtime_checkpoint_note(self, repo_root=repo_root, session_file=session_file)
-            session_end_targets = _derive_session_end_skill_targets(current_note)
-            return CheckpointCaptureResult(
-                mode="auto",
-                attempted=False,
-                appended=False,
-                checkpoint_kind=None,
-                captured_at=captured_at,
-                captured_at_local=captured_at_local,
-                captured_tz=captured_tz,
+            return _checkpoint_capture_result_without_append(
+                self,
+                repo_root=repo_root,
+                session_file=session_file,
                 reason="auto_disabled",
-                note_ref=(
-                    _checkpoint_note_ref_for_capture(
-                        self.workspace,
-                        repo_root,
-                        runtime_session_id=current_note.runtime_session_id,
-                    )
-                    if current_note is not None
-                    else None
-                ),
-                session_end_skill_targets=session_end_targets,
-                session_end_next_honest_move=_derive_session_end_next_honest_move(
-                    note=current_note,
-                    session_end_targets=session_end_targets,
-                ),
-                harvest_candidate_ids=list(current_note.harvest_candidate_ids) if current_note is not None else [],
-                progression_candidate_ids=list(current_note.progression_candidate_ids) if current_note is not None else [],
-                upgrade_candidate_ids=list(current_note.upgrade_candidate_ids) if current_note is not None else [],
-                progression_axis_signals=list(current_note.progression_axis_signals) if current_note is not None else [],
-                stats_refresh_recommended=current_note.stats_refresh_recommended if current_note is not None else False,
-                note=current_note,
+                attempted=False,
+                checkpoint_kind=None,
+                read_only=True,
+            )
+
+        if phase == "ingress" and mutation_surface == "none":
+            return _checkpoint_capture_result_without_append(
+                self,
+                repo_root=repo_root,
+                session_file=session_file,
+                reason="no_checkpoint_signal",
+                attempted=True,
+                checkpoint_kind=None,
+                read_only=True,
             )
 
         inferred_kind = _infer_auto_checkpoint_kind(intent_text=intent_text)
@@ -394,38 +388,14 @@ class CheckpointsAPI:
             checkpoint_kind=inferred_kind,
         )
         if not report.checkpoint_should_capture:
-            captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
-            current_note = _load_runtime_checkpoint_note(self, repo_root=repo_root, session_file=session_file)
-            session_end_targets = _derive_session_end_skill_targets(current_note)
-            return CheckpointCaptureResult(
-                mode="auto",
-                attempted=True,
-                appended=False,
-                checkpoint_kind=inferred_kind,
-                captured_at=captured_at,
-                captured_at_local=captured_at_local,
-                captured_tz=captured_tz,
+            return _checkpoint_capture_result_without_append(
+                self,
+                repo_root=repo_root,
+                session_file=session_file,
                 reason="no_checkpoint_signal",
-                note_ref=(
-                    _checkpoint_note_ref_for_capture(
-                        self.workspace,
-                        repo_root,
-                        runtime_session_id=current_note.runtime_session_id,
-                    )
-                    if current_note is not None
-                    else None
-                ),
-                session_end_skill_targets=session_end_targets,
-                session_end_next_honest_move=_derive_session_end_next_honest_move(
-                    note=current_note,
-                    session_end_targets=session_end_targets,
-                ),
-                harvest_candidate_ids=list(current_note.harvest_candidate_ids) if current_note is not None else [],
-                progression_candidate_ids=list(current_note.progression_candidate_ids) if current_note is not None else [],
-                upgrade_candidate_ids=list(current_note.upgrade_candidate_ids) if current_note is not None else [],
-                progression_axis_signals=list(current_note.progression_axis_signals) if current_note is not None else [],
-                stats_refresh_recommended=current_note.stats_refresh_recommended if current_note is not None else False,
-                note=current_note,
+                attempted=True,
+                checkpoint_kind=inferred_kind,
+                read_only=False,
             )
 
         note = self.append(
@@ -700,6 +670,9 @@ class CheckpointsAPI:
             notes.append("bound closeout evidence to the live Codex rollout trace referenced by the active runtime session")
         if not collected_receipt_paths:
             notes.append("no prior receipt refs were supplied; closeout execution will rely on the reviewed artifact and any local checkpoint evidence only")
+        notes.append(
+            "checkpoint closeout bridge builds mechanical artifacts only; a Codex agent must still apply the listed skills by rereading session evidence before treating outputs as final analysis"
+        )
 
         built_at, built_at_local, built_tz = _local_timestamp_parts()
         context = CheckpointCloseoutContext(
@@ -790,7 +763,7 @@ class CheckpointsAPI:
             CloseoutExecutionStep(
                 skill_name="aoa-session-donor-harvest",
                 status="executed",
-                reason="reviewed closeout begins by rereading the full reviewed artifact and packaging bounded donor outputs before any progression or quest verdict",
+                reason="mechanical bridge artifact build for donor-harvest-shaped output; final donor harvest analysis still requires the Codex agent to apply the skill protocol against reviewed session evidence",
                 artifact_refs=donor_outputs["artifact_refs"],
                 receipt_refs=donor_outputs["receipt_refs"],
             )
@@ -811,7 +784,7 @@ class CheckpointsAPI:
             CloseoutExecutionStep(
                 skill_name="aoa-session-progression-lift",
                 status="executed",
-                reason="reviewed closeout rereads the reviewed artifact plus donor packet and checkpoint axis hints before settling the multi-axis progression verdict",
+                reason="mechanical bridge artifact build for progression-lift-shaped output; final progression analysis still requires the Codex agent to apply the skill protocol against reviewed session evidence",
                 artifact_refs=progression_outputs["artifact_refs"],
                 receipt_refs=progression_outputs["receipt_refs"],
             )
@@ -833,7 +806,7 @@ class CheckpointsAPI:
             CloseoutExecutionStep(
                 skill_name="aoa-quest-harvest",
                 status="executed",
-                reason="reviewed closeout only performs final quest triage after donor harvest and progression lift have reread the session evidence",
+                reason="mechanical bridge artifact build for quest-harvest-shaped output; final quest triage still requires the Codex agent to apply the skill protocol against reviewed session evidence",
                 artifact_refs=quest_outputs["artifact_refs"],
                 receipt_refs=quest_outputs["receipt_refs"],
             )
@@ -860,7 +833,7 @@ class CheckpointsAPI:
             produced_artifact_refs=_dedupe_strings(produced_artifact_refs),
             produced_receipt_refs=_dedupe_strings(produced_receipt_refs),
             final_stop_reason=(
-                "Reviewed closeout chain finished under aoa-checkpoint-closeout-bridge; owner-local publication and stats refresh remain downstream steps."
+                "Mechanical checkpoint-closeout bridge artifacts were built; final session analysis requires agent-led skill application over reviewed evidence, and owner-local publication plus stats refresh remain downstream steps."
             ),
         )
         write_json(paths.closeout_execution_report, report.model_dump(mode="json"))
@@ -999,6 +972,63 @@ def _checkpoint_note_ref_for_capture(
             runtime_session_id=runtime_session_id,
             migrate_legacy=False,
         ).note_json
+    )
+
+
+def _checkpoint_capture_result_without_append(
+    api: CheckpointsAPI,
+    *,
+    repo_root: str,
+    session_file: str | None,
+    reason: Literal["no_checkpoint_signal", "auto_disabled"],
+    attempted: bool,
+    checkpoint_kind: Literal[
+        "manual",
+        "commit",
+        "verify_green",
+        "pr_opened",
+        "pr_merged",
+        "pause",
+        "owner_followthrough",
+    ] | None,
+    read_only: bool,
+) -> CheckpointCaptureResult:
+    captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
+    current_note = (
+        _peek_runtime_checkpoint_note(api, repo_root=repo_root, session_file=session_file)
+        if read_only
+        else _load_runtime_checkpoint_note(api, repo_root=repo_root, session_file=session_file)
+    )
+    session_end_targets = _derive_session_end_skill_targets(current_note)
+    return CheckpointCaptureResult(
+        mode="auto",
+        attempted=attempted,
+        appended=False,
+        checkpoint_kind=checkpoint_kind,
+        captured_at=captured_at,
+        captured_at_local=captured_at_local,
+        captured_tz=captured_tz,
+        reason=reason,
+        note_ref=(
+            _checkpoint_note_ref_for_capture(
+                api.workspace,
+                repo_root,
+                runtime_session_id=current_note.runtime_session_id,
+            )
+            if current_note is not None
+            else None
+        ),
+        session_end_skill_targets=session_end_targets,
+        session_end_next_honest_move=_derive_session_end_next_honest_move(
+            note=current_note,
+            session_end_targets=session_end_targets,
+        ),
+        harvest_candidate_ids=list(current_note.harvest_candidate_ids) if current_note is not None else [],
+        progression_candidate_ids=list(current_note.progression_candidate_ids) if current_note is not None else [],
+        upgrade_candidate_ids=list(current_note.upgrade_candidate_ids) if current_note is not None else [],
+        progression_axis_signals=list(current_note.progression_axis_signals) if current_note is not None else [],
+        stats_refresh_recommended=current_note.stats_refresh_recommended if current_note is not None else False,
+        note=current_note,
     )
 
 
@@ -1657,6 +1687,7 @@ def _build_donor_harvest_outputs(
         "artifact_kind": "harvest_packet",
         "session_ref": context.session_ref,
         "route_ref": "route:checkpoint-closeout-bridge",
+        "authority_contract": CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT,
         "owner_repo": "aoa-skills",
         "reviewed_artifact_ref": str(reviewed_artifact),
         "session_trace_ref": context.session_trace_ref,
@@ -1699,6 +1730,7 @@ def _build_donor_harvest_outputs(
         ],
         "payload": {
             "route_ref": "route:checkpoint-closeout-bridge",
+            "authority_contract": CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT,
             "extract_counts": extract_counts,
             "owner_layer_distribution": owner_layer_distribution,
             "promotion_candidates": len(accepted_candidates),
@@ -1786,6 +1818,7 @@ def _build_progression_lift_outputs(
         "artifact_kind": "progression_delta",
         "session_ref": context.session_ref,
         "route_ref": "route:checkpoint-closeout-bridge",
+        "authority_contract": CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT,
         "scope": "session_scoped",
         "verdict": verdict,
         "axis_deltas": axis_deltas,
@@ -1828,6 +1861,7 @@ def _build_progression_lift_outputs(
         ],
         "payload": {
             "route_ref": "route:checkpoint-closeout-bridge",
+            "authority_contract": CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT,
             "scope": "session_scoped",
             "verdict": verdict,
             "axis_deltas": axis_deltas,
@@ -1875,57 +1909,61 @@ def _build_quest_harvest_outputs(
     output_dir: Path,
 ) -> QuestHarvestOutputs:
     accepted_candidates = _dict_records(donor_packet.get("accepted_candidates", []))
-    candidate = accepted_candidates[0] if accepted_candidates else None
-    candidate_ref = _string_field(candidate, "candidate_ref") if candidate is not None else None
     progression_verdict_value = progression_packet.get("verdict")
     progression_verdict = (
         progression_verdict_value if isinstance(progression_verdict_value, str) else None
     )
-    owner_repo_value = (
-        _string_field(candidate, "owner_repo_recommendation") if candidate is not None else None
-    )
-    next_surface_value = (
-        _string_field(candidate, "chosen_next_artifact") if candidate is not None else None
-    )
-    can_promote = (
-        candidate is not None
-        and progression_verdict in {"advance", "hold"}
-        and owner_repo_value is not None
-        and next_surface_value is not None
-    )
-    if can_promote:
-        assert candidate is not None
-        assert owner_repo_value is not None
-        assert next_surface_value is not None
-        owner_repo = owner_repo_value
-        next_surface = next_surface_value
-        promotion_verdict = QUEST_PROMOTION_VERDICT_BY_OWNER.get(owner_repo, "keep_open_quest")
-        nearest_wrong_target = _string_field(candidate, "nearest_wrong_target") or "promote_to_skill"
-        repeat_shape = _string_field(candidate, "abstraction_shape") or "route"
-        bounded_unit_ref = candidate_ref or f"quest:{_safe_name(context.session_ref)}"
-        unit_name = _string_field(candidate, "unit_name")
-        quest_unit_name = unit_name or f"reviewed closeout candidate {bounded_unit_ref}"
-    else:
-        owner_repo = "aoa-playbooks"
-        next_surface = f"quests/{_safe_name(context.session_ref)}-followup/QUEST.md"
-        promotion_verdict = "keep_open_quest"
-        nearest_wrong_target = "promote_to_skill"
-        repeat_shape = "route"
-        bounded_unit_ref = (
-            cast(str, candidate_ref)
-            if isinstance(candidate_ref, str) and candidate_ref
-            else f"quest:{_safe_name(context.session_ref)}"
-        )
-        quest_unit_name = f"reviewed closeout follow-through for {context.session_ref}"
+    promotion_entries = [
+        {
+            "candidate_index": index,
+            **_quest_promotion_fields(
+                context=context,
+                candidate=candidate,
+                progression_verdict=progression_verdict,
+            ),
+        }
+        for index, candidate in enumerate(accepted_candidates)
+    ]
+    if not promotion_entries:
+        promotion_entries = [
+            {
+                "candidate_index": None,
+                **_quest_promotion_fields(
+                    context=context,
+                    candidate=None,
+                    progression_verdict=progression_verdict,
+                ),
+            }
+        ]
+    primary_promotion = promotion_entries[0]
+    owner_repo = cast(str, primary_promotion["owner_repo"])
+    next_surface = cast(str, primary_promotion["next_surface"])
+    promotion_verdict = cast(str, primary_promotion["promotion_verdict"])
+    nearest_wrong_target = cast(str, primary_promotion["nearest_wrong_target"])
+    repeat_shape = cast(str, primary_promotion["repeat_shape"])
+    bounded_unit_ref = cast(str, primary_promotion["bounded_unit_ref"])
+    quest_unit_name = cast(str, primary_promotion["quest_unit_name"])
+    candidate_refs = [
+        cast(str, entry["bounded_unit_ref"])
+        for entry in promotion_entries
+        if isinstance(entry.get("bounded_unit_ref"), str)
+    ]
+    additional_candidate_refs = candidate_refs[1:]
+    multi_candidate_followup_required = len(accepted_candidates) > 1
 
     triage = {
         "artifact_kind": "quest_triage",
         "session_ref": context.session_ref,
+        "authority_contract": CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT,
         "quest_unit_name": quest_unit_name,
         "reviewed_artifact_ref": str(reviewed_artifact),
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
         "candidate_ref": bounded_unit_ref,
+        "candidate_refs": candidate_refs,
+        "additional_candidate_refs": additional_candidate_refs,
+        "accepted_candidate_count": len(accepted_candidates),
+        "multi_candidate_followup_required": multi_candidate_followup_required,
         "promotion_verdict": promotion_verdict,
         "repeat_shape": repeat_shape,
         "notes": _quest_triage_notes(
@@ -1941,17 +1979,36 @@ def _build_quest_harvest_outputs(
     packet = {
         "artifact_kind": "quest_promotion",
         "session_ref": context.session_ref,
+        "authority_contract": CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT,
         "promotion_verdict": promotion_verdict,
         "owner_repo": owner_repo,
         "next_surface": next_surface,
         "nearest_wrong_target": nearest_wrong_target,
         "repeat_shape": repeat_shape,
         "bounded_unit_ref": bounded_unit_ref,
+        "candidate_refs": candidate_refs,
+        "additional_candidate_refs": additional_candidate_refs,
+        "accepted_candidate_count": len(accepted_candidates),
+        "multi_candidate_followup_required": multi_candidate_followup_required,
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
     }
     packet_path = output_dir / "QUEST_PROMOTION.json"
     write_json(packet_path, packet)
+
+    promotion_bundle = {
+        "artifact_kind": "quest_promotions",
+        "session_ref": context.session_ref,
+        "authority_contract": CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT,
+        "primary_bounded_unit_ref": bounded_unit_ref,
+        "accepted_candidate_count": len(accepted_candidates),
+        "multi_candidate_followup_required": multi_candidate_followup_required,
+        "promotions": promotion_entries,
+        "session_trace_ref": context.session_trace_ref,
+        "session_trace_thread_id": context.session_trace_thread_id,
+    }
+    promotion_bundle_path = output_dir / "QUEST_PROMOTIONS.json"
+    write_json(promotion_bundle_path, promotion_bundle)
 
     run_ref = f"run-{_safe_name(context.session_ref)}-closeout-bridge"
     receipt = {
@@ -1965,6 +2022,7 @@ def _build_quest_harvest_outputs(
         "evidence_refs": [
             {"kind": "quest_triage", "ref": str(triage_path), "role": "primary"},
             {"kind": "quest_promotion", "ref": str(packet_path), "role": "promotion"},
+            {"kind": "quest_promotions", "ref": str(promotion_bundle_path), "role": "all-candidates"},
             {"kind": "reviewed_artifact", "ref": str(reviewed_artifact), "role": "reviewed-source"},
             *(
                 [{"kind": "session_trace", "ref": context.session_trace_ref, "role": "runtime-trace"}]
@@ -1979,11 +2037,16 @@ def _build_quest_harvest_outputs(
         ],
         "payload": {
             "promotion_verdict": promotion_verdict,
+            "authority_contract": CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT,
             "owner_repo": owner_repo,
             "next_surface": next_surface,
             "nearest_wrong_target": nearest_wrong_target,
             "repeat_shape": repeat_shape,
             "bounded_unit_ref": bounded_unit_ref,
+            "candidate_refs": candidate_refs,
+            "additional_candidate_refs": additional_candidate_refs,
+            "accepted_candidate_count": len(accepted_candidates),
+            "multi_candidate_followup_required": multi_candidate_followup_required,
         },
     }
     receipt_path = output_dir / "QUEST_PROMOTION_RECEIPT.json"
@@ -2010,7 +2073,7 @@ def _build_quest_harvest_outputs(
 
     return {
         "packet": cast(dict[str, object], packet),
-        "artifact_refs": [str(triage_path), str(packet_path)],
+        "artifact_refs": [str(triage_path), str(packet_path), str(promotion_bundle_path)],
         "receipt_refs": [str(receipt_path), str(core_receipt_path)],
     }
 
@@ -2194,6 +2257,61 @@ def _progression_cautions(
     return cautions
 
 
+def _quest_promotion_fields(
+    *,
+    context: CheckpointCloseoutContext,
+    candidate: dict[str, object] | None,
+    progression_verdict: str | None,
+) -> dict[str, object]:
+    candidate_ref = _string_field(candidate, "candidate_ref") if candidate is not None else None
+    owner_repo_value = (
+        _string_field(candidate, "owner_repo_recommendation") if candidate is not None else None
+    )
+    next_surface_value = (
+        _string_field(candidate, "chosen_next_artifact") if candidate is not None else None
+    )
+    can_promote = (
+        candidate is not None
+        and progression_verdict in {"advance", "hold"}
+        and owner_repo_value is not None
+        and next_surface_value is not None
+    )
+    if can_promote:
+        assert candidate is not None
+        assert owner_repo_value is not None
+        assert next_surface_value is not None
+        owner_repo = owner_repo_value
+        next_surface = next_surface_value
+        promotion_verdict = QUEST_PROMOTION_VERDICT_BY_OWNER.get(owner_repo, "keep_open_quest")
+        nearest_wrong_target = _string_field(candidate, "nearest_wrong_target") or "promote_to_skill"
+        repeat_shape = _string_field(candidate, "abstraction_shape") or "route"
+        bounded_unit_ref = candidate_ref or f"quest:{_safe_name(context.session_ref)}"
+        unit_name = _string_field(candidate, "unit_name")
+        quest_unit_name = unit_name or f"reviewed closeout candidate {bounded_unit_ref}"
+    else:
+        owner_repo = "aoa-playbooks"
+        next_surface = f"quests/{_safe_name(context.session_ref)}-followup/QUEST.md"
+        promotion_verdict = "keep_open_quest"
+        nearest_wrong_target = "promote_to_skill"
+        repeat_shape = "route"
+        bounded_unit_ref = (
+            candidate_ref
+            if isinstance(candidate_ref, str) and candidate_ref
+            else f"quest:{_safe_name(context.session_ref)}"
+        )
+        quest_unit_name = f"reviewed closeout follow-through for {context.session_ref}"
+    return {
+        "source_candidate_ref": candidate_ref,
+        "promotion_verdict": promotion_verdict,
+        "owner_repo": owner_repo,
+        "next_surface": next_surface,
+        "nearest_wrong_target": nearest_wrong_target,
+        "repeat_shape": repeat_shape,
+        "bounded_unit_ref": bounded_unit_ref,
+        "quest_unit_name": quest_unit_name,
+    }
+
+
 def _quest_triage_notes(
     *,
     context: CheckpointCloseoutContext,
@@ -2252,6 +2370,7 @@ def _build_core_skill_receipt(
             "kernel_id": "project-core-session-growth-v1",
             "skill_name": skill_name,
             "application_stage": "finish",
+            "authority_contract": CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT,
             "detail_event_kind": detail_event_kind,
             "detail_receipt_ref": detail_receipt_ref,
             "route_ref": route_ref,
@@ -2503,6 +2622,18 @@ def _load_runtime_checkpoint_note(
 ) -> SessionCheckpointNote | None:
     try:
         return api.status(repo_root=repo_root, session_file=session_file)
+    except SurfaceNotFound:
+        return None
+
+
+def _peek_runtime_checkpoint_note(
+    api: CheckpointsAPI,
+    *,
+    repo_root: str,
+    session_file: str | None = None,
+) -> SessionCheckpointNote | None:
+    try:
+        return api.peek_status(repo_root=repo_root, session_file=session_file)
     except SurfaceNotFound:
         return None
 

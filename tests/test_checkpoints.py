@@ -287,6 +287,58 @@ def test_capture_from_skill_phase_reports_no_signal_without_writing_note(workspa
     assert not note_dir.exists()
 
 
+def test_capture_from_skill_phase_read_only_ingress_does_not_append_diagnostic_checkpoint(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    runtime_session_id = "runtime-session-diagnostic"
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "test-runtime-session-diagnostic.json",
+        session_id=runtime_session_id,
+    )
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=runtime_session_id,
+    )
+    _write_checkpoint_history_entry(
+        note_dir=note_dir,
+        session_ref="session:test-read-only-diagnostic",
+        runtime_session_id=runtime_session_id,
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-min",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Recurring route candidate",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=["aoa-playbooks.playbook_registry.min"],
+        progression_axis_signals=[],
+    )
+    jsonl_path = note_dir / "checkpoint-note.jsonl"
+    original_jsonl = jsonl_path.read_text(encoding="utf-8")
+
+    capture = sdk.checkpoints.capture_from_skill_phase(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="diagnose why checkpoint closeout skill failed to orient in session space and mixed candidate scopes",
+        mutation_surface="none",
+        session_file=str(session_file),
+    )
+
+    assert capture.mode == "auto"
+    assert capture.appended is False
+    assert capture.reason == "no_checkpoint_signal"
+    assert capture.checkpoint_kind is None
+    assert capture.note is not None
+    assert capture.harvest_candidate_ids == ["candidate:route:aoa-playbooks-playbook-registry-min"]
+    assert jsonl_path.read_text(encoding="utf-8") == original_jsonl
+    assert not (note_dir / "checkpoint-note.json").exists()
+    assert not (
+        workspace_root / "aoa-sdk" / ".aoa" / "surface-detection" / "aoa-sdk.checkpoint.latest.json"
+    ).exists()
+
+
 def test_surface_detect_checkpoint_phase_emits_growth_cluster_for_explicit_commit_intent(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
@@ -1173,6 +1225,10 @@ def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(w
     )
 
     assert report.session_ref == "session:test-closeout-without-note"
+    assert report.execution_mode == "mechanical_bridge_artifact_build"
+    assert report.mechanical_bridge_only is True
+    assert report.agent_skill_application_required is True
+    assert report.authority_contract == "reviewed_artifact_primary_checkpoint_hints_provisional"
     assert report.checkpoint_note_ref is None
     assert report.surface_handoff_ref is None
     assert [step.skill_name for step in report.executed_skills] == [
@@ -1181,10 +1237,13 @@ def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(w
         "aoa-quest-harvest",
     ]
     assert report.skipped_skills == []
+    assert {step.execution_mode for step in report.executed_skills} == {"mechanical_artifact_builder"}
+    assert all(step.agent_skill_application_required for step in report.executed_skills)
     assert report.executed_at_local is not None
     assert report.executed_tz
     assert report.produced_artifact_refs
     assert report.produced_receipt_refs
+    assert "agent-led skill application" in report.final_stop_reason
     for path in [*report.produced_artifact_refs, *report.produced_receipt_refs]:
         assert Path(path).exists()
     receipt_payloads = {
@@ -1331,6 +1390,8 @@ def test_execute_closeout_chain_uses_aggregated_runtime_session_notes(
     legacy_note_dir = _checkpoint_note_dir(workspace_root, repo_label="aoa-sdk")
 
     assert report.runtime_session_id == runtime_session_id
+    assert report.execution_mode == "mechanical_bridge_artifact_build"
+    assert report.agent_skill_application_required is True
     assert report.session_trace_ref == str(rollout_path.resolve())
     assert report.session_trace_thread_id == "thread-closeout"
     assert report.context_ref == str(scoped_note_dir / "closeout-context.json")
@@ -1347,6 +1408,13 @@ def test_execute_closeout_chain_uses_aggregated_runtime_session_notes(
         Path(path) for path in report.produced_artifact_refs if path.endswith("HARVEST_PACKET.json")
     )
     harvest_packet = json.loads(harvest_packet_path.read_text(encoding="utf-8"))
+    assert harvest_packet["authority_contract"] == {
+        "contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
+        "bridge_output": "mechanical_artifact_build",
+        "checkpoint_notes": "focus_hints_only_not_final_authority",
+        "reviewed_artifact": "primary_closeout_evidence",
+        "agent_skill_application": "required_for_final_session_analysis",
+    }
     assert {item["owner_repo_recommendation"] for item in harvest_packet["accepted_candidates"]} == {
         "aoa-playbooks",
         "aoa-memo",
@@ -1356,11 +1424,38 @@ def test_execute_closeout_chain_uses_aggregated_runtime_session_notes(
         Path(path) for path in report.produced_artifact_refs if path.endswith("PROGRESSION_DELTA.json")
     )
     progression_packet = json.loads(progression_packet_path.read_text(encoding="utf-8"))
+    assert progression_packet["authority_contract"]["checkpoint_notes"] == "focus_hints_only_not_final_authority"
     assert set(progression_packet["candidate_ids"]) == {
         "candidate:route:aoa-playbooks-playbook-registry-min",
         "candidate:recall:aoa-memo-memory-catalog-min",
     }
     assert progression_packet["session_trace_ref"] == str(rollout_path.resolve())
+
+    quest_promotion_path = next(
+        Path(path) for path in report.produced_artifact_refs if path.endswith("QUEST_PROMOTION.json")
+    )
+    quest_promotion = json.loads(quest_promotion_path.read_text(encoding="utf-8"))
+    quest_promotions_path = next(
+        Path(path) for path in report.produced_artifact_refs if path.endswith("QUEST_PROMOTIONS.json")
+    )
+    quest_promotions = json.loads(quest_promotions_path.read_text(encoding="utf-8"))
+    assert quest_promotion["authority_contract"]["agent_skill_application"] == "required_for_final_session_analysis"
+    assert quest_promotions["authority_contract"]["bridge_output"] == "mechanical_artifact_build"
+    expected_candidate_refs = {
+        "candidate:route:aoa-playbooks-playbook-registry-min",
+        "candidate:recall:aoa-memo-memory-catalog-min",
+    }
+    assert quest_promotion["multi_candidate_followup_required"] is True
+    assert set(quest_promotion["candidate_refs"]) == expected_candidate_refs
+    assert len(quest_promotion["additional_candidate_refs"]) == 1
+    assert quest_promotions["accepted_candidate_count"] == 2
+    assert {
+        entry["bounded_unit_ref"] for entry in quest_promotions["promotions"]
+    } == expected_candidate_refs
+    assert {entry["owner_repo"] for entry in quest_promotions["promotions"]} == {
+        "aoa-playbooks",
+        "aoa-memo",
+    }
 
 
 def test_execute_closeout_chain_uses_codex_session_trace_as_closeout_evidence(

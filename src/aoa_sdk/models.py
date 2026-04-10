@@ -1365,6 +1365,12 @@ class CloseoutContextCandidateMap(BaseModel):
 class CheckpointCloseoutContext(BaseModel):
     schema_version: int = 1
     context_type: Literal["checkpoint_closeout_context_v1"] = "checkpoint_closeout_context_v1"
+    execution_mode: Literal["mechanical_bridge_context"] = "mechanical_bridge_context"
+    mechanical_bridge_only: bool = True
+    agent_skill_application_required: bool = True
+    authority_contract: Literal["reviewed_artifact_primary_checkpoint_hints_provisional"] = (
+        "reviewed_artifact_primary_checkpoint_hints_provisional"
+    )
     orchestrator_skill_name: Literal["aoa-checkpoint-closeout-bridge"] = (
         "aoa-checkpoint-closeout-bridge"
     )
@@ -1394,6 +1400,8 @@ class CloseoutExecutionStep(BaseModel):
         "aoa-session-progression-lift",
         "aoa-quest-harvest",
     ]
+    execution_mode: Literal["mechanical_artifact_builder"] = "mechanical_artifact_builder"
+    agent_skill_application_required: bool = True
     status: Literal["executed", "skipped"]
     reason: str
     artifact_refs: list[str] = Field(default_factory=list)
@@ -1404,6 +1412,14 @@ class CheckpointCloseoutExecutionReport(BaseModel):
     schema_version: int = 1
     report_type: Literal["checkpoint_closeout_execution_report_v1"] = (
         "checkpoint_closeout_execution_report_v1"
+    )
+    execution_mode: Literal["mechanical_bridge_artifact_build"] = (
+        "mechanical_bridge_artifact_build"
+    )
+    mechanical_bridge_only: bool = True
+    agent_skill_application_required: bool = True
+    authority_contract: Literal["reviewed_artifact_primary_checkpoint_hints_provisional"] = (
+        "reviewed_artifact_primary_checkpoint_hints_provisional"
     )
     orchestrator_skill_name: Literal["aoa-checkpoint-closeout-bridge"] = (
         "aoa-checkpoint-closeout-bridge"

@@ -15,6 +15,7 @@ htmlcov/
 venv/
 
 .aoa/skill-runtime-session.json
+.aoa/skill-runtime-sessions/
 .aoa/skill-dispatch/
 .aoa/closeout/
 .aoa/surface-detection/

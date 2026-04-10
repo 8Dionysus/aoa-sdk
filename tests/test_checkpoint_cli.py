@@ -600,6 +600,9 @@ def test_checkpoint_human_cli_marks_canonical_utc_labels(workspace_root: Path) -
         ],
     )
     assert context_result.exit_code == 0
+    assert "execution_mode: mechanical_bridge_context" in context_result.stdout
+    assert "mechanical_bridge_only: yes" in context_result.stdout
+    assert "agent_skill_application_required: yes" in context_result.stdout
     assert "built_at_canonical_utc:" in context_result.stdout
     assert "(local " in context_result.stdout
 
@@ -616,6 +619,9 @@ def test_checkpoint_human_cli_marks_canonical_utc_labels(workspace_root: Path) -
         ],
     )
     assert execution_result.exit_code == 0
+    assert "execution_mode: mechanical_bridge_artifact_build" in execution_result.stdout
+    assert "mechanical_bridge_only: yes" in execution_result.stdout
+    assert "agent_skill_application_required: yes" in execution_result.stdout
     assert "executed_at_canonical_utc:" in execution_result.stdout
     assert "(local " in execution_result.stdout
 
@@ -657,6 +663,10 @@ def test_checkpoint_execute_closeout_chain_cli_emits_execution_report(workspace_
     payload = json.loads(result.stdout)
     assert payload["session_ref"] == "session:test-checkpoint-execute-cli"
     assert payload["orchestrator_skill_name"] == "aoa-checkpoint-closeout-bridge"
+    assert payload["execution_mode"] == "mechanical_bridge_artifact_build"
+    assert payload["mechanical_bridge_only"] is True
+    assert payload["agent_skill_application_required"] is True
+    assert payload["authority_contract"] == "reviewed_artifact_primary_checkpoint_hints_provisional"
     assert payload["executed_at_local"]
     assert payload["executed_tz"]
     assert [item["skill_name"] for item in payload["executed_skills"]] == [

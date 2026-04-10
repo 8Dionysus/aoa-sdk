@@ -7,9 +7,9 @@ existing session-harvest family into an automatic runtime authority.
 ## Boundary
 
 - `aoa surfaces detect --phase checkpoint` stays additive and read-only
-- `aoa skills enter` and `aoa skills guard` stay skill-first; by default they auto-append one local checkpoint note only when checkpoint-phase surface detection finds a real growth signal
+- `aoa skills enter` and `aoa skills guard` stay skill-first; `enter` stays read-only unless `--checkpoint-kind` is explicit, while `guard` can auto-append one local checkpoint note only when checkpoint-phase surface detection finds a real growth signal
 - explicit `commit` or `verify-green` intents on a non-`none` mutation surface also count as local growth signals, even when recurring-route heuristics stay quiet
-- use `--no-auto-checkpoint` to keep `aoa skills enter` or `aoa skills guard` read-only apart from the persisted skill report
+- use `--no-auto-checkpoint` to keep `aoa skills guard` read-only apart from the persisted skill report; `aoa skills enter` is already read-only unless an explicit `--checkpoint-kind` is present
 - use `--checkpoint-kind` to override the inferred checkpoint kind when one explicit checkpoint event matters
 - `aoa checkpoint append` writes only local note state under `.aoa/`
 - checkpoint capture does not emit `HARVEST_PACKET`
@@ -87,6 +87,14 @@ the reviewed artifact, and then executes donor harvest, progression lift, and
 quest harvest in order without refreshing stats inside the bridge itself.
 That runtime-session fan-in narrows attention honestly, but it still does not
 replace rereading the reviewed artifact itself.
+The SDK bridge is a mechanical artifact builder, not proof that an agent has
+applied those skills. Its context and execution reports publish
+`execution_mode`, `mechanical_bridge_only`, `agent_skill_application_required`,
+and the authority contract
+`reviewed_artifact_primary_checkpoint_hints_provisional`; the Codex agent must
+still use the skill as a protocol, reread the session evidence, and separate
+checkpoint hints from final candidates before treating the closeout as a
+session analysis.
 When the active runtime session also carries a live Codex rollout path,
 closeout now binds that rollout trace into the context and rereads it beside
 the reviewed artifact so one narrow checkpoint ledger does not stand in for the

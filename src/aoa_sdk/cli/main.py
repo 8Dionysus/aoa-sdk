@@ -456,6 +456,13 @@ def _print_checkpoint_promotion(promotion: SessionCheckpointPromotion) -> None:
 def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
     typer.echo(f"session_ref: {context.session_ref}")
     typer.echo(f"orchestrator_skill_name: {context.orchestrator_skill_name}")
+    typer.echo(f"execution_mode: {context.execution_mode}")
+    typer.echo(f"mechanical_bridge_only: {'yes' if context.mechanical_bridge_only else 'no'}")
+    typer.echo(
+        "agent_skill_application_required: "
+        f"{'yes' if context.agent_skill_application_required else 'no'}"
+    )
+    typer.echo(f"authority_contract: {context.authority_contract}")
     typer.echo(
         "built_at_canonical_utc: "
         + _format_dual_timestamp(
@@ -500,6 +507,13 @@ def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
 def _print_closeout_execution_report(report: CheckpointCloseoutExecutionReport) -> None:
     typer.echo(f"session_ref: {report.session_ref}")
     typer.echo(f"orchestrator_skill_name: {report.orchestrator_skill_name}")
+    typer.echo(f"execution_mode: {report.execution_mode}")
+    typer.echo(f"mechanical_bridge_only: {'yes' if report.mechanical_bridge_only else 'no'}")
+    typer.echo(
+        "agent_skill_application_required: "
+        f"{'yes' if report.agent_skill_application_required else 'no'}"
+    )
+    typer.echo(f"authority_contract: {report.authority_contract}")
     typer.echo(
         "executed_at_canonical_utc: "
         + _format_dual_timestamp(
@@ -525,6 +539,11 @@ def _print_closeout_execution_report(report: CheckpointCloseoutExecutionReport) 
     else:
         for item in report.executed_skills:
             typer.echo(f"  - {item.skill_name}")
+            typer.echo(f"    execution_mode: {item.execution_mode}")
+            typer.echo(
+                "    agent_skill_application_required: "
+                f"{'yes' if item.agent_skill_application_required else 'no'}"
+            )
             typer.echo(f"    reason: {item.reason}")
             typer.echo(
                 "    artifact_refs: "
@@ -1008,7 +1027,7 @@ def skills_enter(
     auto_checkpoint: bool = typer.Option(
         True,
         "--auto-checkpoint/--no-auto-checkpoint",
-        help="Auto-append one local checkpoint note only when checkpoint-phase surface detection finds a real growth signal.",
+        help="Ingress stays read-only by default; use --checkpoint-kind when an explicit checkpoint append is intended.",
     ),
     host_skill: list[str] = typer.Option(
         None,
