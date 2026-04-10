@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import subprocess
 from datetime import datetime
 from pathlib import Path
 
@@ -8,6 +9,7 @@ import pytest
 
 from aoa_sdk import AoASDK
 from aoa_sdk.errors import SurfaceNotFound
+from aoa_sdk.skills.session import probe_session
 
 
 @pytest.fixture(autouse=True)
@@ -27,7 +29,12 @@ def _checkpoint_note_dir(
     return current_root / runtime_session_id / repo_label
 
 
-def _write_runtime_session_file(path: Path, *, session_id: str) -> Path:
+def _write_runtime_session_file(
+    path: Path,
+    *,
+    session_id: str,
+    codex_thread_id: str | None = "thread-closeout",
+) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = {
         "schema_version": 1,
@@ -35,13 +42,43 @@ def _write_runtime_session_file(path: Path, *, session_id: str) -> Path:
         "session_id": session_id,
         "created_at": "2026-04-10T14:00:00Z",
         "updated_at": "2026-04-10T14:00:00Z",
-        "codex_thread_id": "thread-closeout",
+        "codex_thread_id": codex_thread_id,
         "codex_rollout_path": str((path.parent / "runtime-trace.jsonl").resolve()),
         "active_skills": [],
         "activation_log": [],
     }
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
     return path
+
+
+def _init_git_repo(repo_root: Path) -> None:
+    subprocess.run(["git", "init"], cwd=repo_root, check=True, capture_output=True, text=True)
+    subprocess.run(["git", "config", "user.name", "AoA Test"], cwd=repo_root, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "config", "user.email", "aoa@example.test"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+
+def _git_commit(repo_root: Path, *, subject: str, body: str = "") -> str:
+    readme = repo_root / "README.md"
+    base_text = readme.read_text(encoding="utf-8")
+    readme.write_text(base_text + f"\n{subject}\n", encoding="utf-8")
+    subprocess.run(["git", "add", "README.md"], cwd=repo_root, check=True, capture_output=True, text=True)
+    command = ["git", "commit", "-m", subject]
+    if body:
+        command.extend(["-m", body])
+    subprocess.run(command, cwd=repo_root, check=True, capture_output=True, text=True)
+    return subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
 
 
 def _write_rollout_trace(
@@ -246,6 +283,155 @@ def test_checkpoint_peek_status_does_not_create_runtime_session_file(workspace_r
     assert not session_file.exists()
 
 
+def test_probe_session_returns_none_without_creating_runtime_session_file(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    session_path, session = probe_session(sdk.workspace, None)
+
+    assert session is None
+    assert session_path == workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+    assert not session_path.exists()
+
+
+def test_after_commit_skips_without_active_session_and_writes_status_artifact(workspace_root: Path) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(repo_root, subject="plan verify a bounded change", body="checkpoint skip path")
+    sdk = AoASDK.from_workspace(repo_root)
+
+    report = sdk.checkpoints.after_commit(repo_root=str(repo_root), commit_ref="HEAD")
+
+    status_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "post-commit-status" / "aoa-sdk.latest.json"
+    assert report.status == "skipped_no_active_session"
+    assert report.commit_sha == commit_sha
+    assert report.commit_subject == "plan verify a bounded change"
+    assert report.changed_paths == ["README.md"]
+    assert report.note_ref is None
+    assert status_path.exists()
+    assert not _checkpoint_note_dir(workspace_root, repo_label="aoa-sdk").exists()
+
+
+def test_after_commit_captures_reviewable_note_and_surface_context(
+    workspace_root: Path,
+    install_host_skills,
+) -> None:
+    install_host_skills(workspace_root, ["aoa-change-protocol"])
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(
+        repo_root,
+        subject="plan verify a bounded change",
+        body="checkpoint capture body",
+    )
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-after-commit",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+
+    report = sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-after-commit",
+    )
+    note_payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
+    skill_payload = json.loads(Path(report.skill_report_path).read_text(encoding="utf-8"))
+    surface_payload = json.loads(Path(report.surface_report_path).read_text(encoding="utf-8"))
+    session_payload = json.loads(session_file.read_text(encoding="utf-8"))
+
+    assert report.status == "captured"
+    assert report.commit_sha == commit_sha
+    assert report.commit_subject == "plan verify a bounded change"
+    assert report.commit_body == "checkpoint capture body"
+    assert report.changed_paths == ["README.md"]
+    assert report.checkpoint_kind == "commit"
+    assert report.mutation_surface == "code"
+    assert report.manual_review_requested is True
+    assert Path(report.report_path).exists()
+    assert Path(report.skill_report_path).exists()
+    assert Path(report.surface_report_path).exists()
+    assert Path(report.note_ref).exists()
+    assert note_payload["state"] == "reviewable"
+    assert note_payload["checkpoint_history"][-1]["checkpoint_kind"] == "commit"
+    assert note_payload["checkpoint_history"][-1]["manual_review_requested"] is True
+    assert skill_payload["report"]["phase"] == "checkpoint"
+    assert skill_payload["report"]["activate_now"][0]["skill_name"] == "aoa-change-protocol"
+    assert surface_payload["report"]["phase"] == "checkpoint"
+    assert "aoa-change-protocol" in surface_payload["report"]["active_skill_names"]
+    assert session_payload["active_skills"][0]["name"] == "aoa-change-protocol"
+    assert any(entry["name"] == "aoa-change-protocol" for entry in session_payload["activation_log"])
+
+
+def test_after_commit_failure_writes_artifact_without_corrupting_checkpoint_state(workspace_root: Path) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _git_commit(repo_root, subject="plan verify a bounded change")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-after-commit-failure",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+
+    report = sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="missing-ref",
+        session_file=str(session_file),
+    )
+
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-after-commit-failure",
+    )
+    fallback_status = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "post-commit-status" / "aoa-sdk.latest.json"
+
+    assert report.status == "failed"
+    assert report.error_text
+    assert Path(report.report_path).exists()
+    assert fallback_status.exists()
+    assert not (note_dir / "checkpoint-note.json").exists()
+    assert not (note_dir / "checkpoint-note.jsonl").exists()
+
+
+def test_after_commit_uses_thread_scoped_runtime_sessions(workspace_root: Path, monkeypatch) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _git_commit(repo_root, subject="plan verify a bounded change")
+    sdk = AoASDK.from_workspace(repo_root)
+
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-one")
+    thread_one_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-one.json",
+        session_id="runtime-thread-one",
+        codex_thread_id="thread-one",
+    )
+    report_one = sdk.checkpoints.after_commit(repo_root=str(repo_root), commit_ref="HEAD")
+
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-two")
+    thread_two_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-two.json",
+        session_id="runtime-thread-two",
+        codex_thread_id="thread-two",
+    )
+    report_two = sdk.checkpoints.after_commit(repo_root=str(repo_root), commit_ref="HEAD")
+
+    assert thread_one_session.exists()
+    assert thread_two_session.exists()
+    assert report_one.status == "captured"
+    assert report_two.status == "captured"
+    assert report_one.runtime_session_id == "runtime-thread-one"
+    assert report_two.runtime_session_id == "runtime-thread-two"
+    assert Path(report_one.report_path).parent != Path(report_two.report_path).parent
+    assert "runtime-thread-one" in report_one.report_path
+    assert "runtime-thread-two" in report_two.report_path
+
+
 def test_capture_from_skill_phase_auto_appends_only_when_growth_signal_exists(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
@@ -355,6 +541,48 @@ def test_surface_detect_checkpoint_phase_emits_growth_cluster_for_explicit_commi
     assert growth_cluster.owner_hint == "aoa-sdk"
     assert growth_cluster.source_surface_ref == "aoa-sdk:checkpoint_auto_capture.commit"
     assert "mutation_surface:code" in growth_cluster.evidence_refs
+
+
+def test_surface_detect_checkpoint_phase_emits_growth_cluster_for_opened_pr(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="checkpoint",
+        checkpoint_kind="pr_opened",
+        intent_text="opened aoa-skills PR #157 after protected main rejected direct push",
+        mutation_surface="public-share",
+    )
+
+    assert report.checkpoint_should_capture is True
+    growth_cluster = next(cluster for cluster in report.candidate_clusters if cluster.candidate_kind == "growth")
+    assert growth_cluster.owner_hint == "aoa-sdk"
+    assert growth_cluster.source_surface_ref == "aoa-sdk:checkpoint_auto_capture.pr_opened"
+    assert "mutation_surface:public-share" in growth_cluster.evidence_refs
+    assert {signal.axis for signal in growth_cluster.progression_axis_signals} == {
+        "execution_reliability",
+        "change_legibility",
+        "review_sharpness",
+    }
+
+
+def test_surface_detect_checkpoint_phase_keeps_growth_cluster_with_heuristic_candidates(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="checkpoint",
+        checkpoint_kind="verify_green",
+        intent_text="verified checkpoint mark captures public-share PR milestones with release_check green",
+        mutation_surface="code",
+    )
+
+    assert report.checkpoint_should_capture is True
+    assert any(cluster.candidate_kind == "route" for cluster in report.candidate_clusters)
+    assert any(
+        cluster.source_surface_ref == "aoa-sdk:checkpoint_auto_capture.verify_green"
+        for cluster in report.candidate_clusters
+    )
 
 
 def test_capture_from_skill_phase_auto_appends_for_explicit_commit_intent(workspace_root: Path) -> None:

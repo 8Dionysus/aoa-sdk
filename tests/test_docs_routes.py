@@ -64,12 +64,17 @@ def test_surface_detection_routes_are_documented_as_additive_and_skill_only() ->
     assert "aoa skills guard /srv/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in readme
     assert 'aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv --json' in readme
     assert "aoa checkpoint append /srv/aoa-sdk" in readme
+    assert "aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json" in readme
+    assert "aoa checkpoint install-hook --repo aoa-sdk --root /srv --json" in readme
+    assert "aoa checkpoint hook-status --repo aoa-sdk --root /srv --json" in readme
     assert "aoa checkpoint build-closeout-context /srv/aoa-sdk" in readme
     assert "aoa checkpoint execute-closeout-chain /srv/aoa-sdk" in readme
     assert "aoa checkpoint promote /srv/aoa-sdk --target dionysus-note" in readme
     assert "aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json" in readme
     assert "sdk.stats.surface_detection()" in readme
     assert "carries harvest, progression, and upgrade candidates through the session" in readme
+    assert "plain `git commit`" in readme
+    assert "post-commit-report.json" in readme
     assert "checkpoint_capture.session_end_skill_targets" in readme
     assert "checkpoint_capture.progression_axis_signals" in readme
     assert "checkpoint_capture.session_end_next_honest_move" in readme
@@ -88,8 +93,12 @@ def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:
     assert 'aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/aoa-sdk --json' in agents
     assert "aoa skills guard /srv/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in agents
     assert 'aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json' in agents
+    assert "aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json" in agents
+    assert "aoa checkpoint install-hook --repo aoa-sdk --root /srv --json" in agents
+    assert "aoa checkpoint hook-status --repo aoa-sdk --root /srv --json" in agents
     assert "aoa skills ...` remains skill-only" in agents
     assert "checkpoint notes stay lower-authority than harvest verdicts" in agents
+    assert "skipped_no_active_session" in agents
     assert "session-local ledger for harvest, progression, and" in agents
     assert "checkpoint_capture.session_end_skill_targets" in agents
     assert "checkpoint_capture.progression_axis_signals" in agents
@@ -120,6 +129,12 @@ def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
     assert "checkpoint_capture.progression_axis_signals" in checkpoints
     assert "checkpoint_capture.session_end_next_honest_move" in checkpoints
     assert "aoa-session-progression-lift" in checkpoints
+    assert "plain `git commit` can trigger one active-session-only checkpoint pass" in checkpoints
+    assert "post-commit-report.json" in checkpoints
+    assert "aoa-sdk/.aoa/session-growth/post-commit-status/<repo>.latest.json" in checkpoints
+    assert "aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json" in checkpoints
+    assert "aoa checkpoint install-hook --repo aoa-sdk --root /srv --json" in checkpoints
+    assert "aoa checkpoint hook-status --repo aoa-sdk --root /srv --json" in checkpoints
     assert "aoa checkpoint build-closeout-context /srv/aoa-sdk" in checkpoints
     assert "aoa checkpoint execute-closeout-chain /srv/aoa-sdk" in checkpoints
     assert "aoa-checkpoint-closeout-bridge" in checkpoints

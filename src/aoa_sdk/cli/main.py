@@ -13,9 +13,12 @@ from ..compatibility import CompatibilityAPI
 from ..loaders import load_json
 from ..release.api import ReleaseAuditPhase, ReleaseAuditResult, ReleasePublishResult
 from ..models import (
+    CheckpointAfterCommitReport,
     CheckpointCloseoutContext,
     CheckpointCloseoutExecutionReport,
     CheckpointCaptureResult,
+    CheckpointHookInstallResult,
+    CheckpointHookStatus,
     KernelNextStepBrief,
     OwnerFollowThroughBrief,
     SessionCheckpointNote,
@@ -31,6 +34,8 @@ from ..skills.detector import enrich_report_with_checkpoint_bridge
 from ..workspace.bootstrap import bootstrap_workspace
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
+
+OWNER_CHECKPOINT_HOOK_REPOS = tuple(repo for repo in KNOWN_REPOS if repo != "8Dionysus")
 
 app = typer.Typer(help="AoA SDK CLI")
 workspace_app = typer.Typer(help="Inspect workspace topology")
@@ -437,6 +442,36 @@ def _print_checkpoint_capture(result: CheckpointCaptureResult | None) -> None:
         typer.echo(f"session_end_next_honest_move: {result.session_end_next_honest_move}")
 
 
+def _print_checkpoint_after_commit_report(report: CheckpointAfterCommitReport) -> None:
+    commit_label = report.commit_short_sha or report.commit_ref
+    if report.status == "captured":
+        typer.echo(
+            f"post_commit_checkpoint: captured commit={commit_label} note={report.note_ref} report={report.report_path}"
+        )
+        return
+    if report.status == "skipped_no_active_session":
+        typer.echo(
+            f"post_commit_checkpoint: skipped_no_active_session commit={commit_label} report={report.report_path}"
+        )
+        return
+    typer.echo(
+        f"post_commit_checkpoint: failed commit={commit_label} report={report.report_path} error={report.error_text or 'unknown'}"
+    )
+
+
+def _print_checkpoint_hook_status(status: CheckpointHookStatus) -> None:
+    typer.echo(f"{status.repo}: {status.status}")
+    typer.echo(f"  hook_path: {status.hook_path}")
+    typer.echo(f"  template_path: {status.template_path}")
+    typer.echo(f"  template_version: {status.template_version}")
+
+
+def _print_checkpoint_hook_install(result: CheckpointHookInstallResult) -> None:
+    typer.echo(f"{result.repo}: {result.action} (was {result.status_before})")
+    typer.echo(f"  hook_path: {result.hook_path}")
+    typer.echo(f"  template_version: {result.template_version}")
+
+
 def _print_checkpoint_promotion(promotion: SessionCheckpointPromotion) -> None:
     typer.echo(f"session_ref: {promotion.session_ref}")
     typer.echo(f"target: {promotion.target}")
@@ -703,6 +738,27 @@ def _load_surface_detection_report(path: str) -> SurfaceDetectionReport:
     payload = load_json(Path(path).expanduser().resolve())
     report_payload = payload.get("report", payload)
     return SurfaceDetectionReport.model_validate(report_payload)
+
+
+def _resolve_checkpoint_hook_repos(
+    *,
+    workspace: Workspace,
+    repo: str | None,
+    all_owner: bool,
+    allow_readonly: bool,
+) -> list[str]:
+    if (repo is None) == (not all_owner):
+        raise typer.BadParameter("Pass exactly one of --repo or --all-owner.")
+    if all_owner:
+        return [name for name in OWNER_CHECKPOINT_HOOK_REPOS if workspace.has_repo(name)]
+    assert repo is not None
+    if repo not in KNOWN_REPOS:
+        raise typer.BadParameter(f"Unknown repository {repo!r}.")
+    if not workspace.has_repo(repo):
+        raise typer.BadParameter(f"Repository {repo!r} is not available in this workspace.")
+    if not allow_readonly and repo == "8Dionysus":
+        raise typer.BadParameter("8Dionysus is read-only and excluded from checkpoint hook installation.")
+    return [repo]
 
 
 @app.command()
@@ -1381,6 +1437,147 @@ def checkpoint_append(
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     _print_checkpoint_note(note)
+
+
+@checkpoint_app.command("mark")
+def checkpoint_mark(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    kind: str = typer.Option(
+        ...,
+        "--kind",
+        help="Checkpoint kind: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
+    ),
+    intent_text: str = typer.Option(
+        ...,
+        "--intent-text",
+        help="Concrete milestone summary to record in the session checkpoint ledger.",
+    ),
+    mutation_surface: str = typer.Option(
+        "none",
+        "--mutation-surface",
+        help="Mutation class: none, code, repo-config, infra, runtime, or public-share.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to read active skill names.",
+    ),
+    skill_report_path: str | None = typer.Option(
+        None,
+        "--skill-report-path",
+        help="Optional reference to an existing persisted skill report used as prelude context.",
+    ),
+    mark_reviewable: bool = typer.Option(
+        True,
+        "--mark-reviewable/--no-mark-reviewable",
+        help="Mark this explicit milestone as manually reviewable by default.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    note = AoASDK.from_workspace(root).checkpoints.append(
+        repo_root=repo_root,
+        checkpoint_kind=kind,  # type: ignore[arg-type]
+        intent_text=intent_text,
+        mutation_surface=mutation_surface,  # type: ignore[arg-type]
+        session_file=session_file,
+        skill_report_path=skill_report_path,
+        manual_review_requested=mark_reviewable,
+    )
+    payload = note.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_note(note)
+
+
+@checkpoint_app.command("after-commit")
+def checkpoint_after_commit(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    commit_ref: str = typer.Option("HEAD", "--commit-ref", help="Committed git ref to capture, usually HEAD."),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    report = AoASDK.from_workspace(root).checkpoints.after_commit(
+        repo_root=repo_root,
+        commit_ref=commit_ref,
+        session_file=session_file,
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_after_commit_report(report)
+
+
+@checkpoint_app.command("install-hook")
+def checkpoint_install_hook(
+    repo: str | None = typer.Option(None, "--repo", help="Repository name that should receive the post-commit hook."),
+    all_owner: bool = typer.Option(
+        False,
+        "--all-owner",
+        help="Install hooks for every mutable owner repo discovered in the workspace.",
+    ),
+    overwrite: bool = typer.Option(
+        False,
+        "--overwrite",
+        help="Replace stale existing hook files with the current aoa-sdk template.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    sdk = AoASDK.from_workspace(root)
+    repo_names = _resolve_checkpoint_hook_repos(
+        workspace=sdk.workspace,
+        repo=repo,
+        all_owner=all_owner,
+        allow_readonly=False,
+    )
+    results = [sdk.checkpoints.install_hook(repo_name=repo_name, overwrite=overwrite) for repo_name in repo_names]
+    payload = {
+        "workspace_root": str(sdk.workspace.root),
+        "results": [result.model_dump(mode="json") for result in results],
+    }
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    for result in results:
+        _print_checkpoint_hook_install(result)
+
+
+@checkpoint_app.command("hook-status")
+def checkpoint_hook_status(
+    repo: str | None = typer.Option(None, "--repo", help="Repository name whose post-commit hook should be inspected."),
+    all_owner: bool = typer.Option(
+        False,
+        "--all-owner",
+        help="Inspect hook status for every mutable owner repo discovered in the workspace.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    sdk = AoASDK.from_workspace(root)
+    repo_names = _resolve_checkpoint_hook_repos(
+        workspace=sdk.workspace,
+        repo=repo,
+        all_owner=all_owner,
+        allow_readonly=True,
+    )
+    statuses = [sdk.checkpoints.hook_status(repo_name=repo_name) for repo_name in repo_names]
+    payload = {
+        "workspace_root": str(sdk.workspace.root),
+        "results": [status.model_dump(mode="json") for status in statuses],
+    }
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    for status in statuses:
+        _print_checkpoint_hook_status(status)
 
 
 @checkpoint_app.command("status")

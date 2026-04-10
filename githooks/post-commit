@@ -1,0 +1,25 @@
+#!/bin/sh
+# aoa-sdk checkpoint post-commit hook v1
+
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+workspace_root="${AOA_CHECKPOINT_WORKSPACE_ROOT:-__AOA_CHECKPOINT_WORKSPACE_ROOT__}"
+aoa_bin="${AOA_CHECKPOINT_AOA_BIN:-aoa}"
+
+output="$("$aoa_bin" checkpoint after-commit "$repo_root" --commit-ref HEAD --root "$workspace_root" 2>&1)"
+status=$?
+
+if [ "$status" -ne 0 ]; then
+  printf '%s\n' "post_commit_checkpoint: failed commit=HEAD report=none error=hook_command_failed"
+  if [ -n "$output" ]; then
+    printf '%s\n' "$output" >&2
+  fi
+  exit 0
+fi
+
+if [ -z "$output" ]; then
+  printf '%s\n' "post_commit_checkpoint: failed commit=HEAD report=none error=hook_command_empty_output"
+  exit 0
+fi
+
+printf '%s\n' "$output"
+exit 0

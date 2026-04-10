@@ -143,6 +143,15 @@ Do not turn `aoa closeout run` into the hidden runtime for that chain.
 Use `--no-auto-checkpoint` when you need the skill lane to stay read-only apart
 from its persisted report, and use `--checkpoint-kind` when one explicit
 checkpoint event matters.
+When a repo has the installed `aoa-sdk` `post-commit` hook, a plain
+`git commit` may also run `aoa checkpoint after-commit` automatically.
+That path is active-session-only: if the resolved thread-scoped or default
+runtime session file does not already exist, it must exit as
+`skipped_no_active_session` and must not create a new session just to emit
+checkpoint noise.
+That hook path may dispatch checkpoint-phase skills, run additive checkpoint
+surface detection, and append one reviewable local note, but it must never run
+closeout, promotion, harvest, push, or release logic.
 Do not treat that local side effect as a change to skill ownership semantics.
 
 When the task shows route drift, owner-layer ambiguity, proof need, recall
@@ -158,6 +167,9 @@ aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better han
 aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/aoa-sdk --json
 aoa skills guard /srv/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green --root /srv/aoa-sdk --json
 aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json
+aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
+aoa checkpoint install-hook --repo aoa-sdk --root /srv --json
+aoa checkpoint hook-status --repo aoa-sdk --root /srv --json
 ```
 
 Use `aoa surfaces handoff` only after review:

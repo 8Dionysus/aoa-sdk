@@ -96,6 +96,13 @@ def load_session(workspace: Workspace, session_file: str | Path | None) -> Skill
     return SkillSession.model_validate(load_json(path))
 
 
+def probe_session(workspace: Workspace, session_file: str | Path | None) -> tuple[Path, SkillSession | None]:
+    path = resolve_session_file(workspace, session_file)
+    if not path.exists():
+        return path, None
+    return path, SkillSession.model_validate(load_json(path))
+
+
 def resolve_codex_thread_context() -> dict[str, Any]:
     thread_id = os.environ.get("CODEX_THREAD_ID")
     if not isinstance(thread_id, str) or not thread_id.strip():

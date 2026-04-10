@@ -40,7 +40,7 @@ Use the shortest route by need:
 - local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - additive owner-layer surface detection without changing `aoa skills ...` meaning: `docs/aoa-surface-detection-first-wave.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
-- checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, `aoa checkpoint append/status/promote`, the auto checkpoint bridge on `aoa skills guard`, and the explicit `aoa skills enter --checkpoint-kind` / `--append-note` overrides
+- checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, `aoa checkpoint mark/append/after-commit/status/promote`, `aoa checkpoint install-hook`, `aoa checkpoint hook-status`, the auto checkpoint bridge on `aoa skills guard`, and the explicit `aoa skills enter --checkpoint-kind` / `--append-note` overrides
 - explicit checkpoint-to-closeout bridge orchestration: `docs/session-growth-checkpoints.md`, `docs/session-closeout.md`, `aoa checkpoint build-closeout-context`, and `aoa checkpoint execute-closeout-chain`
 - second-wave shortlist, receipt-context, and observability seams that stay advisory: `docs/aoa-surface-detection-second-wave.md`, `sdk.routing.owner_layer_shortlist()`, and `sdk.stats.surface_detection()`
 - antifragility stress-context doctrine and fixtures that stay narrowing-only: `docs/antifragility-control-plane.md`, `docs/antifragility-closeout-seam.md`, `tests/fixtures/antifragility/stress_dispatch_input.example.json`, `tests/fixtures/antifragility/stress_dispatch_result.example.json`, and `tests/fixtures/antifragility/stress_closeout_manifest.example.json`
@@ -82,6 +82,7 @@ This repository is the source of truth for:
 - default skill runtime session storage under `aoa-sdk/.aoa/skill-runtime-sessions/<codex-thread>.json` when `CODEX_THREAD_ID` is available, otherwise under `aoa-sdk/.aoa/skill-runtime-session.json`
 - additive first-wave and second-wave surface detection under `aoa-sdk/.aoa/surface-detection/` that keeps `aoa skills ...` skill-only while surfacing eval, memo, playbook, agent, and technique candidates as non-executable hints or reviewed handoffs
 - local checkpoint-note capture under `aoa-sdk/.aoa/session-growth/current/` that keeps mid-session growth work below harvest-verdict authority until reviewed promotion, carries harvest, progression, and upgrade candidates through the session, records provisional progression-axis movement, rotates `current` by active checkpoint session rather than day-only naming, and leaves candidate movement plus stats refresh to reviewed closeout
+- active-session-only post-commit checkpoint capture for plain `git commit`, writing one runtime-scoped `post-commit-report.json` when a session exists and one fallback status artifact under `aoa-sdk/.aoa/session-growth/post-commit-status/` when capture skips or fails before note state is available
 - `aoa skills enter` and `aoa skills guard` now expose the pending reviewed-closeout skill-family plan through `checkpoint_capture.session_end_skill_targets`, `checkpoint_capture.progression_axis_signals`, and `checkpoint_capture.session_end_next_honest_move`
 - reviewed closeout can now raise `aoa-session-progression-lift` from the checkpoint ledger before `aoa-quest-harvest`, so multi-axis progression stays evidence-backed and end-of-session only
 - reviewed closeout can now build one `closeout-context.json` bundle and execute the explicit `aoa-checkpoint-closeout-bridge` chain without turning `aoa closeout run` into a hidden skill runner
@@ -89,6 +90,8 @@ This repository is the source of truth for:
 - the runtime session store is now Codex-thread-aware when `CODEX_THREAD_ID` is available, so a new Codex thread rotates to a fresh session identity instead of silently reusing an older runtime file
 - explicit checkpoint closeout now binds the live Codex rollout trace from that runtime session into `closeout-context.json` and reuses it as additional closeout evidence beside the reviewed artifact
 - default auto checkpoint bridge from `aoa skills guard` when checkpoint-phase detection sees a real growth signal; `aoa skills enter` stays read-only unless `--checkpoint-kind` is explicit, and `aoa surfaces detect --append-note` remains the direct additive override
+- explicit milestone checkpoint marking through `aoa checkpoint mark`, including public-share milestones such as `pr_opened`, `pr_merged`, and `owner_followthrough`, so agents do not have to re-enable ingress auto-append just to capture progress
+- local hook installation and status inspection for checkpoint-aware plain commits through `aoa checkpoint install-hook` and `aoa checkpoint hook-status`; the installed `post-commit` hook only triggers mid-session checkpoint capture and never runs closeout, promotion, harvest, push, or release logic
 - checkpoint closeout execution reports now declare `execution_mode=mechanical_bridge_artifact_build`, `mechanical_bridge_only=true`, and `agent_skill_application_required=true`, so generated packets cannot be mistaken for proof that a Codex agent has already applied the skill protocol to the full session
 - checkpoint and explicit closeout surfaces keep canonical machine timestamps in UTC while also publishing local companion fields such as `observed_at_local`, `captured_at_local`, `built_at_local`, `executed_at_local`, and their matching `*_tz` labels for human review
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
@@ -278,7 +281,11 @@ aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --a
 Capture or promote one checkpoint-aware local note:
 
 ```bash
+aoa checkpoint mark /srv/aoa-sdk --kind pr_opened --intent-text "opened PR after protected main rejected direct push" --mutation-surface public-share --root /srv/aoa-sdk --json
 aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
+aoa checkpoint install-hook --repo aoa-sdk --root /srv --json
+aoa checkpoint hook-status --repo aoa-sdk --root /srv --json
 aoa checkpoint build-closeout-context /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
 aoa checkpoint execute-closeout-chain /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
 aoa checkpoint status /srv/aoa-sdk --root /srv/aoa-sdk --json

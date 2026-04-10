@@ -8,13 +8,15 @@ existing session-harvest family into an automatic runtime authority.
 
 - `aoa surfaces detect --phase checkpoint` stays additive and read-only
 - `aoa skills enter` and `aoa skills guard` stay skill-first; `enter` stays read-only unless `--checkpoint-kind` is explicit, while `guard` can auto-append one local checkpoint note only when checkpoint-phase surface detection finds a real growth signal
-- explicit `commit` or `verify-green` intents on a non-`none` mutation surface also count as local growth signals, even when recurring-route heuristics stay quiet
+- explicit `commit`, `verify-green`, `pr_opened`, `pr_merged`, or `owner_followthrough` intents on a non-`none` mutation surface also count as local growth signals, even when recurring-route heuristics stay quiet
 - use `--no-auto-checkpoint` to keep `aoa skills guard` read-only apart from the persisted skill report; `aoa skills enter` is already read-only unless an explicit `--checkpoint-kind` is present
 - use `--checkpoint-kind` to override the inferred checkpoint kind when one explicit checkpoint event matters
-- `aoa checkpoint append` writes only local note state under `.aoa/`
+- `aoa checkpoint mark` is the agent-facing way to record an explicit milestone, and `aoa checkpoint append` remains the lower-level append surface; both write only local note state under `.aoa/`
+- plain `git commit` can trigger one active-session-only checkpoint pass through the installed `post-commit` hook and `aoa checkpoint after-commit`; when no active session file already exists, that path exits as `skipped_no_active_session` and does not mint a fresh session just to emit noise
 - checkpoint capture does not emit `HARVEST_PACKET`
 - checkpoint capture does not emit `CORE_SKILL_APPLICATION_RECEIPT`
 - promotion remains explicit through `aoa checkpoint promote`
+- post-commit checkpoint capture always stays mid-session and reviewable: it may dispatch checkpoint-phase skills, run additive checkpoint surface detection, and append a local reviewable note, but it never runs closeout, promotion, harvest, push, or release logic
 - full harvest still belongs to the existing reviewed closeout path
 - checkpoint notes carry harvest, progression, and upgrade candidates through the end of the session
 - checkpoint notes keep provisional multi-axis movement for `boundary_integrity`, `execution_reliability`, `change_legibility`, `review_sharpness`, `proof_discipline`, `provenance_hygiene`, and `deep_readiness`
@@ -29,6 +31,7 @@ aoa-sdk/.aoa/session-growth/current/<runtime-session-id>/<repo-label>/
   checkpoint-note.jsonl
   checkpoint-note.json
   checkpoint-note.md
+  post-commit-report.json
   harvest-handoff.json
   closeout-context.json
   closeout-execution-report.json
@@ -63,6 +66,11 @@ mismatch when parallel work is in flight.
 
 The JSONL file is append-only checkpoint history.
 The JSON and Markdown files are rebuilt snapshots for current review.
+`post-commit-report.json` is the trigger/audit artifact for one plain-commit
+capture pass; it is not the authoritative checkpoint ledger.
+When capture skips because no active session file exists, or fails before a
+runtime-scoped note is available, the latest fallback status artifact is
+written under `aoa-sdk/.aoa/session-growth/post-commit-status/<repo>.latest.json`.
 Those rebuilt snapshots now act as the session-local ledger for:
 
 - harvest candidates that should be bundled at reviewed closeout
@@ -111,7 +119,11 @@ aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --muta
 aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 aoa skills guard /srv/aoa-sdk --intent-text "recurring owner follow-through after green verify" --mutation-surface code --checkpoint-kind verify_green --root /srv/aoa-sdk --json
+aoa checkpoint mark /srv/aoa-sdk --kind pr_opened --intent-text "opened PR after protected main rejected direct push" --mutation-surface public-share --root /srv/aoa-sdk --json
 aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
+aoa checkpoint install-hook --repo aoa-sdk --root /srv --json
+aoa checkpoint hook-status --repo aoa-sdk --root /srv --json
 aoa checkpoint build-closeout-context /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
 aoa checkpoint execute-closeout-chain /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
 aoa checkpoint status /srv/aoa-sdk --root /srv/aoa-sdk --json
