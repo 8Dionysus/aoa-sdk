@@ -2346,7 +2346,8 @@ def _promote_to_dionysus(workspace: Workspace, *, paths: _CheckpointPaths, note:
     audits_dir = dionysus_root / "reports" / "ecosystem-audits"
     audits_dir.mkdir(parents=True, exist_ok=True)
     date_str = _date_from_session_ref(note.session_ref) or datetime.now(UTC).date().isoformat()
-    stem = f"{date_str}.{paths.repo_label}.checkpoint-note"
+    session_slug = _safe_name(note.session_ref)
+    stem = f"{date_str}.{session_slug}.{paths.repo_label}.checkpoint-note"
     json_path = audits_dir / f"{stem}.json"
     md_path = audits_dir / f"{stem}.md"
     source_note_ref = f"repo:aoa-sdk/.aoa/session-growth/current/{paths.repo_label}/checkpoint-note.json"

@@ -283,6 +283,53 @@ def test_checkpoint_promote_writes_dionysus_snapshot_and_updates_note(workspace_
     assert any("repo:Dionysus/reports/ecosystem-audits/" in ref for ref in promotion.output_refs)
 
 
+def test_checkpoint_promote_to_dionysus_uses_session_specific_filenames(workspace_root: Path) -> None:
+    dionysus_root = workspace_root / "Dionysus"
+    (dionysus_root / "reports" / "ecosystem-audits").mkdir(parents=True, exist_ok=True)
+    (dionysus_root / "README.md").write_text("# Dionysus\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+
+    first = sdk.checkpoints.promote(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        target="dionysus-note",
+    )
+
+    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    jsonl_path = note_dir / "checkpoint-note.jsonl"
+    updated_lines = []
+    for raw_line in jsonl_path.read_text(encoding="utf-8").splitlines():
+        payload = json.loads(raw_line)
+        payload["session_ref"] = "session:2026-04-09-aoa-sdk-checkpoint-growth-second"
+        updated_lines.append(json.dumps(payload))
+    jsonl_path.write_text("\n".join(updated_lines) + "\n", encoding="utf-8")
+    sdk.checkpoints.status(repo_root=str(workspace_root / "aoa-sdk"))
+
+    second = sdk.checkpoints.promote(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        target="dionysus-note",
+    )
+
+    promoted_json = sorted(
+        path.name
+        for path in (dionysus_root / "reports" / "ecosystem-audits").glob("*.aoa-sdk.checkpoint-note.json")
+    )
+
+    assert first.output_refs != second.output_refs
+    assert len(promoted_json) == 2
+    assert len(set(promoted_json)) == 2
+
+
 def test_checkpoint_promote_harvest_handoff_closes_note(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     sdk.checkpoints.append(

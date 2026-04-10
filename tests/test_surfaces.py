@@ -220,6 +220,53 @@ def test_surface_handoff_targets_are_deterministic(
     assert "aoa-session-route-forks" not in target_names
 
 
+def test_surface_handoff_does_not_offer_automation_scan_for_explicit_playbook_request_only(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="closeout",
+        intent_text="playbook layer inspection only",
+    )
+    handoff = sdk.surfaces.build_closeout_handoff(
+        report,
+        session_ref="session:test-surface-explicit-playbook",
+    )
+
+    target_names = [target.skill_name for target in handoff.handoff_targets]
+
+    assert "aoa-session-donor-harvest" in target_names
+    assert "aoa-automation-opportunity-scan" not in target_names
+
+
+def test_surface_detect_orders_explicit_layer_hints_stably(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="skill technique playbook eval memo",
+    )
+
+    explicit_items = [
+        item.surface_ref
+        for item in report.items
+        if "explicit-request" in item.signals
+    ]
+
+    assert explicit_items == [
+        "aoa-evals.runtime_candidate_template_index.min",
+        "aoa-memo.memory_catalog.min",
+        "aoa-playbooks.playbook_registry.min",
+        "aoa-skills:layer-request",
+        "aoa-techniques.technique_promotion_readiness.min",
+    ]
+
+
 def test_surface_detect_does_not_write_skill_runtime_session(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
@@ -232,6 +279,42 @@ def test_surface_detect_does_not_write_skill_runtime_session(workspace_root: Pat
 
     assert report.skill_report_included is True
     assert not session_file.exists()
+
+
+def test_surface_handoff_ignores_non_open_checkpoint_notes(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+    )
+    sdk.checkpoints.promote(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        target="harvest-handoff",
+    )
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="closeout",
+        intent_text="opaque token only",
+    )
+    handoff = sdk.surfaces.build_closeout_handoff(
+        report,
+        session_ref="session:test-surface-closed-checkpoint",
+    )
+
+    assert handoff.checkpoint_note_ref is not None
+    assert handoff.surviving_checkpoint_clusters == []
+    assert handoff.checkpoint_harvest_candidates == []
+    assert handoff.checkpoint_progression_candidates == []
+    assert handoff.checkpoint_upgrade_candidates == []
+    assert handoff.checkpoint_progression_axes == []
+    assert handoff.stats_refresh_recommended is False
 
 
 def test_surface_detect_consumes_owner_layer_shortlist_without_changing_truth(

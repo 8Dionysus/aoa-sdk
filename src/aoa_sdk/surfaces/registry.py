@@ -59,6 +59,8 @@ SIGNAL_ORDER: list[SurfaceSignal] = [
     "role-posture",
     "closeout-chain",
 ]
+ACTIVE_CHECKPOINT_NOTE_STATES = {"collecting", "reviewable"}
+ACTIVE_CHECKPOINT_CLUSTER_STATES = {"collecting", "reviewable"}
 
 
 class SurfacesAPI:
@@ -167,7 +169,17 @@ class SurfacesAPI:
         report, report_ref = _load_surface_report(report_or_path)
         surviving_items = [item for item in report.items if item.state != "activated"]
         checkpoint_note = _load_current_checkpoint_note(self.workspace, report.repo_root)
-        surviving_checkpoint_clusters = checkpoint_note.candidate_clusters if checkpoint_note is not None else []
+        surviving_checkpoint_clusters = _closeout_surviving_checkpoint_clusters(checkpoint_note)
+        checkpoint_progression_axes = (
+            list(checkpoint_note.progression_axis_signals)
+            if checkpoint_note is not None and checkpoint_note.state in ACTIVE_CHECKPOINT_NOTE_STATES
+            else []
+        )
+        stats_refresh_recommended = (
+            checkpoint_note.stats_refresh_recommended
+            if checkpoint_note is not None and checkpoint_note.state in ACTIVE_CHECKPOINT_NOTE_STATES
+            else False
+        )
         checkpoint_harvest_candidates = [
             cluster for cluster in surviving_checkpoint_clusters if "harvest" in cluster.session_end_targets
         ]
@@ -187,16 +199,14 @@ class SurfacesAPI:
             checkpoint_harvest_candidates=checkpoint_harvest_candidates,
             checkpoint_progression_candidates=checkpoint_progression_candidates,
             checkpoint_upgrade_candidates=checkpoint_upgrade_candidates,
-            checkpoint_progression_axes=(
-                list(checkpoint_note.progression_axis_signals) if checkpoint_note is not None else []
-            ),
-            stats_refresh_recommended=checkpoint_note.stats_refresh_recommended if checkpoint_note is not None else False,
+            checkpoint_progression_axes=checkpoint_progression_axes,
+            stats_refresh_recommended=stats_refresh_recommended,
             handoff_targets=_derive_closeout_handoff_targets(
                 surviving_items=surviving_items,
                 surviving_checkpoint_clusters=surviving_checkpoint_clusters,
                 checkpoint_harvest_candidates=checkpoint_harvest_candidates,
                 checkpoint_progression_candidates=checkpoint_progression_candidates,
-                checkpoint_progression_axes=list(checkpoint_note.progression_axis_signals) if checkpoint_note is not None else [],
+                checkpoint_progression_axes=checkpoint_progression_axes,
                 checkpoint_upgrade_candidates=checkpoint_upgrade_candidates,
                 actionability_gaps=report.actionability_gaps,
             ),
@@ -411,7 +421,7 @@ def _derive_heuristic_items(
             )
         )
 
-    for token in tokens:
+    for token in sorted(tokens):
         explicit_rule = EXPLICIT_LAYER_RULES_BY_TOKEN.get(token)
         if explicit_rule is None:
             continue
@@ -715,7 +725,11 @@ def _derive_closeout_handoff_targets(
                 ],
             )
         )
-    playbook_items = [item for item in surviving_items if item.object_kind == "playbook"]
+    playbook_items = [
+        item
+        for item in surviving_items
+        if item.object_kind == "playbook" and "scenario-recurring" in item.signals
+    ]
     if playbook_items:
         targets.append(
             SurfaceCloseoutHandoffTarget(
@@ -1355,6 +1369,18 @@ def _load_current_checkpoint_note(workspace: Workspace, repo_root: str) -> Sessi
         return SessionCheckpointNote.model_validate_json(note_path.read_text(encoding="utf-8"))
     except Exception:
         return None
+
+
+def _closeout_surviving_checkpoint_clusters(
+    checkpoint_note: SessionCheckpointNote | None,
+) -> list[SessionCheckpointCluster]:
+    if checkpoint_note is None or checkpoint_note.state not in ACTIVE_CHECKPOINT_NOTE_STATES:
+        return []
+    return [
+        cluster
+        for cluster in checkpoint_note.candidate_clusters
+        if cluster.review_status in ACTIVE_CHECKPOINT_CLUSTER_STATES
+    ]
 
 
 def _checkpoint_note_ref(workspace: Workspace, repo_root: str, note: SessionCheckpointNote | None) -> str | None:
