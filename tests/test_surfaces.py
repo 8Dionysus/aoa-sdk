@@ -281,6 +281,21 @@ def test_surface_detect_does_not_write_skill_runtime_session(workspace_root: Pat
     assert not session_file.exists()
 
 
+def test_surface_detect_ignores_empty_runtime_session_file(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+    session_file.parent.mkdir(parents=True, exist_ok=True)
+    session_file.write_text("", encoding="utf-8")
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="verify recurring handoff proof",
+    )
+
+    assert report.active_skill_names == []
+
+
 def test_surface_handoff_ignores_non_open_checkpoint_notes(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     sdk.checkpoints.append(

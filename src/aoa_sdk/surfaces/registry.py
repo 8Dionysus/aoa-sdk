@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from typing import Literal, cast
 
-from ..errors import RepoNotFound, SurfaceNotFound
+from ..errors import InvalidSurface, RepoNotFound, SurfaceNotFound
 from ..models import (
     CheckpointCandidateCluster,
     ProgressionAxisSignal,
@@ -244,7 +244,7 @@ def _load_surface_report(report_or_path: SurfaceDetectionReport | str | Path) ->
 def _load_active_skill_names(workspace: Workspace, *, session_file: str | None) -> list[str]:
     try:
         session = load_session(workspace, session_file)
-    except SurfaceNotFound:
+    except (InvalidSurface, SurfaceNotFound):
         return []
     return [record.name for record in session.active_skills]
 

@@ -430,6 +430,37 @@ def test_skills_enter_writes_ingress_report(workspace_root: Path, install_host_s
     assert payload["report"]["activate_now"][0]["host_availability"]["source"] == "workspace-install"
 
 
+def test_skills_guard_recovers_from_empty_runtime_session_file(workspace_root: Path) -> None:
+    runner = CliRunner()
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+    session_file.parent.mkdir(parents=True, exist_ok=True)
+    session_file.write_text("", encoding="utf-8")
+
+    result = runner.invoke(
+        app,
+        [
+            "skills",
+            "guard",
+            str(workspace_root / "aoa-sdk"),
+            "--root",
+            str(workspace_root),
+            "--session-file",
+            str(session_file),
+            "--intent-text",
+            "plan verify a bounded change",
+            "--mutation-surface",
+            "runtime",
+            "--no-auto-checkpoint",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["report"]["activate_now"][0]["skill_name"] == "aoa-change-protocol"
+    assert json.loads(session_file.read_text(encoding="utf-8"))["active_skills"][0]["name"] == "aoa-change-protocol"
+
+
 def test_skills_detect_supports_checkpoint_phase(workspace_root: Path, install_host_skills) -> None:
     install_host_skills(workspace_root, ["aoa-change-protocol"])
     runner = CliRunner()
