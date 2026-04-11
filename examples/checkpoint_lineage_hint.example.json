@@ -1,17 +1,17 @@
 {
   "schema_version": "aoa_checkpoint_lineage_hint_v1",
-  "cluster_ref": "cluster:route:aoa-playbooks-playbook-registry-min",
-  "owner_hypothesis": "aoa-playbooks",
-  "owner_shape": "playbook",
-  "nearest_wrong_target": "aoa-skills",
-  "status_posture": "reanchor",
+  "cluster_ref": "cluster:growth:aoa-sdk-checkpoint-auto-capture-verify-green",
+  "owner_hypothesis": "aoa-skills",
+  "owner_shape": "reviewed donor harvest candidate",
+  "nearest_wrong_target": "aoa-playbooks",
+  "status_posture": "early",
   "evidence_refs": [
-    "aoa-playbooks.playbook_registry.min",
-    "aoa-techniques.technique_promotion_readiness.min"
+    ".aoa/session-growth/current/aoa-sdk/checkpoint-note.json#candidate_clusters[0]",
+    ".aoa/session-growth/current/aoa-sdk/closeout-context.json#lineage_cluster:0"
   ],
   "axis_pressure": {
     "change_legibility": 1,
-    "deep_readiness": 1
+    "review_sharpness": 1
   },
   "supersedes": [],
   "merged_into": null,

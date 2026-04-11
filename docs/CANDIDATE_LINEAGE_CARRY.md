@@ -17,8 +17,11 @@ refinery without claiming owner truth.
 
 ## Carried shape
 
-The control-plane carry uses `schemas/checkpoint_lineage_hint.schema.json` and
-lands in two places:
+The control-plane carry uses `schemas/checkpoint_lineage_hint.schema.json` for
+one hint and `schemas/closeout_candidate_lineage_map.schema.json` for reviewed
+closeout bundles.
+
+It lands in two places:
 
 - checkpoint candidate clusters under `lineage_hint`
 - reviewed closeout context under `candidate_lineage_map`
@@ -41,6 +44,9 @@ In this repo only the first hop is authoritative.
 - `axis_pressure` is a compact checkpoint-to-closeout carry, not a score
 - `supersedes`, `merged_into`, and `drop_reason` stay representable even before
   owner truth exists
+- closeout map items may carry their
+  `schema_version: aoa_checkpoint_lineage_hint_v1`, but they still must not
+  carry `candidate_ref`, `seed_ref`, or `object_ref`
 
 ## Negative rules
 
