@@ -22,6 +22,11 @@ existing session-harvest family into an automatic runtime authority.
 - post-commit checkpoint capture always stays mid-session and reviewable: it may dispatch checkpoint-phase skills, run additive checkpoint surface detection, and append a local reviewable note, but it never runs closeout, promotion, harvest, push, or release logic
 - full harvest still belongs to the existing reviewed closeout path
 - checkpoint notes carry harvest, progression, and upgrade candidates through the end of the session
+- checkpoint notes may also carry provisional lineage hints rooted in
+  `cluster_ref`; that carry may name owner hypothesis, owner shape, nearest
+  wrong target, evidence refs, axis pressure, supersession metadata, and
+  status posture, but it must not mint `candidate_ref`, `seed_ref`, or
+  `object_ref`
 - checkpoint notes keep provisional multi-axis movement for `boundary_integrity`, `execution_reliability`, `change_legibility`, `review_sharpness`, `proof_discipline`, `provenance_hygiene`, and `deep_readiness`
 - candidate movement and stats refresh stay reviewed-closeout decisions, not
   mid-session auto-promotion; after reviewed closeout, surviving candidates
@@ -113,6 +118,8 @@ and the authority contract
 still use the skill as a protocol, reread the session evidence, and separate
 checkpoint hints from final candidates before treating the closeout as a
 session analysis.
+`docs/CANDIDATE_LINEAGE_CARRY.md` is the canonical note for what the SDK may
+and may not carry on that lineage seam.
 When the active runtime session also carries a live Codex rollout path,
 closeout now binds that rollout trace into the context and rereads it beside
 the reviewed artifact so one narrow checkpoint ledger does not stand in for the

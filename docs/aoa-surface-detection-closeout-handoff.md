@@ -32,6 +32,12 @@ aoa-sdk/.aoa/surface-detection/{label}.closeout-handoff.latest.json
 - `handoff_targets`
 - `notes`
 
+When `surviving_checkpoint_clusters` are present, each cluster may also carry a
+provisional `lineage_hint` with `cluster_ref`, owner hypothesis, owner shape,
+nearest wrong target, evidence refs, axis pressure, supersession metadata, and
+status posture. That carry is still control-plane only and does not mint
+`candidate_ref`, `seed_ref`, or `object_ref`.
+
 All seven session-growth targets remain valid schema values:
 
 - `aoa-session-donor-harvest`

@@ -1,0 +1,24 @@
+{
+  "session_ref": "session:example-growth-refinery-closeout",
+  "candidate_lineage_map": [
+    {
+      "schema_version": "aoa_checkpoint_lineage_hint_v1",
+      "cluster_ref": "cluster:route:aoa-playbooks-playbook-registry-min",
+      "owner_hypothesis": "aoa-playbooks",
+      "owner_shape": "playbook",
+      "nearest_wrong_target": "aoa-skills",
+      "status_posture": "reanchor",
+      "evidence_refs": [
+        "aoa-playbooks.playbook_registry.min",
+        "aoa-techniques.technique_promotion_readiness.min"
+      ],
+      "axis_pressure": {
+        "change_legibility": 1,
+        "deep_readiness": 1
+      },
+      "supersedes": [],
+      "merged_into": null,
+      "drop_reason": null
+    }
+  ]
+}

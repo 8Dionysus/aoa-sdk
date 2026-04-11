@@ -1200,6 +1200,20 @@ class SurfaceDetectionReport(BaseModel):
     actionability_gaps: list[str] = Field(default_factory=list)
 
 
+class CheckpointLineageHint(BaseModel):
+    schema_version: Literal["aoa_checkpoint_lineage_hint_v1"] = "aoa_checkpoint_lineage_hint_v1"
+    cluster_ref: str
+    owner_hypothesis: str
+    owner_shape: str
+    nearest_wrong_target: str | None = None
+    status_posture: Literal["early", "reanchor", "thin-evidence", "stable"]
+    evidence_refs: list[str] = Field(default_factory=list)
+    axis_pressure: dict[str, int] = Field(default_factory=dict)
+    supersedes: list[str] = Field(default_factory=list)
+    merged_into: str | None = None
+    drop_reason: str | None = None
+
+
 class CheckpointCandidateCluster(BaseModel):
     candidate_id: str
     candidate_kind: str
@@ -1214,6 +1228,7 @@ class CheckpointCandidateCluster(BaseModel):
     defer_reason: str | None = None
     blocked_by: list[str] = Field(default_factory=list)
     next_owner_moves: list[str] = Field(default_factory=list)
+    lineage_hint: CheckpointLineageHint | None = None
 
 
 class SessionCheckpointAgentReview(BaseModel):
@@ -1284,6 +1299,7 @@ class SessionCheckpointCluster(BaseModel):
     defer_reason: str | None = None
     blocked_by: list[str] = Field(default_factory=list)
     next_owner_moves: list[str] = Field(default_factory=list)
+    lineage_hint: CheckpointLineageHint | None = None
 
 
 class ProgressionAxisSignal(BaseModel):
@@ -1481,6 +1497,7 @@ class CheckpointCloseoutContext(BaseModel):
     receipt_refs: list[str] = Field(default_factory=list)
     repo_scope: list[str] = Field(default_factory=list)
     candidate_map: CloseoutContextCandidateMap = Field(default_factory=CloseoutContextCandidateMap)
+    candidate_lineage_map: list[CheckpointLineageHint] = Field(default_factory=list)
     progression_axis_signals: list[ProgressionAxisSignal] = Field(default_factory=list)
     ordered_skill_plan: list[SessionEndSkillTarget] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
