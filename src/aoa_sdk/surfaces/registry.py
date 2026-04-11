@@ -7,6 +7,7 @@ from typing import Literal, cast
 
 from ..errors import InvalidSurface, RepoNotFound, SurfaceNotFound
 from ..models import (
+    CheckpointLineageHint,
     CheckpointCandidateCluster,
     ProgressionAxisSignal,
     RoutingOwnerLayerShortlistHint,
@@ -61,6 +62,34 @@ SIGNAL_ORDER: list[SurfaceSignal] = [
 ]
 ACTIVE_CHECKPOINT_NOTE_STATES = {"collecting", "reviewable"}
 ACTIVE_CHECKPOINT_CLUSTER_STATES = {"collecting", "reviewable"}
+OWNER_SHAPE_BY_REPO = {
+    "aoa-techniques": "technique",
+    "aoa-skills": "skill",
+    "aoa-evals": "eval",
+    "aoa-memo": "memo",
+    "aoa-playbooks": "playbook",
+    "aoa-agents": "agent",
+    "aoa-sdk": "runtime_surface",
+    "aoa-stats": "summary_surface",
+    "Dionysus": "seed",
+}
+NEAREST_WRONG_TARGET_BY_REPO = {
+    "aoa-playbooks": "aoa-skills",
+    "aoa-skills": "aoa-playbooks",
+    "aoa-evals": "aoa-skills",
+    "aoa-memo": "aoa-evals",
+    "aoa-agents": "aoa-skills",
+    "aoa-techniques": "aoa-skills",
+    "aoa-sdk": "aoa-skills",
+    "aoa-stats": "aoa-evals",
+    "Dionysus": "aoa-skills",
+}
+AXIS_PRESSURE_BY_MOVEMENT = {
+    "advance": 2,
+    "hold": 1,
+    "reanchor": -1,
+    "downgrade": -2,
+}
 
 
 class SurfacesAPI:
@@ -544,6 +573,17 @@ def _derive_explicit_mutation_growth_clusters(
         review_move_by_kind[explicit_checkpoint_kind],
     ]
     candidate_id = f"candidate:growth:{_slugify(f'{context_label}-{explicit_checkpoint_kind}-{mutation_surface}')}"
+    confidence: Literal["low", "medium", "high"] = (
+        "high"
+        if explicit_checkpoint_kind in {"verify_green", "pr_merged", "owner_followthrough"}
+        else "medium"
+    )
+    progression_axis_signals = _progression_axis_signals_for_explicit_growth(
+        candidate_id=candidate_id,
+        checkpoint_kind=explicit_checkpoint_kind,
+        blocked_by=blocked_by,
+        evidence_refs=evidence_refs,
+    )
 
     return [
         CheckpointCandidateCluster(
@@ -553,22 +593,23 @@ def _derive_explicit_mutation_growth_clusters(
             display_name=display_name_by_kind[explicit_checkpoint_kind],
             source_surface_ref=f"aoa-sdk:checkpoint_auto_capture.{explicit_checkpoint_kind}",
             evidence_refs=evidence_refs,
-            confidence=(
-                "high"
-                if explicit_checkpoint_kind in {"verify_green", "pr_merged", "owner_followthrough"}
-                else "medium"
-            ),
+            confidence=confidence,
             session_end_targets=["harvest", "progression"],
-            progression_axis_signals=_progression_axis_signals_for_explicit_growth(
-                candidate_id=candidate_id,
-                checkpoint_kind=explicit_checkpoint_kind,
-                blocked_by=blocked_by,
-                evidence_refs=evidence_refs,
-            ),
+            progression_axis_signals=progression_axis_signals,
             promote_if=promote_if,
             defer_reason=defer_reason,
             blocked_by=blocked_by,
             next_owner_moves=next_owner_moves,
+            lineage_hint=_build_checkpoint_lineage_hint(
+                candidate_kind="growth",
+                owner_hint=context_label,
+                source_surface_ref=f"aoa-sdk:checkpoint_auto_capture.{explicit_checkpoint_kind}",
+                evidence_refs=evidence_refs,
+                confidence=confidence,
+                blocked_by=blocked_by,
+                progression_axis_signals=progression_axis_signals,
+                defer_reason=defer_reason,
+            ),
         )
     ]
 
@@ -580,6 +621,71 @@ def _dedupe_checkpoint_candidate_clusters(
     for cluster in clusters:
         deduped[(cluster.candidate_id, cluster.owner_hint)] = cluster
     return list(deduped.values())
+
+
+def _build_checkpoint_lineage_hint(
+    *,
+    candidate_kind: str,
+    owner_hint: str,
+    source_surface_ref: str,
+    evidence_refs: list[str],
+    confidence: Literal["low", "medium", "high"],
+    blocked_by: list[str],
+    progression_axis_signals: list[ProgressionAxisSignal],
+    defer_reason: str | None,
+) -> CheckpointLineageHint:
+    return CheckpointLineageHint(
+        cluster_ref=f"cluster:{candidate_kind}:{_slugify(source_surface_ref)}",
+        owner_hypothesis=owner_hint,
+        owner_shape=_owner_shape(owner_hint=owner_hint, candidate_kind=candidate_kind),
+        nearest_wrong_target=_nearest_wrong_target_repo(owner_hint=owner_hint),
+        status_posture=_lineage_status_posture(blocked_by=blocked_by, confidence=confidence),
+        evidence_refs=list(evidence_refs),
+        axis_pressure=_axis_pressure_from_signals(progression_axis_signals),
+        supersedes=[],
+        merged_into=None,
+        drop_reason=defer_reason if "thin-evidence" in blocked_by else None,
+    )
+
+
+def _owner_shape(*, owner_hint: str, candidate_kind: str) -> str:
+    if owner_hint in OWNER_SHAPE_BY_REPO:
+        return OWNER_SHAPE_BY_REPO[owner_hint]
+    shape_by_candidate_kind = {
+        "route": "playbook",
+        "pattern": "technique",
+        "proof": "eval",
+        "recall": "memo",
+        "role": "agent",
+        "risk": "skill",
+        "growth": "runtime_surface",
+    }
+    return shape_by_candidate_kind.get(candidate_kind, "runtime_surface")
+
+
+def _nearest_wrong_target_repo(*, owner_hint: str) -> str:
+    return NEAREST_WRONG_TARGET_BY_REPO.get(owner_hint, "aoa-skills")
+
+
+def _lineage_status_posture(
+    *,
+    blocked_by: list[str],
+    confidence: Literal["low", "medium", "high"],
+) -> Literal["early", "reanchor", "thin-evidence", "stable"]:
+    if "owner-ambiguity" in blocked_by:
+        return "reanchor"
+    if "thin-evidence" in blocked_by:
+        return "thin-evidence"
+    if confidence == "high" and not blocked_by:
+        return "stable"
+    return "early"
+
+
+def _axis_pressure_from_signals(signals: list[ProgressionAxisSignal]) -> dict[str, int]:
+    return {
+        signal.axis: AXIS_PRESSURE_BY_MOVEMENT.get(signal.movement, 0)
+        for signal in signals
+    }
 
 
 def _promote_hint_for_explicit_checkpoint_kind(
@@ -1259,9 +1365,16 @@ def _derive_checkpoint_candidate_clusters(
                 ),
             ]
         )
+        candidate_id = f"candidate:{candidate_kind}:{_slugify(item.surface_ref)}"
+        progression_axis_signals = _progression_axis_signals_for_item(
+            item,
+            candidate_kind=candidate_kind,
+            blocked_by=blocked_by,
+            evidence_refs=evidence_refs,
+        )
         clusters.append(
             CheckpointCandidateCluster(
-                candidate_id=f"candidate:{candidate_kind}:{_slugify(item.surface_ref)}",
+                candidate_id=candidate_id,
                 candidate_kind=candidate_kind,
                 owner_hint=item.owner_repo,
                 display_name=item.display_name,
@@ -1269,16 +1382,21 @@ def _derive_checkpoint_candidate_clusters(
                 evidence_refs=evidence_refs,
                 confidence=item.confidence,
                 session_end_targets=_session_end_targets_for_candidate_kind(candidate_kind),
-                progression_axis_signals=_progression_axis_signals_for_item(
-                    item,
-                    candidate_kind=candidate_kind,
-                    blocked_by=blocked_by,
-                    evidence_refs=evidence_refs,
-                ),
+                progression_axis_signals=progression_axis_signals,
                 promote_if=promote_if,
                 defer_reason=defer_reason,
                 blocked_by=blocked_by,
                 next_owner_moves=next_owner_moves,
+                lineage_hint=_build_checkpoint_lineage_hint(
+                    candidate_kind=candidate_kind,
+                    owner_hint=item.owner_repo,
+                    source_surface_ref=item.surface_ref,
+                    evidence_refs=evidence_refs,
+                    confidence=item.confidence,
+                    blocked_by=blocked_by,
+                    progression_axis_signals=progression_axis_signals,
+                    defer_reason=defer_reason,
+                ),
             )
         )
     return clusters

@@ -16,6 +16,7 @@ from ..models import (
     CheckpointCaptureResult,
     CheckpointHookInstallResult,
     CheckpointHookStatus,
+    CheckpointLineageHint,
     CloseoutContextCandidateMap,
     CloseoutExecutionStep,
     ProgressionAxisSignal,
@@ -178,6 +179,31 @@ def _dict_records(value: object) -> list[dict[str, object]]:
 def _string_field(mapping: dict[str, object], key: str) -> str | None:
     value = mapping.get(key)
     return value if isinstance(value, str) else None
+
+
+def _merge_checkpoint_lineage_hint(
+    existing: CheckpointLineageHint | None,
+    incoming: CheckpointLineageHint | None,
+) -> CheckpointLineageHint | None:
+    if existing is None:
+        return incoming
+    if incoming is None:
+        return existing
+    axis_pressure = dict(existing.axis_pressure)
+    axis_pressure.update(incoming.axis_pressure)
+    return existing.model_copy(
+        update={
+            "owner_hypothesis": incoming.owner_hypothesis or existing.owner_hypothesis,
+            "owner_shape": incoming.owner_shape or existing.owner_shape,
+            "nearest_wrong_target": incoming.nearest_wrong_target or existing.nearest_wrong_target,
+            "status_posture": incoming.status_posture,
+            "evidence_refs": _dedupe_strings([*existing.evidence_refs, *incoming.evidence_refs]),
+            "axis_pressure": axis_pressure,
+            "supersedes": _dedupe_strings([*existing.supersedes, *incoming.supersedes]),
+            "merged_into": incoming.merged_into or existing.merged_into,
+            "drop_reason": incoming.drop_reason or existing.drop_reason,
+        }
+    )
 
 
 def _utc_timestamp(now_utc: datetime | None = None) -> str:
@@ -1031,14 +1057,12 @@ class CheckpointsAPI:
             )
             handoff = None
 
+        shortlisted_clusters = _closeout_candidate_clusters(notes=aggregated_notes, handoff=handoff)
         repo_scope = _dedupe_strings(
             [
                 paths.repo_label,
                 *(scope for candidate_note in aggregated_notes for scope in candidate_note.repo_scope),
-                *(
-                    cluster.owner_hint
-                    for cluster in (handoff.surviving_checkpoint_clusters if handoff is not None else [])
-                ),
+                *(cluster.owner_hint for cluster in shortlisted_clusters),
             ]
         )
         candidate_map = CloseoutContextCandidateMap(
@@ -1064,6 +1088,7 @@ class CheckpointsAPI:
                 ]
             ),
         )
+        candidate_lineage_map = _collect_candidate_lineage_hints(shortlisted_clusters)
         ordered_skill_plan = _derive_closeout_skill_plan(notes=aggregated_notes, handoff=handoff)
         if not aggregated_notes:
             notes.append("no matching local checkpoint note was available; the reviewed artifact becomes the primary execution source")
@@ -1096,6 +1121,7 @@ class CheckpointsAPI:
             receipt_refs=[str(path) for path in collected_receipt_paths],
             repo_scope=repo_scope,
             candidate_map=candidate_map,
+            candidate_lineage_map=candidate_lineage_map,
             progression_axis_signals=_merge_progression_axis_signals(
                 [
                     signal
@@ -2057,6 +2083,23 @@ def _closeout_candidate_clusters(
     return [deduped[key] for key in order]
 
 
+def _collect_candidate_lineage_hints(
+    clusters: list[SessionCheckpointCluster],
+) -> list[CheckpointLineageHint]:
+    deduped: dict[str, CheckpointLineageHint] = {}
+    order: list[str] = []
+    for cluster in clusters:
+        if cluster.lineage_hint is None:
+            continue
+        cluster_ref = cluster.lineage_hint.cluster_ref
+        if cluster_ref not in deduped:
+            deduped[cluster_ref] = cluster.lineage_hint
+            order.append(cluster_ref)
+            continue
+        deduped[cluster_ref] = _merge_checkpoint_lineage_hint(deduped[cluster_ref], cluster.lineage_hint) or deduped[cluster_ref]
+    return [deduped[key] for key in order]
+
+
 def _derive_closeout_skill_plan(
     *,
     notes: list[SessionCheckpointNote],
@@ -3006,6 +3049,10 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
                 defer_reason=cluster.defer_reason or (existing.defer_reason if existing else None),
                 blocked_by=merged_blocked,
                 next_owner_moves=merged_moves,
+                lineage_hint=_merge_checkpoint_lineage_hint(
+                    existing.lineage_hint if existing is not None else None,
+                    cluster.lineage_hint,
+                ),
             )
             all_evidence.update(merged_evidence)
             next_owner_moves.update(merged_moves)

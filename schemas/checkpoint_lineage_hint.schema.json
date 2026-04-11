@@ -1,0 +1,80 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/checkpoint_lineage_hint.schema.json",
+  "title": "Checkpoint Lineage Hint",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "cluster_ref",
+    "owner_hypothesis",
+    "owner_shape",
+    "status_posture",
+    "evidence_refs"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_checkpoint_lineage_hint_v1"
+    },
+    "cluster_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "owner_hypothesis": {
+      "type": "string",
+      "minLength": 1
+    },
+    "owner_shape": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nearest_wrong_target": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status_posture": {
+      "enum": [
+        "early",
+        "reanchor",
+        "thin-evidence",
+        "stable"
+      ]
+    },
+    "evidence_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "axis_pressure": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "integer",
+        "minimum": -3,
+        "maximum": 3
+      }
+    },
+    "supersedes": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "merged_into": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "drop_reason": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  }
+}

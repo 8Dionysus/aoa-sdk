@@ -212,6 +212,8 @@ def test_surface_detect_checkpoint_phase_emits_candidate_clusters(workspace_root
     assert report.candidate_clusters
     assert report.promotion_recommendation in {"local_note", "dionysus_note"}
     assert {cluster.candidate_kind for cluster in report.candidate_clusters} >= {"route", "proof", "recall"}
+    assert all(cluster.lineage_hint is not None for cluster in report.candidate_clusters)
+    assert all("candidate_ref" not in cluster.lineage_hint.model_dump() for cluster in report.candidate_clusters if cluster.lineage_hint is not None)
 
 
 def test_checkpoint_status_becomes_reviewable_after_repeat(workspace_root: Path) -> None:
@@ -1295,6 +1297,17 @@ def test_surface_closeout_handoff_links_checkpoint_note(workspace_root: Path) ->
     assert handoff.checkpoint_upgrade_candidates
     assert handoff.checkpoint_progression_axes
     assert handoff.stats_refresh_recommended is True
+    assert all(cluster.lineage_hint is not None for cluster in handoff.surviving_checkpoint_clusters)
+    route_lineage = next(
+        cluster.lineage_hint
+        for cluster in handoff.surviving_checkpoint_clusters
+        if cluster.lineage_hint is not None and cluster.candidate_kind == "route"
+    )
+    assert route_lineage is not None
+    assert route_lineage.cluster_ref.startswith("cluster:route:")
+    assert route_lineage.owner_hypothesis == "aoa-playbooks"
+    assert route_lineage.owner_shape == "playbook"
+    assert "candidate_ref" not in route_lineage.model_dump()
     assert any(target.skill_name == "aoa-session-donor-harvest" for target in handoff.handoff_targets)
     assert any(target.skill_name == "aoa-session-progression-lift" for target in handoff.handoff_targets)
     assert any(target.skill_name == "aoa-quest-harvest" for target in handoff.handoff_targets)
@@ -1391,6 +1404,15 @@ def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: P
     assert context.checkpoint_note_ref is not None
     assert context.surface_handoff_ref is not None
     assert context.receipt_refs == [str(receipt_path.resolve())]
+    assert context.candidate_lineage_map
+    route_lineage = next(
+        hint
+        for hint in context.candidate_lineage_map
+        if hint.owner_hypothesis == "aoa-playbooks"
+    )
+    assert route_lineage.cluster_ref.startswith("cluster:route:")
+    assert route_lineage.nearest_wrong_target == "aoa-skills"
+    assert "candidate_ref" not in route_lineage.model_dump()
     assert [target.skill_name for target in context.ordered_skill_plan] == [
         "aoa-session-donor-harvest",
         "aoa-session-progression-lift",
