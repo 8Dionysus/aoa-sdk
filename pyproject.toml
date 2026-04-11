@@ -26,6 +26,9 @@ dev = [
   "mypy>=1.11",
   "jsonschema>=4.23",
 ]
+mcp = [
+  "mcp[cli]>=1.2,<2",
+]
 
 [project.scripts]
 aoa = "aoa_sdk.cli.main:app"
