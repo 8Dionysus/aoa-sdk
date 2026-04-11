@@ -325,6 +325,24 @@ def test_after_commit_skips_without_active_session_and_writes_status_artifact(wo
     assert not _checkpoint_note_dir(workspace_root, repo_label="aoa-sdk").exists()
 
 
+def test_after_commit_reports_session_resolution_failure(workspace_root: Path) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(repo_root, subject="plan verify a bounded change")
+    contract_path = workspace_root / "aoa-skills" / "generated" / "runtime_session_contract.json"
+    contract_path.unlink()
+    sdk = AoASDK.from_workspace(repo_root)
+
+    report = sdk.checkpoints.after_commit(repo_root=str(repo_root), commit_ref="HEAD")
+
+    status_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "post-commit-status" / "aoa-sdk.latest.json"
+    assert report.status == "failed"
+    assert report.commit_sha == commit_sha
+    assert report.session_file is None
+    assert report.error_text
+    assert status_path.exists()
+
+
 def test_after_commit_captures_reviewable_note_and_surface_context(
     workspace_root: Path,
     install_host_skills,
@@ -1419,6 +1437,43 @@ def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: P
         "aoa-quest-harvest",
     ]
     assert (note_dir / "closeout-context.json").exists()
+
+
+def test_build_closeout_context_keeps_same_kind_mutation_lineage_seams_distinct(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-session.md"
+    reviewed_artifact.parent.mkdir(parents=True, exist_ok=True)
+    reviewed_artifact.write_text("# Reviewed Session\n\n- checkpoint evidence reviewed\n", encoding="utf-8")
+
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="commit checkpoint for code seam",
+        mutation_surface="code",
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="commit checkpoint for public share seam",
+        mutation_surface="public-share",
+    )
+
+    context = sdk.checkpoints.build_closeout_context(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        reviewed_artifact_path=str(reviewed_artifact),
+    )
+    lineage_refs = [
+        hint.cluster_ref
+        for hint in context.candidate_lineage_map
+        if hint.owner_hypothesis == "aoa-sdk"
+    ]
+
+    assert len(lineage_refs) == 2
+    assert len(set(lineage_refs)) == 2
+    assert any("commit-code" in cluster_ref for cluster_ref in lineage_refs)
+    assert any("commit-public-share" in cluster_ref for cluster_ref in lineage_refs)
 
 
 def test_build_closeout_context_aggregates_runtime_session_notes_across_repo_labels(

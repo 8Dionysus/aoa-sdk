@@ -946,6 +946,42 @@ def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(wor
     current_payload = json.loads(current.stdout)
     assert current_payload["results"][0]["status"] == "current"
 
+    hook_path.chmod(0o644)
+
+    non_executable = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "hook-status",
+            "--repo",
+            "aoa-sdk",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert non_executable.exit_code == 0
+    non_executable_payload = json.loads(non_executable.stdout)
+    assert non_executable_payload["results"][0]["status"] == "stale"
+
+    refreshed = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "install-hook",
+            "--repo",
+            "aoa-sdk",
+            "--overwrite",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert refreshed.exit_code == 0
+    refreshed_payload = json.loads(refreshed.stdout)
+    assert refreshed_payload["results"][0]["action"] == "updated"
+    assert os.access(hook_path, os.X_OK)
+
     hook_path.write_text(hook_path.read_text(encoding="utf-8") + "\n# stale\n", encoding="utf-8")
 
     stale = runner.invoke(

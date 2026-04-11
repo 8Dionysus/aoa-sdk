@@ -45,7 +45,7 @@ REPO_HINTS: dict[str, dict[str, Any]] = {
     "aoa-skills": {
         "role": "workflow-canon",
         "surface": "canonical skills, exports, and runtime discovery indexes",
-        "entry_candidates": ["SKILL_INDEX.md", "generated/runtime_discovery_index.min.json", "skills"],
+        "entry_candidates": ["SKILL_INDEX.md", "generated/runtime_discovery_index.json", "skills"],
     },
     "aoa-agents": {
         "role": "role-canon",
@@ -279,7 +279,7 @@ class AoAWorkspaceMCPState:
             {
                 "name": "skill_runtime_discovery",
                 "scope": "aoa-skills",
-                "path": "generated/runtime_discovery_index.min.json",
+                "path": "generated/runtime_discovery_index.json",
                 "need": "generated skill discovery index",
             },
             {
