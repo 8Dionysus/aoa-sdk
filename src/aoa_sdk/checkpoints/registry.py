@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+import os
 import re
 import subprocess
 from datetime import UTC, datetime
@@ -495,7 +496,7 @@ class CheckpointsAPI:
             )
         repo_root_path = _resolve_context_root(self.workspace, repo_root)
         repo_label = _resolve_context_label(self.workspace, repo_root)
-        session_path = resolve_session_file(self.workspace, session_file)
+        session_path: Path | None = None
         runtime_session_id: str | None = None
         runtime_session_created_at: datetime | None = None
         skill_report_path: str | None = None
@@ -510,8 +511,8 @@ class CheckpointsAPI:
         }
 
         try:
-            session_path, runtime_session = probe_session(self.workspace, session_file)
             commit_metadata = _read_git_commit_metadata(repo_root_path, commit_ref)
+            session_path, runtime_session = probe_session(self.workspace, session_file)
             captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
             if runtime_session is None:
                 resolved_checkpoint_kind = _resolve_after_commit_checkpoint_kind(
@@ -716,7 +717,13 @@ class CheckpointsAPI:
                 captured_at=captured_at,
                 captured_at_local=captured_at_local,
                 captured_tz=captured_tz,
-                session_file=str(session_path),
+                session_file=(
+                    str(session_path)
+                    if session_path is not None
+                    else str(session_file)
+                    if session_file is not None
+                    else None
+                ),
                 runtime_session_id=runtime_session_id,
                 runtime_session_created_at=runtime_session_created_at,
                 skill_report_path=skill_report_path,
@@ -826,7 +833,7 @@ class CheckpointsAPI:
             status = "missing"
         else:
             existing = hook_path.read_text(encoding="utf-8")
-            status = "current" if existing == rendered else "stale"
+            status = "current" if existing == rendered and os.access(hook_path, os.X_OK) else "stale"
         return CheckpointHookStatus(
             repo=repo_name,
             repo_root=str(repo_root),

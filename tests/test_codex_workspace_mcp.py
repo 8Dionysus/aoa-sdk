@@ -42,7 +42,7 @@ def _seed_codex_workspace(workspace_root: Path) -> None:
         encoding="utf-8",
     )
     (workspace_root / "aoa-skills" / "generated").mkdir(parents=True, exist_ok=True)
-    (workspace_root / "aoa-skills" / "generated" / "runtime_discovery_index.min.json").write_text(
+    (workspace_root / "aoa-skills" / "generated" / "runtime_discovery_index.json").write_text(
         "{}\n",
         encoding="utf-8",
     )
@@ -119,6 +119,7 @@ def test_workspace_runtime_entrypoints_report_curated_surfaces(workspace_root: P
     assert names["project_codex_config"] is True
     assert names["workspace_control_plane"] is True
     assert names["skill_index"] is True
+    assert names["skill_runtime_discovery"] is True
     assert names["seed_route_map"] is True
     assert names["abyss_stack_diagnostic_catalog"] is True
 

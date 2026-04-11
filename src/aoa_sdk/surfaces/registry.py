@@ -601,6 +601,7 @@ def _derive_explicit_mutation_growth_clusters(
             blocked_by=blocked_by,
             next_owner_moves=next_owner_moves,
             lineage_hint=_build_checkpoint_lineage_hint(
+                candidate_id=candidate_id,
                 candidate_kind="growth",
                 owner_hint=context_label,
                 source_surface_ref=f"aoa-sdk:checkpoint_auto_capture.{explicit_checkpoint_kind}",
@@ -625,6 +626,7 @@ def _dedupe_checkpoint_candidate_clusters(
 
 def _build_checkpoint_lineage_hint(
     *,
+    candidate_id: str,
     candidate_kind: str,
     owner_hint: str,
     source_surface_ref: str,
@@ -635,7 +637,7 @@ def _build_checkpoint_lineage_hint(
     defer_reason: str | None,
 ) -> CheckpointLineageHint:
     return CheckpointLineageHint(
-        cluster_ref=f"cluster:{candidate_kind}:{_slugify(source_surface_ref)}",
+        cluster_ref=f"cluster:{candidate_kind}:{_slugify(candidate_id)}",
         owner_hypothesis=owner_hint,
         owner_shape=_owner_shape(owner_hint=owner_hint, candidate_kind=candidate_kind),
         nearest_wrong_target=_nearest_wrong_target_repo(owner_hint=owner_hint),
@@ -1388,6 +1390,7 @@ def _derive_checkpoint_candidate_clusters(
                 blocked_by=blocked_by,
                 next_owner_moves=next_owner_moves,
                 lineage_hint=_build_checkpoint_lineage_hint(
+                    candidate_id=candidate_id,
                     candidate_kind=candidate_kind,
                     owner_hint=item.owner_repo,
                     source_surface_ref=item.surface_ref,
