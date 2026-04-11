@@ -798,6 +798,39 @@ def test_checkpoint_after_commit_cli_reports_skip_without_active_session(workspa
     assert payload["changed_paths"] == ["README.md"]
 
 
+def test_checkpoint_after_commit_cli_accepts_owner_followthrough_kind(workspace_root: Path) -> None:
+    runner = CliRunner()
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-cli-owner-followthrough",
+    )
+    _git_commit(repo_root, subject="owner follow-through after reviewed closeout")
+
+    result = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "after-commit",
+            str(repo_root),
+            "--commit-ref",
+            "HEAD",
+            "--kind",
+            "owner_followthrough",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["status"] == "captured"
+    assert payload["checkpoint_kind"] == "owner_followthrough"
+    assert payload["mutation_surface"] == "public-share"
+
+
 def test_checkpoint_review_note_cli_records_agent_authored_review(workspace_root: Path) -> None:
     runner = CliRunner()
     repo_root = workspace_root / "aoa-sdk"

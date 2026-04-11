@@ -13,6 +13,8 @@ existing session-harvest family into an automatic runtime authority.
 - use `--checkpoint-kind` to override the inferred checkpoint kind when one explicit checkpoint event matters
 - `aoa checkpoint mark` is the agent-facing way to record an explicit milestone, and `aoa checkpoint append` remains the lower-level append surface; both write only local note state under `.aoa/`
 - plain `git commit` can trigger one active-session-only checkpoint pass through the installed `post-commit` hook and `aoa checkpoint after-commit`; when no active session file already exists, that path exits as `skipped_no_active_session` and does not mint a fresh session just to emit noise
+- post-commit kind selection defaults to `auto`; ordinary commits resolve to `commit/code`, explicit `owner_followthrough`, owner-follow-through commit text, or closed-session follow-through resolves to `owner_followthrough/public-share`, and a closed note is never rotated or reopened by the hook
+- use `AOA_CHECKPOINT_KIND=owner_followthrough git commit ...` when the commit is the final owner follow-through after reviewed closeout; if the note has already been closed or promoted, `auto` records a report-only follow-through artifact instead of mutating closed ledger state
 - a captured post-commit checkpoint starts with `agent_review=pending`; the Codex agent must then apply the checkpoint skill protocol and run `aoa checkpoint review-note` to record real intermediate findings, candidate notes, stats hints, mechanic hints, closeout questions, and evidence refs in the note
 - checkpoint capture does not emit `HARVEST_PACKET`
 - checkpoint capture does not emit `CORE_SKILL_APPLICATION_RECEIPT`
@@ -21,7 +23,11 @@ existing session-harvest family into an automatic runtime authority.
 - full harvest still belongs to the existing reviewed closeout path
 - checkpoint notes carry harvest, progression, and upgrade candidates through the end of the session
 - checkpoint notes keep provisional multi-axis movement for `boundary_integrity`, `execution_reliability`, `change_legibility`, `review_sharpness`, `proof_discipline`, `provenance_hygiene`, and `deep_readiness`
-- candidate movement and stats refresh stay end-of-session decisions, not mid-session auto-promotion
+- candidate movement and stats refresh stay reviewed-closeout decisions, not
+  mid-session auto-promotion; after reviewed closeout, surviving candidates
+  should land promptly in tracked owner status surfaces with early, reanchor, or
+  thin-evidence posture instead of remaining only in runtime-local `.aoa`
+  state
 
 ## Local storage
 
@@ -126,6 +132,7 @@ aoa skills guard /srv/aoa-sdk --intent-text "recurring owner follow-through afte
 aoa checkpoint mark /srv/aoa-sdk --kind pr_opened --intent-text "opened PR after protected main rejected direct push" --mutation-surface public-share --root /srv/aoa-sdk --json
 aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
+aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv --json
 aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --summary "agent-reviewed checkpoint notes for this commit" --finding "what changed and why it matters" --candidate-note "candidate, owner, and where it should be revisited" --stats-hint "stats to refresh only after reviewed closeout" --mechanic-hint "workflow mechanism to retain" --closeout-question "what to verify when rereading the full session" --applied-skill aoa-change-protocol --root /srv --json
 aoa checkpoint install-hook --repo aoa-sdk --root /srv --json
 aoa checkpoint hook-status --repo aoa-sdk --root /srv --json
@@ -146,6 +153,11 @@ Checkpoint notes stay below harvest verdict authority. They exist to preserve
 good mid-session candidates until reviewed promotion is honest.
 They should be carried through the session and only moved, harvested, or paired
 with stats refresh from the final reviewed closeout path.
+Once that reviewed closeout path has run, owner follow-through should not leave
+surviving candidates only in `harvest-handoff.json`. If the relevant owner repo
+has a tracked status surface, land the candidate there with its early status,
+provenance, and blockers preserved, and keep final promotion authority separate
+from that early landing.
 When progression evidence exists, reviewed closeout should raise
 `aoa-session-progression-lift` before `aoa-quest-harvest`, so the final
 multi-axis verdict is gathered once from the carried checkpoint evidence instead
