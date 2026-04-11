@@ -127,7 +127,9 @@ def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
     checkpoints = read_text("docs/session-growth-checkpoints.md")
 
     assert "carry harvest, progression, and upgrade candidates through the end of the session" in checkpoints
-    assert "candidate movement and stats refresh stay end-of-session decisions" in checkpoints
+    assert "candidate movement and stats refresh stay reviewed-closeout decisions" in checkpoints
+    assert "land promptly in tracked owner status surfaces" in checkpoints
+    assert "provenance, and blockers preserved" in checkpoints
     assert "the final stats-refresh hint" in checkpoints
     assert "checkpoint_capture.session_end_skill_targets" in checkpoints
     assert "checkpoint_capture.progression_axis_signals" in checkpoints

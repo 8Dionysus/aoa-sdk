@@ -129,8 +129,11 @@ stay quiet.
 Treat that note as the session-local ledger for harvest, progression, and
 upgrade candidates until reviewed closeout; it should also carry provisional
 multi-axis progression evidence for `aoa-session-progression-lift`.
-Do not move candidates or stats mid-session just
-because the note became reviewable.
+Do not move candidates or stats mid-session just because the note became
+reviewable. After reviewed closeout has actually run, do not leave surviving
+candidates only in runtime-local `.aoa` state; land them promptly in the
+relevant owner repo's tracked early-status surface with provenance and blockers
+preserved.
 Expect `aoa skills enter` and `aoa skills guard` to expose that reviewed-closeout
 plan directly in `checkpoint_capture.session_end_skill_targets` and
 `checkpoint_capture.session_end_next_honest_move`, with

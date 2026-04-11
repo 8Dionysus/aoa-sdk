@@ -23,7 +23,11 @@ existing session-harvest family into an automatic runtime authority.
 - full harvest still belongs to the existing reviewed closeout path
 - checkpoint notes carry harvest, progression, and upgrade candidates through the end of the session
 - checkpoint notes keep provisional multi-axis movement for `boundary_integrity`, `execution_reliability`, `change_legibility`, `review_sharpness`, `proof_discipline`, `provenance_hygiene`, and `deep_readiness`
-- candidate movement and stats refresh stay end-of-session decisions, not mid-session auto-promotion
+- candidate movement and stats refresh stay reviewed-closeout decisions, not
+  mid-session auto-promotion; after reviewed closeout, surviving candidates
+  should land promptly in tracked owner status surfaces with early, reanchor, or
+  thin-evidence posture instead of remaining only in runtime-local `.aoa`
+  state
 
 ## Local storage
 
@@ -149,6 +153,11 @@ Checkpoint notes stay below harvest verdict authority. They exist to preserve
 good mid-session candidates until reviewed promotion is honest.
 They should be carried through the session and only moved, harvested, or paired
 with stats refresh from the final reviewed closeout path.
+Once that reviewed closeout path has run, owner follow-through should not leave
+surviving candidates only in `harvest-handoff.json`. If the relevant owner repo
+has a tracked status surface, land the candidate there with its early status,
+provenance, and blockers preserved, and keep final promotion authority separate
+from that early landing.
 When progression evidence exists, reviewed closeout should raise
 `aoa-session-progression-lift` before `aoa-quest-harvest`, so the final
 multi-axis verdict is gathered once from the carried checkpoint evidence instead
