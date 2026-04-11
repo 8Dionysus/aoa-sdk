@@ -9,7 +9,7 @@ from typing import Any
 try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover
-    import tomli as tomllib  # type: ignore[no-redef]
+    import tomli as tomllib  # type: ignore[import-not-found, no-redef]
 
 from ..workspace.config import load_workspace_config
 from ..workspace.discovery import Workspace
@@ -220,14 +220,15 @@ class AoAWorkspaceMCPState:
             hint = REPO_HINTS.get(repo, {})
             repo_root = self.workspace.repo_roots.get(repo)
             repo_config = config.repo_configs.get(repo)
+            manifest_role = repo_config.role if repo_config is not None else None
             rows.append(
                 {
                     "repo": repo,
                     "present": repo_root is not None,
                     "path": str(repo_root) if repo_root is not None else None,
                     "origin": self.workspace.repo_origins.get(repo),
-                    "manifest_role": repo_config.role if repo_config is not None else None,
-                    "role": hint.get("role") or repo_config.role or "repo-local-surface",
+                    "manifest_role": manifest_role,
+                    "role": hint.get("role") or manifest_role or "repo-local-surface",
                     "surface": hint.get("surface") or "owner-local source and generated surfaces",
                     "preferred_entrypoints": self._existing_entrypoints(repo),
                 }
@@ -401,6 +402,7 @@ class AoAWorkspaceMCPState:
     def _resolve_entrypoint(self, entry: dict[str, str]) -> dict[str, Any]:
         scope = entry["scope"]
         rel_path = entry["path"]
+        abs_path: Path | None
         if scope == "workspace":
             abs_path = self.workspace_root / rel_path
         else:
@@ -453,7 +455,7 @@ class AoAWorkspaceMCPState:
 
 def build_server(start: str | Path | None = None) -> Any:
     try:
-        from mcp.server.fastmcp import FastMCP
+        from mcp.server.fastmcp import FastMCP  # type: ignore[import-not-found]
     except ImportError as exc:
         raise SystemExit(
             "Missing dependency 'mcp'. Install with: python -m pip install -e '.[mcp]'"
