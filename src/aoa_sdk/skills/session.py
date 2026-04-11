@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import json
 import os
 import re
 import sqlite3
@@ -8,7 +9,10 @@ from pathlib import Path
 from typing import Any
 from uuid import uuid4
 
+from pydantic import ValidationError
+
 from ..compatibility import load_surface
+from ..errors import InvalidSurface
 from ..models import ActiveSkillRecord, SkillDisclosure, SkillSession
 from ..loaders import load_json, write_json
 from ..workspace.discovery import Workspace
@@ -91,16 +95,28 @@ def resolve_session_file(workspace: Workspace, session_file: str | Path | None) 
     return workspace.root / path
 
 
+def _load_session_at_path(path: Path) -> SkillSession:
+    try:
+        return SkillSession.model_validate(load_json(path))
+    except json.JSONDecodeError as exc:
+        raise InvalidSurface(f"skill runtime session is not valid JSON: {path}") from exc
+    except ValidationError as exc:
+        raise InvalidSurface(f"skill runtime session does not match the expected schema: {path}") from exc
+
+
 def load_session(workspace: Workspace, session_file: str | Path | None) -> SkillSession:
     path = resolve_session_file(workspace, session_file)
-    return SkillSession.model_validate(load_json(path))
+    return _load_session_at_path(path)
 
 
 def probe_session(workspace: Workspace, session_file: str | Path | None) -> tuple[Path, SkillSession | None]:
     path = resolve_session_file(workspace, session_file)
     if not path.exists():
         return path, None
-    return path, SkillSession.model_validate(load_json(path))
+    try:
+        return path, _load_session_at_path(path)
+    except InvalidSurface:
+        return path, None
 
 
 def resolve_codex_thread_context() -> dict[str, Any]:
@@ -188,7 +204,16 @@ def ensure_session(workspace: Workspace, session_file: str | Path | None) -> tup
     contract = load_session_contract(workspace)
     thread_context = resolve_codex_thread_context()
     if path.exists():
-        session = load_session(workspace, path)
+        try:
+            session = load_session(workspace, path)
+        except InvalidSurface:
+            session = _new_skill_session(
+                contract,
+                now=datetime.now(timezone.utc),
+                thread_context=thread_context,
+            )
+            save_session(path, session)
+            return path, session
         if _should_rotate_for_codex_thread(session, thread_context):
             session = _new_skill_session(
                 contract,

@@ -253,6 +253,26 @@ def test_dispatch_falls_back_to_workspace_root_when_aoa_sdk_session_file_is_read
     assert json.loads(session_file.read_text(encoding="utf-8")) == session_payload
 
 
+def test_dispatch_recovers_from_empty_runtime_session_file(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root)
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+    session_file.parent.mkdir(parents=True, exist_ok=True)
+    session_file.write_text("", encoding="utf-8")
+
+    dispatch_report = sdk.skills.dispatch(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="pre-mutation",
+        intent_text="plan verify a bounded change",
+        mutation_surface="runtime",
+    )
+
+    session_payload = json.loads(session_file.read_text(encoding="utf-8"))
+
+    assert dispatch_report.activate_now[0].skill_name == "aoa-change-protocol"
+    assert session_payload["active_skills"][0]["name"] == "aoa-change-protocol"
+    assert session_payload["session_id"]
+
+
 def test_dispatch_rotates_runtime_session_when_codex_thread_changes(
     workspace_root: Path,
     install_host_skills,

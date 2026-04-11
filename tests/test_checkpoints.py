@@ -293,6 +293,18 @@ def test_probe_session_returns_none_without_creating_runtime_session_file(worksp
     assert not session_path.exists()
 
 
+def test_probe_session_returns_none_for_empty_runtime_session_file(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_path = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
+    session_path.parent.mkdir(parents=True, exist_ok=True)
+    session_path.write_text("", encoding="utf-8")
+
+    resolved_path, session = probe_session(sdk.workspace, None)
+
+    assert resolved_path == session_path
+    assert session is None
+
+
 def test_after_commit_skips_without_active_session_and_writes_status_artifact(workspace_root: Path) -> None:
     repo_root = workspace_root / "aoa-sdk"
     _init_git_repo(repo_root)
