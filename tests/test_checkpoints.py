@@ -375,6 +375,110 @@ def test_after_commit_captures_reviewable_note_and_surface_context(
     assert any(entry["name"] == "aoa-change-protocol" for entry in session_payload["activation_log"])
 
 
+def test_after_commit_owner_followthrough_uses_public_share_checkpoint(
+    workspace_root: Path,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(
+        repo_root,
+        subject="owner follow-through after reviewed closeout",
+        body="checkpoint capture body",
+    )
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-owner-followthrough",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+
+    report = sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-owner-followthrough",
+    )
+    note_payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
+    surface_payload = json.loads(Path(report.surface_report_path).read_text(encoding="utf-8"))
+
+    assert report.status == "captured"
+    assert report.commit_sha == commit_sha
+    assert report.checkpoint_kind == "owner_followthrough"
+    assert report.mutation_surface == "public-share"
+    assert report.agent_review_status == "pending"
+    assert report.agent_review_command is not None
+    assert note_payload["checkpoint_history"][-1]["checkpoint_kind"] == "owner_followthrough"
+    assert note_payload["checkpoint_history"][-1]["manual_review_requested"] is True
+    assert note_payload["checkpoint_history"][-1]["agent_review_status"] == "pending"
+    assert surface_payload["report"]["checkpoint_kind"] == "owner_followthrough"
+    assert surface_payload["report"]["mutation_surface"] == "public-share"
+
+
+def test_after_commit_records_closed_session_followthrough_without_rotating_note(
+    workspace_root: Path,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _git_commit(repo_root, subject="plan verify a bounded change")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-closed-followthrough",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    sdk.checkpoints.append(
+        repo_root=str(repo_root),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
+    )
+    note = sdk.checkpoints.append(
+        repo_root=str(repo_root),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
+    )
+    sdk.checkpoints.promote(
+        repo_root=str(repo_root),
+        target="harvest-handoff",
+        session_file=str(session_file),
+    )
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=note.runtime_session_id,
+    )
+    closed_note_payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
+    history_count = len(closed_note_payload["checkpoint_history"])
+    commit_sha = _git_commit(repo_root, subject="owner follow-through promote reviewed closeout")
+
+    report = sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref=commit_sha,
+        session_file=str(session_file),
+    )
+
+    archive_root = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "archive"
+    refreshed_note_payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
+
+    assert report.status == "recorded_closed_session_followthrough"
+    assert report.checkpoint_kind == "owner_followthrough"
+    assert report.mutation_surface == "public-share"
+    assert report.manual_review_requested is False
+    assert report.note_ref == str(note_dir / "checkpoint-note.json")
+    assert report.error_text is not None
+    assert Path(report.report_path).exists()
+    assert refreshed_note_payload["state"] == "closed"
+    assert len(refreshed_note_payload["checkpoint_history"]) == history_count
+    assert refreshed_note_payload["checkpoint_history"][-1]["checkpoint_kind"] == "verify_green"
+    assert not archive_root.exists()
+
+
 def test_checkpoint_review_note_adds_agent_authored_checkpoint_review(workspace_root: Path) -> None:
     repo_root = workspace_root / "aoa-sdk"
     _init_git_repo(repo_root)

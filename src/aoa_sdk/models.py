@@ -1383,7 +1383,13 @@ class CheckpointCaptureResult(BaseModel):
 class CheckpointAfterCommitReport(BaseModel):
     schema_version: int = 1
     contract_type: Literal["checkpoint_after_commit_report_v1"] = "checkpoint_after_commit_report_v1"
-    status: Literal["captured", "skipped_no_active_session", "failed"]
+    status: Literal[
+        "captured",
+        "recorded_closed_session_followthrough",
+        "skipped_no_active_session",
+        "skipped_closed_session",
+        "failed",
+    ]
     repo_root: str
     repo_label: str
     report_path: str
@@ -1393,8 +1399,8 @@ class CheckpointAfterCommitReport(BaseModel):
     commit_subject: str | None = None
     commit_body: str | None = None
     changed_paths: list[str] = Field(default_factory=list)
-    checkpoint_kind: Literal["commit"] = "commit"
-    mutation_surface: Literal["code"] = "code"
+    checkpoint_kind: Literal["commit", "owner_followthrough"] = "commit"
+    mutation_surface: Literal["code", "public-share"] = "code"
     manual_review_requested: bool = True
     captured_at: datetime
     captured_at_local: str | None = None

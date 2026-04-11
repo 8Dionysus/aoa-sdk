@@ -152,6 +152,11 @@ checkpoint noise.
 That hook path may dispatch checkpoint-phase skills, run additive checkpoint
 surface detection, and append one reviewable local note, but it must never run
 closeout, promotion, harvest, push, or release logic.
+The hook defaults to `--kind auto`: ordinary commits stay `commit/code`, but an
+explicit `AOA_CHECKPOINT_KIND=owner_followthrough`, owner-follow-through commit
+text, or an already closed/promoted active checkpoint note records
+`owner_followthrough/public-share` follow-through without rotating or reopening
+the closed note.
 The hook-created checkpoint starts as `agent_review=pending`; after every
 successful commit, the Codex agent must apply the checkpoint skill protocol and
 write a semantic `aoa checkpoint review-note` entry before treating the commit
@@ -176,6 +181,7 @@ aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-su
 aoa skills guard /srv/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green --root /srv/aoa-sdk --json
 aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
+aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv --json
 aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --summary "agent-reviewed checkpoint notes for this commit" --finding "what changed and why it matters" --candidate-note "candidate, owner, and where it should be revisited" --stats-hint "stats to refresh only after reviewed closeout" --mechanic-hint "workflow mechanism to retain" --closeout-question "what to verify when rereading the full session" --applied-skill aoa-change-protocol --root /srv --json
 aoa checkpoint install-hook --repo aoa-sdk --root /srv --json
 aoa checkpoint hook-status --repo aoa-sdk --root /srv --json

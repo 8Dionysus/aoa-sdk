@@ -44,9 +44,10 @@ CHECKPOINT_KINDS = (
     "pause",
     "owner_followthrough",
 )
+POST_COMMIT_CHECKPOINT_KINDS = ("auto", "commit", "owner_followthrough")
 OWNER_MUTABLE_REPOS = tuple(repo for repo in KNOWN_REPOS if repo != "8Dionysus")
-POST_COMMIT_HOOK_TEMPLATE_VERSION = "aoa-sdk-post-commit-hook-v1"
-POST_COMMIT_HOOK_MARKER = "# aoa-sdk checkpoint post-commit hook v1"
+POST_COMMIT_HOOK_TEMPLATE_VERSION = "aoa-sdk-post-commit-hook-v2"
+POST_COMMIT_HOOK_MARKER = "# aoa-sdk checkpoint post-commit hook v2"
 PROMOTION_TARGETS = ("dionysus-note", "harvest-handoff")
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 SESSION_REF_RE = re.compile(r'"session_ref"\s*:\s*"([^"]+)"|session_ref:\s*`?([^`\s]+)`?|Session ref:\s*`?([^`\n]+)`?')
@@ -460,7 +461,12 @@ class CheckpointsAPI:
         repo_root: str,
         commit_ref: str = "HEAD",
         session_file: str | None = None,
+        checkpoint_kind: Literal["auto", "commit", "owner_followthrough"] = "auto",
     ) -> CheckpointAfterCommitReport:
+        if checkpoint_kind not in POST_COMMIT_CHECKPOINT_KINDS:
+            raise ValueError(
+                "post-commit checkpoint kind must be auto, commit, or owner_followthrough"
+            )
         repo_root_path = _resolve_context_root(self.workspace, repo_root)
         repo_label = _resolve_context_label(self.workspace, repo_root)
         session_path = resolve_session_file(self.workspace, session_file)
@@ -482,6 +488,13 @@ class CheckpointsAPI:
             commit_metadata = _read_git_commit_metadata(repo_root_path, commit_ref)
             captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
             if runtime_session is None:
+                resolved_checkpoint_kind = _resolve_after_commit_checkpoint_kind(
+                    checkpoint_kind=checkpoint_kind,
+                    commit_subject=commit_metadata["commit_subject"],
+                    commit_body=commit_metadata["commit_body"],
+                    existing_note=None,
+                )
+                mutation_surface = _after_commit_mutation_surface(resolved_checkpoint_kind)
                 report_path = _post_commit_status_path(self.workspace, repo_label)
                 report = CheckpointAfterCommitReport(
                     status="skipped_no_active_session",
@@ -494,6 +507,8 @@ class CheckpointsAPI:
                     commit_subject=commit_metadata["commit_subject"],
                     commit_body=commit_metadata["commit_body"],
                     changed_paths=list(commit_metadata["changed_paths"]),
+                    checkpoint_kind=resolved_checkpoint_kind,
+                    mutation_surface=mutation_surface,
                     captured_at=captured_at,
                     captured_at_local=captured_at_local,
                     captured_tz=captured_tz,
@@ -512,16 +527,66 @@ class CheckpointsAPI:
             )
             report_path = paths.post_commit_report
             session_file_ref = str(session_path)
+            existing_note = _load_checkpoint_note(paths.note_json) if paths.note_json.exists() else None
+            resolved_checkpoint_kind = _resolve_after_commit_checkpoint_kind(
+                checkpoint_kind=checkpoint_kind,
+                commit_subject=commit_metadata["commit_subject"],
+                commit_body=commit_metadata["commit_body"],
+                existing_note=existing_note,
+            )
+            mutation_surface = _after_commit_mutation_surface(resolved_checkpoint_kind)
             intent_text = _after_commit_intent(
                 commit_short_sha=commit_metadata["commit_short_sha"],
                 commit_subject=commit_metadata["commit_subject"],
+                checkpoint_kind=resolved_checkpoint_kind,
             )
+
+            if existing_note is not None and existing_note.state in {"closed", "promoted"}:
+                is_followthrough = resolved_checkpoint_kind == "owner_followthrough"
+                report = CheckpointAfterCommitReport(
+                    status=(
+                        "recorded_closed_session_followthrough"
+                        if is_followthrough
+                        else "skipped_closed_session"
+                    ),
+                    repo_root=str(repo_root_path),
+                    repo_label=repo_label,
+                    report_path=str(report_path),
+                    commit_ref=commit_ref,
+                    commit_sha=commit_metadata["commit_sha"],
+                    commit_short_sha=commit_metadata["commit_short_sha"],
+                    commit_subject=commit_metadata["commit_subject"],
+                    commit_body=commit_metadata["commit_body"],
+                    changed_paths=list(commit_metadata["changed_paths"]),
+                    checkpoint_kind=resolved_checkpoint_kind,
+                    mutation_surface=mutation_surface,
+                    manual_review_requested=False,
+                    captured_at=captured_at,
+                    captured_at_local=captured_at_local,
+                    captured_tz=captured_tz,
+                    session_file=session_file_ref,
+                    runtime_session_id=runtime_session_id,
+                    runtime_session_created_at=runtime_session_created_at,
+                    note_ref=_checkpoint_note_ref_for_capture(
+                        self.workspace,
+                        repo_root,
+                        runtime_session_id=runtime_session_id,
+                    ),
+                    error_text=(
+                        f"checkpoint note is {existing_note.state}; "
+                        "owner follow-through was recorded without mutating the closed note"
+                        if is_followthrough
+                        else f"checkpoint note is {existing_note.state}; start a new runtime session or use owner_followthrough"
+                    ),
+                )
+                _write_after_commit_report(report_path, report)
+                return report
 
             skill_report = SkillsAPI(self.workspace).dispatch(
                 repo_root=repo_root,
                 phase="checkpoint",
                 intent_text=intent_text,
-                mutation_surface="code",
+                mutation_surface=mutation_surface,
                 session_file=session_file_ref,
             )
             skill_report_path = str(_checkpoint_skill_report_path(self.workspace, repo_root))
@@ -534,17 +599,17 @@ class CheckpointsAPI:
                 repo_root=repo_root,
                 phase="checkpoint",
                 intent_text=intent_text,
-                mutation_surface="code",
+                mutation_surface=mutation_surface,
                 session_file=session_file_ref,
                 skill_report_path=skill_report_path,
-                checkpoint_kind="commit",
+                checkpoint_kind=resolved_checkpoint_kind,
             )
             surface_report_path = str(paths.surface_report)
             note = self.append(
                 repo_root=repo_root,
-                checkpoint_kind="commit",
+                checkpoint_kind=resolved_checkpoint_kind,
                 intent_text=intent_text,
-                mutation_surface="code",
+                mutation_surface=mutation_surface,
                 session_file=session_file_ref,
                 skill_report_path=skill_report_path,
                 surface_report=surface_report,
@@ -570,6 +635,8 @@ class CheckpointsAPI:
                 commit_subject=commit_metadata["commit_subject"],
                 commit_body=commit_metadata["commit_body"],
                 changed_paths=list(commit_metadata["changed_paths"]),
+                checkpoint_kind=resolved_checkpoint_kind,
+                mutation_surface=mutation_surface,
                 captured_at=captured_at,
                 captured_at_local=captured_at_local,
                 captured_tz=captured_tz,
@@ -591,6 +658,12 @@ class CheckpointsAPI:
             return report
         except Exception as exc:
             captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
+            failed_checkpoint_kind = _resolve_after_commit_checkpoint_kind(
+                checkpoint_kind=checkpoint_kind,
+                commit_subject=commit_metadata["commit_subject"],
+                commit_body=commit_metadata["commit_body"],
+                existing_note=None,
+            )
             report_path = (
                 _resolve_runtime_checkpoint_paths(
                     self.workspace,
@@ -612,6 +685,8 @@ class CheckpointsAPI:
                 commit_subject=commit_metadata["commit_subject"],
                 commit_body=commit_metadata["commit_body"],
                 changed_paths=list(commit_metadata["changed_paths"]),
+                checkpoint_kind=failed_checkpoint_kind,
+                mutation_surface=_after_commit_mutation_surface(failed_checkpoint_kind),
                 captured_at=captured_at,
                 captured_at_local=captured_at_local,
                 captured_tz=captured_tz,
@@ -3747,9 +3822,43 @@ def _render_dionysus_checkpoint_markdown(payload: dict[str, object]) -> str:
     return "\n".join(lines).rstrip() + "\n"
 
 
-def _after_commit_intent(*, commit_short_sha: str | None, commit_subject: str | None) -> str:
+def _resolve_after_commit_checkpoint_kind(
+    *,
+    checkpoint_kind: Literal["auto", "commit", "owner_followthrough"],
+    commit_subject: str | None,
+    commit_body: str | None,
+    existing_note: SessionCheckpointNote | None,
+) -> Literal["commit", "owner_followthrough"]:
+    if checkpoint_kind == "commit":
+        return "commit"
+    if checkpoint_kind == "owner_followthrough":
+        return "owner_followthrough"
+    if existing_note is not None and existing_note.state in {"closed", "promoted"}:
+        return "owner_followthrough"
+    inferred = _infer_auto_checkpoint_kind(
+        intent_text="\n".join(part for part in (commit_subject, commit_body) if part)
+    )
+    return "owner_followthrough" if inferred == "owner_followthrough" else "commit"
+
+
+def _after_commit_mutation_surface(
+    checkpoint_kind: Literal["commit", "owner_followthrough"],
+) -> Literal["code", "public-share"]:
+    if checkpoint_kind == "owner_followthrough":
+        return "public-share"
+    return "code"
+
+
+def _after_commit_intent(
+    *,
+    commit_short_sha: str | None,
+    commit_subject: str | None,
+    checkpoint_kind: Literal["commit", "owner_followthrough"],
+) -> str:
     short_sha = (commit_short_sha or "HEAD").strip()
     subject = re.sub(r"\s+", " ", (commit_subject or "checkpoint").strip())
+    if checkpoint_kind == "owner_followthrough":
+        return f"owner follow-through commit {short_sha}: {subject}"
     return f"checkpoint commit {short_sha}: {subject}"
 
 

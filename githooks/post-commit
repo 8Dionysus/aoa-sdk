@@ -1,11 +1,12 @@
 #!/bin/sh
-# aoa-sdk checkpoint post-commit hook v1
+# aoa-sdk checkpoint post-commit hook v2
 
 repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
 workspace_root="${AOA_CHECKPOINT_WORKSPACE_ROOT:-__AOA_CHECKPOINT_WORKSPACE_ROOT__}"
 aoa_bin="${AOA_CHECKPOINT_AOA_BIN:-aoa}"
+checkpoint_kind="${AOA_CHECKPOINT_KIND:-auto}"
 
-output="$("$aoa_bin" checkpoint after-commit "$repo_root" --commit-ref HEAD --root "$workspace_root" 2>&1)"
+output="$("$aoa_bin" checkpoint after-commit "$repo_root" --commit-ref HEAD --kind "$checkpoint_kind" --root "$workspace_root" 2>&1)"
 status=$?
 
 if [ "$status" -ne 0 ]; then

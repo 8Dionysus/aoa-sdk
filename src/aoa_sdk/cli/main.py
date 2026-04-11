@@ -449,18 +449,28 @@ def _print_checkpoint_after_commit_report(report: CheckpointAfterCommitReport) -
     commit_label = report.commit_short_sha or report.commit_ref
     if report.status == "captured":
         typer.echo(
-            f"post_commit_checkpoint: captured commit={commit_label} agent_review={report.agent_review_status} note={report.note_ref} report={report.report_path}"
+            f"post_commit_checkpoint: captured kind={report.checkpoint_kind} commit={commit_label} agent_review={report.agent_review_status} note={report.note_ref} report={report.report_path}"
         )
         if report.agent_review_command is not None:
             typer.echo(f"post_commit_checkpoint_review: required command={report.agent_review_command}")
         return
+    if report.status == "recorded_closed_session_followthrough":
+        typer.echo(
+            f"post_commit_checkpoint: recorded_closed_session_followthrough kind={report.checkpoint_kind} commit={commit_label} note={report.note_ref} report={report.report_path}"
+        )
+        return
     if report.status == "skipped_no_active_session":
         typer.echo(
-            f"post_commit_checkpoint: skipped_no_active_session commit={commit_label} report={report.report_path}"
+            f"post_commit_checkpoint: skipped_no_active_session kind={report.checkpoint_kind} commit={commit_label} report={report.report_path}"
+        )
+        return
+    if report.status == "skipped_closed_session":
+        typer.echo(
+            f"post_commit_checkpoint: skipped_closed_session kind={report.checkpoint_kind} commit={commit_label} report={report.report_path} error={report.error_text or 'closed_session'}"
         )
         return
     typer.echo(
-        f"post_commit_checkpoint: failed commit={commit_label} report={report.report_path} error={report.error_text or 'unknown'}"
+        f"post_commit_checkpoint: failed kind={report.checkpoint_kind} commit={commit_label} report={report.report_path} error={report.error_text or 'unknown'}"
     )
 
 
@@ -1500,6 +1510,12 @@ def checkpoint_mark(
 def checkpoint_after_commit(
     repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
     commit_ref: str = typer.Option("HEAD", "--commit-ref", help="Committed git ref to capture, usually HEAD."),
+    checkpoint_kind: str = typer.Option(
+        "auto",
+        "--kind",
+        "--checkpoint-kind",
+        help="Post-commit checkpoint kind: auto, commit, or owner_followthrough.",
+    ),
     session_file: str | None = typer.Option(
         None,
         "--session-file",
@@ -1512,6 +1528,7 @@ def checkpoint_after_commit(
         repo_root=repo_root,
         commit_ref=commit_ref,
         session_file=session_file,
+        checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
     )
     payload = report.model_dump(mode="json")
     if json_output:
