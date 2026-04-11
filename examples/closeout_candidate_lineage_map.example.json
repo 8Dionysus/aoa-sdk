@@ -1,5 +1,7 @@
 {
-  "session_ref": "session:example-growth-refinery-closeout",
+  "schema_version": "aoa_closeout_candidate_lineage_map_v1",
+  "session_ref": "session:2026-04-11:first-wave-candidate-lineage",
+  "reviewed": true,
   "candidate_lineage_map": [
     {
       "schema_version": "aoa_checkpoint_lineage_hint_v1",
