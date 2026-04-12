@@ -640,6 +640,49 @@ def test_checkpoint_review_note_auto_fills_from_observation(workspace_root: Path
     assert report_payload["agent_review_ref"] == note.agent_reviews[-1].review_id
 
 
+def test_checkpoint_review_note_auto_dedupes_repeated_review_for_same_commit(
+    workspace_root: Path,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(repo_root, subject="dedupe repeated checkpoint review note")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-agent-review-dedupe",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    captured = sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+
+    first = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        auto_fill=True,
+        session_file=str(session_file),
+    )
+    reviewed = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        auto_fill=True,
+        session_file=str(session_file),
+    )
+    report_payload = json.loads(Path(captured.report_path).read_text(encoding="utf-8"))
+
+    assert first.agent_reviews[-1].commit_sha == commit_sha
+    assert reviewed.agent_review_status == "reviewed"
+    assert reviewed.review_status == "reviewed"
+    assert len(reviewed.agent_reviews) == 1
+    assert reviewed.agent_reviews[-1].commit_sha == commit_sha
+    assert reviewed.agent_reviews[-1].summary.startswith(
+        "Agent reviewed the auto-captured commit checkpoint"
+    )
+    assert report_payload["agent_review_status"] == "reviewed"
+    assert report_payload["agent_review_ref"] == reviewed.agent_reviews[-1].review_id
+
+
 def test_checkpoint_review_note_auto_falls_back_to_history_when_observation_is_missing(
     workspace_root: Path,
 ) -> None:
