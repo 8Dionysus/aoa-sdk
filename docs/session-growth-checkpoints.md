@@ -18,7 +18,7 @@ existing session-harvest family into an automatic runtime authority.
 - a captured post-commit checkpoint starts with `agent_review=pending`, but it now also writes one structured `auto_observation` into the checkpoint history using commit metadata plus checkpoint-phase skill and surface outputs
 - the Codex agent must then apply the checkpoint skill protocol and run `aoa checkpoint review-note`; `--auto` now lifts the matching `auto_observation` into the stronger semantic layer without retyping summary/findings by hand, while manual flags remain available when the agent wants to add more specific judgment and still record real intermediate findings, candidate notes, stats hints, mechanic hints, closeout questions, and evidence refs in the note
 - while any checkpoint commit still has `agent_review=pending`, next-step guidance must point to the missing `review-note --auto` rather than directly to reviewed closeout
-- installed `pre-push` and `pre-merge-commit` hooks now fail closed through `aoa checkpoint git-boundary-check` when the active repo note still carries pending checkpoint reviews; they stay active-session-only and do not mint a new session when no current session file exists
+- installed `pre-push` and `pre-merge-commit` hooks now fail closed through `aoa checkpoint git-boundary-check` when any aggregated runtime-session checkpoint note still carries pending checkpoint reviews; they stay active-session-only and do not mint a new session when no current session file exists
 - while any aggregated runtime-session checkpoint note still has `agent_review=pending`, `aoa checkpoint build-closeout-context` and `aoa checkpoint execute-closeout-chain` fail closed instead of building reviewed-closeout artifacts too early
 - once reviewed closeout is allowed, `closeout-context.json` carries one aggregated checkpoint-review bundle with review refs, inherited auto-observation refs, findings, candidate notes, stats hints, mechanic hints, closeout questions, evidence refs, and deferred next-owner moves
 - the mechanical donor, progression, and quest artifacts emitted by `aoa-checkpoint-closeout-bridge` now carry the same checkpoint-review bundle forward so reviewed closeout does not drop the semantic checkpoint layer immediately after context build
@@ -75,9 +75,12 @@ With an active runtime session, `current/<runtime-session-id>/<repo-label>/` is
 the live ledger for that repo scope inside one specific session, not a date
 bucket.
 The unscoped fallback stays only as a migration bridge for a note that has no
-`runtime_session_id` yet, or for one that already matches the active runtime
-session. If an unscoped ledger explicitly points at a different
-`runtime_session_id`, stateful checkpoint flows archive it under
+`runtime_session_id` yet when no active runtime session exists. With an active
+runtime session, the unscoped fallback becomes quarantine-only: it may stay on
+disk as migration evidence, but it does not auto-attach to the live session,
+block git boundaries, or join reviewed closeout fan-in. If an unscoped ledger
+explicitly points at a different `runtime_session_id`, stateful checkpoint
+flows archive it under
 `aoa-sdk/.aoa/session-growth/archive/` so `current/` stops advertising a stale
 session as live.
 The checkpoint `session_ref` is minted uniquely when a new ledger starts and
@@ -97,9 +100,10 @@ to `aoa checkpoint status`, `aoa checkpoint promote`,
 active checkpoint session.
 At reviewed closeout, the builder aggregates every checkpoint ledger under the
 same active runtime-session scope before it derives the closeout candidate map.
-During that aggregation, stale unscoped ledgers from a different runtime
-session are archived out of `current/` instead of lingering beside the live
-scope.
+During that aggregation, runtime-scoped ledgers are the only live inputs for
+the active session. Legacy unscoped ledgers stay quarantined unless there is no
+active runtime session at all, and explicit mismatched runtime ledgers are
+archived out of `current/` instead of lingering beside the live scope.
 The repo-root checkpoint note must still agree with the resolved reviewed
 session for the closeout to proceed. This keeps one narrow repo-scoped note
 from silently standing in for the whole session and blocks cross-session

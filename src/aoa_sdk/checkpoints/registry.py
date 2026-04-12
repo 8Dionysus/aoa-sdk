@@ -1282,12 +1282,24 @@ class CheckpointsAPI:
                 status="clear_no_active_session",
             )
 
-        note = _peek_runtime_checkpoint_note(
+        primary_note = _peek_runtime_checkpoint_note(
             self,
             repo_root=repo_root,
             session_file=str(session_path),
         )
-        if note is None:
+        if primary_note is not None:
+            session_records = _load_runtime_checkpoint_notes_for_closeout(
+                self,
+                repo_root=repo_root,
+                resolved_session_ref=primary_note.session_ref,
+                primary_note=primary_note,
+            )
+        else:
+            session_records = _load_runtime_scoped_checkpoint_notes(
+                self,
+                runtime_session_id=runtime_session_id,
+            )
+        if not session_records:
             return CheckpointGitBoundaryCheck(
                 repo_root=str(repo_root_path),
                 repo_label=repo_label,
@@ -1296,28 +1308,43 @@ class CheckpointsAPI:
                 runtime_session_id=runtime_session_id,
             )
 
-        paths = _resolve_runtime_checkpoint_paths(
-            self.workspace,
-            repo_root=repo_root,
-            runtime_session_id=note.runtime_session_id,
-            migrate_legacy=False,
-        )
-        pending_refs = _dedupe_strings(note.agent_review_pending_refs)
+        preferred_note_ref: str | None = None
+        pending_refs: list[str] = []
+        blocking_repo_labels: list[str] = []
+        blocking_note_refs: list[str] = []
+        for paths, note in session_records:
+            note_ref = str(paths.note_json)
+            if preferred_note_ref is None or paths.repo_label == repo_label:
+                preferred_note_ref = note_ref
+            note_pending_refs = _dedupe_strings(note.agent_review_pending_refs)
+            if not note_pending_refs:
+                continue
+            pending_refs.extend(note_pending_refs)
+            blocking_repo_labels.append(paths.repo_label)
+            blocking_note_refs.append(note_ref)
+
+        pending_refs = _dedupe_strings(pending_refs)
+        blocking_repo_labels = _dedupe_strings(blocking_repo_labels)
         if pending_refs:
             refs_preview = ", ".join(pending_refs[:5])
             if len(pending_refs) > 5:
                 refs_preview += f" (+{len(pending_refs) - 5} more)"
+            blocking_preview = ", ".join(blocking_repo_labels[:5])
+            if len(blocking_repo_labels) > 5:
+                blocking_preview += f" (+{len(blocking_repo_labels) - 5} more)"
             return CheckpointGitBoundaryCheck(
                 repo_root=str(repo_root_path),
                 repo_label=repo_label,
                 boundary=boundary,
                 status="blocked_pending_review",
-                runtime_session_id=note.runtime_session_id,
-                note_ref=str(paths.note_json),
+                runtime_session_id=runtime_session_id,
+                note_ref=blocking_note_refs[0] if blocking_note_refs else preferred_note_ref,
                 pending_refs=pending_refs,
+                blocking_repo_labels=blocking_repo_labels,
                 required_action=(
                     "pending checkpoint agent review blocks "
-                    f"{boundary}; run `aoa checkpoint review-note --auto` for: {refs_preview}"
+                    f"{boundary}; blocking repos: {blocking_preview}; "
+                    f"run `aoa checkpoint review-note --auto` for: {refs_preview}"
                 ),
             )
         return CheckpointGitBoundaryCheck(
@@ -1325,15 +1352,21 @@ class CheckpointsAPI:
             repo_label=repo_label,
             boundary=boundary,
             status="clear",
-            runtime_session_id=note.runtime_session_id,
-            note_ref=str(paths.note_json),
+            runtime_session_id=runtime_session_id,
+            note_ref=preferred_note_ref,
         )
 
     def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:
-        runtime_session_id, _ = _ensure_checkpoint_runtime_session(
+        runtime_session_metadata = _peek_checkpoint_runtime_session(
             workspace=self.workspace,
             session_file=session_file,
         )
+        runtime_session_id = cast(str | None, runtime_session_metadata["runtime_session_id"])
+        if runtime_session_id is None and session_file is not None:
+            runtime_session_id, _ = _ensure_checkpoint_runtime_session(
+                workspace=self.workspace,
+                session_file=session_file,
+            )
         paths = _resolve_runtime_checkpoint_paths(
             self.workspace,
             repo_root=repo_root,
@@ -1901,9 +1934,10 @@ def _resolve_runtime_checkpoint_paths_for_label(
         legacy_note = _load_checkpoint_note(legacy_paths.note_json)
         if legacy_note is None:
             legacy_note = _build_checkpoint_note(legacy_paths)
-        if legacy_note.runtime_session_id not in {None, runtime_session_id}:
+        if legacy_note.runtime_session_id != runtime_session_id:
             if migrate_legacy:
-                _archive_current_checkpoint(legacy_paths)
+                if legacy_note.runtime_session_id is not None:
+                    _archive_current_checkpoint(legacy_paths)
             return scoped_paths
     if scoped_paths.jsonl.exists():
         return scoped_paths
@@ -1914,6 +1948,8 @@ def _resolve_runtime_checkpoint_paths_for_label(
         legacy_note = _load_checkpoint_note(legacy_paths.note_json)
         if legacy_note is None:
             legacy_note = _build_checkpoint_note(legacy_paths)
+    if legacy_note.runtime_session_id != runtime_session_id:
+        return scoped_paths
     if migrate_legacy:
         _move_current_checkpoint(source_paths=legacy_paths, target_paths=scoped_paths)
         return scoped_paths
@@ -3886,6 +3922,42 @@ def _peek_runtime_checkpoint_note(
         return None
 
 
+def _load_runtime_scoped_checkpoint_notes(
+    api: CheckpointsAPI,
+    *,
+    runtime_session_id: str,
+) -> list[tuple[_CheckpointPaths, SessionCheckpointNote]]:
+    current_root = _checkpoint_current_root(api.workspace)
+    if not current_root.exists():
+        return []
+
+    runtime_scope_key = _checkpoint_runtime_scope_key(runtime_session_id)
+    if runtime_scope_key is None:
+        return []
+
+    scope_root = current_root / runtime_scope_key
+    if not scope_root.exists():
+        return []
+
+    records: list[tuple[_CheckpointPaths, SessionCheckpointNote]] = []
+    for current_dir in sorted(path for path in scope_root.iterdir() if path.is_dir()):
+        paths = _checkpoint_paths_for_label(
+            api.workspace,
+            current_dir.name,
+            runtime_session_id=runtime_session_id,
+        )
+        if not paths.jsonl.exists():
+            continue
+        note = _build_checkpoint_note(paths)
+        if note.runtime_session_id != runtime_session_id:
+            continue
+        if _should_hide_current_checkpoint_note(note, runtime_session_id=runtime_session_id):
+            _archive_current_checkpoint(paths)
+            continue
+        records.append((paths, note))
+    return records
+
+
 def _load_runtime_checkpoint_notes_for_closeout(
     api: CheckpointsAPI,
     *,
@@ -3925,8 +3997,8 @@ def _load_runtime_checkpoint_notes_for_closeout(
         if not paths.jsonl.exists():
             continue
         note = _build_checkpoint_note(paths)
-        if runtime_session_id is not None and note.runtime_session_id not in {None, runtime_session_id}:
-            if paths.runtime_session_id is None:
+        if runtime_session_id is not None and note.runtime_session_id != runtime_session_id:
+            if note.runtime_session_id is not None and paths.runtime_session_id is None:
                 _archive_current_checkpoint(paths)
             continue
         if _should_hide_current_checkpoint_note(note, runtime_session_id=runtime_session_id):

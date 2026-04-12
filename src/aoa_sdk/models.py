@@ -1615,6 +1615,7 @@ class CheckpointGitBoundaryCheck(BaseModel):
     runtime_session_id: str | None = None
     note_ref: str | None = None
     pending_refs: list[str] = Field(default_factory=list)
+    blocking_repo_labels: list[str] = Field(default_factory=list)
     required_action: str | None = None
 
 

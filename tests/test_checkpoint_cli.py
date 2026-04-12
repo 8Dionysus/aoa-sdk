@@ -1256,6 +1256,107 @@ def test_pre_push_hook_blocks_until_pending_checkpoint_review_is_written(workspa
     assert "checkpoint_git_boundary: clear boundary=push" in allowed_output
 
 
+def test_pre_push_hook_blocks_when_sibling_repo_has_pending_checkpoint_review(workspace_root: Path) -> None:
+    runner = CliRunner()
+    repo_root = workspace_root / "aoa-sdk"
+    sibling_repo_root = workspace_root / "aoa-playbooks"
+    _init_git_repo(repo_root)
+    _init_git_repo(sibling_repo_root)
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-pre-push-sibling",
+    )
+    remote_root = workspace_root / "push-sibling-remote.git"
+    subprocess.run(["git", "init", "--bare", str(remote_root)], check=True, capture_output=True, text=True)
+    _git_run(repo_root, "remote", "add", "origin", str(remote_root))
+    _git_commit_file(
+        repo_root,
+        relative_path="base-before-install.txt",
+        content="base before hook install\n",
+        subject="base commit before hook install",
+    )
+    _git_run(repo_root, "push", "-u", "origin", "HEAD")
+    _git_commit_file(
+        repo_root,
+        relative_path="sdk-ahead-before-install.txt",
+        content="sdk ahead before hook install\n",
+        subject="sdk ahead before hook install",
+    )
+
+    install = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "install-hook",
+            "--repo",
+            "aoa-sdk",
+            "--hook",
+            "all",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert install.exit_code == 0
+
+    _git_commit_file(
+        sibling_repo_root,
+        relative_path="playbook-pending-review.txt",
+        content="playbook pending checkpoint review\n",
+        subject="playbook commit with pending checkpoint review",
+    )
+    sibling_commit_sha = _git_run(sibling_repo_root, "rev-parse", "HEAD").stdout.strip()
+    captured = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "after-commit",
+            str(sibling_repo_root),
+            "--commit-ref",
+            "HEAD",
+            "--session-file",
+            str(session_file),
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert captured.exit_code == 0
+
+    shim_path = _write_aoa_shim(workspace_root / "aoa-bin-sibling")
+    env = {"AOA_CHECKPOINT_AOA_BIN": str(shim_path)}
+    blocked_push = _git_run(repo_root, "push", "-u", "origin", "HEAD", extra_env=env, check=False)
+    blocked_output = "\n".join(part for part in (blocked_push.stdout, blocked_push.stderr) if part)
+
+    assert blocked_push.returncode != 0
+    assert "checkpoint_git_boundary: blocked boundary=push" in blocked_output
+    assert "blocking=aoa-playbooks" in blocked_output
+
+    reviewed = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "review-note",
+            str(sibling_repo_root),
+            "--commit-ref",
+            sibling_commit_sha,
+            "--auto",
+            "--session-file",
+            str(session_file),
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert reviewed.exit_code == 0
+
+    allowed_push = _git_run(repo_root, "push", "-u", "origin", "HEAD", extra_env=env, check=False)
+    allowed_output = "\n".join(part for part in (allowed_push.stdout, allowed_push.stderr) if part)
+
+    assert allowed_push.returncode == 0
+    assert "checkpoint_git_boundary: clear boundary=push" in allowed_output
+
+
 def test_pre_merge_commit_hook_blocks_until_pending_checkpoint_review_is_written(workspace_root: Path) -> None:
     runner = CliRunner()
     repo_root = workspace_root / "aoa-sdk"
