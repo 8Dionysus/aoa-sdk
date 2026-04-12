@@ -116,3 +116,129 @@ def test_codex_plane_deploy_status_requires_live_rollout_artifacts(workspace_roo
 
     with pytest.raises(RecordNotFound, match="Missing Codex rollout artifact"):
         sdk.codex.deploy_status()
+
+
+def test_codex_plane_deploy_status_rejects_missing_live_refs(workspace_root: Path) -> None:
+    rollout_root = workspace_root / ".codex" / "generated" / "rollout"
+    write_json(
+        rollout_root / "codex_plane_trust_state.current.json",
+        {
+            "schema_version": "8dionysus_codex_plane_trust_state_v1",
+            "trust_state_id": "",
+            "workspace_root": str(workspace_root),
+            "detected_project_root": str(workspace_root),
+            "project_root_markers_expected": ["AOA_WORKSPACE_ROOT", ".git"],
+            "project_root_marker_match": ["AOA_WORKSPACE_ROOT"],
+            "project_config_active": True,
+            "active_config_layers": [str(workspace_root / ".codex" / "config.toml")],
+            "hooks_enabled": True,
+            "hook_layers_detected": [str(workspace_root / ".codex" / "hooks.json")],
+            "mcp_server_names_expected": ["aoa_workspace", "aoa_stats", "dionysus"],
+            "mcp_server_names_detected": ["aoa_workspace", "aoa_stats", "dionysus"],
+            "stable_names_ok": True,
+            "trust_posture": "trusted_ready",
+            "warnings": [],
+            "captured_at": "2026-04-11T21:04:00Z",
+        },
+    )
+    write_json(
+        rollout_root / "codex_plane_regeneration_report.latest.json",
+        {
+            "schema_version": "8dionysus_codex_plane_regeneration_report_v1",
+            "regeneration_report_id": "cpregen-live",
+            "source_profile_ref": "8Dionysus:config/codex_plane/profiles/linux-python3.json",
+            "target_workspace_root": str(workspace_root),
+            "render_posture": "execute",
+            "rendered_files": [],
+            "stable_names": {
+                "aoa_workspace": True,
+                "aoa_stats": True,
+                "dionysus": True,
+            },
+            "warnings": [],
+            "generated_at": "2026-04-11T21:05:00Z",
+        },
+    )
+    write_json(
+        rollout_root / "codex_plane_rollout_receipt.latest.json",
+        {
+            "schema_version": "8dionysus_codex_plane_rollout_receipt_v1",
+            "rollout_receipt_id": "cprollout-live",
+            "trust_state_id": "cptrust-live",
+            "regeneration_report_id": "cpregen-live",
+            "apply_mode": "execute",
+            "deployment_state": "verified",
+            "doctor_result": "pass",
+            "rollback_plan_ref": "docs/CODEX_PLANE_ROLLOUT.md#rollback-posture",
+            "stats_refresh_required": True,
+            "verified_at": "2026-04-11T21:07:00Z",
+        },
+    )
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    with pytest.raises(RecordNotFound, match="missing non-empty trust_state_id"):
+        sdk.codex.deploy_status()
+
+
+def test_codex_plane_deploy_status_rejects_malformed_timestamps(workspace_root: Path) -> None:
+    rollout_root = workspace_root / ".codex" / "generated" / "rollout"
+    write_json(
+        rollout_root / "codex_plane_trust_state.current.json",
+        {
+            "schema_version": "8dionysus_codex_plane_trust_state_v1",
+            "trust_state_id": "cptrust-live",
+            "workspace_root": str(workspace_root),
+            "detected_project_root": str(workspace_root),
+            "project_root_markers_expected": ["AOA_WORKSPACE_ROOT", ".git"],
+            "project_root_marker_match": ["AOA_WORKSPACE_ROOT"],
+            "project_config_active": True,
+            "active_config_layers": [str(workspace_root / ".codex" / "config.toml")],
+            "hooks_enabled": True,
+            "hook_layers_detected": [str(workspace_root / ".codex" / "hooks.json")],
+            "mcp_server_names_expected": ["aoa_workspace", "aoa_stats", "dionysus"],
+            "mcp_server_names_detected": ["aoa_workspace", "aoa_stats", "dionysus"],
+            "stable_names_ok": True,
+            "trust_posture": "trusted_ready",
+            "warnings": [],
+            "captured_at": "not-a-timestamp",
+        },
+    )
+    write_json(
+        rollout_root / "codex_plane_regeneration_report.latest.json",
+        {
+            "schema_version": "8dionysus_codex_plane_regeneration_report_v1",
+            "regeneration_report_id": "cpregen-live",
+            "source_profile_ref": "8Dionysus:config/codex_plane/profiles/linux-python3.json",
+            "target_workspace_root": str(workspace_root),
+            "render_posture": "execute",
+            "rendered_files": [],
+            "stable_names": {
+                "aoa_workspace": True,
+                "aoa_stats": True,
+                "dionysus": True,
+            },
+            "warnings": [],
+            "generated_at": "2026-04-11T21:05:00Z",
+        },
+    )
+    write_json(
+        rollout_root / "codex_plane_rollout_receipt.latest.json",
+        {
+            "schema_version": "8dionysus_codex_plane_rollout_receipt_v1",
+            "rollout_receipt_id": "cprollout-live",
+            "trust_state_id": "cptrust-live",
+            "regeneration_report_id": "cpregen-live",
+            "apply_mode": "execute",
+            "deployment_state": "verified",
+            "doctor_result": "pass",
+            "rollback_plan_ref": "docs/CODEX_PLANE_ROLLOUT.md#rollback-posture",
+            "stats_refresh_required": True,
+            "verified_at": "2026-04-11T21:07:00Z",
+        },
+    )
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    with pytest.raises(RecordNotFound, match="Invalid Codex rollout timestamp"):
+        sdk.codex.deploy_status()
