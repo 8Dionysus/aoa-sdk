@@ -124,6 +124,10 @@ When the active runtime session also carries a live Codex rollout path,
 closeout now binds that rollout trace into the context and rereads it beside
 the reviewed artifact so one narrow checkpoint ledger does not stand in for the
 whole runtime thread.
+That reviewed closeout context may now also carry one deterministic
+`followthrough_decision` naming the next honest kernel class after the reread.
+It stays reviewed-only and advisory, and it does not auto-run kernel skills
+from the SDK.
 
 ## Commands
 

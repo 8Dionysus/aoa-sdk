@@ -66,6 +66,11 @@ The generator only auto-emits targets when the signals are explicit:
 `aoa-session-progression-lift` remain legal targets in the schema, but wave one
 does not auto-generate them without a later deterministic signal.
 
+Reviewed checkpoint closeout may later derive one sibling
+`followthrough_decision` inside `closeout-context.json` after the reread.
+That decision is not emitted by `aoa surfaces handoff`, and it does not
+auto-run any kernel skill by itself.
+
 ## Commands
 
 ```bash

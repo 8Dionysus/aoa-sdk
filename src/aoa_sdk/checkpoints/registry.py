@@ -18,6 +18,7 @@ from ..models import (
     CheckpointHookInstallResult,
     CheckpointHookStatus,
     CheckpointLineageHint,
+    CloseoutFollowthroughDecision,
     CloseoutOwnerFollowthroughHint,
     CloseoutContextCandidateMap,
     CloseoutExecutionStep,
@@ -122,6 +123,14 @@ FOLLOWTHROUGH_DECISION_BY_STATUS: dict[
     "thin-evidence": "prove_first",
     "stable": "land_direct",
 }
+KERNEL_SIGNAL_SKILLS = (
+    "aoa-session-route-forks",
+    "aoa-session-self-diagnose",
+    "aoa-session-self-repair",
+    "aoa-session-progression-lift",
+    "aoa-automation-opportunity-scan",
+    "aoa-quest-harvest",
+)
 
 
 class DonorHarvestOutputs(TypedDict):
@@ -183,6 +192,188 @@ def _build_owner_followthrough_map(
         )
         for hint in hints
     ]
+
+
+def _cluster_text(cluster: SessionCheckpointCluster) -> str:
+    return " ".join(
+        [
+            cluster.candidate_kind,
+            cluster.owner_hint,
+            cluster.display_name,
+            cluster.source_surface_ref,
+            cluster.defer_reason or "",
+            *cluster.blocked_by,
+            *cluster.promote_if,
+            *cluster.next_owner_moves,
+            *(cluster.evidence_refs or []),
+            cluster.lineage_hint.owner_shape if cluster.lineage_hint is not None else "",
+            cluster.lineage_hint.nearest_wrong_target if cluster.lineage_hint and cluster.lineage_hint.nearest_wrong_target else "",
+        ]
+    ).lower()
+
+
+def _is_route_cluster(cluster: SessionCheckpointCluster) -> bool:
+    cluster_text = _cluster_text(cluster)
+    return (
+        cluster.candidate_kind == "route"
+        or cluster.owner_hint == "aoa-playbooks"
+        or "playbook_registry" in cluster_text
+        or "playbook" in cluster_text
+    )
+
+
+def _is_repair_cluster(cluster: SessionCheckpointCluster) -> bool:
+    cluster_text = _cluster_text(cluster)
+    return "repair" in cluster_text
+
+
+def _has_blocked_signal(cluster: SessionCheckpointCluster) -> bool:
+    return bool(
+        cluster.blocked_by
+        or cluster.defer_reason
+        or (cluster.lineage_hint is not None and cluster.lineage_hint.status_posture == "thin-evidence")
+    )
+
+
+def _has_upgrade_pressure(cluster: SessionCheckpointCluster) -> bool:
+    return "upgrade" in cluster.session_end_targets and bool(cluster.promote_if)
+
+
+def _primary_lineage_cluster(clusters: list[SessionCheckpointCluster]) -> SessionCheckpointCluster:
+    for cluster in clusters:
+        if cluster.lineage_hint is not None and cluster.candidate_kind != "route":
+            return cluster
+    return clusters[0]
+
+
+def _closeout_followthrough_alternatives(
+    *,
+    clusters: list[SessionCheckpointCluster],
+    has_progression_signal: bool,
+    recommended_next_skill: Literal[
+        "aoa-session-route-forks",
+        "aoa-session-self-diagnose",
+        "aoa-session-self-repair",
+        "aoa-session-progression-lift",
+        "aoa-automation-opportunity-scan",
+        "aoa-quest-harvest",
+    ],
+) -> list[str]:
+    candidates: list[str] = []
+    if len(clusters) > 1 or len({cluster.owner_hint for cluster in clusters}) > 1:
+        candidates.append("aoa-session-route-forks")
+    if any(_has_blocked_signal(cluster) for cluster in clusters):
+        candidates.append("aoa-session-self-diagnose")
+    if any(_is_repair_cluster(cluster) for cluster in clusters):
+        candidates.append("aoa-session-self-repair")
+    if has_progression_signal:
+        candidates.append("aoa-session-progression-lift")
+    if any(_is_route_cluster(cluster) for cluster in clusters):
+        candidates.append("aoa-automation-opportunity-scan")
+    if any(_has_upgrade_pressure(cluster) for cluster in clusters):
+        candidates.append("aoa-quest-harvest")
+    alternatives = [
+        skill
+        for skill in _dedupe_strings(candidates)
+        if skill != recommended_next_skill and skill in KERNEL_SIGNAL_SKILLS
+    ]
+    return alternatives[:2]
+
+
+def _approval_posture_for_next_skill(
+    skill_name: Literal[
+        "aoa-session-route-forks",
+        "aoa-session-self-diagnose",
+        "aoa-session-self-repair",
+        "aoa-session-progression-lift",
+        "aoa-automation-opportunity-scan",
+        "aoa-quest-harvest",
+    ],
+) -> Literal["not_required", "review_required", "approval_required"]:
+    if skill_name == "aoa-session-self-repair":
+        return "approval_required"
+    if skill_name in {"aoa-session-route-forks", "aoa-automation-opportunity-scan", "aoa-quest-harvest"}:
+        return "review_required"
+    return "not_required"
+
+
+def _build_closeout_followthrough_decision(
+    *,
+    session_ref: str,
+    reviewed_closeout_context_ref: str,
+    clusters: list[SessionCheckpointCluster],
+    progression_axis_signals: list[ProgressionAxisSignal],
+) -> CloseoutFollowthroughDecision | None:
+    lineage_clusters = [cluster for cluster in clusters if cluster.lineage_hint is not None]
+    if not lineage_clusters:
+        return None
+
+    primary_cluster = _primary_lineage_cluster(lineage_clusters)
+    route_cluster = next((cluster for cluster in lineage_clusters if _is_route_cluster(cluster)), None)
+    repair_cluster = next((cluster for cluster in lineage_clusters if _is_repair_cluster(cluster)), None)
+    blocked_cluster = next((cluster for cluster in lineage_clusters if _has_blocked_signal(cluster)), None)
+    upgrade_cluster = next((cluster for cluster in lineage_clusters if _has_upgrade_pressure(cluster)), None)
+    has_progression_signal = bool(
+        any(signal.movement == "advance" for signal in progression_axis_signals)
+        or any(signal.movement == "advance" for cluster in lineage_clusters for signal in cluster.progression_axis_signals)
+        or any(
+            value > 0
+            for cluster in lineage_clusters
+            for value in (cluster.lineage_hint.axis_pressure.values() if cluster.lineage_hint is not None else [])
+        )
+    )
+    if route_cluster is not None:
+        selected_cluster = route_cluster
+        recommended_next_skill = "aoa-automation-opportunity-scan"
+        reason_codes = ["repeated_manual_route", "stable_output_shape", "checkpoint_sensitive"]
+    elif repair_cluster is not None:
+        selected_cluster = repair_cluster
+        recommended_next_skill = "aoa-session-self-repair"
+        reason_codes = ["reviewed_diagnosis_present", "smallest_repair_clear", "checkpoint_sensitive"]
+    elif blocked_cluster is not None:
+        selected_cluster = blocked_cluster
+        recommended_next_skill = "aoa-session-self-diagnose"
+        reason_codes = ["repeated_friction", "blocked_automation_readiness", "checkpoint_sensitive"]
+    elif has_progression_signal:
+        selected_cluster = primary_cluster
+        recommended_next_skill = "aoa-session-progression-lift"
+        reason_codes = ["explicit_axis_movement", "no_repair_needed", "checkpoint_sensitive"]
+    elif upgrade_cluster is not None:
+        selected_cluster = upgrade_cluster
+        recommended_next_skill = "aoa-quest-harvest"
+        reason_codes = ["reviewed_quest_unit", "promotion_pressure", "checkpoint_sensitive"]
+    else:
+        selected_cluster = primary_cluster
+        recommended_next_skill = "aoa-session-route-forks"
+        reason_codes = ["multiple_plausible_next_moves", "checkpoint_sensitive"]
+
+    selected_hint = selected_cluster.lineage_hint
+    assert selected_hint is not None
+    approval_posture = _approval_posture_for_next_skill(recommended_next_skill)
+    defer_allowed = bool(
+        selected_cluster.blocked_by
+        or selected_cluster.defer_reason
+        or selected_hint.status_posture != "stable"
+        or approval_posture != "not_required"
+    )
+    return CloseoutFollowthroughDecision(
+        session_ref=session_ref,
+        reviewed_closeout_context_ref=reviewed_closeout_context_ref,
+        cluster_ref=selected_hint.cluster_ref,
+        recommended_next_skill=recommended_next_skill,
+        also_considered=_closeout_followthrough_alternatives(
+            clusters=lineage_clusters,
+            has_progression_signal=has_progression_signal,
+            recommended_next_skill=recommended_next_skill,
+        ),
+        reason_codes=reason_codes,
+        checkpoint_required=selected_cluster.checkpoint_hits > 0,
+        approval_posture=approval_posture,
+        defer_allowed=defer_allowed,
+        owner_hypothesis=selected_hint.owner_hypothesis,
+        nearest_wrong_target=selected_hint.nearest_wrong_target,
+        status_posture=selected_hint.status_posture,
+    )
 
 
 def _coerce_datetime(value: datetime | str | None) -> datetime | None:
@@ -1142,6 +1333,18 @@ class CheckpointsAPI:
         candidate_lineage_map = _collect_candidate_lineage_hints(shortlisted_clusters)
         owner_followthrough_map = _build_owner_followthrough_map(candidate_lineage_map)
         ordered_skill_plan = _derive_closeout_skill_plan(notes=aggregated_notes, handoff=handoff)
+        followthrough_decision = _build_closeout_followthrough_decision(
+            session_ref=resolved_session_ref,
+            reviewed_closeout_context_ref=str(paths.closeout_context),
+            clusters=shortlisted_clusters,
+            progression_axis_signals=_merge_progression_axis_signals(
+                [
+                    signal
+                    for candidate_note in aggregated_notes
+                    for signal in candidate_note.progression_axis_signals
+                ]
+            ),
+        )
         if not aggregated_notes:
             notes.append("no matching local checkpoint note was available; the reviewed artifact becomes the primary execution source")
         if handoff is None:
@@ -1175,6 +1378,7 @@ class CheckpointsAPI:
             candidate_map=candidate_map,
             candidate_lineage_map=candidate_lineage_map,
             owner_followthrough_map=owner_followthrough_map,
+            followthrough_decision=followthrough_decision,
             progression_axis_signals=_merge_progression_axis_signals(
                 [
                     signal

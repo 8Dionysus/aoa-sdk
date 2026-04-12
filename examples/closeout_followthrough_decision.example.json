@@ -1,0 +1,22 @@
+{
+  "schema_version": "aoa_sdk_closeout_followthrough_decision_v1",
+  "session_ref": "session:2026-04-11:wave4-kernel-automation",
+  "reviewed_closeout_context_ref": ".aoa/session-growth/current/aoa-sdk/closeout-context.json",
+  "cluster_ref": "cluster:route:aoa-playbooks-playbook-registry-min",
+  "recommended_next_skill": "aoa-automation-opportunity-scan",
+  "also_considered": [
+    "aoa-session-route-forks",
+    "aoa-session-self-diagnose"
+  ],
+  "reason_codes": [
+    "repeated_manual_route",
+    "stable_output_shape",
+    "checkpoint_sensitive"
+  ],
+  "checkpoint_required": true,
+  "approval_posture": "review_required",
+  "defer_allowed": true,
+  "owner_hypothesis": "aoa-playbooks",
+  "nearest_wrong_target": "aoa-skills",
+  "status_posture": "reanchor"
+}

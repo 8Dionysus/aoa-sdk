@@ -1237,6 +1237,62 @@ class CloseoutOwnerFollowthroughHint(BaseModel):
     evidence_refs: list[str] = Field(default_factory=list)
 
 
+class CloseoutFollowthroughDecision(BaseModel):
+    schema_version: Literal["aoa_sdk_closeout_followthrough_decision_v1"] = (
+        "aoa_sdk_closeout_followthrough_decision_v1"
+    )
+    session_ref: str
+    reviewed_closeout_context_ref: str
+    cluster_ref: str
+    candidate_ref: str | None = None
+    recommended_next_skill: Literal[
+        "aoa-session-route-forks",
+        "aoa-session-self-diagnose",
+        "aoa-session-self-repair",
+        "aoa-session-progression-lift",
+        "aoa-automation-opportunity-scan",
+        "aoa-quest-harvest",
+    ]
+    also_considered: list[
+        Literal[
+            "aoa-session-route-forks",
+            "aoa-session-self-diagnose",
+            "aoa-session-self-repair",
+            "aoa-session-progression-lift",
+            "aoa-automation-opportunity-scan",
+            "aoa-quest-harvest",
+        ]
+    ] = Field(default_factory=list)
+    reason_codes: list[
+        Literal[
+            "multiple_plausible_next_moves",
+            "repeated_friction",
+            "blocked_automation_readiness",
+            "reviewed_diagnosis_present",
+            "smallest_repair_clear",
+            "explicit_axis_movement",
+            "no_repair_needed",
+            "repeated_manual_route",
+            "stable_output_shape",
+            "checkpoint_sensitive",
+            "reviewed_quest_unit",
+            "promotion_pressure",
+        ]
+    ] = Field(default_factory=list)
+    checkpoint_required: bool
+    approval_posture: Literal["not_required", "review_required", "approval_required"]
+    defer_allowed: bool
+    owner_hypothesis: str
+    nearest_wrong_target: str | None = None
+    status_posture: Literal["early", "reanchor", "thin-evidence", "stable"]
+
+    @model_validator(mode="after")
+    def _validate_also_considered(self) -> "CloseoutFollowthroughDecision":
+        if self.recommended_next_skill in self.also_considered:
+            raise ValueError("also_considered must not repeat recommended_next_skill")
+        return self
+
+
 class CheckpointCandidateCluster(BaseModel):
     candidate_id: str
     candidate_kind: str
@@ -1522,6 +1578,7 @@ class CheckpointCloseoutContext(BaseModel):
     candidate_map: CloseoutContextCandidateMap = Field(default_factory=CloseoutContextCandidateMap)
     candidate_lineage_map: list[CheckpointLineageHint] = Field(default_factory=list)
     owner_followthrough_map: list[CloseoutOwnerFollowthroughHint] = Field(default_factory=list)
+    followthrough_decision: CloseoutFollowthroughDecision | None = None
     progression_axis_signals: list[ProgressionAxisSignal] = Field(default_factory=list)
     ordered_skill_plan: list[SessionEndSkillTarget] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)

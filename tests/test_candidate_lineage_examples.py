@@ -42,6 +42,13 @@ def test_closeout_owner_followthrough_map_example_validates_against_schema() -> 
     )
 
 
+def test_closeout_followthrough_decision_example_validates_against_schema() -> None:
+    validate_example(
+        "schemas/closeout_followthrough_decision.schema.json",
+        "examples/closeout_followthrough_decision.example.json",
+    )
+
+
 def test_sdk_lineage_examples_stay_on_first_wave_chain() -> None:
     checkpoint = load_json("examples/checkpoint_lineage_hint.example.json")
     closeout = load_json("examples/closeout_candidate_lineage_map.example.json")
@@ -63,3 +70,15 @@ def test_sdk_lineage_examples_stay_on_first_wave_chain() -> None:
     assert "object_ref" not in followthrough_hint
     assert followthrough_hint["recommended_owner_status_surface"] == "aoa-skills:reviewed_owner_landing_bundle"
     assert followthrough_hint["requested_next_decision_class"] == "land_direct"
+
+
+def test_closeout_followthrough_decision_example_stays_reviewed_only() -> None:
+    decision = load_json("examples/closeout_followthrough_decision.example.json")
+
+    assert decision["cluster_ref"] == "cluster:route:aoa-playbooks-playbook-registry-min"
+    assert decision["recommended_next_skill"] == "aoa-automation-opportunity-scan"
+    assert "candidate_ref" not in decision
+    also_considered = decision["also_considered"]  # type: ignore[index]
+    assert isinstance(also_considered, list)
+    assert decision["recommended_next_skill"] not in also_considered
+    assert decision["approval_posture"] == "review_required"
