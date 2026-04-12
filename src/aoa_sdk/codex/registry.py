@@ -56,6 +56,16 @@ class CodexAPI:
                 if isinstance(name, str) and name
             }
         )
+        trust_state_ref = _require_nonempty_ref(
+            trust.get("trust_state_id"),
+            artifact_name=TRUST_STATE_FILENAME,
+            field_name="trust_state_id",
+        )
+        rollout_receipt_ref = _require_nonempty_ref(
+            receipt.get("rollout_receipt_id"),
+            artifact_name=ROLLOUT_RECEIPT_FILENAME,
+            field_name="rollout_receipt_id",
+        )
         drift_detected = (
             rollout_state in {"drifted", "rollback_recommended"}
             or trust_posture == "rollback_recommended"
@@ -65,8 +75,8 @@ class CodexAPI:
         return CodexPlaneDeployStatusSnapshot(
             workspace_root=str(workspace_root),
             trust_posture=trust_posture,
-            latest_trust_state_ref=str(trust.get("trust_state_id") or ""),
-            latest_rollout_receipt_ref=str(receipt.get("rollout_receipt_id") or ""),
+            latest_trust_state_ref=trust_state_ref,
+            latest_rollout_receipt_ref=rollout_receipt_ref,
             project_config_active=project_config_active,
             hooks_active=hooks_active,
             active_mcp_servers=active_mcp_servers,
@@ -151,11 +161,24 @@ def _coerce_rollout_state(value: object) -> RolloutState:
     return "render_only"
 
 
+def _require_nonempty_ref(value: object, *, artifact_name: str, field_name: str) -> str:
+    if isinstance(value, str) and value:
+        return value
+    raise RecordNotFound(
+        f"Invalid Codex rollout artifact: {artifact_name} is missing non-empty {field_name}"
+    )
+
+
 def _latest_timestamp(*values: object) -> datetime:
     timestamps: list[datetime] = []
     for value in values:
         if isinstance(value, str) and value:
-            timestamps.append(datetime.fromisoformat(value.replace("Z", "+00:00")))
+            try:
+                timestamps.append(datetime.fromisoformat(value.replace("Z", "+00:00")))
+            except ValueError as exc:
+                raise RecordNotFound(
+                    f"Invalid Codex rollout timestamp: {value!r}"
+                ) from exc
     if not timestamps:
         raise RecordNotFound("Codex rollout artifacts are missing timestamp fields")
     return max(timestamps).astimezone(UTC)
