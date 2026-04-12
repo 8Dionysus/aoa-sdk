@@ -894,6 +894,58 @@ def test_checkpoint_review_note_cli_records_agent_authored_review(workspace_root
     assert payload["agent_reviews"][-1]["stats_hints"]
 
 
+def test_checkpoint_review_note_cli_auto_fills_from_observation(workspace_root: Path) -> None:
+    runner = CliRunner()
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-review-cli-auto",
+    )
+    _git_commit(repo_root, subject="stabilize checkpoint review followthrough")
+
+    captured = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "after-commit",
+            str(repo_root),
+            "--commit-ref",
+            "HEAD",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert captured.exit_code == 0
+    captured_payload = json.loads(captured.stdout)
+    assert "--auto" in captured_payload["agent_review_command"]
+
+    reviewed = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "review-note",
+            str(repo_root),
+            "--commit-ref",
+            "HEAD",
+            "--auto",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert reviewed.exit_code == 0
+    payload = json.loads(reviewed.stdout)
+    assert payload["agent_review_status"] == "reviewed"
+    assert payload["review_status"] == "reviewed"
+    assert payload["agent_reviews"][-1]["summary"].startswith(
+        "Agent reviewed the auto-captured commit checkpoint"
+    )
+    assert payload["agent_reviews"][-1]["findings"]
+
+
 def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(workspace_root: Path) -> None:
     runner = CliRunner()
     repo_root = workspace_root / "aoa-sdk"

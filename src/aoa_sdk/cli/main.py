@@ -1568,7 +1568,16 @@ def checkpoint_after_commit(
 def checkpoint_review_note(
     repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
     commit_ref: str = typer.Option("HEAD", "--commit-ref", help="Committed git ref being reviewed."),
-    summary: str = typer.Option(..., "--summary", help="Agent-authored summary for this checkpoint review."),
+    auto: bool = typer.Option(
+        False,
+        "--auto",
+        help="Auto-fill the checkpoint review from the matching auto observation when summary or note lists are omitted.",
+    ),
+    summary: str | None = typer.Option(
+        None,
+        "--summary",
+        help="Agent-authored summary for this checkpoint review. Required unless --auto is used.",
+    ),
     finding: list[str] = typer.Option(
         None,
         "--finding",
@@ -1621,6 +1630,7 @@ def checkpoint_review_note(
         repo_root=repo_root,
         commit_ref=commit_ref,
         summary=summary,
+        auto_fill=auto,
         findings=finding or [],
         candidate_notes=candidate_note or [],
         stats_hints=stats_hint or [],
