@@ -1214,6 +1214,29 @@ class CheckpointLineageHint(BaseModel):
     drop_reason: str | None = None
 
 
+class CloseoutOwnerFollowthroughHint(BaseModel):
+    schema_version: Literal["aoa_closeout_owner_followthrough_hint_v1"] = (
+        "aoa_closeout_owner_followthrough_hint_v1"
+    )
+    cluster_ref: str
+    candidate_slot: str | None = None
+    owner_hypothesis: str
+    owner_shape: str
+    nearest_wrong_target: str | None = None
+    status_posture: Literal["early", "reanchor", "thin-evidence", "stable"]
+    recommended_owner_status_surface: str
+    requested_next_decision_class: Literal[
+        "land_direct",
+        "stage_seed",
+        "reanchor_owner",
+        "prove_first",
+        "merge_into_existing",
+        "defer",
+        "drop",
+    ]
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
 class CheckpointCandidateCluster(BaseModel):
     candidate_id: str
     candidate_kind: str
@@ -1498,6 +1521,7 @@ class CheckpointCloseoutContext(BaseModel):
     repo_scope: list[str] = Field(default_factory=list)
     candidate_map: CloseoutContextCandidateMap = Field(default_factory=CloseoutContextCandidateMap)
     candidate_lineage_map: list[CheckpointLineageHint] = Field(default_factory=list)
+    owner_followthrough_map: list[CloseoutOwnerFollowthroughHint] = Field(default_factory=list)
     progression_axis_signals: list[ProgressionAxisSignal] = Field(default_factory=list)
     ordered_skill_plan: list[SessionEndSkillTarget] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)

@@ -121,6 +121,8 @@ def test_session_closeout_explicitly_keeps_surface_handoff_separate() -> None:
     assert "`checkpoint_note_ref`" in closeout
     assert "docs/aoa-surface-detection-closeout-handoff.md" in closeout
     assert "docs/aoa-surface-detection-second-wave.md" in closeout
+    assert "`owner_followthrough_map`" in closeout
+    assert "without minting `candidate_ref`, `seed_ref`, or `object_ref`" in closeout
 
 
 def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
@@ -146,6 +148,18 @@ def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
     assert "aoa checkpoint build-closeout-context /srv/aoa-sdk" in checkpoints
     assert "aoa checkpoint execute-closeout-chain /srv/aoa-sdk" in checkpoints
     assert "aoa-checkpoint-closeout-bridge" in checkpoints
+
+
+def test_readme_routes_to_closeout_followthrough_map() -> None:
+    readme = read_text("README.md")
+    carry = read_text("docs/CANDIDATE_LINEAGE_CARRY.md")
+    followthrough = read_text("docs/closeout-followthrough-map.md")
+
+    assert "docs/closeout-followthrough-map.md" in readme
+    assert "schemas/closeout_owner_followthrough_map.schema.json" in readme
+    assert "examples/closeout_owner_followthrough_map.example.json" in readme
+    assert "owner_followthrough_map" in carry
+    assert "must not carry `candidate_ref`" in followthrough
 
 
 def test_blueprint_is_marked_as_direction_surface() -> None:

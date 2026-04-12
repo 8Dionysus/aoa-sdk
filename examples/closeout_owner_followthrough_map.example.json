@@ -1,0 +1,22 @@
+{
+  "schema_version": "aoa_closeout_owner_followthrough_map_v1",
+  "session_ref": "session:2026-04-12:wave3-owner-followthrough",
+  "reviewed": true,
+  "owner_followthrough_map": [
+    {
+      "schema_version": "aoa_closeout_owner_followthrough_hint_v1",
+      "cluster_ref": "cluster:growth:aoa-sdk-checkpoint-auto-capture-verify-green",
+      "candidate_slot": "growth-refinery:verify-green",
+      "owner_hypothesis": "aoa-skills",
+      "owner_shape": "reviewed donor harvest candidate",
+      "nearest_wrong_target": "aoa-playbooks",
+      "status_posture": "early",
+      "recommended_owner_status_surface": "aoa-skills:reviewed_owner_landing_bundle",
+      "requested_next_decision_class": "land_direct",
+      "evidence_refs": [
+        ".aoa/session-growth/current/aoa-sdk/closeout-context.json#owner_followthrough_map[0]",
+        ".aoa/session-growth/current/aoa-sdk/checkpoint-note.json#candidate_clusters[0]"
+      ]
+    }
+  ]
+}

@@ -1428,9 +1428,23 @@ def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: P
         for hint in context.candidate_lineage_map
         if hint.owner_hypothesis == "aoa-playbooks"
     )
+    route_followthrough = next(
+        hint
+        for hint in context.owner_followthrough_map
+        if hint.owner_hypothesis == "aoa-playbooks"
+    )
     assert route_lineage.cluster_ref.startswith("cluster:route:")
     assert route_lineage.nearest_wrong_target == "aoa-skills"
     assert "candidate_ref" not in route_lineage.model_dump()
+    assert route_followthrough.cluster_ref == route_lineage.cluster_ref
+    assert route_followthrough.nearest_wrong_target == route_lineage.nearest_wrong_target
+    assert route_followthrough.recommended_owner_status_surface == "aoa-skills:reviewed_owner_landing_bundle"
+    assert route_followthrough.requested_next_decision_class == {
+        "early": "land_direct",
+        "reanchor": "reanchor_owner",
+        "thin-evidence": "prove_first",
+        "stable": "land_direct",
+    }[route_lineage.status_posture]
     assert [target.skill_name for target in context.ordered_skill_plan] == [
         "aoa-session-donor-harvest",
         "aoa-session-progression-lift",

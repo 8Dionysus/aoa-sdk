@@ -19,6 +19,7 @@ Use the shortest route by need:
 - release protocol and bounded publication path: `docs/RELEASING.md`
 - release, support, and CI posture: `docs/RELEASE_CI_POSTURE.md`
 - reviewed session closeout orchestration: `docs/session-closeout.md`
+- reviewed closeout followthrough map toward owner-status surfaces: `docs/closeout-followthrough-map.md`, `schemas/closeout_owner_followthrough_map.schema.json`, and `examples/closeout_owner_followthrough_map.example.json`
 - additive surface detection and reviewed owner-layer handoff: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-second-wave.md`, `docs/aoa-surface-detection-heuristics.md`, and `docs/aoa-surface-detection-closeout-handoff.md`
 - checkpoint-aware session-growth note capture and promotion: `docs/session-growth-checkpoints.md` and `docs/checkpoint-note-promotion.md`
 - antifragility control-plane and closeout contracts: `docs/antifragility-control-plane.md`, `docs/antifragility-closeout-seam.md`, `tests/fixtures/antifragility/stress_dispatch_input.example.json`, `tests/fixtures/antifragility/stress_dispatch_result.example.json`, and `tests/fixtures/antifragility/stress_closeout_manifest.example.json`
@@ -40,6 +41,7 @@ Use the shortest route by need:
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
 - local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
+- reviewed closeout followthrough hints that stay advisory: `docs/closeout-followthrough-map.md`, `examples/closeout_owner_followthrough_map.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
 - additive owner-layer surface detection without changing `aoa skills ...` meaning: `docs/aoa-surface-detection-first-wave.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
 - checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, `aoa checkpoint mark/append/after-commit/review-note/status/promote`, `aoa checkpoint install-hook`, `aoa checkpoint hook-status`, the auto checkpoint bridge on `aoa skills guard`, and the explicit `aoa skills enter --checkpoint-kind` / `--append-note` overrides
 - explicit checkpoint-to-closeout bridge orchestration: `docs/session-growth-checkpoints.md`, `docs/session-closeout.md`, `aoa checkpoint build-closeout-context`, and `aoa checkpoint execute-closeout-chain`

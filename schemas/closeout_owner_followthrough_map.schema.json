@@ -1,0 +1,103 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/closeout_owner_followthrough_map.schema.json",
+  "title": "Closeout Owner Followthrough Map",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_ref",
+    "reviewed",
+    "owner_followthrough_map"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_closeout_owner_followthrough_map_v1"
+    },
+    "session_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewed": {
+      "const": true
+    },
+    "owner_followthrough_map": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "schema_version",
+          "cluster_ref",
+          "owner_hypothesis",
+          "owner_shape",
+          "status_posture",
+          "recommended_owner_status_surface",
+          "requested_next_decision_class",
+          "evidence_refs"
+        ],
+        "properties": {
+          "schema_version": {
+            "const": "aoa_closeout_owner_followthrough_hint_v1"
+          },
+          "cluster_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "candidate_slot": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "owner_hypothesis": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner_shape": {
+            "type": "string",
+            "minLength": 1
+          },
+          "nearest_wrong_target": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "status_posture": {
+            "enum": [
+              "early",
+              "reanchor",
+              "thin-evidence",
+              "stable"
+            ]
+          },
+          "recommended_owner_status_surface": {
+            "type": "string",
+            "minLength": 1
+          },
+          "requested_next_decision_class": {
+            "enum": [
+              "land_direct",
+              "stage_seed",
+              "reanchor_owner",
+              "prove_first",
+              "merge_into_existing",
+              "defer",
+              "drop"
+            ]
+          },
+          "evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    }
+  }
+}

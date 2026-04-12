@@ -44,6 +44,9 @@ reviewed session into:
   replace source-owned truth.
 - `aoa closeout run` does not auto-run `aoa-checkpoint-closeout-bridge`.
 - `aoa surfaces handoff` is reviewed-only and remains separate from this closeout runner.
+- `closeout-context.json` may carry `candidate_lineage_map` and
+  `owner_followthrough_map`, but both stay reviewed-only advisory surfaces
+  rather than owner truth.
 
 ## Manifest shape
 
@@ -210,6 +213,11 @@ repo-scoped checkpoint ledger under
 the closeout candidate map. The reviewed artifact remains the primary reread
 source, and the repo-root checkpoint note must still match the resolved
 reviewed session or the closeout fails closed.
+That same bundle may now emit a sibling `owner_followthrough_map` which points
+toward the next owner-status surface and requested decision class without
+minting `candidate_ref`, `seed_ref`, or `object_ref`.
+In other words, reviewed closeout may point toward the next tracked owner move
+without minting `candidate_ref`, `seed_ref`, or `object_ref`.
 When the active runtime session also exposes a live Codex rollout path, the
 builder now binds that session trace into the context so reviewed closeout can
 reread the whole runtime thread instead of only the reviewed artifact plus one
