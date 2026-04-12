@@ -1,0 +1,114 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/component_drift_hint_set.schema.json",
+  "title": "Component Drift Hint Set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_ref",
+    "repo_root",
+    "hints"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_component_drift_hint_set_v1"
+    },
+    "session_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repo_root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "hint_ref",
+          "component_ref",
+          "owner_repo",
+          "observed_at",
+          "observed_by",
+          "severity",
+          "signals",
+          "repeat_count",
+          "evidence_refs",
+          "recommended_route_class",
+          "review_required"
+        ],
+        "properties": {
+          "hint_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "component_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner_repo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "observed_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "observed_by": {
+            "enum": [
+              "workspace_root",
+              "closeout_reread",
+              "stats_reread",
+              "reviewed_closeout"
+            ]
+          },
+          "severity": {
+            "enum": [
+              "low",
+              "medium",
+              "high"
+            ]
+          },
+          "signals": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "repeat_count": {
+            "type": "integer",
+            "minimum": 0
+          },
+          "evidence_refs": {
+            "type": "array",
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "recommended_route_class": {
+            "enum": [
+              "observe",
+              "revalidate",
+              "rebuild",
+              "reexport",
+              "regenerate",
+              "reproject",
+              "repair",
+              "defer"
+            ]
+          },
+          "review_required": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}

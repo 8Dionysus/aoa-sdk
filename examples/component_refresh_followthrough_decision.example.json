@@ -1,0 +1,78 @@
+{
+  "schema_version": "aoa_component_refresh_followthrough_decision_set_v1",
+  "decision_ref": "decision:2026-04-12:component-refresh-alpha",
+  "reviewed": true,
+  "session_ref": "session:2026-04-12-component-refresh-alpha",
+  "decisions": [
+    {
+      "component_ref": "component:codex-plane:shared-root",
+      "owner_repo": "8Dionysus",
+      "route_class": "regenerate",
+      "decision_status": "chosen",
+      "selected_refresh_path": [
+        "python scripts/render_codex_plane.py",
+        "python scripts/validate_codex_plane.py",
+        "python .codex/bin/aoa-codex-doctor"
+      ],
+      "reason": "doctor drift and repeated hand patching together justify rerender from manifest/profile",
+      "evidence_refs": [
+        "hint:2026-04-12:codex-plane"
+      ],
+      "rollback_anchor": "docs/CODEX_PLANE_ROLLOUT.md",
+      "stats_should_refresh": true,
+      "memo_writeback_candidate": false
+    },
+    {
+      "component_ref": "component:skills-export:foundation",
+      "owner_repo": "aoa-skills",
+      "route_class": "reexport",
+      "decision_status": "chosen",
+      "selected_refresh_path": [
+        "python scripts/build_catalog.py",
+        "python scripts/validate_skills.py",
+        "python scripts/validate_agent_skills.py"
+      ],
+      "reason": "source/export drift should be resolved by normal export refresh and validation",
+      "evidence_refs": [
+        "hint:2026-04-12:skills-export"
+      ],
+      "rollback_anchor": "docs/LOCAL_ADAPTER_CONTRACT.md",
+      "stats_should_refresh": true,
+      "memo_writeback_candidate": false
+    },
+    {
+      "component_ref": "component:codex-subagents:projection",
+      "owner_repo": "aoa-agents",
+      "route_class": "regenerate",
+      "decision_status": "deferred",
+      "selected_refresh_path": [
+        "python scripts/build_published_surfaces.py",
+        "python scripts/build_codex_subagents_v2.py"
+      ],
+      "reason": "one signal exists, but route may wait until the next profile or wiring edit unless validation fails",
+      "evidence_refs": [
+        "hint:2026-04-12:subagents"
+      ],
+      "rollback_anchor": "docs/CODEX_SUBAGENT_PROJECTION.md",
+      "stats_should_refresh": false,
+      "memo_writeback_candidate": false
+    },
+    {
+      "component_ref": "component:stats-derived-summaries:growth-refinery",
+      "owner_repo": "aoa-stats",
+      "route_class": "rebuild",
+      "decision_status": "chosen",
+      "selected_refresh_path": [
+        "python scripts/build_views.py",
+        "python scripts/validate_repo.py"
+      ],
+      "reason": "stale and out-of-sync summaries should be rebuilt after upstream refresh receipts exist",
+      "evidence_refs": [
+        "hint:2026-04-12:stats-summaries"
+      ],
+      "rollback_anchor": "docs/ARCHITECTURE.md",
+      "stats_should_refresh": true,
+      "memo_writeback_candidate": true
+    }
+  ]
+}
