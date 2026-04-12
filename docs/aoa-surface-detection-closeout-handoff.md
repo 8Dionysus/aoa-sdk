@@ -70,6 +70,11 @@ Reviewed checkpoint closeout may later derive one sibling
 `followthrough_decision` inside `closeout-context.json` after the reread.
 That decision is not emitted by `aoa surfaces handoff`, and it does not
 auto-run any kernel skill by itself.
+When reviewed closeout needs to preserve component-refresh drift instead of a
+next owner-status landing, use the companion carry in
+`docs/COMPONENT_DRIFT_HINTS.md`.
+`aoa surfaces handoff` does not auto-emit that packet, and it does not auto-run
+owner refresh.
 
 ## Commands
 

@@ -65,5 +65,8 @@ That keeps `aoa-sdk` from turning reviewed closeout into owner identity minting.
 Use this map when reviewed closeout needs to say where the next tracked move
 belongs without pretending that the move already ran.
 
+For control-plane carry about a drifting owner-owned component rather than
+owner-status landing, use `docs/COMPONENT_DRIFT_HINTS.md`.
+
 If the question is already about final owner truth, leave `aoa-sdk` and read
 the owner repository instead.

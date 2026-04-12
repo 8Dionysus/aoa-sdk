@@ -58,7 +58,7 @@ Before making changes, read in this order:
 
 Then branch by task:
 
-- reviewed closeout handoff or session-growth targets: `docs/aoa-surface-detection-closeout-handoff.md`, `docs/session-growth-checkpoints.md`, `docs/SELF_AGENCY_CONTINUITY_CARRY.md`, and `docs/checkpoint-note-promotion.md`
+- reviewed closeout handoff or session-growth targets: `docs/aoa-surface-detection-closeout-handoff.md`, `docs/session-growth-checkpoints.md`, `docs/COMPONENT_DRIFT_HINTS.md`, `docs/SELF_AGENCY_CONTINUITY_CARRY.md`, and `docs/checkpoint-note-promotion.md`
 - additive surface detection: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-second-wave.md`, and `docs/aoa-surface-detection-heuristics.md`
 - RPG / progression readers: `docs/RPG_SDK_ADDENDUM.md` and `docs/RPG_SURFACE_PATHS.md`
 - release, CI, or compatibility posture: `docs/RELEASE_CI_POSTURE.md` and `docs/ecosystem-impact.md`

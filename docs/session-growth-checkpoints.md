@@ -32,6 +32,12 @@ existing session-harvest family into an automatic runtime authority.
   `continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref`; it
   may name `reanchor_need` and `continuity_status_hint`, but it must not claim
   reviewed continuity truth or runtime self-agency authority
+- checkpoint and reviewed closeout may also carry
+  `component_drift_hint` and reviewed
+  `component_refresh_followthrough_decision` packets rooted in `component_ref`;
+  they may name owner repo, signals, route class, evidence refs, rollback
+  anchor, and whether stats or memo follow-through is worth considering, but
+  they must not auto-run owner refresh or stand in for owner receipts
 - checkpoint notes keep provisional multi-axis movement for `boundary_integrity`, `execution_reliability`, `change_legibility`, `review_sharpness`, `proof_discipline`, `provenance_hygiene`, and `deep_readiness`
 - candidate movement and stats refresh stay reviewed-closeout decisions, not
   mid-session auto-promotion; after reviewed closeout, surviving candidates
@@ -125,6 +131,9 @@ checkpoint hints from final candidates before treating the closeout as a
 session analysis.
 `docs/CANDIDATE_LINEAGE_CARRY.md` is the canonical note for what the SDK may
 and may not carry on that lineage seam.
+`docs/COMPONENT_DRIFT_HINTS.md` is the companion note for control-plane
+component drift hints and reviewed refresh decisions that stay weaker than
+owner refresh law and owner receipts.
 `docs/SELF_AGENCY_CONTINUITY_CARRY.md` is the companion note for the narrower
 self-agency continuity hint seam that may survive reviewed closeout without
 becoming self-agent truth.
@@ -136,6 +145,9 @@ That reviewed closeout context may now also carry one deterministic
 `followthrough_decision` naming the next honest kernel class after the reread.
 It stays reviewed-only and advisory, and it does not auto-run kernel skills
 from the SDK.
+When the reread is instead about a drifting owner-owned component,
+`docs/COMPONENT_DRIFT_HINTS.md` defines the companion hint and reviewed
+decision packets.
 
 ## Commands
 

@@ -73,5 +73,8 @@ Read `followthrough_decision` together with:
 - `docs/closeout-followthrough-map.md`
 - `docs/session-growth-checkpoints.md`
 
+For component-refresh drift routing rather than next-kernel skill selection,
+read `docs/COMPONENT_DRIFT_HINTS.md`.
+
 If the question is already about execution, owner truth, approval, or
 publisher output, leave this surface and read the owning repository instead.

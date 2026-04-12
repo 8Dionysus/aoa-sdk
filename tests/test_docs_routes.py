@@ -157,11 +157,17 @@ def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
 def test_readme_routes_to_closeout_followthrough_map() -> None:
     readme = read_text("README.md")
     carry = read_text("docs/CANDIDATE_LINEAGE_CARRY.md")
+    component_carry = read_text("docs/COMPONENT_DRIFT_HINTS.md")
     followthrough = read_text("docs/closeout-followthrough-map.md")
     kernel_rules = read_text("docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md")
     continuity = read_text("docs/SELF_AGENCY_CONTINUITY_CARRY.md")
 
     assert "docs/closeout-followthrough-map.md" in readme
+    assert "docs/COMPONENT_DRIFT_HINTS.md" in readme
+    assert "schemas/component_drift_hint_set.schema.json" in readme
+    assert "examples/component_drift_hints.example.json" in readme
+    assert "schemas/component_refresh_followthrough_decision_set.schema.json" in readme
+    assert "examples/component_refresh_followthrough_decision.example.json" in readme
     assert "schemas/closeout_owner_followthrough_map.schema.json" in readme
     assert "examples/closeout_owner_followthrough_map.example.json" in readme
     assert "docs/SELF_AGENCY_CONTINUITY_CARRY.md" in readme
@@ -170,9 +176,13 @@ def test_readme_routes_to_closeout_followthrough_map() -> None:
     assert "docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md" in readme
     assert "schemas/closeout_followthrough_decision.schema.json" in readme
     assert "examples/closeout_followthrough_decision.example.json" in readme
+    assert "owner repo, route class" in component_carry
+    assert "weaker than owner refresh laws and owner" in component_carry
     assert "owner_followthrough_map" in carry
     assert "must not carry `candidate_ref`" in followthrough
+    assert "docs/COMPONENT_DRIFT_HINTS.md" in followthrough
     assert "It does not execute that class" in kernel_rules
+    assert "docs/COMPONENT_DRIFT_HINTS.md" in kernel_rules
     assert "It does not define self-agency meaning." in continuity
     assert "do not turn this carry into runtime self-modification authority" in continuity
 

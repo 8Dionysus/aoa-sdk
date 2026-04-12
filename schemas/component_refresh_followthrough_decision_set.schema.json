@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/component_refresh_followthrough_decision_set.schema.json",
+  "title": "Component Refresh Followthrough Decision Set",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "decision_ref",
+    "reviewed",
+    "session_ref",
+    "decisions"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_component_refresh_followthrough_decision_set_v1"
+    },
+    "decision_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewed": {
+      "type": "boolean",
+      "const": true
+    },
+    "session_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decisions": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "component_ref",
+          "owner_repo",
+          "route_class",
+          "decision_status",
+          "selected_refresh_path",
+          "reason",
+          "evidence_refs",
+          "rollback_anchor",
+          "stats_should_refresh",
+          "memo_writeback_candidate"
+        ],
+        "properties": {
+          "component_ref": {
+            "type": "string",
+            "minLength": 1
+          },
+          "owner_repo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "route_class": {
+            "enum": [
+              "observe",
+              "revalidate",
+              "rebuild",
+              "reexport",
+              "regenerate",
+              "reproject",
+              "repair",
+              "defer"
+            ]
+          },
+          "decision_status": {
+            "enum": [
+              "chosen",
+              "deferred",
+              "safe_stop"
+            ]
+          },
+          "selected_refresh_path": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 1
+          },
+          "evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {
+              "type": "string",
+              "minLength": 1
+            }
+          },
+          "rollback_anchor": {
+            "type": "string",
+            "minLength": 1
+          },
+          "stats_should_refresh": {
+            "type": "boolean"
+          },
+          "memo_writeback_candidate": {
+            "type": "boolean"
+          }
+        }
+      }
+    }
+  }
+}
