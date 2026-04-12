@@ -1,0 +1,15 @@
+#!/bin/sh
+# aoa-sdk checkpoint pre-push hook v1
+
+repo_root="$(git rev-parse --show-toplevel 2>/dev/null || pwd)"
+workspace_root="${AOA_CHECKPOINT_WORKSPACE_ROOT:-__AOA_CHECKPOINT_WORKSPACE_ROOT__}"
+aoa_bin="${AOA_CHECKPOINT_AOA_BIN:-aoa}"
+
+output="$("$aoa_bin" checkpoint git-boundary-check "$repo_root" --boundary push --root "$workspace_root" 2>&1)"
+status=$?
+
+if [ -n "$output" ]; then
+  printf '%s\n' "$output"
+fi
+
+exit "$status"

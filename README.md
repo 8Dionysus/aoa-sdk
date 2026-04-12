@@ -115,9 +115,10 @@ This repository is the source of truth for:
 - explicit checkpoint closeout now binds the live Codex rollout trace from that runtime session into `closeout-context.json` and reuses it as additional closeout evidence beside the reviewed artifact
 - default auto checkpoint bridge from `aoa skills guard` when checkpoint-phase detection sees a real growth signal; `aoa skills enter` stays read-only unless `--checkpoint-kind` is explicit, and `aoa surfaces detect --append-note` remains the direct additive override
 - explicit milestone checkpoint marking through `aoa checkpoint mark`, including public-share milestones such as `pr_opened`, `pr_merged`, and `owner_followthrough`, so agents do not have to re-enable ingress auto-append just to capture progress
-- local hook installation and status inspection for checkpoint-aware plain commits through `aoa checkpoint install-hook` and `aoa checkpoint hook-status`; the installed `post-commit` hook only triggers mid-session checkpoint capture and never runs closeout, promotion, harvest, push, or release logic
+- local managed-hook installation and status inspection for checkpoint-aware plain commits and git boundaries through `aoa checkpoint install-hook` and `aoa checkpoint hook-status`; the installed `post-commit` hook only triggers mid-session checkpoint capture and never runs closeout, promotion, harvest, push, or release logic, while `pre-push` and `pre-merge-commit` fail closed when the active repo note still carries pending checkpoint reviews
 - post-commit kind selection through `aoa checkpoint after-commit --kind auto|commit|owner_followthrough` and the hook's `AOA_CHECKPOINT_KIND`; `auto` keeps normal commits as `commit/code`, but owner-follow-through commit text or an already closed checkpoint note resolves to `owner_followthrough/public-share` without mutating or rotating the closed note
 - a commit is not complete from the agent workflow perspective until the hook-created checkpoint has a matching `aoa checkpoint review-note --auto` or richer manual review entry; scripts preserve the event boundary, while the agent still owns the semantic review
+- `aoa checkpoint git-boundary-check` is the fail-closed control-plane surface behind the installed `pre-push` and `pre-merge-commit` hooks, and it stays active-session-only just like post-commit capture
 - checkpoint closeout execution reports now declare `execution_mode=mechanical_bridge_artifact_build`, `mechanical_bridge_only=true`, and `agent_skill_application_required=true`, so generated packets cannot be mistaken for proof that a Codex agent has already applied the skill protocol to the full session
 - checkpoint and explicit closeout surfaces keep canonical machine timestamps in UTC while also publishing local companion fields such as `observed_at_local`, `captured_at_local`, `built_at_local`, `executed_at_local`, and their matching `*_tz` labels for human review
 - local CLI inspection surfaces that stay subordinate to source-owned meaning
@@ -321,8 +322,9 @@ aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner 
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv --json
 aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --auto --root /srv --json
-aoa checkpoint install-hook --repo aoa-sdk --root /srv --json
-aoa checkpoint hook-status --repo aoa-sdk --root /srv --json
+aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json
+aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json
+aoa checkpoint git-boundary-check /srv/aoa-sdk --boundary push --root /srv --json
 aoa checkpoint build-closeout-context /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
 aoa checkpoint execute-closeout-chain /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
 aoa checkpoint status /srv/aoa-sdk --root /srv/aoa-sdk --json

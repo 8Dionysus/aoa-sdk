@@ -73,6 +73,29 @@ def _git_commit(repo_root: Path, *, subject: str, extra_env: dict[str, str] | No
     )
 
 
+def _git_commit_file(
+    repo_root: Path,
+    *,
+    relative_path: str,
+    content: str,
+    subject: str,
+    extra_env: dict[str, str] | None = None,
+) -> subprocess.CompletedProcess[str]:
+    target = repo_root / relative_path
+    target.parent.mkdir(parents=True, exist_ok=True)
+    target.write_text(content, encoding="utf-8")
+    subprocess.run(["git", "add", relative_path], cwd=repo_root, check=True, capture_output=True, text=True)
+    env = None if extra_env is None else {**os.environ, **extra_env}
+    return subprocess.run(
+        ["git", "commit", "-m", subject],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+
+
 def _write_aoa_shim(path: Path) -> Path:
     import pydantic
 
@@ -85,6 +108,30 @@ def _write_aoa_shim(path: Path) -> Path:
     path.write_text(script, encoding="utf-8")
     path.chmod(0o755)
     return path
+
+
+def _git_run(
+    repo_root: Path,
+    *args: str,
+    extra_env: dict[str, str] | None = None,
+    check: bool = True,
+) -> subprocess.CompletedProcess[str]:
+    env = None if extra_env is None else {**os.environ, **extra_env}
+    return subprocess.run(
+        ["git", *args],
+        cwd=repo_root,
+        check=check,
+        capture_output=True,
+        text=True,
+        env=env,
+    )
+
+
+def _hook_results_by_name(payload: dict[str, object]) -> dict[str, dict[str, object]]:
+    return {
+        item["hook_name"]: item
+        for item in payload["results"]  # type: ignore[index]
+    }
 
 
 def test_surfaces_detect_cli_supports_checkpoint_phase(workspace_root: Path) -> None:
@@ -958,6 +1005,8 @@ def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(wor
             "hook-status",
             "--repo",
             "aoa-sdk",
+            "--hook",
+            "post-commit",
             "--root",
             str(workspace_root),
             "--json",
@@ -974,6 +1023,8 @@ def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(wor
             "install-hook",
             "--repo",
             "aoa-sdk",
+            "--hook",
+            "post-commit",
             "--root",
             str(workspace_root),
             "--json",
@@ -992,6 +1043,8 @@ def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(wor
             "hook-status",
             "--repo",
             "aoa-sdk",
+            "--hook",
+            "post-commit",
             "--root",
             str(workspace_root),
             "--json",
@@ -1010,6 +1063,8 @@ def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(wor
             "hook-status",
             "--repo",
             "aoa-sdk",
+            "--hook",
+            "post-commit",
             "--root",
             str(workspace_root),
             "--json",
@@ -1026,6 +1081,8 @@ def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(wor
             "install-hook",
             "--repo",
             "aoa-sdk",
+            "--hook",
+            "post-commit",
             "--overwrite",
             "--root",
             str(workspace_root),
@@ -1046,6 +1103,8 @@ def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(wor
             "hook-status",
             "--repo",
             "aoa-sdk",
+            "--hook",
+            "post-commit",
             "--root",
             str(workspace_root),
             "--json",
@@ -1054,6 +1113,35 @@ def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(wor
     assert stale.exit_code == 0
     stale_payload = json.loads(stale.stdout)
     assert stale_payload["results"][0]["status"] == "stale"
+
+
+def test_checkpoint_install_hook_all_managed_hooks(workspace_root: Path) -> None:
+    runner = CliRunner()
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+
+    install = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "install-hook",
+            "--repo",
+            "aoa-sdk",
+            "--hook",
+            "all",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert install.exit_code == 0
+    payload = json.loads(install.stdout)
+    results_by_name = _hook_results_by_name(payload)
+    assert set(results_by_name) == {"post-commit", "pre-push", "pre-merge-commit"}
+    assert all(item["action"] == "installed" for item in results_by_name.values())
+    assert all(Path(item["hook_path"]).exists() for item in results_by_name.values())
+    assert all(os.access(Path(item["hook_path"]), os.X_OK) for item in results_by_name.values())
 
 
 def test_post_commit_hook_runs_after_real_git_commit(workspace_root: Path) -> None:
@@ -1072,6 +1160,8 @@ def test_post_commit_hook_runs_after_real_git_commit(workspace_root: Path) -> No
             "install-hook",
             "--repo",
             "aoa-sdk",
+            "--hook",
+            "post-commit",
             "--root",
             str(workspace_root),
             "--json",
@@ -1102,6 +1192,155 @@ def test_post_commit_hook_runs_after_real_git_commit(workspace_root: Path) -> No
     )
 
 
+def test_pre_push_hook_blocks_until_pending_checkpoint_review_is_written(workspace_root: Path) -> None:
+    runner = CliRunner()
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-pre-push",
+    )
+    remote_root = workspace_root / "push-remote.git"
+    subprocess.run(["git", "init", "--bare", str(remote_root)], check=True, capture_output=True, text=True)
+    _git_run(repo_root, "remote", "add", "origin", str(remote_root))
+
+    install = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "install-hook",
+            "--repo",
+            "aoa-sdk",
+            "--hook",
+            "all",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert install.exit_code == 0
+
+    shim_path = _write_aoa_shim(workspace_root / "aoa-bin")
+    env = {"AOA_CHECKPOINT_AOA_BIN": str(shim_path)}
+    commit = _git_commit(
+        repo_root,
+        subject="block push until checkpoint review is written",
+        extra_env=env,
+    )
+    blocked_push = _git_run(repo_root, "push", "-u", "origin", "HEAD", extra_env=env, check=False)
+    blocked_output = "\n".join(part for part in (commit.stdout, commit.stderr, blocked_push.stdout, blocked_push.stderr) if part)
+
+    assert blocked_push.returncode != 0
+    assert "checkpoint_git_boundary: blocked boundary=push" in blocked_output
+
+    reviewed = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "review-note",
+            str(repo_root),
+            "--commit-ref",
+            "HEAD",
+            "--auto",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert reviewed.exit_code == 0
+
+    allowed_push = _git_run(repo_root, "push", "-u", "origin", "HEAD", extra_env=env, check=False)
+    allowed_output = "\n".join(part for part in (allowed_push.stdout, allowed_push.stderr) if part)
+
+    assert allowed_push.returncode == 0
+    assert "checkpoint_git_boundary: clear boundary=push" in allowed_output
+
+
+def test_pre_merge_commit_hook_blocks_until_pending_checkpoint_review_is_written(workspace_root: Path) -> None:
+    runner = CliRunner()
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    base_branch = _git_run(repo_root, "branch", "--show-current").stdout.strip() or "master"
+    _git_commit(repo_root, subject="base commit before hook install")
+    _git_run(repo_root, "checkout", "-b", "feature")
+    _git_commit_file(
+        repo_root,
+        relative_path="feature-before-install.txt",
+        content="feature branch before hook install\n",
+        subject="feature commit before hook install",
+    )
+    _git_run(repo_root, "checkout", base_branch)
+    _git_commit_file(
+        repo_root,
+        relative_path="main-before-install.txt",
+        content="main branch before hook install\n",
+        subject="main divergence before hook install",
+    )
+
+    _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-pre-merge",
+    )
+    install = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "install-hook",
+            "--repo",
+            "aoa-sdk",
+            "--hook",
+            "all",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert install.exit_code == 0
+
+    shim_path = _write_aoa_shim(workspace_root / "aoa-bin-merge")
+    env = {"AOA_CHECKPOINT_AOA_BIN": str(shim_path)}
+    _git_run(repo_root, "checkout", "feature")
+    _git_commit_file(
+        repo_root,
+        relative_path="feature-pending-review.txt",
+        content="feature branch pending review\n",
+        subject="feature commit with pending checkpoint review",
+        extra_env=env,
+    )
+    feature_commit_sha = _git_run(repo_root, "rev-parse", "HEAD").stdout.strip()
+    _git_run(repo_root, "checkout", base_branch)
+
+    blocked_merge = _git_run(repo_root, "merge", "--no-ff", "feature", extra_env=env, check=False)
+    blocked_output = "\n".join(part for part in (blocked_merge.stdout, blocked_merge.stderr) if part)
+
+    assert blocked_merge.returncode != 0
+    assert "checkpoint_git_boundary: blocked boundary=merge" in blocked_output
+
+    _git_run(repo_root, "merge", "--abort", check=False)
+
+    reviewed = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "review-note",
+            str(repo_root),
+            "--commit-ref",
+            feature_commit_sha,
+            "--auto",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert reviewed.exit_code == 0
+
+    allowed_merge = _git_run(repo_root, "merge", "--no-ff", "feature", extra_env=env, check=False)
+    allowed_output = "\n".join(part for part in (allowed_merge.stdout, allowed_merge.stderr) if part)
+
+    assert allowed_merge.returncode == 0
+    assert "checkpoint_git_boundary: clear boundary=merge" in allowed_output
+
+
 def test_install_hook_allows_explicit_8dionysus(workspace_root: Path) -> None:
     runner = CliRunner()
     repo_root = workspace_root / "8Dionysus"
@@ -1114,6 +1353,8 @@ def test_install_hook_allows_explicit_8dionysus(workspace_root: Path) -> None:
             "install-hook",
             "--repo",
             "8Dionysus",
+            "--hook",
+            "post-commit",
             "--root",
             str(workspace_root),
             "--json",

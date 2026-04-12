@@ -16,6 +16,7 @@ from ..models import (
     CheckpointCloseoutReviewCarry,
     CheckpointCloseoutExecutionReport,
     CheckpointCaptureResult,
+    CheckpointGitBoundaryCheck,
     CheckpointHookInstallResult,
     CheckpointHookStatus,
     CheckpointLineageHint,
@@ -56,8 +57,17 @@ CHECKPOINT_KINDS = (
 )
 POST_COMMIT_CHECKPOINT_KINDS = ("auto", "commit", "owner_followthrough")
 OWNER_MUTABLE_REPOS = tuple(repo for repo in KNOWN_REPOS if repo != "8Dionysus")
-POST_COMMIT_HOOK_TEMPLATE_VERSION = "aoa-sdk-post-commit-hook-v2"
-POST_COMMIT_HOOK_MARKER = "# aoa-sdk checkpoint post-commit hook v2"
+CHECKPOINT_MANAGED_HOOKS = ("post-commit", "pre-push", "pre-merge-commit")
+CHECKPOINT_HOOK_TEMPLATE_VERSIONS: dict[str, str] = {
+    "post-commit": "aoa-sdk-post-commit-hook-v2",
+    "pre-push": "aoa-sdk-pre-push-hook-v1",
+    "pre-merge-commit": "aoa-sdk-pre-merge-commit-hook-v1",
+}
+CHECKPOINT_HOOK_MARKERS: dict[str, str] = {
+    "post-commit": "# aoa-sdk checkpoint post-commit hook v2",
+    "pre-push": "# aoa-sdk checkpoint pre-push hook v1",
+    "pre-merge-commit": "# aoa-sdk checkpoint pre-merge-commit hook v1",
+}
 PROMOTION_TARGETS = ("dionysus-note", "harvest-handoff")
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 SESSION_REF_RE = re.compile(r'"session_ref"\s*:\s*"([^"]+)"|session_ref:\s*`?([^`\s]+)`?|Session ref:\s*`?([^`\n]+)`?')
@@ -1192,11 +1202,16 @@ class CheckpointsAPI:
         _mark_after_commit_report_reviewed(paths.post_commit_report, review=review)
         return note
 
-    def hook_status(self, *, repo_name: str) -> CheckpointHookStatus:
+    def hook_status(
+        self,
+        *,
+        repo_name: str,
+        hook_name: Literal["post-commit", "pre-push", "pre-merge-commit"],
+    ) -> CheckpointHookStatus:
         repo_root = self.workspace.repo_path(repo_name)
-        hook_path = _resolve_git_hook_path(repo_root)
-        template_path = _hook_template_path(self.workspace)
-        rendered = _render_post_commit_hook(self.workspace)
+        hook_path = _resolve_git_hook_path(repo_root, hook_name)
+        template_path = _hook_template_path(self.workspace, hook_name)
+        rendered = _render_checkpoint_hook(self.workspace, hook_name)
         status: Literal["missing", "stale", "current"]
         if not hook_path.exists():
             status = "missing"
@@ -1205,10 +1220,11 @@ class CheckpointsAPI:
             status = "current" if existing == rendered and os.access(hook_path, os.X_OK) else "stale"
         return CheckpointHookStatus(
             repo=repo_name,
+            hook_name=hook_name,
             repo_root=str(repo_root),
             hook_path=str(hook_path),
             template_path=str(template_path),
-            template_version=POST_COMMIT_HOOK_TEMPLATE_VERSION,
+            template_version=CHECKPOINT_HOOK_TEMPLATE_VERSIONS[hook_name],
             status=status,
         )
 
@@ -1216,30 +1232,101 @@ class CheckpointsAPI:
         self,
         *,
         repo_name: str,
+        hook_name: Literal["post-commit", "pre-push", "pre-merge-commit"],
         overwrite: bool = False,
     ) -> CheckpointHookInstallResult:
-        status = self.hook_status(repo_name=repo_name)
+        status = self.hook_status(repo_name=repo_name, hook_name=hook_name)
         hook_path = Path(status.hook_path)
         action: Literal["installed", "updated", "unchanged"]
         if status.status == "missing":
             hook_path.parent.mkdir(parents=True, exist_ok=True)
-            hook_path.write_text(_render_post_commit_hook(self.workspace), encoding="utf-8")
+            hook_path.write_text(_render_checkpoint_hook(self.workspace, hook_name), encoding="utf-8")
             hook_path.chmod(0o755)
             action = "installed"
         elif status.status == "stale" and overwrite:
-            hook_path.write_text(_render_post_commit_hook(self.workspace), encoding="utf-8")
+            hook_path.write_text(_render_checkpoint_hook(self.workspace, hook_name), encoding="utf-8")
             hook_path.chmod(0o755)
             action = "updated"
         else:
             action = "unchanged"
         return CheckpointHookInstallResult(
             repo=repo_name,
+            hook_name=hook_name,
             repo_root=status.repo_root,
             hook_path=status.hook_path,
             template_path=status.template_path,
             template_version=status.template_version,
             status_before=status.status,
             action=action,
+        )
+
+    def git_boundary_check(
+        self,
+        *,
+        repo_root: str,
+        boundary: Literal["push", "merge"],
+        session_file: str | None = None,
+    ) -> CheckpointGitBoundaryCheck:
+        repo_root_path = _resolve_context_root(self.workspace, repo_root)
+        repo_label = _resolve_context_label(self.workspace, repo_root)
+        session_path, runtime_metadata = _probe_checkpoint_runtime_session(
+            workspace=self.workspace,
+            session_file=session_file,
+        )
+        runtime_session_id = cast(str | None, runtime_metadata["runtime_session_id"])
+        if runtime_session_id is None:
+            return CheckpointGitBoundaryCheck(
+                repo_root=str(repo_root_path),
+                repo_label=repo_label,
+                boundary=boundary,
+                status="clear_no_active_session",
+            )
+
+        note = _peek_runtime_checkpoint_note(
+            self,
+            repo_root=repo_root,
+            session_file=str(session_path),
+        )
+        if note is None:
+            return CheckpointGitBoundaryCheck(
+                repo_root=str(repo_root_path),
+                repo_label=repo_label,
+                boundary=boundary,
+                status="clear_no_note",
+                runtime_session_id=runtime_session_id,
+            )
+
+        paths = _resolve_runtime_checkpoint_paths(
+            self.workspace,
+            repo_root=repo_root,
+            runtime_session_id=note.runtime_session_id,
+            migrate_legacy=False,
+        )
+        pending_refs = _dedupe_strings(note.agent_review_pending_refs)
+        if pending_refs:
+            refs_preview = ", ".join(pending_refs[:5])
+            if len(pending_refs) > 5:
+                refs_preview += f" (+{len(pending_refs) - 5} more)"
+            return CheckpointGitBoundaryCheck(
+                repo_root=str(repo_root_path),
+                repo_label=repo_label,
+                boundary=boundary,
+                status="blocked_pending_review",
+                runtime_session_id=note.runtime_session_id,
+                note_ref=str(paths.note_json),
+                pending_refs=pending_refs,
+                required_action=(
+                    "pending checkpoint agent review blocks "
+                    f"{boundary}; run `aoa checkpoint review-note --auto` for: {refs_preview}"
+                ),
+            )
+        return CheckpointGitBoundaryCheck(
+            repo_root=str(repo_root_path),
+            repo_label=repo_label,
+            boundary=boundary,
+            status="clear",
+            runtime_session_id=note.runtime_session_id,
+            note_ref=str(paths.note_json),
         )
 
     def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:
@@ -1858,11 +1945,14 @@ def _post_commit_status_path(workspace: Workspace, repo_label: str) -> Path:
     return _checkpoint_post_commit_status_root(workspace) / f"{repo_label}.latest.json"
 
 
-def _hook_template_path(workspace: Workspace) -> Path:
-    workspace_candidate = workspace.repo_path("aoa-sdk") / "githooks" / "post-commit"
+def _hook_template_path(
+    workspace: Workspace,
+    hook_name: Literal["post-commit", "pre-push", "pre-merge-commit"],
+) -> Path:
+    workspace_candidate = workspace.repo_path("aoa-sdk") / "githooks" / hook_name
     if workspace_candidate.exists():
         return workspace_candidate
-    package_candidate = Path(__file__).resolve().parents[3] / "githooks" / "post-commit"
+    package_candidate = Path(__file__).resolve().parents[3] / "githooks" / hook_name
     if package_candidate.exists():
         return package_candidate
     return workspace_candidate
@@ -4697,9 +4787,10 @@ def _build_after_commit_auto_observation(
     )
 
     observation_kind = "owner follow-through" if checkpoint_kind == "owner_followthrough" else "commit"
+    normalized_commit_subject = re.sub(r"\s+", " ", (commit_subject or "checkpoint").strip())
     summary = (
         f"Auto-captured {observation_kind} checkpoint observation for {commit_short_sha or commit_ref}: "
-        f"{re.sub(r'\\s+', ' ', (commit_subject or 'checkpoint').strip())}"
+        f"{normalized_commit_subject}"
     )
     return SessionCheckpointAutoObservation(
         observation_id=(
@@ -5102,8 +5193,11 @@ def _read_git_commit_metadata(repo_root: Path, commit_ref: str) -> dict[str, Any
     }
 
 
-def _resolve_git_hook_path(repo_root: Path) -> Path:
-    result = _run_git(repo_root, "rev-parse", "--git-path", "hooks/post-commit")
+def _resolve_git_hook_path(
+    repo_root: Path,
+    hook_name: Literal["post-commit", "pre-push", "pre-merge-commit"],
+) -> Path:
+    result = _run_git(repo_root, "rev-parse", "--git-path", f"hooks/{hook_name}")
     raw_path = result.stdout.strip()
     hook_path = Path(raw_path)
     if hook_path.is_absolute():
@@ -5111,10 +5205,14 @@ def _resolve_git_hook_path(repo_root: Path) -> Path:
     return (repo_root / hook_path).resolve()
 
 
-def _render_post_commit_hook(workspace: Workspace) -> str:
-    template = _hook_template_path(workspace).read_text(encoding="utf-8")
-    if POST_COMMIT_HOOK_MARKER not in template:
-        raise ValueError("post-commit hook template is missing the aoa-sdk version marker")
+def _render_checkpoint_hook(
+    workspace: Workspace,
+    hook_name: Literal["post-commit", "pre-push", "pre-merge-commit"],
+) -> str:
+    template = _hook_template_path(workspace, hook_name).read_text(encoding="utf-8")
+    marker = CHECKPOINT_HOOK_MARKERS[hook_name]
+    if marker not in template:
+        raise ValueError(f"{hook_name} hook template is missing the aoa-sdk version marker")
     return template.replace("__AOA_CHECKPOINT_WORKSPACE_ROOT__", str(workspace.federation_root))
 
 

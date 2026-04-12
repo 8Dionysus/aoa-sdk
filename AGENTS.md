@@ -164,6 +164,11 @@ The hook-created checkpoint starts as `agent_review=pending`; after every
 successful commit, the Codex agent must apply the checkpoint skill protocol and
 write a semantic `aoa checkpoint review-note --auto` entry before treating the commit
 as fully handled.
+When the same repo also has the installed `pre-push` and `pre-merge-commit`
+hooks, `git push` and merge-commit creation now fail closed while that repo's
+active checkpoint note still carries pending checkpoint reviews. Those
+boundary hooks stay active-session-only and must not create a fresh session
+just to block or clear a boundary.
 The hook-created note now also carries one structured auto-observation drawn
 from commit metadata, checkpoint skill dispatch, and surface detection, so the
 agent is extending a real intermediate collection rather than starting from an
@@ -216,8 +221,9 @@ aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --muta
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv --json
 aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --auto --root /srv --json
-aoa checkpoint install-hook --repo aoa-sdk --root /srv --json
-aoa checkpoint hook-status --repo aoa-sdk --root /srv --json
+aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json
+aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json
+aoa checkpoint git-boundary-check /srv/aoa-sdk --boundary push --root /srv --json
 ```
 
 Use `aoa surfaces handoff` only after review:
