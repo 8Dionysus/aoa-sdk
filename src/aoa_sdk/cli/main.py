@@ -514,8 +514,11 @@ def _print_checkpoint_hook_install(result: CheckpointHookInstallResult) -> None:
 def _print_checkpoint_git_boundary(report: CheckpointGitBoundaryCheck) -> None:
     if report.status == "blocked_pending_review":
         pending_preview = ", ".join(report.pending_refs[:5]) or "none"
+        blocking_preview = ", ".join(report.blocking_repo_labels[:5])
+        blocking_suffix = f" blocking={blocking_preview}" if blocking_preview else ""
         typer.echo(
-            f"checkpoint_git_boundary: blocked boundary={report.boundary} repo={report.repo_label} pending={pending_preview}",
+            "checkpoint_git_boundary: "
+            f"blocked boundary={report.boundary} repo={report.repo_label}{blocking_suffix} pending={pending_preview}",
             err=True,
         )
         if report.required_action is not None:

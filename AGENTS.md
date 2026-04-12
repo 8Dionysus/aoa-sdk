@@ -152,6 +152,10 @@ That path is active-session-only: if the resolved thread-scoped or default
 runtime session file does not already exist, it must exit as
 `skipped_no_active_session` and must not create a new session just to emit
 checkpoint noise.
+When an active runtime session exists, treat legacy unscoped
+`current/<repo-label>/` checkpoint ledgers as quarantined migration evidence,
+not as live session state. They must not auto-attach to the current runtime
+session or silently stand in for scoped git-boundary or closeout inputs.
 That hook path may dispatch checkpoint-phase skills, run additive checkpoint
 surface detection, and append one reviewable local note, but it must never run
 closeout, promotion, harvest, push, or release logic.
@@ -165,8 +169,9 @@ successful commit, the Codex agent must apply the checkpoint skill protocol and
 write a semantic `aoa checkpoint review-note --auto` entry before treating the commit
 as fully handled.
 When the same repo also has the installed `pre-push` and `pre-merge-commit`
-hooks, `git push` and merge-commit creation now fail closed while that repo's
-active checkpoint note still carries pending checkpoint reviews. Those
+hooks, `git push` and merge-commit creation now fail closed while any
+aggregated runtime-session checkpoint note still carries pending checkpoint
+reviews. Those
 boundary hooks stay active-session-only and must not create a fresh session
 just to block or clear a boundary.
 The hook-created note now also carries one structured auto-observation drawn

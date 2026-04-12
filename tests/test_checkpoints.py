@@ -135,7 +135,7 @@ def _write_checkpoint_history_entry(
     *,
     note_dir: Path,
     session_ref: str,
-    runtime_session_id: str,
+    runtime_session_id: str | None,
     repo_root: Path,
     repo_label: str,
     candidate_id: str,
@@ -148,10 +148,14 @@ def _write_checkpoint_history_entry(
     checkpoint_kind: str = "verify_green",
     observed_at: str = "2026-04-10T14:00:00Z",
     intent_text: str = "reviewed closeout candidate survived this runtime session",
+    commit_sha: str | None = None,
+    commit_short_sha: str | None = None,
+    agent_review_status: str = "not_required",
     blocked_by: list[str] | None = None,
     promote_if: list[str] | None = None,
     next_owner_moves: list[str] | None = None,
     defer_reason: str | None = None,
+    manual_review_requested: bool = False,
 ) -> None:
     note_dir.mkdir(parents=True, exist_ok=True)
     payload = {
@@ -167,6 +171,9 @@ def _write_checkpoint_history_entry(
             "intent_text": intent_text,
             "checkpoint_should_capture": True,
             "blocked_by": blocked_by or [],
+            "commit_sha": commit_sha,
+            "commit_short_sha": commit_short_sha,
+            "agent_review_status": agent_review_status,
             "candidate_clusters": [
                 {
                     "candidate_id": candidate_id,
@@ -187,7 +194,7 @@ def _write_checkpoint_history_entry(
                     ],
                 }
             ],
-            "manual_review_requested": False,
+            "manual_review_requested": manual_review_requested,
         },
     }
     (note_dir / "checkpoint-note.jsonl").write_text(
@@ -812,6 +819,111 @@ def test_git_boundary_check_blocks_pending_review_and_clears_after_review(
     assert cleared_note.agent_review_status == "reviewed"
     assert cleared.status == "clear"
     assert cleared.pending_refs == []
+    assert cleared.blocking_repo_labels == []
+
+
+def test_git_boundary_check_blocks_when_sibling_repo_in_same_session_has_pending_review(
+    workspace_root: Path,
+) -> None:
+    sdk_repo_root = workspace_root / "aoa-sdk"
+    sibling_repo_root = workspace_root / "aoa-playbooks"
+    _init_git_repo(sdk_repo_root)
+    _init_git_repo(sibling_repo_root)
+    (sibling_repo_root / "README.md").write_text("# aoa-playbooks\n", encoding="utf-8")
+    sibling_commit_sha = _git_commit(
+        sibling_repo_root,
+        subject="sibling repo commit with pending checkpoint review",
+    )
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-git-boundary-sibling",
+    )
+    sdk = AoASDK.from_workspace(sdk_repo_root)
+    sdk.checkpoints.after_commit(
+        repo_root=str(sibling_repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+
+    blocked = sdk.checkpoints.git_boundary_check(
+        repo_root=str(sdk_repo_root),
+        boundary="push",
+        session_file=str(session_file),
+    )
+
+    assert blocked.status == "blocked_pending_review"
+    assert blocked.pending_refs == [sibling_commit_sha]
+    assert blocked.blocking_repo_labels == ["aoa-playbooks"]
+    assert blocked.required_action is not None
+    assert "blocking repos: aoa-playbooks" in blocked.required_action
+
+    reviewed_note = sdk.checkpoints.review_note(
+        repo_root=str(sibling_repo_root),
+        commit_ref="HEAD",
+        auto_fill=True,
+        session_file=str(session_file),
+    )
+    cleared = sdk.checkpoints.git_boundary_check(
+        repo_root=str(sdk_repo_root),
+        boundary="merge",
+        session_file=str(session_file),
+    )
+
+    assert reviewed_note.agent_review_status == "reviewed"
+    assert cleared.status == "clear"
+    assert cleared.pending_refs == []
+    assert cleared.blocking_repo_labels == []
+
+
+def test_git_boundary_check_ignores_unscoped_legacy_sibling_note_outside_active_runtime_session(
+    workspace_root: Path,
+) -> None:
+    sdk_repo_root = workspace_root / "aoa-sdk"
+    sibling_repo_root = workspace_root / "aoa-playbooks"
+    _init_git_repo(sdk_repo_root)
+    _init_git_repo(sibling_repo_root)
+    (sibling_repo_root / "README.md").write_text("# aoa-playbooks\n", encoding="utf-8")
+    sibling_commit_sha = _git_commit(
+        sibling_repo_root,
+        subject="legacy unscoped checkpoint from another session",
+    )
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-git-boundary-live",
+    )
+    legacy_note_dir = _checkpoint_note_dir(workspace_root, repo_label="aoa-playbooks")
+    _write_checkpoint_history_entry(
+        note_dir=legacy_note_dir,
+        session_ref="session:legacy-unscoped",
+        runtime_session_id=None,
+        repo_root=sibling_repo_root,
+        repo_label="aoa-playbooks",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-legacy",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Legacy unscoped route candidate",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=["aoa-playbooks.playbook_registry.min"],
+        progression_axis_signals=[],
+        checkpoint_kind="commit",
+        intent_text="legacy unscoped checkpoint from another session",
+        commit_sha=sibling_commit_sha,
+        commit_short_sha=sibling_commit_sha[:7],
+        agent_review_status="pending",
+        manual_review_requested=True,
+    )
+
+    sdk = AoASDK.from_workspace(sdk_repo_root)
+    result = sdk.checkpoints.git_boundary_check(
+        repo_root=str(sdk_repo_root),
+        boundary="push",
+        session_file=str(session_file),
+    )
+
+    assert result.status == "clear_no_note"
+    assert result.pending_refs == []
+    assert result.blocking_repo_labels == []
+    assert (legacy_note_dir / "checkpoint-note.jsonl").exists()
 
 
 def test_after_commit_failure_writes_artifact_without_corrupting_checkpoint_state(workspace_root: Path) -> None:
@@ -1322,6 +1434,43 @@ def test_checkpoint_status_archives_stale_legacy_fallback_when_scoped_note_exist
     assert archived_payload["session_ref"] == "session:test-stale"
     assert not (legacy_note_dir / "checkpoint-note.jsonl").exists()
     assert (scoped_note_dir / "checkpoint-note.json").exists()
+
+
+def test_checkpoint_status_quarantines_unscoped_legacy_note_from_active_runtime_session(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json",
+        session_id="runtime-session-live",
+    )
+    legacy_note_dir = _checkpoint_note_dir(workspace_root, repo_label="aoa-sdk")
+    scoped_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-live",
+    )
+    _write_checkpoint_history_entry(
+        note_dir=legacy_note_dir,
+        session_ref="session:test-legacy-unscoped",
+        runtime_session_id=None,
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-legacy",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Legacy unscoped route candidate",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=["aoa-playbooks.playbook_registry.min"],
+        progression_axis_signals=[],
+    )
+
+    with pytest.raises(SurfaceNotFound):
+        sdk.checkpoints.status(
+            repo_root=str(workspace_root / "aoa-sdk"),
+            session_file=str(session_file),
+        )
+
+    assert (legacy_note_dir / "checkpoint-note.jsonl").exists()
+    assert not (scoped_note_dir / "checkpoint-note.json").exists()
 
 
 def test_capture_from_skill_phase_does_not_reuse_stale_current_note(workspace_root: Path) -> None:
