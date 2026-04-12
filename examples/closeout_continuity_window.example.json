@@ -1,0 +1,8 @@
+{
+  "schema_version": "aoa_sdk_closeout_continuity_window_v1",
+  "continuity_ref_hint": "continuity:aoa-playbooks:self-agency-continuity-cycle",
+  "revision_window_ref_hint": "revision-window:session:2026-04-12T14:35:53Z:wave9-self-agency",
+  "anchor_artifact_ref": ".aoa/session-growth/current/aoa-sdk/closeout-context.json",
+  "reanchor_need": true,
+  "continuity_status_hint": "reanchor_needed"
+}

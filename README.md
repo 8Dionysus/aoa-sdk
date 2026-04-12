@@ -20,6 +20,7 @@ Use the shortest route by need:
 - release, support, and CI posture: `docs/RELEASE_CI_POSTURE.md`
 - reviewed session closeout orchestration: `docs/session-closeout.md`
 - reviewed closeout followthrough map toward owner-status surfaces: `docs/closeout-followthrough-map.md`, `schemas/closeout_owner_followthrough_map.schema.json`, and `examples/closeout_owner_followthrough_map.example.json`
+- reviewed continuity hints after closeout reread: `docs/SELF_AGENCY_CONTINUITY_CARRY.md`, `schemas/closeout_continuity_window.schema.json`, and `examples/closeout_continuity_window.example.json`
 - reviewed next-kernel decision after closeout reread: `docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md`, `schemas/closeout_followthrough_decision.schema.json`, and `examples/closeout_followthrough_decision.example.json`
 - additive surface detection and reviewed owner-layer handoff: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-second-wave.md`, `docs/aoa-surface-detection-heuristics.md`, and `docs/aoa-surface-detection-closeout-handoff.md`
 - checkpoint-aware session-growth note capture and promotion: `docs/session-growth-checkpoints.md` and `docs/checkpoint-note-promotion.md`
@@ -45,6 +46,7 @@ Use the shortest route by need:
 - local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - reviewed closeout followthrough hints that stay advisory: `docs/closeout-followthrough-map.md`, `examples/closeout_owner_followthrough_map.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
+- hint-only self-agency continuity carry after reviewed closeout: `docs/SELF_AGENCY_CONTINUITY_CARRY.md`, `examples/closeout_continuity_window.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
 - deterministic next-kernel hints after reviewed closeout: `docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md`, `examples/closeout_followthrough_decision.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
 - additive owner-layer surface detection without changing `aoa skills ...` meaning: `docs/aoa-surface-detection-first-wave.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
 - checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, `aoa checkpoint mark/append/after-commit/review-note/status/promote`, `aoa checkpoint install-hook`, `aoa checkpoint hook-status`, the auto checkpoint bridge on `aoa skills guard`, and the explicit `aoa skills enter --checkpoint-kind` / `--append-note` overrides
@@ -94,6 +96,9 @@ This repository is the source of truth for:
 - `aoa skills enter` and `aoa skills guard` now expose the pending reviewed-closeout skill-family plan through `checkpoint_capture.session_end_skill_targets`, `checkpoint_capture.progression_axis_signals`, and `checkpoint_capture.session_end_next_honest_move`
 - reviewed closeout can now raise `aoa-session-progression-lift` from the checkpoint ledger before `aoa-quest-harvest`, so multi-axis progression stays evidence-backed and end-of-session only
 - reviewed closeout can now build one `closeout-context.json` bundle and execute the explicit `aoa-checkpoint-closeout-bridge` chain without turning `aoa closeout run` into a hidden skill runner
+- reviewed closeout may now also publish one hint-only continuity window so a
+  later bounded reanchor can stay inspectable without turning the SDK into a
+  self-agency owner
 - reviewed closeout now aggregates every repo-scoped checkpoint ledger that shares the active runtime-session identity before it derives the closeout candidate map, so one narrow ledger cannot silently stand in for the whole session
 - the runtime session store is now Codex-thread-aware when `CODEX_THREAD_ID` is available, so a new Codex thread rotates to a fresh session identity instead of silently reusing an older runtime file
 - explicit checkpoint closeout now binds the live Codex rollout trace from that runtime session into `closeout-context.json` and reuses it as additional closeout evidence beside the reviewed artifact

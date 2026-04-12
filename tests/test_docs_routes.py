@@ -149,6 +149,9 @@ def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
     assert "aoa checkpoint build-closeout-context /srv/aoa-sdk" in checkpoints
     assert "aoa checkpoint execute-closeout-chain /srv/aoa-sdk" in checkpoints
     assert "aoa-checkpoint-closeout-bridge" in checkpoints
+    assert "continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref" in checkpoints
+    assert "reanchor_need" in checkpoints
+    assert "docs/SELF_AGENCY_CONTINUITY_CARRY.md" in checkpoints
 
 
 def test_readme_routes_to_closeout_followthrough_map() -> None:
@@ -156,16 +159,22 @@ def test_readme_routes_to_closeout_followthrough_map() -> None:
     carry = read_text("docs/CANDIDATE_LINEAGE_CARRY.md")
     followthrough = read_text("docs/closeout-followthrough-map.md")
     kernel_rules = read_text("docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md")
+    continuity = read_text("docs/SELF_AGENCY_CONTINUITY_CARRY.md")
 
     assert "docs/closeout-followthrough-map.md" in readme
     assert "schemas/closeout_owner_followthrough_map.schema.json" in readme
     assert "examples/closeout_owner_followthrough_map.example.json" in readme
+    assert "docs/SELF_AGENCY_CONTINUITY_CARRY.md" in readme
+    assert "schemas/closeout_continuity_window.schema.json" in readme
+    assert "examples/closeout_continuity_window.example.json" in readme
     assert "docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md" in readme
     assert "schemas/closeout_followthrough_decision.schema.json" in readme
     assert "examples/closeout_followthrough_decision.example.json" in readme
     assert "owner_followthrough_map" in carry
     assert "must not carry `candidate_ref`" in followthrough
     assert "It does not execute that class" in kernel_rules
+    assert "It does not define self-agency meaning." in continuity
+    assert "do not turn this carry into runtime self-modification authority" in continuity
 
 
 def test_codex_plane_portability_boundary_stays_routeable() -> None:

@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/closeout_continuity_window.schema.json",
+  "title": "Closeout Continuity Window",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "continuity_ref_hint",
+    "revision_window_ref_hint",
+    "anchor_artifact_ref",
+    "reanchor_need",
+    "continuity_status_hint"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_closeout_continuity_window_v1"
+    },
+    "continuity_ref_hint": {
+      "type": "string",
+      "minLength": 1
+    },
+    "revision_window_ref_hint": {
+      "type": "string",
+      "minLength": 1
+    },
+    "anchor_artifact_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reanchor_need": {
+      "type": "boolean"
+    },
+    "continuity_status_hint": {
+      "enum": [
+        "active",
+        "reanchor_needed",
+        "reanchored",
+        "closed"
+      ]
+    }
+  }
+}
