@@ -771,8 +771,6 @@ def _resolve_checkpoint_hook_repos(
         raise typer.BadParameter(f"Unknown repository {repo!r}.")
     if not workspace.has_repo(repo):
         raise typer.BadParameter(f"Repository {repo!r} is not available in this workspace.")
-    if not allow_readonly and repo == "8Dionysus":
-        raise typer.BadParameter("8Dionysus is read-only and excluded from checkpoint hook installation.")
     return [repo]
 
 
@@ -1632,7 +1630,7 @@ def checkpoint_install_hook(
         workspace=sdk.workspace,
         repo=repo,
         all_owner=all_owner,
-        allow_readonly=False,
+        allow_readonly=True,
     )
     results = [sdk.checkpoints.install_hook(repo_name=repo_name, overwrite=overwrite) for repo_name in repo_names]
     payload = {

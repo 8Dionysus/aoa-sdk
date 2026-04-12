@@ -7,7 +7,8 @@ from pathlib import Path
 import pytest
 from typer.testing import CliRunner
 
-from aoa_sdk.cli.main import app
+from aoa_sdk import AoASDK
+from aoa_sdk.cli.main import _resolve_checkpoint_hook_repos, app
 
 
 @pytest.fixture(autouse=True)
@@ -1041,3 +1042,44 @@ def test_post_commit_hook_runs_after_real_git_commit(workspace_root: Path) -> No
     assert "agent_review=pending" in combined_output
     assert (note_dir / "checkpoint-note.json").exists()
     assert (note_dir / "post-commit-report.json").exists()
+
+
+def test_install_hook_allows_explicit_8dionysus(workspace_root: Path) -> None:
+    runner = CliRunner()
+    repo_root = workspace_root / "8Dionysus"
+    _init_git_repo(repo_root)
+
+    install = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "install-hook",
+            "--repo",
+            "8Dionysus",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert install.exit_code == 0
+    payload = json.loads(install.stdout)
+    assert payload["results"][0]["repo"] == "8Dionysus"
+    assert payload["results"][0]["action"] == "installed"
+    hook_path = Path(payload["results"][0]["hook_path"])
+    assert hook_path.exists()
+    assert os.access(hook_path, os.X_OK)
+
+
+def test_install_hook_all_owner_still_excludes_8dionysus(workspace_root: Path) -> None:
+    workspace = AoASDK.from_workspace(str(workspace_root)).workspace
+
+    repo_names = _resolve_checkpoint_hook_repos(
+        workspace=workspace,
+        repo=None,
+        all_owner=True,
+        allow_readonly=True,
+    )
+
+    assert "aoa-sdk" in repo_names
+    assert "8Dionysus" not in repo_names

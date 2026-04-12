@@ -1098,8 +1098,6 @@ class CheckpointsAPI:
         repo_name: str,
         overwrite: bool = False,
     ) -> CheckpointHookInstallResult:
-        if repo_name == "8Dionysus":
-            raise ValueError("8Dionysus is read-only and excluded from checkpoint hook mutation")
         status = self.hook_status(repo_name=repo_name)
         hook_path = Path(status.hook_path)
         action: Literal["installed", "updated", "unchanged"]
