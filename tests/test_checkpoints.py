@@ -388,6 +388,7 @@ def test_after_commit_captures_reviewable_note_and_surface_context(
     assert report.agent_review_required is True
     assert report.agent_review_status == "pending"
     assert report.agent_review_command is not None
+    assert "--auto" in report.agent_review_command
     assert Path(report.report_path).exists()
     assert Path(report.skill_report_path).exists()
     assert Path(report.surface_report_path).exists()
@@ -466,6 +467,7 @@ def test_after_commit_owner_followthrough_uses_public_share_checkpoint(
     assert report.mutation_surface == "public-share"
     assert report.agent_review_status == "pending"
     assert report.agent_review_command is not None
+    assert "--auto" in report.agent_review_command
     assert note_payload["checkpoint_history"][-1]["checkpoint_kind"] == "owner_followthrough"
     assert note_payload["checkpoint_history"][-1]["manual_review_requested"] is True
     assert note_payload["checkpoint_history"][-1]["agent_review_status"] == "pending"
@@ -596,6 +598,86 @@ def test_checkpoint_review_note_adds_agent_authored_checkpoint_review(workspace_
     )
     assert followup.session_end_next_honest_move is not None
     assert followup.session_end_next_honest_move.startswith("At reviewed closeout")
+
+
+def test_checkpoint_review_note_auto_fills_from_observation(workspace_root: Path) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(repo_root, subject="stabilize checkpoint review followthrough")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-agent-review-auto",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    captured = sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+
+    note = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        auto_fill=True,
+        session_file=str(session_file),
+    )
+    report_payload = json.loads(Path(captured.report_path).read_text(encoding="utf-8"))
+
+    assert note.agent_review_status == "reviewed"
+    assert note.review_status == "reviewed"
+    assert note.agent_reviews[-1].commit_sha == commit_sha
+    assert note.agent_reviews[-1].summary.startswith(
+        "Agent reviewed the auto-captured commit checkpoint"
+    )
+    assert note.agent_reviews[-1].findings
+    assert note.agent_reviews[-1].candidate_notes
+    assert note.agent_reviews[-1].stats_hints
+    assert note.agent_reviews[-1].mechanic_hints
+    assert note.agent_reviews[-1].closeout_questions
+    assert note.agent_reviews[-1].next_owner_moves
+    assert note.agent_reviews[-1].auto_observation_ref is not None
+    assert report_payload["agent_review_status"] == "reviewed"
+    assert report_payload["agent_review_ref"] == note.agent_reviews[-1].review_id
+
+
+def test_checkpoint_review_note_auto_falls_back_to_history_when_observation_is_missing(
+    workspace_root: Path,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(repo_root, subject="recover pending checkpoint review from legacy history")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-agent-review-fallback",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    note = sdk.checkpoints.append(
+        repo_root=str(repo_root),
+        checkpoint_kind="commit",
+        intent_text=f"checkpoint commit {commit_sha[:7]}: recover pending checkpoint review from legacy history",
+        commit_sha=commit_sha,
+        commit_short_sha=commit_sha[:7],
+        agent_review_status="pending",
+        session_file=str(session_file),
+    )
+
+    reviewed = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        auto_fill=True,
+        session_file=str(session_file),
+    )
+
+    assert note.agent_review_pending_refs == [commit_sha]
+    assert note.checkpoint_history[-1].auto_observation is None
+    assert reviewed.agent_review_status == "reviewed"
+    assert reviewed.review_status == "reviewed"
+    assert reviewed.agent_reviews[-1].summary.startswith(
+        "Agent reviewed the auto-derived commit checkpoint"
+    )
+    assert reviewed.agent_reviews[-1].findings
+    assert reviewed.agent_reviews[-1].candidate_notes
+    assert reviewed.agent_reviews[-1].mechanic_hints
 
 
 def test_checkpoint_promote_fails_when_agent_review_is_pending(workspace_root: Path) -> None:

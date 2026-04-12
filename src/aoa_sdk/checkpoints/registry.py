@@ -1021,7 +1021,8 @@ class CheckpointsAPI:
         *,
         repo_root: str,
         commit_ref: str = "HEAD",
-        summary: str,
+        summary: str | None = None,
+        auto_fill: bool = False,
         findings: list[str] | None = None,
         candidate_notes: list[str] | None = None,
         stats_hints: list[str] | None = None,
@@ -1032,9 +1033,6 @@ class CheckpointsAPI:
         applied_skill_names: list[str] | None = None,
         session_file: str | None = None,
     ) -> SessionCheckpointNote:
-        if not summary.strip():
-            raise ValueError("checkpoint agent review requires a non-empty summary")
-
         session_path, runtime_session = probe_session(self.workspace, session_file)
         if runtime_session is None:
             raise SurfaceNotFound("checkpoint agent review requires an existing active runtime session")
@@ -1058,6 +1056,29 @@ class CheckpointsAPI:
             commit_sha=cast(str | None, commit_metadata.get("commit_sha")),
             commit_short_sha=cast(str | None, commit_metadata.get("commit_short_sha")),
         )
+        history_entry = _matching_checkpoint_history_entry(
+            note=current_note,
+            commit_ref=commit_ref,
+            commit_sha=cast(str | None, commit_metadata.get("commit_sha")),
+            commit_short_sha=cast(str | None, commit_metadata.get("commit_short_sha")),
+        )
+        resolved_summary = summary.strip() if isinstance(summary, str) and summary.strip() else None
+        if auto_fill:
+            if auto_observation is None and history_entry is None:
+                raise SurfaceNotFound(
+                    "checkpoint auto review requires matching checkpoint history for the commit"
+                )
+            if resolved_summary is None:
+                resolved_summary = _auto_review_summary(
+                    auto_observation=auto_observation,
+                    history_entry=history_entry,
+                    commit_ref=commit_ref,
+                    commit_subject=cast(str | None, commit_metadata.get("commit_subject")),
+                    commit_short_sha=cast(str | None, commit_metadata.get("commit_short_sha")),
+                )
+        elif resolved_summary is None:
+            raise ValueError("checkpoint agent review requires a non-empty summary")
+
         reviewed_at, reviewed_at_local, reviewed_tz = _local_timestamp_parts()
         review_id = (
             "agent-review:"
@@ -1071,9 +1092,10 @@ class CheckpointsAPI:
                 str(paths.note_json),
                 str(paths.surface_report),
                 _checkpoint_skill_report_path(self.workspace, repo_root).as_posix(),
+                *(auto_observation.evidence_refs if auto_observation is not None else []),
                 *(
-                    auto_observation.evidence_refs
-                    if auto_observation is not None
+                    _history_auto_review_evidence_refs(history_entry)
+                    if auto_fill and history_entry is not None
                     else []
                 ),
                 *(
@@ -1097,20 +1119,62 @@ class CheckpointsAPI:
             commit_sha=commit_metadata["commit_sha"],
             commit_short_sha=commit_metadata["commit_short_sha"],
             commit_subject=commit_metadata["commit_subject"],
-            summary=summary.strip(),
+            summary=cast(str, resolved_summary),
             applied_skill_names=_dedupe_strings(
                 [
                     *(applied_skill_names or []),
                     *(auto_observation.applied_skill_names if auto_observation is not None else []),
                 ]
             ),
-            findings=_dedupe_strings(findings or []),
-            candidate_notes=_dedupe_strings(candidate_notes or []),
-            stats_hints=_dedupe_strings(stats_hints or []),
-            mechanic_hints=_dedupe_strings(mechanic_hints or []),
-            closeout_questions=_dedupe_strings(closeout_questions or []),
+            findings=_merge_auto_review_items(
+                explicit_items=findings,
+                auto_items=_auto_review_findings(
+                    auto_observation=auto_observation,
+                    history_entry=history_entry,
+                    auto_fill=auto_fill,
+                ),
+            ),
+            candidate_notes=_merge_auto_review_items(
+                explicit_items=candidate_notes,
+                auto_items=_auto_review_candidate_notes(
+                    auto_observation=auto_observation,
+                    history_entry=history_entry,
+                    auto_fill=auto_fill,
+                ),
+            ),
+            stats_hints=_merge_auto_review_items(
+                explicit_items=stats_hints,
+                auto_items=_auto_review_stats_hints(
+                    auto_observation=auto_observation,
+                    history_entry=history_entry,
+                    auto_fill=auto_fill,
+                ),
+            ),
+            mechanic_hints=_merge_auto_review_items(
+                explicit_items=mechanic_hints,
+                auto_items=_auto_review_mechanic_hints(
+                    auto_observation=auto_observation,
+                    history_entry=history_entry,
+                    auto_fill=auto_fill,
+                ),
+            ),
+            closeout_questions=_merge_auto_review_items(
+                explicit_items=closeout_questions,
+                auto_items=_auto_review_closeout_questions(
+                    auto_observation=auto_observation,
+                    history_entry=history_entry,
+                    auto_fill=auto_fill,
+                ),
+            ),
             evidence_refs=review_evidence_refs,
-            next_owner_moves=_dedupe_strings(next_owner_moves or []),
+            next_owner_moves=_merge_auto_review_items(
+                explicit_items=next_owner_moves,
+                auto_items=_auto_review_next_owner_moves(
+                    auto_observation=auto_observation,
+                    history_entry=history_entry,
+                    auto_fill=auto_fill,
+                ),
+            ),
         )
         payload = {
             "session_ref": self.peek_status(repo_root=repo_root, session_file=str(session_path)).session_ref,
@@ -1246,7 +1310,7 @@ class CheckpointsAPI:
                 refs_preview += f" (+{len(note.agent_review_pending_refs) - 5} more)"
             raise ValueError(
                 "pending checkpoint agent review blocks checkpoint promotion; "
-                f"run `aoa checkpoint review-note` for: {refs_preview}"
+                f"run `aoa checkpoint review-note --auto` for: {refs_preview}"
             )
 
         new_state: Literal["collecting", "reviewable", "promoted", "closed"]
@@ -1343,7 +1407,7 @@ class CheckpointsAPI:
                 refs_preview += f" (+{len(pending_agent_review_refs) - 5} more)"
             raise ValueError(
                 "pending checkpoint agent review blocks reviewed closeout; "
-                f"run `aoa checkpoint review-note` for: {refs_preview}"
+                f"run `aoa checkpoint review-note --auto` for: {refs_preview}"
             )
         runtime_session_id = next(
             (
@@ -4170,7 +4234,7 @@ def _derive_session_end_next_honest_move(
         if len(note.agent_review_pending_refs) > 3:
             refs_preview += f" (+{len(note.agent_review_pending_refs) - 3} more)"
         return (
-            "Before reviewed closeout, write `aoa checkpoint review-note` for pending checkpoint commit(s): "
+            "Before reviewed closeout, write `aoa checkpoint review-note --auto` for pending checkpoint commit(s): "
             + refs_preview
             + "."
         )
@@ -4632,8 +4696,236 @@ def _build_after_commit_auto_observation(
 def _agent_review_command(*, repo_root: str, commit_ref: str, workspace_root: str) -> str:
     return (
         f"aoa checkpoint review-note {repo_root} --commit-ref {commit_ref} "
-        f"--root {workspace_root} --summary '<agent checkpoint review>'"
+        f"--auto --root {workspace_root}"
     )
+
+
+def _auto_review_summary(
+    *,
+    auto_observation: SessionCheckpointAutoObservation | None,
+    history_entry: SessionCheckpointHistoryEntry | None,
+    commit_ref: str,
+    commit_subject: str | None,
+    commit_short_sha: str | None,
+) -> str:
+    subject = re.sub(
+        r"\s+",
+        " ",
+        (
+            commit_subject
+            or (auto_observation.commit_subject if auto_observation is not None else None)
+            or (history_entry.intent_text if history_entry is not None else None)
+            or "checkpoint"
+        ).strip(),
+    )
+    if auto_observation is not None:
+        observation_kind = (
+            "owner follow-through checkpoint"
+            if "owner follow-through" in auto_observation.summary.lower()
+            else "commit checkpoint"
+        )
+    else:
+        observation_kind = (
+            "owner follow-through checkpoint"
+            if history_entry is not None and history_entry.checkpoint_kind == "owner_followthrough"
+            else "commit checkpoint"
+        )
+    derivation = "auto-captured" if auto_observation is not None else "auto-derived"
+    return (
+        f"Agent reviewed the {derivation} {observation_kind} for "
+        f"{commit_short_sha or (auto_observation.commit_short_sha if auto_observation is not None else None) or (history_entry.commit_short_sha if history_entry is not None else None) or commit_ref}: {subject}"
+    )
+
+
+def _merge_auto_review_items(
+    *,
+    explicit_items: list[str] | None,
+    auto_items: list[str],
+) -> list[str]:
+    return _dedupe_strings([*(explicit_items or []), *auto_items])
+
+
+def _matching_checkpoint_history_entry(
+    *,
+    note: SessionCheckpointNote,
+    commit_ref: str,
+    commit_sha: str | None,
+    commit_short_sha: str | None,
+) -> SessionCheckpointHistoryEntry | None:
+    for entry in reversed(note.checkpoint_history):
+        if commit_sha and entry.commit_sha == commit_sha:
+            return entry
+        if commit_short_sha and entry.commit_short_sha == commit_short_sha:
+            return entry
+        if entry.intent_text and commit_ref in entry.intent_text:
+            return entry
+    return None
+
+
+def _history_auto_review_evidence_refs(entry: SessionCheckpointHistoryEntry) -> list[str]:
+    refs = [
+        *( [entry.report_ref] if entry.report_ref is not None else [] ),
+        *( [f"commit:{entry.commit_sha}"] if entry.commit_sha else [] ),
+        *(cluster.source_surface_ref for cluster in entry.candidate_clusters),
+        *(ref for cluster in entry.candidate_clusters for ref in cluster.evidence_refs[:3]),
+    ]
+    return _dedupe_strings([ref for ref in refs if isinstance(ref, str) and ref])
+
+
+def _history_auto_review_findings(entry: SessionCheckpointHistoryEntry) -> list[str]:
+    candidate_kinds = sorted({cluster.candidate_kind for cluster in entry.candidate_clusters if cluster.candidate_kind})
+    findings = []
+    if entry.candidate_clusters:
+        findings.append(
+            "what: checkpoint history already preserved "
+            f"{len(entry.candidate_clusters)} candidate cluster(s) across {', '.join(candidate_kinds) or 'reviewable seams'}; "
+            "why: semantic review should stay attached to the original commit boundary"
+        )
+    if entry.blocked_by:
+        findings.append(
+            "what: checkpoint history still carries blockers "
+            f"({', '.join(entry.blocked_by)}); why: reviewed closeout should revisit them explicitly instead of skipping ahead"
+        )
+    if not findings:
+        findings.append(
+            "what: checkpoint history preserved a pending review boundary; why: this commit still needs semantic review before closeout or promotion"
+        )
+    return findings
+
+
+def _history_auto_review_candidate_notes(entry: SessionCheckpointHistoryEntry) -> list[str]:
+    notes: list[str] = []
+    for cluster in entry.candidate_clusters[:3]:
+        notes.append(
+            f"candidate: {cluster.display_name} -> {cluster.owner_hint} ({cluster.candidate_kind}) via {cluster.source_surface_ref}"
+        )
+    return notes
+
+
+def _history_auto_review_stats_hints(entry: SessionCheckpointHistoryEntry) -> list[str]:
+    if entry.candidate_clusters or entry.blocked_by:
+        return [
+            "stats: refresh only after reviewed closeout confirms which checkpoint candidates and blockers still survive from this commit boundary"
+        ]
+    return []
+
+
+def _history_auto_review_mechanic_hints(entry: SessionCheckpointHistoryEntry) -> list[str]:
+    hints = [
+        "mechanic: older pending checkpoint reviews without auto_observation should still be resolved from checkpoint history before closeout"
+    ]
+    if entry.manual_review_requested:
+        hints.append(
+            "mechanic: keep semantic checkpoint review coupled to the commit boundary before promotion or reviewed closeout"
+        )
+    return hints
+
+
+def _history_auto_review_closeout_questions(entry: SessionCheckpointHistoryEntry) -> list[str]:
+    candidate_targets = ", ".join(cluster.display_name for cluster in entry.candidate_clusters[:2])
+    if candidate_targets:
+        return [
+            f"closeout: does the full session still support the same owner hints and blockers around {candidate_targets}?"
+        ]
+    return [
+        "closeout: does the full session still support the same checkpoint boundary judgment recorded for this commit?"
+    ]
+
+
+def _history_auto_review_next_owner_moves(entry: SessionCheckpointHistoryEntry) -> list[str]:
+    return _dedupe_strings(
+        [move for cluster in entry.candidate_clusters for move in cluster.next_owner_moves]
+    )
+
+
+def _auto_review_findings(
+    *,
+    auto_observation: SessionCheckpointAutoObservation | None,
+    history_entry: SessionCheckpointHistoryEntry | None,
+    auto_fill: bool,
+) -> list[str]:
+    if not auto_fill:
+        return []
+    if auto_observation is not None:
+        return auto_observation.findings
+    if history_entry is not None:
+        return _history_auto_review_findings(history_entry)
+    return []
+
+
+def _auto_review_candidate_notes(
+    *,
+    auto_observation: SessionCheckpointAutoObservation | None,
+    history_entry: SessionCheckpointHistoryEntry | None,
+    auto_fill: bool,
+) -> list[str]:
+    if not auto_fill:
+        return []
+    if auto_observation is not None:
+        return auto_observation.candidate_notes
+    if history_entry is not None:
+        return _history_auto_review_candidate_notes(history_entry)
+    return []
+
+
+def _auto_review_stats_hints(
+    *,
+    auto_observation: SessionCheckpointAutoObservation | None,
+    history_entry: SessionCheckpointHistoryEntry | None,
+    auto_fill: bool,
+) -> list[str]:
+    if not auto_fill:
+        return []
+    if auto_observation is not None:
+        return auto_observation.stats_hints
+    if history_entry is not None:
+        return _history_auto_review_stats_hints(history_entry)
+    return []
+
+
+def _auto_review_mechanic_hints(
+    *,
+    auto_observation: SessionCheckpointAutoObservation | None,
+    history_entry: SessionCheckpointHistoryEntry | None,
+    auto_fill: bool,
+) -> list[str]:
+    if not auto_fill:
+        return []
+    if auto_observation is not None:
+        return auto_observation.mechanic_hints
+    if history_entry is not None:
+        return _history_auto_review_mechanic_hints(history_entry)
+    return []
+
+
+def _auto_review_closeout_questions(
+    *,
+    auto_observation: SessionCheckpointAutoObservation | None,
+    history_entry: SessionCheckpointHistoryEntry | None,
+    auto_fill: bool,
+) -> list[str]:
+    if not auto_fill:
+        return []
+    if auto_observation is not None:
+        return auto_observation.closeout_questions
+    if history_entry is not None:
+        return _history_auto_review_closeout_questions(history_entry)
+    return []
+
+
+def _auto_review_next_owner_moves(
+    *,
+    auto_observation: SessionCheckpointAutoObservation | None,
+    history_entry: SessionCheckpointHistoryEntry | None,
+    auto_fill: bool,
+) -> list[str]:
+    if not auto_fill:
+        return []
+    if auto_observation is not None:
+        return auto_observation.next_owner_moves
+    if history_entry is not None:
+        return _history_auto_review_next_owner_moves(history_entry)
+    return []
 
 
 def _matching_auto_observation(

@@ -162,7 +162,7 @@ text, or an already closed/promoted active checkpoint note records
 the closed note.
 The hook-created checkpoint starts as `agent_review=pending`; after every
 successful commit, the Codex agent must apply the checkpoint skill protocol and
-write a semantic `aoa checkpoint review-note` entry before treating the commit
+write a semantic `aoa checkpoint review-note --auto` entry before treating the commit
 as fully handled.
 The hook-created note now also carries one structured auto-observation drawn
 from commit metadata, checkpoint skill dispatch, and surface detection, so the
@@ -215,7 +215,7 @@ aoa skills guard /srv/aoa-sdk --intent-text "reviewable verify-green checkpoint"
 aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv --json
-aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --summary "agent-reviewed checkpoint notes for this commit" --finding "what changed and why it matters" --candidate-note "candidate, owner, and where it should be revisited" --stats-hint "stats to refresh only after reviewed closeout" --mechanic-hint "workflow mechanism to retain" --closeout-question "what to verify when rereading the full session" --applied-skill aoa-change-protocol --root /srv --json
+aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --auto --root /srv --json
 aoa checkpoint install-hook --repo aoa-sdk --root /srv --json
 aoa checkpoint hook-status --repo aoa-sdk --root /srv --json
 ```
