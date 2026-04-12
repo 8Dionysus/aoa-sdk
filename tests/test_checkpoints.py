@@ -770,6 +770,50 @@ def test_checkpoint_promote_fails_when_agent_review_is_pending(workspace_root: P
         )
 
 
+def test_git_boundary_check_blocks_pending_review_and_clears_after_review(
+    workspace_root: Path,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(repo_root, subject="gate push and merge on pending checkpoint review")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-git-boundary",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+
+    blocked = sdk.checkpoints.git_boundary_check(
+        repo_root=str(repo_root),
+        boundary="push",
+        session_file=str(session_file),
+    )
+
+    assert blocked.status == "blocked_pending_review"
+    assert blocked.pending_refs == [commit_sha]
+    assert blocked.required_action is not None
+
+    cleared_note = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        auto_fill=True,
+        session_file=str(session_file),
+    )
+    cleared = sdk.checkpoints.git_boundary_check(
+        repo_root=str(repo_root),
+        boundary="merge",
+        session_file=str(session_file),
+    )
+
+    assert cleared_note.agent_review_status == "reviewed"
+    assert cleared.status == "clear"
+    assert cleared.pending_refs == []
+
+
 def test_after_commit_failure_writes_artifact_without_corrupting_checkpoint_state(workspace_root: Path) -> None:
     repo_root = workspace_root / "aoa-sdk"
     _init_git_repo(repo_root)
@@ -2160,6 +2204,104 @@ def test_execute_closeout_chain_carries_agent_review_material_into_outputs(works
     assert quest_handoff["evidence_refs"]
     assert report.reviewed_artifact_ref in quest_handoff["evidence_refs"]
     assert report.owner_handoff_path in report.produced_artifact_refs
+
+
+def test_execute_closeout_chain_carries_multi_commit_review_material_into_outputs(
+    workspace_root: Path,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _git_commit(repo_root, subject="seed closeout carry base")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-closeout-multi-commit",
+    )
+    _write_rollout_trace(
+        workspace_root / "aoa-sdk" / ".aoa" / "runtime-trace.jsonl",
+        assistant_message="carried two reviewed checkpoint commits into closeout verification",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+
+    first_sha = _git_commit(repo_root, subject="first reviewed commit for closeout carry")
+    sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref=first_sha,
+        session_file=str(session_file),
+    )
+    first_note = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref=first_sha,
+        summary="Agent reviewed the first checkpoint and preserved the donor-facing seam.",
+        findings=["finding: the first commit established a durable donor-facing seam"],
+        candidate_notes=["candidate: preserve the donor-facing seam through closeout reread"],
+        stats_hints=["stats: review both commits before refreshing anything"],
+        mechanic_hints=["mechanic: carry the first semantic layer into multi-commit closeout"],
+        closeout_questions=["closeout: does the first seam still survive after the second commit?"],
+        next_owner_moves=["keep the first reviewed seam attached to the closeout bundle"],
+        applied_skill_names=["aoa-change-protocol"],
+        session_file=str(session_file),
+    )
+
+    second_sha = _git_commit(repo_root, subject="second reviewed commit for closeout carry")
+    sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref=second_sha,
+        session_file=str(session_file),
+    )
+    second_note = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref=second_sha,
+        summary="Agent reviewed the second checkpoint and preserved the progression-facing seam.",
+        findings=["finding: the second commit extended the progression-facing seam"],
+        candidate_notes=["candidate: preserve the progression-facing seam through closeout reread"],
+        stats_hints=["stats: reviewed closeout should see both commits before final stats hints land"],
+        mechanic_hints=["mechanic: multi-commit closeout should carry both semantic layers together"],
+        closeout_questions=["closeout: do both seams survive together under the full-session reread?"],
+        next_owner_moves=["keep the second reviewed seam attached to the closeout bundle"],
+        applied_skill_names=["aoa-bounded-context-map"],
+        session_file=str(session_file),
+    )
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-multi-commit-output-carry.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                f"Session ref: `{second_note.session_ref}`",
+                "",
+                "- closeout outputs should preserve semantic carry from multiple reviewed checkpoint commits",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    report = sdk.checkpoints.execute_closeout_chain(
+        repo_root=str(repo_root),
+        reviewed_artifact_path=str(reviewed_artifact),
+        session_file=str(session_file),
+    )
+    harvest_packet = json.loads(
+        Path(next(ref for ref in report.produced_artifact_refs if ref.endswith("HARVEST_PACKET.json"))).read_text(
+            encoding="utf-8"
+        )
+    )
+    carry = harvest_packet["checkpoint_review_carry"]
+
+    assert second_note.review_refs == [
+        first_note.agent_reviews[-1].review_id,
+        second_note.agent_reviews[-1].review_id,
+    ]
+    assert carry["review_refs"] == [
+        first_note.agent_reviews[-1].review_id,
+        second_note.agent_reviews[-1].review_id,
+    ]
+    assert first_note.agent_reviews[-1].summary in carry["summaries"]
+    assert second_note.agent_reviews[-1].summary in carry["summaries"]
+    assert first_note.agent_reviews[-1].candidate_notes[0] in carry["candidate_notes"]
+    assert second_note.agent_reviews[-1].candidate_notes[0] in carry["candidate_notes"]
+    assert "aoa-change-protocol" in carry["applied_skill_names"]
+    assert "aoa-bounded-context-map" in carry["applied_skill_names"]
 
 
 def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(workspace_root: Path) -> None:

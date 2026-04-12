@@ -1583,6 +1583,7 @@ class CheckpointAfterCommitReport(BaseModel):
 
 class CheckpointHookStatus(BaseModel):
     repo: str
+    hook_name: Literal["post-commit", "pre-push", "pre-merge-commit"]
     repo_root: str
     hook_path: str
     template_path: str
@@ -1592,12 +1593,29 @@ class CheckpointHookStatus(BaseModel):
 
 class CheckpointHookInstallResult(BaseModel):
     repo: str
+    hook_name: Literal["post-commit", "pre-push", "pre-merge-commit"]
     repo_root: str
     hook_path: str
     template_path: str
     template_version: str
     status_before: Literal["missing", "stale", "current"]
     action: Literal["installed", "updated", "unchanged"]
+
+
+class CheckpointGitBoundaryCheck(BaseModel):
+    repo_root: str
+    repo_label: str
+    boundary: Literal["push", "merge"]
+    status: Literal[
+        "clear",
+        "clear_no_active_session",
+        "clear_no_note",
+        "blocked_pending_review",
+    ]
+    runtime_session_id: str | None = None
+    note_ref: str | None = None
+    pending_refs: list[str] = Field(default_factory=list)
+    required_action: str | None = None
 
 
 class SessionEndSkillTarget(BaseModel):

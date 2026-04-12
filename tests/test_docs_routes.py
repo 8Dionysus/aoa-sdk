@@ -66,8 +66,8 @@ def test_surface_detection_routes_are_documented_as_additive_and_skill_only() ->
     assert "aoa checkpoint append /srv/aoa-sdk" in readme
     assert "aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json" in readme
     assert "aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD" in readme
-    assert "aoa checkpoint install-hook --repo aoa-sdk --root /srv --json" in readme
-    assert "aoa checkpoint hook-status --repo aoa-sdk --root /srv --json" in readme
+    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json" in readme
+    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json" in readme
     assert "aoa checkpoint build-closeout-context /srv/aoa-sdk" in readme
     assert "aoa checkpoint execute-closeout-chain /srv/aoa-sdk" in readme
     assert "aoa checkpoint promote /srv/aoa-sdk --target dionysus-note" in readme
@@ -97,8 +97,8 @@ def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:
     assert 'aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json' in agents
     assert "aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json" in agents
     assert "aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD" in agents
-    assert "aoa checkpoint install-hook --repo aoa-sdk --root /srv --json" in agents
-    assert "aoa checkpoint hook-status --repo aoa-sdk --root /srv --json" in agents
+    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json" in agents
+    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json" in agents
     assert "aoa skills ...` remains skill-only" in agents
     assert "checkpoint notes stay lower-authority than harvest verdicts" in agents
     assert "skipped_no_active_session" in agents
@@ -143,8 +143,8 @@ def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
     assert "aoa-sdk/.aoa/session-growth/post-commit-status/<repo>.latest.json" in checkpoints
     assert "aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json" in checkpoints
     assert "aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD" in checkpoints
-    assert "aoa checkpoint install-hook --repo aoa-sdk --root /srv --json" in checkpoints
-    assert "aoa checkpoint hook-status --repo aoa-sdk --root /srv --json" in checkpoints
+    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json" in checkpoints
+    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json" in checkpoints
     assert "real intermediate findings, candidate notes, stats hints" in checkpoints
     assert "aoa checkpoint build-closeout-context /srv/aoa-sdk" in checkpoints
     assert "aoa checkpoint execute-closeout-chain /srv/aoa-sdk" in checkpoints

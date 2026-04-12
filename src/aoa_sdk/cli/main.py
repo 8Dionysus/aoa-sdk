@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, cast
 
 import typer
 
@@ -17,6 +17,7 @@ from ..models import (
     CheckpointCloseoutContext,
     CheckpointCloseoutExecutionReport,
     CheckpointCaptureResult,
+    CheckpointGitBoundaryCheck,
     CheckpointHookInstallResult,
     CheckpointHookStatus,
     KernelNextStepBrief,
@@ -36,6 +37,7 @@ from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
 
 OWNER_CHECKPOINT_HOOK_REPOS = tuple(repo for repo in KNOWN_REPOS if repo != "8Dionysus")
+CHECKPOINT_MANAGED_HOOKS = ("post-commit", "pre-push", "pre-merge-commit")
 
 app = typer.Typer(help="AoA SDK CLI")
 workspace_app = typer.Typer(help="Inspect workspace topology")
@@ -492,16 +494,33 @@ def _print_checkpoint_after_commit_report(report: CheckpointAfterCommitReport) -
 
 
 def _print_checkpoint_hook_status(status: CheckpointHookStatus) -> None:
-    typer.echo(f"{status.repo}: {status.status}")
+    typer.echo(f"{status.repo} [{status.hook_name}]: {status.status}")
     typer.echo(f"  hook_path: {status.hook_path}")
     typer.echo(f"  template_path: {status.template_path}")
     typer.echo(f"  template_version: {status.template_version}")
 
 
 def _print_checkpoint_hook_install(result: CheckpointHookInstallResult) -> None:
-    typer.echo(f"{result.repo}: {result.action} (was {result.status_before})")
+    typer.echo(f"{result.repo} [{result.hook_name}]: {result.action} (was {result.status_before})")
     typer.echo(f"  hook_path: {result.hook_path}")
     typer.echo(f"  template_version: {result.template_version}")
+
+
+def _print_checkpoint_git_boundary(report: CheckpointGitBoundaryCheck) -> None:
+    if report.status == "blocked_pending_review":
+        pending_preview = ", ".join(report.pending_refs[:5]) or "none"
+        typer.echo(
+            f"checkpoint_git_boundary: blocked boundary={report.boundary} repo={report.repo_label} pending={pending_preview}",
+            err=True,
+        )
+        if report.required_action is not None:
+            typer.echo(report.required_action, err=True)
+        return
+    typer.echo(
+        "checkpoint_git_boundary: "
+        f"{report.status} boundary={report.boundary} repo={report.repo_label} "
+        f"session={report.runtime_session_id or 'none'}"
+    )
 
 
 def _print_checkpoint_promotion(promotion: SessionCheckpointPromotion) -> None:
@@ -801,6 +820,26 @@ def _resolve_checkpoint_hook_repos(
     if not workspace.has_repo(repo):
         raise typer.BadParameter(f"Repository {repo!r} is not available in this workspace.")
     return [repo]
+
+
+def _resolve_checkpoint_managed_hooks(
+    hook: str,
+) -> list[Literal["post-commit", "pre-push", "pre-merge-commit"]]:
+    normalized = hook.strip().lower()
+    if normalized == "all":
+        return list(CHECKPOINT_MANAGED_HOOKS)
+    if normalized not in CHECKPOINT_MANAGED_HOOKS:
+        raise typer.BadParameter(
+            "Managed checkpoint hook must be one of: post-commit, pre-push, pre-merge-commit, all."
+        )
+    return [cast(Literal["post-commit", "pre-push", "pre-merge-commit"], normalized)]
+
+
+def _resolve_checkpoint_git_boundary(boundary: str) -> Literal["push", "merge"]:
+    normalized = boundary.strip().lower()
+    if normalized not in {"push", "merge"}:
+        raise typer.BadParameter("Checkpoint git boundary must be one of: push, merge.")
+    return cast(Literal["push", "merge"], normalized)
 
 
 @app.command()
@@ -1650,11 +1689,16 @@ def checkpoint_review_note(
 
 @checkpoint_app.command("install-hook")
 def checkpoint_install_hook(
-    repo: str | None = typer.Option(None, "--repo", help="Repository name that should receive the post-commit hook."),
+    repo: str | None = typer.Option(None, "--repo", help="Repository name that should receive the managed checkpoint hooks."),
     all_owner: bool = typer.Option(
         False,
         "--all-owner",
         help="Install hooks for every mutable owner repo discovered in the workspace.",
+    ),
+    hook: str = typer.Option(
+        "all",
+        "--hook",
+        help="Managed checkpoint hook to install: post-commit, pre-push, pre-merge-commit, or all.",
     ),
     overwrite: bool = typer.Option(
         False,
@@ -1671,7 +1715,12 @@ def checkpoint_install_hook(
         all_owner=all_owner,
         allow_readonly=True,
     )
-    results = [sdk.checkpoints.install_hook(repo_name=repo_name, overwrite=overwrite) for repo_name in repo_names]
+    hook_names = _resolve_checkpoint_managed_hooks(hook)
+    results = [
+        sdk.checkpoints.install_hook(repo_name=repo_name, hook_name=hook_name, overwrite=overwrite)
+        for repo_name in repo_names
+        for hook_name in hook_names
+    ]
     payload = {
         "workspace_root": str(sdk.workspace.root),
         "results": [result.model_dump(mode="json") for result in results],
@@ -1685,11 +1734,16 @@ def checkpoint_install_hook(
 
 @checkpoint_app.command("hook-status")
 def checkpoint_hook_status(
-    repo: str | None = typer.Option(None, "--repo", help="Repository name whose post-commit hook should be inspected."),
+    repo: str | None = typer.Option(None, "--repo", help="Repository name whose managed checkpoint hooks should be inspected."),
     all_owner: bool = typer.Option(
         False,
         "--all-owner",
         help="Inspect hook status for every mutable owner repo discovered in the workspace.",
+    ),
+    hook: str = typer.Option(
+        "all",
+        "--hook",
+        help="Managed checkpoint hook to inspect: post-commit, pre-push, pre-merge-commit, or all.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
@@ -1701,7 +1755,12 @@ def checkpoint_hook_status(
         all_owner=all_owner,
         allow_readonly=True,
     )
-    statuses = [sdk.checkpoints.hook_status(repo_name=repo_name) for repo_name in repo_names]
+    hook_names = _resolve_checkpoint_managed_hooks(hook)
+    statuses = [
+        sdk.checkpoints.hook_status(repo_name=repo_name, hook_name=hook_name)
+        for repo_name in repo_names
+        for hook_name in hook_names
+    ]
     payload = {
         "workspace_root": str(sdk.workspace.root),
         "results": [status.model_dump(mode="json") for status in statuses],
@@ -1711,6 +1770,37 @@ def checkpoint_hook_status(
         return
     for status in statuses:
         _print_checkpoint_hook_status(status)
+
+
+@checkpoint_app.command("git-boundary-check")
+def checkpoint_git_boundary_check(
+    repo_root: str = typer.Argument(..., help="Repository root or repo name whose current checkpoint note should gate the git boundary."),
+    boundary: str = typer.Option(
+        ...,
+        "--boundary",
+        help="Git boundary to check: push or merge.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    resolved_boundary = _resolve_checkpoint_git_boundary(boundary)
+    report = AoASDK.from_workspace(root).checkpoints.git_boundary_check(
+        repo_root=repo_root,
+        boundary=resolved_boundary,
+        session_file=session_file,
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+    else:
+        _print_checkpoint_git_boundary(report)
+    if report.status == "blocked_pending_review":
+        raise typer.Exit(1)
 
 
 @checkpoint_app.command("status")

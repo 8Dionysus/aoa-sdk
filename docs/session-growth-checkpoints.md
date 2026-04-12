@@ -18,6 +18,7 @@ existing session-harvest family into an automatic runtime authority.
 - a captured post-commit checkpoint starts with `agent_review=pending`, but it now also writes one structured `auto_observation` into the checkpoint history using commit metadata plus checkpoint-phase skill and surface outputs
 - the Codex agent must then apply the checkpoint skill protocol and run `aoa checkpoint review-note`; `--auto` now lifts the matching `auto_observation` into the stronger semantic layer without retyping summary/findings by hand, while manual flags remain available when the agent wants to add more specific judgment and still record real intermediate findings, candidate notes, stats hints, mechanic hints, closeout questions, and evidence refs in the note
 - while any checkpoint commit still has `agent_review=pending`, next-step guidance must point to the missing `review-note --auto` rather than directly to reviewed closeout
+- installed `pre-push` and `pre-merge-commit` hooks now fail closed through `aoa checkpoint git-boundary-check` when the active repo note still carries pending checkpoint reviews; they stay active-session-only and do not mint a new session when no current session file exists
 - while any aggregated runtime-session checkpoint note still has `agent_review=pending`, `aoa checkpoint build-closeout-context` and `aoa checkpoint execute-closeout-chain` fail closed instead of building reviewed-closeout artifacts too early
 - once reviewed closeout is allowed, `closeout-context.json` carries one aggregated checkpoint-review bundle with review refs, inherited auto-observation refs, findings, candidate notes, stats hints, mechanic hints, closeout questions, evidence refs, and deferred next-owner moves
 - the mechanical donor, progression, and quest artifacts emitted by `aoa-checkpoint-closeout-bridge` now carry the same checkpoint-review bundle forward so reviewed closeout does not drop the semantic checkpoint layer immediately after context build
@@ -182,8 +183,9 @@ aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner 
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
 aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv --json
 aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --auto --root /srv --json
-aoa checkpoint install-hook --repo aoa-sdk --root /srv --json
-aoa checkpoint hook-status --repo aoa-sdk --root /srv --json
+aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json
+aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json
+aoa checkpoint git-boundary-check /srv/aoa-sdk --boundary merge --root /srv --json
 aoa checkpoint build-closeout-context /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
 aoa checkpoint execute-closeout-chain /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
 aoa checkpoint status /srv/aoa-sdk --root /srv/aoa-sdk --json
