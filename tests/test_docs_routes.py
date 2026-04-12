@@ -184,6 +184,20 @@ def test_codex_plane_portability_boundary_stays_routeable() -> None:
     assert "Do not patch SDK code or MCP server names" in portability
 
 
+def test_codex_plane_deploy_status_routes_from_readme() -> None:
+    readme = read_text("README.md")
+    status_doc = read_text("docs/CODEX_PLANE_DEPLOY_STATUS.md")
+
+    assert "docs/CODEX_PLANE_DEPLOY_STATUS.md" in readme
+    assert "schemas/codex_plane_deploy_status_snapshot_v1.json" in readme
+    assert "examples/codex_plane_deploy_status_snapshot.example.json" in readme
+    assert "src/aoa_sdk/codex/registry.py" in readme
+    assert "typed live read over deploy-local Codex-plane rollout" in status_doc
+    assert "It does not own rollout authority." in status_doc
+    assert "`/.codex/generated/rollout/codex_plane_trust_state.current.json`" in status_doc
+    assert "`rerollout`" in status_doc
+
+
 def test_blueprint_is_marked_as_direction_surface() -> None:
     blueprint = read_text("docs/blueprint.md")
 
