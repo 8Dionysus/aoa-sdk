@@ -227,6 +227,105 @@ def test_closeout_submit_reviewed_can_emit_json(workspace_root: Path) -> None:
     assert payload["build_report"]["enqueue_report"] is None
 
 
+def test_closeout_submit_reviewed_accepts_diagnosis_packet_receipts(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    runner = CliRunner()
+    receipts_dir = fixture["skill_receipt_path"].parent
+    diagnosis_receipt_path = receipts_dir / "diagnosis-cli.json"
+    diagnosis_core_receipt_path = receipts_dir / "diagnosis-cli-core.json"
+
+    diagnosis_receipt_path.write_text(
+        json.dumps(
+            {
+                "event_kind": "diagnosis_packet_receipt",
+                "event_id": "event-diagnosis-submit-reviewed-cli-001",
+                "observed_at": "2026-04-06T09:00:00Z",
+                "run_ref": "run-diagnosis-submit-reviewed-cli-001",
+                "session_ref": "session:test-closeout",
+                "actor_ref": "aoa-skills:aoa-session-self-diagnose",
+                "object_ref": {
+                    "repo": "aoa-skills",
+                    "kind": "skill",
+                    "id": "aoa-session-self-diagnose",
+                    "version": "main",
+                },
+                "evidence_refs": [{"kind": "diagnosis_packet", "ref": str(fixture["reviewed_artifact_path"])}],
+                "payload": {
+                    "route_ref": "route:test-closeout",
+                    "skill_name": "aoa-session-self-diagnose",
+                    "result_kind": "diagnosis_packet",
+                    "diagnosis_types": ["boundary-drift"],
+                    "symptom_refs": ["artifact:test-closeout/diagnosis-gap"],
+                    "probable_cause_hypotheses": ["reviewed follow-through still needs explicit filtering"],
+                    "confidence_band": "medium",
+                    "owner_hints": ["aoa-sdk"],
+                },
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    diagnosis_core_receipt_path.write_text(
+        json.dumps(
+            {
+                "event_kind": "core_skill_application_receipt",
+                "event_id": "event-diagnosis-submit-reviewed-cli-core-001",
+                "observed_at": "2026-04-06T09:03:00Z",
+                "run_ref": "run-diagnosis-submit-reviewed-cli-001",
+                "session_ref": "session:test-closeout",
+                "actor_ref": "aoa-skills:aoa-session-self-diagnose",
+                "object_ref": {
+                    "repo": "aoa-skills",
+                    "kind": "skill",
+                    "id": "aoa-session-self-diagnose",
+                    "version": "main",
+                },
+                "evidence_refs": [{"kind": "detail_receipt", "ref": str(diagnosis_receipt_path)}],
+                "payload": {
+                    "kernel_id": "project-core-session-growth-v1",
+                    "skill_name": "aoa-session-self-diagnose",
+                    "application_stage": "finish",
+                    "detail_event_kind": "diagnosis_packet_receipt",
+                    "detail_receipt_ref": str(diagnosis_receipt_path),
+                    "route_ref": "route:test-closeout",
+                },
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    result = runner.invoke(
+        app,
+        [
+            "closeout",
+            "submit-reviewed",
+            str(fixture["reviewed_artifact_path"]),
+            "--session-ref",
+            "session:test-closeout",
+            "--receipt-path",
+            str(diagnosis_receipt_path),
+            "--receipt-path",
+            str(diagnosis_core_receipt_path),
+            "--closeout-id",
+            "closeout-submit-cli-diagnosis-001",
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--no-enqueue",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["detected_publishers"] == [
+        "aoa-skills.core-kernel-applications",
+        "aoa-skills.session-harvest-family",
+    ]
+
+
 def test_closeout_submit_reviewed_allow_empty_can_emit_json(workspace_root: Path) -> None:
     fixture = install_closeout_fixture(workspace_root)
     runner = CliRunner()
