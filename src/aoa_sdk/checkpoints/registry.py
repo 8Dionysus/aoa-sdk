@@ -3652,6 +3652,7 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
     for review in agent_reviews:
         all_evidence.update(review.evidence_refs)
         next_owner_moves.update(review.next_owner_moves)
+    note_review_carry = _collect_review_carry(agent_reviews)
 
     candidate_clusters: list[SessionCheckpointCluster] = []
     for checkpoint_cluster in cluster_map.values():
@@ -3724,6 +3725,15 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
         agent_review_status=agent_review_status,
         agent_review_required=bool(pending_agent_review_refs),
         agent_review_pending_refs=_dedupe_strings(pending_agent_review_refs),
+        review_refs=note_review_carry.review_refs,
+        auto_observation_refs=note_review_carry.auto_observation_refs,
+        applied_skill_names=note_review_carry.applied_skill_names,
+        summaries=note_review_carry.summaries,
+        findings=note_review_carry.findings,
+        candidate_notes=note_review_carry.candidate_notes,
+        stats_hints=note_review_carry.stats_hints,
+        mechanic_hints=note_review_carry.mechanic_hints,
+        closeout_questions=note_review_carry.closeout_questions,
         agent_reviews=agent_reviews,
         blocked_by=sorted(all_blocked),
         review_status=(
@@ -4294,6 +4304,27 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
         lines.extend(["", "## Upgrade Candidates", ""])
         lines.extend(f"- `{candidate_id}`" for candidate_id in note.upgrade_candidate_ids)
     if note.agent_reviews:
+        lines.extend(["", "## Semantic Review Carry", ""])
+        lines.extend(
+            [
+                f"- review refs: {', '.join(f'`{ref}`' for ref in note.review_refs) or '`none`'}",
+                "- auto observation refs: "
+                + (", ".join(f"`{ref}`" for ref in note.auto_observation_refs) or "`none`"),
+                "- applied skills: "
+                + (", ".join(f"`{name}`" for name in note.applied_skill_names) or "`none`"),
+            ]
+        )
+        for label, values in (
+            ("summaries", note.summaries),
+            ("findings", note.findings),
+            ("candidate notes", note.candidate_notes),
+            ("stats hints", note.stats_hints),
+            ("mechanic hints", note.mechanic_hints),
+            ("closeout questions", note.closeout_questions),
+        ):
+            if values:
+                lines.append(f"- {label}:")
+                lines.extend(f"  - {value}" for value in values)
         lines.extend(["", "## Agent Checkpoint Reviews", ""])
         for review in note.agent_reviews:
             lines.extend(
@@ -4959,8 +4990,7 @@ def _closeout_pending_agent_review_refs(notes: list[SessionCheckpointNote]) -> l
     return _dedupe_strings(pending_refs)
 
 
-def _collect_closeout_review_carry(notes: list[SessionCheckpointNote]) -> CheckpointCloseoutReviewCarry:
-    reviews = [review for note in notes for review in note.agent_reviews]
+def _collect_review_carry(reviews: list[SessionCheckpointAgentReview]) -> CheckpointCloseoutReviewCarry:
     return CheckpointCloseoutReviewCarry(
         review_refs=_dedupe_strings([review.review_id for review in reviews]),
         auto_observation_refs=_dedupe_strings(
@@ -4984,6 +5014,10 @@ def _collect_closeout_review_carry(notes: list[SessionCheckpointNote]) -> Checkp
         evidence_refs=_dedupe_strings([item for review in reviews for item in review.evidence_refs]),
         next_owner_moves=_dedupe_strings([item for review in reviews for item in review.next_owner_moves]),
     )
+
+
+def _collect_closeout_review_carry(notes: list[SessionCheckpointNote]) -> CheckpointCloseoutReviewCarry:
+    return _collect_review_carry([review for note in notes for review in note.agent_reviews])
 
 
 def _history_entry_review_key(entry: SessionCheckpointHistoryEntry) -> str:

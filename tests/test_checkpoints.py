@@ -580,6 +580,15 @@ def test_checkpoint_review_note_adds_agent_authored_checkpoint_review(workspace_
     assert note.agent_reviews[-1].findings
     assert note.agent_reviews[-1].stats_hints
     assert "aoa-change-protocol" in note.agent_reviews[-1].applied_skill_names
+    assert note.review_refs == [note.agent_reviews[-1].review_id]
+    assert note.auto_observation_refs == [note.agent_reviews[-1].auto_observation_ref]
+    assert "aoa-change-protocol" in note.applied_skill_names
+    assert note.agent_reviews[-1].summary in note.summaries
+    assert note.agent_reviews[-1].findings[0] in note.findings
+    assert note.agent_reviews[-1].candidate_notes[0] in note.candidate_notes
+    assert note.agent_reviews[-1].stats_hints[0] in note.stats_hints
+    assert note.agent_reviews[-1].mechanic_hints[0] in note.mechanic_hints
+    assert note.agent_reviews[-1].closeout_questions[0] in note.closeout_questions
     assert any(
         ref.startswith("auto-observation:")
         for ref in note.agent_reviews[-1].evidence_refs
@@ -588,6 +597,14 @@ def test_checkpoint_review_note_adds_agent_authored_checkpoint_review(workspace_
     assert note.checkpoint_history[-1].agent_review_status == "reviewed"
     assert report_payload["agent_review_status"] == "reviewed"
     assert report_payload["agent_review_ref"] == note.agent_reviews[-1].review_id
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-agent-review",
+    )
+    note_markdown = (note_dir / "checkpoint-note.md").read_text(encoding="utf-8")
+    assert "## Semantic Review Carry" in note_markdown
+    assert "where: aoa-sdk owns the control-plane review-note command and hook template" in note_markdown
     followup = sdk.checkpoints.capture_from_skill_phase(
         repo_root=str(repo_root),
         phase="pre-mutation",
@@ -636,6 +653,13 @@ def test_checkpoint_review_note_auto_fills_from_observation(workspace_root: Path
     assert note.agent_reviews[-1].closeout_questions
     assert note.agent_reviews[-1].next_owner_moves
     assert note.agent_reviews[-1].auto_observation_ref is not None
+    assert note.review_refs == [note.agent_reviews[-1].review_id]
+    assert note.summaries == [note.agent_reviews[-1].summary]
+    assert note.findings
+    assert note.candidate_notes
+    assert note.stats_hints
+    assert note.mechanic_hints
+    assert note.closeout_questions
     assert report_payload["agent_review_status"] == "reviewed"
     assert report_payload["agent_review_ref"] == note.agent_reviews[-1].review_id
 
