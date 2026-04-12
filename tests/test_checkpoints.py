@@ -399,12 +399,35 @@ def test_after_commit_captures_reviewable_note_and_surface_context(
     assert note_payload["checkpoint_history"][-1]["checkpoint_kind"] == "commit"
     assert note_payload["checkpoint_history"][-1]["manual_review_requested"] is True
     assert note_payload["checkpoint_history"][-1]["agent_review_status"] == "pending"
+    assert note_payload["checkpoint_history"][-1]["auto_observation"]["commit_sha"] == commit_sha
+    assert note_payload["checkpoint_history"][-1]["auto_observation"]["summary"].startswith(
+        "Auto-captured commit checkpoint observation"
+    )
+    assert note_payload["checkpoint_history"][-1]["auto_observation"]["applied_skill_names"] == [
+        "aoa-change-protocol"
+    ]
+    assert note_payload["checkpoint_history"][-1]["auto_observation"]["findings"]
+    assert note_payload["checkpoint_history"][-1]["auto_observation"]["candidate_notes"]
+    assert note_payload["checkpoint_history"][-1]["auto_observation"]["stats_hints"]
+    assert note_payload["checkpoint_history"][-1]["auto_observation"]["mechanic_hints"]
+    assert note_payload["checkpoint_history"][-1]["auto_observation"]["closeout_questions"]
     assert skill_payload["report"]["phase"] == "checkpoint"
     assert skill_payload["report"]["activate_now"][0]["skill_name"] == "aoa-change-protocol"
     assert surface_payload["report"]["phase"] == "checkpoint"
     assert "aoa-change-protocol" in surface_payload["report"]["active_skill_names"]
     assert session_payload["active_skills"][0]["name"] == "aoa-change-protocol"
     assert any(entry["name"] == "aoa-change-protocol" for entry in session_payload["activation_log"])
+    followup = sdk.checkpoints.capture_from_skill_phase(
+        repo_root=str(repo_root),
+        phase="pre-mutation",
+        intent_text="inspect the pending checkpoint review before closeout",
+        mutation_surface="code",
+        session_file=str(session_file),
+        auto_capture=False,
+    )
+    assert followup.session_end_next_honest_move is not None
+    assert followup.session_end_next_honest_move.startswith("Before reviewed closeout")
+    assert commit_sha in followup.session_end_next_honest_move
 
 
 def test_after_commit_owner_followthrough_uses_public_share_checkpoint(
@@ -446,6 +469,9 @@ def test_after_commit_owner_followthrough_uses_public_share_checkpoint(
     assert note_payload["checkpoint_history"][-1]["checkpoint_kind"] == "owner_followthrough"
     assert note_payload["checkpoint_history"][-1]["manual_review_requested"] is True
     assert note_payload["checkpoint_history"][-1]["agent_review_status"] == "pending"
+    assert note_payload["checkpoint_history"][-1]["auto_observation"]["summary"].startswith(
+        "Auto-captured owner follow-through checkpoint observation"
+    )
     assert surface_payload["report"]["checkpoint_kind"] == "owner_followthrough"
     assert surface_payload["report"]["mutation_surface"] == "public-share"
 
@@ -544,14 +570,55 @@ def test_checkpoint_review_note_adds_agent_authored_checkpoint_review(workspace_
 
     assert note.agent_review_status == "reviewed"
     assert note.agent_review_required is False
+    assert note.review_status == "reviewed"
     assert note.agent_reviews
     assert note.agent_reviews[-1].commit_sha == commit_sha
+    assert note.agent_reviews[-1].auto_observation_ref is not None
     assert note.agent_reviews[-1].summary.startswith("Agent reviewed")
     assert note.agent_reviews[-1].findings
     assert note.agent_reviews[-1].stats_hints
+    assert "aoa-change-protocol" in note.agent_reviews[-1].applied_skill_names
+    assert any(
+        ref.startswith("auto-observation:")
+        for ref in note.agent_reviews[-1].evidence_refs
+    )
+    assert note.checkpoint_history[-1].auto_observation is not None
     assert note.checkpoint_history[-1].agent_review_status == "reviewed"
     assert report_payload["agent_review_status"] == "reviewed"
     assert report_payload["agent_review_ref"] == note.agent_reviews[-1].review_id
+    followup = sdk.checkpoints.capture_from_skill_phase(
+        repo_root=str(repo_root),
+        phase="pre-mutation",
+        intent_text="inspect the reviewed checkpoint note after semantic review",
+        mutation_surface="code",
+        session_file=str(session_file),
+        auto_capture=False,
+    )
+    assert followup.session_end_next_honest_move is not None
+    assert followup.session_end_next_honest_move.startswith("At reviewed closeout")
+
+
+def test_checkpoint_promote_fails_when_agent_review_is_pending(workspace_root: Path) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _git_commit(repo_root, subject="plan verify a bounded change")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-promotion-pending-review",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+
+    with pytest.raises(ValueError, match="pending checkpoint agent review blocks checkpoint promotion"):
+        sdk.checkpoints.promote(
+            repo_root=str(repo_root),
+            target="harvest-handoff",
+            session_file=str(session_file),
+        )
 
 
 def test_after_commit_failure_writes_artifact_without_corrupting_checkpoint_state(workspace_root: Path) -> None:
@@ -1756,6 +1823,196 @@ def test_build_closeout_context_fails_when_repo_root_checkpoint_session_mismatch
         )
 
 
+def test_build_closeout_context_fails_when_pending_agent_review_exists(workspace_root: Path) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _git_commit(repo_root, subject="plan verify a bounded change")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-closeout-pending-review",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    captured = sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-pending-closeout.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                f"Session ref: `{sdk.checkpoints.status(repo_root=str(repo_root), session_file=str(session_file)).session_ref}`",
+                "",
+                "- closeout should fail closed while a checkpoint review is still pending",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    with pytest.raises(ValueError, match="pending checkpoint agent review blocks reviewed closeout"):
+        sdk.checkpoints.build_closeout_context(
+            repo_root=str(repo_root),
+            reviewed_artifact_path=str(reviewed_artifact),
+            session_file=str(session_file),
+        )
+
+    assert captured.agent_review_status == "pending"
+
+
+def test_build_closeout_context_carries_agent_review_material(workspace_root: Path) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _git_commit(repo_root, subject="plan verify a bounded change")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-closeout-review-carry",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+    note = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        summary="Agent reviewed the checkpoint and confirmed the reviewed closeout should revisit the workflow seam.",
+        findings=["finding: the checkpoint seam is real and should survive into closeout context"],
+        candidate_notes=["candidate: aoa-sdk owns the control-plane seam; do not jump owner layers early"],
+        stats_hints=["stats: refresh only after the reviewed closeout confirms the candidate survives"],
+        mechanic_hints=["mechanic: reuse checkpoint review evidence during closeout instead of restating it from memory"],
+        closeout_questions=["closeout: does the full session still support the same owner and seam judgment?"],
+        next_owner_moves=["carry the semantic review into the reviewed closeout context"],
+        applied_skill_names=["aoa-change-protocol"],
+        session_file=str(session_file),
+    )
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-review-carry.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                f"Session ref: `{note.session_ref}`",
+                "",
+                "- closeout should carry semantic checkpoint review material forward",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    context = sdk.checkpoints.build_closeout_context(
+        repo_root=str(repo_root),
+        reviewed_artifact_path=str(reviewed_artifact),
+        session_file=str(session_file),
+    )
+
+    assert context.checkpoint_review_carry.review_refs == [note.agent_reviews[-1].review_id]
+    assert context.checkpoint_review_carry.auto_observation_refs == [
+        note.agent_reviews[-1].auto_observation_ref
+    ]
+    assert "aoa-change-protocol" in context.checkpoint_review_carry.applied_skill_names
+    assert note.agent_reviews[-1].summary in context.checkpoint_review_carry.summaries
+    assert note.agent_reviews[-1].findings[0] in context.checkpoint_review_carry.findings
+    assert note.agent_reviews[-1].candidate_notes[0] in context.checkpoint_review_carry.candidate_notes
+    assert note.agent_reviews[-1].stats_hints[0] in context.checkpoint_review_carry.stats_hints
+    assert note.agent_reviews[-1].mechanic_hints[0] in context.checkpoint_review_carry.mechanic_hints
+    assert note.agent_reviews[-1].closeout_questions[0] in context.checkpoint_review_carry.closeout_questions
+    assert note.agent_reviews[-1].next_owner_moves[0] in context.checkpoint_review_carry.next_owner_moves
+    assert any("agent-authored checkpoint review" in entry for entry in context.notes)
+
+
+def test_execute_closeout_chain_carries_agent_review_material_into_outputs(workspace_root: Path) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _git_commit(repo_root, subject="plan verify a bounded change")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-closeout-output-carry",
+    )
+    _write_rollout_trace(
+        workspace_root / "aoa-sdk" / ".aoa" / "runtime-trace.jsonl",
+        assistant_message="reviewed the checkpoint seam and prepared the closeout carry",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+    note = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        summary="Agent reviewed the checkpoint and prepared semantic carry for closeout outputs.",
+        findings=["finding: the reviewed seam should stay visible inside closeout outputs"],
+        candidate_notes=["candidate: keep the owner hypothesis attached to the closeout artifacts"],
+        stats_hints=["stats: defer refresh until after reviewed closeout receipts exist"],
+        mechanic_hints=["mechanic: downstream artifacts should carry checkpoint review material explicitly"],
+        closeout_questions=["closeout: does the final reread still support this candidate?"],
+        next_owner_moves=["carry the semantic review into the donor/progression/quest outputs"],
+        applied_skill_names=["aoa-change-protocol"],
+        session_file=str(session_file),
+    )
+    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-output-carry.md"
+    reviewed_artifact.write_text(
+        "\n".join(
+            [
+                "# Reviewed Session Artifact",
+                "",
+                f"Session ref: `{note.session_ref}`",
+                "",
+                "- closeout outputs should preserve checkpoint semantic review carry",
+            ]
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    report = sdk.checkpoints.execute_closeout_chain(
+        repo_root=str(repo_root),
+        reviewed_artifact_path=str(reviewed_artifact),
+        session_file=str(session_file),
+    )
+    assert report.owner_handoff_path is not None
+    assert Path(report.owner_handoff_path).exists()
+    assert report.owner_follow_through_briefs
+    handoff_payload = json.loads(Path(report.owner_handoff_path).read_text(encoding="utf-8"))
+
+    harvest_packet = json.loads(
+        Path(next(ref for ref in report.produced_artifact_refs if ref.endswith("HARVEST_PACKET.json"))).read_text(
+            encoding="utf-8"
+        )
+    )
+    progression_packet = json.loads(
+        Path(next(ref for ref in report.produced_artifact_refs if ref.endswith("PROGRESSION_DELTA.json"))).read_text(
+            encoding="utf-8"
+        )
+    )
+    quest_triage = json.loads(
+        Path(next(ref for ref in report.produced_artifact_refs if ref.endswith("QUEST_TRIAGE.json"))).read_text(
+            encoding="utf-8"
+        )
+    )
+
+    assert harvest_packet["checkpoint_review_carry"]["review_refs"] == [note.agent_reviews[-1].review_id]
+    assert progression_packet["checkpoint_review_carry"]["closeout_questions"] == [
+        note.agent_reviews[-1].closeout_questions[0]
+    ]
+    assert quest_triage["checkpoint_review_carry"]["mechanic_hints"] == [
+        note.agent_reviews[-1].mechanic_hints[0]
+    ]
+    assert handoff_payload["session_ref"] == note.session_ref
+    assert handoff_payload["manifest_path"] == report.context_ref
+    assert any(item["source_kind"] == "quest-promotion" for item in handoff_payload["items"])
+    quest_handoff = next(item for item in handoff_payload["items"] if item["source_kind"] == "quest-promotion")
+    assert quest_handoff["evidence_refs"]
+    assert report.reviewed_artifact_ref in quest_handoff["evidence_refs"]
+    assert report.owner_handoff_path in report.produced_artifact_refs
+
+
 def test_execute_closeout_chain_emits_artifacts_and_receipts_even_without_note(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-session-no-note.md"
@@ -1956,7 +2213,12 @@ def test_execute_closeout_chain_uses_aggregated_runtime_session_notes(
     assert {
         Path(ref).parent.name for ref in report.checkpoint_note_refs
     } == {"aoa-sdk", "aoa-memo"}
-    assert all(scoped_note_dir in Path(ref).parents for ref in report.produced_artifact_refs)
+    handoff_dir = workspace_root / "aoa-sdk" / ".aoa" / "closeout" / "handoffs"
+    assert report.owner_handoff_path is not None
+    assert all(
+        scoped_note_dir in Path(ref).parents or handoff_dir in Path(ref).parents
+        for ref in report.produced_artifact_refs
+    )
     assert all(scoped_note_dir in Path(ref).parents for ref in report.produced_receipt_refs)
 
     harvest_packet_path = next(

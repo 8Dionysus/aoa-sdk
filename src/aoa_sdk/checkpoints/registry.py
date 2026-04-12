@@ -13,6 +13,7 @@ from ..loaders import load_json, write_json
 from ..models import (
     CheckpointAfterCommitReport,
     CheckpointCloseoutContext,
+    CheckpointCloseoutReviewCarry,
     CheckpointCloseoutExecutionReport,
     CheckpointCaptureResult,
     CheckpointHookInstallResult,
@@ -22,7 +23,12 @@ from ..models import (
     CloseoutOwnerFollowthroughHint,
     CloseoutContextCandidateMap,
     CloseoutExecutionStep,
+    CloseoutOwnerHandoff,
     ProgressionAxisSignal,
+    SkillDetectionReport,
+    OwnerFollowThroughBrief,
+    WorkflowFollowThroughBrief,
+    SessionCheckpointAutoObservation,
     SessionCheckpointAgentReview,
     SessionEndSkillTarget,
     SessionCheckpointCluster,
@@ -499,6 +505,10 @@ class CheckpointsAPI:
         commit_short_sha: str | None = None,
         agent_review_status: Literal["not_required", "pending", "reviewed"] = "not_required",
         agent_review_ref: str | None = None,
+        auto_observation: SessionCheckpointAutoObservation | None = None,
+        observed_at: datetime | None = None,
+        observed_at_local: str | None = None,
+        observed_tz: str | None = None,
     ) -> SessionCheckpointNote:
         runtime_session_id, runtime_session_created_at = _ensure_checkpoint_runtime_session(
             workspace=self.workspace,
@@ -552,7 +562,8 @@ class CheckpointsAPI:
             + "\n",
             encoding="utf-8",
         )
-        observed_at, observed_at_local, observed_tz = _local_timestamp_parts()
+        if observed_at is None:
+            observed_at, observed_at_local, observed_tz = _local_timestamp_parts()
         payload = {
             "session_ref": _default_session_ref(
                 paths,
@@ -582,6 +593,7 @@ class CheckpointsAPI:
                 commit_short_sha=commit_short_sha,
                 agent_review_status=agent_review_status,
                 agent_review_ref=agent_review_ref,
+                auto_observation=auto_observation,
             ).model_dump(mode="json"),
         }
         paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
@@ -881,6 +893,7 @@ class CheckpointsAPI:
                 checkpoint_kind=resolved_checkpoint_kind,
             )
             surface_report_path = str(paths.surface_report)
+            observed_at, observed_at_local, observed_tz = _local_timestamp_parts()
             note = self.append(
                 repo_root=repo_root,
                 checkpoint_kind=resolved_checkpoint_kind,
@@ -894,6 +907,24 @@ class CheckpointsAPI:
                 commit_sha=commit_metadata["commit_sha"],
                 commit_short_sha=commit_metadata["commit_short_sha"],
                 agent_review_status="pending",
+                auto_observation=_build_after_commit_auto_observation(
+                    repo_root_path=repo_root_path,
+                    repo_label=repo_label,
+                    commit_ref=commit_ref,
+                    commit_metadata=commit_metadata,
+                    checkpoint_kind=resolved_checkpoint_kind,
+                    mutation_surface=mutation_surface,
+                    skill_report=skill_report,
+                    surface_report=surface_report,
+                    observed_at=observed_at,
+                    observed_at_local=observed_at_local,
+                    observed_tz=observed_tz,
+                    skill_report_path=skill_report_path,
+                    surface_report_path=surface_report_path,
+                ),
+                observed_at=observed_at,
+                observed_at_local=observed_at_local,
+                observed_tz=observed_tz,
             )
             note_ref = _checkpoint_note_ref_for_capture(
                 self.workspace,
@@ -1020,6 +1051,13 @@ class CheckpointsAPI:
             raise SurfaceNotFound(f"no checkpoint note exists yet for {paths.repo_label}")
 
         commit_metadata = _read_git_commit_metadata(repo_root_path, commit_ref)
+        current_note = self.status(repo_root=repo_root, session_file=str(session_path))
+        auto_observation = _matching_auto_observation(
+            note=current_note,
+            commit_ref=commit_ref,
+            commit_sha=cast(str | None, commit_metadata.get("commit_sha")),
+            commit_short_sha=cast(str | None, commit_metadata.get("commit_short_sha")),
+        )
         reviewed_at, reviewed_at_local, reviewed_tz = _local_timestamp_parts()
         review_id = (
             "agent-review:"
@@ -1033,10 +1071,23 @@ class CheckpointsAPI:
                 str(paths.note_json),
                 str(paths.surface_report),
                 _checkpoint_skill_report_path(self.workspace, repo_root).as_posix(),
+                *(
+                    auto_observation.evidence_refs
+                    if auto_observation is not None
+                    else []
+                ),
+                *(
+                    [f"auto-observation:{auto_observation.observation_id}"]
+                    if auto_observation is not None
+                    else []
+                ),
             ]
         )
         review = SessionCheckpointAgentReview(
             review_id=review_id,
+            auto_observation_ref=(
+                auto_observation.observation_id if auto_observation is not None else None
+            ),
             reviewed_at=reviewed_at,
             reviewed_at_local=reviewed_at_local,
             reviewed_tz=reviewed_tz,
@@ -1047,7 +1098,12 @@ class CheckpointsAPI:
             commit_short_sha=commit_metadata["commit_short_sha"],
             commit_subject=commit_metadata["commit_subject"],
             summary=summary.strip(),
-            applied_skill_names=_dedupe_strings(applied_skill_names or []),
+            applied_skill_names=_dedupe_strings(
+                [
+                    *(applied_skill_names or []),
+                    *(auto_observation.applied_skill_names if auto_observation is not None else []),
+                ]
+            ),
             findings=_dedupe_strings(findings or []),
             candidate_notes=_dedupe_strings(candidate_notes or []),
             stats_hints=_dedupe_strings(stats_hints or []),
@@ -1184,6 +1240,14 @@ class CheckpointsAPI:
         )
         if not note.candidate_clusters:
             raise SurfaceNotFound("cannot promote an empty checkpoint note")
+        if note.agent_review_pending_refs:
+            refs_preview = ", ".join(note.agent_review_pending_refs[:5])
+            if len(note.agent_review_pending_refs) > 5:
+                refs_preview += f" (+{len(note.agent_review_pending_refs) - 5} more)"
+            raise ValueError(
+                "pending checkpoint agent review blocks checkpoint promotion; "
+                f"run `aoa checkpoint review-note` for: {refs_preview}"
+            )
 
         new_state: Literal["collecting", "reviewable", "promoted", "closed"]
         if target == "dionysus-note":
@@ -1272,6 +1336,15 @@ class CheckpointsAPI:
         )
         aggregated_notes = [candidate_note for _, candidate_note in note_records]
         aggregated_note_refs = [str(candidate_paths.note_json) for candidate_paths, _ in note_records]
+        pending_agent_review_refs = _closeout_pending_agent_review_refs(aggregated_notes)
+        if pending_agent_review_refs:
+            refs_preview = ", ".join(pending_agent_review_refs[:5])
+            if len(pending_agent_review_refs) > 5:
+                refs_preview += f" (+{len(pending_agent_review_refs) - 5} more)"
+            raise ValueError(
+                "pending checkpoint agent review blocks reviewed closeout; "
+                f"run `aoa checkpoint review-note` for: {refs_preview}"
+            )
         runtime_session_id = next(
             (
                 candidate_note.runtime_session_id
@@ -1311,6 +1384,7 @@ class CheckpointsAPI:
             )
             handoff = None
 
+        checkpoint_review_carry = _collect_closeout_review_carry(aggregated_notes)
         shortlisted_clusters = _closeout_candidate_clusters(notes=aggregated_notes, handoff=handoff)
         repo_scope = _dedupe_strings(
             [
@@ -1367,6 +1441,10 @@ class CheckpointsAPI:
             notes.append("bound closeout evidence to the live Codex rollout trace referenced by the active runtime session")
         if not collected_receipt_paths:
             notes.append("no prior receipt refs were supplied; closeout execution will rely on the reviewed artifact and any local checkpoint evidence only")
+        if checkpoint_review_carry.review_refs:
+            notes.append(
+                f"bound {len(checkpoint_review_carry.review_refs)} agent-authored checkpoint review(s) into the closeout context so the final reread can revisit semantic findings and questions"
+            )
         notes.append(
             "checkpoint closeout bridge builds mechanical artifacts only; a Codex agent must still apply the listed skills by rereading session evidence before treating outputs as final analysis"
         )
@@ -1388,6 +1466,7 @@ class CheckpointsAPI:
             receipt_refs=[str(path) for path in collected_receipt_paths],
             repo_scope=repo_scope,
             candidate_map=candidate_map,
+            checkpoint_review_carry=checkpoint_review_carry,
             candidate_lineage_map=candidate_lineage_map,
             owner_followthrough_map=owner_followthrough_map,
             followthrough_decision=followthrough_decision,
@@ -1514,6 +1593,19 @@ class CheckpointsAPI:
         produced_artifact_refs.extend(quest_outputs["artifact_refs"])
         produced_receipt_refs.extend(quest_outputs["receipt_refs"])
 
+        owner_handoff_path, owner_follow_through_briefs, workflow_follow_through_briefs = (
+            _write_checkpoint_owner_handoff(
+                workspace=self.workspace,
+                closeout_context_ref=paths.closeout_context,
+                context=context,
+                donor_outputs=donor_outputs,
+                quest_outputs=quest_outputs,
+                reviewed_artifact=reviewed_artifact_path_obj,
+            )
+        )
+        if owner_handoff_path is not None:
+            produced_artifact_refs.append(str(owner_handoff_path))
+
         executed_at, executed_at_local, executed_tz = _local_timestamp_parts()
         report = CheckpointCloseoutExecutionReport(
             session_ref=context.session_ref,
@@ -1528,6 +1620,9 @@ class CheckpointsAPI:
             checkpoint_note_refs=list(context.checkpoint_note_refs),
             surface_handoff_ref=context.surface_handoff_ref,
             context_ref=str(paths.closeout_context),
+            owner_handoff_path=str(owner_handoff_path) if owner_handoff_path is not None else None,
+            owner_follow_through_briefs=owner_follow_through_briefs,
+            workflow_follow_through_briefs=workflow_follow_through_briefs,
             executed_skills=executed_steps,
             skipped_skills=[],
             produced_artifact_refs=_dedupe_strings(produced_artifact_refs),
@@ -2472,6 +2567,7 @@ def _build_donor_harvest_outputs(
         "session_trace_thread_id": context.session_trace_thread_id,
         "checkpoint_note_ref": context.checkpoint_note_ref,
         "surface_handoff_ref": context.surface_handoff_ref,
+        "checkpoint_review_carry": context.checkpoint_review_carry.model_dump(mode="json"),
         "accepted_candidates": accepted_candidates,
         "deferred_candidates": deferred_candidates,
         "extract_counts": extract_counts,
@@ -2514,6 +2610,8 @@ def _build_donor_harvest_outputs(
             "promotion_candidates": len(accepted_candidates),
             "deferrals": len(deferred_candidates),
             "evidence_density": "reviewed",
+            "checkpoint_review_refs": context.checkpoint_review_carry.review_refs,
+            "checkpoint_closeout_questions": context.checkpoint_review_carry.closeout_questions,
         },
     }
     receipt_path = output_dir / "HARVEST_PACKET_RECEIPT.json"
@@ -2604,6 +2702,7 @@ def _build_progression_lift_outputs(
         "reviewed_artifact_ref": str(reviewed_artifact),
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
+        "checkpoint_review_carry": context.checkpoint_review_carry.model_dump(mode="json"),
         "candidate_ids": _dedupe_strings(
             [
                 *context.candidate_map.progression_candidate_ids,
@@ -2644,6 +2743,8 @@ def _build_progression_lift_outputs(
             "verdict": verdict,
             "axis_deltas": axis_deltas,
             "cautions": cautions,
+            "checkpoint_review_refs": context.checkpoint_review_carry.review_refs,
+            "checkpoint_closeout_questions": context.checkpoint_review_carry.closeout_questions,
         },
     }
     receipt_path = output_dir / "PROGRESSION_DELTA_RECEIPT.json"
@@ -2737,6 +2838,7 @@ def _build_quest_harvest_outputs(
         "reviewed_artifact_ref": str(reviewed_artifact),
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
+        "checkpoint_review_carry": context.checkpoint_review_carry.model_dump(mode="json"),
         "candidate_ref": bounded_unit_ref,
         "candidate_refs": candidate_refs,
         "additional_candidate_refs": additional_candidate_refs,
@@ -2770,6 +2872,7 @@ def _build_quest_harvest_outputs(
         "multi_candidate_followup_required": multi_candidate_followup_required,
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
+        "checkpoint_review_carry": context.checkpoint_review_carry.model_dump(mode="json"),
     }
     packet_path = output_dir / "QUEST_PROMOTION.json"
     write_json(packet_path, packet)
@@ -2784,6 +2887,7 @@ def _build_quest_harvest_outputs(
         "promotions": promotion_entries,
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
+        "checkpoint_review_carry": context.checkpoint_review_carry.model_dump(mode="json"),
     }
     promotion_bundle_path = output_dir / "QUEST_PROMOTIONS.json"
     write_json(promotion_bundle_path, promotion_bundle)
@@ -2825,6 +2929,8 @@ def _build_quest_harvest_outputs(
             "additional_candidate_refs": additional_candidate_refs,
             "accepted_candidate_count": len(accepted_candidates),
             "multi_candidate_followup_required": multi_candidate_followup_required,
+            "checkpoint_review_refs": context.checkpoint_review_carry.review_refs,
+            "checkpoint_closeout_questions": context.checkpoint_review_carry.closeout_questions,
         },
     }
     receipt_path = output_dir / "QUEST_PROMOTION_RECEIPT.json"
@@ -2854,6 +2960,142 @@ def _build_quest_harvest_outputs(
         "artifact_refs": [str(triage_path), str(packet_path), str(promotion_bundle_path)],
         "receipt_refs": [str(receipt_path), str(core_receipt_path)],
     }
+
+
+def _checkpoint_closeout_handoff_root(workspace: Workspace) -> Path:
+    return workspace.repo_path("aoa-sdk") / ".aoa" / "closeout" / "handoffs"
+
+
+def _checkpoint_owner_follow_through_key(brief: OwnerFollowThroughBrief) -> str:
+    return brief.unit_ref or brief.next_surface
+
+
+def _load_checkpoint_quest_unit_name(artifact_refs: list[str]) -> str | None:
+    triage_ref = next((ref for ref in artifact_refs if ref.endswith("QUEST_TRIAGE.json")), None)
+    if triage_ref is None:
+        return None
+    try:
+        payload = load_json(Path(triage_ref).expanduser().resolve())
+    except (FileNotFoundError, json.JSONDecodeError, ValueError):
+        return None
+    if not isinstance(payload, dict):
+        return None
+    quest_unit_name = payload.get("quest_unit_name")
+    return quest_unit_name if isinstance(quest_unit_name, str) and quest_unit_name else None
+
+
+def _write_checkpoint_owner_handoff(
+    *,
+    workspace: Workspace,
+    closeout_context_ref: Path,
+    context: CheckpointCloseoutContext,
+    donor_outputs: DonorHarvestOutputs,
+    quest_outputs: QuestHarvestOutputs,
+    reviewed_artifact: Path,
+) -> tuple[Path | None, list[OwnerFollowThroughBrief], list[WorkflowFollowThroughBrief]]:
+    reviewed_ref = str(reviewed_artifact)
+    session_trace_ref = context.session_trace_ref
+    review_evidence_refs = list(context.checkpoint_review_carry.evidence_refs)
+    harvest_packet_ref = next(
+        (ref for ref in donor_outputs["artifact_refs"] if ref.endswith("HARVEST_PACKET.json")),
+        None,
+    )
+    quest_packet_ref = next(
+        (ref for ref in quest_outputs["artifact_refs"] if ref.endswith("QUEST_PROMOTION.json")),
+        None,
+    )
+    briefs_by_key: dict[str, OwnerFollowThroughBrief] = {}
+
+    for candidate in _dict_records(donor_outputs["packet"].get("accepted_candidates", [])):
+        owner_repo = _string_field(candidate, "owner_repo_recommendation")
+        next_surface = _string_field(candidate, "chosen_next_artifact")
+        unit_ref = _string_field(candidate, "candidate_ref")
+        if not all(value is not None and value for value in (owner_repo, next_surface, unit_ref)):
+            continue
+        evidence_anchors = candidate.get("evidence_anchors")
+        evidence_refs = _dedupe_strings(
+            [
+                *([harvest_packet_ref] if harvest_packet_ref is not None else []),
+                reviewed_ref,
+                *([session_trace_ref] if session_trace_ref is not None else []),
+                *review_evidence_refs,
+                *(
+                    anchor
+                    for anchor in (evidence_anchors if isinstance(evidence_anchors, list) else [])
+                    if isinstance(anchor, str) and anchor
+                ),
+            ]
+        )
+        brief = OwnerFollowThroughBrief(
+            source_kind="harvest-candidate",
+            unit_ref=cast(str, unit_ref),
+            unit_name=_string_field(candidate, "unit_name"),
+            owner_repo=cast(str, owner_repo),
+            next_surface=cast(str, next_surface),
+            suggested_action="draft-owner-artifact",
+            abstraction_shape=_string_field(candidate, "abstraction_shape"),
+            nearest_wrong_target=_string_field(candidate, "nearest_wrong_target"),
+            reason=(
+                _string_field(candidate, "owner_reason")
+                or "Harvest named this as a reusable owner-layer candidate, so the next honest move is a bounded owner-surface draft."
+            ),
+            evidence_refs=evidence_refs,
+        )
+        briefs_by_key[_checkpoint_owner_follow_through_key(brief)] = brief
+
+    quest_packet = quest_outputs["packet"]
+    owner_repo = _string_field(quest_packet, "owner_repo")
+    next_surface = _string_field(quest_packet, "next_surface")
+    promotion_verdict = _string_field(quest_packet, "promotion_verdict")
+    bounded_unit_ref = _string_field(quest_packet, "bounded_unit_ref") or context.session_ref
+    if all(value is not None and value for value in (owner_repo, next_surface, promotion_verdict)):
+        evidence_refs = _dedupe_strings(
+            [
+                *([quest_packet_ref] if quest_packet_ref is not None else []),
+                *quest_outputs["artifact_refs"],
+                reviewed_ref,
+                *([session_trace_ref] if session_trace_ref is not None else []),
+                *review_evidence_refs,
+            ]
+        )
+        brief = OwnerFollowThroughBrief(
+            source_kind="quest-promotion",
+            unit_ref=bounded_unit_ref,
+            unit_name=_load_checkpoint_quest_unit_name(quest_outputs["artifact_refs"]),
+            owner_repo=cast(str, owner_repo),
+            next_surface=cast(str, next_surface),
+            suggested_action="author-owner-artifact",
+            promotion_verdict=cast(str, promotion_verdict),
+            nearest_wrong_target=_string_field(quest_packet, "nearest_wrong_target"),
+            reason=(
+                f"Quest promotion closed with {promotion_verdict}, so the next honest move is to author the owner-layer artifact."
+            ),
+            evidence_refs=evidence_refs,
+        )
+        briefs_by_key[_checkpoint_owner_follow_through_key(brief)] = brief
+
+    owner_briefs = sorted(
+        briefs_by_key.values(),
+        key=lambda item: (item.owner_repo, item.next_surface, item.unit_ref),
+    )
+    workflow_briefs: list[WorkflowFollowThroughBrief] = []
+    if not owner_briefs and not workflow_briefs:
+        return None, owner_briefs, workflow_briefs
+
+    handoff_dir = _checkpoint_closeout_handoff_root(workspace)
+    handoff_dir.mkdir(parents=True, exist_ok=True)
+    handoff_path = handoff_dir / f"{_safe_name(context.session_ref)}.owner-handoff.json"
+    payload = CloseoutOwnerHandoff(
+        schema_version=1,
+        closeout_id=f"checkpoint-closeout-{_safe_name(context.session_ref)}",
+        session_ref=context.session_ref,
+        manifest_path=str(closeout_context_ref),
+        generated_at=datetime.now(UTC),
+        items=owner_briefs,
+        workflow_items=workflow_briefs,
+    )
+    write_json(handoff_path, payload.model_dump(mode="json"))
+    return handoff_path, owner_briefs, workflow_briefs
 
 
 def _build_accepted_candidate(
@@ -3286,6 +3528,9 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             manual_review_requested = True
         if entry.checkpoint_kind == "owner_followthrough":
             has_owner_followthrough = True
+        if entry.auto_observation is not None:
+            all_evidence.update(entry.auto_observation.evidence_refs)
+            next_owner_moves.update(entry.auto_observation.next_owner_moves)
         all_blocked.update(entry.blocked_by)
         for cluster in entry.candidate_clusters:
             repo_scope.add(cluster.owner_hint)
@@ -3413,7 +3658,12 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
         agent_review_pending_refs=_dedupe_strings(pending_agent_review_refs),
         agent_reviews=agent_reviews,
         blocked_by=sorted(all_blocked),
-        review_status="reviewed" if existing_review_status == "reviewed" else "unreviewed",
+        review_status=(
+            "reviewed"
+            if existing_review_status == "reviewed"
+            or (agent_review_status == "reviewed" and not pending_agent_review_refs)
+            else "unreviewed"
+        ),
         evidence_refs=sorted(all_evidence),
         next_owner_moves=sorted(
             {
@@ -3915,6 +4165,16 @@ def _derive_session_end_next_honest_move(
     if note is None or not session_end_targets:
         return None
 
+    if note.agent_review_pending_refs:
+        refs_preview = ", ".join(note.agent_review_pending_refs[:3])
+        if len(note.agent_review_pending_refs) > 3:
+            refs_preview += f" (+{len(note.agent_review_pending_refs) - 3} more)"
+        return (
+            "Before reviewed closeout, write `aoa checkpoint review-note` for pending checkpoint commit(s): "
+            + refs_preview
+            + "."
+        )
+
     skill_names = [target.skill_name for target in session_end_targets]
     if note.stats_refresh_recommended:
         return (
@@ -3973,6 +4233,7 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
                     f"### {review.commit_short_sha or review.commit_ref}",
                     "",
                     f"- review id: `{review.review_id}`",
+                    f"- auto observation ref: `{review.auto_observation_ref or 'none'}`",
                     f"- summary: {review.summary}",
                     f"- applied skills: {', '.join(f'`{name}`' for name in review.applied_skill_names) or '`none`'}",
                     f"- defer until closeout: `{'yes' if review.defer_until_closeout else 'no'}`",
@@ -4049,6 +4310,23 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
         )
         if entry.agent_review_status != "not_required":
             lines.append(f"  - agent review: `{entry.agent_review_status}`")
+        if entry.auto_observation is not None:
+            lines.append(f"  - auto observation: {entry.auto_observation.summary}")
+            if entry.auto_observation.applied_skill_names:
+                lines.append(
+                    "  - auto skills: "
+                    + ", ".join(f"`{name}`" for name in entry.auto_observation.applied_skill_names)
+                )
+            for label, values in (
+                ("auto findings", entry.auto_observation.findings),
+                ("auto candidate notes", entry.auto_observation.candidate_notes),
+                ("auto stats hints", entry.auto_observation.stats_hints),
+                ("auto mechanic hints", entry.auto_observation.mechanic_hints),
+                ("auto closeout questions", entry.auto_observation.closeout_questions),
+            ):
+                if values:
+                    lines.append(f"  - {label}:")
+                    lines.extend(f"    - {value}" for value in values)
     if note.blocked_by:
         lines.extend(["", "## Blocked By", ""])
         lines.extend(f"- `{item}`" for item in note.blocked_by)
@@ -4190,10 +4468,225 @@ def _after_commit_intent(
     return f"checkpoint commit {short_sha}: {subject}"
 
 
+def _preview_strings(values: list[str], *, limit: int = 4) -> str:
+    items = [value.strip() for value in values if value and value.strip()]
+    if not items:
+        return "none"
+    preview = items[:limit]
+    text = ", ".join(preview)
+    if len(items) > limit:
+        text += f" (+{len(items) - limit} more)"
+    return text
+
+
+def _build_after_commit_auto_observation(
+    *,
+    repo_root_path: Path,
+    repo_label: str,
+    commit_ref: str,
+    commit_metadata: dict[str, Any],
+    checkpoint_kind: Literal["commit", "owner_followthrough"],
+    mutation_surface: Literal["code", "public-share"],
+    skill_report: SkillDetectionReport,
+    surface_report: SurfaceDetectionReport,
+    observed_at: datetime,
+    observed_at_local: str | None,
+    observed_tz: str | None,
+    skill_report_path: str,
+    surface_report_path: str,
+) -> SessionCheckpointAutoObservation:
+    commit_sha = cast(str | None, commit_metadata.get("commit_sha"))
+    commit_short_sha = cast(str | None, commit_metadata.get("commit_short_sha"))
+    commit_subject = cast(str | None, commit_metadata.get("commit_subject"))
+    changed_paths = [
+        path
+        for path in cast(list[str], commit_metadata.get("changed_paths", []))
+        if isinstance(path, str) and path.strip()
+    ]
+    active_skills = _dedupe_strings(
+        [
+            *(item.skill_name for item in skill_report.activate_now),
+            *surface_report.active_skill_names,
+            *surface_report.immediate_skill_dispatch,
+        ]
+    )
+    candidate_ids = [cluster.candidate_id for cluster in surface_report.candidate_clusters]
+    findings: list[str] = []
+    if changed_paths:
+        findings.append(f"tracked paths changed: {_preview_strings(changed_paths, limit=5)}")
+    if active_skills:
+        findings.append(
+            "checkpoint-phase skill context active before surface detection: "
+            + _preview_strings(active_skills, limit=6)
+        )
+    if surface_report.candidate_clusters:
+        findings.append(
+            f"surface detection preserved {len(surface_report.candidate_clusters)} checkpoint candidate(s): "
+            + _preview_strings(candidate_ids, limit=4)
+        )
+    if surface_report.blocked_by:
+        findings.append(
+            "checkpoint-time promotion remains blocked by: "
+            + _preview_strings(surface_report.blocked_by, limit=4)
+        )
+
+    candidate_notes = [
+        cluster.candidate_id
+        + f" -> owner {cluster.owner_hint}/{cluster.candidate_kind}"
+        + (
+            f"; blocked by {_preview_strings(cluster.blocked_by, limit=3)}"
+            if cluster.blocked_by
+            else ""
+        )
+        + (
+            f"; next move {cluster.next_owner_moves[0]}"
+            if cluster.next_owner_moves
+            else ""
+        )
+        for cluster in surface_report.candidate_clusters
+    ]
+
+    stats_hints: list[str] = []
+    if surface_report.candidate_clusters:
+        stats_hints.append(
+            "refresh stats only after reviewed closeout confirms which checkpoint candidates survive the full-session reread"
+        )
+
+    mechanic_hints = [
+        "treat auto-observation output as provisional checkpoint collection rather than agent-reviewed session judgment"
+    ]
+    if active_skills:
+        mechanic_hints.append(
+            "when the agent writes review-note, keep these active checkpoint skills in scope: "
+            + _preview_strings(active_skills, limit=6)
+        )
+    if mutation_surface == "public-share":
+        mechanic_hints.append(
+            "owner-followthrough capture should preserve publish-surface evidence without reopening or rotating a closed checkpoint ledger"
+        )
+
+    closeout_questions: list[str] = []
+    if any(block == "owner-ambiguity" for block in surface_report.blocked_by):
+        closeout_questions.append(
+            "does the full-session reread clarify the right owner layer, or should this remain only an early tracked candidate?"
+        )
+    if checkpoint_kind == "owner_followthrough":
+        closeout_questions.append(
+            "did the reviewed closeout already justify this owner follow-through, or is this commit over-claiming beyond checkpoint authority?"
+        )
+    else:
+        closeout_questions.append(
+            "does the later verify-green or reviewed session reread confirm that this commit seam still survives as a real candidate?"
+        )
+
+    next_owner_moves = _dedupe_strings(
+        [
+            *surface_report.closeout_followups,
+            *(cluster.next_owner_moves[0] for cluster in surface_report.candidate_clusters if cluster.next_owner_moves),
+            "write an explicit agent checkpoint review before treating this commit boundary as semantically understood",
+        ]
+    )
+    evidence_refs = _dedupe_strings(
+        [
+            *( [f"commit:{commit_sha}"] if commit_sha else [] ),
+            *(f"path:{path}" for path in changed_paths),
+            skill_report_path,
+            surface_report_path,
+            *(cluster.source_surface_ref for cluster in surface_report.candidate_clusters),
+            *(ref for cluster in surface_report.candidate_clusters for ref in cluster.evidence_refs[:3]),
+        ]
+    )
+
+    observation_kind = "owner follow-through" if checkpoint_kind == "owner_followthrough" else "commit"
+    summary = (
+        f"Auto-captured {observation_kind} checkpoint observation for {commit_short_sha or commit_ref}: "
+        f"{re.sub(r'\\s+', ' ', (commit_subject or 'checkpoint').strip())}"
+    )
+    return SessionCheckpointAutoObservation(
+        observation_id=(
+            "auto-observation:"
+            f"{_safe_name(commit_short_sha or commit_ref)}:"
+            f"{observed_at.strftime('%Y%m%dT%H%M%SZ')}"
+        ),
+        observed_at=observed_at,
+        observed_at_local=observed_at_local,
+        observed_tz=observed_tz,
+        repo_root=str(repo_root_path),
+        repo_label=repo_label,
+        commit_ref=commit_ref,
+        commit_sha=commit_sha,
+        commit_short_sha=commit_short_sha,
+        commit_subject=commit_subject,
+        summary=summary,
+        applied_skill_names=active_skills,
+        findings=findings,
+        candidate_notes=candidate_notes,
+        stats_hints=stats_hints,
+        mechanic_hints=mechanic_hints,
+        closeout_questions=closeout_questions,
+        evidence_refs=evidence_refs,
+        next_owner_moves=next_owner_moves,
+    )
+
+
 def _agent_review_command(*, repo_root: str, commit_ref: str, workspace_root: str) -> str:
     return (
         f"aoa checkpoint review-note {repo_root} --commit-ref {commit_ref} "
         f"--root {workspace_root} --summary '<agent checkpoint review>'"
+    )
+
+
+def _matching_auto_observation(
+    *,
+    note: SessionCheckpointNote,
+    commit_ref: str,
+    commit_sha: str | None,
+    commit_short_sha: str | None,
+) -> SessionCheckpointAutoObservation | None:
+    for entry in reversed(note.checkpoint_history):
+        observation = entry.auto_observation
+        if observation is None:
+            continue
+        if commit_sha and observation.commit_sha == commit_sha:
+            return observation
+        if commit_short_sha and observation.commit_short_sha == commit_short_sha:
+            return observation
+        if observation.commit_ref == commit_ref:
+            return observation
+    return None
+
+
+def _closeout_pending_agent_review_refs(notes: list[SessionCheckpointNote]) -> list[str]:
+    pending_refs: list[str] = []
+    for note in notes:
+        pending_refs.extend(note.agent_review_pending_refs)
+    return _dedupe_strings(pending_refs)
+
+
+def _collect_closeout_review_carry(notes: list[SessionCheckpointNote]) -> CheckpointCloseoutReviewCarry:
+    reviews = [review for note in notes for review in note.agent_reviews]
+    return CheckpointCloseoutReviewCarry(
+        review_refs=_dedupe_strings([review.review_id for review in reviews]),
+        auto_observation_refs=_dedupe_strings(
+            [
+                review.auto_observation_ref
+                for review in reviews
+                if review.auto_observation_ref is not None
+            ]
+        ),
+        applied_skill_names=_dedupe_strings(
+            [name for review in reviews for name in review.applied_skill_names]
+        ),
+        summaries=_dedupe_strings([review.summary for review in reviews]),
+        findings=_dedupe_strings([item for review in reviews for item in review.findings]),
+        candidate_notes=_dedupe_strings([item for review in reviews for item in review.candidate_notes]),
+        stats_hints=_dedupe_strings([item for review in reviews for item in review.stats_hints]),
+        mechanic_hints=_dedupe_strings([item for review in reviews for item in review.mechanic_hints]),
+        closeout_questions=_dedupe_strings(
+            [item for review in reviews for item in review.closeout_questions]
+        ),
+        evidence_refs=_dedupe_strings([item for review in reviews for item in review.evidence_refs]),
+        next_owner_moves=_dedupe_strings([item for review in reviews for item in review.next_owner_moves]),
     )
 
 

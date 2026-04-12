@@ -719,6 +719,7 @@ def test_checkpoint_human_cli_marks_canonical_utc_labels(workspace_root: Path) -
     assert "agent_skill_application_required: yes" in execution_result.stdout
     assert "executed_at_canonical_utc:" in execution_result.stdout
     assert "(local " in execution_result.stdout
+    assert "owner_handoff_path:" in execution_result.stdout
 
 
 def test_checkpoint_execute_closeout_chain_cli_emits_execution_report(workspace_root: Path) -> None:
@@ -764,6 +765,7 @@ def test_checkpoint_execute_closeout_chain_cli_emits_execution_report(workspace_
     assert payload["authority_contract"] == "reviewed_artifact_primary_checkpoint_hints_provisional"
     assert payload["executed_at_local"]
     assert payload["executed_tz"]
+    assert "owner_handoff_path" in payload
     assert [item["skill_name"] for item in payload["executed_skills"]] == [
         "aoa-session-donor-harvest",
         "aoa-session-progression-lift",
@@ -1037,11 +1039,15 @@ def test_post_commit_hook_runs_after_real_git_commit(workspace_root: Path) -> No
         repo_label="aoa-sdk",
         runtime_session_id="runtime-hook",
     )
+    note_payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
 
     assert "post_commit_checkpoint: captured" in combined_output
     assert "agent_review=pending" in combined_output
     assert (note_dir / "checkpoint-note.json").exists()
     assert (note_dir / "post-commit-report.json").exists()
+    assert note_payload["checkpoint_history"][-1]["auto_observation"]["summary"].startswith(
+        "Auto-captured commit checkpoint observation"
+    )
 
 
 def test_install_hook_allows_explicit_8dionysus(workspace_root: Path) -> None:

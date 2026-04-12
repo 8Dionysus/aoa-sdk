@@ -1341,12 +1341,39 @@ class CheckpointCandidateCluster(BaseModel):
     lineage_hint: CheckpointLineageHint | None = None
 
 
+class SessionCheckpointAutoObservation(BaseModel):
+    schema_version: int = 1
+    observation_type: Literal["auto_post_commit_checkpoint_observation_v1"] = (
+        "auto_post_commit_checkpoint_observation_v1"
+    )
+    observation_id: str
+    observed_at: datetime
+    observed_at_local: str | None = None
+    observed_tz: str | None = None
+    repo_root: str
+    repo_label: str
+    commit_ref: str
+    commit_sha: str | None = None
+    commit_short_sha: str | None = None
+    commit_subject: str | None = None
+    summary: str
+    applied_skill_names: list[str] = Field(default_factory=list)
+    findings: list[str] = Field(default_factory=list)
+    candidate_notes: list[str] = Field(default_factory=list)
+    stats_hints: list[str] = Field(default_factory=list)
+    mechanic_hints: list[str] = Field(default_factory=list)
+    closeout_questions: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    next_owner_moves: list[str] = Field(default_factory=list)
+
+
 class SessionCheckpointAgentReview(BaseModel):
     schema_version: int = 1
     review_type: Literal["agent_post_commit_checkpoint_review_v1"] = (
         "agent_post_commit_checkpoint_review_v1"
     )
     review_id: str
+    auto_observation_ref: str | None = None
     reviewed_at: datetime
     reviewed_at_local: str | None = None
     reviewed_tz: str | None = None
@@ -1391,6 +1418,7 @@ class SessionCheckpointHistoryEntry(BaseModel):
     commit_short_sha: str | None = None
     agent_review_status: Literal["not_required", "pending", "reviewed"] = "not_required"
     agent_review_ref: str | None = None
+    auto_observation: SessionCheckpointAutoObservation | None = None
 
 
 class SessionCheckpointCluster(BaseModel):
@@ -1580,6 +1608,20 @@ class CloseoutContextCandidateMap(BaseModel):
     upgrade_candidate_ids: list[str] = Field(default_factory=list)
 
 
+class CheckpointCloseoutReviewCarry(BaseModel):
+    review_refs: list[str] = Field(default_factory=list)
+    auto_observation_refs: list[str] = Field(default_factory=list)
+    applied_skill_names: list[str] = Field(default_factory=list)
+    summaries: list[str] = Field(default_factory=list)
+    findings: list[str] = Field(default_factory=list)
+    candidate_notes: list[str] = Field(default_factory=list)
+    stats_hints: list[str] = Field(default_factory=list)
+    mechanic_hints: list[str] = Field(default_factory=list)
+    closeout_questions: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    next_owner_moves: list[str] = Field(default_factory=list)
+
+
 class CheckpointCloseoutContext(BaseModel):
     schema_version: int = 1
     context_type: Literal["checkpoint_closeout_context_v1"] = "checkpoint_closeout_context_v1"
@@ -1607,6 +1649,7 @@ class CheckpointCloseoutContext(BaseModel):
     receipt_refs: list[str] = Field(default_factory=list)
     repo_scope: list[str] = Field(default_factory=list)
     candidate_map: CloseoutContextCandidateMap = Field(default_factory=CloseoutContextCandidateMap)
+    checkpoint_review_carry: CheckpointCloseoutReviewCarry = Field(default_factory=CheckpointCloseoutReviewCarry)
     candidate_lineage_map: list[CheckpointLineageHint] = Field(default_factory=list)
     owner_followthrough_map: list[CloseoutOwnerFollowthroughHint] = Field(default_factory=list)
     followthrough_decision: CloseoutFollowthroughDecision | None = None
@@ -1657,6 +1700,9 @@ class CheckpointCloseoutExecutionReport(BaseModel):
     checkpoint_note_refs: list[str] = Field(default_factory=list)
     surface_handoff_ref: str | None = None
     context_ref: str
+    owner_handoff_path: str | None = None
+    owner_follow_through_briefs: list["OwnerFollowThroughBrief"] = Field(default_factory=list)
+    workflow_follow_through_briefs: list["WorkflowFollowThroughBrief"] = Field(default_factory=list)
     executed_skills: list[CloseoutExecutionStep] = Field(default_factory=list)
     skipped_skills: list[CloseoutExecutionStep] = Field(default_factory=list)
     produced_artifact_refs: list[str] = Field(default_factory=list)

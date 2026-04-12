@@ -372,6 +372,12 @@ now also writes a persistent owner handoff bundle under:
 
 - `.aoa/closeout/handoffs/`
 
+The explicit checkpoint bridge now uses this same persistent handoff surface.
+For checkpoint-led reviewed closeout, the handoff is rooted in the emitted
+`closeout-context.json` rather than a canonical closeout manifest, and it stays
+strictly advisory: it records the next owner authoring move without minting
+owner-layer landing truth on its own.
+
 This handoff stays separate from the kernel brief.
 The kernel brief answers "what core skill comes next, if any?"
 The owner handoff answers "what owner-layer artifact should be drafted or
