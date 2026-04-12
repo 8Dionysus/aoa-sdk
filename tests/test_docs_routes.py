@@ -189,6 +189,7 @@ def test_codex_plane_deploy_status_routes_from_readme() -> None:
     status_doc = read_text("docs/CODEX_PLANE_DEPLOY_STATUS.md")
 
     assert "docs/CODEX_PLANE_DEPLOY_STATUS.md" in readme
+    assert "docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md" in readme
     assert "schemas/codex_plane_deploy_status_snapshot_v1.json" in readme
     assert "examples/codex_plane_deploy_status_snapshot.example.json" in readme
     assert "src/aoa_sdk/codex/registry.py" in readme
@@ -196,6 +197,12 @@ def test_codex_plane_deploy_status_routes_from_readme() -> None:
     assert "It does not own rollout authority." in status_doc
     assert "`/.codex/generated/rollout/codex_plane_trust_state.current.json`" in status_doc
     assert "`rerollout`" in status_doc
+    boundary_doc = read_text("docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md")
+    assert "`aoa-sdk` may surface typed references related to Codex-plane rollout operations." in boundary_doc
+    assert "It does not own:" in boundary_doc
+    assert "rollout success authority" in boundary_doc
+    assert "Acceptable seam:" in boundary_doc
+    assert "Unacceptable seam:" in boundary_doc
 
 
 def test_blueprint_is_marked_as_direction_surface() -> None:
