@@ -213,6 +213,10 @@ repo-scoped checkpoint ledger under
 the closeout candidate map. The reviewed artifact remains the primary reread
 source, and the repo-root checkpoint note must still match the resolved
 reviewed session or the closeout fails closed.
+Legacy unscoped ledgers stay eligible only when they are migration-safe for the
+same runtime session; if one explicitly points at a different runtime session,
+the builder archives it out of `current/` before continuing so the live closeout
+scope stays unambiguous.
 That same bundle may now emit a sibling `owner_followthrough_map` which points
 toward the next owner-status surface and requested decision class without
 minting `candidate_ref`, `seed_ref`, or `object_ref`.

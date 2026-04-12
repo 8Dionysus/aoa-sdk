@@ -65,6 +65,12 @@ When no runtime session is available yet, the legacy unscoped fallback remains
 With an active runtime session, `current/<runtime-session-id>/<repo-label>/` is
 the live ledger for that repo scope inside one specific session, not a date
 bucket.
+The unscoped fallback stays only as a migration bridge for a note that has no
+`runtime_session_id` yet, or for one that already matches the active runtime
+session. If an unscoped ledger explicitly points at a different
+`runtime_session_id`, stateful checkpoint flows archive it under
+`aoa-sdk/.aoa/session-growth/archive/` so `current/` stops advertising a stale
+session as live.
 The checkpoint `session_ref` is minted uniquely when a new ledger starts and
 now includes a high-resolution timestamp plus the current runtime-session
 identity suffix when available, so many same-day sessions do not collapse into
@@ -82,6 +88,9 @@ to `aoa checkpoint status`, `aoa checkpoint promote`,
 active checkpoint session.
 At reviewed closeout, the builder aggregates every checkpoint ledger under the
 same active runtime-session scope before it derives the closeout candidate map.
+During that aggregation, stale unscoped ledgers from a different runtime
+session are archived out of `current/` instead of lingering beside the live
+scope.
 The repo-root checkpoint note must still agree with the resolved reviewed
 session for the closeout to proceed. This keeps one narrow repo-scoped note
 from silently standing in for the whole session and blocks cross-session
