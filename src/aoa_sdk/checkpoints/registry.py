@@ -3494,7 +3494,7 @@ def _safe_name(value: str) -> str:
 
 def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
     entries: list[SessionCheckpointHistoryEntry] = []
-    agent_reviews: list[SessionCheckpointAgentReview] = []
+    agent_review_map: dict[str, SessionCheckpointAgentReview] = {}
     session_ref: str | None = None
     runtime_session_id: str | None = None
     runtime_session_created_at: datetime | None = None
@@ -3524,7 +3524,10 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
                         "reviewed_tz": reviewed_tz,
                     }
                 )
-            agent_reviews.append(review)
+            review_key = _agent_review_key(review)
+            if review_key in agent_review_map:
+                del agent_review_map[review_key]
+            agent_review_map[review_key] = review
             continue
         entry = SessionCheckpointHistoryEntry.model_validate(payload["history_entry"])
         observed_at_local, observed_tz = _with_local_timestamp_fallback(
@@ -3548,6 +3551,7 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             existing_note=None,
             runtime_session_id=runtime_session_id,
         )
+    agent_reviews = list(agent_review_map.values())
 
     existing_state = "collecting"
     existing_review_status = "unreviewed"
@@ -4986,10 +4990,19 @@ def _history_entry_review_key(entry: SessionCheckpointHistoryEntry) -> str:
     return entry.commit_sha or entry.commit_short_sha or entry.intent_text
 
 
+def _agent_review_key(review: SessionCheckpointAgentReview) -> str:
+    return review.commit_sha or review.commit_short_sha or review.commit_ref or review.review_id
+
+
 def _agent_review_commit_keys(reviews: list[SessionCheckpointAgentReview]) -> dict[str, str]:
     keys: dict[str, str] = {}
     for review in reviews:
-        for key in (review.commit_sha, review.commit_short_sha, review.commit_ref):
+        for key in (
+            review.commit_sha,
+            review.commit_short_sha,
+            review.commit_ref,
+            _agent_review_key(review),
+        ):
             if key:
                 keys[key] = review.review_id
     return keys
