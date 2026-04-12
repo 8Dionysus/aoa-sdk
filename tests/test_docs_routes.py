@@ -187,9 +187,11 @@ def test_codex_plane_portability_boundary_stays_routeable() -> None:
 def test_codex_plane_deploy_status_routes_from_readme() -> None:
     readme = read_text("README.md")
     status_doc = read_text("docs/CODEX_PLANE_DEPLOY_STATUS.md")
+    campaign_doc = read_text("docs/codex_rollout_campaign_refs.md")
 
     assert "docs/CODEX_PLANE_DEPLOY_STATUS.md" in readme
     assert "docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md" in readme
+    assert "docs/codex_rollout_campaign_refs.md" in readme
     assert "schemas/codex_plane_deploy_status_snapshot_v1.json" in readme
     assert "examples/codex_plane_deploy_status_snapshot.example.json" in readme
     assert "src/aoa_sdk/codex/registry.py" in readme
@@ -201,6 +203,10 @@ def test_codex_plane_deploy_status_routes_from_readme() -> None:
     assert "`aoa-sdk` may surface typed references related to Codex-plane rollout operations." in boundary_doc
     assert "It does not own:" in boundary_doc
     assert "rollout success authority" in boundary_doc
+    assert "`campaign_ref`" in boundary_doc
+    assert "`review_ref`" in boundary_doc
+    assert "`rollback_ref`" in campaign_doc
+    assert "These refs stay source-owned in `8Dionysus` cadence windows" in campaign_doc
     assert "Acceptable seam:" in boundary_doc
     assert "Unacceptable seam:" in boundary_doc
 

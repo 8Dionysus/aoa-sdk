@@ -34,7 +34,8 @@ receipt that it reads.
 
 For checked-in rollout campaign history, drift windows, rollback windows, and
 other typed pass-through refs that remain source-owned, see
-`docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`.
+`docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md` and
+`docs/codex_rollout_campaign_refs.md`.
 
 ## Next-action posture
 
