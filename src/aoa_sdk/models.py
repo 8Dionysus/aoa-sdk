@@ -1486,6 +1486,15 @@ class SessionCheckpointNote(BaseModel):
     agent_review_status: Literal["none", "pending", "reviewed"] = "none"
     agent_review_required: bool = False
     agent_review_pending_refs: list[str] = Field(default_factory=list)
+    review_refs: list[str] = Field(default_factory=list)
+    auto_observation_refs: list[str] = Field(default_factory=list)
+    applied_skill_names: list[str] = Field(default_factory=list)
+    summaries: list[str] = Field(default_factory=list)
+    findings: list[str] = Field(default_factory=list)
+    candidate_notes: list[str] = Field(default_factory=list)
+    stats_hints: list[str] = Field(default_factory=list)
+    mechanic_hints: list[str] = Field(default_factory=list)
+    closeout_questions: list[str] = Field(default_factory=list)
     agent_reviews: list[SessionCheckpointAgentReview] = Field(default_factory=list)
     blocked_by: list[str] = Field(default_factory=list)
     review_status: Literal["unreviewed", "reviewed"] = "unreviewed"
