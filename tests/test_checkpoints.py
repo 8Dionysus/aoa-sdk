@@ -1006,6 +1006,64 @@ def test_checkpoint_status_archives_stale_current_note_when_runtime_session_chan
     assert not (second_note_dir / "checkpoint-note.json").exists()
 
 
+def test_checkpoint_status_archives_stale_legacy_fallback_when_scoped_note_exists(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json",
+        session_id="runtime-session-live",
+    )
+    legacy_note_dir = _checkpoint_note_dir(workspace_root, repo_label="aoa-sdk")
+    scoped_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-live",
+    )
+    _write_checkpoint_history_entry(
+        note_dir=legacy_note_dir,
+        session_ref="session:test-stale",
+        runtime_session_id="runtime-session-stale",
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-stale",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Stale recurring route candidate",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=["aoa-playbooks.playbook_registry.min"],
+        progression_axis_signals=[],
+    )
+    _write_checkpoint_history_entry(
+        note_dir=scoped_note_dir,
+        session_ref="session:test-live",
+        runtime_session_id="runtime-session-live",
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-live",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Live recurring route candidate",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=["aoa-playbooks.playbook_registry.min"],
+        progression_axis_signals=[],
+    )
+
+    note = sdk.checkpoints.status(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(session_file),
+    )
+
+    archive_dirs = sorted((workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "archive").glob("aoa-sdk-*"))
+    archived_payload = json.loads((archive_dirs[-1] / "checkpoint-note.jsonl").read_text(encoding="utf-8").splitlines()[0])
+
+    assert note.runtime_session_id == "runtime-session-live"
+    assert note.session_ref == "session:test-live"
+    assert archive_dirs
+    assert archived_payload["runtime_session_id"] == "runtime-session-stale"
+    assert archived_payload["session_ref"] == "session:test-stale"
+    assert not (legacy_note_dir / "checkpoint-note.jsonl").exists()
+    assert (scoped_note_dir / "checkpoint-note.json").exists()
+
+
 def test_capture_from_skill_phase_does_not_reuse_stale_current_note(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"

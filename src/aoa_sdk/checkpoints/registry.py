@@ -1648,16 +1648,26 @@ def _resolve_runtime_checkpoint_paths_for_label(
         return scoped_paths
 
     legacy_paths = _checkpoint_paths_for_label(workspace, repo_label, runtime_session_id=None)
-    if scoped_paths.current_dir == legacy_paths.current_dir or scoped_paths.jsonl.exists():
+    if scoped_paths.current_dir == legacy_paths.current_dir:
+        return scoped_paths
+    legacy_note: SessionCheckpointNote | None = None
+    if legacy_paths.jsonl.exists():
+        legacy_note = _load_checkpoint_note(legacy_paths.note_json)
+        if legacy_note is None:
+            legacy_note = _build_checkpoint_note(legacy_paths)
+        if legacy_note.runtime_session_id not in {None, runtime_session_id}:
+            if migrate_legacy:
+                _archive_current_checkpoint(legacy_paths)
+            return scoped_paths
+    if scoped_paths.jsonl.exists():
         return scoped_paths
     if not legacy_paths.jsonl.exists():
         return scoped_paths
 
-    legacy_note = _load_checkpoint_note(legacy_paths.note_json)
     if legacy_note is None:
-        legacy_note = _build_checkpoint_note(legacy_paths)
-    if legacy_note.runtime_session_id not in {None, runtime_session_id}:
-        return scoped_paths
+        legacy_note = _load_checkpoint_note(legacy_paths.note_json)
+        if legacy_note is None:
+            legacy_note = _build_checkpoint_note(legacy_paths)
     if migrate_legacy:
         _move_current_checkpoint(source_paths=legacy_paths, target_paths=scoped_paths)
         return scoped_paths
@@ -3498,6 +3508,8 @@ def _load_runtime_checkpoint_notes_for_closeout(
             continue
         note = _build_checkpoint_note(paths)
         if runtime_session_id is not None and note.runtime_session_id not in {None, runtime_session_id}:
+            if paths.runtime_session_id is None:
+                _archive_current_checkpoint(paths)
             continue
         if _should_hide_current_checkpoint_note(note, runtime_session_id=runtime_session_id):
             _archive_current_checkpoint(paths)
