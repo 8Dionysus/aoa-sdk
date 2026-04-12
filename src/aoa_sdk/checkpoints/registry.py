@@ -18,6 +18,7 @@ from ..models import (
     CheckpointHookInstallResult,
     CheckpointHookStatus,
     CheckpointLineageHint,
+    CloseoutOwnerFollowthroughHint,
     CloseoutContextCandidateMap,
     CloseoutExecutionStep,
     ProgressionAxisSignal,
@@ -112,6 +113,15 @@ CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT: dict[str, object] = {
     "reviewed_artifact": "primary_closeout_evidence",
     "agent_skill_application": "required_for_final_session_analysis",
 }
+FOLLOWTHROUGH_DECISION_BY_STATUS: dict[
+    Literal["early", "reanchor", "thin-evidence", "stable"],
+    Literal["land_direct", "reanchor_owner", "prove_first"],
+] = {
+    "early": "land_direct",
+    "reanchor": "reanchor_owner",
+    "thin-evidence": "prove_first",
+    "stable": "land_direct",
+}
 
 
 class DonorHarvestOutputs(TypedDict):
@@ -139,6 +149,40 @@ def _local_timestamp_parts(now_utc: datetime | None = None) -> tuple[datetime, s
     local_now = canonical_utc.astimezone()
     local_tz = local_now.tzname() or local_now.strftime("%z")
     return canonical_utc, local_now.isoformat(), local_tz
+
+
+def _requested_followthrough_decision_class(
+    hint: CheckpointLineageHint,
+) -> Literal[
+    "land_direct",
+    "stage_seed",
+    "reanchor_owner",
+    "prove_first",
+    "merge_into_existing",
+    "defer",
+    "drop",
+]:
+    if hint.merged_into:
+        return "merge_into_existing"
+    return FOLLOWTHROUGH_DECISION_BY_STATUS[hint.status_posture]
+
+
+def _build_owner_followthrough_map(
+    hints: list[CheckpointLineageHint],
+) -> list[CloseoutOwnerFollowthroughHint]:
+    return [
+        CloseoutOwnerFollowthroughHint(
+            cluster_ref=hint.cluster_ref,
+            owner_hypothesis=hint.owner_hypothesis,
+            owner_shape=hint.owner_shape,
+            nearest_wrong_target=hint.nearest_wrong_target,
+            status_posture=hint.status_posture,
+            recommended_owner_status_surface="aoa-skills:reviewed_owner_landing_bundle",
+            requested_next_decision_class=_requested_followthrough_decision_class(hint),
+            evidence_refs=list(hint.evidence_refs),
+        )
+        for hint in hints
+    ]
 
 
 def _coerce_datetime(value: datetime | str | None) -> datetime | None:
@@ -1096,6 +1140,7 @@ class CheckpointsAPI:
             ),
         )
         candidate_lineage_map = _collect_candidate_lineage_hints(shortlisted_clusters)
+        owner_followthrough_map = _build_owner_followthrough_map(candidate_lineage_map)
         ordered_skill_plan = _derive_closeout_skill_plan(notes=aggregated_notes, handoff=handoff)
         if not aggregated_notes:
             notes.append("no matching local checkpoint note was available; the reviewed artifact becomes the primary execution source")
@@ -1129,6 +1174,7 @@ class CheckpointsAPI:
             repo_scope=repo_scope,
             candidate_map=candidate_map,
             candidate_lineage_map=candidate_lineage_map,
+            owner_followthrough_map=owner_followthrough_map,
             progression_axis_signals=_merge_progression_axis_signals(
                 [
                     signal

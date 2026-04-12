@@ -18,13 +18,15 @@ refinery without claiming owner truth.
 ## Carried shape
 
 The control-plane carry uses `schemas/checkpoint_lineage_hint.schema.json` for
-one hint and `schemas/closeout_candidate_lineage_map.schema.json` for reviewed
-closeout bundles.
+one hint, `schemas/closeout_candidate_lineage_map.schema.json` for reviewed
+lineage bundles, and `schemas/closeout_owner_followthrough_map.schema.json`
+for the reviewed closeout pointer toward the next owner-status surface.
 
 It lands in two places:
 
 - checkpoint candidate clusters under `lineage_hint`
 - reviewed closeout context under `candidate_lineage_map`
+- reviewed closeout context under `owner_followthrough_map`
 
 The canonical growth-refinery axis remains:
 
@@ -47,6 +49,9 @@ In this repo only the first hop is authoritative.
 - closeout map items may carry their
   `schema_version: aoa_checkpoint_lineage_hint_v1`, but they still must not
   carry `candidate_ref`, `seed_ref`, or `object_ref`
+- followthrough map items may point to
+  `aoa-skills:reviewed_owner_landing_bundle` and request one next decision
+  class, but they still must not claim that owner landing already happened
 
 ## Negative rules
 
