@@ -164,10 +164,40 @@ The hook-created checkpoint starts as `agent_review=pending`; after every
 successful commit, the Codex agent must apply the checkpoint skill protocol and
 write a semantic `aoa checkpoint review-note` entry before treating the commit
 as fully handled.
-That review note is where the agent records what changed, why it matters, where
-the candidate belongs, stats hints, mechanic hints, closeout questions, and
-evidence refs. Scripts may preserve the checkpoint boundary, but scripts do not
-replace the agent's semantic review.
+The hook-created note now also carries one structured auto-observation drawn
+from commit metadata, checkpoint skill dispatch, and surface detection, so the
+agent is extending a real intermediate collection rather than starting from an
+empty pending marker.
+That review note is where the agent records the stronger semantic layer: what
+changed, why it matters, where the candidate belongs, stats hints, mechanic
+hints, closeout questions, and evidence refs. Scripts may preserve the
+checkpoint boundary and auto-observation, but scripts do not replace the
+agent's semantic review. The review-note flow now inherits matching
+auto-observation provenance and active checkpoint skill context automatically,
+so the agent extends the existing checkpoint evidence instead of rebuilding
+that provenance by hand.
+Until those pending reviews are written, treat reviewed closeout as blocked at
+the guidance layer: the honest next move is the missing `review-note`, not the
+bridge.
+The control-plane gate now matches that posture: closeout context build and
+closeout-chain execution fail closed while any pending checkpoint review is
+still unresolved in the active runtime-session fan-in.
+When closeout is finally allowed, the resulting context now carries the
+aggregated semantic checkpoint-review material forward, so the agent can reread
+findings, questions, and mechanic hints beside the reviewed artifact instead of
+reconstructing them from memory.
+The bridge outputs now preserve that same review carry in their local donor,
+progression, and quest artifacts, so the semantic checkpoint layer survives one
+step further downstream without pretending those artifacts are the final
+analysis.
+When that reviewed bridge reaches owner follow-through, it now also writes one
+persistent `.aoa/closeout/handoffs/*.owner-handoff.json` bundle rooted in the
+generated `closeout-context.json`, so later authoring work can resume from an
+explicit queue-like surface instead of rereading only runtime-local bridge
+artifacts.
+The note's own `review_status` now becomes `reviewed` only when the semantic
+checkpoint review actually exists and no pending review remains, and promotion
+is blocked while that pending state still exists.
 Do not treat that local side effect as a change to skill ownership semantics.
 
 When the task shows route drift, owner-layer ambiguity, proof need, recall

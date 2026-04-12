@@ -351,18 +351,35 @@ def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
     typer.echo("candidate_clusters:")
     if not note.candidate_clusters:
         typer.echo("  - none")
+    else:
+        for cluster in note.candidate_clusters:
+            typer.echo(
+                f"  - {cluster.display_name} [{cluster.candidate_kind} / {cluster.owner_hint} / hits={cluster.checkpoint_hits} / {cluster.review_status}]"
+            )
+            typer.echo(f"    candidate_id: {cluster.candidate_id}")
+            typer.echo(
+                "    session_end_targets: "
+                f"{', '.join(cluster.session_end_targets) if cluster.session_end_targets else 'none'}"
+            )
+            if cluster.blocked_by:
+                typer.echo(f"    blocked_by: {', '.join(cluster.blocked_by)}")
+    typer.echo("checkpoint_history:")
+    if not note.checkpoint_history:
+        typer.echo("  - none")
         return
-    for cluster in note.candidate_clusters:
+    for entry in note.checkpoint_history:
         typer.echo(
-            f"  - {cluster.display_name} [{cluster.candidate_kind} / {cluster.owner_hint} / hits={cluster.checkpoint_hits} / {cluster.review_status}]"
+            "  - "
+            + f"{entry.checkpoint_kind} @ {entry.commit_short_sha or entry.commit_sha or entry.intent_text or 'checkpoint'}"
         )
-        typer.echo(f"    candidate_id: {cluster.candidate_id}")
-        typer.echo(
-            "    session_end_targets: "
-            f"{', '.join(cluster.session_end_targets) if cluster.session_end_targets else 'none'}"
-        )
-        if cluster.blocked_by:
-            typer.echo(f"    blocked_by: {', '.join(cluster.blocked_by)}")
+        typer.echo(f"    agent_review: {entry.agent_review_status}")
+        if entry.auto_observation is not None:
+            typer.echo(f"    auto_summary: {entry.auto_observation.summary}")
+            if entry.auto_observation.applied_skill_names:
+                typer.echo(
+                    "    auto_skills: "
+                    + ", ".join(entry.auto_observation.applied_skill_names)
+                )
 
 
 def _format_dual_timestamp(
@@ -540,6 +557,12 @@ def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
         f"progression={len(context.candidate_map.progression_candidate_ids)}, "
         f"upgrade={len(context.candidate_map.upgrade_candidate_ids)}"
     )
+    typer.echo(
+        "checkpoint_review_carry: "
+        f"reviews={len(context.checkpoint_review_carry.review_refs)}, "
+        f"questions={len(context.checkpoint_review_carry.closeout_questions)}, "
+        f"findings={len(context.checkpoint_review_carry.findings)}"
+    )
     typer.echo("ordered_skill_plan:")
     if not context.ordered_skill_plan:
         typer.echo("  - none")
@@ -583,6 +606,12 @@ def _print_closeout_execution_report(report: CheckpointCloseoutExecutionReport) 
         f"{', '.join(report.checkpoint_note_refs) if report.checkpoint_note_refs else 'none'}"
     )
     typer.echo(f"surface_handoff_ref: {report.surface_handoff_ref or 'none'}")
+    typer.echo(f"owner_handoff_path: {report.owner_handoff_path or 'none'}")
+    _print_owner_follow_through(
+        report.owner_follow_through_briefs,
+        handoff_path=report.owner_handoff_path,
+    )
+    _print_workflow_follow_through(report.workflow_follow_through_briefs)
     typer.echo("executed_skills:")
     if not report.executed_skills:
         typer.echo("  - none")
