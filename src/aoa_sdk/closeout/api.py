@@ -87,6 +87,7 @@ PUBLISHER_EVENT_KINDS = {
     "aoa-skills.session-harvest-family": {
         "automation_candidate_receipt",
         "decision_fork_receipt",
+        "diagnosis_packet_receipt",
         "harvest_packet_receipt",
         "progression_delta_receipt",
         "quest_promotion_receipt",
@@ -929,8 +930,13 @@ class CloseoutAPI:
 
         diagnosis_receipt = self._latest_detail_receipt(
             detail_receipts,
-            event_kind="skill_run_receipt",
+            event_kind="diagnosis_packet_receipt",
         )
+        if diagnosis_receipt is None:
+            diagnosis_receipt = self._latest_detail_receipt(
+                detail_receipts,
+                event_kind="skill_run_receipt",
+            )
         repair_receipt = self._latest_detail_receipt(
             detail_receipts,
             event_kind="repair_cycle_receipt",
@@ -1373,7 +1379,10 @@ class CloseoutAPI:
                 "aoa-session-progression-lift",
                 "Repair has landed but progression has not, so the next core step is explicit progression lift.",
             )
-        if "skill_run_receipt" in detail_event_kind_set:
+        if (
+            "diagnosis_packet_receipt" in detail_event_kind_set
+            or "skill_run_receipt" in detail_event_kind_set
+        ):
             return self._invoke_core_skill_brief(
                 "aoa-session-self-repair",
                 "Diagnosis has landed but repair has not, so the next core step is bounded self-repair.",

@@ -253,8 +253,8 @@ print(f"[summaries] {summary_dir}")
                     },
                     {
                         "skill_name": "aoa-session-self-diagnose",
-                        "detail_event_kind": "skill_run_receipt",
-                        "detail_receipt_schema_ref": "references/skill-run-receipt-schema.yaml",
+                        "detail_event_kind": "diagnosis_packet_receipt",
+                        "detail_receipt_schema_ref": "references/diagnosis-packet-receipt-schema.yaml",
                     },
                     {
                         "skill_name": "aoa-session-self-repair",
@@ -662,6 +662,105 @@ def test_closeout_api_submit_reviewed_builds_request_and_manifest(workspace_root
     assert report.build_report.enqueue_report is None
 
 
+def test_closeout_api_submit_reviewed_accepts_diagnosis_packet_receipts(workspace_root: Path) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    receipts_dir = fixture["skill_receipt_path"].parent
+
+    diagnosis_receipt_path = receipts_dir / "diagnosis.json"
+    diagnosis_core_receipt_path = receipts_dir / "diagnosis-core.json"
+    diagnosis_receipt_path.write_text(
+        json.dumps(
+            {
+                "event_kind": "diagnosis_packet_receipt",
+                "event_id": "event-diagnosis-submit-reviewed-001",
+                "observed_at": "2026-04-06T09:00:00Z",
+                "run_ref": "run-diagnosis-submit-reviewed-001",
+                "session_ref": "session:test-closeout",
+                "actor_ref": "aoa-skills:aoa-session-self-diagnose",
+                "object_ref": {
+                    "repo": "aoa-skills",
+                    "kind": "skill",
+                    "id": "aoa-session-self-diagnose",
+                    "version": "main",
+                },
+                "evidence_refs": [
+                    {
+                        "kind": "diagnosis_packet",
+                        "ref": str(fixture["reviewed_artifact_path"]),
+                        "role": "primary",
+                    }
+                ],
+                "payload": {
+                    "route_ref": "route:test-closeout",
+                    "skill_name": "aoa-session-self-diagnose",
+                    "result_kind": "diagnosis_packet",
+                    "diagnosis_types": ["boundary-drift", "proof-debt"],
+                    "symptom_refs": ["artifact:test-closeout/diagnosis-gap"],
+                    "probable_cause_hypotheses": ["reviewed follow-through still needs explicit filtering"],
+                    "confidence_band": "medium",
+                    "owner_hints": ["aoa-sdk", "aoa-stats"],
+                    "blocked_automation_causes": ["public-share-requires-sanitization-review"],
+                    "repair_handoff": "aoa-session-self-repair",
+                    "unknowns": ["another reviewed run should confirm the route boundary"],
+                },
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    diagnosis_core_receipt_path.write_text(
+        json.dumps(
+            {
+                "event_kind": "core_skill_application_receipt",
+                "event_id": "event-diagnosis-submit-reviewed-core-001",
+                "observed_at": "2026-04-06T09:03:00Z",
+                "run_ref": "run-diagnosis-submit-reviewed-001",
+                "session_ref": "session:test-closeout",
+                "actor_ref": "aoa-skills:aoa-session-self-diagnose",
+                "object_ref": {
+                    "repo": "aoa-skills",
+                    "kind": "skill",
+                    "id": "aoa-session-self-diagnose",
+                    "version": "main",
+                },
+                "evidence_refs": [
+                    {
+                        "kind": "detail_receipt",
+                        "ref": str(diagnosis_receipt_path),
+                        "role": "primary",
+                    }
+                ],
+                "payload": {
+                    "kernel_id": "project-core-session-growth-v1",
+                    "skill_name": "aoa-session-self-diagnose",
+                    "application_stage": "finish",
+                    "detail_event_kind": "diagnosis_packet_receipt",
+                    "detail_receipt_ref": str(diagnosis_receipt_path),
+                    "route_ref": "route:test-closeout",
+                },
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    report = sdk.closeout.submit_reviewed(
+        fixture["reviewed_artifact_path"],
+        session_ref="session:test-closeout",
+        receipt_paths=[diagnosis_receipt_path, diagnosis_core_receipt_path],
+        closeout_id="closeout-submit-diagnosis-001",
+        enqueue=False,
+    )
+
+    assert report.detected_publishers == [
+        "aoa-skills.core-kernel-applications",
+        "aoa-skills.session-harvest-family",
+    ]
+
+
 def test_closeout_api_submit_reviewed_allows_missing_optional_audit_refs(workspace_root: Path) -> None:
     fixture = install_closeout_fixture(workspace_root)
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
@@ -1003,7 +1102,7 @@ def test_closeout_api_run_surfaces_self_repair_when_diagnosis_exists_without_rep
         encoding="utf-8",
     )
     diagnosis_receipt = {
-        "event_kind": "skill_run_receipt",
+        "event_kind": "diagnosis_packet_receipt",
         "event_id": "event-diagnosis-001",
         "observed_at": "2026-04-06T19:10:00Z",
         "run_ref": "run-diagnosis-001",
@@ -1011,7 +1110,11 @@ def test_closeout_api_run_surfaces_self_repair_when_diagnosis_exists_without_rep
         "actor_ref": "aoa-skills:aoa-session-self-diagnose",
         "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-self-diagnose"},
         "evidence_refs": [{"kind": "diagnosis_packet", "ref": str(diagnosis_packet_path)}],
-        "payload": {"diagnosis_types": ["boundary-drift", "workflow-gap"]},
+        "payload": {
+            "skill_name": "aoa-session-self-diagnose",
+            "result_kind": "diagnosis_packet_ready",
+            "diagnosis_types": ["boundary-drift", "workflow-gap"],
+        },
     }
     diagnosis_receipt_path = receipts_dir / "diagnosis-gap.json"
     diagnosis_receipt_path.write_text(
@@ -1058,6 +1161,67 @@ def test_closeout_api_run_surfaces_self_repair_when_diagnosis_exists_without_rep
     assert any(
         item["skill_name"] == "aoa-session-self-repair"
         for item in handoff_payload["workflow_items"]
+    )
+
+
+def test_closeout_api_run_surfaces_self_repair_for_legacy_skill_run_receipt(
+    workspace_root: Path,
+) -> None:
+    fixture = install_closeout_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    receipts_dir = fixture["skill_receipt_path"].parent
+    manifest_dir = fixture["manifest_path"].parent
+    notes_dir = manifest_dir / "notes"
+
+    diagnosis_packet_path = notes_dir / "DIAGNOSIS_PACKET_LEGACY.json"
+    diagnosis_packet_path.write_text(
+        json.dumps({"diagnosis_types": ["authority-seam"]}, indent=2) + "\n",
+        encoding="utf-8",
+    )
+    diagnosis_receipt = {
+        "event_kind": "skill_run_receipt",
+        "event_id": "event-diagnosis-legacy-001",
+        "observed_at": "2026-04-06T19:11:00Z",
+        "run_ref": "run-diagnosis-legacy-001",
+        "session_ref": "session:test-closeout-diagnosis-gap-legacy",
+        "actor_ref": "aoa-skills:aoa-session-self-diagnose",
+        "object_ref": {"repo": "aoa-skills", "kind": "skill", "id": "aoa-session-self-diagnose"},
+        "evidence_refs": [{"kind": "diagnosis_packet", "ref": str(diagnosis_packet_path)}],
+        "payload": {"diagnosis_types": ["authority-seam"]},
+    }
+    diagnosis_receipt_path = receipts_dir / "diagnosis-gap-legacy.json"
+    diagnosis_receipt_path.write_text(
+        json.dumps(diagnosis_receipt, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+    manifest_path = manifest_dir / "closeout-test-diagnosis-gap-legacy.json"
+    manifest_path.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "closeout_id": "closeout-test-diagnosis-gap-legacy",
+                "session_ref": "session:test-closeout-diagnosis-gap-legacy",
+                "reviewed": True,
+                "trigger": "reviewed-closeout",
+                "batches": [
+                    {
+                        "publisher": "aoa-skills.session-harvest-family",
+                        "input_paths": [str(diagnosis_receipt_path)],
+                    }
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    report = sdk.closeout.run(manifest_path)
+
+    assert any(
+        brief.skill_name == "aoa-session-self-repair"
+        for brief in report.workflow_follow_through_briefs
     )
 
 

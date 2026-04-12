@@ -4,11 +4,12 @@ import json
 import os
 import re
 import subprocess
+import time
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal, TypedDict, cast
 
-from ..errors import RepoNotFound, SurfaceNotFound
+from ..errors import InvalidSurface, RepoNotFound, SurfaceNotFound
 from ..loaders import load_json, write_json
 from ..models import (
     CheckpointAfterCommitReport,
@@ -40,7 +41,7 @@ from ..models import (
     SurfaceDetectionReport,
 )
 from ..skills.discovery import SkillsAPI
-from ..skills.session import ensure_session, probe_session, resolve_session_file, save_session
+from ..skills.session import ensure_session, load_session, probe_session, resolve_session_file, save_session
 from ..surfaces import SurfacesAPI
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
@@ -77,6 +78,8 @@ IGNORABLE_UNTRACKED_SUFFIXES = (".pyc", ".pyo", ".pyd")
 CODEX_TRACE_TEXT_ITEM_TYPES = {"input_text", "output_text"}
 CODEX_TRACE_MAX_CHARS = 120_000
 CODEX_TRACE_MAX_CHUNK_CHARS = 3_000
+AFTER_COMMIT_SESSION_PROBE_ATTEMPTS = 3
+AFTER_COMMIT_SESSION_PROBE_DELAY_SECONDS = 0.05
 SESSION_END_SKILL_ORDER = (
     "aoa-session-donor-harvest",
     "aoa-session-progression-lift",
@@ -783,9 +786,16 @@ class CheckpointsAPI:
 
         try:
             commit_metadata = _read_git_commit_metadata(repo_root_path, commit_ref)
-            session_path, runtime_session = probe_session(self.workspace, session_file)
+            session_path, runtime_session, session_probe_error = (
+                _probe_active_runtime_session_for_after_commit(
+                    self.workspace,
+                    session_file,
+                )
+            )
             captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
             if runtime_session is None:
+                if session_probe_error is not None:
+                    raise RuntimeError(session_probe_error)
                 resolved_checkpoint_kind = _resolve_after_commit_checkpoint_kind(
                     checkpoint_kind=checkpoint_kind,
                     commit_subject=commit_metadata["commit_subject"],
@@ -2160,6 +2170,32 @@ def _peek_checkpoint_runtime_session(
 ) -> dict[str, str | datetime | None]:
     _, metadata = _probe_checkpoint_runtime_session(workspace=workspace, session_file=session_file)
     return metadata
+
+
+def _probe_active_runtime_session_for_after_commit(
+    workspace: Workspace,
+    session_file: str | None,
+) -> tuple[Path, Any | None, str | None]:
+    session_path = resolve_session_file(workspace, session_file)
+    if not session_path.exists():
+        return session_path, None, None
+
+    last_error: InvalidSurface | None = None
+    for attempt in range(AFTER_COMMIT_SESSION_PROBE_ATTEMPTS):
+        try:
+            return session_path, load_session(workspace, str(session_path)), None
+        except InvalidSurface as exc:
+            last_error = exc
+            if attempt + 1 < AFTER_COMMIT_SESSION_PROBE_ATTEMPTS:
+                time.sleep(AFTER_COMMIT_SESSION_PROBE_DELAY_SECONDS)
+                continue
+
+    error_text = (
+        f"active runtime session exists but could not be read: {last_error}"
+        if last_error is not None
+        else "active runtime session exists but could not be read"
+    )
+    return session_path, None, error_text
 
 
 def _should_rotate_checkpoint_note(

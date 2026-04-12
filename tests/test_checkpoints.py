@@ -8,7 +8,8 @@ from pathlib import Path
 import pytest
 
 from aoa_sdk import AoASDK
-from aoa_sdk.errors import SurfaceNotFound
+from aoa_sdk.checkpoints import registry as checkpoint_registry
+from aoa_sdk.errors import InvalidSurface, SurfaceNotFound
 from aoa_sdk.skills.session import probe_session
 
 
@@ -347,6 +348,104 @@ def test_after_commit_reports_session_resolution_failure(workspace_root: Path) -
     assert report.commit_sha == commit_sha
     assert report.session_file is None
     assert report.error_text
+    assert status_path.exists()
+
+
+def test_after_commit_captures_for_sibling_repo_using_thread_scoped_aoa_sdk_session(
+    workspace_root: Path,
+    install_host_skills,
+    monkeypatch,
+) -> None:
+    install_host_skills(workspace_root, ["aoa-change-protocol"])
+    repo_root = workspace_root / "aoa-playbooks"
+    _init_git_repo(repo_root)
+    (repo_root / "README.md").write_text("# aoa-playbooks\n", encoding="utf-8")
+    commit_sha = _git_commit(repo_root, subject="owner follow-through docs")
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-sibling-capture")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-sibling-capture.json",
+        session_id="runtime-sibling-capture",
+        codex_thread_id="thread-sibling-capture",
+    )
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.checkpoints.after_commit(repo_root=str(repo_root), commit_ref="HEAD")
+
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-playbooks",
+        runtime_session_id="runtime-sibling-capture",
+    )
+    assert session_file.exists()
+    assert report.status == "captured"
+    assert report.commit_sha == commit_sha
+    assert report.runtime_session_id == "runtime-sibling-capture"
+    assert report.session_file == str(session_file)
+    assert note_dir.joinpath("checkpoint-note.json").exists()
+
+
+def test_after_commit_retries_transient_runtime_session_read_error(
+    workspace_root: Path,
+    install_host_skills,
+    monkeypatch,
+) -> None:
+    install_host_skills(workspace_root, ["aoa-change-protocol"])
+    repo_root = workspace_root / "aoa-playbooks"
+    _init_git_repo(repo_root)
+    (repo_root / "README.md").write_text("# aoa-playbooks\n", encoding="utf-8")
+    _git_commit(repo_root, subject="owner follow-through docs")
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-transient-retry")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-transient-retry.json",
+        session_id="runtime-transient-retry",
+        codex_thread_id="thread-transient-retry",
+    )
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    original_load_session = checkpoint_registry.load_session
+    call_count = {"count": 0}
+
+    def flaky_load_session(workspace, session_file_arg):
+        if str(session_file_arg) == str(session_file) and call_count["count"] == 0:
+            call_count["count"] += 1
+            raise InvalidSurface("transient session read")
+        call_count["count"] += 1
+        return original_load_session(workspace, session_file_arg)
+
+    monkeypatch.setattr(checkpoint_registry, "load_session", flaky_load_session)
+    monkeypatch.setattr(checkpoint_registry, "AFTER_COMMIT_SESSION_PROBE_DELAY_SECONDS", 0.0)
+
+    report = sdk.checkpoints.after_commit(repo_root=str(repo_root), commit_ref="HEAD")
+
+    assert report.status == "captured"
+    assert report.runtime_session_id == "runtime-transient-retry"
+    assert report.session_file == str(session_file)
+    assert call_count["count"] >= 2
+
+
+def test_after_commit_fails_when_existing_runtime_session_file_is_invalid(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    repo_root = workspace_root / "aoa-playbooks"
+    _init_git_repo(repo_root)
+    (repo_root / "README.md").write_text("# aoa-playbooks\n", encoding="utf-8")
+    commit_sha = _git_commit(repo_root, subject="owner follow-through docs")
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-invalid-session")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-invalid-session.json"
+    session_file.parent.mkdir(parents=True, exist_ok=True)
+    session_file.write_text("{", encoding="utf-8")
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    monkeypatch.setattr(checkpoint_registry, "AFTER_COMMIT_SESSION_PROBE_DELAY_SECONDS", 0.0)
+
+    report = sdk.checkpoints.after_commit(repo_root=str(repo_root), commit_ref="HEAD")
+
+    status_path = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "post-commit-status" / "aoa-playbooks.latest.json"
+    assert report.status == "failed"
+    assert report.commit_sha == commit_sha
+    assert report.session_file == str(session_file)
+    assert report.runtime_session_id is None
+    assert report.error_text is not None
+    assert "active runtime session exists but could not be read" in report.error_text
     assert status_path.exists()
 
 
