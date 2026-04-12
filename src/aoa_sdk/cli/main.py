@@ -3,7 +3,7 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Literal, cast
+from typing import Any, Literal, TypeAlias, cast
 
 import typer
 
@@ -37,7 +37,12 @@ from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
 
 OWNER_CHECKPOINT_HOOK_REPOS = tuple(repo for repo in KNOWN_REPOS if repo != "8Dionysus")
-CHECKPOINT_MANAGED_HOOKS = ("post-commit", "pre-push", "pre-merge-commit")
+CheckpointManagedHookName: TypeAlias = Literal["post-commit", "pre-push", "pre-merge-commit"]
+CHECKPOINT_MANAGED_HOOKS: tuple[CheckpointManagedHookName, ...] = (
+    "post-commit",
+    "pre-push",
+    "pre-merge-commit",
+)
 
 app = typer.Typer(help="AoA SDK CLI")
 workspace_app = typer.Typer(help="Inspect workspace topology")
@@ -824,7 +829,7 @@ def _resolve_checkpoint_hook_repos(
 
 def _resolve_checkpoint_managed_hooks(
     hook: str,
-) -> list[Literal["post-commit", "pre-push", "pre-merge-commit"]]:
+) -> list[CheckpointManagedHookName]:
     normalized = hook.strip().lower()
     if normalized == "all":
         return list(CHECKPOINT_MANAGED_HOOKS)
@@ -832,7 +837,7 @@ def _resolve_checkpoint_managed_hooks(
         raise typer.BadParameter(
             "Managed checkpoint hook must be one of: post-commit, pre-push, pre-merge-commit, all."
         )
-    return [cast(Literal["post-commit", "pre-push", "pre-merge-commit"], normalized)]
+    return [cast(CheckpointManagedHookName, normalized)]
 
 
 def _resolve_checkpoint_git_boundary(boundary: str) -> Literal["push", "merge"]:
