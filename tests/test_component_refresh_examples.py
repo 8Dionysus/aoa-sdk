@@ -3,7 +3,9 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from jsonschema import Draft202012Validator
+from jsonschema.exceptions import ValidationError
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -71,3 +73,17 @@ def test_component_refresh_examples_stay_coherent() -> None:
         if decision["component_ref"] == "component:codex-subagents:projection"
     )
     assert subagents["decision_status"] == "deferred"
+
+
+def test_component_drift_hint_example_requires_non_empty_evidence_refs() -> None:
+    schema = load_json("schemas/component_drift_hint_set.schema.json")
+    example = load_json("examples/component_drift_hints.example.json")
+
+    hint_set = dict(example)
+    hints = [dict(item) for item in example["hints"]]  # type: ignore[index]
+    hints[0]["evidence_refs"] = []
+    hint_set["hints"] = hints
+
+    validator = Draft202012Validator(schema)
+    with pytest.raises(ValidationError):
+        validator.validate(hint_set)
