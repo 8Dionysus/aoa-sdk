@@ -683,7 +683,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "aoa-sdk"
-version = "0.2.0"
+version = "0.2.1"
 description = "Typed Python SDK for the AoA federation"
 readme = "README.md"
 requires-python = ">=3.11"

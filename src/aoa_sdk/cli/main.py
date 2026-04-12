@@ -778,7 +778,7 @@ def _resolve_checkpoint_hook_repos(
 
 @app.command()
 def version() -> None:
-    print("aoa-sdk 0.2.0")
+    print("aoa-sdk 0.2.1")
 
 
 @release_app.command("audit")

@@ -6,6 +6,30 @@ The format is intentionally simple and human-first.
 
 ## [Unreleased]
 
+## [0.2.1] - 2026-04-12
+
+### Summary
+
+- this patch hardens Codex-plane deploy-state reads, rollout reference
+  boundaries, and continuity carry in the control plane
+- closeout follow-through and release publish failure handling are tightened
+  without widening `aoa-sdk` into a runtime owner
+- the release remains a bounded control-plane refinement over `v0.2.0`
+
+### Added
+
+- Codex deploy-status snapshot surfaces and deploy-operation boundary guidance
+  for the control plane.
+- self-agency continuity carry and closeout follow-through mapping for
+  checkpoint-driven rollout sessions.
+- rollout campaign reference-boundary guidance so campaign refs stay explicit
+  and local-first.
+
+### Changed
+
+- release-audit typing and deploy-status reads are hardened across the current
+  Codex-plane rollout path.
+
 ### Fixed
 
 - `aoa release publish` now treats GitHub Release lookup timeouts as an unknown remote state and aborts before tag mutation.
@@ -14,6 +38,12 @@ The format is intentionally simple and human-first.
 ### Validation
 
 - `python scripts/release_check.py`
+
+### Notes
+
+- this patch stays on the control plane: rollout references,
+  continuity carry, and deploy-state reads are tightened without turning
+  `aoa-sdk` into a source-owning runtime layer.
 
 ## [0.2.0] - 2026-04-10
 
