@@ -36,7 +36,7 @@ Use the shortest route by need:
 - project-level Codex workspace orientation via MCP: `docs/codex-workspace-mcp.md`, `src/aoa_sdk/codex/workspace_mcp.py`, and `scripts/aoa_workspace_mcp_server.py`
 - portable sibling-workspace bootstrap for non-`/srv` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`
 - Codex-plane portability boundary when the live root changes: `docs/CODEX_PLANE_PORTABILITY.md` and `8Dionysus/docs/CODEX_PLANE_REGENERATION.md`
-- live Codex-plane rollout status at the current workspace root: `docs/CODEX_PLANE_DEPLOY_STATUS.md`, `schemas/codex_plane_deploy_status_snapshot_v1.json`, `examples/codex_plane_deploy_status_snapshot.example.json`, and `src/aoa_sdk/codex/registry.py`
+- live Codex-plane rollout status at the current workspace root: `docs/CODEX_PLANE_DEPLOY_STATUS.md`, `docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`, `schemas/codex_plane_deploy_status_snapshot_v1.json`, `examples/codex_plane_deploy_status_snapshot.example.json`, and `src/aoa_sdk/codex/registry.py`
 - source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
 - compatibility rules and local checks: `docs/versioning.md`, `scripts/sibling_canary_matrix.json`, `scripts/run_sibling_canary.py`, `.github/workflows/latest-sibling-canary.yml`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
 - public support, release scope, and CI tiers: `docs/RELEASE_CI_POSTURE.md`

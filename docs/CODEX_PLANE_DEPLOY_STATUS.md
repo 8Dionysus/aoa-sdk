@@ -32,6 +32,10 @@ The snapshot is for control-plane orientation and review. It is not a
 permission surface and it does not overrule the live trust-state or rollout
 receipt that it reads.
 
+For checked-in rollout campaign history, drift windows, rollback windows, and
+other typed pass-through refs that remain source-owned, see
+`docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`.
+
 ## Next-action posture
 
 The typed reader keeps the next move small and explicit:
