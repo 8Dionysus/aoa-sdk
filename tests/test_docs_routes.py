@@ -168,6 +168,22 @@ def test_readme_routes_to_closeout_followthrough_map() -> None:
     assert "It does not execute that class" in kernel_rules
 
 
+def test_codex_plane_portability_boundary_stays_routeable() -> None:
+    readme = read_text("README.md")
+    workspace_layout = read_text("docs/workspace-layout.md")
+    portability = read_text("docs/CODEX_PLANE_PORTABILITY.md")
+
+    assert "docs/CODEX_PLANE_PORTABILITY.md" in readme
+    assert "8Dionysus/docs/CODEX_PLANE_REGENERATION.md" in readme
+    assert "Workspace discovery overrides in `aoa-sdk` are not a substitute for" in workspace_layout
+    assert "Codex-plane deployment regeneration" in workspace_layout
+    assert "`aoa-sdk` owns:" in portability
+    assert "It does not own:" in portability
+    assert "8Dionysus/.codex/config.toml" in portability
+    assert "8Dionysus/.codex/hooks.json" in portability
+    assert "Do not patch SDK code or MCP server names" in portability
+
+
 def test_blueprint_is_marked_as_direction_surface() -> None:
     blueprint = read_text("docs/blueprint.md")
 
