@@ -42,6 +42,13 @@ def test_closeout_owner_followthrough_map_example_validates_against_schema() -> 
     )
 
 
+def test_closeout_continuity_window_example_validates_against_schema() -> None:
+    validate_example(
+        "schemas/closeout_continuity_window.schema.json",
+        "examples/closeout_continuity_window.example.json",
+    )
+
+
 def test_closeout_followthrough_decision_example_validates_against_schema() -> None:
     validate_example(
         "schemas/closeout_followthrough_decision.schema.json",
@@ -82,3 +89,14 @@ def test_closeout_followthrough_decision_example_stays_reviewed_only() -> None:
     assert isinstance(also_considered, list)
     assert decision["recommended_next_skill"] not in also_considered
     assert decision["approval_posture"] == "review_required"
+
+
+def test_closeout_continuity_window_example_stays_hint_only() -> None:
+    continuity = load_json("examples/closeout_continuity_window.example.json")
+
+    assert continuity["continuity_ref_hint"] == "continuity:aoa-playbooks:self-agency-continuity-cycle"
+    assert continuity["continuity_status_hint"] == "reanchor_needed"
+    assert continuity["reanchor_need"] is True
+    assert "continuity_ref" not in continuity
+    assert "revision_window_ref" not in continuity
+    assert "reanchor_ref" not in continuity

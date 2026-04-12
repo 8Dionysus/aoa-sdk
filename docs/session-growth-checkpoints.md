@@ -27,6 +27,11 @@ existing session-harvest family into an automatic runtime authority.
   wrong target, evidence refs, axis pressure, supersession metadata, and
   status posture, but it must not mint `candidate_ref`, `seed_ref`, or
   `object_ref`
+- reviewed closeout may also carry one separate self-agency continuity hint
+  surface rooted in
+  `continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref`; it
+  may name `reanchor_need` and `continuity_status_hint`, but it must not claim
+  reviewed continuity truth or runtime self-agency authority
 - checkpoint notes keep provisional multi-axis movement for `boundary_integrity`, `execution_reliability`, `change_legibility`, `review_sharpness`, `proof_discipline`, `provenance_hygiene`, and `deep_readiness`
 - candidate movement and stats refresh stay reviewed-closeout decisions, not
   mid-session auto-promotion; after reviewed closeout, surviving candidates
@@ -120,6 +125,9 @@ checkpoint hints from final candidates before treating the closeout as a
 session analysis.
 `docs/CANDIDATE_LINEAGE_CARRY.md` is the canonical note for what the SDK may
 and may not carry on that lineage seam.
+`docs/SELF_AGENCY_CONTINUITY_CARRY.md` is the companion note for the narrower
+self-agency continuity hint seam that may survive reviewed closeout without
+becoming self-agent truth.
 When the active runtime session also carries a live Codex rollout path,
 closeout now binds that rollout trace into the context and rereads it beside
 the reviewed artifact so one narrow checkpoint ledger does not stand in for the
