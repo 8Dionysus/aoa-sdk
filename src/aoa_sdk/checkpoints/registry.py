@@ -114,6 +114,29 @@ CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT: dict[str, object] = {
     "reviewed_artifact": "primary_closeout_evidence",
     "agent_skill_application": "required_for_final_session_analysis",
 }
+FollowthroughSkillName = Literal[
+    "aoa-session-route-forks",
+    "aoa-session-self-diagnose",
+    "aoa-session-self-repair",
+    "aoa-session-progression-lift",
+    "aoa-automation-opportunity-scan",
+    "aoa-quest-harvest",
+]
+FollowthroughReasonCode = Literal[
+    "multiple_plausible_next_moves",
+    "repeated_friction",
+    "blocked_automation_readiness",
+    "reviewed_diagnosis_present",
+    "smallest_repair_clear",
+    "explicit_axis_movement",
+    "no_repair_needed",
+    "repeated_manual_route",
+    "stable_output_shape",
+    "checkpoint_sensitive",
+    "reviewed_quest_unit",
+    "promotion_pressure",
+]
+ApprovalPosture = Literal["not_required", "review_required", "approval_required"]
 FOLLOWTHROUGH_DECISION_BY_STATUS: dict[
     Literal["early", "reanchor", "thin-evidence", "stable"],
     Literal["land_direct", "reanchor_owner", "prove_first"],
@@ -123,7 +146,7 @@ FOLLOWTHROUGH_DECISION_BY_STATUS: dict[
     "thin-evidence": "prove_first",
     "stable": "land_direct",
 }
-KERNEL_SIGNAL_SKILLS = (
+KERNEL_SIGNAL_SKILLS: tuple[FollowthroughSkillName, ...] = (
     "aoa-session-route-forks",
     "aoa-session-self-diagnose",
     "aoa-session-self-repair",
@@ -250,16 +273,9 @@ def _closeout_followthrough_alternatives(
     *,
     clusters: list[SessionCheckpointCluster],
     has_progression_signal: bool,
-    recommended_next_skill: Literal[
-        "aoa-session-route-forks",
-        "aoa-session-self-diagnose",
-        "aoa-session-self-repair",
-        "aoa-session-progression-lift",
-        "aoa-automation-opportunity-scan",
-        "aoa-quest-harvest",
-    ],
-) -> list[str]:
-    candidates: list[str] = []
+    recommended_next_skill: FollowthroughSkillName,
+) -> list[FollowthroughSkillName]:
+    candidates: list[FollowthroughSkillName] = []
     if len(clusters) > 1 or len({cluster.owner_hint for cluster in clusters}) > 1:
         candidates.append("aoa-session-route-forks")
     if any(_has_blocked_signal(cluster) for cluster in clusters):
@@ -272,24 +288,19 @@ def _closeout_followthrough_alternatives(
         candidates.append("aoa-automation-opportunity-scan")
     if any(_has_upgrade_pressure(cluster) for cluster in clusters):
         candidates.append("aoa-quest-harvest")
-    alternatives = [
-        skill
-        for skill in _dedupe_strings(candidates)
-        if skill != recommended_next_skill and skill in KERNEL_SIGNAL_SKILLS
-    ]
+    alternatives: list[FollowthroughSkillName] = []
+    seen: set[FollowthroughSkillName] = set()
+    for skill in candidates:
+        if skill == recommended_next_skill or skill in seen:
+            continue
+        alternatives.append(skill)
+        seen.add(skill)
     return alternatives[:2]
 
 
 def _approval_posture_for_next_skill(
-    skill_name: Literal[
-        "aoa-session-route-forks",
-        "aoa-session-self-diagnose",
-        "aoa-session-self-repair",
-        "aoa-session-progression-lift",
-        "aoa-automation-opportunity-scan",
-        "aoa-quest-harvest",
-    ],
-) -> Literal["not_required", "review_required", "approval_required"]:
+    skill_name: FollowthroughSkillName,
+) -> ApprovalPosture:
     if skill_name == "aoa-session-self-repair":
         return "approval_required"
     if skill_name in {"aoa-session-route-forks", "aoa-automation-opportunity-scan", "aoa-quest-harvest"}:
@@ -308,6 +319,9 @@ def _build_closeout_followthrough_decision(
     if not lineage_clusters:
         return None
 
+    selected_cluster: SessionCheckpointCluster
+    recommended_next_skill: FollowthroughSkillName
+    reason_codes: list[FollowthroughReasonCode]
     primary_cluster = _primary_lineage_cluster(lineage_clusters)
     route_cluster = next((cluster for cluster in lineage_clusters if _is_route_cluster(cluster)), None)
     repair_cluster = next((cluster for cluster in lineage_clusters if _is_repair_cluster(cluster)), None)

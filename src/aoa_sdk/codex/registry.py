@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from datetime import UTC, datetime
 from pathlib import Path
-from typing import Any
+from typing import Any, Literal, cast
 
 from ..errors import RecordNotFound, SurfaceNotFound
 from ..loaders.json_file import load_json
@@ -14,6 +14,23 @@ ROLLOUT_DIR_RELATIVE_PATH = ".codex/generated/rollout"
 TRUST_STATE_FILENAME = "codex_plane_trust_state.current.json"
 REGENERATION_REPORT_FILENAME = "codex_plane_regeneration_report.latest.json"
 ROLLOUT_RECEIPT_FILENAME = "codex_plane_rollout_receipt.latest.json"
+TrustPosture = Literal[
+    "unknown",
+    "root_mismatch",
+    "config_inactive",
+    "trusted_ready",
+    "rollout_active",
+    "rollback_recommended",
+]
+RolloutState = Literal[
+    "render_only",
+    "dry_run_ready",
+    "applied",
+    "verified",
+    "drifted",
+    "rollback_recommended",
+]
+NextAction = Literal["none", "run_doctor", "rerender", "rerollout", "rollback"]
 
 
 class CodexAPI:
@@ -27,8 +44,8 @@ class CodexAPI:
         regeneration = self._load_required(rollout_root / REGENERATION_REPORT_FILENAME)
         receipt = self._load_required(rollout_root / ROLLOUT_RECEIPT_FILENAME)
 
-        trust_posture = str(trust.get("trust_posture") or "unknown")
-        rollout_state = str(receipt.get("deployment_state") or "render_only")
+        trust_posture = _coerce_trust_posture(trust.get("trust_posture"))
+        rollout_state = _coerce_rollout_state(receipt.get("deployment_state"))
         stable_names_ok = trust.get("stable_names_ok") is True
         project_config_active = trust.get("project_config_active") is True
         hooks_active = trust.get("hooks_enabled") is True
@@ -82,13 +99,13 @@ class CodexAPI:
 
 def _next_action(
     *,
-    trust_posture: str,
-    rollout_state: str,
+    trust_posture: TrustPosture,
+    rollout_state: RolloutState,
     doctor_result: str,
     project_config_active: bool,
     hooks_active: bool,
     stable_names_ok: bool,
-) -> str:
+) -> NextAction:
     if (
         trust_posture == "rollback_recommended"
         or rollout_state == "rollback_recommended"
@@ -106,6 +123,32 @@ def _next_action(
     if rollout_state in {"render_only", "drifted"}:
         return "rerollout"
     return "none"
+
+
+def _coerce_trust_posture(value: object) -> TrustPosture:
+    if value in {
+        "unknown",
+        "root_mismatch",
+        "config_inactive",
+        "trusted_ready",
+        "rollout_active",
+        "rollback_recommended",
+    }:
+        return cast(TrustPosture, value)
+    return "unknown"
+
+
+def _coerce_rollout_state(value: object) -> RolloutState:
+    if value in {
+        "render_only",
+        "dry_run_ready",
+        "applied",
+        "verified",
+        "drifted",
+        "rollback_recommended",
+    }:
+        return cast(RolloutState, value)
+    return "render_only"
 
 
 def _latest_timestamp(*values: object) -> datetime:
