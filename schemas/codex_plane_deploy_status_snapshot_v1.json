@@ -1,0 +1,88 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/codex_plane_deploy_status_snapshot_v1.json",
+  "title": "aoa-sdk Codex Plane Deploy Status Snapshot",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "workspace_root",
+    "trust_posture",
+    "latest_trust_state_ref",
+    "latest_rollout_receipt_ref",
+    "project_config_active",
+    "hooks_active",
+    "active_mcp_servers",
+    "rollout_state",
+    "drift_detected",
+    "next_action",
+    "observed_at"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_codex_plane_deploy_status_snapshot_v1"
+    },
+    "workspace_root": {
+      "type": "string",
+      "minLength": 1
+    },
+    "trust_posture": {
+      "enum": [
+        "unknown",
+        "root_mismatch",
+        "config_inactive",
+        "trusted_ready",
+        "rollout_active",
+        "rollback_recommended"
+      ]
+    },
+    "latest_trust_state_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "latest_rollout_receipt_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "project_config_active": {
+      "type": "boolean"
+    },
+    "hooks_active": {
+      "type": "boolean"
+    },
+    "active_mcp_servers": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "rollout_state": {
+      "enum": [
+        "render_only",
+        "dry_run_ready",
+        "applied",
+        "verified",
+        "drifted",
+        "rollback_recommended"
+      ]
+    },
+    "drift_detected": {
+      "type": "boolean"
+    },
+    "next_action": {
+      "enum": [
+        "none",
+        "run_doctor",
+        "rerender",
+        "rerollout",
+        "rollback"
+      ]
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    }
+  }
+}

@@ -32,6 +32,11 @@ The followthrough map may carry:
 - `requested_next_decision_class`
 - `evidence_refs`
 
+That map answers "where should the next tracked owner move land?".
+The sibling `followthrough_decision` answers "which next kernel skill best
+matches the reviewed route?".
+Keep those questions separate.
+
 ## Forbidden Carry
 
 The followthrough map must not carry `candidate_ref`, `seed_ref`, or

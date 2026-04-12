@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/closeout_followthrough_decision.schema.json",
+  "title": "Closeout Followthrough Decision",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "session_ref",
+    "reviewed_closeout_context_ref",
+    "cluster_ref",
+    "recommended_next_skill",
+    "also_considered",
+    "reason_codes",
+    "checkpoint_required",
+    "approval_posture",
+    "defer_allowed",
+    "owner_hypothesis",
+    "status_posture"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_closeout_followthrough_decision_v1"
+    },
+    "session_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "reviewed_closeout_context_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "cluster_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "candidate_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "recommended_next_skill": {
+      "enum": [
+        "aoa-session-route-forks",
+        "aoa-session-self-diagnose",
+        "aoa-session-self-repair",
+        "aoa-session-progression-lift",
+        "aoa-automation-opportunity-scan",
+        "aoa-quest-harvest"
+      ]
+    },
+    "also_considered": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "aoa-session-route-forks",
+          "aoa-session-self-diagnose",
+          "aoa-session-self-repair",
+          "aoa-session-progression-lift",
+          "aoa-automation-opportunity-scan",
+          "aoa-quest-harvest"
+        ]
+      }
+    },
+    "reason_codes": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "enum": [
+          "multiple_plausible_next_moves",
+          "repeated_friction",
+          "blocked_automation_readiness",
+          "reviewed_diagnosis_present",
+          "smallest_repair_clear",
+          "explicit_axis_movement",
+          "no_repair_needed",
+          "repeated_manual_route",
+          "stable_output_shape",
+          "checkpoint_sensitive",
+          "reviewed_quest_unit",
+          "promotion_pressure"
+        ]
+      }
+    },
+    "checkpoint_required": {
+      "type": "boolean"
+    },
+    "approval_posture": {
+      "enum": [
+        "not_required",
+        "review_required",
+        "approval_required"
+      ]
+    },
+    "defer_allowed": {
+      "type": "boolean"
+    },
+    "owner_hypothesis": {
+      "type": "string",
+      "minLength": 1
+    },
+    "nearest_wrong_target": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "status_posture": {
+      "enum": [
+        "early",
+        "reanchor",
+        "thin-evidence",
+        "stable"
+      ]
+    }
+  }
+}

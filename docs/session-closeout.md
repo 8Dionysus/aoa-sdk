@@ -45,7 +45,7 @@ reviewed session into:
 - `aoa closeout run` does not auto-run `aoa-checkpoint-closeout-bridge`.
 - `aoa surfaces handoff` is reviewed-only and remains separate from this closeout runner.
 - `closeout-context.json` may carry `candidate_lineage_map` and
-  `owner_followthrough_map`, but both stay reviewed-only advisory surfaces
+  `owner_followthrough_map`, plus one `followthrough_decision`, but all three stay reviewed-only advisory surfaces
   rather than owner truth.
 
 ## Manifest shape

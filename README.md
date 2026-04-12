@@ -20,6 +20,7 @@ Use the shortest route by need:
 - release, support, and CI posture: `docs/RELEASE_CI_POSTURE.md`
 - reviewed session closeout orchestration: `docs/session-closeout.md`
 - reviewed closeout followthrough map toward owner-status surfaces: `docs/closeout-followthrough-map.md`, `schemas/closeout_owner_followthrough_map.schema.json`, and `examples/closeout_owner_followthrough_map.example.json`
+- reviewed next-kernel decision after closeout reread: `docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md`, `schemas/closeout_followthrough_decision.schema.json`, and `examples/closeout_followthrough_decision.example.json`
 - additive surface detection and reviewed owner-layer handoff: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-second-wave.md`, `docs/aoa-surface-detection-heuristics.md`, and `docs/aoa-surface-detection-closeout-handoff.md`
 - checkpoint-aware session-growth note capture and promotion: `docs/session-growth-checkpoints.md` and `docs/checkpoint-note-promotion.md`
 - antifragility control-plane and closeout contracts: `docs/antifragility-control-plane.md`, `docs/antifragility-closeout-seam.md`, `tests/fixtures/antifragility/stress_dispatch_input.example.json`, `tests/fixtures/antifragility/stress_dispatch_result.example.json`, and `tests/fixtures/antifragility/stress_closeout_manifest.example.json`
@@ -34,6 +35,8 @@ Use the shortest route by need:
 - machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
 - project-level Codex workspace orientation via MCP: `docs/codex-workspace-mcp.md`, `src/aoa_sdk/codex/workspace_mcp.py`, and `scripts/aoa_workspace_mcp_server.py`
 - portable sibling-workspace bootstrap for non-`/srv` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`
+- Codex-plane portability boundary when the live root changes: `docs/CODEX_PLANE_PORTABILITY.md` and `8Dionysus/docs/CODEX_PLANE_REGENERATION.md`
+- live Codex-plane rollout status at the current workspace root: `docs/CODEX_PLANE_DEPLOY_STATUS.md`, `schemas/codex_plane_deploy_status_snapshot_v1.json`, `examples/codex_plane_deploy_status_snapshot.example.json`, and `src/aoa_sdk/codex/registry.py`
 - source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
 - compatibility rules and local checks: `docs/versioning.md`, `scripts/sibling_canary_matrix.json`, `scripts/run_sibling_canary.py`, `.github/workflows/latest-sibling-canary.yml`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
 - public support, release scope, and CI tiers: `docs/RELEASE_CI_POSTURE.md`
@@ -42,6 +45,7 @@ Use the shortest route by need:
 - local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - reviewed closeout followthrough hints that stay advisory: `docs/closeout-followthrough-map.md`, `examples/closeout_owner_followthrough_map.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
+- deterministic next-kernel hints after reviewed closeout: `docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md`, `examples/closeout_followthrough_decision.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
 - additive owner-layer surface detection without changing `aoa skills ...` meaning: `docs/aoa-surface-detection-first-wave.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
 - checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, `aoa checkpoint mark/append/after-commit/review-note/status/promote`, `aoa checkpoint install-hook`, `aoa checkpoint hook-status`, the auto checkpoint bridge on `aoa skills guard`, and the explicit `aoa skills enter --checkpoint-kind` / `--append-note` overrides
 - explicit checkpoint-to-closeout bridge orchestration: `docs/session-growth-checkpoints.md`, `docs/session-closeout.md`, `aoa checkpoint build-closeout-context`, and `aoa checkpoint execute-closeout-chain`
@@ -177,6 +181,7 @@ closeout_context = sdk.checkpoints.build_closeout_context(
     repo_root="/srv/aoa-sdk",
     reviewed_artifact_path="/srv/path/to/reviewed_session_artifact.md",
 )
+next_kernel_decision = closeout_context.followthrough_decision
 closeout_execution = sdk.checkpoints.execute_closeout_chain(
     repo_root="/srv/aoa-sdk",
     reviewed_artifact_path="/srv/path/to/reviewed_session_artifact.md",
@@ -192,6 +197,7 @@ memory = sdk.memo.recall(mode="semantic", query="charter")
 eval_bundle = sdk.evals.inspect("aoa-bounded-change-quality")
 automation = sdk.stats.automation_pipelines("pipeline:session-growth")
 surface_stats = sdk.stats.surface_detection(window_date="2026-04-05")
+deploy_status = sdk.codex.deploy_status()
 kag = sdk.kag.inspect("AOA-K-0011")
 rpg_build = sdk.rpg.latest_build("AOA-A-0002")
 compatibility = sdk.compatibility.check_all()

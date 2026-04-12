@@ -1445,6 +1445,18 @@ def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: P
         "thin-evidence": "prove_first",
         "stable": "land_direct",
     }[route_lineage.status_posture]
+    assert context.followthrough_decision is not None
+    assert context.followthrough_decision.reviewed_closeout_context_ref == str((note_dir / "closeout-context.json").resolve())
+    assert context.followthrough_decision.cluster_ref == route_lineage.cluster_ref
+    assert context.followthrough_decision.recommended_next_skill == "aoa-automation-opportunity-scan"
+    assert context.followthrough_decision.owner_hypothesis == "aoa-playbooks"
+    assert context.followthrough_decision.nearest_wrong_target == route_lineage.nearest_wrong_target
+    assert context.followthrough_decision.status_posture == route_lineage.status_posture
+    assert context.followthrough_decision.checkpoint_required is True
+    assert context.followthrough_decision.approval_posture == "review_required"
+    assert "aoa-session-route-forks" in context.followthrough_decision.also_considered
+    assert "aoa-session-self-diagnose" in context.followthrough_decision.also_considered
+    assert context.followthrough_decision.recommended_next_skill not in context.followthrough_decision.also_considered
     assert [target.skill_name for target in context.ordered_skill_plan] == [
         "aoa-session-donor-harvest",
         "aoa-session-progression-lift",

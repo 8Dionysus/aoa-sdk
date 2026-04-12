@@ -122,6 +122,7 @@ def test_session_closeout_explicitly_keeps_surface_handoff_separate() -> None:
     assert "docs/aoa-surface-detection-closeout-handoff.md" in closeout
     assert "docs/aoa-surface-detection-second-wave.md" in closeout
     assert "`owner_followthrough_map`" in closeout
+    assert "`followthrough_decision`" in closeout
     assert "without minting `candidate_ref`, `seed_ref`, or `object_ref`" in closeout
 
 
@@ -154,12 +155,47 @@ def test_readme_routes_to_closeout_followthrough_map() -> None:
     readme = read_text("README.md")
     carry = read_text("docs/CANDIDATE_LINEAGE_CARRY.md")
     followthrough = read_text("docs/closeout-followthrough-map.md")
+    kernel_rules = read_text("docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md")
 
     assert "docs/closeout-followthrough-map.md" in readme
     assert "schemas/closeout_owner_followthrough_map.schema.json" in readme
     assert "examples/closeout_owner_followthrough_map.example.json" in readme
+    assert "docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md" in readme
+    assert "schemas/closeout_followthrough_decision.schema.json" in readme
+    assert "examples/closeout_followthrough_decision.example.json" in readme
     assert "owner_followthrough_map" in carry
     assert "must not carry `candidate_ref`" in followthrough
+    assert "It does not execute that class" in kernel_rules
+
+
+def test_codex_plane_portability_boundary_stays_routeable() -> None:
+    readme = read_text("README.md")
+    workspace_layout = read_text("docs/workspace-layout.md")
+    portability = read_text("docs/CODEX_PLANE_PORTABILITY.md")
+
+    assert "docs/CODEX_PLANE_PORTABILITY.md" in readme
+    assert "8Dionysus/docs/CODEX_PLANE_REGENERATION.md" in readme
+    assert "Workspace discovery overrides in `aoa-sdk` are not a substitute for" in workspace_layout
+    assert "Codex-plane deployment regeneration" in workspace_layout
+    assert "`aoa-sdk` owns:" in portability
+    assert "It does not own:" in portability
+    assert "8Dionysus/.codex/config.toml" in portability
+    assert "8Dionysus/.codex/hooks.json" in portability
+    assert "Do not patch SDK code or MCP server names" in portability
+
+
+def test_codex_plane_deploy_status_routes_from_readme() -> None:
+    readme = read_text("README.md")
+    status_doc = read_text("docs/CODEX_PLANE_DEPLOY_STATUS.md")
+
+    assert "docs/CODEX_PLANE_DEPLOY_STATUS.md" in readme
+    assert "schemas/codex_plane_deploy_status_snapshot_v1.json" in readme
+    assert "examples/codex_plane_deploy_status_snapshot.example.json" in readme
+    assert "src/aoa_sdk/codex/registry.py" in readme
+    assert "typed live read over deploy-local Codex-plane rollout" in status_doc
+    assert "It does not own rollout authority." in status_doc
+    assert "`/.codex/generated/rollout/codex_plane_trust_state.current.json`" in status_doc
+    assert "`rerollout`" in status_doc
 
 
 def test_blueprint_is_marked_as_direction_surface() -> None:

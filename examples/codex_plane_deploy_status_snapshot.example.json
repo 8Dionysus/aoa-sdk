@@ -1,0 +1,18 @@
+{
+  "schema_version": "aoa_sdk_codex_plane_deploy_status_snapshot_v1",
+  "workspace_root": "/srv",
+  "trust_posture": "trusted_ready",
+  "latest_trust_state_ref": "cptrust-2026-04-11T210400Z-root-srv",
+  "latest_rollout_receipt_ref": "cprollout-2026-04-11T210700Z-root-srv",
+  "project_config_active": true,
+  "hooks_active": true,
+  "active_mcp_servers": [
+    "aoa_workspace",
+    "aoa_stats",
+    "dionysus"
+  ],
+  "rollout_state": "verified",
+  "drift_detected": false,
+  "next_action": "none",
+  "observed_at": "2026-04-11T21:07:00Z"
+}
