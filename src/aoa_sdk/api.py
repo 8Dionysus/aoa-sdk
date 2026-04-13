@@ -2,6 +2,7 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from .a2a import A2AAPI
 from .compatibility import CompatibilityAPI
 from .closeout import CloseoutAPI
 from .checkpoints import CheckpointsAPI
@@ -25,6 +26,7 @@ from .workspace.discovery import Workspace
 class AoASDK:
     def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
+        self.a2a = A2AAPI(workspace)
         self.compatibility = CompatibilityAPI(workspace)
         self.checkpoints = CheckpointsAPI(workspace)
         self.codex = CodexAPI(workspace)

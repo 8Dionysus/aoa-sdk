@@ -2,6 +2,11 @@
 
 This note records the current control-plane helper slice for A2A-related work in `aoa-sdk`.
 
+The sibling-owned summon contract stays in `aoa-skills` under
+`skills/aoa-summon/references/*.schema.json`.
+`aoa-sdk` may consume that contract through `sdk.a2a`; it must not redefine the
+skill law.
+
 ## What this slice may build
 
 - Codex-local child targets
