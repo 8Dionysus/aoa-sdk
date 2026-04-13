@@ -230,9 +230,17 @@ def test_codex_plane_deploy_status_routes_from_readme() -> None:
     assert "Unacceptable seam:" in boundary_doc
 
 
-def test_blueprint_is_marked_as_direction_surface() -> None:
+def test_readme_routes_current_direction_through_roadmap() -> None:
+    readme = read_text("README.md")
+    agents = read_text("AGENTS.md")
+    roadmap = read_text("ROADMAP.md")
     blueprint = read_text("docs/blueprint.md")
 
-    assert "original seed blueprint and direction surface" in blueprint
-    assert "not the current-state source of truth" in blueprint
+    assert "ROADMAP.md" in readme
+    assert "ROADMAP.md" in agents
+    assert "control-plane contract hardening" in roadmap
+    assert "docs/blueprint.md" in readme
+    assert "original seed blueprint and historical design context" in readme
+    assert "original seed blueprint and historical design note" in blueprint
+    assert "It is not the current-direction surface" in blueprint
     assert "Treat any module, command, or layout entry that is not present in the current tree as planned or aspirational rather than landed." in blueprint

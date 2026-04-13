@@ -53,8 +53,9 @@ Before making changes, read in this order:
 2. `docs/boundaries.md`
 3. `docs/workspace-layout.md`
 4. `docs/versioning.md`
-5. `.aoa/workspace.toml`
-6. the source files and tests you plan to touch
+5. `ROADMAP.md`
+6. `.aoa/workspace.toml`
+7. the source files and tests you plan to touch
 
 Then branch by task:
 
@@ -96,6 +97,7 @@ The most important objects in this repository are:
 - workspace discovery and topology code under `src/aoa_sdk/workspace/`
 - typed surface facades under `src/aoa_sdk/`
 - `.aoa/workspace.toml`
+- `ROADMAP.md`
 - `generated/workspace_control_plane.min.json`
 - topology, boundary, and versioning docs under `docs/`
 - additive surface-detection docs and heuristics under `docs/aoa-surface-detection-*.md` and `src/aoa_sdk/surfaces/`

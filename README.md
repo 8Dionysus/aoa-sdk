@@ -16,6 +16,7 @@ Use the shortest route by need:
 - compact control-plane capsule: `generated/workspace_control_plane.min.json`
 - workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
 - compatibility posture: `docs/versioning.md`
+- current direction and hardening lanes: `ROADMAP.md`
 - release protocol and bounded publication path: `docs/RELEASING.md`
 - release, support, and CI posture: `docs/RELEASE_CI_POSTURE.md`
 - reviewed session closeout orchestration: `docs/session-closeout.md`
@@ -28,12 +29,13 @@ Use the shortest route by need:
 - antifragility control-plane and closeout contracts: `docs/antifragility-control-plane.md`, `docs/antifragility-closeout-seam.md`, `tests/fixtures/antifragility/stress_dispatch_input.example.json`, `tests/fixtures/antifragility/stress_dispatch_result.example.json`, and `tests/fixtures/antifragility/stress_closeout_manifest.example.json`
 - RPG typed consumer slice: `docs/RPG_SDK_ADDENDUM.md`, `docs/RPG_SURFACE_PATHS.md`, and `src/aoa_sdk/rpg/`
 - federation effects and obligations: `docs/ecosystem-impact.md`
-- seed blueprint and direction surface: `docs/blueprint.md`
+- original seed blueprint and historical design context: `docs/blueprint.md`
 - local agent instructions: `AGENTS.md`
 
 ## Route by need
 
 - compact control-plane capsule for low-context routing: `generated/workspace_control_plane.min.json`
+- current direction and control-plane hardening: `ROADMAP.md`
 - machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
 - project-level Codex workspace orientation via MCP: `docs/codex-workspace-mcp.md`, `src/aoa_sdk/codex/workspace_mcp.py`, and `scripts/aoa_workspace_mcp_server.py`
 - portable sibling-workspace bootstrap for non-`/srv` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`

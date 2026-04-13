@@ -1,10 +1,13 @@
 # aoa-sdk blueprint
 
-This document is the original seed blueprint and direction surface for `aoa-sdk`.
-It is not the current-state source of truth for every module, CLI slice, or helper named below.
+This document is the original seed blueprint and historical design note for
+`aoa-sdk`.
+It is not the current-direction surface, and it is not the current-state source
+of truth for every module, CLI slice, or helper named below.
 
 Current repo truth lives first in:
 
+- `ROADMAP.md`
 - `README.md`
 - `docs/boundaries.md`
 - `docs/workspace-layout.md`
