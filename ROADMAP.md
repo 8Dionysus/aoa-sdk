@@ -26,6 +26,40 @@ The current landed surface already includes:
 - typed Codex-plane deploy-status reads plus bounded release audit and publish
   helpers
 
+### Current release contour
+
+The live direction for `v0.2.1` is control-plane hardening. Its current
+release contour is:
+
+- workspace topology and the compact control-plane capsule:
+  `.aoa/workspace.toml`, `docs/workspace-layout.md`, and
+  `generated/workspace_control_plane.min.json`
+- Codex-plane deploy-state and rollout reference boundaries:
+  `docs/CODEX_PLANE_DEPLOY_STATUS.md`,
+  `docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`,
+  `docs/codex_rollout_campaign_refs.md`,
+  `schemas/codex_plane_deploy_status_snapshot_v1.json`,
+  `examples/codex_plane_deploy_status_snapshot.example.json`, and
+  `src/aoa_sdk/codex/registry.py`
+- reviewed closeout followthrough, component-refresh carry, continuity carry,
+  and next-kernel hints:
+  `docs/closeout-followthrough-map.md`, `docs/COMPONENT_DRIFT_HINTS.md`,
+  `docs/SELF_AGENCY_CONTINUITY_CARRY.md`,
+  `docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md`,
+  `schemas/closeout_owner_followthrough_map.schema.json`,
+  `schemas/closeout_continuity_window.schema.json`, and
+  `schemas/closeout_followthrough_decision.schema.json`
+- checkpoint, surface-detection, and reviewed handoff guidance:
+  `docs/session-growth-checkpoints.md`,
+  `docs/checkpoint-note-promotion.md`, `docs/session-closeout.md`, and
+  `docs/aoa-surface-detection-closeout-handoff.md`
+- bounded release and CI posture: `docs/RELEASING.md` and
+  `docs/RELEASE_CI_POSTURE.md`
+
+Roadmap drift is an SDK-layer risk because downstream agents use this file to
+choose whether a change belongs on the control plane. It still must not turn
+`aoa-sdk` into a source-owning runtime layer.
+
 The next honest move is not to widen the SDK into a second owner layer.
 It is to keep the control plane small, explicit, testable, and source-
 subordinate while cross-repo growth becomes denser.
