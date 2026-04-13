@@ -1,0 +1,18 @@
+{
+  "agent_id": "reviewer",
+  "role": "reviewer",
+  "workspace_root": "/srv",
+  "workspace_marker": "/srv/AOA_WORKSPACE_ROOT",
+  "project_codex_root": "/srv/.codex",
+  "config_path": "/srv/.codex/agents/reviewer.toml",
+  "install_surface": "/srv/.codex/agents",
+  "sandbox_mode": "read-only",
+  "mcp_servers": ["aoa_workspace", "aoa_stats"],
+  "nickname_candidates": ["Sentinel", "Lens", "Check"],
+  "projection_chain": [
+    "aoa-agents/profiles/reviewer.profile.json",
+    "aoa-agents/config/codex_subagent_wiring.v2.json",
+    "aoa-agents/generated/codex_agents/agents/reviewer.toml",
+    "8Dionysus/.codex/agents/reviewer.toml"
+  ]
+}

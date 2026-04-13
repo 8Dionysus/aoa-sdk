@@ -1,0 +1,36 @@
+{
+  "schema_version": 1,
+  "request_kind": "a2a_wave5_closeout_request",
+  "closeout_id": "closeout-example-child",
+  "session_ref": "session:example",
+  "reviewed": true,
+  "reviewed_artifact_path": "/srv/notes/reviewed_session_artifact.md",
+  "trigger": "reviewed-closeout",
+  "audit_refs": [
+    "/srv/notes/reviewed_session_artifact.md",
+    "/srv/notes/route_summary.md"
+  ],
+  "batches": [
+    {
+      "publisher": "abyss-stack.runtime-wave-closeouts",
+      "input_paths": ["/srv/receipts/runtime_wave_closeout_receipt.json"]
+    }
+  ],
+  "a2a_child": {
+    "execution_surface": "codex_local",
+    "child_task_id": "task-child-1",
+    "selected_agent_id": "reviewer"
+  },
+  "return_plan": {
+    "decision": "return",
+    "anchor_artifact": "bounded_plan",
+    "reentry_mode": "checkpoint_relaunch"
+  },
+  "checkpoint_bridge_plan": {
+    "execution_order": [
+      "aoa-session-donor-harvest",
+      "aoa-session-progression-lift",
+      "aoa-quest-harvest"
+    ]
+  }
+}

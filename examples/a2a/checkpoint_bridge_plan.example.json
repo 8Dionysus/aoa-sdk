@@ -1,0 +1,17 @@
+{
+  "mode": "reviewed-closeout-execute",
+  "session_ref": "session:example",
+  "reviewed_artifact_path": "/srv/notes/reviewed_session_artifact.md",
+  "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/example/checkpoint-note.json",
+  "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/example-trace.json",
+  "surviving_checkpoint_clusters": ["cluster:return-anchor", "cluster:progression"],
+  "execution_order": [
+    "aoa-session-donor-harvest",
+    "aoa-session-progression-lift",
+    "aoa-quest-harvest"
+  ],
+  "authority_contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
+  "mechanical_bridge_only": true,
+  "agent_skill_application_required": true,
+  "return_anchor_artifact": "bounded_plan"
+}
