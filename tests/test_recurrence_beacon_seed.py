@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 
 from aoa_sdk.recurrence.api import RecurrenceAPI
-from aoa_sdk.recurrence.models import ObservationRecord, RecurrenceComponent
+from aoa_sdk.recurrence.models import RecurrenceComponent
 from aoa_sdk.workspace.discovery import Workspace
 
 
