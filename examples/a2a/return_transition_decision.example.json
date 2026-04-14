@@ -1,9 +1,9 @@
 {
   "artifact_kind": "transition_decision",
   "decision": "return",
-  "next_hop": "aoa-routing/generated/return_navigation_hints.min.json",
+  "next_hop": "aoa-checkpoint-closeout-bridge",
   "anchor_artifact": "bounded_plan",
-  "reentry_note": "Remote child ended in failed state. Re-enter through checkpoint relaunch with reviewed artifact primary.",
+  "reentry_note": "Remote child ended in failed state. Re-enter through checkpoint relaunch with reviewed artifact primary and checkpoint hints provisional.",
   "reason_codes": ["remote_terminal_failure", "stress:reground_first"],
   "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/example/checkpoint-note.json",
   "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/example-trace.json"

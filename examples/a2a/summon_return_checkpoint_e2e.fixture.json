@@ -1,0 +1,1060 @@
+{
+  "fixture_id": "wave5-a2a-summon-return-checkpoint-e2e",
+  "schema_version": 1,
+  "fixture_kind": "a2a_summon_return_checkpoint_e2e",
+  "dry_run": true,
+  "live_automation": false,
+  "playbook_id": "AOA-P-0031",
+  "eval_anchor": "aoa-a2a-summon-return-checkpoint",
+  "owner_refs": {
+    "summon_contract": "repo:aoa-skills/skills/aoa-summon/SKILL.md",
+    "sdk_helper": "repo:aoa-sdk/docs/A2A_WAVE5_CODEX_RETURN_CHECKPOINT.md",
+    "playbook": "repo:aoa-playbooks/playbooks/a2a-summon-return-checkpoint/PLAYBOOK.md",
+    "eval_hook": "repo:aoa-evals/examples/artifact_to_verdict_hook.a2a-summon-return-checkpoint.example.json",
+    "memo_writeback": "repo:aoa-memo/docs/A2A_CHILD_RETURN_WRITEBACK.md",
+    "runtime_dry_run": "repo:abyss-stack/docs/A2A_RETURN_DRY_RUN.md",
+    "routing_reentry": "repo:aoa-routing/generated/return_navigation_hints.min.json"
+  },
+  "summon_request": {
+    "quest_passport": {
+      "difficulty": "d2_slice",
+      "risk": "r2_contract",
+      "control_mode": "codex_supervised",
+      "delegate_tier": "executor",
+      "fallback_tier": null,
+      "wrapper_class": null,
+      "route_anchor": "AOA-P-0031:a2a-summon-return-checkpoint",
+      "expected_artifacts": [
+        "verification_result",
+        "bounded_plan"
+      ],
+      "self_agent": false
+    },
+    "summon_request": {
+      "desired_role": "reviewer",
+      "child_agent_id": null,
+      "skill_refs": [
+        "aoa-summon",
+        "aoa-checkpoint-closeout-bridge"
+      ],
+      "expected_outputs": [
+        "verification_result",
+        "bounded_plan"
+      ],
+      "parent_task_id": "parent:wave5-a2a-return-checkpoint",
+      "session_ref": "session:wave5-a2a-return-checkpoint-e2e",
+      "reviewed_artifact_path": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+      "audit_refs": [
+        "repo:aoa-playbooks/playbooks/a2a-summon-return-checkpoint/PLAYBOOK.md",
+        "repo:aoa-evals/examples/artifact_to_verdict_hook.a2a-summon-return-checkpoint.example.json"
+      ],
+      "playbook_ref": "AOA-P-0031",
+      "review_required": true,
+      "transport_preference": "codex_local",
+      "require_progression": false,
+      "workspace_root": "/srv"
+    },
+    "expected_outputs": [
+      "verification_result",
+      "bounded_plan"
+    ],
+    "progression_overlay_ref": null,
+    "self_agent_checkpoint_ref": null,
+    "stress_bundle_ref": null,
+    "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
+    "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json",
+    "reviewed_artifact_path": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+    "audit_refs": [
+      "repo:aoa-playbooks/playbooks/a2a-summon-return-checkpoint/PLAYBOOK.md",
+      "repo:aoa-evals/examples/artifact_to_verdict_hook.a2a-summon-return-checkpoint.example.json"
+    ]
+  },
+  "summon_result": {
+    "allowed": true,
+    "lane": "codex_local_reviewed",
+    "execution_surface": "codex_local",
+    "cohort_pattern": "checkpoint_cohort",
+    "require_split": false,
+    "closeout_required": true,
+    "checkpoint_required": false,
+    "progression_required": false,
+    "codex_projection_required": true,
+    "requested_posture": null,
+    "reason_codes": [
+      "review_lane_only"
+    ],
+    "blocked_actions": [],
+    "expected_outputs": [
+      "verification_result",
+      "bounded_plan"
+    ],
+    "codex_local_target": {
+      "agent_id": "reviewer",
+      "role": "reviewer",
+      "workspace_root": "/srv",
+      "workspace_marker": "/srv/AOA_WORKSPACE_ROOT",
+      "project_codex_root": "/srv/.codex",
+      "config_path": "/srv/.codex/agents/reviewer.toml",
+      "install_surface": "/srv/.codex/agents",
+      "sandbox_mode": "read-only",
+      "mcp_servers": [
+        "aoa_workspace",
+        "aoa_stats"
+      ],
+      "nickname_candidates": [
+        "Sentinel",
+        "Lens",
+        "Check"
+      ],
+      "projection_chain": [
+        "aoa-agents/profiles/reviewer.profile.json",
+        "aoa-agents/config/codex_subagent_wiring.v2.json",
+        "aoa-agents/generated/codex_agents/projection_manifest.json",
+        "aoa-agents/generated/codex_agents/agents/reviewer.toml",
+        "8Dionysus/.codex/agents/reviewer.toml"
+      ]
+    },
+    "return_plan": {
+      "decision": "return",
+      "anchor_artifact": "bounded_plan",
+      "reentry_mode": "checkpoint_relaunch",
+      "next_hop": "aoa-checkpoint-closeout-bridge",
+      "reentry_note": "Remote child lost shape or ended in terminal state. Re-enter through checkpoint relaunch with the reviewed artifact primary and checkpoint hints provisional.",
+      "reason_codes": [
+        "remote_terminal_failure"
+      ],
+      "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
+      "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json",
+      "navigation_target": "aoa-routing/generated/return_navigation_hints.min.json"
+    },
+    "checkpoint_bridge_plan": {
+      "mode": "reviewed-closeout-execute",
+      "session_ref": "session:wave5-a2a-return-checkpoint-e2e",
+      "reviewed_artifact_path": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+      "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
+      "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json",
+      "surviving_checkpoint_clusters": [
+        "cluster:return-anchor",
+        "cluster:child-result-review"
+      ],
+      "execution_order": [
+        "aoa-session-donor-harvest",
+        "aoa-session-progression-lift",
+        "aoa-quest-harvest"
+      ],
+      "authority_contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
+      "mechanical_bridge_only": true,
+      "agent_skill_application_required": true,
+      "return_anchor_artifact": "bounded_plan"
+    },
+    "memo_export_plan": {
+      "writeback_targets": [
+        {
+          "kind": "audit_event",
+          "review_status": "reviewed_candidate",
+          "summary": "Remote verification may be retained as a review-facing audit event.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "source_artifact": "verification_result"
+          }
+        },
+        {
+          "kind": "state_capsule",
+          "review_status": "reviewed_candidate",
+          "summary": "Remote child returned bounded working state that may become a state capsule after review.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "source_artifact": "bounded_plan"
+          }
+        },
+        {
+          "kind": "decision",
+          "review_status": "reviewed_candidate",
+          "summary": "Remote child returned a route or transition decision that may survive recall after review.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "source_artifact": "transition_decision"
+          }
+        },
+        {
+          "kind": "decision",
+          "review_status": "reviewed_candidate",
+          "summary": "The child route returned through a governed transition decision.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "decision": "return",
+            "anchor_artifact": "bounded_plan",
+            "reentry_mode": "checkpoint_relaunch"
+          }
+        },
+        {
+          "kind": "state_capsule",
+          "review_status": "reviewed_candidate",
+          "summary": "Checkpoint-shaped working state may survive as a state capsule after review.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json"
+          }
+        }
+      ],
+      "candidate_targets": [
+        {
+          "kind": "anchor",
+          "review_status": "reviewed_candidate",
+          "summary": "The return anchor may survive as a stable memo-side anchor after review.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "anchor_artifact": "bounded_plan"
+          }
+        }
+      ],
+      "adjunct_targets": [],
+      "contains_raw_trace": false
+    },
+    "owner_publication_plan": [
+      {
+        "publisher": "abyss-stack.runtime-wave-closeouts",
+        "reason": "publish canonical runtime closeout receipts under the runtime owner lane",
+        "receipt_kind": "runtime_wave_closeout_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/runtime_wave_closeout_receipt.json"
+        ],
+        "required": true
+      },
+      {
+        "publisher": "aoa-evals.eval-result",
+        "reason": "publish eval-backed proof receipts when present",
+        "receipt_kind": "eval_result_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/a2a_return_eval_packet.json"
+        ],
+        "required": false
+      },
+      {
+        "publisher": "aoa-playbooks.reviewed-run",
+        "reason": "publish reviewed playbook receipts when present",
+        "receipt_kind": "playbook_review_harvest_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/playbook_review_harvest_receipt.json"
+        ],
+        "required": false
+      },
+      {
+        "publisher": "aoa-memo.writeback",
+        "reason": "publish reviewed memo writeback receipts when present",
+        "receipt_kind": "memo_writeback_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/memo_writeback_receipt.json"
+        ],
+        "required": false
+      }
+    ]
+  },
+  "summon_decision": {
+    "allowed": true,
+    "lane": "codex_local_reviewed",
+    "execution_surface": "codex_local",
+    "cohort_pattern": "checkpoint_cohort",
+    "require_split": false,
+    "closeout_required": true,
+    "checkpoint_required": false,
+    "progression_required": false,
+    "codex_projection_required": true,
+    "requested_posture": null,
+    "reason_codes": [
+      "review_lane_only"
+    ],
+    "blocked_actions": [],
+    "expected_outputs": [
+      "verification_result",
+      "bounded_plan"
+    ]
+  },
+  "codex_local_target": {
+    "agent_id": "reviewer",
+    "role": "reviewer",
+    "workspace_root": "/srv",
+    "workspace_marker": "/srv/AOA_WORKSPACE_ROOT",
+    "project_codex_root": "/srv/.codex",
+    "config_path": "/srv/.codex/agents/reviewer.toml",
+    "install_surface": "/srv/.codex/agents",
+    "sandbox_mode": "read-only",
+    "mcp_servers": [
+      "aoa_workspace",
+      "aoa_stats"
+    ],
+    "nickname_candidates": [
+      "Sentinel",
+      "Lens",
+      "Check"
+    ],
+    "projection_chain": [
+      "aoa-agents/profiles/reviewer.profile.json",
+      "aoa-agents/config/codex_subagent_wiring.v2.json",
+      "aoa-agents/generated/codex_agents/projection_manifest.json",
+      "aoa-agents/generated/codex_agents/agents/reviewer.toml",
+      "8Dionysus/.codex/agents/reviewer.toml"
+    ]
+  },
+  "child_task_result": {
+    "reviewed": true,
+    "review_status": "reviewed",
+    "reviewed_artifact_path": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+    "remote_task": {
+      "task_id": "task-wave5-a2a-return-child",
+      "state": "failed",
+      "agent_id": "reviewer",
+      "endpoint": "codex://local/reviewer",
+      "returned_artifacts": [
+        "verification_result",
+        "bounded_plan",
+        "transition_decision"
+      ],
+      "context_id": "ctx-wave5-a2a-return-checkpoint",
+      "parent_task_id": "parent:wave5-a2a-return-checkpoint",
+      "artifact_refs": [
+        "/srv/artifacts/wave5-a2a/verification_result.json",
+        "/srv/artifacts/wave5-a2a/bounded_plan.md"
+      ],
+      "message_refs": []
+    }
+  },
+  "return_plan": {
+    "decision": "return",
+    "anchor_artifact": "bounded_plan",
+    "reentry_mode": "checkpoint_relaunch",
+    "next_hop": "aoa-checkpoint-closeout-bridge",
+    "reentry_note": "Remote child lost shape or ended in terminal state. Re-enter through checkpoint relaunch with the reviewed artifact primary and checkpoint hints provisional.",
+    "reason_codes": [
+      "remote_terminal_failure"
+    ],
+    "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
+    "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json",
+    "navigation_target": "aoa-routing/generated/return_navigation_hints.min.json"
+  },
+  "transition_decision": {
+    "artifact_kind": "transition_decision",
+    "decision": "return",
+    "next_hop": "aoa-checkpoint-closeout-bridge",
+    "anchor_artifact": "bounded_plan",
+    "reentry_note": "Remote child lost shape or ended in terminal state. Re-enter through checkpoint relaunch with the reviewed artifact primary and checkpoint hints provisional.",
+    "reason_codes": [
+      "remote_terminal_failure"
+    ],
+    "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
+    "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json"
+  },
+  "checkpoint_bridge_plan": {
+    "mode": "reviewed-closeout-execute",
+    "session_ref": "session:wave5-a2a-return-checkpoint-e2e",
+    "reviewed_artifact_path": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+    "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
+    "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json",
+    "surviving_checkpoint_clusters": [
+      "cluster:return-anchor",
+      "cluster:child-result-review"
+    ],
+    "execution_order": [
+      "aoa-session-donor-harvest",
+      "aoa-session-progression-lift",
+      "aoa-quest-harvest"
+    ],
+    "authority_contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
+    "mechanical_bridge_only": true,
+    "agent_skill_application_required": true,
+    "return_anchor_artifact": "bounded_plan"
+  },
+  "checkpoint_context_bundle": {
+    "mode": "reviewed-closeout-execute",
+    "session_ref": "session:wave5-a2a-return-checkpoint-e2e",
+    "reviewed_artifact_path": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+    "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
+    "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json",
+    "surviving_checkpoint_clusters": [
+      "cluster:return-anchor",
+      "cluster:child-result-review"
+    ],
+    "execution_order": [
+      "aoa-session-donor-harvest",
+      "aoa-session-progression-lift",
+      "aoa-quest-harvest"
+    ],
+    "authority_contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
+    "mechanical_bridge_only": true,
+    "agent_skill_application_required": true,
+    "return_anchor_artifact": "bounded_plan",
+    "owner_publication_plan": [
+      {
+        "publisher": "abyss-stack.runtime-wave-closeouts",
+        "reason": "publish canonical runtime closeout receipts under the runtime owner lane",
+        "receipt_kind": "runtime_wave_closeout_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/runtime_wave_closeout_receipt.json"
+        ],
+        "required": true
+      },
+      {
+        "publisher": "aoa-evals.eval-result",
+        "reason": "publish eval-backed proof receipts when present",
+        "receipt_kind": "eval_result_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/a2a_return_eval_packet.json"
+        ],
+        "required": false
+      },
+      {
+        "publisher": "aoa-playbooks.reviewed-run",
+        "reason": "publish reviewed playbook receipts when present",
+        "receipt_kind": "playbook_review_harvest_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/playbook_review_harvest_receipt.json"
+        ],
+        "required": false
+      },
+      {
+        "publisher": "aoa-memo.writeback",
+        "reason": "publish reviewed memo writeback receipts when present",
+        "receipt_kind": "memo_writeback_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/memo_writeback_receipt.json"
+        ],
+        "required": false
+      }
+    ]
+  },
+  "a2a_return_eval_packet": {
+    "hook_id": "aoa-p-0031-a2a-summon-return-checkpoint-hook",
+    "playbook_id": "AOA-P-0031",
+    "eval_anchor": "aoa-a2a-summon-return-checkpoint",
+    "artifact_inputs": [
+      "summon_request",
+      "summon_decision",
+      "codex_local_target",
+      "child_task_result",
+      "return_plan",
+      "checkpoint_bridge_plan",
+      "memo_writeback_ref",
+      "runtime_closeout_dry_run_receipt"
+    ],
+    "review_required": true,
+    "verdict_shape": "mixed"
+  },
+  "memo_writeback_candidate": {
+    "memo_writeback_ref": "repo:aoa-memo/docs/A2A_CHILD_RETURN_WRITEBACK.md",
+    "memo_export_plan": {
+      "writeback_targets": [
+        {
+          "kind": "audit_event",
+          "review_status": "reviewed_candidate",
+          "summary": "Remote verification may be retained as a review-facing audit event.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "source_artifact": "verification_result"
+          }
+        },
+        {
+          "kind": "state_capsule",
+          "review_status": "reviewed_candidate",
+          "summary": "Remote child returned bounded working state that may become a state capsule after review.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "source_artifact": "bounded_plan"
+          }
+        },
+        {
+          "kind": "decision",
+          "review_status": "reviewed_candidate",
+          "summary": "Remote child returned a route or transition decision that may survive recall after review.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "source_artifact": "transition_decision"
+          }
+        },
+        {
+          "kind": "decision",
+          "review_status": "reviewed_candidate",
+          "summary": "The child route returned through a governed transition decision.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "decision": "return",
+            "anchor_artifact": "bounded_plan",
+            "reentry_mode": "checkpoint_relaunch"
+          }
+        },
+        {
+          "kind": "state_capsule",
+          "review_status": "reviewed_candidate",
+          "summary": "Checkpoint-shaped working state may survive as a state capsule after review.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json"
+          }
+        }
+      ],
+      "candidate_targets": [
+        {
+          "kind": "anchor",
+          "review_status": "reviewed_candidate",
+          "summary": "The return anchor may survive as a stable memo-side anchor after review.",
+          "evidence_refs": [
+            {
+              "kind": "remote_task",
+              "ref": "a2a:task:task-wave5-a2a-return-child",
+              "role": "child_task"
+            },
+            {
+              "kind": "reviewed_artifact",
+              "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+              "role": "closeout"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+              "role": "returned_artifact"
+            },
+            {
+              "kind": "remote_artifact",
+              "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+              "role": "returned_artifact"
+            }
+          ],
+          "metadata": {
+            "anchor_artifact": "bounded_plan"
+          }
+        }
+      ],
+      "adjunct_targets": [],
+      "contains_raw_trace": false
+    },
+    "contains_raw_trace": false
+  },
+  "owner_publication_plan": [
+    {
+      "publisher": "abyss-stack.runtime-wave-closeouts",
+      "reason": "publish canonical runtime closeout receipts under the runtime owner lane",
+      "receipt_kind": "runtime_wave_closeout_receipt",
+      "input_paths": [
+        "/srv/receipts/wave5-a2a/runtime_wave_closeout_receipt.json"
+      ],
+      "required": true
+    },
+    {
+      "publisher": "aoa-evals.eval-result",
+      "reason": "publish eval-backed proof receipts when present",
+      "receipt_kind": "eval_result_receipt",
+      "input_paths": [
+        "/srv/receipts/wave5-a2a/a2a_return_eval_packet.json"
+      ],
+      "required": false
+    },
+    {
+      "publisher": "aoa-playbooks.reviewed-run",
+      "reason": "publish reviewed playbook receipts when present",
+      "receipt_kind": "playbook_review_harvest_receipt",
+      "input_paths": [
+        "/srv/receipts/wave5-a2a/playbook_review_harvest_receipt.json"
+      ],
+      "required": false
+    },
+    {
+      "publisher": "aoa-memo.writeback",
+      "reason": "publish reviewed memo writeback receipts when present",
+      "receipt_kind": "memo_writeback_receipt",
+      "input_paths": [
+        "/srv/receipts/wave5-a2a/memo_writeback_receipt.json"
+      ],
+      "required": false
+    }
+  ],
+  "reviewed_closeout_request": {
+    "schema_version": 1,
+    "request_kind": "a2a_wave5_closeout_request",
+    "closeout_id": "closeout-task-wave5-a2a-return-child",
+    "session_ref": "session:wave5-a2a-return-checkpoint-e2e",
+    "reviewed": true,
+    "reviewed_artifact_path": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+    "trigger": "reviewed-closeout",
+    "audit_refs": [
+      "/srv/notes/wave5-a2a-reviewed-child-return.md",
+      "repo:aoa-sdk/examples/a2a/summon_return_checkpoint_e2e.fixture.json"
+    ],
+    "batches": [
+      {
+        "publisher": "abyss-stack.runtime-wave-closeouts",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/runtime_wave_closeout_receipt.json"
+        ]
+      },
+      {
+        "publisher": "aoa-evals.eval-result",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/a2a_return_eval_packet.json"
+        ]
+      },
+      {
+        "publisher": "aoa-playbooks.reviewed-run",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/playbook_review_harvest_receipt.json"
+        ]
+      },
+      {
+        "publisher": "aoa-memo.writeback",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/memo_writeback_receipt.json"
+        ]
+      }
+    ],
+    "owner_local_publications": [
+      {
+        "publisher": "abyss-stack.runtime-wave-closeouts",
+        "reason": "publish canonical runtime closeout receipts under the runtime owner lane",
+        "receipt_kind": "runtime_wave_closeout_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/runtime_wave_closeout_receipt.json"
+        ],
+        "required": true
+      },
+      {
+        "publisher": "aoa-evals.eval-result",
+        "reason": "publish eval-backed proof receipts when present",
+        "receipt_kind": "eval_result_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/a2a_return_eval_packet.json"
+        ],
+        "required": false
+      },
+      {
+        "publisher": "aoa-playbooks.reviewed-run",
+        "reason": "publish reviewed playbook receipts when present",
+        "receipt_kind": "playbook_review_harvest_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/playbook_review_harvest_receipt.json"
+        ],
+        "required": false
+      },
+      {
+        "publisher": "aoa-memo.writeback",
+        "reason": "publish reviewed memo writeback receipts when present",
+        "receipt_kind": "memo_writeback_receipt",
+        "input_paths": [
+          "/srv/receipts/wave5-a2a/memo_writeback_receipt.json"
+        ],
+        "required": false
+      }
+    ],
+    "a2a_child": {
+      "selected_agent_id": "reviewer",
+      "endpoint": "codex://local/reviewer",
+      "child_task_id": "task-wave5-a2a-return-child",
+      "context_id": "ctx-wave5-a2a-return-checkpoint",
+      "terminal_state": "failed",
+      "returned_artifacts": [
+        "verification_result",
+        "bounded_plan",
+        "transition_decision"
+      ],
+      "expected_outputs": [
+        "verification_result",
+        "bounded_plan"
+      ],
+      "decision_lane": "codex_local_reviewed",
+      "execution_surface": "codex_local"
+    },
+    "summary_lines": [
+      "selected_agent=reviewer",
+      "endpoint=codex://local/reviewer",
+      "child_task_id=task-wave5-a2a-return-child",
+      "terminal_state=failed",
+      "decision_lane=codex_local_reviewed",
+      "execution_surface=codex_local",
+      "cohort_pattern=checkpoint_cohort",
+      "returned_artifacts=verification_result,bounded_plan,transition_decision",
+      "codex_role=reviewer",
+      "codex_config_path=/srv/.codex/agents/reviewer.toml",
+      "return_anchor=bounded_plan",
+      "return_reentry_mode=checkpoint_relaunch",
+      "memo_writeback_targets=5",
+      "memo_candidates=1",
+      "memo_adjuncts=0"
+    ],
+    "memo_export_plan": {
+      "writeback_targets": 5,
+      "candidate_targets": 1,
+      "adjunct_targets": 0,
+      "contains_raw_trace": false
+    },
+    "return_plan": {
+      "decision": "return",
+      "anchor_artifact": "bounded_plan",
+      "reentry_mode": "checkpoint_relaunch",
+      "next_hop": "aoa-checkpoint-closeout-bridge",
+      "reentry_note": "Remote child lost shape or ended in terminal state. Re-enter through checkpoint relaunch with the reviewed artifact primary and checkpoint hints provisional.",
+      "reason_codes": [
+        "remote_terminal_failure"
+      ],
+      "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
+      "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json",
+      "navigation_target": "aoa-routing/generated/return_navigation_hints.min.json"
+    },
+    "checkpoint_bridge_plan": {
+      "mode": "reviewed-closeout-execute",
+      "session_ref": "session:wave5-a2a-return-checkpoint-e2e",
+      "reviewed_artifact_path": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+      "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
+      "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json",
+      "surviving_checkpoint_clusters": [
+        "cluster:return-anchor",
+        "cluster:child-result-review"
+      ],
+      "execution_order": [
+        "aoa-session-donor-harvest",
+        "aoa-session-progression-lift",
+        "aoa-quest-harvest"
+      ],
+      "authority_contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
+      "mechanical_bridge_only": true,
+      "agent_skill_application_required": true,
+      "return_anchor_artifact": "bounded_plan"
+    },
+    "codex_local_target": {
+      "agent_id": "reviewer",
+      "role": "reviewer",
+      "workspace_root": "/srv",
+      "workspace_marker": "/srv/AOA_WORKSPACE_ROOT",
+      "project_codex_root": "/srv/.codex",
+      "config_path": "/srv/.codex/agents/reviewer.toml",
+      "install_surface": "/srv/.codex/agents",
+      "sandbox_mode": "read-only",
+      "mcp_servers": [
+        "aoa_workspace",
+        "aoa_stats"
+      ],
+      "nickname_candidates": [
+        "Sentinel",
+        "Lens",
+        "Check"
+      ],
+      "projection_chain": [
+        "aoa-agents/profiles/reviewer.profile.json",
+        "aoa-agents/config/codex_subagent_wiring.v2.json",
+        "aoa-agents/generated/codex_agents/projection_manifest.json",
+        "aoa-agents/generated/codex_agents/agents/reviewer.toml",
+        "8Dionysus/.codex/agents/reviewer.toml"
+      ]
+    }
+  },
+  "runtime_wave_closeout_receipt": {
+    "event_kind": "runtime_wave_closeout_receipt",
+    "event_id": "runtime-wave-closeout::task-wave5-a2a-return-child",
+    "observed_at": "2026-04-14T00:00:00.000Z",
+    "run_ref": "run:a2a:task-wave5-a2a-return-child",
+    "session_ref": "session:wave5-a2a-return-checkpoint-e2e",
+    "actor_ref": "abyss-stack.runtime-a2a",
+    "object_ref": {
+      "repo": "abyss-stack",
+      "kind": "a2a_child_route",
+      "id": "task-wave5-a2a-return-child"
+    },
+    "evidence_refs": [
+      {
+        "kind": "remote_task",
+        "ref": "a2a:task:task-wave5-a2a-return-child",
+        "role": "child_task"
+      },
+      {
+        "kind": "reviewed_artifact",
+        "ref": "/srv/notes/wave5-a2a-reviewed-child-return.md",
+        "role": "closeout"
+      },
+      {
+        "kind": "remote_artifact",
+        "ref": "/srv/artifacts/wave5-a2a/verification_result.json",
+        "role": "returned_artifact"
+      },
+      {
+        "kind": "remote_artifact",
+        "ref": "/srv/artifacts/wave5-a2a/bounded_plan.md",
+        "role": "returned_artifact"
+      }
+    ],
+    "payload": {
+      "selected_agent_id": "reviewer",
+      "endpoint": "codex://local/reviewer",
+      "parent_task_id": "parent:wave5-a2a-return-checkpoint",
+      "child_task_id": "task-wave5-a2a-return-child",
+      "context_id": "ctx-wave5-a2a-return-checkpoint",
+      "terminal_state": "failed",
+      "returned_artifacts": [
+        "verification_result",
+        "bounded_plan",
+        "transition_decision"
+      ],
+      "decision_lane": "codex_local_reviewed",
+      "execution_surface": "codex_local",
+      "cohort_pattern": "checkpoint_cohort",
+      "requested_posture": null,
+      "blocked_actions": [],
+      "expected_outputs": [
+        "verification_result",
+        "bounded_plan"
+      ],
+      "return_required": true,
+      "return_anchor_artifact": "bounded_plan",
+      "return_reentry_mode": "checkpoint_relaunch",
+      "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
+      "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json",
+      "codex_role": "reviewer",
+      "codex_config_path": "/srv/.codex/agents/reviewer.toml"
+    }
+  },
+  "runtime_closeout_dry_run_receipt_contract": {
+    "artifact_kind": "aoa.runtime-a2a-return-closeout-dry-run",
+    "dry_run": true,
+    "live_automation": false,
+    "exported_by": "scripts/aoa-a2a-return-closeout-dry-run",
+    "source_payload": "reviewed_closeout_request"
+  },
+  "routing_reentry": {
+    "entry_id": "AOA-P-0031",
+    "return_reason": "checkpoint_continuity_needed",
+    "surface_ref": "repo:aoa-routing/generated/return_navigation_hints.min.json",
+    "primary_action": {
+      "verb": "inspect",
+      "target_repo": "aoa-playbooks",
+      "target_surface": "generated/playbook_registry.min.json",
+      "match_field": "id",
+      "target_value": "AOA-P-0031"
+    }
+  }
+}

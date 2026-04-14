@@ -26,6 +26,7 @@ from .rebase import (
     build_memo_export_plan,
     build_reviewed_closeout_request,
     build_runtime_wave_closeout_receipt,
+    build_summon_return_checkpoint_fixture,
     build_summon_request_payload,
     build_summon_result_payload,
     build_transition_decision_payload,
@@ -305,6 +306,14 @@ class A2AAPI:
             owner_repo=owner_repo,
             actor_ref=actor_ref,
         )
+
+    def build_summon_return_checkpoint_fixture(
+        self,
+        *,
+        observed_at: str | None = None,
+    ) -> dict[str, Any]:
+        kwargs = {"observed_at": observed_at} if observed_at is not None else {}
+        return build_summon_return_checkpoint_fixture(**kwargs)
 
     def _load_schema(self, path: Path) -> dict[str, Any]:
         return json.loads(path.read_text(encoding="utf-8"))
