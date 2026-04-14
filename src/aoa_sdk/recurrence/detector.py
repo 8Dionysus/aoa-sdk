@@ -40,7 +40,7 @@ def detect_change_signal(
     unmatched_paths: list[str] = []
 
     for rel_path in changed:
-        matches = registry.match_path(rel_path)
+        matches = registry.match_path(rel_path, owner_repo=repo_name)
         matched_refs = [item.component.component_ref for item, _ in matches]
         matched_classes = [surface_class for _, surface_class in matches]
         changed_path_items.append(

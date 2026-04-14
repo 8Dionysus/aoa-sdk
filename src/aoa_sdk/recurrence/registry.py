@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import fnmatch
 import json
+import shlex
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
@@ -17,6 +18,7 @@ SURFACE_GROUPS: tuple[tuple[SurfaceClass, str], ...] = (
     ("contract", "contract_surfaces"),
     ("docs", "documentation_surfaces"),
     ("test", "test_surfaces"),
+    ("proof", "proof_surfaces"),
     ("receipt", "receipt_surfaces"),
 )
 
@@ -39,11 +41,13 @@ class RecurrenceRegistry:
     def iter_components(self) -> Iterable[LoadedComponent]:
         return iter(self.loaded)
 
-    def match_path(self, path: str) -> list[tuple[LoadedComponent, SurfaceClass]]:
+    def match_path(self, path: str, *, owner_repo: str | None = None) -> list[tuple[LoadedComponent, SurfaceClass]]:
         normalized = normalize_path(path)
         matches: list[tuple[LoadedComponent, SurfaceClass]] = []
         for item in self.loaded:
             component = item.component
+            if owner_repo is not None and component.owner_repo != owner_repo:
+                continue
             for surface_class, attr in SURFACE_GROUPS:
                 patterns = getattr(component, attr)
                 for pattern in patterns:
@@ -68,20 +72,56 @@ def load_registry(workspace: Workspace) -> RecurrenceRegistry:
     return RecurrenceRegistry(workspace, loaded)
 
 
-def normalize_path(path: str | Path) -> str:
+def normalize_path(path: str | Path, *, preserve_trailing_slash: bool = False) -> str:
     raw = str(path).replace("\\", "/")
     raw = raw[2:] if raw.startswith("./") else raw
-    return raw.strip("/")
+    had_trailing_slash = raw.endswith("/")
+    normalized = raw.strip("/")
+    if preserve_trailing_slash and had_trailing_slash and normalized:
+        return normalized + "/"
+    return normalized
+
+
+def _looks_like_path_pattern(pattern: str) -> bool:
+    if any(token in pattern for token in ("*", "?", "[")):
+        return True
+    if "/" in pattern:
+        return True
+    name = Path(pattern.rstrip("/")).name
+    return "." in name or pattern.startswith(".")
+
+
+def _iter_match_patterns(pattern: str) -> Iterable[str]:
+    normalized = normalize_path(pattern, preserve_trailing_slash=True)
+    if normalized:
+        yield normalized
+
+    try:
+        tokens = shlex.split(str(pattern))
+    except ValueError:
+        tokens = str(pattern).split()
+
+    for token in tokens:
+        if token.startswith("-"):
+            continue
+        candidate = normalize_path(token, preserve_trailing_slash=True)
+        if not candidate or candidate == normalized or not _looks_like_path_pattern(candidate):
+            continue
+        yield candidate
 
 
 def pattern_matches(pattern: str, path: str) -> bool:
-    normalized_pattern = normalize_path(pattern)
     normalized_path = normalize_path(path)
-    if not normalized_pattern:
-        return False
-    if normalized_pattern.endswith("/"):
-        prefix = normalized_pattern.rstrip("/")
-        return normalized_path == prefix or normalized_path.startswith(prefix + "/")
-    if "/" not in normalized_pattern and "/" not in normalized_path:
-        return fnmatch.fnmatchcase(normalized_path, normalized_pattern)
-    return fnmatch.fnmatchcase(normalized_path, normalized_pattern)
+    for normalized_pattern in _iter_match_patterns(pattern):
+        if normalized_pattern.endswith("/"):
+            prefix = normalized_pattern.rstrip("/")
+            if normalized_path == prefix or normalized_path.startswith(prefix + "/"):
+                return True
+            continue
+        if "/" not in normalized_pattern and "/" not in normalized_path:
+            if fnmatch.fnmatchcase(normalized_path, normalized_pattern):
+                return True
+            continue
+        if fnmatch.fnmatchcase(normalized_path, normalized_pattern):
+            return True
+    return False
