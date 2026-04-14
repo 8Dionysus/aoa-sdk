@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 from .models import (
+    CohortPattern,
+    ExecutionSurface,
     ProgressionOverlay,
     QuestPassport,
     SelfAgentCheckpoint,
@@ -23,7 +25,7 @@ DIFFICULTY_ORDER = {
 }
 
 
-def recommended_cohort(passport: QuestPassport) -> str:
+def recommended_cohort(passport: QuestPassport) -> CohortPattern:
     if passport.self_agent or passport.risk in {"r2_contract", "r3_side_effect"}:
         return "checkpoint_cohort"
     if DIFFICULTY_ORDER[passport.difficulty] >= DIFFICULTY_ORDER["d3_seam"]:
@@ -41,7 +43,7 @@ def _expected_outputs(passport: QuestPassport, intent: SummonIntent) -> list[str
     return unique_preserve_order(intent.expected_outputs or passport.expected_artifacts)
 
 
-def _select_execution_surface(intent: SummonIntent) -> str:
+def _select_execution_surface(intent: SummonIntent) -> ExecutionSurface:
     return (
         "a2a_remote" if intent.transport_preference == "a2a_remote" else "codex_local"
     )
@@ -57,8 +59,8 @@ def assess_summon(
 ) -> SummonDecision:
     outputs = _expected_outputs(passport, intent)
     anchor_present = _has_anchor(passport, intent)
-    cohort = recommended_cohort(passport)
-    execution_surface = _select_execution_surface(intent)
+    cohort: CohortPattern = recommended_cohort(passport)
+    execution_surface: ExecutionSurface = _select_execution_surface(intent)
     reasons: list[str] = []
     blocked_actions: list[str] = []
 

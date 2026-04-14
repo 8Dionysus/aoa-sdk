@@ -37,6 +37,7 @@ from .rebase import (
     recommended_cohort,
     assess_summon,
 )
+from .rebase.models import CohortPattern
 
 
 SUMMON_REQUEST_SCHEMA_RELATIVE_PATH = Path(
@@ -65,7 +66,7 @@ class A2AAPI:
     def summon_result_schema(self) -> dict[str, Any]:
         return self._load_schema(self.summon_result_schema_path())
 
-    def recommended_cohort(self, passport: QuestPassport) -> str:
+    def recommended_cohort(self, passport: QuestPassport) -> CohortPattern:
         return recommended_cohort(passport)
 
     def assess_summon(
@@ -88,7 +89,7 @@ class A2AAPI:
     def progression_allows(
         self,
         passport: QuestPassport,
-        cohort: str,
+        cohort: CohortPattern,
         overlay: ProgressionOverlay | None,
     ) -> tuple[bool, list[str]]:
         return progression_allows(passport, cohort, overlay)

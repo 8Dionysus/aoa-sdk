@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from dataclasses import asdict, is_dataclass
 from datetime import datetime, timezone
-from typing import Any, Iterable, TypeVar
+from typing import Any, Iterable, TypeVar, cast
 import re
 
 
@@ -36,7 +36,9 @@ def unique_preserve_order(items: Iterable[T]) -> list[T]:
 
 def to_jsonable(value: Any) -> Any:
     if is_dataclass(value):
-        return {key: to_jsonable(item) for key, item in asdict(value).items()}
+        return {
+            key: to_jsonable(item) for key, item in asdict(cast(Any, value)).items()
+        }
     if isinstance(value, dict):
         return {str(key): to_jsonable(item) for key, item in value.items()}
     if isinstance(value, (list, tuple, set)):
