@@ -80,9 +80,10 @@ class RecurrenceAPI:
         )
 
     def plan(self, report_or_path: ChangeSignal | str | Path) -> PropagationPlan:
-        report = report_or_path
         if isinstance(report_or_path, (str, Path)):
             report = read_model(report_or_path, ChangeSignal)
+        else:
+            report = report_or_path
         return build_propagation_plan(self.workspace, signal=report, registry=self.registry())
 
     def doctor(self, report_or_path: ChangeSignal | str | Path | None = None) -> ConnectivityGapReport:
@@ -99,9 +100,10 @@ class RecurrenceAPI:
         *,
         reviewed: bool = True,
     ) -> ReturnHandoff:
-        plan = plan_or_path
         if isinstance(plan_or_path, (str, Path)):
             plan = read_model(plan_or_path, PropagationPlan)
+        else:
+            plan = plan_or_path
         return build_return_handoff(plan=plan, registry=self.registry(), reviewed=reviewed)
 
     def observe(
@@ -125,9 +127,10 @@ class RecurrenceAPI:
         )
 
     def beacon(self, observation_or_path: ObservationPacket | str | Path) -> BeaconPacket:
-        packet = observation_or_path
         if isinstance(observation_or_path, (str, Path)):
             packet = read_model(observation_or_path, ObservationPacket)
+        else:
+            packet = observation_or_path
         return build_beacon_packet(self.workspace, observations=packet, registry=self.registry())
 
     def ledger(
@@ -136,13 +139,15 @@ class RecurrenceAPI:
         *,
         include_lower_status: bool = True,
     ) -> CandidateLedger:
-        packet = beacon_or_path
         if isinstance(beacon_or_path, (str, Path)):
             packet = read_model(beacon_or_path, BeaconPacket)
+        else:
+            packet = beacon_or_path
         return build_candidate_ledger(packet, include_lower_status=include_lower_status)
 
     def usage_gaps(self, beacon_or_path: BeaconPacket | str | Path) -> UsageGapReport:
-        packet = beacon_or_path
         if isinstance(beacon_or_path, (str, Path)):
             packet = read_model(beacon_or_path, BeaconPacket)
+        else:
+            packet = beacon_or_path
         return build_usage_gap_report(packet)

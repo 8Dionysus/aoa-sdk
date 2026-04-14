@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import Literal
 
 from ..workspace.discovery import Workspace
 from .graph import expand_component_graph
@@ -34,7 +35,7 @@ DEFAULT_ACTION_BY_EDGE_KIND: dict[str, RouteClass] = {
     "owns": "repair",
 }
 
-RETURN_KIND_BY_ACTION: dict[RouteClass, str] = {
+RETURN_KIND_BY_ACTION: dict[RouteClass, ReturnTargetKind] = {
     "reroute": "route",
     "restat": "summary",
     "reground": "route",
@@ -63,6 +64,7 @@ def build_propagation_plan(
     steps: list[PlanStep] = []
     step_counter = 0
     step_ref_by_component: dict[str, str] = {}
+    extra_unresolved_edges: list[str] = []
 
     direct_matches_by_ref: dict[str, list[SurfaceClass]] = {}
     for item in signal.direct_components:
@@ -114,13 +116,22 @@ def build_propagation_plan(
 
     for external in expansion.external_impacts:
         source_step_ref = step_ref_by_component.get(external.source_component_ref)
-        owner_repo = external.edge.target_repo or registry.get(external.source_component_ref).component.owner_repo
+        source_loaded = registry.get(external.source_component_ref)
+        if external.edge.target_repo is not None:
+            owner_repo = external.edge.target_repo
+        elif source_loaded is not None:
+            owner_repo = source_loaded.component.owner_repo
+        else:
+            extra_unresolved_edges.append(
+                f"{external.source_component_ref} could not resolve owner for edge {external.edge.kind}:{external.edge.target}"
+            )
+            continue
         action = external.edge.suggested_action or DEFAULT_ACTION_BY_EDGE_KIND.get(external.edge.kind, "repair")
         commands = list(external.edge.suggested_commands)
         target_ref = external.edge.target
         step_counter += 1
         step_ref = f"step:{step_counter:03d}:{owner_repo}"
-        status = "planned" if commands or action == "handoff" else "blocked"
+        status: Literal["planned", "blocked"] = "planned" if commands or action == "handoff" else "blocked"
         steps.append(
             PlanStep(
                 step_ref=step_ref,
@@ -137,7 +148,7 @@ def build_propagation_plan(
             )
         )
 
-    unresolved_edges = list(expansion.unresolved_edges)
+    unresolved_edges = list(expansion.unresolved_edges) + extra_unresolved_edges
     open_questions = []
     for step in steps:
         if step.status == "blocked":
@@ -254,3 +265,4 @@ def _unique(values: list[str]) -> list[str]:
             seen.add(value)
             result.append(value)
     return result
+ReturnTargetKind = Literal["source", "contract", "docs", "route", "summary", "playbook"]

@@ -1,10 +1,13 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import Literal
 
-from .models import PropagationPlan, ReturnHandoff, ReturnTarget
+from .models import PropagationPlan, RecurrenceComponent, ReturnHandoff, ReturnTarget
 from .registry import RecurrenceRegistry
 from .planner import RETURN_KIND_BY_ACTION
+
+ReturnTargetKind = Literal["source", "contract", "docs", "route", "summary", "playbook"]
 
 
 def build_return_handoff(
@@ -60,7 +63,7 @@ def build_return_handoff(
                     owner_repo=step.owner_repo,
                     component_ref=step.component_ref if step.component_ref.startswith("component:") else None,
                     target=step.surface_refs[0] if step.surface_refs else step.component_ref,
-                    target_kind=RETURN_KIND_BY_ACTION[step.action],  # type: ignore[index]
+                    target_kind=RETURN_KIND_BY_ACTION[step.action],
                     reason=f"{step.action} downstream surface preserved for reviewed follow-through",
                 ),
             )
@@ -84,7 +87,7 @@ def build_return_handoff(
     )
 
 
-def choose_primary_return_target(component) -> tuple[str, str]:
+def choose_primary_return_target(component: RecurrenceComponent) -> tuple[str, ReturnTargetKind]:
     if component.contract_surfaces:
         return component.contract_surfaces[0], "contract"
     if component.source_inputs:

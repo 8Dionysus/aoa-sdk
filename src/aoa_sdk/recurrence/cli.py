@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from typing import cast
 
 import typer
 
@@ -17,10 +18,31 @@ from .io import (
     persist_return_handoff,
     persist_usage_gap_report,
 )
+from .models import HookEvent
 
 recur_app = typer.Typer(help="Plan recurrence propagation, emit beacons, and keep reviewed return handoffs explicit.")
 hooks_app = typer.Typer(help="Run thin observation producers without turning them into a hidden scheduler.")
 recur_app.add_typer(hooks_app, name="hooks")
+
+HOOK_EVENTS: tuple[HookEvent, ...] = (
+    "manual_run",
+    "session_start",
+    "user_prompt_submit",
+    "session_stop",
+    "receipt_published",
+    "generated_surface_refreshed",
+    "harvest_written",
+    "real_run_published",
+    "gate_review_written",
+    "runtime_evidence_selected",
+)
+
+
+def _parse_hook_event(value: str) -> HookEvent:
+    if value not in HOOK_EVENTS:
+        allowed = ", ".join(HOOK_EVENTS)
+        raise typer.BadParameter(f"unsupported event {value!r}; expected one of: {allowed}")
+    return cast(HookEvent, value)
 
 
 @recur_app.command("detect")
@@ -274,9 +296,10 @@ def recur_hooks_list(
 ) -> None:
     workspace = Workspace.discover(root)
     api = RecurrenceAPI(workspace)
-    bindings = api.hooks(event=event) if event is not None else api.hooks()
+    parsed_event = _parse_hook_event(event) if event is not None else None
+    bindings = api.hooks(event=parsed_event) if parsed_event is not None else api.hooks()
     payload = {
-        "event": event,
+        "event": parsed_event,
         "count": len(bindings),
         "bindings": [item.model_dump(mode="json") for item in bindings],
     }
@@ -310,7 +333,7 @@ def recur_hooks_run(
 ) -> None:
     workspace = Workspace.discover(root)
     api = RecurrenceAPI(workspace)
-    report = api.run_hooks(event=event, signal_or_path=signal_path, binding_refs=binding_ref)
+    report = api.run_hooks(event=_parse_hook_event(event), signal_or_path=signal_path, binding_refs=binding_ref)
     report_path = persist_hook_run_report(workspace, report, output=report_output)
     payload = report.model_dump(mode="json")
     payload["report_path"] = str(report_path)
@@ -322,9 +345,9 @@ def recur_hooks_run(
     typer.echo(f"observations: {len(report.observations)}")
     if report.missing_paths:
         typer.echo("missing_paths:")
-        for item in report.missing_paths:
-            typer.echo(f"  - {item}")
+        for missing_path in report.missing_paths:
+            typer.echo(f"  - {missing_path}")
     if report.warnings:
         typer.echo("warnings:")
-        for item in report.warnings:
-            typer.echo(f"  - {item.binding_ref}: {item.message}")
+        for warning in report.warnings:
+            typer.echo(f"  - {warning.binding_ref}: {warning.message}")

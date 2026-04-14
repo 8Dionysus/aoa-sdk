@@ -174,6 +174,10 @@ class BeaconThresholds(StrictModel):
     min_unique_evidence_refs: int = 1
 
 
+def _default_status_ladder() -> list[BeaconStatus]:
+    return ["hint", "watch", "candidate", "review_ready"]
+
+
 class BeaconRule(StrictModel):
     beacon_ref: str
     kind: BeaconKind
@@ -183,9 +187,7 @@ class BeaconRule(StrictModel):
     match_signals: list[str] = Field(default_factory=list)
     match_categories: list[ObservationCategory] = Field(default_factory=list)
     thresholds: BeaconThresholds = Field(default_factory=BeaconThresholds)
-    status_ladder: list[BeaconStatus] = Field(
-        default_factory=lambda: ["hint", "watch", "candidate", "review_ready"]
-    )
+    status_ladder: list[BeaconStatus] = Field(default_factory=_default_status_ladder)
     suppress_when: list[str] = Field(default_factory=list)
     recommended_actions: list[str] = Field(default_factory=list)
     notes: str = ""
