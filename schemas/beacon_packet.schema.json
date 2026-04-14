@@ -1,0 +1,157 @@
+{
+  "$defs": {
+    "BeaconEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "beacon_ref": {
+          "title": "Beacon Ref",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "new_technique_candidate",
+            "technique_overlap_hold",
+            "canonical_pressure",
+            "unused_skill_opportunity",
+            "skill_trigger_drift",
+            "skill_bundle_candidate",
+            "portable_eval_candidate",
+            "progression_evidence_candidate",
+            "overclaim_alarm",
+            "playbook_candidate",
+            "subagent_recipe_candidate",
+            "automation_seed_candidate"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "hint",
+            "watch",
+            "candidate",
+            "review_ready"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "component_ref": {
+          "title": "Component Ref",
+          "type": "string"
+        },
+        "owner_repo": {
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "target_repo": {
+          "title": "Target Repo",
+          "type": "string"
+        },
+        "decision_surface": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Surface"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "source_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Inputs",
+          "type": "array"
+        },
+        "related_signals": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Related Signals",
+          "type": "array"
+        },
+        "suppression_flags": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Suppression Flags",
+          "type": "array"
+        },
+        "recommended_actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "beacon_ref",
+        "kind",
+        "status",
+        "component_ref",
+        "owner_repo",
+        "target_repo",
+        "reason"
+      ],
+      "title": "BeaconEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_beacon_packet_v1",
+      "default": "aoa_beacon_packet_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "packet_ref": {
+      "title": "Packet Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "signal_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Signal Ref"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/BeaconEntry"
+      },
+      "title": "Entries",
+      "type": "array"
+    }
+  },
+  "required": [
+    "packet_ref",
+    "workspace_root"
+  ],
+  "title": "BeaconPacket",
+  "type": "object"
+}

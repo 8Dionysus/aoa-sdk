@@ -1,0 +1,29 @@
+{
+  "schema_version": "aoa_hook_binding_set_v1",
+  "component_ref": "component:skills:bundle-and-activation-beacons",
+  "owner_repo": "aoa-skills",
+  "bindings": [
+    {
+      "binding_ref": "skills.trigger_gap.session_stop",
+      "event": "session_stop",
+      "producer": "skill_trigger_gap_watch",
+      "component_ref": "component:skills:bundle-and-activation-beacons",
+      "owner_repo": "aoa-skills",
+      "input_ref": "description-trigger-suite",
+      "path_globs": [
+        "generated/description_trigger_eval_cases.jsonl"
+      ],
+      "config": {
+        "receipt_globs": [
+          "examples/session_growth_artifacts/*.wave4.json"
+        ],
+        "positive_case_values": [
+          "should-trigger",
+          "explicit-handle"
+        ]
+      },
+      "signal_rules": [],
+      "notes": "Example only."
+    }
+  ]
+}

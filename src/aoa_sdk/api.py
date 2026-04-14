@@ -13,6 +13,7 @@ from .governed_runs import GovernedRunsAPI
 from .kag import KagAPI
 from .memo import MemoAPI
 from .playbooks import PlaybooksAPI
+from .recurrence import RecurrenceAPI
 from .release import ReleaseAPI
 from .rpg import RpgAPI
 from .routing.picker import RoutingAPI
@@ -35,6 +36,7 @@ class AoASDK:
         self.surfaces = SurfacesAPI(workspace)
         self.agents = AgentsAPI(workspace)
         self.playbooks = PlaybooksAPI(workspace)
+        self.recurrence = RecurrenceAPI(workspace)
         self.memo = MemoAPI(workspace)
         self.techniques = TechniquesAPI(workspace)
         self.evals = EvalsAPI(workspace)

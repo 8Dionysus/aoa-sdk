@@ -1,0 +1,115 @@
+{
+  "schema_version": "aoa_beacon_packet_v1",
+  "packet_ref": "beacons:20260413T120100Z",
+  "workspace_root": "/srv/federation",
+  "signal_ref": "signal:20260413T115900Z:aoa-skills",
+  "entries": [
+    {
+      "beacon_ref": "technique.new_candidate.distillation_pressure",
+      "kind": "new_technique_candidate",
+      "status": "candidate",
+      "component_ref": "component:techniques:canon-and-intake-beacons",
+      "owner_repo": "aoa-techniques",
+      "target_repo": "aoa-techniques",
+      "decision_surface": "docs/CROSS_LAYER_TECHNIQUE_CANDIDATES.md",
+      "reason": "new_technique_candidate reached candidate with 2 matching observation(s), 2 unique source input(s), and 2 evidence ref(s)",
+      "evidence_refs": [
+        ".aoa/live_receipts/technique-receipts.jsonl#1",
+        "docs/CROSS_LAYER_TECHNIQUE_CANDIDATES.md#candidate"
+      ],
+      "source_inputs": [
+        "cross-layer-technique-candidates",
+        "technique-live-receipts"
+      ],
+      "related_signals": [
+        "cross_layer_candidate_seen",
+        "distillation_pressure_observed"
+      ],
+      "suppression_flags": [],
+      "recommended_actions": [
+        "refresh cross-layer technique candidate intake",
+        "check overlap and boundedness before distillation"
+      ]
+    },
+    {
+      "beacon_ref": "skills.unused_skill.activation_gap",
+      "kind": "unused_skill_opportunity",
+      "status": "candidate",
+      "component_ref": "component:skills:bundle-and-activation-beacons",
+      "owner_repo": "aoa-skills",
+      "target_repo": "aoa-skills",
+      "decision_surface": "docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
+      "reason": "unused_skill_opportunity reached candidate with 2 matching observation(s), 2 unique source input(s), and 2 evidence ref(s)",
+      "evidence_refs": [
+        "generated/description_trigger_eval_cases.jsonl#case-17",
+        "generated/skill_evaluation_matrix.md#gap-2"
+      ],
+      "source_inputs": [
+        "description-trigger-suite",
+        "skill-evaluation-matrix"
+      ],
+      "related_signals": [
+        "prefer_other_skill_gap",
+        "should_trigger_missing"
+      ],
+      "suppression_flags": [],
+      "recommended_actions": [
+        "inspect the applicability map and defer/skip notes",
+        "check whether a nearby skill should have triggered"
+      ]
+    },
+    {
+      "beacon_ref": "evals.portable_eval.runtime_pressure",
+      "kind": "portable_eval_candidate",
+      "status": "candidate",
+      "component_ref": "component:evals:portable-proof-beacons",
+      "owner_repo": "aoa-evals",
+      "target_repo": "aoa-evals",
+      "decision_surface": "docs/RUNTIME_BENCH_PROMOTION_GUIDE.md",
+      "reason": "portable_eval_candidate reached candidate with 2 matching observation(s), 2 unique source input(s), and 2 evidence ref(s)",
+      "evidence_refs": [
+        "docs/TRACE_EVAL_BRIDGE.md#portable",
+        "runtime-receipts.json#1"
+      ],
+      "source_inputs": [
+        "change_signal",
+        "trace-eval-bridge"
+      ],
+      "related_signals": [
+        "portable_claim_repeat",
+        "trace_bridge_receipt_ready"
+      ],
+      "suppression_flags": [],
+      "recommended_actions": [
+        "open portable eval boundary review",
+        "check trace bridge and runner/report contracts"
+      ]
+    },
+    {
+      "beacon_ref": "playbooks.subagent.recipe_pressure",
+      "kind": "subagent_recipe_candidate",
+      "status": "candidate",
+      "component_ref": "component:playbooks:scenario-composition-beacons",
+      "owner_repo": "aoa-playbooks",
+      "target_repo": "aoa-playbooks",
+      "decision_surface": "docs/SUBAGENT_PATTERNS.md",
+      "reason": "subagent_recipe_candidate reached candidate with 2 matching observation(s), 2 unique source input(s), and 2 evidence ref(s)",
+      "evidence_refs": [
+        "docs/gate-reviews/review-2.md",
+        "examples/harvests/run-2.json"
+      ],
+      "source_inputs": [
+        "composition-gates",
+        "real-run-harvests"
+      ],
+      "related_signals": [
+        "bounded_parallel_split_seen",
+        "reviewable_split_repeated"
+      ],
+      "suppression_flags": [],
+      "recommended_actions": [
+        "record an explicit subagent recipe without turning it into auto-orchestration"
+      ]
+    }
+  ]
+}

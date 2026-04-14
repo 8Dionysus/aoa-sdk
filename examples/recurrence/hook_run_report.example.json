@@ -1,0 +1,38 @@
+{
+  "schema_version": "aoa_hook_run_report_v1",
+  "run_ref": "hooks:session_stop:20260413T190000Z",
+  "workspace_root": "/srv/federation",
+  "event": "session_stop",
+  "signal_ref": null,
+  "bindings_run": [
+    "skills.trigger_gap.session_stop",
+    "playbooks.harvest_patterns.session_stop"
+  ],
+  "missing_paths": [
+    "aoa-skills:.aoa/live_receipts/skill-receipts.jsonl"
+  ],
+  "warnings": [],
+  "observations": [
+    {
+      "observation_ref": "obs:hook:skills.trigger_gap.session_stop:0001",
+      "component_ref": "component:skills:bundle-and-activation-beacons",
+      "owner_repo": "aoa-skills",
+      "observed_at": "2026-04-13T19:00:00Z",
+      "category": "usage_gap",
+      "signal": "should_trigger_missing",
+      "source_inputs": [
+        "description-trigger-suite",
+        "skill-live-receipts"
+      ],
+      "evidence_refs": [
+        "aoa-skills:generated/description_trigger_eval_cases.jsonl#case-17"
+      ],
+      "attributes": {
+        "binding_ref": "skills.trigger_gap.session_stop",
+        "producer": "skill_trigger_gap_watch",
+        "skill_name": "aoa-change-protocol"
+      },
+      "notes": "trigger suite suggests this skill should fire, but no recent skill evidence was seen"
+    }
+  ]
+}

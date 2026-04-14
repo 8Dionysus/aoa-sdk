@@ -1,0 +1,120 @@
+{
+  "schema_version": "aoa_propagation_plan_v1",
+  "plan_ref": "plan:20260413T145832Z:8Dionysus",
+  "signal_ref": "signal:20260413T145832Z:8Dionysus",
+  "workspace_root": "/mnt/data/aoa_recurrence_seed_wave1",
+  "direct_components": [
+    "component:codex-plane:shared-root"
+  ],
+  "impacted_components": [
+    "component:codex-plane:shared-root"
+  ],
+  "impacted_targets": [
+    "component:codex-plane:shared-root",
+    "aoa-routing:generated/return_navigation_hints.min.json",
+    "aoa-stats:generated/component_refresh_summary.min.json",
+    "aoa-kag:generated/return_regrounding_pack.min.json",
+    "aoa-playbooks:AOA-P-0030"
+  ],
+  "ordered_steps": [
+    {
+      "step_ref": "step:001:8Dionysus",
+      "order": 1,
+      "component_ref": "component:codex-plane:shared-root",
+      "owner_repo": "8Dionysus",
+      "action": "regenerate",
+      "reason": "direct source change detected for component:codex-plane:shared-root",
+      "surface_refs": [
+        "config/codex_plane/runtime_manifest.v1.json",
+        "config/codex_plane/profiles/*.json"
+      ],
+      "commands": [
+        "python scripts/render_codex_plane.py",
+        "python scripts/validate_codex_plane.py",
+        "python .codex/bin/aoa-codex-doctor"
+      ],
+      "depends_on": [],
+      "review_required": true,
+      "status": "planned"
+    },
+    {
+      "step_ref": "step:002:aoa-routing",
+      "order": 2,
+      "component_ref": "aoa-routing:generated/return_navigation_hints.min.json",
+      "owner_repo": "aoa-routing",
+      "action": "reroute",
+      "reason": "routes_via edge from component:codex-plane:shared-root",
+      "surface_refs": [
+        "generated/return_navigation_hints.min.json"
+      ],
+      "commands": [
+        "python scripts/build_router.py",
+        "python scripts/validate_router.py"
+      ],
+      "depends_on": [
+        "step:001:8Dionysus"
+      ],
+      "review_required": true,
+      "status": "planned"
+    },
+    {
+      "step_ref": "step:003:aoa-stats",
+      "order": 3,
+      "component_ref": "aoa-stats:generated/component_refresh_summary.min.json",
+      "owner_repo": "aoa-stats",
+      "action": "restat",
+      "reason": "summarized_by edge from component:codex-plane:shared-root",
+      "surface_refs": [
+        "generated/component_refresh_summary.min.json"
+      ],
+      "commands": [
+        "python scripts/build_views.py",
+        "python scripts/validate_repo.py"
+      ],
+      "depends_on": [
+        "step:001:8Dionysus"
+      ],
+      "review_required": true,
+      "status": "planned"
+    },
+    {
+      "step_ref": "step:004:aoa-kag",
+      "order": 4,
+      "component_ref": "aoa-kag:generated/return_regrounding_pack.min.json",
+      "owner_repo": "aoa-kag",
+      "action": "reground",
+      "reason": "requires_regrounding edge from component:codex-plane:shared-root",
+      "surface_refs": [
+        "generated/return_regrounding_pack.min.json"
+      ],
+      "commands": [],
+      "depends_on": [
+        "step:001:8Dionysus"
+      ],
+      "review_required": true,
+      "status": "blocked"
+    },
+    {
+      "step_ref": "step:005:aoa-playbooks",
+      "order": 5,
+      "component_ref": "aoa-playbooks:AOA-P-0030",
+      "owner_repo": "aoa-playbooks",
+      "action": "handoff",
+      "reason": "handoff_home edge from component:codex-plane:shared-root",
+      "surface_refs": [
+        "AOA-P-0030"
+      ],
+      "commands": [],
+      "depends_on": [
+        "step:001:8Dionysus"
+      ],
+      "review_required": true,
+      "status": "planned"
+    }
+  ],
+  "unresolved_edges": [],
+  "open_questions": [
+    "aoa-kag:generated/return_regrounding_pack.min.json has no planted route commands for reground"
+  ],
+  "summary": "1 direct component(s), 5 step(s), 0 unresolved edge(s), 1 open question(s)"
+}

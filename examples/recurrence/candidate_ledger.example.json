@@ -1,0 +1,48 @@
+{
+  "schema_version": "aoa_candidate_ledger_v1",
+  "ledger_ref": "candidate-ledger:20260413T120110Z",
+  "workspace_root": "/srv/federation",
+  "signal_ref": "signal:20260413T115900Z:aoa-skills",
+  "entries": [
+    {
+      "entry_ref": "ledger:0001",
+      "recorded_at": "2026-04-13T12:01:10Z",
+      "beacon_ref": "technique.new_candidate.distillation_pressure",
+      "kind": "new_technique_candidate",
+      "status": "candidate",
+      "component_ref": "component:techniques:canon-and-intake-beacons",
+      "owner_repo": "aoa-techniques",
+      "target_repo": "aoa-techniques",
+      "decision_surface": "docs/CROSS_LAYER_TECHNIQUE_CANDIDATES.md",
+      "evidence_refs": [
+        ".aoa/live_receipts/technique-receipts.jsonl#1",
+        "docs/CROSS_LAYER_TECHNIQUE_CANDIDATES.md#candidate"
+      ],
+      "source_inputs": [
+        "cross-layer-technique-candidates",
+        "technique-live-receipts"
+      ],
+      "notes": "new_technique_candidate reached candidate with 2 matching observation(s), 2 unique source input(s), and 2 evidence ref(s)"
+    },
+    {
+      "entry_ref": "ledger:0002",
+      "recorded_at": "2026-04-13T12:01:10Z",
+      "beacon_ref": "skills.unused_skill.activation_gap",
+      "kind": "unused_skill_opportunity",
+      "status": "candidate",
+      "component_ref": "component:skills:bundle-and-activation-beacons",
+      "owner_repo": "aoa-skills",
+      "target_repo": "aoa-skills",
+      "decision_surface": "docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
+      "evidence_refs": [
+        "generated/description_trigger_eval_cases.jsonl#case-17",
+        "generated/skill_evaluation_matrix.md#gap-2"
+      ],
+      "source_inputs": [
+        "description-trigger-suite",
+        "skill-evaluation-matrix"
+      ],
+      "notes": "unused_skill_opportunity reached candidate with 2 matching observation(s), 2 unique source input(s), and 2 evidence ref(s)"
+    }
+  ]
+}

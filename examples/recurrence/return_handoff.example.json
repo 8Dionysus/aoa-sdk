@@ -1,0 +1,62 @@
+{
+  "schema_version": "aoa_return_handoff_v1",
+  "handoff_ref": "handoff:20260413T145832Z",
+  "plan_ref": "plan:20260413T145832Z:8Dionysus",
+  "reviewed": true,
+  "surviving_fields": [
+    "component_ref",
+    "owner_repo",
+    "action",
+    "surface_refs",
+    "reason",
+    "review_required",
+    "rollback_anchor"
+  ],
+  "targets": [
+    {
+      "owner_repo": "8Dionysus",
+      "component_ref": "component:codex-plane:shared-root",
+      "target": "docs/CODEX_PLANE_REGENERATION.md",
+      "target_kind": "contract",
+      "reason": "smallest owner-boundary re-entry surface for the direct component"
+    },
+    {
+      "owner_repo": "8Dionysus",
+      "component_ref": "component:codex-plane:shared-root",
+      "target": "docs/CODEX_PLANE_ROLLOUT.md",
+      "target_kind": "docs",
+      "reason": "first rollback anchor preserved for bounded recovery"
+    },
+    {
+      "owner_repo": "aoa-routing",
+      "component_ref": null,
+      "target": "generated/return_navigation_hints.min.json",
+      "target_kind": "route",
+      "reason": "reroute downstream surface preserved for reviewed follow-through"
+    },
+    {
+      "owner_repo": "aoa-stats",
+      "component_ref": null,
+      "target": "generated/component_refresh_summary.min.json",
+      "target_kind": "summary",
+      "reason": "restat downstream surface preserved for reviewed follow-through"
+    },
+    {
+      "owner_repo": "aoa-kag",
+      "component_ref": null,
+      "target": "generated/return_regrounding_pack.min.json",
+      "target_kind": "route",
+      "reason": "reground downstream surface preserved for reviewed follow-through"
+    },
+    {
+      "owner_repo": "aoa-playbooks",
+      "component_ref": null,
+      "target": "AOA-P-0030",
+      "target_kind": "playbook",
+      "reason": "handoff downstream surface preserved for reviewed follow-through"
+    }
+  ],
+  "unresolved_items": [
+    "aoa-kag:generated/return_regrounding_pack.min.json has no planted route commands for reground"
+  ]
+}

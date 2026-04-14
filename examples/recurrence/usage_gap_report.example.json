@@ -1,0 +1,25 @@
+{
+  "schema_version": "aoa_usage_gap_report_v1",
+  "report_ref": "usage-gaps:20260413T120115Z",
+  "workspace_root": "/srv/federation",
+  "signal_ref": "signal:20260413T115900Z:aoa-skills",
+  "items": [
+    {
+      "gap_ref": "usage-gap:0001",
+      "component_ref": "component:skills:bundle-and-activation-beacons",
+      "owner_repo": "aoa-skills",
+      "beacon_ref": "skills.unused_skill.activation_gap",
+      "status": "candidate",
+      "reason": "unused_skill_opportunity reached candidate with 2 matching observation(s), 2 unique source input(s), and 2 evidence ref(s)",
+      "decision_surface": "docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
+      "evidence_refs": [
+        "generated/description_trigger_eval_cases.jsonl#case-17",
+        "generated/skill_evaluation_matrix.md#gap-2"
+      ],
+      "recommended_actions": [
+        "inspect the applicability map and defer/skip notes",
+        "check whether a nearby skill should have triggered"
+      ]
+    }
+  ]
+}

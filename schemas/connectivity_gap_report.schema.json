@@ -1,0 +1,128 @@
+{
+  "$defs": {
+    "ConnectivityGap": {
+      "additionalProperties": false,
+      "properties": {
+        "gap_ref": {
+          "title": "Gap Ref",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "gap_kind": {
+          "enum": [
+            "unmapped_changed_path",
+            "unresolved_edge",
+            "missing_refresh_route",
+            "missing_proof_surface",
+            "orphan_generated_surface",
+            "projected_without_generation",
+            "weak_owner_handoff",
+            "missing_target_route"
+          ],
+          "title": "Gap Kind",
+          "type": "string"
+        },
+        "component_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Component Ref"
+        },
+        "owner_repo": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owner Repo"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "recommendation": {
+          "title": "Recommendation",
+          "type": "string"
+        }
+      },
+      "required": [
+        "gap_ref",
+        "severity",
+        "gap_kind",
+        "recommendation"
+      ],
+      "title": "ConnectivityGap",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_connectivity_gap_report_v1",
+      "default": "aoa_connectivity_gap_report_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "report_ref": {
+      "title": "Report Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "signal_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Signal Ref"
+    },
+    "components_checked": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Components Checked",
+      "type": "array"
+    },
+    "gaps": {
+      "items": {
+        "$ref": "#/$defs/ConnectivityGap"
+      },
+      "title": "Gaps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "report_ref",
+    "workspace_root"
+  ],
+  "title": "ConnectivityGapReport",
+  "type": "object"
+}

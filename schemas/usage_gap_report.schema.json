@@ -1,0 +1,117 @@
+{
+  "$defs": {
+    "UsageGapItem": {
+      "additionalProperties": false,
+      "properties": {
+        "gap_ref": {
+          "title": "Gap Ref",
+          "type": "string"
+        },
+        "component_ref": {
+          "title": "Component Ref",
+          "type": "string"
+        },
+        "owner_repo": {
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "beacon_ref": {
+          "title": "Beacon Ref",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "hint",
+            "watch",
+            "candidate",
+            "review_ready"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "decision_surface": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Surface"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "recommended_actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "gap_ref",
+        "component_ref",
+        "owner_repo",
+        "beacon_ref",
+        "status",
+        "reason"
+      ],
+      "title": "UsageGapItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_usage_gap_report_v1",
+      "default": "aoa_usage_gap_report_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "report_ref": {
+      "title": "Report Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "signal_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Signal Ref"
+    },
+    "items": {
+      "items": {
+        "$ref": "#/$defs/UsageGapItem"
+      },
+      "title": "Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "report_ref",
+    "workspace_root"
+  ],
+  "title": "UsageGapReport",
+  "type": "object"
+}

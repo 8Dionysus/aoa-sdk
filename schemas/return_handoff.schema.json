@@ -1,0 +1,103 @@
+{
+  "$defs": {
+    "ReturnTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "owner_repo": {
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "component_ref": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Component Ref"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "target_kind": {
+          "enum": [
+            "source",
+            "contract",
+            "docs",
+            "route",
+            "summary",
+            "playbook"
+          ],
+          "title": "Target Kind",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner_repo",
+        "target",
+        "target_kind",
+        "reason"
+      ],
+      "title": "ReturnTarget",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_return_handoff_v1",
+      "default": "aoa_return_handoff_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "handoff_ref": {
+      "title": "Handoff Ref",
+      "type": "string"
+    },
+    "plan_ref": {
+      "title": "Plan Ref",
+      "type": "string"
+    },
+    "reviewed": {
+      "const": true,
+      "default": true,
+      "title": "Reviewed",
+      "type": "boolean"
+    },
+    "surviving_fields": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Surviving Fields",
+      "type": "array"
+    },
+    "targets": {
+      "items": {
+        "$ref": "#/$defs/ReturnTarget"
+      },
+      "title": "Targets",
+      "type": "array"
+    },
+    "unresolved_items": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Unresolved Items",
+      "type": "array"
+    }
+  },
+  "required": [
+    "handoff_ref",
+    "plan_ref"
+  ],
+  "title": "ReturnHandoff",
+  "type": "object"
+}

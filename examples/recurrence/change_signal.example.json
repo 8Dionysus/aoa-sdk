@@ -1,0 +1,35 @@
+{
+  "schema_version": "aoa_change_signal_v1",
+  "signal_ref": "signal:20260413T145832Z:8Dionysus",
+  "workspace_root": "/mnt/data/aoa_recurrence_seed_wave1",
+  "repo_root": "/mnt/data/aoa_recurrence_seed_wave1/8Dionysus",
+  "repo_name": "8Dionysus",
+  "observed_at": "2026-04-13T14:58:32.735728Z",
+  "diff_base": null,
+  "changed_paths": [
+    {
+      "repo": "8Dionysus",
+      "path": "config/codex_plane/runtime_manifest.v1.json",
+      "matched_component_refs": [
+        "component:codex-plane:shared-root"
+      ],
+      "matched_classes": [
+        "source"
+      ]
+    }
+  ],
+  "direct_components": [
+    {
+      "component_ref": "component:codex-plane:shared-root",
+      "owner_repo": "8Dionysus",
+      "match_class": "source",
+      "matched_paths": [
+        "config/codex_plane/runtime_manifest.v1.json"
+      ],
+      "inferred_signals": [
+        "source_changed"
+      ]
+    }
+  ],
+  "unmatched_paths": []
+}
