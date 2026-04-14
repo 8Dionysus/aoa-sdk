@@ -47,3 +47,45 @@ def test_memo_local_read_path(workspace_root: Path) -> None:
     assert writeback_governance_target.writeback_class == "reviewed_candidate"
     assert writeback_governance_target.intake_posture == "review_candidate_only"
     assert writeback_governance_target.governance_passed is True
+
+
+def test_memo_runtime_writeback_governance_resolves_through_targets_and_intake(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    reviewed_candidate_targets = {
+        "distillation_bridge_candidate": "bridge",
+        "distillation_claim_candidate": "claim",
+        "distillation_pattern_candidate": "pattern",
+    }
+
+    for governance in sdk.memo.writeback_governance():
+        target = sdk.memo.writeback_target(governance.runtime_surface)
+        intake = sdk.memo.writeback_intake(governance.runtime_surface)
+
+        assert governance.in_writeback_targets is True
+        assert governance.in_writeback_intake is True
+        assert target.target_kind == governance.target_kind
+        assert intake.target_kind == governance.target_kind
+        assert intake.writeback_class == governance.writeback_class
+        assert intake.requires_human_review == governance.requires_human_review
+        assert intake.review_state_default == governance.review_state_default
+
+    for runtime_surface, target_kind in reviewed_candidate_targets.items():
+        target = sdk.memo.writeback_target(runtime_surface)
+        intake = sdk.memo.writeback_intake(runtime_surface)
+        governance = sdk.memo.writeback_governance(runtime_surface)
+
+        assert target.target_kind == target_kind
+        assert intake.target_kind == target_kind
+        assert governance.target_kind == target_kind
+        assert target.writeback_class == "reviewed_candidate"
+        assert intake.writeback_class == "reviewed_candidate"
+        assert governance.writeback_class == "reviewed_candidate"
+        assert target.requires_human_review is True
+        assert intake.requires_human_review is True
+        assert governance.requires_human_review is True
+        assert intake.intake_posture == "review_candidate_only"
+        assert governance.intake_posture == "review_candidate_only"
+        assert governance.governance_passed is True
+        assert governance.blockers == []

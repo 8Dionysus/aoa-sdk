@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from typing import Literal
+
 from .models import EvidenceRef, StressBundle, StressPosture, StressSignal
 from .utils import unique_preserve_order
 
@@ -54,7 +56,7 @@ def merge_stress_signals(signals: list[StressSignal]) -> StressBundle:
     )
     primary = ordered[0]
 
-    suppression = "active"
+    suppression: Literal["active", "low_evidence", "disabled"] = "active"
     if len(ordered) == 1 and SOURCE_PRIORITY[primary.source_family] >= 2:
         suppression = "low_evidence"
 

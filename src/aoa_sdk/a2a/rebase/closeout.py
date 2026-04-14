@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from typing import Iterable
+from typing import Any, Iterable
 
 from .models import (
     CANONICAL_STATS_EVENT_KINDS,
@@ -54,7 +54,7 @@ def build_runtime_wave_closeout_receipt(
             EvidenceRef(kind="remote_artifact", ref=ref, role="returned_artifact")
         )
 
-    payload = {
+    payload: dict[str, Any] = {
         "selected_agent_id": remote_task.agent_id,
         "endpoint": remote_task.endpoint,
         "parent_task_id": remote_task.parent_task_id,
