@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+import json
+
 from aoa_sdk import AoASDK
 from aoa_sdk.a2a.rebase import QuestPassport, RemoteTaskResult, SummonIntent
 
@@ -52,8 +54,41 @@ def test_sdk_exposes_a2a_rebase_bridge(workspace_root) -> None:
     )
     assert decision.lane == "codex_local_reviewed"
     assert target.workspace_root == str(workspace_root.resolve())
+    assert (
+        "aoa-agents/generated/codex_agents/projection_manifest.json"
+        in target.projection_chain
+    )
     assert result_payload["codex_local_target"]["config_path"].endswith(
         "/.codex/agents/reviewer.toml"
     )
     assert result_payload["return_plan"]["reentry_mode"] == "checkpoint_relaunch"
     assert result_payload["owner_publication_plan"] == []
+
+
+def test_sdk_prefers_aoa_agents_projection_manifest_for_local_target(
+    workspace_root,
+) -> None:
+    manifest_path = (
+        workspace_root
+        / "aoa-agents"
+        / "generated"
+        / "codex_agents"
+        / "projection_manifest.json"
+    )
+    payload = json.loads(manifest_path.read_text(encoding="utf-8"))
+    for entry in payload["generated_agents"]:
+        if entry["name"] == "coder":
+            entry["sandbox_mode"] = "read-only"
+            entry["mcp_affinity"] = ["aoa_workspace", "aoa_stats"]
+            entry["nickname_candidates"] = ["Weld", "Join", "Fit"]
+            entry["config_path"] = "agents/coder.custom.toml"
+            break
+    manifest_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    target = sdk.a2a.build_codex_local_target("coder")
+
+    assert target.sandbox_mode == "read-only"
+    assert target.mcp_servers == ["aoa_workspace", "aoa_stats"]
+    assert target.nickname_candidates == ["Weld", "Join", "Fit"]
+    assert target.config_path.endswith("/.codex/agents/coder.custom.toml")

@@ -75,6 +75,10 @@ def test_sdk_a2a_bridge_validates_against_live_aoa_summon_contract() -> None:
     assert result_errors == []
     assert result_payload["lane"] == "codex_local_reviewed"
     assert result_payload["return_plan"]["reentry_mode"] == "checkpoint_relaunch"
+    assert (
+        "aoa-agents/generated/codex_agents/projection_manifest.json"
+        in target.projection_chain
+    )
 
 
 def _live_sdk_or_skip() -> AoASDK:

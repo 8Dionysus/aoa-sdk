@@ -4,6 +4,8 @@ import json
 from pathlib import Path
 from typing import Any, Iterable
 
+from ..compatibility import load_surface
+from ..errors import RepoNotFound, SurfaceNotFound
 from ..workspace.discovery import Workspace
 from .rebase import (
     CheckpointBridgePlan,
@@ -39,9 +41,7 @@ from .rebase import (
 SUMMON_REQUEST_SCHEMA_RELATIVE_PATH = Path(
     "skills/aoa-summon/references/summon-request-v3.schema.json"
 )
-SUMMON_RESULT_SCHEMA_RELATIVE_PATH = Path(
-    "skills/aoa-summon/references/summon-result-v3.schema.json"
-)
+SUMMON_RESULT_SCHEMA_RELATIVE_PATH = Path("skills/aoa-summon/references/summon-result-v3.schema.json")
 
 
 class A2AAPI:
@@ -152,6 +152,7 @@ class A2AAPI:
             role,
             workspace_root=workspace_root or str(self.workspace.federation_root),
             agent_id=agent_id,
+            projection_entry=self._codex_projection_entry(role),
         )
 
     def build_return_plan(
@@ -307,3 +308,17 @@ class A2AAPI:
 
     def _load_schema(self, path: Path) -> dict[str, Any]:
         return json.loads(path.read_text(encoding="utf-8"))
+
+    def _codex_projection_entry(self, role: str) -> dict[str, Any] | None:
+        try:
+            payload = load_surface(self.workspace, "aoa-agents.codex_projection_manifest")
+        except (RepoNotFound, SurfaceNotFound):
+            return None
+        generated_agents = payload.get("generated_agents")
+        if not isinstance(generated_agents, list):
+            return None
+
+        for entry in generated_agents:
+            if isinstance(entry, dict) and entry.get("name") == role:
+                return entry
+        return None
