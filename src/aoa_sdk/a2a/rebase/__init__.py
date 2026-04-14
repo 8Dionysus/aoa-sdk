@@ -7,6 +7,7 @@ from .closeout import (
     plan_owner_publications,
 )
 from .codex import build_codex_local_target
+from .e2e import build_summon_return_checkpoint_fixture
 from .memo import build_memo_export_plan
 from .models import (
     CANONICAL_STATS_EVENT_KINDS,
@@ -66,4 +67,5 @@ __all__ = [
     "plan_owner_publications",
     "build_reviewed_closeout_request",
     "closeout_summary_lines",
+    "build_summon_return_checkpoint_fixture",
 ]
