@@ -1,0 +1,199 @@
+{
+  "$defs": {
+    "HookBinding": {
+      "additionalProperties": false,
+      "properties": {
+        "binding_ref": {
+          "title": "Binding Ref",
+          "type": "string"
+        },
+        "event": {
+          "enum": [
+            "manual_run",
+            "session_start",
+            "user_prompt_submit",
+            "session_stop",
+            "receipt_published",
+            "generated_surface_refreshed",
+            "harvest_written",
+            "real_run_published",
+            "gate_review_written",
+            "runtime_evidence_selected"
+          ],
+          "title": "Event",
+          "type": "string"
+        },
+        "producer": {
+          "enum": [
+            "jsonl_receipt_watch",
+            "skill_trigger_gap_watch",
+            "harvest_pattern_watch",
+            "runtime_candidate_watch"
+          ],
+          "title": "Producer",
+          "type": "string"
+        },
+        "component_ref": {
+          "title": "Component Ref",
+          "type": "string"
+        },
+        "owner_repo": {
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "input_ref": {
+          "title": "Input Ref",
+          "type": "string"
+        },
+        "path_globs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path Globs",
+          "type": "array"
+        },
+        "config": {
+          "additionalProperties": true,
+          "title": "Config",
+          "type": "object"
+        },
+        "signal_rules": {
+          "items": {
+            "$ref": "#/$defs/HookSignalRule"
+          },
+          "title": "Signal Rules",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "binding_ref",
+        "event",
+        "producer",
+        "component_ref",
+        "owner_repo",
+        "input_ref"
+      ],
+      "title": "HookBinding",
+      "type": "object"
+    },
+    "HookSignalRule": {
+      "additionalProperties": false,
+      "properties": {
+        "signal": {
+          "title": "Signal",
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "change_pressure",
+            "evidence_pressure",
+            "usage_gap",
+            "repeat_pattern",
+            "review_signal",
+            "overclaim_risk"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "match": {
+          "default": "always",
+          "enum": [
+            "always",
+            "exists",
+            "equals",
+            "contains"
+          ],
+          "title": "Match",
+          "type": "string"
+        },
+        "field": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Field"
+        },
+        "value": {
+          "anyOf": [
+            {},
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Value"
+        },
+        "source_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Inputs",
+          "type": "array"
+        },
+        "attributes_from_fields": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Attributes From Fields",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "signal",
+        "category"
+      ],
+      "title": "HookSignalRule",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_hook_binding_set_v1",
+      "default": "aoa_hook_binding_set_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "component_ref": {
+      "title": "Component Ref",
+      "type": "string"
+    },
+    "owner_repo": {
+      "title": "Owner Repo",
+      "type": "string"
+    },
+    "bindings": {
+      "items": {
+        "$ref": "#/$defs/HookBinding"
+      },
+      "title": "Bindings",
+      "type": "array"
+    },
+    "notes": {
+      "default": "",
+      "title": "Notes",
+      "type": "string"
+    }
+  },
+  "required": [
+    "component_ref",
+    "owner_repo"
+  ],
+  "title": "HookBindingSet",
+  "type": "object"
+}

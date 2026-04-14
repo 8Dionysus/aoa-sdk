@@ -1,0 +1,100 @@
+{
+  "schema_version": "aoa_connectivity_gap_report_v1",
+  "report_ref": "doctor:20260413T145832Z",
+  "workspace_root": "/mnt/data/aoa_recurrence_seed_wave1",
+  "signal_ref": "signal:20260413T145832Z:8Dionysus",
+  "components_checked": [
+    "component:codex-plane:shared-root",
+    "component:codex-subagents:projection"
+  ],
+  "gaps": [
+    {
+      "gap_ref": "gap:001",
+      "severity": "low",
+      "gap_kind": "weak_owner_handoff",
+      "component_ref": "component:codex-plane:shared-root",
+      "owner_repo": "8Dionysus",
+      "evidence_refs": [
+        "aoa-routing:generated/return_navigation_hints.min.json"
+      ],
+      "recommendation": "plant a recurrence manifest in the target repo to close this owner boundary"
+    },
+    {
+      "gap_ref": "gap:002",
+      "severity": "low",
+      "gap_kind": "weak_owner_handoff",
+      "component_ref": "component:codex-plane:shared-root",
+      "owner_repo": "8Dionysus",
+      "evidence_refs": [
+        "aoa-stats:generated/component_refresh_summary.min.json"
+      ],
+      "recommendation": "plant a recurrence manifest in the target repo to close this owner boundary"
+    },
+    {
+      "gap_ref": "gap:003",
+      "severity": "low",
+      "gap_kind": "weak_owner_handoff",
+      "component_ref": "component:codex-plane:shared-root",
+      "owner_repo": "8Dionysus",
+      "evidence_refs": [
+        "aoa-kag:generated/return_regrounding_pack.min.json"
+      ],
+      "recommendation": "plant a recurrence manifest in the target repo to close this owner boundary"
+    },
+    {
+      "gap_ref": "gap:004",
+      "severity": "medium",
+      "gap_kind": "missing_target_route",
+      "component_ref": "component:codex-plane:shared-root",
+      "owner_repo": "8Dionysus",
+      "evidence_refs": [
+        "aoa-kag:generated/return_regrounding_pack.min.json"
+      ],
+      "recommendation": "declare the owner-repo route commands or land the target manifest that owns them"
+    },
+    {
+      "gap_ref": "gap:005",
+      "severity": "low",
+      "gap_kind": "weak_owner_handoff",
+      "component_ref": "component:codex-plane:shared-root",
+      "owner_repo": "8Dionysus",
+      "evidence_refs": [
+        "aoa-playbooks:AOA-P-0030"
+      ],
+      "recommendation": "plant a recurrence manifest in the target repo to close this owner boundary"
+    },
+    {
+      "gap_ref": "gap:006",
+      "severity": "low",
+      "gap_kind": "weak_owner_handoff",
+      "component_ref": "component:codex-subagents:projection",
+      "owner_repo": "aoa-agents",
+      "evidence_refs": [
+        "aoa-stats:generated/component_refresh_summary.min.json"
+      ],
+      "recommendation": "plant a recurrence manifest in the target repo to close this owner boundary"
+    },
+    {
+      "gap_ref": "gap:007",
+      "severity": "low",
+      "gap_kind": "weak_owner_handoff",
+      "component_ref": "component:codex-subagents:projection",
+      "owner_repo": "aoa-agents",
+      "evidence_refs": [
+        "aoa-routing:generated/return_navigation_hints.min.json"
+      ],
+      "recommendation": "plant a recurrence manifest in the target repo to close this owner boundary"
+    },
+    {
+      "gap_ref": "gap:008",
+      "severity": "low",
+      "gap_kind": "weak_owner_handoff",
+      "component_ref": "component:codex-subagents:projection",
+      "owner_repo": "aoa-agents",
+      "evidence_refs": [
+        "aoa-playbooks:AOA-P-0030"
+      ],
+      "recommendation": "plant a recurrence manifest in the target repo to close this owner boundary"
+    }
+  ]
+}

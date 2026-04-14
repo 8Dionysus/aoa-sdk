@@ -1,0 +1,616 @@
+{
+  "$defs": {
+    "BeaconRule": {
+      "additionalProperties": false,
+      "properties": {
+        "beacon_ref": {
+          "title": "Beacon Ref",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "new_technique_candidate",
+            "technique_overlap_hold",
+            "canonical_pressure",
+            "unused_skill_opportunity",
+            "skill_trigger_drift",
+            "skill_bundle_candidate",
+            "portable_eval_candidate",
+            "progression_evidence_candidate",
+            "overclaim_alarm",
+            "playbook_candidate",
+            "subagent_recipe_candidate",
+            "automation_seed_candidate"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "decision_surface": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Surface"
+        },
+        "target_repo": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Repo"
+        },
+        "observation_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Observation Inputs",
+          "type": "array"
+        },
+        "match_signals": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Match Signals",
+          "type": "array"
+        },
+        "match_categories": {
+          "items": {
+            "enum": [
+              "change_pressure",
+              "evidence_pressure",
+              "usage_gap",
+              "repeat_pattern",
+              "review_signal",
+              "overclaim_risk"
+            ],
+            "type": "string"
+          },
+          "title": "Match Categories",
+          "type": "array"
+        },
+        "thresholds": {
+          "$ref": "#/$defs/BeaconThresholds"
+        },
+        "status_ladder": {
+          "items": {
+            "enum": [
+              "hint",
+              "watch",
+              "candidate",
+              "review_ready"
+            ],
+            "type": "string"
+          },
+          "title": "Status Ladder",
+          "type": "array"
+        },
+        "suppress_when": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Suppress When",
+          "type": "array"
+        },
+        "recommended_actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "beacon_ref",
+        "kind"
+      ],
+      "title": "BeaconRule",
+      "type": "object"
+    },
+    "BeaconThresholds": {
+      "additionalProperties": false,
+      "properties": {
+        "watch_observations": {
+          "default": 1,
+          "title": "Watch Observations",
+          "type": "integer"
+        },
+        "candidate_observations": {
+          "default": 2,
+          "title": "Candidate Observations",
+          "type": "integer"
+        },
+        "review_ready_observations": {
+          "default": 3,
+          "title": "Review Ready Observations",
+          "type": "integer"
+        },
+        "min_unique_sources": {
+          "default": 1,
+          "title": "Min Unique Sources",
+          "type": "integer"
+        },
+        "min_unique_evidence_refs": {
+          "default": 1,
+          "title": "Min Unique Evidence Refs",
+          "type": "integer"
+        }
+      },
+      "title": "BeaconThresholds",
+      "type": "object"
+    },
+    "ConsumerEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "owns",
+            "generates",
+            "projects_to",
+            "validated_by",
+            "documents",
+            "evaluated_by",
+            "routes_via",
+            "summarized_by",
+            "donates_to_kag",
+            "requires_regrounding",
+            "handoff_home"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "target_repo": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Repo"
+        },
+        "required": {
+          "default": true,
+          "title": "Required",
+          "type": "boolean"
+        },
+        "suggested_action": {
+          "anyOf": [
+            {
+              "enum": [
+                "observe",
+                "revalidate",
+                "rebuild",
+                "reexport",
+                "regenerate",
+                "reproject",
+                "repair",
+                "reroute",
+                "restat",
+                "reground",
+                "handoff",
+                "defer"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Suggested Action"
+        },
+        "suggested_commands": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Suggested Commands",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "target"
+      ],
+      "title": "ConsumerEdge",
+      "type": "object"
+    },
+    "DriftSignalRule": {
+      "additionalProperties": false,
+      "properties": {
+        "signal": {
+          "title": "Signal",
+          "type": "string"
+        },
+        "recommended_action": {
+          "enum": [
+            "observe",
+            "revalidate",
+            "rebuild",
+            "reexport",
+            "regenerate",
+            "reproject",
+            "repair",
+            "reroute",
+            "restat",
+            "reground",
+            "handoff",
+            "defer"
+          ],
+          "title": "Recommended Action",
+          "type": "string"
+        },
+        "severity": {
+          "default": "medium",
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Severity",
+          "type": "string"
+        }
+      },
+      "required": [
+        "signal",
+        "recommended_action"
+      ],
+      "title": "DriftSignalRule",
+      "type": "object"
+    },
+    "FreshnessWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "stale_after_days": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Stale After Days"
+        },
+        "repeat_trigger_threshold": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Repeat Trigger Threshold"
+        },
+        "open_window_days": {
+          "anyOf": [
+            {
+              "type": "integer"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Open Window Days"
+        }
+      },
+      "title": "FreshnessWindow",
+      "type": "object"
+    },
+    "ObservationInputSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "input_ref": {
+          "title": "Input Ref",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "change_signal",
+            "receipt",
+            "closeout",
+            "evaluation_matrix",
+            "trigger_eval",
+            "review_note",
+            "runtime_artifact",
+            "harvest",
+            "other"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "path_globs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Path Globs",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "input_ref",
+        "kind"
+      ],
+      "title": "ObservationInputSpec",
+      "type": "object"
+    },
+    "RefreshRoute": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "observe",
+            "revalidate",
+            "rebuild",
+            "reexport",
+            "regenerate",
+            "reproject",
+            "repair",
+            "reroute",
+            "restat",
+            "reground",
+            "handoff",
+            "defer"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "commands": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Commands",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "action"
+      ],
+      "title": "RefreshRoute",
+      "type": "object"
+    },
+    "SignalEdge": {
+      "additionalProperties": false,
+      "properties": {
+        "kind": {
+          "enum": [
+            "implemented_by_skill",
+            "proved_by_eval",
+            "composed_by_playbook",
+            "incubated_by_technique",
+            "documents_decision",
+            "summarized_by"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "target": {
+          "title": "Target",
+          "type": "string"
+        },
+        "target_repo": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Target Repo"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "target"
+      ],
+      "title": "SignalEdge",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "default": "aoa_recurrence_component_v2",
+      "enum": [
+        "aoa_recurrence_component_v1",
+        "aoa_recurrence_component_v2"
+      ],
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "component_ref": {
+      "title": "Component Ref",
+      "type": "string"
+    },
+    "owner_repo": {
+      "title": "Owner Repo",
+      "type": "string"
+    },
+    "description": {
+      "default": "",
+      "title": "Description",
+      "type": "string"
+    },
+    "source_inputs": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Source Inputs",
+      "type": "array"
+    },
+    "generated_surfaces": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Generated Surfaces",
+      "type": "array"
+    },
+    "projected_surfaces": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Projected Surfaces",
+      "type": "array"
+    },
+    "contract_surfaces": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Contract Surfaces",
+      "type": "array"
+    },
+    "documentation_surfaces": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Documentation Surfaces",
+      "type": "array"
+    },
+    "test_surfaces": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Test Surfaces",
+      "type": "array"
+    },
+    "proof_surfaces": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Proof Surfaces",
+      "type": "array"
+    },
+    "receipt_surfaces": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Receipt Surfaces",
+      "type": "array"
+    },
+    "refresh_routes": {
+      "items": {
+        "$ref": "#/$defs/RefreshRoute"
+      },
+      "title": "Refresh Routes",
+      "type": "array"
+    },
+    "consumer_edges": {
+      "items": {
+        "$ref": "#/$defs/ConsumerEdge"
+      },
+      "title": "Consumer Edges",
+      "type": "array"
+    },
+    "drift_signals": {
+      "items": {
+        "$ref": "#/$defs/DriftSignalRule"
+      },
+      "title": "Drift Signals",
+      "type": "array"
+    },
+    "freshness": {
+      "$ref": "#/$defs/FreshnessWindow"
+    },
+    "rollback_anchors": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Rollback Anchors",
+      "type": "array"
+    },
+    "tags": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Tags",
+      "type": "array"
+    },
+    "signal_edges": {
+      "items": {
+        "$ref": "#/$defs/SignalEdge"
+      },
+      "title": "Signal Edges",
+      "type": "array"
+    },
+    "observation_inputs": {
+      "items": {
+        "$ref": "#/$defs/ObservationInputSpec"
+      },
+      "title": "Observation Inputs",
+      "type": "array"
+    },
+    "beacon_rules": {
+      "items": {
+        "$ref": "#/$defs/BeaconRule"
+      },
+      "title": "Beacon Rules",
+      "type": "array"
+    },
+    "decision_surfaces": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Decision Surfaces",
+      "type": "array"
+    },
+    "candidate_targets": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Candidate Targets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "component_ref",
+    "owner_repo"
+  ],
+  "title": "RecurrenceComponent",
+  "type": "object"
+}

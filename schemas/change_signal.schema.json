@@ -1,0 +1,176 @@
+{
+  "$defs": {
+    "ChangedPath": {
+      "additionalProperties": false,
+      "properties": {
+        "repo": {
+          "title": "Repo",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "matched_component_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Matched Component Refs",
+          "type": "array"
+        },
+        "matched_classes": {
+          "items": {
+            "enum": [
+              "source",
+              "generated",
+              "projected",
+              "contract",
+              "docs",
+              "test",
+              "proof",
+              "receipt",
+              "other"
+            ],
+            "type": "string"
+          },
+          "title": "Matched Classes",
+          "type": "array"
+        }
+      },
+      "required": [
+        "repo",
+        "path"
+      ],
+      "title": "ChangedPath",
+      "type": "object"
+    },
+    "MatchedComponent": {
+      "additionalProperties": false,
+      "properties": {
+        "component_ref": {
+          "title": "Component Ref",
+          "type": "string"
+        },
+        "owner_repo": {
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "match_class": {
+          "enum": [
+            "source",
+            "generated",
+            "projected",
+            "contract",
+            "docs",
+            "test",
+            "proof",
+            "receipt",
+            "other"
+          ],
+          "title": "Match Class",
+          "type": "string"
+        },
+        "matched_paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Matched Paths",
+          "type": "array"
+        },
+        "inferred_signals": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Inferred Signals",
+          "type": "array"
+        }
+      },
+      "required": [
+        "component_ref",
+        "owner_repo",
+        "match_class"
+      ],
+      "title": "MatchedComponent",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_change_signal_v1",
+      "default": "aoa_change_signal_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "signal_ref": {
+      "title": "Signal Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "repo_root": {
+      "title": "Repo Root",
+      "type": "string"
+    },
+    "repo_name": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Repo Name"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    },
+    "diff_base": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Diff Base"
+    },
+    "changed_paths": {
+      "items": {
+        "$ref": "#/$defs/ChangedPath"
+      },
+      "title": "Changed Paths",
+      "type": "array"
+    },
+    "direct_components": {
+      "items": {
+        "$ref": "#/$defs/MatchedComponent"
+      },
+      "title": "Direct Components",
+      "type": "array"
+    },
+    "unmatched_paths": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Unmatched Paths",
+      "type": "array"
+    }
+  },
+  "required": [
+    "signal_ref",
+    "workspace_root",
+    "repo_root",
+    "observed_at"
+  ],
+  "title": "ChangeSignal",
+  "type": "object"
+}

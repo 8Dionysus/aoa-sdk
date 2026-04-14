@@ -1,0 +1,147 @@
+{
+  "$defs": {
+    "CandidateLedgerEntry": {
+      "additionalProperties": false,
+      "properties": {
+        "entry_ref": {
+          "title": "Entry Ref",
+          "type": "string"
+        },
+        "recorded_at": {
+          "format": "date-time",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "beacon_ref": {
+          "title": "Beacon Ref",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "new_technique_candidate",
+            "technique_overlap_hold",
+            "canonical_pressure",
+            "unused_skill_opportunity",
+            "skill_trigger_drift",
+            "skill_bundle_candidate",
+            "portable_eval_candidate",
+            "progression_evidence_candidate",
+            "overclaim_alarm",
+            "playbook_candidate",
+            "subagent_recipe_candidate",
+            "automation_seed_candidate"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "hint",
+            "watch",
+            "candidate",
+            "review_ready"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "component_ref": {
+          "title": "Component Ref",
+          "type": "string"
+        },
+        "owner_repo": {
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "target_repo": {
+          "title": "Target Repo",
+          "type": "string"
+        },
+        "decision_surface": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Surface"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "source_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Inputs",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "entry_ref",
+        "recorded_at",
+        "beacon_ref",
+        "kind",
+        "status",
+        "component_ref",
+        "owner_repo",
+        "target_repo"
+      ],
+      "title": "CandidateLedgerEntry",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_candidate_ledger_v1",
+      "default": "aoa_candidate_ledger_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "ledger_ref": {
+      "title": "Ledger Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "signal_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Signal Ref"
+    },
+    "entries": {
+      "items": {
+        "$ref": "#/$defs/CandidateLedgerEntry"
+      },
+      "title": "Entries",
+      "type": "array"
+    }
+  },
+  "required": [
+    "ledger_ref",
+    "workspace_root"
+  ],
+  "title": "CandidateLedger",
+  "type": "object"
+}

@@ -12,6 +12,7 @@ from ..closeout import CloseoutAPI
 from ..compatibility import CompatibilityAPI
 from ..loaders import load_json
 from ..release.api import ReleaseAuditPhase, ReleaseAuditResult, ReleasePublishResult
+from ..recurrence.cli import recur_app
 from ..models import (
     CheckpointAfterCommitReport,
     CheckpointCloseoutContext,
@@ -57,6 +58,7 @@ app.add_typer(workspace_app, name="workspace")
 app.add_typer(compatibility_app, name="compatibility")
 app.add_typer(closeout_app, name="closeout")
 app.add_typer(skills_app, name="skills")
+app.add_typer(recur_app, name="recur")
 app.add_typer(surfaces_app, name="surfaces")
 app.add_typer(checkpoint_app, name="checkpoint")
 app.add_typer(release_app, name="release")

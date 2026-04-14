@@ -1,0 +1,182 @@
+{
+  "$defs": {
+    "HookRunWarning": {
+      "additionalProperties": false,
+      "properties": {
+        "binding_ref": {
+          "title": "Binding Ref",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "paths": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Paths",
+          "type": "array"
+        }
+      },
+      "required": [
+        "binding_ref",
+        "message"
+      ],
+      "title": "HookRunWarning",
+      "type": "object"
+    },
+    "ObservationRecord": {
+      "additionalProperties": false,
+      "properties": {
+        "observation_ref": {
+          "title": "Observation Ref",
+          "type": "string"
+        },
+        "component_ref": {
+          "title": "Component Ref",
+          "type": "string"
+        },
+        "owner_repo": {
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "category": {
+          "enum": [
+            "change_pressure",
+            "evidence_pressure",
+            "usage_gap",
+            "repeat_pattern",
+            "review_signal",
+            "overclaim_risk"
+          ],
+          "title": "Category",
+          "type": "string"
+        },
+        "signal": {
+          "title": "Signal",
+          "type": "string"
+        },
+        "source_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Inputs",
+          "type": "array"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "attributes": {
+          "additionalProperties": true,
+          "title": "Attributes",
+          "type": "object"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "observation_ref",
+        "component_ref",
+        "owner_repo",
+        "observed_at",
+        "category",
+        "signal"
+      ],
+      "title": "ObservationRecord",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_hook_run_report_v1",
+      "default": "aoa_hook_run_report_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "run_ref": {
+      "title": "Run Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "event": {
+      "enum": [
+        "manual_run",
+        "session_start",
+        "user_prompt_submit",
+        "session_stop",
+        "receipt_published",
+        "generated_surface_refreshed",
+        "harvest_written",
+        "real_run_published",
+        "gate_review_written",
+        "runtime_evidence_selected"
+      ],
+      "title": "Event",
+      "type": "string"
+    },
+    "signal_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Signal Ref"
+    },
+    "bindings_run": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Bindings Run",
+      "type": "array"
+    },
+    "missing_paths": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Missing Paths",
+      "type": "array"
+    },
+    "warnings": {
+      "items": {
+        "$ref": "#/$defs/HookRunWarning"
+      },
+      "title": "Warnings",
+      "type": "array"
+    },
+    "observations": {
+      "items": {
+        "$ref": "#/$defs/ObservationRecord"
+      },
+      "title": "Observations",
+      "type": "array"
+    }
+  },
+  "required": [
+    "run_ref",
+    "workspace_root",
+    "event"
+  ],
+  "title": "HookRunReport",
+  "type": "object"
+}

@@ -1,0 +1,167 @@
+{
+  "$defs": {
+    "PlanStep": {
+      "additionalProperties": false,
+      "properties": {
+        "step_ref": {
+          "title": "Step Ref",
+          "type": "string"
+        },
+        "order": {
+          "title": "Order",
+          "type": "integer"
+        },
+        "component_ref": {
+          "title": "Component Ref",
+          "type": "string"
+        },
+        "owner_repo": {
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "action": {
+          "enum": [
+            "observe",
+            "revalidate",
+            "rebuild",
+            "reexport",
+            "regenerate",
+            "reproject",
+            "repair",
+            "reroute",
+            "restat",
+            "reground",
+            "handoff",
+            "defer"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "reason": {
+          "title": "Reason",
+          "type": "string"
+        },
+        "surface_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Surface Refs",
+          "type": "array"
+        },
+        "commands": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Commands",
+          "type": "array"
+        },
+        "depends_on": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Depends On",
+          "type": "array"
+        },
+        "review_required": {
+          "default": true,
+          "title": "Review Required",
+          "type": "boolean"
+        },
+        "status": {
+          "default": "planned",
+          "enum": [
+            "planned",
+            "blocked"
+          ],
+          "title": "Status",
+          "type": "string"
+        }
+      },
+      "required": [
+        "step_ref",
+        "order",
+        "component_ref",
+        "owner_repo",
+        "action",
+        "reason"
+      ],
+      "title": "PlanStep",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_propagation_plan_v1",
+      "default": "aoa_propagation_plan_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "plan_ref": {
+      "title": "Plan Ref",
+      "type": "string"
+    },
+    "signal_ref": {
+      "title": "Signal Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "direct_components": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Direct Components",
+      "type": "array"
+    },
+    "impacted_components": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Impacted Components",
+      "type": "array"
+    },
+    "impacted_targets": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Impacted Targets",
+      "type": "array"
+    },
+    "ordered_steps": {
+      "items": {
+        "$ref": "#/$defs/PlanStep"
+      },
+      "title": "Ordered Steps",
+      "type": "array"
+    },
+    "unresolved_edges": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Unresolved Edges",
+      "type": "array"
+    },
+    "open_questions": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Open Questions",
+      "type": "array"
+    },
+    "summary": {
+      "default": "",
+      "title": "Summary",
+      "type": "string"
+    }
+  },
+  "required": [
+    "plan_ref",
+    "signal_ref",
+    "workspace_root"
+  ],
+  "title": "PropagationPlan",
+  "type": "object"
+}

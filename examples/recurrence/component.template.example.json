@@ -1,0 +1,134 @@
+{
+  "schema_version": "aoa_recurrence_component_v2",
+  "component_ref": "component:example:name",
+  "owner_repo": "example-repo",
+  "description": "Template for a source-authored recurrence component with beacon support.",
+  "source_inputs": [
+    "source/**/*.json"
+  ],
+  "generated_surfaces": [
+    "generated/example.min.json"
+  ],
+  "projected_surfaces": [
+    ".runtime/example/"
+  ],
+  "contract_surfaces": [
+    "docs/EXAMPLE_CONTRACT.md"
+  ],
+  "documentation_surfaces": [
+    "README.md"
+  ],
+  "test_surfaces": [
+    "tests/test_example.py"
+  ],
+  "proof_surfaces": [
+    "python scripts/validate_example.py"
+  ],
+  "receipt_surfaces": [
+    ".aoa/live_receipts/example-receipts.jsonl"
+  ],
+  "refresh_routes": [
+    {
+      "action": "rebuild",
+      "commands": [
+        "python scripts/build_example.py",
+        "python scripts/validate_example.py"
+      ],
+      "notes": "normal rebuild route"
+    }
+  ],
+  "consumer_edges": [
+    {
+      "kind": "routes_via",
+      "target": "generated/example_return_hints.min.json",
+      "target_repo": "aoa-routing",
+      "required": true,
+      "suggested_action": "reroute",
+      "suggested_commands": [
+        "python scripts/build_router.py",
+        "python scripts/validate_router.py"
+      ],
+      "notes": "thin routing follow-through"
+    }
+  ],
+  "drift_signals": [
+    {
+      "signal": "source_changed_without_regeneration",
+      "recommended_action": "rebuild",
+      "severity": "medium"
+    }
+  ],
+  "freshness": {
+    "stale_after_days": 7,
+    "repeat_trigger_threshold": 2,
+    "open_window_days": 5
+  },
+  "rollback_anchors": [
+    "docs/EXAMPLE_CONTRACT.md"
+  ],
+  "tags": [
+    "template"
+  ],
+  "signal_edges": [
+    {
+      "kind": "implemented_by_skill",
+      "target": "component:skills:bundle-and-activation-beacons",
+      "target_repo": "aoa-skills",
+      "notes": "example cross-layer donation edge"
+    }
+  ],
+  "observation_inputs": [
+    {
+      "input_ref": "example-trigger-suite",
+      "kind": "trigger_eval",
+      "path_globs": [
+        "generated/example_trigger_cases.jsonl"
+      ],
+      "notes": "example activation or usage-gap signal input"
+    }
+  ],
+  "beacon_rules": [
+    {
+      "beacon_ref": "example.workflow.candidate",
+      "kind": "skill_bundle_candidate",
+      "decision_surface": "docs/EXAMPLE_CONTRACT.md",
+      "target_repo": "example-repo",
+      "observation_inputs": [
+        "change_signal",
+        "example-trigger-suite"
+      ],
+      "match_signals": [
+        "source_changed",
+        "example_candidate_seen"
+      ],
+      "match_categories": [
+        "change_pressure",
+        "repeat_pattern"
+      ],
+      "thresholds": {
+        "watch_observations": 1,
+        "candidate_observations": 2,
+        "review_ready_observations": 3,
+        "min_unique_sources": 2,
+        "min_unique_evidence_refs": 2
+      },
+      "status_ladder": [
+        "hint",
+        "watch",
+        "candidate",
+        "review_ready"
+      ],
+      "suppress_when": [],
+      "recommended_actions": [
+        "open the owning decision surface"
+      ],
+      "notes": "template only"
+    }
+  ],
+  "decision_surfaces": [
+    "docs/EXAMPLE_CONTRACT.md"
+  ],
+  "candidate_targets": [
+    "generated/example.min.json"
+  ]
+}
