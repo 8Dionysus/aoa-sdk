@@ -139,6 +139,8 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-skills.tiny_router_capsules.min"].compatible is True
     assert report["aoa-skills.skill_trigger_collision_matrix"].detected_version == 1
     assert report["aoa-skills.skill_trigger_collision_matrix"].compatible is True
+    assert report["aoa-agents.codex_projection_manifest"].detected_version == 2
+    assert report["aoa-agents.codex_projection_manifest"].compatible is True
     assert report["aoa-kag.kag_registry.min"].detected_version == 1
     assert report["aoa-kag.federation_spine.min"].compatible is True
 
@@ -208,6 +210,7 @@ def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surf
     memo_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-memo")}
     technique_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-techniques")}
     routing_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-routing")}
+    agent_checks = {entry.surface_id: entry for entry in sdk.compatibility.check_repo("aoa-agents")}
     aoa_center_checks = {
         entry.surface_id: entry for entry in sdk.compatibility.check_repo("Agents-of-Abyss")
     }
@@ -219,6 +222,8 @@ def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surf
     assert routing_checks["aoa-routing.federation_entrypoints.min"].compatible is True
     assert routing_checks["aoa-routing.return_navigation_hints.min"].compatible is True
     assert routing_checks["aoa-routing.owner_layer_shortlist.min"].compatible is True
+    assert agent_checks["aoa-agents.codex_projection_manifest"].detected_version == 2
+    assert agent_checks["aoa-agents.codex_projection_manifest"].compatible is True
     assert aoa_center_checks["Agents-of-Abyss.center_entry_map.min"].compatible is True
     assert tos_checks["Tree-of-Sophia.root_entry_map.min"].compatible is True
     assert playbook_checks["aoa-playbooks.playbook_automation_seeds"].detected_version == 1

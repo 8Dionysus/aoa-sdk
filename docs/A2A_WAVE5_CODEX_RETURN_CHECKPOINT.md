@@ -7,6 +7,13 @@ The sibling-owned summon contract stays in `aoa-skills` under
 `aoa-sdk` may consume that contract through `sdk.a2a`; it must not redefine the
 skill law.
 
+For Codex-local child targets, `aoa-sdk` may also consume the bounded
+projection manifest published by `aoa-agents` at
+`generated/codex_agents/projection_manifest.json`.
+That seam carries planning fields such as sandbox posture, nickname candidates,
+MCP affinity, and config-relative agent paths; it does not transfer role
+ownership into `aoa-sdk`.
+
 ## What this slice may build
 
 - Codex-local child targets
@@ -23,6 +30,7 @@ skill law.
 - auto-run skill meaning
 - auto-run reviewed closeout reasoning
 - invent new owner-local receipt families
+- redefine `aoa-agents` role projection defaults when the manifest is available
 - replace workspace install truth
 - replace role, playbook, memo, or eval ownership
 

@@ -190,6 +190,14 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="version",
         supported_versions=[1],
     ),
+    "aoa-agents.codex_projection_manifest": SurfaceCompatibilityRule(
+        surface_id="aoa-agents.codex_projection_manifest",
+        repo="aoa-agents",
+        relative_path="generated/codex_agents/projection_manifest.json",
+        version_field="version",
+        supported_versions=[2],
+        required_top_level_keys=["generated_agents", "config_file_prefix", "wiring_version"],
+    ),
     "aoa-playbooks.playbook_registry.min": SurfaceCompatibilityRule(
         surface_id="aoa-playbooks.playbook_registry.min",
         repo="aoa-playbooks",

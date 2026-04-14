@@ -12,6 +12,7 @@
   "projection_chain": [
     "aoa-agents/profiles/reviewer.profile.json",
     "aoa-agents/config/codex_subagent_wiring.v2.json",
+    "aoa-agents/generated/codex_agents/projection_manifest.json",
     "aoa-agents/generated/codex_agents/agents/reviewer.toml",
     "8Dionysus/.codex/agents/reviewer.toml"
   ]

@@ -19,6 +19,10 @@ def test_codex_local_target_uses_project_level_paths() -> None:
     assert target.install_surface == "/srv/.codex/agents"
     assert target.workspace_marker == "/srv/AOA_WORKSPACE_ROOT"
     assert target.mcp_servers == ["aoa_workspace"]
+    assert (
+        "aoa-agents/generated/codex_agents/projection_manifest.json"
+        in target.projection_chain
+    )
 
 
 def test_closeout_request_and_runtime_receipt_keep_canonical_mapping() -> None:
