@@ -1572,6 +1572,54 @@ def test_checkpoint_status_quarantines_unscoped_legacy_note_from_active_runtime_
     assert not (scoped_note_dir / "checkpoint-note.json").exists()
 
 
+def test_checkpoint_status_quarantines_legacy_note_with_matching_runtime_session_from_active_runtime_session(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json",
+        session_id="runtime-session-live",
+    )
+    legacy_note_dir = _checkpoint_note_dir(workspace_root, repo_label="aoa-sdk")
+    scoped_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-live",
+    )
+    _write_checkpoint_history_entry(
+        note_dir=legacy_note_dir,
+        session_ref="session:test-legacy-matching-runtime",
+        runtime_session_id="runtime-session-live",
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:route:aoa-playbooks-playbook-registry-legacy-matching-runtime",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Legacy route candidate with matching runtime id",
+        source_surface_ref="aoa-playbooks.playbook_registry.min",
+        evidence_refs=["aoa-playbooks.playbook_registry.min"],
+        progression_axis_signals=[],
+        agent_review_status="pending",
+        commit_sha="abc123",
+        commit_short_sha="abc123",
+    )
+
+    with pytest.raises(SurfaceNotFound):
+        sdk.checkpoints.status(
+            repo_root=str(workspace_root / "aoa-sdk"),
+            session_file=str(session_file),
+        )
+
+    archive_dirs = sorted((workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "archive").glob("aoa-sdk-*"))
+    archived_payload = json.loads((archive_dirs[-1] / "checkpoint-note.jsonl").read_text(encoding="utf-8").splitlines()[0])
+
+    assert archive_dirs
+    assert archived_payload["runtime_session_id"] == "runtime-session-live"
+    assert archived_payload["session_ref"] == "session:test-legacy-matching-runtime"
+    assert not (legacy_note_dir / "checkpoint-note.jsonl").exists()
+    assert not (scoped_note_dir / "checkpoint-note.json").exists()
+
+
 def test_capture_from_skill_phase_does_not_reuse_stale_current_note(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
@@ -2301,6 +2349,53 @@ def test_build_closeout_context_fails_when_pending_agent_review_exists(workspace
         )
 
     assert captured.agent_review_status == "pending"
+
+
+def test_checkpoint_status_recomputes_review_status_when_new_pending_review_is_added(
+    workspace_root: Path,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _git_commit(repo_root, subject="first reviewed checkpoint")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-review-status-reset",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+    reviewed = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        auto_fill=True,
+        session_file=str(session_file),
+    )
+    second_commit_sha = _git_commit(repo_root, subject="second pending checkpoint")
+
+    pending = sdk.checkpoints.append(
+        repo_root=str(repo_root),
+        checkpoint_kind="commit",
+        intent_text=f"checkpoint commit {second_commit_sha[:7]}: second pending checkpoint",
+        commit_sha=second_commit_sha,
+        commit_short_sha=second_commit_sha[:7],
+        agent_review_status="pending",
+        session_file=str(session_file),
+    )
+    refreshed = sdk.checkpoints.status(
+        repo_root=str(repo_root),
+        session_file=str(session_file),
+    )
+
+    assert reviewed.review_status == "reviewed"
+    assert pending.agent_review_status == "pending"
+    assert pending.agent_review_pending_refs == [second_commit_sha]
+    assert pending.review_status == "unreviewed"
+    assert refreshed.agent_review_status == "pending"
+    assert refreshed.agent_review_pending_refs == [second_commit_sha]
+    assert refreshed.review_status == "unreviewed"
 
 
 def test_build_closeout_context_carries_agent_review_material(workspace_root: Path) -> None:
