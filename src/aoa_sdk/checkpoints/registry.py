@@ -1944,26 +1944,17 @@ def _resolve_runtime_checkpoint_paths_for_label(
         legacy_note = _load_checkpoint_note(legacy_paths.note_json)
         if legacy_note is None:
             legacy_note = _build_checkpoint_note(legacy_paths)
-        if legacy_note.runtime_session_id != runtime_session_id:
-            if migrate_legacy:
-                if legacy_note.runtime_session_id is not None:
-                    _archive_current_checkpoint(legacy_paths)
-            return scoped_paths
+        # Unscoped legacy ledgers stay quarantined once an active runtime session
+        # exists, even if their payload happens to mention the same session id.
+        if migrate_legacy and legacy_note.runtime_session_id is not None:
+            _archive_current_checkpoint(legacy_paths)
+        return scoped_paths
     if scoped_paths.jsonl.exists():
         return scoped_paths
     if not legacy_paths.jsonl.exists():
         return scoped_paths
 
-    if legacy_note is None:
-        legacy_note = _load_checkpoint_note(legacy_paths.note_json)
-        if legacy_note is None:
-            legacy_note = _build_checkpoint_note(legacy_paths)
-    if legacy_note.runtime_session_id != runtime_session_id:
-        return scoped_paths
-    if migrate_legacy:
-        _move_current_checkpoint(source_paths=legacy_paths, target_paths=scoped_paths)
-        return scoped_paths
-    return legacy_paths
+    return scoped_paths
 
 
 def _checkpoint_note_ref_for_capture(
@@ -3900,8 +3891,8 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
         blocked_by=sorted(all_blocked),
         review_status=(
             "reviewed"
-            if existing_review_status == "reviewed"
-            or (agent_review_status == "reviewed" and not pending_agent_review_refs)
+            if not pending_agent_review_refs
+            and (existing_review_status == "reviewed" or agent_review_status == "reviewed")
             else "unreviewed"
         ),
         evidence_refs=sorted(all_evidence),
