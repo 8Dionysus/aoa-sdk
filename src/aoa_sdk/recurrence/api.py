@@ -190,6 +190,7 @@ class RecurrenceAPI:
             packet = read_model(beacon_or_path, BeaconPacket)
         else:
             packet = beacon_or_path
+        usage_gaps: UsageGapReport | None
         if isinstance(usage_gap_or_path, (str, Path)):
             usage_gaps = read_model(usage_gap_or_path, UsageGapReport)
         else:
@@ -235,10 +236,12 @@ class RecurrenceAPI:
             wiring_plan = read_model(wiring_plan_or_path, WiringPlan)
         else:
             wiring_plan = wiring_plan_or_path
+        review_summary: OwnerReviewSummary | None
         if isinstance(review_summary_or_path, (str, Path)):
             review_summary = read_model(review_summary_or_path, OwnerReviewSummary)
         else:
             review_summary = review_summary_or_path
+        doctor_report: ConnectivityGapReport | None
         if isinstance(doctor_report_or_path, (str, Path)):
             doctor_report = read_model(doctor_report_or_path, ConnectivityGapReport)
         else:
