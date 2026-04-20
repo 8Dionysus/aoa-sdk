@@ -6,8 +6,11 @@ import subprocess
 import sys
 from pathlib import Path
 
+from jsonschema import Draft202012Validator
+
 ROOT = Path(__file__).resolve().parents[1]
 REG = ROOT / "generated" / "agon_recurrence_adapter_registry.min.json"
+SCHEMA = ROOT / "schemas" / "agon-recurrence-adapter-registry.schema.json"
 
 REQUIRED_STOP_LINES = {
     "no_arena_session_creation",
@@ -37,6 +40,19 @@ def fail(msg: str) -> int:
     print(f"agon recurrence adapter validation failed: {msg}", file=sys.stderr)
     return 1
 
+
+def format_error_path(path_parts: list[object]) -> str:
+    rendered: list[str] = []
+    for part in path_parts:
+        if isinstance(part, int):
+            rendered.append(f"[{part}]")
+        elif rendered:
+            rendered.append(f".{part}")
+        else:
+            rendered.append(str(part))
+    return "".join(rendered) or "<root>"
+
+
 def main() -> int:
     builder = ROOT / "scripts" / "build_agon_recurrence_adapter_registry.py"
     result = subprocess.run([sys.executable, str(builder), "--check"], cwd=ROOT)
@@ -44,6 +60,16 @@ def main() -> int:
         return result.returncode
 
     data = json.loads(REG.read_text(encoding="utf-8"))
+    schema = json.loads(SCHEMA.read_text(encoding="utf-8"))
+    errors = sorted(
+        Draft202012Validator(schema).iter_errors(data),
+        key=lambda error: list(error.absolute_path),
+    )
+    if errors:
+        first = errors[0]
+        return fail(
+            f"schema violation at {format_error_path(list(first.absolute_path))}: {first.message}"
+        )
     if data.get("interlude") != "R4":
         return fail("interlude must be R4")
     if data.get("owner_repo") != "aoa-sdk":

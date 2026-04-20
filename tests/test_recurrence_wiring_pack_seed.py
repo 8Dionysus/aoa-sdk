@@ -2,16 +2,26 @@ from __future__ import annotations
 
 # ruff: noqa: E402
 
+import importlib.util
 import sys
 import types
 from pathlib import Path
+
+SRC_ROOT = Path(__file__).resolve().parents[1] / "src" / "aoa_sdk"
 
 
 def _install_workspace_stub() -> None:
     if "aoa_sdk.workspace.discovery" in sys.modules:
         return
+    aoa_sdk_pkg = sys.modules.setdefault("aoa_sdk", types.ModuleType("aoa_sdk"))
+    aoa_sdk_pkg.__path__ = [str(SRC_ROOT)]
+    recurrence_pkg = sys.modules.setdefault("aoa_sdk.recurrence", types.ModuleType("aoa_sdk.recurrence"))
+    recurrence_pkg.__path__ = [str(SRC_ROOT / "recurrence")]
     workspace_pkg = types.ModuleType("aoa_sdk.workspace")
+    workspace_pkg.__path__ = []
     discovery = types.ModuleType("aoa_sdk.workspace.discovery")
+    roots = types.ModuleType("aoa_sdk.workspace.roots")
+    roots.KNOWN_REPOS = ()
 
     class Workspace:
         def __init__(self, root=None, repo_roots=None):
@@ -32,18 +42,30 @@ def _install_workspace_stub() -> None:
     workspace_pkg.discovery = discovery
     sys.modules["aoa_sdk.workspace"] = workspace_pkg
     sys.modules["aoa_sdk.workspace.discovery"] = discovery
+    sys.modules["aoa_sdk.workspace.roots"] = roots
 
 
 _install_workspace_stub()
 
-from aoa_sdk.recurrence.models import (
-    ConnectivityGap,
-    ConnectivityGapReport,
-    OwnerReviewSummary,
-    OwnerReviewSummaryItem,
-)
-from aoa_sdk.recurrence.rollout import build_rollout_window_bundle
-from aoa_sdk.recurrence.wiring import build_wiring_plan
+def _load_module(name: str, path: Path):
+    spec = importlib.util.spec_from_file_location(name, path)
+    assert spec and spec.loader
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+models = _load_module("aoa_sdk.recurrence.models", SRC_ROOT / "recurrence" / "models.py")
+rollout = _load_module("aoa_sdk.recurrence.rollout", SRC_ROOT / "recurrence" / "rollout.py")
+wiring = _load_module("aoa_sdk.recurrence.wiring", SRC_ROOT / "recurrence" / "wiring.py")
+
+ConnectivityGap = models.ConnectivityGap
+ConnectivityGapReport = models.ConnectivityGapReport
+OwnerReviewSummary = models.OwnerReviewSummary
+OwnerReviewSummaryItem = models.OwnerReviewSummaryItem
+build_rollout_window_bundle = rollout.build_rollout_window_bundle
+build_wiring_plan = wiring.build_wiring_plan
 from aoa_sdk.workspace.discovery import Workspace
 
 
@@ -59,6 +81,15 @@ def test_wiring_plan_emits_expected_scopes(tmp_path: Path) -> None:
         "pre_push",
         "ci",
     ]
+
+
+def test_wiring_plan_ci_commands_use_repo_root_test_paths(tmp_path: Path) -> None:
+    workspace = Workspace.discover(tmp_path)
+    plan = build_wiring_plan(workspace)
+    ci_snippet = next(item for item in plan.snippets if item.scope == "ci")
+
+    assert ci_snippet.commands[1].startswith("pytest -q tests/test_recurrence_seed.py")
+    assert "aoa-sdk/tests/" not in ci_snippet.commands[1]
 
 
 def test_rollout_bundle_opens_rollback_on_high_gap(tmp_path: Path) -> None:
