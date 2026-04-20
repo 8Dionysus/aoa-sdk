@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+REPO_ROOT="${1:-<repo-root>}"
+DIFF_BASE="${2:-git:HEAD~1..HEAD}"
+
+aoa recur detect "$REPO_ROOT" --from "$DIFF_BASE" --root . --json

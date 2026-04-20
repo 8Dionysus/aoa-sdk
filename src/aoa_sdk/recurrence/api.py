@@ -12,6 +12,7 @@ from .io import read_model
 from .ledger import build_candidate_ledger
 from .models import (
     BeaconPacket,
+    CandidateDossierPacket,
     CandidateLedger,
     ChangeSignal,
     ConnectivityGapReport,
@@ -19,15 +20,26 @@ from .models import (
     HookEvent,
     HookRunReport,
     ObservationPacket,
+    OwnerReviewSummary,
     PropagationPlan,
     ReturnHandoff,
+    ReviewQueue,
+    RolloutWindowBundle,
     UsageGapReport,
+    WiringPlan,
 )
 from .observations import build_observation_packet
 from .planner import build_propagation_plan
 from .reentry import build_return_handoff
 from .registry import RecurrenceRegistry, load_registry
+from .review import (
+    build_candidate_dossier_packet,
+    build_owner_review_summary,
+    build_review_queue,
+)
+from .rollout import build_rollout_window_bundle
 from .usage_gaps import build_usage_gap_report
+from .wiring import build_wiring_plan
 
 
 class RecurrenceAPI:
@@ -41,7 +53,9 @@ class RecurrenceAPI:
         return load_hook_registry(self.workspace)
 
     def hooks(self, *, event: HookEvent | None = None) -> list[HookBinding]:
-        return list_hook_bindings(self.workspace, event=event, registry=self.hook_registry())
+        return list_hook_bindings(
+            self.workspace, event=event, registry=self.hook_registry()
+        )
 
     def run_hooks(
         self,
@@ -84,15 +98,21 @@ class RecurrenceAPI:
             report = read_model(report_or_path, ChangeSignal)
         else:
             report = report_or_path
-        return build_propagation_plan(self.workspace, signal=report, registry=self.registry())
+        return build_propagation_plan(
+            self.workspace, signal=report, registry=self.registry()
+        )
 
-    def doctor(self, report_or_path: ChangeSignal | str | Path | None = None) -> ConnectivityGapReport:
+    def doctor(
+        self, report_or_path: ChangeSignal | str | Path | None = None
+    ) -> ConnectivityGapReport:
         report = None
         if isinstance(report_or_path, (str, Path)):
             report = read_model(report_or_path, ChangeSignal)
         elif isinstance(report_or_path, ChangeSignal):
             report = report_or_path
-        return build_connectivity_gap_report(self.workspace, signal=report, registry=self.registry())
+        return build_connectivity_gap_report(
+            self.workspace, signal=report, registry=self.registry()
+        )
 
     def build_return_handoff(
         self,
@@ -104,7 +124,9 @@ class RecurrenceAPI:
             plan = read_model(plan_or_path, PropagationPlan)
         else:
             plan = plan_or_path
-        return build_return_handoff(plan=plan, registry=self.registry(), reviewed=reviewed)
+        return build_return_handoff(
+            plan=plan, registry=self.registry(), reviewed=reviewed
+        )
 
     def observe(
         self,
@@ -126,12 +148,16 @@ class RecurrenceAPI:
             hook_run_paths=hook_run_paths,
         )
 
-    def beacon(self, observation_or_path: ObservationPacket | str | Path) -> BeaconPacket:
+    def beacon(
+        self, observation_or_path: ObservationPacket | str | Path
+    ) -> BeaconPacket:
         if isinstance(observation_or_path, (str, Path)):
             packet = read_model(observation_or_path, ObservationPacket)
         else:
             packet = observation_or_path
-        return build_beacon_packet(self.workspace, observations=packet, registry=self.registry())
+        return build_beacon_packet(
+            self.workspace, observations=packet, registry=self.registry()
+        )
 
     def ledger(
         self,
@@ -151,3 +177,75 @@ class RecurrenceAPI:
         else:
             packet = beacon_or_path
         return build_usage_gap_report(packet)
+
+    def review_queue(
+        self,
+        beacon_or_path: BeaconPacket | str | Path,
+        *,
+        usage_gap_or_path: UsageGapReport | str | Path | None = None,
+        include_lower_status: bool = False,
+        include_watch_usage_gaps: bool = True,
+    ) -> ReviewQueue:
+        if isinstance(beacon_or_path, (str, Path)):
+            packet = read_model(beacon_or_path, BeaconPacket)
+        else:
+            packet = beacon_or_path
+        if isinstance(usage_gap_or_path, (str, Path)):
+            usage_gaps = read_model(usage_gap_or_path, UsageGapReport)
+        else:
+            usage_gaps = usage_gap_or_path
+        return build_review_queue(
+            packet,
+            usage_gaps=usage_gaps,
+            include_lower_status=include_lower_status,
+            include_watch_usage_gaps=include_watch_usage_gaps,
+        )
+
+    def review_dossiers(
+        self, review_queue_or_path: ReviewQueue | str | Path
+    ) -> CandidateDossierPacket:
+        if isinstance(review_queue_or_path, (str, Path)):
+            queue = read_model(review_queue_or_path, ReviewQueue)
+        else:
+            queue = review_queue_or_path
+        return build_candidate_dossier_packet(queue)
+
+    def review_summary(
+        self, review_queue_or_path: ReviewQueue | str | Path
+    ) -> OwnerReviewSummary:
+        if isinstance(review_queue_or_path, (str, Path)):
+            queue = read_model(review_queue_or_path, ReviewQueue)
+        else:
+            queue = review_queue_or_path
+        return build_owner_review_summary(queue)
+
+    def wiring_plan(self) -> WiringPlan:
+        return build_wiring_plan(self.workspace)
+
+    def rollout_bundle(
+        self,
+        *,
+        wiring_plan_or_path: WiringPlan | str | Path | None = None,
+        review_summary_or_path: OwnerReviewSummary | str | Path | None = None,
+        doctor_report_or_path: ConnectivityGapReport | str | Path | None = None,
+    ) -> RolloutWindowBundle:
+        if wiring_plan_or_path is None:
+            wiring_plan = self.wiring_plan()
+        elif isinstance(wiring_plan_or_path, (str, Path)):
+            wiring_plan = read_model(wiring_plan_or_path, WiringPlan)
+        else:
+            wiring_plan = wiring_plan_or_path
+        if isinstance(review_summary_or_path, (str, Path)):
+            review_summary = read_model(review_summary_or_path, OwnerReviewSummary)
+        else:
+            review_summary = review_summary_or_path
+        if isinstance(doctor_report_or_path, (str, Path)):
+            doctor_report = read_model(doctor_report_or_path, ConnectivityGapReport)
+        else:
+            doctor_report = doctor_report_or_path
+        return build_rollout_window_bundle(
+            self.workspace,
+            wiring_plan=wiring_plan,
+            review_summary=review_summary,
+            doctor_report=doctor_report,
+        )

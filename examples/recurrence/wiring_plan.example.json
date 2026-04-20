@@ -1,0 +1,74 @@
+{
+  "schema_version": "aoa_wiring_plan_v1",
+  "plan_ref": "wiring-plan:20260414T043558Z",
+  "workspace_root": "/mnt/data/wiring_pack_merged",
+  "snippets": [
+    {
+      "snippet_ref": "wiring:session_start",
+      "scope": "session_start",
+      "title": "Codex SessionStart recurrence hooks",
+      "target_path": ".codex/hooks/session_start.recurrence.sh",
+      "commands": [
+        "aoa recur hooks run --event session_start --root . --json"
+      ],
+      "notes": "Use the shared-root SessionStart seam for discovery and early observation only."
+    },
+    {
+      "snippet_ref": "wiring:user_prompt_submit",
+      "scope": "user_prompt_submit",
+      "title": "Codex UserPromptSubmit change detection",
+      "target_path": ".codex/hooks/user_prompt_submit.recurrence.sh",
+      "commands": [
+        "aoa recur detect <repo-root> --from git:HEAD~1..HEAD --root . --json"
+      ],
+      "notes": "Use placeholders until the host runtime provides the active repo root and diff base."
+    },
+    {
+      "snippet_ref": "wiring:session_stop",
+      "scope": "session_stop",
+      "title": "Codex Stop review-surface pipeline",
+      "target_path": ".codex/hooks/session_stop.recurrence.sh",
+      "commands": [
+        "aoa recur hooks run --event session_stop --signal <signal-path> --root . --report-output .aoa/recurrence/hooks/session_stop.latest.json",
+        "aoa recur observe --signal <signal-path> --hook-run .aoa/recurrence/hooks/session_stop.latest.json --root . --report-output .aoa/recurrence/observations/session.latest.json",
+        "aoa recur beacon .aoa/recurrence/observations/session.latest.json --root . --report-output .aoa/recurrence/beacons/session.latest.json",
+        "aoa recur usage-gaps .aoa/recurrence/beacons/session.latest.json --root . --report-output .aoa/recurrence/usage-gaps/session.latest.json",
+        "aoa recur review-queue .aoa/recurrence/beacons/session.latest.json --usage-gaps .aoa/recurrence/usage-gaps/session.latest.json --root . --report-output .aoa/recurrence/review-queues/session.latest.json",
+        "aoa recur review-summary .aoa/recurrence/review-queues/session.latest.json --root . --report-output .aoa/recurrence/review-summaries/session.latest.json"
+      ],
+      "notes": "Keep the pipeline reviewable. It should emit surfaces, not mutate owner repos silently."
+    },
+    {
+      "snippet_ref": "wiring:pre_commit",
+      "scope": "pre_commit",
+      "title": "Git pre-commit recurrence doctor",
+      "target_path": ".githooks/pre-commit.recurrence",
+      "commands": [
+        "aoa recur doctor --root . --json"
+      ],
+      "notes": "Pre-commit should stay quick and diagnostic. Do not turn it into a hidden repair loop."
+    },
+    {
+      "snippet_ref": "wiring:pre_push",
+      "scope": "pre_push",
+      "title": "Git pre-push recurrence doctor and review summary",
+      "target_path": ".githooks/pre-push.recurrence",
+      "commands": [
+        "aoa recur doctor --root . --json",
+        "test -f .aoa/recurrence/review-queues/session.latest.json && aoa recur review-summary .aoa/recurrence/review-queues/session.latest.json --root . --json || true"
+      ],
+      "notes": "Pre-push may look one step farther than pre-commit, but should still stop short of auto-resolution."
+    },
+    {
+      "snippet_ref": "wiring:ci",
+      "scope": "ci",
+      "title": "CI recurrence control-plane checks",
+      "target_path": ".github/workflows/recurrence-control-plane.example.yml",
+      "commands": [
+        "aoa recur doctor --root . --json",
+        "pytest -q aoa-sdk/tests/test_recurrence_seed.py aoa-sdk/tests/test_recurrence_beacon_seed.py aoa-sdk/tests/test_recurrence_hook_pack_seed.py aoa-sdk/tests/test_recurrence_review_pack_seed.py"
+      ],
+      "notes": "CI should prove the planted control-plane stays coherent before it widens further."
+    }
+  ]
+}

@@ -1,0 +1,91 @@
+{
+  "schema_version": "aoa_candidate_dossier_packet_v1",
+  "packet_ref": "candidate-dossiers:20260414T043008Z",
+  "workspace_root": "/srv/workspace",
+  "signal_ref": "signal:example",
+  "dossiers": [
+    {
+      "dossier_ref": "dossier:0001",
+      "lane": "eval",
+      "target_repo": "aoa-evals",
+      "owner_repo": "aoa-evals",
+      "component_ref": "component:evals:portable-proof-beacons",
+      "beacon_ref": "evals.portable_eval.runtime_pressure",
+      "kind": "portable_eval_candidate",
+      "status": "candidate",
+      "decision_surface": "docs/RUNTIME_BENCH_PROMOTION_GUIDE.md",
+      "title": "Eval review for component:evals:portable-proof-beacons (portable_eval_candidate, candidate)",
+      "summary": "runtime evidence repeated with a bounded claim shape and now pressures portable-eval review",
+      "evidence_refs": [
+        "bench:rt-001",
+        "bench:rt-002"
+      ],
+      "source_inputs": [
+        "runtime-candidate-guide"
+      ],
+      "recommended_actions": [
+        "open portable eval boundary review"
+      ],
+      "review_questions": [
+        {
+          "prompt": "Does the evidence stay bounded to the owning repo and decision surface?",
+          "why": "Recurrence should surface pressure without quietly widening ownership."
+        },
+        {
+          "prompt": "Do the cited evidence refs justify the current status, or is the signal still early?",
+          "why": "Hints and candidates should not pretend to be a decision."
+        },
+        {
+          "prompt": "Is the underlying claim portable and bounded enough for aoa-evals, or should it remain runtime-local evidence?",
+          "why": "A repeated artifact is not automatically a public proof surface."
+        },
+        {
+          "prompt": "Do any phrases here overclaim what the evidence actually supports?",
+          "why": "Recurrence should tighten proof, not inflate it."
+        }
+      ]
+    },
+    {
+      "dossier_ref": "dossier:0002",
+      "lane": "skill",
+      "target_repo": "aoa-skills",
+      "owner_repo": "aoa-skills",
+      "component_ref": "component:skills:bundle-and-activation-beacons",
+      "beacon_ref": "skills.unused_skill.activation_gap",
+      "kind": "unused_skill_opportunity",
+      "status": "watch",
+      "decision_surface": "docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
+      "title": "Skill review for component:skills:bundle-and-activation-beacons (unused_skill_opportunity, watch)",
+      "summary": "description-trigger suite suggests a relevant skill should have appeared, but the receipt trail does not show it",
+      "evidence_refs": [
+        "trigger-case:case-004",
+        "receipt:skill-20260414-01"
+      ],
+      "source_inputs": [
+        "description-trigger-suite",
+        "skill-live-receipts"
+      ],
+      "recommended_actions": [
+        "inspect the applicability map and defer notes"
+      ],
+      "review_questions": [
+        {
+          "prompt": "Does the evidence stay bounded to the owning repo and decision surface?",
+          "why": "Recurrence should surface pressure without quietly widening ownership."
+        },
+        {
+          "prompt": "Do the cited evidence refs justify the current status, or is the signal still early?",
+          "why": "Hints and candidates should not pretend to be a decision."
+        },
+        {
+          "prompt": "Was a relevant skill omitted, deferred, or blocked by an explicit boundary?",
+          "why": "Usage-gap signals should distinguish genuine misses from intentional restraint."
+        },
+        {
+          "prompt": "Do trigger descriptions and collision tests still match the intended activation boundary?",
+          "why": "Trigger drift often hides as routing intuition until the evals go stale."
+        }
+      ]
+    }
+  ]
+}

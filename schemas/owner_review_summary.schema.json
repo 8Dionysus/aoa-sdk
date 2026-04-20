@@ -1,0 +1,93 @@
+{
+  "$defs": {
+    "OwnerReviewSummaryItem": {
+      "additionalProperties": false,
+      "properties": {
+        "target_repo": {
+          "title": "Target Repo",
+          "type": "string"
+        },
+        "total_items": {
+          "title": "Total Items",
+          "type": "integer"
+        },
+        "by_lane": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "By Lane",
+          "type": "object"
+        },
+        "by_status": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "By Status",
+          "type": "object"
+        },
+        "by_kind": {
+          "additionalProperties": {
+            "type": "integer"
+          },
+          "title": "By Kind",
+          "type": "object"
+        },
+        "decision_surfaces": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Decision Surfaces",
+          "type": "array"
+        }
+      },
+      "required": [
+        "target_repo",
+        "total_items"
+      ],
+      "title": "OwnerReviewSummaryItem",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_owner_review_summary_v1",
+      "default": "aoa_owner_review_summary_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "summary_ref": {
+      "title": "Summary Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "signal_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Signal Ref"
+    },
+    "owners": {
+      "items": {
+        "$ref": "#/$defs/OwnerReviewSummaryItem"
+      },
+      "title": "Owners",
+      "type": "array"
+    }
+  },
+  "required": [
+    "summary_ref",
+    "workspace_root"
+  ],
+  "title": "OwnerReviewSummary",
+  "type": "object"
+}

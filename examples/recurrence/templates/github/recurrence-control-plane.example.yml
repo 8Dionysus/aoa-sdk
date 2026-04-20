@@ -1,0 +1,20 @@
+name: recurrence-control-plane
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  recurrence:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Recurrence doctor
+        run: aoa recur doctor --root . --json
+      - name: Recurrence tests
+        run: pytest -q aoa-sdk/tests/test_recurrence_seed.py aoa-sdk/tests/test_recurrence_beacon_seed.py aoa-sdk/tests/test_recurrence_hook_pack_seed.py aoa-sdk/tests/test_recurrence_review_pack_seed.py aoa-sdk/tests/test_recurrence_wiring_pack_seed.py

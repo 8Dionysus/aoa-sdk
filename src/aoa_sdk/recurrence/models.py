@@ -316,7 +316,9 @@ class ConnectivityGap(StrictModel):
 
 
 class ConnectivityGapReport(StrictModel):
-    schema_version: Literal["aoa_connectivity_gap_report_v1"] = "aoa_connectivity_gap_report_v1"
+    schema_version: Literal["aoa_connectivity_gap_report_v1"] = (
+        "aoa_connectivity_gap_report_v1"
+    )
     report_ref: str
     workspace_root: str
     signal_ref: str | None = None
@@ -460,3 +462,152 @@ class UsageGapReport(StrictModel):
     workspace_root: str
     signal_ref: str | None = None
     items: list[UsageGapItem] = Field(default_factory=list)
+
+
+ReviewLane = Literal["technique", "skill", "eval", "playbook", "general"]
+
+ReviewPriority = Literal["low", "medium", "high", "critical"]
+
+
+class ReviewQueueItem(StrictModel):
+    item_ref: str
+    lane: ReviewLane
+    priority: ReviewPriority
+    target_repo: str
+    owner_repo: str
+    component_ref: str
+    beacon_ref: str
+    kind: BeaconKind
+    status: BeaconStatus
+    decision_surface: str | None = None
+    summary: str
+    evidence_refs: list[str] = Field(default_factory=list)
+    source_inputs: list[str] = Field(default_factory=list)
+    recommended_actions: list[str] = Field(default_factory=list)
+
+
+class ReviewQueue(StrictModel):
+    schema_version: Literal["aoa_review_queue_v1"] = "aoa_review_queue_v1"
+    queue_ref: str
+    workspace_root: str
+    signal_ref: str | None = None
+    items: list[ReviewQueueItem] = Field(default_factory=list)
+
+
+class DossierQuestion(StrictModel):
+    prompt: str
+    why: str = ""
+
+
+class CandidateDossier(StrictModel):
+    dossier_ref: str
+    lane: ReviewLane
+    target_repo: str
+    owner_repo: str
+    component_ref: str
+    beacon_ref: str
+    kind: BeaconKind
+    status: BeaconStatus
+    decision_surface: str | None = None
+    title: str
+    summary: str
+    evidence_refs: list[str] = Field(default_factory=list)
+    source_inputs: list[str] = Field(default_factory=list)
+    recommended_actions: list[str] = Field(default_factory=list)
+    review_questions: list[DossierQuestion] = Field(default_factory=list)
+
+
+class CandidateDossierPacket(StrictModel):
+    schema_version: Literal["aoa_candidate_dossier_packet_v1"] = (
+        "aoa_candidate_dossier_packet_v1"
+    )
+    packet_ref: str
+    workspace_root: str
+    signal_ref: str | None = None
+    dossiers: list[CandidateDossier] = Field(default_factory=list)
+
+
+class OwnerReviewSummaryItem(StrictModel):
+    target_repo: str
+    total_items: int
+    by_lane: dict[str, int] = Field(default_factory=dict)
+    by_status: dict[str, int] = Field(default_factory=dict)
+    by_kind: dict[str, int] = Field(default_factory=dict)
+    decision_surfaces: list[str] = Field(default_factory=list)
+
+
+class OwnerReviewSummary(StrictModel):
+    schema_version: Literal["aoa_owner_review_summary_v1"] = (
+        "aoa_owner_review_summary_v1"
+    )
+    summary_ref: str
+    workspace_root: str
+    signal_ref: str | None = None
+    owners: list[OwnerReviewSummaryItem] = Field(default_factory=list)
+
+
+WiringScope = Literal[
+    "session_start",
+    "user_prompt_submit",
+    "session_stop",
+    "pre_commit",
+    "pre_push",
+    "ci",
+]
+
+RolloutPhase = Literal[
+    "prepared",
+    "activated",
+    "monitoring",
+    "repairing",
+    "rollback_open",
+    "rolled_back",
+]
+
+
+class WiringSnippet(StrictModel):
+    snippet_ref: str
+    scope: WiringScope
+    title: str
+    target_path: str
+    commands: list[str] = Field(default_factory=list)
+    notes: str = ""
+
+
+class WiringPlan(StrictModel):
+    schema_version: Literal["aoa_wiring_plan_v1"] = "aoa_wiring_plan_v1"
+    plan_ref: str
+    workspace_root: str
+    snippets: list[WiringSnippet] = Field(default_factory=list)
+
+
+class DriftTrigger(StrictModel):
+    signal: str
+    severity: Literal["low", "medium", "high"]
+    source: str
+    notes: str = ""
+
+
+class RolloutWindow(StrictModel):
+    window_ref: str
+    campaign_ref: str
+    phase: RolloutPhase
+    title: str
+    wiring_scopes: list[WiringScope] = Field(default_factory=list)
+    review_surfaces: list[str] = Field(default_factory=list)
+    guard_commands: list[str] = Field(default_factory=list)
+    drift_triggers: list[DriftTrigger] = Field(default_factory=list)
+    rollback_anchors: list[str] = Field(default_factory=list)
+    notes: str = ""
+
+
+class RolloutWindowBundle(StrictModel):
+    schema_version: Literal["aoa_rollout_window_bundle_v1"] = (
+        "aoa_rollout_window_bundle_v1"
+    )
+    bundle_ref: str
+    workspace_root: str
+    wiring_plan_ref: str
+    campaign_window: RolloutWindow
+    drift_review_window: RolloutWindow
+    rollback_followthrough_window: RolloutWindow

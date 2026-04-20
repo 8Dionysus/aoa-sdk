@@ -1,0 +1,83 @@
+{
+  "$defs": {
+    "WiringSnippet": {
+      "additionalProperties": false,
+      "properties": {
+        "snippet_ref": {
+          "title": "Snippet Ref",
+          "type": "string"
+        },
+        "scope": {
+          "enum": [
+            "session_start",
+            "user_prompt_submit",
+            "session_stop",
+            "pre_commit",
+            "pre_push",
+            "ci"
+          ],
+          "title": "Scope",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "target_path": {
+          "title": "Target Path",
+          "type": "string"
+        },
+        "commands": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Commands",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "snippet_ref",
+        "scope",
+        "title",
+        "target_path"
+      ],
+      "title": "WiringSnippet",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_wiring_plan_v1",
+      "default": "aoa_wiring_plan_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "plan_ref": {
+      "title": "Plan Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "snippets": {
+      "items": {
+        "$ref": "#/$defs/WiringSnippet"
+      },
+      "title": "Snippets",
+      "type": "array"
+    }
+  },
+  "required": [
+    "plan_ref",
+    "workspace_root"
+  ],
+  "title": "WiringPlan",
+  "type": "object"
+}

@@ -1,0 +1,7 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+aoa recur doctor --root . --json >/dev/null
+if [[ -f .aoa/recurrence/review-queues/session.latest.json ]]; then
+  aoa recur review-summary .aoa/recurrence/review-queues/session.latest.json --root . --json >/dev/null
+fi

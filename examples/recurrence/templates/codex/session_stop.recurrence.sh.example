@@ -1,0 +1,11 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+SIGNAL_PATH="${1:-<signal-path>}"
+
+aoa recur hooks run --event session_stop --signal "$SIGNAL_PATH" --root . --report-output .aoa/recurrence/hooks/session_stop.latest.json
+aoa recur observe --signal "$SIGNAL_PATH" --hook-run .aoa/recurrence/hooks/session_stop.latest.json --root . --report-output .aoa/recurrence/observations/session.latest.json
+aoa recur beacon .aoa/recurrence/observations/session.latest.json --root . --report-output .aoa/recurrence/beacons/session.latest.json
+aoa recur usage-gaps .aoa/recurrence/beacons/session.latest.json --root . --report-output .aoa/recurrence/usage-gaps/session.latest.json
+aoa recur review-queue .aoa/recurrence/beacons/session.latest.json --usage-gaps .aoa/recurrence/usage-gaps/session.latest.json --root . --report-output .aoa/recurrence/review-queues/session.latest.json
+aoa recur review-summary .aoa/recurrence/review-queues/session.latest.json --root . --report-output .aoa/recurrence/review-summaries/session.latest.json
