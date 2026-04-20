@@ -1,0 +1,238 @@
+{
+  "beacon_rules": [
+    {
+      "beacon_ref": "agon.center.law_surface_drift",
+      "decision_surface": "docs/AGON_IMPOSITION_POSTURE.md",
+      "kind": "canonical_pressure",
+      "match_categories": [
+        "change_pressure",
+        "review_signal"
+      ],
+      "match_signals": [
+        "agon_surface_changed",
+        "lawful_move_registry_changed",
+        "owner_binding_changed"
+      ],
+      "notes": "Center law drift should become review pressure, not hidden protocol activation.",
+      "observation_inputs": [
+        "change_signal",
+        "agon-center-generated-surfaces"
+      ],
+      "recommended_actions": [
+        "revalidate center Agon surfaces",
+        "open owner review only; do not mutate source repos"
+      ],
+      "status_ladder": [
+        "hint",
+        "watch",
+        "candidate",
+        "review_ready"
+      ],
+      "suppress_when": [
+        "live_protocol_claim_present",
+        "hidden_authority_detected"
+      ],
+      "target_repo": "Agents-of-Abyss",
+      "thresholds": {
+        "candidate_observations": 2,
+        "min_unique_evidence_refs": 2,
+        "min_unique_sources": 2,
+        "review_ready_observations": 3,
+        "watch_observations": 1
+      }
+    },
+    {
+      "beacon_ref": "agon.center.pre_protocol_handoff_pressure",
+      "decision_surface": "docs/AGON_RECURRENCE_ADAPTER_HANDOFF.md",
+      "kind": "automation_seed_candidate",
+      "match_categories": [
+        "repeat_pattern",
+        "review_signal"
+      ],
+      "match_signals": [
+        "gate_handoff_changed",
+        "trial_handoff_changed",
+        "adapter_request_changed"
+      ],
+      "notes": "Repeated handoff changes may request wiring review without creating runtime authority.",
+      "observation_inputs": [
+        "agon-center-law-docs",
+        "agon-center-generated-surfaces"
+      ],
+      "recommended_actions": [
+        "refresh Agon recurrence adapter request",
+        "check stop-lines before wiring"
+      ],
+      "status_ladder": [
+        "hint",
+        "watch",
+        "candidate",
+        "review_ready"
+      ],
+      "suppress_when": [
+        "live_protocol_claim_present",
+        "hidden_authority_detected"
+      ],
+      "target_repo": "Agents-of-Abyss",
+      "thresholds": {
+        "candidate_observations": 2,
+        "min_unique_evidence_refs": 2,
+        "min_unique_sources": 2,
+        "review_ready_observations": 3,
+        "watch_observations": 1
+      }
+    }
+  ],
+  "candidate_targets": [
+    "generated/agon_imposition_readiness.min.json",
+    "generated/agon_lawful_move_registry.min.json",
+    "generated/agon_move_owner_binding_registry.min.json",
+    "generated/agon_gate_routing_handoff_request.min.json",
+    "generated/agon_trial_playbook_request.min.json",
+    "generated/agon_recurrence_adapter_request.min.json"
+  ],
+  "component_ref": "component:agon:center-surfaces",
+  "consumer_edges": [
+    {
+      "kind": "handoff_home",
+      "notes": "Owner remains the review home for its own Agon recurrence signals.",
+      "required": true,
+      "suggested_action": "observe",
+      "suggested_commands": [],
+      "target": "docs/AGON_RECURRENCE_ADAPTER.md",
+      "target_repo": "Agents-of-Abyss"
+    }
+  ],
+  "contract_surfaces": [
+    "docs/AGON_IMPOSITION_POSTURE.md",
+    "docs/AGON_LAWFUL_MOVE_LANGUAGE.md",
+    "docs/AGON_MOVE_OWNER_BINDING.md",
+    "docs/AGON_GATE_ROUTING_HANDOFF.md",
+    "docs/AGON_TRIAL_PLAYBOOK_HANDOFF.md",
+    "docs/AGON_RECURRENCE_ADAPTER_HANDOFF.md"
+  ],
+  "decision_surfaces": [
+    "docs/AGON_IMPOSITION_POSTURE.md",
+    "docs/AGON_LAWFUL_MOVE_LANGUAGE.md"
+  ],
+  "description": "Center-owned Agon law and stop-line surfaces from Waves 0, III, IV, V handoff, and VI handoff.",
+  "documentation_surfaces": [
+    "docs/AGON_IMPOSITION_POSTURE.md",
+    "docs/AGON_LAWFUL_MOVE_LANGUAGE.md",
+    "docs/AGON_MOVE_OWNER_BINDING.md",
+    "docs/AGON_GATE_ROUTING_HANDOFF.md",
+    "docs/AGON_TRIAL_PLAYBOOK_HANDOFF.md",
+    "docs/AGON_RECURRENCE_ADAPTER_HANDOFF.md"
+  ],
+  "drift_signals": [
+    {
+      "recommended_action": "revalidate",
+      "severity": "medium",
+      "signal": "agon_surface_changed_without_recurrence_review"
+    },
+    {
+      "recommended_action": "defer",
+      "severity": "high",
+      "signal": "agon_stop_line_blur_detected"
+    }
+  ],
+  "freshness": {
+    "open_window_days": 7,
+    "repeat_trigger_threshold": 2,
+    "stale_after_days": 14
+  },
+  "generated_surfaces": [
+    "generated/agon_imposition_readiness.min.json",
+    "generated/agon_lawful_move_registry.min.json",
+    "generated/agon_move_owner_binding_registry.min.json",
+    "generated/agon_gate_routing_handoff_request.min.json",
+    "generated/agon_trial_playbook_request.min.json",
+    "generated/agon_recurrence_adapter_request.min.json"
+  ],
+  "observation_inputs": [
+    {
+      "input_ref": "agon-center-generated-surfaces",
+      "kind": "other",
+      "notes": "Center-owned Agon generated surfaces from Waves 0, III, IV, V, VI, and the adapter request.",
+      "path_globs": [
+        "generated/agon_*.min.json"
+      ]
+    },
+    {
+      "input_ref": "agon-center-law-docs",
+      "kind": "review_note",
+      "notes": "Center law, stop-line, and handoff documents.",
+      "path_globs": [
+        "docs/AGON_*.md"
+      ]
+    }
+  ],
+  "owner_repo": "Agents-of-Abyss",
+  "proof_surfaces": [
+    "python scripts/validate_agon_imposition_readiness.py",
+    "python scripts/validate_agon_lawful_moves.py",
+    "python scripts/validate_agon_move_owner_bindings.py",
+    "python scripts/validate_agon_gate_routing_handoff_request.py",
+    "python scripts/validate_agon_trial_playbook_request.py",
+    "python scripts/validate_agon_recurrence_adapter_request.py"
+  ],
+  "refresh_routes": [
+    {
+      "action": "revalidate",
+      "commands": [
+        "python scripts/validate_agon_imposition_readiness.py",
+        "python scripts/validate_agon_lawful_moves.py",
+        "python scripts/validate_agon_move_owner_bindings.py",
+        "python scripts/validate_agon_gate_routing_handoff_request.py",
+        "python scripts/validate_agon_trial_playbook_request.py",
+        "python scripts/validate_agon_recurrence_adapter_request.py"
+      ],
+      "notes": "Owner-local validation path. Recurrence may suggest this route; it must not run it as hidden authority."
+    }
+  ],
+  "rollback_anchors": [
+    "docs/AGON_IMPOSITION_POSTURE.md",
+    "docs/AGON_LAWFUL_MOVE_LANGUAGE.md"
+  ],
+  "schema_version": "aoa_recurrence_component_v2",
+  "signal_edges": [
+    {
+      "kind": "incubated_by_technique",
+      "notes": "Move law can request practice candidates; techniques do not own move law.",
+      "target": "component:agon:technique-binding-surfaces",
+      "target_repo": "aoa-techniques"
+    },
+    {
+      "kind": "implemented_by_skill",
+      "notes": "Move law can request bounded workflow candidates; skills do not own arena law.",
+      "target": "component:agon:skill-binding-surfaces",
+      "target_repo": "aoa-skills"
+    },
+    {
+      "kind": "composed_by_playbook",
+      "notes": "Trial choreography can provide recurrence evidence without issuing verdicts.",
+      "target": "component:agon:trial-playbook-surfaces",
+      "target_repo": "aoa-playbooks"
+    },
+    {
+      "kind": "proved_by_eval",
+      "notes": "Future VII will bind proof checks; recurrence does not create proof authority.",
+      "target": "component:evals:portable-proof-beacons",
+      "target_repo": "aoa-evals"
+    }
+  ],
+  "source_inputs": [
+    "config/agon_lawful_moves.seed.json",
+    "config/agon_move_owner_bindings.seed.json",
+    "config/agon_gate_routing_handoff_request.seed.json",
+    "config/agon_trial_playbook_request.seed.json",
+    "config/agon_recurrence_adapter_request.seed.json"
+  ],
+  "tags": [
+    "agon",
+    "center",
+    "law",
+    "recurrence",
+    "adapter"
+  ]
+}

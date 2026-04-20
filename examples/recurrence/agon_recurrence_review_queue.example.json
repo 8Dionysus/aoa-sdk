@@ -1,0 +1,148 @@
+{
+  "items": [
+    {
+      "beacon_ref": "agon.center.law_surface_drift",
+      "component_ref": "component:agon:center-surfaces",
+      "decision_surface": "docs/AGON_IMPOSITION_POSTURE.md",
+      "evidence_refs": [
+        "generated/agon_lawful_move_registry.min.json",
+        "generated/agon_move_owner_binding_registry.min.json"
+      ],
+      "item_ref": "agon.review.center.law_surface_drift",
+      "kind": "canonical_pressure",
+      "lane": "general",
+      "owner_repo": "Agents-of-Abyss",
+      "priority": "high",
+      "recommended_actions": [
+        "revalidate center Agon surfaces",
+        "do not activate arena protocol"
+      ],
+      "source_inputs": [
+        "agon-center-generated-surfaces"
+      ],
+      "status": "watch",
+      "summary": "Center Agon law or owner-binding surfaces changed and need owner review before future protocol work.",
+      "target_repo": "Agents-of-Abyss"
+    },
+    {
+      "beacon_ref": "agon.agents.assistant_anti_drift_alarm",
+      "component_ref": "component:agon:actor-formation-surfaces",
+      "decision_surface": "docs/ASSISTANT_CIVIL_RECHARTERING.md",
+      "evidence_refs": [
+        "generated/assistant_civil_formation_index.min.json"
+      ],
+      "item_ref": "agon.review.agents.assistant_anti_drift",
+      "kind": "overclaim_alarm",
+      "lane": "general",
+      "owner_repo": "aoa-agents",
+      "priority": "critical",
+      "recommended_actions": [
+        "open assistant anti-drift review",
+        "quarantine hidden arena authority"
+      ],
+      "source_inputs": [
+        "agon-agent-boundary-docs",
+        "agon-agent-formation-surfaces"
+      ],
+      "status": "watch",
+      "summary": "Assistant surfaces appear to claim contestant, judge, closer, summon, scar, or ToS authority.",
+      "target_repo": "aoa-agents"
+    },
+    {
+      "beacon_ref": "agon.routing.gate_trigger_recurrence",
+      "component_ref": "component:agon:gate-routing-surfaces",
+      "decision_surface": "docs/AGON_GATE_ROUTING.md",
+      "evidence_refs": [
+        "generated/agon_gate_routing_registry.min.json"
+      ],
+      "item_ref": "agon.review.routing.gate_recurrence",
+      "kind": "automation_seed_candidate",
+      "lane": "general",
+      "owner_repo": "aoa-routing",
+      "priority": "medium",
+      "recommended_actions": [
+        "refresh gate routing registry",
+        "handoff to center without opening arena"
+      ],
+      "source_inputs": [
+        "agon-gate-routing-registry"
+      ],
+      "status": "hint",
+      "summary": "Agon gate candidates or missing-context patterns repeated across routing surfaces.",
+      "target_repo": "aoa-routing"
+    },
+    {
+      "beacon_ref": "agon.playbooks.trial_repeat_pattern",
+      "component_ref": "component:agon:trial-playbook-surfaces",
+      "decision_surface": "docs/AGON_TRIAL_PLAYBOOKS.md",
+      "evidence_refs": [
+        "generated/agon_trial_playbook_registry.min.json"
+      ],
+      "item_ref": "agon.review.playbooks.trial_repeat",
+      "kind": "playbook_candidate",
+      "lane": "playbook",
+      "owner_repo": "aoa-playbooks",
+      "priority": "medium",
+      "recommended_actions": [
+        "refresh trial registry",
+        "do not issue verdicts from trial choreography"
+      ],
+      "source_inputs": [
+        "agon-trial-playbook-registry"
+      ],
+      "status": "candidate",
+      "summary": "The same pre-protocol trial shape repeats and may need playbook-owner review.",
+      "target_repo": "aoa-playbooks"
+    },
+    {
+      "beacon_ref": "agon.techniques.practice_pressure",
+      "component_ref": "component:agon:technique-binding-surfaces",
+      "decision_surface": "docs/AGON_MOVE_TECHNIQUE_BRIDGE.md",
+      "evidence_refs": [
+        "generated/agon_technique_binding_candidates.min.json"
+      ],
+      "item_ref": "agon.review.techniques.practice_pressure",
+      "kind": "new_technique_candidate",
+      "lane": "technique",
+      "owner_repo": "aoa-techniques",
+      "priority": "medium",
+      "recommended_actions": [
+        "review candidate boundedness",
+        "do not promote technique automatically"
+      ],
+      "source_inputs": [
+        "agon-technique-binding-candidates"
+      ],
+      "status": "candidate",
+      "summary": "Lawful moves repeatedly request reusable practice behind technique candidates.",
+      "target_repo": "aoa-techniques"
+    },
+    {
+      "beacon_ref": "agon.skills.bundle_pressure",
+      "component_ref": "component:agon:skill-binding-surfaces",
+      "decision_surface": "docs/AGON_MOVE_SKILL_BRIDGE.md",
+      "evidence_refs": [
+        "generated/agon_skill_binding_candidates.min.json"
+      ],
+      "item_ref": "agon.review.skills.bundle_pressure",
+      "kind": "skill_bundle_candidate",
+      "lane": "skill",
+      "owner_repo": "aoa-skills",
+      "priority": "medium",
+      "recommended_actions": [
+        "review trigger boundary",
+        "do not activate skill automatically"
+      ],
+      "source_inputs": [
+        "agon-skill-binding-candidates"
+      ],
+      "status": "candidate",
+      "summary": "Lawful moves repeatedly request bounded workflow candidates.",
+      "target_repo": "aoa-skills"
+    }
+  ],
+  "queue_ref": "review_queue:agon:recurrence_adapter:example",
+  "schema_version": "aoa_review_queue_v1",
+  "signal_ref": "signal:agon:recurrence:example",
+  "workspace_root": "AOA_WORKSPACE_ROOT"
+}
