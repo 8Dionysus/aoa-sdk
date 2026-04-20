@@ -1,0 +1,73 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "components": {
+      "items": {
+        "properties": {
+          "component_ref": {
+            "type": "string"
+          },
+          "hook_manifest_path": {
+            "type": "string"
+          },
+          "manifest_path": {
+            "type": "string"
+          },
+          "observed_surfaces": {
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "owner_repo": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "component_ref",
+          "owner_repo",
+          "manifest_path",
+          "hook_manifest_path",
+          "observed_surfaces"
+        ],
+        "type": "object"
+      },
+      "minItems": 6,
+      "type": "array"
+    },
+    "interlude": {
+      "const": "R4"
+    },
+    "live_protocol": {
+      "const": false
+    },
+    "owner_repo": {
+      "const": "aoa-sdk"
+    },
+    "runtime_effect": {
+      "const": "none"
+    },
+    "schema_version": {
+      "const": "agon_recurrence_adapter_registry.seed.v1"
+    },
+    "stop_lines": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "schema_version",
+    "adapter_ref",
+    "interlude",
+    "owner_repo",
+    "live_protocol",
+    "runtime_effect",
+    "components",
+    "stop_lines"
+  ],
+  "title": "AgonRecurrenceAdapterRegistry",
+  "type": "object"
+}

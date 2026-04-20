@@ -1,0 +1,104 @@
+{
+  "owners": [
+    {
+      "by_kind": {
+        "canonical_pressure": 1
+      },
+      "by_lane": {
+        "general": 1
+      },
+      "by_status": {
+        "watch": 1
+      },
+      "decision_surfaces": [
+        "docs/AGON_IMPOSITION_POSTURE.md"
+      ],
+      "target_repo": "Agents-of-Abyss",
+      "total_items": 1
+    },
+    {
+      "by_kind": {
+        "overclaim_alarm": 1
+      },
+      "by_lane": {
+        "general": 1
+      },
+      "by_status": {
+        "watch": 1
+      },
+      "decision_surfaces": [
+        "docs/ASSISTANT_CIVIL_RECHARTERING.md"
+      ],
+      "target_repo": "aoa-agents",
+      "total_items": 1
+    },
+    {
+      "by_kind": {
+        "playbook_candidate": 1
+      },
+      "by_lane": {
+        "playbook": 1
+      },
+      "by_status": {
+        "candidate": 1
+      },
+      "decision_surfaces": [
+        "docs/AGON_TRIAL_PLAYBOOKS.md"
+      ],
+      "target_repo": "aoa-playbooks",
+      "total_items": 1
+    },
+    {
+      "by_kind": {
+        "automation_seed_candidate": 1
+      },
+      "by_lane": {
+        "general": 1
+      },
+      "by_status": {
+        "hint": 1
+      },
+      "decision_surfaces": [
+        "docs/AGON_GATE_ROUTING.md"
+      ],
+      "target_repo": "aoa-routing",
+      "total_items": 1
+    },
+    {
+      "by_kind": {
+        "skill_bundle_candidate": 1
+      },
+      "by_lane": {
+        "skill": 1
+      },
+      "by_status": {
+        "candidate": 1
+      },
+      "decision_surfaces": [
+        "docs/AGON_MOVE_SKILL_BRIDGE.md"
+      ],
+      "target_repo": "aoa-skills",
+      "total_items": 1
+    },
+    {
+      "by_kind": {
+        "new_technique_candidate": 1
+      },
+      "by_lane": {
+        "technique": 1
+      },
+      "by_status": {
+        "candidate": 1
+      },
+      "decision_surfaces": [
+        "docs/AGON_MOVE_TECHNIQUE_BRIDGE.md"
+      ],
+      "target_repo": "aoa-techniques",
+      "total_items": 1
+    }
+  ],
+  "schema_version": "aoa_owner_review_summary_v1",
+  "signal_ref": "signal:agon:recurrence:example",
+  "summary_ref": "owner_summary:agon:recurrence_adapter:example",
+  "workspace_root": "AOA_WORKSPACE_ROOT"
+}

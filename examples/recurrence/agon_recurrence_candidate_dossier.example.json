@@ -1,0 +1,109 @@
+{
+  "dossiers": [
+    {
+      "beacon_ref": "agon.center.law_surface_drift",
+      "component_ref": "component:agon:center-surfaces",
+      "decision_surface": "docs/AGON_IMPOSITION_POSTURE.md",
+      "dossier_ref": "dossier:agon:center.law_surface_drift",
+      "evidence_refs": [
+        "generated/agon_lawful_move_registry.min.json",
+        "generated/agon_move_owner_binding_registry.min.json"
+      ],
+      "kind": "canonical_pressure",
+      "lane": "general",
+      "owner_repo": "Agents-of-Abyss",
+      "recommended_actions": [
+        "revalidate center Agon surfaces",
+        "do not activate arena protocol"
+      ],
+      "review_questions": [
+        {
+          "prompt": "Does this recurrence signal request owner review, or should it remain only a watch item?",
+          "why": "Recurrence must not become hidden automation."
+        },
+        {
+          "prompt": "Does any proposed follow-through cross into arena sessions, verdicts, scars, retention, rank mutation, or ToS promotion?",
+          "why": "Those are later Agon protocol layers and must remain blocked here."
+        }
+      ],
+      "source_inputs": [
+        "agon-center-generated-surfaces"
+      ],
+      "status": "watch",
+      "summary": "Center Agon law or owner-binding surfaces changed and need owner review before future protocol work.",
+      "target_repo": "Agents-of-Abyss",
+      "title": "Center Agon law or owner-binding surfaces changed and need owner review before future protocol work"
+    },
+    {
+      "beacon_ref": "agon.agents.assistant_anti_drift_alarm",
+      "component_ref": "component:agon:actor-formation-surfaces",
+      "decision_surface": "docs/ASSISTANT_CIVIL_RECHARTERING.md",
+      "dossier_ref": "dossier:agon:agents.assistant_anti_drift",
+      "evidence_refs": [
+        "generated/assistant_civil_formation_index.min.json"
+      ],
+      "kind": "overclaim_alarm",
+      "lane": "general",
+      "owner_repo": "aoa-agents",
+      "recommended_actions": [
+        "open assistant anti-drift review",
+        "quarantine hidden arena authority"
+      ],
+      "review_questions": [
+        {
+          "prompt": "Does this recurrence signal request owner review, or should it remain only a watch item?",
+          "why": "Recurrence must not become hidden automation."
+        },
+        {
+          "prompt": "Does any proposed follow-through cross into arena sessions, verdicts, scars, retention, rank mutation, or ToS promotion?",
+          "why": "Those are later Agon protocol layers and must remain blocked here."
+        }
+      ],
+      "source_inputs": [
+        "agon-agent-boundary-docs",
+        "agon-agent-formation-surfaces"
+      ],
+      "status": "watch",
+      "summary": "Assistant surfaces appear to claim contestant, judge, closer, summon, scar, or ToS authority.",
+      "target_repo": "aoa-agents",
+      "title": "Assistant surfaces appear to claim contestant, judge, closer, summon, scar, or ToS authority"
+    },
+    {
+      "beacon_ref": "agon.routing.gate_trigger_recurrence",
+      "component_ref": "component:agon:gate-routing-surfaces",
+      "decision_surface": "docs/AGON_GATE_ROUTING.md",
+      "dossier_ref": "dossier:agon:routing.gate_recurrence",
+      "evidence_refs": [
+        "generated/agon_gate_routing_registry.min.json"
+      ],
+      "kind": "automation_seed_candidate",
+      "lane": "general",
+      "owner_repo": "aoa-routing",
+      "recommended_actions": [
+        "refresh gate routing registry",
+        "handoff to center without opening arena"
+      ],
+      "review_questions": [
+        {
+          "prompt": "Does this recurrence signal request owner review, or should it remain only a watch item?",
+          "why": "Recurrence must not become hidden automation."
+        },
+        {
+          "prompt": "Does any proposed follow-through cross into arena sessions, verdicts, scars, retention, rank mutation, or ToS promotion?",
+          "why": "Those are later Agon protocol layers and must remain blocked here."
+        }
+      ],
+      "source_inputs": [
+        "agon-gate-routing-registry"
+      ],
+      "status": "hint",
+      "summary": "Agon gate candidates or missing-context patterns repeated across routing surfaces.",
+      "target_repo": "aoa-routing",
+      "title": "Agon gate candidates or missing-context patterns repeated across routing surfaces"
+    }
+  ],
+  "packet_ref": "dossier_packet:agon:recurrence_adapter:example",
+  "schema_version": "aoa_candidate_dossier_packet_v1",
+  "signal_ref": "signal:agon:recurrence:example",
+  "workspace_root": "AOA_WORKSPACE_ROOT"
+}
