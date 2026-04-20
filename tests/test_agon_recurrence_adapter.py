@@ -1,5 +1,7 @@
 from __future__ import annotations
-import subprocess, sys
+
+import subprocess
+import sys
 from pathlib import Path
 
 def test_agon_recurrence_adapter_validates():
