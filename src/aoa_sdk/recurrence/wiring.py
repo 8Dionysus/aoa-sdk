@@ -83,7 +83,7 @@ def build_wiring_plan(workspace: Workspace) -> WiringPlan:
             target_path=".github/workflows/recurrence-control-plane.example.yml",
             commands=[
                 "aoa recur doctor --root . --json",
-                "pytest -q aoa-sdk/tests/test_recurrence_seed.py aoa-sdk/tests/test_recurrence_beacon_seed.py aoa-sdk/tests/test_recurrence_hook_pack_seed.py aoa-sdk/tests/test_recurrence_review_pack_seed.py aoa-sdk/tests/test_recurrence_wiring_pack_seed.py",
+                "pytest -q tests/test_recurrence_seed.py tests/test_recurrence_beacon_seed.py tests/test_recurrence_hook_pack_seed.py tests/test_recurrence_review_pack_seed.py tests/test_recurrence_wiring_pack_seed.py",
             ],
             notes="CI should prove the planted control-plane stays coherent before it widens further.",
         ),
