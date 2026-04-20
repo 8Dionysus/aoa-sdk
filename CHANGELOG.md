@@ -6,6 +6,39 @@ The format is intentionally simple and human-first.
 
 ## [Unreleased]
 
+## [0.2.2] - 2026-04-19
+
+### Summary
+
+- this patch hardens checkpoint review and quarantine flow, recurrence
+  control-plane surfaces, and A2A summon planning helpers across the SDK
+- memo writeback intake, release workflow safety, and roadmap/repo-contract
+  surfaces are tightened without widening `aoa-sdk` into a runtime owner
+- `aoa-sdk` remains the bounded control plane for sibling-owned AoA surfaces
+
+### Added
+
+- recurrence control-plane and hook-producer surfaces plus A2A summon planning
+  helpers and end-to-end fixtures
+- checkpoint auto-review, review carry, and closeout follow-through fixes
+  across the active session-ledger path
+
+### Changed
+
+- checkpoint typing, memo writeback intake, required-check plus Node24
+  workflow refs, and release-facing repo posture are tightened for the current
+  control-plane wave
+
+### Validation
+
+- `python scripts/release_check.py`
+
+### Notes
+
+- this patch stays on the control plane: checkpoint orchestration,
+  recurrence, and summon helpers are tightened without turning `aoa-sdk` into
+  a source-owning runtime layer
+
 ## [0.2.1] - 2026-04-12
 
 ### Summary

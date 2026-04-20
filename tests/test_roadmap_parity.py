@@ -21,9 +21,9 @@ def test_roadmap_keeps_current_control_plane_surface_explicit() -> None:
     changelog = read_text("CHANGELOG.md")
     payload = load_json("generated/workspace_control_plane.min.json")
 
-    assert "> Current release: `v0.2.1`" in readme
-    assert "## [0.2.1] - 2026-04-12" in changelog
-    assert "`v0.2.1`" in roadmap
+    assert "> Current release: `v0.2.2`" in readme
+    assert "## [0.2.2] - 2026-04-19" in changelog
+    assert "`v0.2.2`" in roadmap
     assert "Current release contour" in roadmap
     assert "Roadmap drift is an SDK-layer risk" in roadmap
     assert "must not turn\n`aoa-sdk` into a source-owning runtime layer" in roadmap
