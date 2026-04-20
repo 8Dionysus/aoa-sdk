@@ -1,0 +1,40 @@
+{
+  "schema_version": "aoa_owner_review_summary_v1",
+  "summary_ref": "owner-review-summary:20260414T043008Z",
+  "workspace_root": "/srv/workspace",
+  "signal_ref": "signal:example",
+  "owners": [
+    {
+      "target_repo": "aoa-evals",
+      "total_items": 1,
+      "by_lane": {
+        "eval": 1
+      },
+      "by_status": {
+        "candidate": 1
+      },
+      "by_kind": {
+        "portable_eval_candidate": 1
+      },
+      "decision_surfaces": [
+        "docs/RUNTIME_BENCH_PROMOTION_GUIDE.md"
+      ]
+    },
+    {
+      "target_repo": "aoa-skills",
+      "total_items": 1,
+      "by_lane": {
+        "skill": 1
+      },
+      "by_status": {
+        "watch": 1
+      },
+      "by_kind": {
+        "unused_skill_opportunity": 1
+      },
+      "decision_surfaces": [
+        "docs/ADAPTIVE_SKILL_ORCHESTRATION.md"
+      ]
+    }
+  ]
+}

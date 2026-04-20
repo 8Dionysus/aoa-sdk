@@ -1,0 +1,159 @@
+{
+  "schema_version": "aoa_rollout_window_bundle_v1",
+  "bundle_ref": "rollout-bundle:20260414T043558Z",
+  "workspace_root": "/mnt/data/wiring_pack_merged",
+  "wiring_plan_ref": "wiring-plan:20260414T043558Z",
+  "campaign_window": {
+    "window_ref": "campaign-window:20260414T043558Z",
+    "campaign_ref": "CAMP-RECURRENCE-20260414T043558Z",
+    "phase": "prepared",
+    "title": "Recurrence control-plane rollout campaign",
+    "wiring_scopes": [
+      "session_start",
+      "user_prompt_submit",
+      "session_stop",
+      "pre_commit",
+      "pre_push",
+      "ci"
+    ],
+    "review_surfaces": [
+      ".aoa/recurrence/review-queues/*.latest.json",
+      ".aoa/recurrence/review-summaries/*.latest.json",
+      "generated/codex/rollout/rollout_latest.min.json"
+    ],
+    "guard_commands": [
+      "aoa recur doctor --root . --json",
+      "aoa recur hooks list --root . --json"
+    ],
+    "drift_triggers": [
+      {
+        "signal": "hook_wiring_missing_or_drifted",
+        "severity": "medium",
+        "source": "wiring-plan",
+        "notes": "Use this when SessionStart, UserPromptSubmit, or Stop recurrence snippets are missing or stale."
+      },
+      {
+        "signal": "review_surfaces_missing",
+        "severity": "medium",
+        "source": "review-queue",
+        "notes": "Use this when the session-stop path stops producing review queues or owner summaries."
+      },
+      {
+        "signal": "unresolved_edge",
+        "severity": "high",
+        "source": "component:evals:portable-proof-beacons",
+        "notes": "repair the unresolved edge before widening rollout"
+      },
+      {
+        "signal": "overclaim_alarm_present",
+        "severity": "high",
+        "source": "aoa-evals",
+        "notes": "Proof wording is drifting stronger than the bounded evidence posture."
+      }
+    ],
+    "rollback_anchors": [
+      "docs/CODEX_PLANE_ROLLOUT.md",
+      "generated/codex/rollout/rollback_windows.min.json",
+      ".aoa/recurrence/review-summaries/*.latest.json"
+    ],
+    "notes": "Bound the rollout as one reviewable campaign. Do not turn cadence windows into a scheduler."
+  },
+  "drift_review_window": {
+    "window_ref": "drift-review-window:20260414T043558Z",
+    "campaign_ref": "CAMP-RECURRENCE-20260414T043558Z",
+    "phase": "repairing",
+    "title": "Recurrence drift review window",
+    "wiring_scopes": [
+      "session_stop",
+      "pre_push",
+      "ci"
+    ],
+    "review_surfaces": [
+      ".aoa/recurrence/doctor/*.latest.json",
+      ".aoa/recurrence/review-summaries/*.latest.json"
+    ],
+    "guard_commands": [
+      "aoa recur doctor --root . --json"
+    ],
+    "drift_triggers": [
+      {
+        "signal": "hook_wiring_missing_or_drifted",
+        "severity": "medium",
+        "source": "wiring-plan",
+        "notes": "Use this when SessionStart, UserPromptSubmit, or Stop recurrence snippets are missing or stale."
+      },
+      {
+        "signal": "review_surfaces_missing",
+        "severity": "medium",
+        "source": "review-queue",
+        "notes": "Use this when the session-stop path stops producing review queues or owner summaries."
+      },
+      {
+        "signal": "unresolved_edge",
+        "severity": "high",
+        "source": "component:evals:portable-proof-beacons",
+        "notes": "repair the unresolved edge before widening rollout"
+      },
+      {
+        "signal": "overclaim_alarm_present",
+        "severity": "high",
+        "source": "aoa-evals",
+        "notes": "Proof wording is drifting stronger than the bounded evidence posture."
+      }
+    ],
+    "rollback_anchors": [
+      "generated/codex/rollout/rollback_windows.min.json"
+    ],
+    "notes": "Name drift explicitly when wiring, hook activation, or review-surfaces stop lining up."
+  },
+  "rollback_followthrough_window": {
+    "window_ref": "rollback-followthrough-window:20260414T043558Z",
+    "campaign_ref": "CAMP-RECURRENCE-20260414T043558Z",
+    "phase": "rollback_open",
+    "title": "Recurrence rollback follow-through window",
+    "wiring_scopes": [
+      "session_start",
+      "session_stop",
+      "ci"
+    ],
+    "review_surfaces": [
+      "generated/codex/rollout/rollback_windows.min.json",
+      ".aoa/recurrence/doctor/*.latest.json"
+    ],
+    "guard_commands": [
+      "aoa recur doctor --root . --json"
+    ],
+    "drift_triggers": [
+      {
+        "signal": "hook_wiring_missing_or_drifted",
+        "severity": "medium",
+        "source": "wiring-plan",
+        "notes": "Use this when SessionStart, UserPromptSubmit, or Stop recurrence snippets are missing or stale."
+      },
+      {
+        "signal": "review_surfaces_missing",
+        "severity": "medium",
+        "source": "review-queue",
+        "notes": "Use this when the session-stop path stops producing review queues or owner summaries."
+      },
+      {
+        "signal": "unresolved_edge",
+        "severity": "high",
+        "source": "component:evals:portable-proof-beacons",
+        "notes": "repair the unresolved edge before widening rollout"
+      },
+      {
+        "signal": "overclaim_alarm_present",
+        "severity": "high",
+        "source": "aoa-evals",
+        "notes": "Proof wording is drifting stronger than the bounded evidence posture."
+      }
+    ],
+    "rollback_anchors": [
+      "docs/CODEX_TRUSTED_ROLLOUT_OPERATIONS.md",
+      "generated/codex/rollout/rollback_windows.min.json",
+      ".aoa/recurrence/review-queues/*.latest.json"
+    ],
+    "notes": "Open rollback follow-through when drift becomes material on startup, hook activation, or review-surface trust."
+  }
+}

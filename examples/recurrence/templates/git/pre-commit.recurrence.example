@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+aoa recur doctor --root . --json >/dev/null

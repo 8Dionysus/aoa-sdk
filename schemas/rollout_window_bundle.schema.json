@@ -1,0 +1,163 @@
+{
+  "$defs": {
+    "DriftTrigger": {
+      "additionalProperties": false,
+      "properties": {
+        "signal": {
+          "title": "Signal",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "source": {
+          "title": "Source",
+          "type": "string"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "signal",
+        "severity",
+        "source"
+      ],
+      "title": "DriftTrigger",
+      "type": "object"
+    },
+    "RolloutWindow": {
+      "additionalProperties": false,
+      "properties": {
+        "window_ref": {
+          "title": "Window Ref",
+          "type": "string"
+        },
+        "campaign_ref": {
+          "title": "Campaign Ref",
+          "type": "string"
+        },
+        "phase": {
+          "enum": [
+            "prepared",
+            "activated",
+            "monitoring",
+            "repairing",
+            "rollback_open",
+            "rolled_back"
+          ],
+          "title": "Phase",
+          "type": "string"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "wiring_scopes": {
+          "items": {
+            "enum": [
+              "session_start",
+              "user_prompt_submit",
+              "session_stop",
+              "pre_commit",
+              "pre_push",
+              "ci"
+            ],
+            "type": "string"
+          },
+          "title": "Wiring Scopes",
+          "type": "array"
+        },
+        "review_surfaces": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Review Surfaces",
+          "type": "array"
+        },
+        "guard_commands": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Guard Commands",
+          "type": "array"
+        },
+        "drift_triggers": {
+          "items": {
+            "$ref": "#/$defs/DriftTrigger"
+          },
+          "title": "Drift Triggers",
+          "type": "array"
+        },
+        "rollback_anchors": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Rollback Anchors",
+          "type": "array"
+        },
+        "notes": {
+          "default": "",
+          "title": "Notes",
+          "type": "string"
+        }
+      },
+      "required": [
+        "window_ref",
+        "campaign_ref",
+        "phase",
+        "title"
+      ],
+      "title": "RolloutWindow",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_rollout_window_bundle_v1",
+      "default": "aoa_rollout_window_bundle_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "bundle_ref": {
+      "title": "Bundle Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "wiring_plan_ref": {
+      "title": "Wiring Plan Ref",
+      "type": "string"
+    },
+    "campaign_window": {
+      "$ref": "#/$defs/RolloutWindow"
+    },
+    "drift_review_window": {
+      "$ref": "#/$defs/RolloutWindow"
+    },
+    "rollback_followthrough_window": {
+      "$ref": "#/$defs/RolloutWindow"
+    }
+  },
+  "required": [
+    "bundle_ref",
+    "workspace_root",
+    "wiring_plan_ref",
+    "campaign_window",
+    "drift_review_window",
+    "rollback_followthrough_window"
+  ],
+  "title": "RolloutWindowBundle",
+  "type": "object"
+}

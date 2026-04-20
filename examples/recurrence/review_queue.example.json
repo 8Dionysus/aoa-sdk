@@ -1,0 +1,55 @@
+{
+  "schema_version": "aoa_review_queue_v1",
+  "queue_ref": "review-queue:20260414T043008Z",
+  "workspace_root": "/srv/workspace",
+  "signal_ref": "signal:example",
+  "items": [
+    {
+      "item_ref": "review-item:0001",
+      "lane": "eval",
+      "priority": "high",
+      "target_repo": "aoa-evals",
+      "owner_repo": "aoa-evals",
+      "component_ref": "component:evals:portable-proof-beacons",
+      "beacon_ref": "evals.portable_eval.runtime_pressure",
+      "kind": "portable_eval_candidate",
+      "status": "candidate",
+      "decision_surface": "docs/RUNTIME_BENCH_PROMOTION_GUIDE.md",
+      "summary": "runtime evidence repeated with a bounded claim shape and now pressures portable-eval review",
+      "evidence_refs": [
+        "bench:rt-001",
+        "bench:rt-002"
+      ],
+      "source_inputs": [
+        "runtime-candidate-guide"
+      ],
+      "recommended_actions": [
+        "open portable eval boundary review"
+      ]
+    },
+    {
+      "item_ref": "review-item:0002",
+      "lane": "skill",
+      "priority": "medium",
+      "target_repo": "aoa-skills",
+      "owner_repo": "aoa-skills",
+      "component_ref": "component:skills:bundle-and-activation-beacons",
+      "beacon_ref": "skills.unused_skill.activation_gap",
+      "kind": "unused_skill_opportunity",
+      "status": "watch",
+      "decision_surface": "docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
+      "summary": "description-trigger suite suggests a relevant skill should have appeared, but the receipt trail does not show it",
+      "evidence_refs": [
+        "trigger-case:case-004",
+        "receipt:skill-20260414-01"
+      ],
+      "source_inputs": [
+        "description-trigger-suite",
+        "skill-live-receipts"
+      ],
+      "recommended_actions": [
+        "inspect the applicability map and defer notes"
+      ]
+    }
+  ]
+}

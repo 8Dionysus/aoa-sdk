@@ -1,0 +1,191 @@
+{
+  "$defs": {
+    "CandidateDossier": {
+      "additionalProperties": false,
+      "properties": {
+        "dossier_ref": {
+          "title": "Dossier Ref",
+          "type": "string"
+        },
+        "lane": {
+          "enum": [
+            "technique",
+            "skill",
+            "eval",
+            "playbook",
+            "general"
+          ],
+          "title": "Lane",
+          "type": "string"
+        },
+        "target_repo": {
+          "title": "Target Repo",
+          "type": "string"
+        },
+        "owner_repo": {
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "component_ref": {
+          "title": "Component Ref",
+          "type": "string"
+        },
+        "beacon_ref": {
+          "title": "Beacon Ref",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "new_technique_candidate",
+            "technique_overlap_hold",
+            "canonical_pressure",
+            "unused_skill_opportunity",
+            "skill_trigger_drift",
+            "skill_bundle_candidate",
+            "portable_eval_candidate",
+            "progression_evidence_candidate",
+            "overclaim_alarm",
+            "playbook_candidate",
+            "subagent_recipe_candidate",
+            "automation_seed_candidate"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "status": {
+          "enum": [
+            "hint",
+            "watch",
+            "candidate",
+            "review_ready"
+          ],
+          "title": "Status",
+          "type": "string"
+        },
+        "decision_surface": {
+          "anyOf": [
+            {
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Decision Surface"
+        },
+        "title": {
+          "title": "Title",
+          "type": "string"
+        },
+        "summary": {
+          "title": "Summary",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "source_inputs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Source Inputs",
+          "type": "array"
+        },
+        "recommended_actions": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Recommended Actions",
+          "type": "array"
+        },
+        "review_questions": {
+          "items": {
+            "$ref": "#/$defs/DossierQuestion"
+          },
+          "title": "Review Questions",
+          "type": "array"
+        }
+      },
+      "required": [
+        "dossier_ref",
+        "lane",
+        "target_repo",
+        "owner_repo",
+        "component_ref",
+        "beacon_ref",
+        "kind",
+        "status",
+        "title",
+        "summary"
+      ],
+      "title": "CandidateDossier",
+      "type": "object"
+    },
+    "DossierQuestion": {
+      "additionalProperties": false,
+      "properties": {
+        "prompt": {
+          "title": "Prompt",
+          "type": "string"
+        },
+        "why": {
+          "default": "",
+          "title": "Why",
+          "type": "string"
+        }
+      },
+      "required": [
+        "prompt"
+      ],
+      "title": "DossierQuestion",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_candidate_dossier_packet_v1",
+      "default": "aoa_candidate_dossier_packet_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "packet_ref": {
+      "title": "Packet Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "signal_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Signal Ref"
+    },
+    "dossiers": {
+      "items": {
+        "$ref": "#/$defs/CandidateDossier"
+      },
+      "title": "Dossiers",
+      "type": "array"
+    }
+  },
+  "required": [
+    "packet_ref",
+    "workspace_root"
+  ],
+  "title": "CandidateDossierPacket",
+  "type": "object"
+}
