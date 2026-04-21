@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import json
 import sys
 from pathlib import Path
 from types import SimpleNamespace
+
+from jsonschema import Draft202012Validator, ValidationError
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "src"))
@@ -160,6 +163,21 @@ def test_routing_projection_is_advisory_and_thin() -> None:
         for hint in projection.owner_hints
         for ref in hint.source_refs
     )
+    schema = json.loads(
+        (ROOT / "schemas/recurrence-routing-projection.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    Draft202012Validator(schema).validate(projection.model_dump(mode="json"))
+    invalid = projection.model_dump(mode="json")
+    invalid["owner_hints"][0].pop("inspect_surfaces", None)
+    invalid["owner_hints"][0].pop("source_refs", None)
+    try:
+        Draft202012Validator(schema).validate(invalid)
+    except ValidationError:
+        pass
+    else:
+        raise AssertionError("routing owner hints must carry source surface refs")
 
 
 def test_stats_projection_is_derived_observability_only() -> None:
@@ -176,6 +194,17 @@ def test_stats_projection_is_derived_observability_only() -> None:
     assert projection.review.by_kind["unused_skill_opportunity"] == 1
 
 
+def test_stats_projection_no_input_path_keeps_schema_provenance() -> None:
+    projection = build_stats_projection(workspace())
+    assert projection.source_packet_refs == ["workspace:/srv/workspace"]
+    schema = json.loads(
+        (ROOT / "schemas/recurrence-stats-projection.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    Draft202012Validator(schema).validate(projection.model_dump(mode="json"))
+
+
 def test_kag_projection_regrounds_without_claiming_canon() -> None:
     projection = build_kag_projection(
         workspace(),
@@ -187,9 +216,32 @@ def test_kag_projection_regrounds_without_claiming_canon() -> None:
     assert projection.donor_refresh_obligations
     assert projection.retrieval_invalidation_hints
     assert projection.source_strength_hints
+    assert projection.regrounding_modes
     assert "canon authority" not in " ".join(projection.boundary_notes).lower().replace(
         "not become ", ""
     )
+    schema = json.loads(
+        (ROOT / "schemas/recurrence-kag-projection.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    Draft202012Validator(schema).validate(projection.model_dump(mode="json"))
+    invalid_modes = projection.model_dump(mode="json")
+    invalid_modes["regrounding_modes"] = []
+    try:
+        Draft202012Validator(schema).validate(invalid_modes)
+    except ValidationError:
+        pass
+    else:
+        raise AssertionError("KAG projections must carry at least one regrounding mode")
+    invalid_hint = projection.model_dump(mode="json")
+    invalid_hint["source_strength_hints"] = [{}]
+    try:
+        Draft202012Validator(schema).validate(invalid_hint)
+    except ValidationError:
+        pass
+    else:
+        raise AssertionError("KAG source strength hints must be actionable")
 
 
 def test_bundle_carries_guard_report_and_surface_postures() -> None:

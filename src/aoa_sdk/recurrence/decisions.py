@@ -128,7 +128,7 @@ def build_owner_review_decision_template(
     return OwnerReviewDecision(
         decision_ref=decision_ref,
         decided_at=stamp,
-        owner_repo=item.target_repo,
+        owner_repo=item.owner_repo,
         target_repo=item.target_repo,
         reviewer=reviewer,
         queue_ref=queue.queue_ref,
