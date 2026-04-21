@@ -1,0 +1,13 @@
+{
+  "allowed_effect": "draft_candidate_only",
+  "candidate_only": true,
+  "description": "Draft a retention check request candidate from trial outcome candidates.",
+  "forbidden_effects": [
+    "hidden_scheduler_action"
+  ],
+  "id": "agon.sdk.retention.draft_check_request_candidate",
+  "kind": "sdk_helper_candidate",
+  "live_authority": false,
+  "owner": "aoa-sdk",
+  "status": "requested_only"
+}
