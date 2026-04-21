@@ -1549,6 +1549,7 @@ class CheckpointAfterCommitReport(BaseModel):
     status: Literal[
         "captured",
         "recorded_closed_session_followthrough",
+        "recorded_reviewed_closeout_followthrough",
         "skipped_no_active_session",
         "skipped_closed_session",
         "failed",

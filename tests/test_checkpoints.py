@@ -204,6 +204,43 @@ def _write_checkpoint_history_entry(
     )
 
 
+def _write_owner_handoff(
+    workspace_root: Path,
+    *,
+    session_ref: str,
+    owner_repo: str,
+    next_surface: str = "playbooks/final-owner-artifact/PLAYBOOK.md",
+) -> Path:
+    handoff_root = workspace_root / "aoa-sdk" / ".aoa" / "closeout" / "handoffs"
+    handoff_root.mkdir(parents=True, exist_ok=True)
+    handoff_path = handoff_root / f"{checkpoint_registry._safe_name(session_ref)}.owner-handoff.json"
+    payload = {
+        "schema_version": 1,
+        "closeout_id": f"checkpoint-closeout-{checkpoint_registry._safe_name(session_ref)}",
+        "session_ref": session_ref,
+        "manifest_path": str((workspace_root / "aoa-sdk" / ".aoa" / "closeout-context.json").resolve()),
+        "generated_at": "2026-04-10T14:00:00Z",
+        "items": [
+            {
+                "source_kind": "quest-promotion",
+                "unit_ref": "candidate:route:aoa-playbooks-playbook-registry-min",
+                "unit_name": "Recurring route candidate",
+                "owner_repo": owner_repo,
+                "next_surface": next_surface,
+                "suggested_action": "author-owner-artifact",
+                "abstraction_shape": "playbook",
+                "promotion_verdict": "keep_open_quest",
+                "nearest_wrong_target": "skill",
+                "reason": "Reviewed closeout already routed the surviving route into the owner layer.",
+                "evidence_refs": [],
+            }
+        ],
+        "workflow_items": [],
+    }
+    handoff_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return handoff_path
+
+
 def test_surface_detect_checkpoint_phase_emits_candidate_clusters(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
@@ -643,6 +680,76 @@ def test_after_commit_records_closed_session_followthrough_without_rotating_note
     assert len(refreshed_note_payload["checkpoint_history"]) == history_count
     assert refreshed_note_payload["checkpoint_history"][-1]["checkpoint_kind"] == "verify_green"
     assert not archive_root.exists()
+
+
+def test_after_commit_records_reviewed_closeout_followthrough_without_new_pending_review(
+    workspace_root: Path,
+) -> None:
+    repo_root = workspace_root / "aoa-playbooks"
+    _init_git_repo(repo_root)
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-reviewed-closeout-followthrough",
+    )
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    (repo_root / "README.md").write_text("# aoa-playbooks test repo\n", encoding="utf-8")
+    _git_commit(repo_root, subject="draft owner artifact")
+    captured = sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        session_file=str(session_file),
+    )
+    reviewed = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref="HEAD",
+        summary="Agent reviewed the owner-layer candidate and confirmed the route already survived reviewed closeout.",
+        findings=["what: owner routing is already explicit; why: the final owner commit should not reopen checkpoint review"],
+        candidate_notes=["where: aoa-playbooks already has a reviewed owner-handoff target for this session"],
+        stats_hints=["stats: refresh remains a reviewed-closeout decision, not a post-commit side effect"],
+        mechanic_hints=["mechanic: explicit owner follow-through can be report-only once reviewed closeout already routed the repo"],
+        closeout_questions=["did the owner handoff already make this repo's next artifact explicit enough to avoid a new pending review?"],
+        evidence_refs=[captured.report_path],
+        next_owner_moves=["author the owner artifact without reopening checkpoint review"],
+        applied_skill_names=["aoa-change-protocol"],
+        session_file=str(session_file),
+    )
+    handoff_path = _write_owner_handoff(
+        workspace_root,
+        session_ref=reviewed.session_ref,
+        owner_repo="aoa-playbooks",
+    )
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-playbooks",
+        runtime_session_id="runtime-reviewed-closeout-followthrough",
+    )
+    note_payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
+    history_count = len(note_payload["checkpoint_history"])
+
+    commit_sha = _git_commit(repo_root, subject="land owner artifact after reviewed closeout")
+    report = sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref=commit_sha,
+        checkpoint_kind="owner_followthrough",
+        session_file=str(session_file),
+    )
+    refreshed_note_payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
+
+    assert handoff_path.exists()
+    assert report.status == "recorded_reviewed_closeout_followthrough"
+    assert report.checkpoint_kind == "owner_followthrough"
+    assert report.mutation_surface == "public-share"
+    assert report.manual_review_requested is False
+    assert report.agent_review_required is False
+    assert report.agent_review_status == "not_required"
+    assert report.note_ref == str(note_dir / "checkpoint-note.json")
+    assert report.error_text is not None
+    assert "matching owner handoff" in report.error_text
+    assert Path(report.report_path).exists()
+    assert refreshed_note_payload["state"] == "reviewable"
+    assert refreshed_note_payload["review_status"] == "reviewed"
+    assert len(refreshed_note_payload["checkpoint_history"]) == history_count
 
 
 def test_checkpoint_review_note_adds_agent_authored_checkpoint_review(workspace_root: Path) -> None:
