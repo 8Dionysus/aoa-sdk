@@ -1,0 +1,26 @@
+{
+  "component_id": "component:agon:sdk-state-packet-helper-candidates",
+  "component_kind": "agon_recurrence_component",
+  "forbidden_effects": [
+    "create_live_arena_session",
+    "execute_move",
+    "issue_verdict",
+    "grant_closure",
+    "write_durable_scar",
+    "schedule_retention_as_authority",
+    "mutate_rank",
+    "promote_to_tree_of_sophia",
+    "auto_modify_owner_repo"
+  ],
+  "observed_surfaces": [
+    "config/agon_sdk_state_packet_bindings.seed.json",
+    "generated/agon_sdk_state_packet_bindings.min.json"
+  ],
+  "owner_repo": "aoa-sdk",
+  "review_lanes": [
+    "sdk_helper_drift",
+    "packet_helper_stop_line_review"
+  ],
+  "status": "seeded_pre_runtime_observation_target",
+  "wave": "IX"
+}

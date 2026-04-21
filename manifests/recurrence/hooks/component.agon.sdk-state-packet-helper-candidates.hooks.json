@@ -1,0 +1,14 @@
+{
+  "component_id": "component:agon:sdk-state-packet-helper-candidates",
+  "hook_set_id": "hooks:component:agon:sdk-state-packet-helper-candidates",
+  "hooks": [
+    {
+      "emits": "sdk_helper_review_candidate",
+      "hook_id": "agon.sdk_state_packet_bindings_changed",
+      "observes": "generated/agon_sdk_state_packet_bindings.min.json"
+    }
+  ],
+  "live_protocol": false,
+  "owner_repo": "aoa-sdk",
+  "runtime_effect": "none"
+}
