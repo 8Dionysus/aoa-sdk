@@ -13,6 +13,12 @@
     "registry_id": {
       "type": "string"
     },
+    "stop_lines": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
     "wave": {
       "type": "string"
     }
@@ -22,6 +28,7 @@
     "wave",
     "count",
     "helpers",
+    "stop_lines",
     "digest"
   ],
   "title": "Agon Duel Kernel SDK Binding Registry",

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 # ruff: noqa: E402
 
+import importlib
 import importlib.util
 import sys
 import types
@@ -13,10 +14,14 @@ SRC_ROOT = Path(__file__).resolve().parents[1] / "src" / "aoa_sdk"
 def _install_workspace_stub() -> None:
     if "aoa_sdk.workspace.discovery" in sys.modules:
         return
-    aoa_sdk_pkg = sys.modules.setdefault("aoa_sdk", types.ModuleType("aoa_sdk"))
-    aoa_sdk_pkg.__path__ = [str(SRC_ROOT)]
-    recurrence_pkg = sys.modules.setdefault("aoa_sdk.recurrence", types.ModuleType("aoa_sdk.recurrence"))
-    recurrence_pkg.__path__ = [str(SRC_ROOT / "recurrence")]
+
+    src_parent = str(SRC_ROOT.parent)
+    if src_parent not in sys.path:
+        sys.path.insert(0, src_parent)
+
+    importlib.import_module("aoa_sdk")
+    importlib.import_module("aoa_sdk.recurrence")
+
     workspace_pkg = types.ModuleType("aoa_sdk.workspace")
     workspace_pkg.__path__ = []
     discovery = types.ModuleType("aoa_sdk.workspace.discovery")
@@ -46,6 +51,7 @@ def _install_workspace_stub() -> None:
 
 
 _install_workspace_stub()
+
 
 def _load_module(name: str, path: Path):
     spec = importlib.util.spec_from_file_location(name, path)

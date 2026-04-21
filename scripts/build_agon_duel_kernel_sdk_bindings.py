@@ -25,13 +25,15 @@ def digest_obj(obj):
 def build():
     data = json.loads(SRC.read_text(encoding="utf-8"))
     helpers = data.get("helpers", [])
+    stop_lines = data.get("stop_lines", [])
     return {
         "registry_id": data["registry_id"],
         "wave": data.get("wave", "XII"),
         "count": len(helpers),
         "status": data.get("status"),
         "helpers": helpers,
-        "digest": digest_obj(helpers),
+        "stop_lines": stop_lines,
+        "digest": digest_obj({"helpers": helpers, "stop_lines": stop_lines}),
     }
 
 
