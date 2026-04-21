@@ -317,7 +317,10 @@ def expand_component_graph(
     reachable_refs = {item.component_ref for item in component_nodes}
     cycles.extend(
         _detect_reachable_cycles(
-            reachable_refs, registry, existing={tuple(item.path) for item in cycles}
+            reachable_refs,
+            registry,
+            existing={tuple(item.path) for item in cycles},
+            include_optional=include_optional,
         )
     )
 
@@ -599,6 +602,7 @@ def _detect_reachable_cycles(
     registry: RecurrenceRegistry,
     *,
     existing: set[tuple[str, ...]],
+    include_optional: bool = True,
 ) -> list[CycleRecord]:
     cycles: list[CycleRecord] = []
     emitted: set[str] = {_cycle_signature(list(path)) for path in existing}
@@ -630,6 +634,9 @@ def _detect_reachable_cycles(
             return
         next_stack = [*stack, component_ref]
         for edge in _ordered_edges(loaded.component.consumer_edges):
+            strength = classify_edge_strength(edge)
+            if not include_optional and strength in {"recommended", "advisory"}:
+                continue
             if edge.target.startswith("component:") and edge.target in reachable_refs:
                 walk(edge.target, next_stack, edge.kind)
 

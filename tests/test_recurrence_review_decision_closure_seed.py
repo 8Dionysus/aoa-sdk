@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from aoa_sdk.recurrence.decisions import (
+    build_review_decision_ledger,
     build_owner_review_decision_template,
     close_review_decisions,
 )
@@ -67,6 +68,42 @@ def test_decision_template_carries_owner_boundaries_without_minting_owner_refs()
     assert decision.lineage_bridge.owner_assigned_ref is None
     assert "sdk_does_not_accept_skill" in decision.forbidden_implications
     assert any("trigger" in boundary for boundary in decision.boundaries_preserved)
+
+
+def test_decision_template_preserves_source_owner_when_target_differs() -> None:
+    queue = ReviewQueue(
+        queue_ref="review-queue:cross-owner",
+        workspace_root="/tmp/workspace",
+        items=[
+            ReviewQueueItem(
+                item_ref="review-item:cross-owner",
+                lane="technique",
+                priority="medium",
+                target_repo="aoa-routing",
+                owner_repo="aoa-techniques",
+                component_ref="component:techniques:intake",
+                beacon_ref="techniques.intake.routing_pressure",
+                kind="canonical_pressure",
+                status="watch",
+                decision_surface="docs/CROSS_LAYER_TECHNIQUE_CANDIDATES.md",
+                summary="Routing pressure points back to technique ownership.",
+            )
+        ],
+    )
+    decision = build_owner_review_decision_template(
+        queue,
+        item_ref="review-item:cross-owner",
+        decision="defer",
+    )
+    ledger = build_review_decision_ledger(
+        workspace_root="/tmp/workspace",
+        decisions=[decision],
+        source_queue_ref=queue.queue_ref,
+    )
+
+    assert decision.owner_repo == "aoa-techniques"
+    assert decision.target_repo == "aoa-routing"
+    assert ledger.by_owner == {"aoa-techniques": 1}
 
 
 def test_close_report_records_suppression_and_unresolved_items() -> None:

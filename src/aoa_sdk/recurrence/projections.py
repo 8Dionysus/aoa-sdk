@@ -60,6 +60,10 @@ def _packet_refs(*packets: Any) -> list[str]:
     return sorted(set(refs))
 
 
+def _workspace_source_ref(workspace: Any) -> str:
+    return f"workspace:{_workspace_root(workspace)}"
+
+
 def _counter_bucket(
     name: str,
     total: int,
@@ -207,6 +211,8 @@ def build_stats_projection(
     source_packet_refs = _packet_refs(
         gap_report, beacon_packet, review_queue, review_summary, decision_report
     )
+    if not source_packet_refs:
+        source_packet_refs = [_workspace_source_ref(workspace)]
     gaps = list(gap_report.gaps if gap_report is not None else [])
     beacons = list(beacon_packet.entries if beacon_packet is not None else [])
     reviews = list(review_queue.items if review_queue is not None else [])
@@ -345,11 +351,14 @@ def build_kag_projection(
                 "canonical_pressure",
             }:
                 continue
+            stronger_source_refs = entry.source_inputs[:10]
+            if not stronger_source_refs:
+                stronger_source_refs = [entry.component_ref or entry.beacon_ref]
             source_strength_hints.append(
                 KagSourceStrengthHint(
                     hint_ref=f"kag-beacon-strength:{len(source_strength_hints) + 1:04d}",
                     owner_repo=entry.target_repo,
-                    stronger_source_refs=entry.source_inputs[:10],
+                    stronger_source_refs=stronger_source_refs,
                     weaker_derived_refs=[entry.beacon_ref],
                     reason=f"beacon {entry.kind} should reground derived consumers toward owner surfaces",
                     mode="handoff_guardrail_reentry"
@@ -364,7 +373,7 @@ def build_kag_projection(
         {item.mode for item in donor_obligations}
         | {item.mode for item in invalidation_hints}
         | {item.mode for item in source_strength_hints}
-    )
+    ) or ["owner_boundary_reentry"]
     return RecurrenceKagProjection(
         projection_ref=_stamp("recurrence-kag-projection"),
         workspace_root=_workspace_root(workspace),

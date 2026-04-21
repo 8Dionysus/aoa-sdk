@@ -147,6 +147,16 @@ def test_graph_closure_detects_transitive_edges_cycles_and_external_impacts(
         "aoa-routing",
         "aoa-kag",
     }
+    required_only = expand_component_graph(
+        direct_component_refs=["component:skills:activation-boundary"],
+        registry=registry,
+        depth_limit=6,
+        include_optional=False,
+    )
+    assert not required_only.cycles
+    assert {impact.edge.target_repo for impact in required_only.external_impacts} == {
+        "aoa-kag"
+    }
 
     report = build_graph_closure_report(
         workspace,
