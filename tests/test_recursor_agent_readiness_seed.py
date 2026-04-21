@@ -98,22 +98,35 @@ def seed_workspace(root: Path) -> Path:
                 {
                     "recursor_id": "recursor.witness",
                     "activation_status": "candidate_only",
+                    "activation_requires": [
+                        "explicit_main_codex_call",
+                        "no_agonic_runtime_claim",
+                    ],
                     "forbidden": [
+                        "workspace_write",
                         "agent_spawn",
                         "arena_session",
                         "verdict",
                         "scar_write",
+                        "rank_mutation",
                         "hidden_scheduler",
                     ],
                 },
                 {
                     "recursor_id": "recursor.executor",
                     "activation_status": "candidate_only",
+                    "activation_requires": [
+                        "explicit_main_codex_call",
+                        "no_agonic_runtime_claim",
+                    ],
                     "forbidden": [
+                        "execute_without_plan",
+                        "self_verify_as_final",
                         "agent_spawn",
                         "arena_session",
                         "verdict",
                         "scar_write",
+                        "rank_mutation",
                         "hidden_scheduler",
                     ],
                 },
@@ -145,6 +158,64 @@ class RecursorAgentReadinessSdkSeedTest(unittest.TestCase):
         self.assertEqual(report["status"], "pass")
         self.assertEqual(report["projection_status"], "candidate_only")
         self.assertFalse(report["install_by_default"])
+
+    def test_readiness_preserves_fail_when_diagnostics_and_violations_coexist(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = seed_workspace(Path(tmp))
+            (workspace / "aoa-agents" / "config" / "recursor_roles.seed.json").unlink()
+            projection_path = (
+                workspace / "aoa-agents" / "config" / "codex_recursor_projection.candidate.json"
+            )
+            projection = json.loads(projection_path.read_text(encoding="utf-8"))
+            projection["install_by_default"] = True
+            write_json(projection_path, projection)
+            report = build_recursor_readiness_projection(workspace)
+        self.assertEqual(report["status"], "fail")
+        self.assertTrue(report["violations"])
+        self.assertTrue(report["diagnostics"])
+
+    def test_readiness_flags_invalid_seed_json(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = seed_workspace(Path(tmp))
+            roles_path = workspace / "aoa-agents" / "config" / "recursor_roles.seed.json"
+            roles_path.write_text("{not-json", encoding="utf-8")
+            report = build_recursor_readiness_projection(workspace)
+        self.assertEqual(report["status"], "fail")
+        self.assertTrue(
+            any(diagnostic["kind"] == "invalid_seed_json" for diagnostic in report["diagnostics"])
+        )
+
+    def test_projection_rejects_unexpected_candidate_role(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            workspace = seed_workspace(Path(tmp))
+            projection_path = (
+                workspace / "aoa-agents" / "config" / "codex_recursor_projection.candidate.json"
+            )
+            projection = json.loads(projection_path.read_text(encoding="utf-8"))
+            projection["candidate_agents"].append(
+                {
+                    "recursor_id": "recursor.admin",
+                    "activation_status": "candidate_only",
+                    "activation_requires": [
+                        "explicit_main_codex_call",
+                        "no_agonic_runtime_claim",
+                    ],
+                    "forbidden": [
+                        "agent_spawn",
+                        "arena_session",
+                        "verdict",
+                        "scar_write",
+                        "rank_mutation",
+                        "hidden_scheduler",
+                    ],
+                }
+            )
+            write_json(projection_path, projection)
+            report = build_recursor_projection_candidates(workspace)
+        self.assertEqual(report["status"], "fail")
+        self.assertTrue(
+            any(violation["kind"] == "unexpected_projection_agent" for violation in report["violations"])
+        )
 
 
 if __name__ == "__main__":

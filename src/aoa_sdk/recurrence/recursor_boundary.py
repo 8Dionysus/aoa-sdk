@@ -16,6 +16,25 @@ GLOBAL_FORBIDDEN_ACTIONS = {
     "promote_to_tree_of_sophia",
     "hidden_scheduler_action",
 }
+PROJECTION_REQUIRED_ROLES = {"recursor.witness", "recursor.executor"}
+PROJECTION_REQUIRED_FORBIDDEN = {
+    "global": {
+        "agent_spawn",
+        "arena_session",
+        "verdict",
+        "scar_write",
+        "rank_mutation",
+        "hidden_scheduler",
+    },
+    "recursor.witness": {
+        "workspace_write",
+    },
+    "recursor.executor": {
+        "execute_without_plan",
+        "self_verify_as_final",
+    },
+}
+PROJECTION_REQUIRED_ACTIVATION = {"explicit_main_codex_call", "no_agonic_runtime_claim"}
 
 BOUNDARY_STOP_LINES = [
     "no_arena_session",
@@ -83,14 +102,34 @@ def check_projection_candidate(projection: Dict[str, Any]) -> List[Dict[str, Any
         add("projection_installs_by_default", "Projection must not install by default.")
     if projection.get("requires_owner_review") is not True:
         add("projection_no_owner_review", "Projection must require owner review.")
-    for agent in projection.get("candidate_agents", []):
-        rid = agent.get("recursor_id", "<missing>")
+    agents = [agent for agent in projection.get("candidate_agents", []) if isinstance(agent, dict)]
+    agent_ids = [str(agent.get("recursor_id", "<missing>")) for agent in agents]
+    agent_id_set = set(agent_ids)
+    unexpected = agent_id_set - PROJECTION_REQUIRED_ROLES
+    missing_roles = PROJECTION_REQUIRED_ROLES - agent_id_set
+    duplicate_ids = sorted({rid for rid in agent_ids if agent_ids.count(rid) > 1})
+    if unexpected:
+        add("unexpected_projection_agent", f"Unexpected projection candidate roles: {sorted(unexpected)}")
+    if missing_roles:
+        add("missing_projection_agent", f"Missing projection candidates: {sorted(missing_roles)}")
+    if duplicate_ids:
+        add("duplicate_projection_agent", f"Duplicate projection candidate roles: {duplicate_ids}")
+    if len(agents) != len(PROJECTION_REQUIRED_ROLES):
+        add("invalid_projection_agent_count", "Projection must contain exactly witness and executor.")
+    for agent in agents:
+        rid = str(agent.get("recursor_id", "<missing>"))
         if agent.get("activation_status") != "candidate_only":
             add("projection_agent_not_candidate_only", f"{rid} must remain candidate_only.")
         forbidden = set(agent.get("forbidden", []))
-        missing = {"agent_spawn", "arena_session", "verdict", "scar_write", "hidden_scheduler"} - forbidden
+        required_forbidden = set(PROJECTION_REQUIRED_FORBIDDEN["global"])
+        required_forbidden |= PROJECTION_REQUIRED_FORBIDDEN.get(rid, set())
+        missing = required_forbidden - forbidden
         if missing:
             add("projection_agent_missing_forbidden", f"{rid} missing forbidden tokens: {sorted(missing)}")
+        activation_requires = set(agent.get("activation_requires", []))
+        missing_activation = PROJECTION_REQUIRED_ACTIVATION - activation_requires
+        if missing_activation:
+            add("projection_agent_missing_activation_guard", f"{rid} missing activation guards: {sorted(missing_activation)}")
     return violations
 
 

@@ -41,24 +41,76 @@ def _repo(workspace_root: Path, name: str) -> Path:
     return direct
 
 
+def _seed_status(violations: List[Dict[str, Any]], diagnostics: List[Dict[str, Any]]) -> str:
+    if violations:
+        return "fail"
+    if any(diagnostic.get("severity") == "critical" for diagnostic in diagnostics):
+        return "fail"
+    if diagnostics:
+        return "warn"
+    return "pass"
+
+
+def _materialize_seed(
+    value: Optional[Any],
+    *,
+    missing_kind: str,
+    path: str,
+    default: Dict[str, Any],
+    diagnostics: List[Dict[str, Any]],
+) -> Dict[str, Any]:
+    if value is None:
+        diagnostics.append({"kind": missing_kind, "severity": "warning", "path": path})
+        return default
+    if isinstance(value, dict) and value.get("_error") == "invalid_json":
+        diagnostics.append(
+            {
+                "kind": "invalid_seed_json",
+                "severity": "critical",
+                "path": path,
+                "message": value.get("message"),
+            }
+        )
+        return default
+    if not isinstance(value, dict):
+        diagnostics.append({"kind": "invalid_seed_shape", "severity": "critical", "path": path})
+        return default
+    return value
+
+
 def build_recursor_readiness_projection(workspace_root: str | Path) -> Dict[str, Any]:
     """Build a compact read-only projection from `aoa-agents` readiness surfaces."""
     root = Path(workspace_root)
     agents = _repo(root, "aoa-agents")
+    roles_path = "aoa-agents/config/recursor_roles.seed.json"
+    pair_path = "aoa-agents/config/recursor_pair.seed.json"
+    projection_path = "aoa-agents/config/codex_recursor_projection.candidate.json"
     roles = _read_json(agents / "config" / "recursor_roles.seed.json")
     pair = _read_json(agents / "config" / "recursor_pair.seed.json")
     projection = _read_json(agents / "config" / "codex_recursor_projection.candidate.json")
 
     diagnostics: List[Dict[str, Any]] = []
-    if roles is None:
-        diagnostics.append({"kind": "missing_roles_seed", "path": "aoa-agents/config/recursor_roles.seed.json"})
-        roles = {"roles": []}
-    if pair is None:
-        diagnostics.append({"kind": "missing_pair_seed", "path": "aoa-agents/config/recursor_pair.seed.json"})
-        pair = {}
-    if projection is None:
-        diagnostics.append({"kind": "missing_projection_candidate", "path": "aoa-agents/config/codex_recursor_projection.candidate.json"})
-        projection = {}
+    roles = _materialize_seed(
+        roles,
+        missing_kind="missing_roles_seed",
+        path=roles_path,
+        default={"roles": []},
+        diagnostics=diagnostics,
+    )
+    pair = _materialize_seed(
+        pair,
+        missing_kind="missing_pair_seed",
+        path=pair_path,
+        default={},
+        diagnostics=diagnostics,
+    )
+    projection = _materialize_seed(
+        projection,
+        missing_kind="missing_projection_candidate",
+        path=projection_path,
+        default={},
+        diagnostics=diagnostics,
+    )
 
     violations: List[Dict[str, Any]] = []
     if isinstance(roles, dict):
@@ -89,7 +141,7 @@ def build_recursor_readiness_projection(workspace_root: str | Path) -> Dict[str,
         "generated_at": _utc_now(),
         "workspace_root": str(root),
         "source_repo": str(agents),
-        "status": boundary_status(violations) if not diagnostics else "warn",
+        "status": _seed_status(violations, diagnostics),
         "roles": role_rows,
         "pair_activation_status": pair.get("activation_status") if isinstance(pair, dict) else None,
         "projection_status": projection.get("projection_status") if isinstance(projection, dict) else None,
@@ -105,7 +157,7 @@ def build_recursor_boundary_scan_report(workspace_root: str | Path) -> Dict[str,
     projection = build_recursor_readiness_projection(workspace_root)
     violations = list(projection.get("violations", []))
     diagnostics = list(projection.get("diagnostics", []))
-    status = "fail" if violations else ("warn" if diagnostics else "pass")
+    status = _seed_status(violations, diagnostics)
     return {
         "schema_version": "recursor-boundary-scan-report/v1",
         "generated_at": _utc_now(),
