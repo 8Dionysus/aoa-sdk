@@ -1,0 +1,30 @@
+{
+  "schema_version": "recursor-boundary-scan-report/v1",
+  "generated_at": "2026-04-21T00:00:00Z",
+  "workspace_root": "/srv/workspace",
+  "status": "pass",
+  "violations": [],
+  "warnings": [
+    {
+      "kind": "readiness_not_runtime",
+      "severity": "info",
+      "message": "Recursor readiness surfaces are visible but not active runtime agents."
+    }
+  ],
+  "checked_stop_lines": [
+    "no_arena_session",
+    "no_verdict",
+    "no_scar_write",
+    "no_rank_mutation",
+    "no_assistant_contestant_drift",
+    "no_hidden_scheduler",
+    "no_tos_promotion",
+    "no_codex_projection_absorption"
+  ],
+  "summary": {
+    "role_count": 2,
+    "pair_activation_status": "readiness_only",
+    "projection_status": "candidate_only",
+    "install_by_default": false
+  }
+}

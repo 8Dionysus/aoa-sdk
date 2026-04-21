@@ -1,0 +1,53 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/recursor_readiness_projection.schema.json",
+  "title": "Recursor Readiness Projection",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "workspace_root",
+    "status",
+    "roles",
+    "violations",
+    "diagnostics",
+    "stop_lines"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "recursor-readiness-projection/v1"
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "warn",
+        "fail"
+      ]
+    },
+    "roles": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "stop_lines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}

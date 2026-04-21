@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/recursor_boundary_scan_report.schema.json",
+  "title": "Recursor Boundary Scan Report",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "generated_at",
+    "workspace_root",
+    "status",
+    "violations",
+    "warnings",
+    "checked_stop_lines"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "recursor-boundary-scan-report/v1"
+    },
+    "status": {
+      "enum": [
+        "pass",
+        "warn",
+        "fail"
+      ]
+    },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "warnings": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "checked_stop_lines": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": true
+}
