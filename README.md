@@ -16,6 +16,12 @@ Use the shortest route by need:
 - compact control-plane capsule: `generated/workspace_control_plane.min.json`
 - workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
 - compatibility posture: `docs/versioning.md`
+- recurrence manifest compatibility gate: `docs/RECURRENCE_HARDENING_COMPATIBILITY.md`, `aoa recur manifest-scan --root /srv --json`, and `python scripts/validate_recurrence_manifests.py --workspace-root /srv`
+- recurrence graph closure and snapshots: `docs/RECURRENCE_GRAPH_CLOSURE_AND_SNAPSHOT.md`, `aoa recur graph snapshot --root /srv --json`, and `aoa recur graph closure --root /srv --component component:<owner>:<name> --json`
+- recurrence live observation producers: `docs/RECURRENCE_LIVE_OBSERVATION_PRODUCERS.md`, `aoa recur live producers --root /srv --json`, and `python scripts/collect_live_recurrence_observations.py --workspace-root /srv --json`
+- recurrence review decision closure: `docs/RECURRENCE_REVIEW_DECISION_CLOSURE.md`, `aoa recur review decision-template --root /srv`, and `python scripts/review_decision_closure.py --workspace-root /srv template`
+- recurrence downstream projections: `docs/RECURRENCE_DOWNSTREAM_PROJECTIONS.md`, `aoa recur project build --root /srv --json`, and `python scripts/build_downstream_recurrence_projections.py --workspace-root /srv --json`
+- recurrence eval-suite handoff: `docs/RECURRENCE_EVAL_SUITE_HANDOFF.md` and `aoa-evals/bundles/aoa-recurrence-control-plane-integrity/`
 - current direction and hardening lanes: `ROADMAP.md`
 - release protocol and bounded publication path: `docs/RELEASING.md`
 - release, support, and CI posture: `docs/RELEASE_CI_POSTURE.md`
@@ -43,6 +49,12 @@ Use the shortest route by need:
 - live Codex-plane rollout status at the current workspace root: `docs/CODEX_PLANE_DEPLOY_STATUS.md`, `docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`, `docs/codex_rollout_campaign_refs.md`, `schemas/codex_plane_deploy_status_snapshot_v1.json`, `examples/codex_plane_deploy_status_snapshot.example.json`, and `src/aoa_sdk/codex/registry.py`
 - source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
 - compatibility rules and local checks: `docs/versioning.md`, `scripts/sibling_canary_matrix.json`, `scripts/run_sibling_canary.py`, `.github/workflows/latest-sibling-canary.yml`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
+- recurrence manifest compatibility: `docs/RECURRENCE_CONTROL_PLANE.md`, `docs/RECURRENCE_HARDENING_COMPATIBILITY.md`, `schemas/manifest_scan_report.schema.json`, `src/aoa_sdk/recurrence/compat.py`, `aoa recur manifest-scan --root /srv --json`, and `python scripts/validate_recurrence_manifests.py --workspace-root /srv`
+- recurrence graph inspection: `docs/RECURRENCE_GRAPH_CLOSURE_AND_SNAPSHOT.md`, `schemas/graph_snapshot.schema.json`, `schemas/graph_closure_report.schema.json`, `schemas/graph_delta_report.schema.json`, `src/aoa_sdk/recurrence/graph.py`, `aoa recur graph snapshot --root /srv --json`, `aoa recur graph closure --root /srv --component component:<owner>:<name> --json`, and `python scripts/build_recurrence_graph_snapshot.py --workspace-root /srv --json`
+- recurrence live observations: `docs/RECURRENCE_LIVE_OBSERVATION_PRODUCERS.md`, `schemas/live_observation_run.schema.json`, `src/aoa_sdk/recurrence/live_observations.py`, `aoa recur live observe --root /srv --json`, and `python scripts/collect_live_recurrence_observations.py --workspace-root /srv --json`
+- recurrence review decision closure: `docs/RECURRENCE_REVIEW_DECISION_CLOSURE.md`, `schemas/owner_review_decision.schema.json`, `schemas/review_decision_close_report.schema.json`, `src/aoa_sdk/recurrence/decisions.py`, `aoa recur review decision-template --root /srv`, `aoa recur review close --root /srv`, and `python scripts/review_decision_closure.py --workspace-root /srv template`
+- recurrence downstream projections: `docs/RECURRENCE_DOWNSTREAM_PROJECTIONS.md`, `schemas/downstream-projection-bundle.schema.json`, `schemas/downstream-projection-guard-report.schema.json`, `src/aoa_sdk/recurrence/projections.py`, `aoa recur project routing|stats|kag|build --root /srv`, and `python scripts/build_downstream_recurrence_projections.py --workspace-root /srv --json`
+- recurrence eval-suite handoff to the proof layer: `docs/RECURRENCE_EVAL_SUITE_HANDOFF.md`, with proof ownership remaining in `aoa-evals`
 - public support, release scope, and CI tiers: `docs/RELEASE_CI_POSTURE.md`
 - bounded federation release audit and publish helper: `docs/RELEASING.md`, `aoa release audit /srv --phase preflight --all --json`, and `aoa release publish /srv --repo aoa-sdk --dry-run --json`
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`

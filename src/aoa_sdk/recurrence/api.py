@@ -4,11 +4,25 @@ from pathlib import Path
 
 from ..workspace.discovery import Workspace
 from .beacons import build_beacon_packet
+from .decisions import (
+    build_owner_review_decision_template,
+    close_review_decisions,
+    load_decisions_from_paths,
+)
 from .detector import detect_change_signal
 from .doctor import build_connectivity_gap_report
+from .graph import (
+    GraphClosureReport,
+    GraphDeltaReport,
+    GraphSnapshot,
+    build_graph_closure_report,
+    build_graph_snapshot,
+    diff_graph_snapshots,
+)
 from .hook_registry import HookRegistry, load_hook_registry
 from .hooks import build_hook_run_report, list_hook_bindings
 from .io import read_model
+from .live_observations import build_live_observation_packet, list_live_producers
 from .ledger import build_candidate_ledger
 from .models import (
     BeaconPacket,
@@ -16,12 +30,21 @@ from .models import (
     CandidateLedger,
     ChangeSignal,
     ConnectivityGapReport,
+    DownstreamProjectionBundle,
+    DownstreamProjectionGuardReport,
     HookBinding,
     HookEvent,
     HookRunReport,
+    ManifestScanReport,
     ObservationPacket,
+    OwnerReviewDecision,
     OwnerReviewSummary,
     PropagationPlan,
+    RecurrenceKagProjection,
+    RecurrenceRoutingProjection,
+    RecurrenceStatsProjection,
+    ReviewDecisionAction,
+    ReviewDecisionCloseReport,
     ReturnHandoff,
     ReviewQueue,
     RolloutWindowBundle,
@@ -30,8 +53,15 @@ from .models import (
 )
 from .observations import build_observation_packet
 from .planner import build_propagation_plan
+from .projections import (
+    build_downstream_projection_bundle,
+    build_kag_projection,
+    build_projection_guard_report,
+    build_routing_projection,
+    build_stats_projection,
+)
 from .reentry import build_return_handoff
-from .registry import RecurrenceRegistry, load_registry
+from .registry import RecurrenceRegistry, build_manifest_scan_report, load_registry
 from .review import (
     build_candidate_dossier_packet,
     build_owner_review_summary,
@@ -48,6 +78,16 @@ class RecurrenceAPI:
 
     def registry(self) -> RecurrenceRegistry:
         return load_registry(self.workspace)
+
+    def _loaded_component_refs(self) -> list[str]:
+        return [
+            loaded.component.component_ref
+            for loaded in self.registry().iter_components()
+        ]
+
+    def manifest_scan(self) -> ManifestScanReport:
+        registry = self.registry()
+        return build_manifest_scan_report(self.workspace, registry=registry)
 
     def hook_registry(self) -> HookRegistry:
         return load_hook_registry(self.workspace)
@@ -103,7 +143,10 @@ class RecurrenceAPI:
         )
 
     def doctor(
-        self, report_or_path: ChangeSignal | str | Path | None = None
+        self,
+        report_or_path: ChangeSignal | str | Path | None = None,
+        *,
+        include_manifest_diagnostics: bool = True,
     ) -> ConnectivityGapReport:
         report = None
         if isinstance(report_or_path, (str, Path)):
@@ -111,7 +154,10 @@ class RecurrenceAPI:
         elif isinstance(report_or_path, ChangeSignal):
             report = report_or_path
         return build_connectivity_gap_report(
-            self.workspace, signal=report, registry=self.registry()
+            self.workspace,
+            signal=report,
+            registry=self.registry(),
+            include_manifest_diagnostics=include_manifest_diagnostics,
         )
 
     def build_return_handoff(
@@ -126,6 +172,22 @@ class RecurrenceAPI:
             plan = plan_or_path
         return build_return_handoff(
             plan=plan, registry=self.registry(), reviewed=reviewed
+        )
+
+    def live_producers(self) -> list[str]:
+        return list_live_producers()
+
+    def live_observations(
+        self,
+        *,
+        producers: list[str] | None = None,
+        max_observations_per_producer: int = 200,
+    ) -> ObservationPacket:
+        return build_live_observation_packet(
+            self.workspace,
+            registry=self.registry(),
+            producers=producers,
+            max_observations_per_producer=max_observations_per_producer,
         )
 
     def observe(
@@ -219,6 +281,291 @@ class RecurrenceAPI:
         else:
             queue = review_queue_or_path
         return build_owner_review_summary(queue)
+
+    def review_decision_template(
+        self,
+        review_queue_or_path: ReviewQueue | str | Path,
+        *,
+        item_ref: str | None = None,
+        beacon_ref: str | None = None,
+        decision: ReviewDecisionAction = "defer",
+        reviewer: str = "owner-review",
+        rationale: str = "",
+        cluster_ref: str | None = None,
+        next_review_after: str | None = None,
+    ) -> OwnerReviewDecision:
+        if isinstance(review_queue_or_path, (str, Path)):
+            queue = read_model(review_queue_or_path, ReviewQueue)
+        else:
+            queue = review_queue_or_path
+        return build_owner_review_decision_template(
+            queue,
+            item_ref=item_ref,
+            beacon_ref=beacon_ref,
+            decision=decision,
+            reviewer=reviewer,
+            rationale=rationale,
+            cluster_ref=cluster_ref,
+            next_review_after=next_review_after,
+        )
+
+    def review_close(
+        self,
+        review_queue_or_path: ReviewQueue | str | Path,
+        *,
+        decision_paths: list[str | Path] | None = None,
+        decisions: list[OwnerReviewDecision] | None = None,
+    ) -> ReviewDecisionCloseReport:
+        if isinstance(review_queue_or_path, (str, Path)):
+            queue = read_model(review_queue_or_path, ReviewQueue)
+        else:
+            queue = review_queue_or_path
+        loaded_decisions = list(decisions or [])
+        if decision_paths:
+            loaded_decisions.extend(load_decisions_from_paths(decision_paths))
+        return close_review_decisions(
+            workspace_root=str(self.workspace.root),
+            queue=queue,
+            decisions=loaded_decisions,
+        )
+
+    def graph_snapshot(
+        self, *, include_manifest_diagnostics: bool = True
+    ) -> GraphSnapshot:
+        return build_graph_snapshot(
+            self.workspace,
+            registry=self.registry(),
+            include_manifest_diagnostics=include_manifest_diagnostics,
+        )
+
+    def graph_delta(
+        self, before_path: str | Path, after_path: str | Path
+    ) -> GraphDeltaReport:
+        before = read_model(before_path, GraphSnapshot)
+        after = read_model(after_path, GraphSnapshot)
+        return diff_graph_snapshots(before, after)
+
+    def graph_closure(
+        self,
+        *,
+        direct_component_refs: list[str],
+        depth_limit: int = 8,
+        include_optional: bool = True,
+    ) -> GraphClosureReport:
+        return build_graph_closure_report(
+            self.workspace,
+            direct_component_refs=direct_component_refs,
+            registry=self.registry(),
+            depth_limit=depth_limit,
+            include_optional=include_optional,
+        )
+
+    def routing_projection(
+        self,
+        *,
+        plan_or_path: PropagationPlan | str | Path | None = None,
+        gap_report_or_path: ConnectivityGapReport | str | Path | None = None,
+        return_handoff_or_path: ReturnHandoff | str | Path | None = None,
+        review_queue_or_path: ReviewQueue | str | Path | None = None,
+    ) -> RecurrenceRoutingProjection:
+        plan: PropagationPlan | None
+        if isinstance(plan_or_path, (str, Path)):
+            plan = read_model(plan_or_path, PropagationPlan)
+        else:
+            plan = plan_or_path
+        gap_report: ConnectivityGapReport | None
+        if isinstance(gap_report_or_path, (str, Path)):
+            gap_report = read_model(gap_report_or_path, ConnectivityGapReport)
+        else:
+            gap_report = gap_report_or_path
+        handoff: ReturnHandoff | None
+        if isinstance(return_handoff_or_path, (str, Path)):
+            handoff = read_model(return_handoff_or_path, ReturnHandoff)
+        else:
+            handoff = return_handoff_or_path
+        queue: ReviewQueue | None
+        if isinstance(review_queue_or_path, (str, Path)):
+            queue = read_model(review_queue_or_path, ReviewQueue)
+        else:
+            queue = review_queue_or_path
+        return build_routing_projection(
+            self.workspace,
+            plan=plan,
+            gap_report=gap_report,
+            return_handoff=handoff,
+            review_queue=queue,
+        )
+
+    def stats_projection(
+        self,
+        *,
+        gap_report_or_path: ConnectivityGapReport | str | Path | None = None,
+        beacon_or_path: BeaconPacket | str | Path | None = None,
+        review_queue_or_path: ReviewQueue | str | Path | None = None,
+        review_summary_or_path: OwnerReviewSummary | str | Path | None = None,
+        decision_report_or_path: ReviewDecisionCloseReport | str | Path | None = None,
+    ) -> RecurrenceStatsProjection:
+        gap_report: ConnectivityGapReport | None
+        if isinstance(gap_report_or_path, (str, Path)):
+            gap_report = read_model(gap_report_or_path, ConnectivityGapReport)
+        else:
+            gap_report = gap_report_or_path
+        beacon: BeaconPacket | None
+        if isinstance(beacon_or_path, (str, Path)):
+            beacon = read_model(beacon_or_path, BeaconPacket)
+        else:
+            beacon = beacon_or_path
+        queue: ReviewQueue | None
+        if isinstance(review_queue_or_path, (str, Path)):
+            queue = read_model(review_queue_or_path, ReviewQueue)
+        else:
+            queue = review_queue_or_path
+        summary: OwnerReviewSummary | None
+        if isinstance(review_summary_or_path, (str, Path)):
+            summary = read_model(review_summary_or_path, OwnerReviewSummary)
+        else:
+            summary = review_summary_or_path
+        decision_report: ReviewDecisionCloseReport | None
+        if isinstance(decision_report_or_path, (str, Path)):
+            decision_report = read_model(
+                decision_report_or_path,
+                ReviewDecisionCloseReport,
+            )
+        else:
+            decision_report = decision_report_or_path
+        return build_stats_projection(
+            self.workspace,
+            gap_report=gap_report,
+            beacon_packet=beacon,
+            review_queue=queue,
+            review_summary=summary,
+            decision_report=decision_report,
+            loaded_components=self._loaded_component_refs(),
+        )
+
+    def kag_projection(
+        self,
+        *,
+        plan_or_path: PropagationPlan | str | Path | None = None,
+        gap_report_or_path: ConnectivityGapReport | str | Path | None = None,
+        return_handoff_or_path: ReturnHandoff | str | Path | None = None,
+        beacon_or_path: BeaconPacket | str | Path | None = None,
+        review_queue_or_path: ReviewQueue | str | Path | None = None,
+    ) -> RecurrenceKagProjection:
+        plan: PropagationPlan | None
+        if isinstance(plan_or_path, (str, Path)):
+            plan = read_model(plan_or_path, PropagationPlan)
+        else:
+            plan = plan_or_path
+        gap_report: ConnectivityGapReport | None
+        if isinstance(gap_report_or_path, (str, Path)):
+            gap_report = read_model(gap_report_or_path, ConnectivityGapReport)
+        else:
+            gap_report = gap_report_or_path
+        handoff: ReturnHandoff | None
+        if isinstance(return_handoff_or_path, (str, Path)):
+            handoff = read_model(return_handoff_or_path, ReturnHandoff)
+        else:
+            handoff = return_handoff_or_path
+        beacon: BeaconPacket | None
+        if isinstance(beacon_or_path, (str, Path)):
+            beacon = read_model(beacon_or_path, BeaconPacket)
+        else:
+            beacon = beacon_or_path
+        queue: ReviewQueue | None
+        if isinstance(review_queue_or_path, (str, Path)):
+            queue = read_model(review_queue_or_path, ReviewQueue)
+        else:
+            queue = review_queue_or_path
+        return build_kag_projection(
+            self.workspace,
+            plan=plan,
+            gap_report=gap_report,
+            return_handoff=handoff,
+            beacon_packet=beacon,
+            review_queue=queue,
+        )
+
+    def downstream_projection_bundle(
+        self,
+        *,
+        plan_or_path: PropagationPlan | str | Path | None = None,
+        gap_report_or_path: ConnectivityGapReport | str | Path | None = None,
+        return_handoff_or_path: ReturnHandoff | str | Path | None = None,
+        beacon_or_path: BeaconPacket | str | Path | None = None,
+        review_queue_or_path: ReviewQueue | str | Path | None = None,
+        review_summary_or_path: OwnerReviewSummary | str | Path | None = None,
+        decision_report_or_path: ReviewDecisionCloseReport | str | Path | None = None,
+        include_routing: bool = True,
+        include_stats: bool = True,
+        include_kag: bool = True,
+    ) -> DownstreamProjectionBundle:
+        plan: PropagationPlan | None
+        if isinstance(plan_or_path, (str, Path)):
+            plan = read_model(plan_or_path, PropagationPlan)
+        else:
+            plan = plan_or_path
+        gap_report: ConnectivityGapReport | None
+        if isinstance(gap_report_or_path, (str, Path)):
+            gap_report = read_model(gap_report_or_path, ConnectivityGapReport)
+        else:
+            gap_report = gap_report_or_path
+        handoff: ReturnHandoff | None
+        if isinstance(return_handoff_or_path, (str, Path)):
+            handoff = read_model(return_handoff_or_path, ReturnHandoff)
+        else:
+            handoff = return_handoff_or_path
+        beacon: BeaconPacket | None
+        if isinstance(beacon_or_path, (str, Path)):
+            beacon = read_model(beacon_or_path, BeaconPacket)
+        else:
+            beacon = beacon_or_path
+        queue: ReviewQueue | None
+        if isinstance(review_queue_or_path, (str, Path)):
+            queue = read_model(review_queue_or_path, ReviewQueue)
+        else:
+            queue = review_queue_or_path
+        summary: OwnerReviewSummary | None
+        if isinstance(review_summary_or_path, (str, Path)):
+            summary = read_model(review_summary_or_path, OwnerReviewSummary)
+        else:
+            summary = review_summary_or_path
+        decision_report: ReviewDecisionCloseReport | None
+        if isinstance(decision_report_or_path, (str, Path)):
+            decision_report = read_model(
+                decision_report_or_path,
+                ReviewDecisionCloseReport,
+            )
+        else:
+            decision_report = decision_report_or_path
+        return build_downstream_projection_bundle(
+            self.workspace,
+            plan=plan,
+            gap_report=gap_report,
+            return_handoff=handoff,
+            beacon_packet=beacon,
+            review_queue=queue,
+            review_summary=summary,
+            decision_report=decision_report,
+            loaded_components=self._loaded_component_refs(),
+            include_routing=include_routing,
+            include_stats=include_stats,
+            include_kag=include_kag,
+        )
+
+    def projection_guard_report(
+        self,
+        *,
+        routing: RecurrenceRoutingProjection | None = None,
+        stats: RecurrenceStatsProjection | None = None,
+        kag: RecurrenceKagProjection | None = None,
+    ) -> DownstreamProjectionGuardReport:
+        return build_projection_guard_report(
+            self.workspace,
+            routing=routing,
+            stats=stats,
+            kag=kag,
+        )
 
     def wiring_plan(self) -> WiringPlan:
         return build_wiring_plan(self.workspace)

@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime, timezone
+from typing import Literal, cast
 
 from ..workspace.discovery import Workspace
 from .models import (
@@ -11,6 +12,16 @@ from .models import (
     RolloutWindowBundle,
     WiringPlan,
 )
+
+RolloutSeverity = Literal["low", "medium", "high"]
+
+
+def _rollout_severity(severity: str) -> RolloutSeverity:
+    if severity == "critical":
+        return "high"
+    if severity in {"low", "medium", "high"}:
+        return cast(RolloutSeverity, severity)
+    return "medium"
 
 
 def build_rollout_window_bundle(
@@ -129,7 +140,7 @@ def build_drift_triggers(
             triggers.append(
                 DriftTrigger(
                     signal=gap.gap_kind,
-                    severity=gap.severity,
+                    severity=_rollout_severity(gap.severity),
                     source=gap.component_ref or "doctor",
                     notes=gap.recommendation,
                 )

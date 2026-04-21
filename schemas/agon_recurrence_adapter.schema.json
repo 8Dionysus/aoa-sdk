@@ -1,0 +1,19 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/agon_recurrence_adapter.schema.json",
+  "title": "AOA Agon Recurrence Adapter Stub",
+  "description": "Observation-only compatibility shape. It is not a live Agon runtime, verdict, scar, rank, or scheduler surface.",
+  "type": "object",
+  "additionalProperties": true,
+  "required": ["component_id", "authority", "observation_only"],
+  "properties": {
+    "manifest_kind": {"const": "agon_recurrence_adapter"},
+    "component_id": {"type": "string"},
+    "authority": {"type": "string"},
+    "observation_only": {"const": true},
+    "surface_refs": {"type": "array", "items": {"type": "string"}},
+    "recurrence_watch": {"type": "array", "items": {"type": "string"}},
+    "forbidden_actions": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": "string"}
+  }
+}

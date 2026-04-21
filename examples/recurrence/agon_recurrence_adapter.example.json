@@ -1,0 +1,10 @@
+{
+  "manifest_kind": "agon_recurrence_adapter",
+  "component_id": "agon:trial:preparation-posture",
+  "authority": "observation_only",
+  "observation_only": true,
+  "surface_refs": ["docs/AGON_PREPARATION_POSTURE.md"],
+  "recurrence_watch": ["owner_binding", "proof_alignment", "trial_choreography_handoff"],
+  "forbidden_actions": ["create_arena_session", "write_scar", "assign_rank", "emit_verdict", "spawn_agent"],
+  "notes": "Compatibility scanner may see this shape, but recurrence must not execute Agon runtime actions. Adapter stays observation-only until the Agon phase is explicitly opened."
+}

@@ -1,0 +1,17 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/review_decision_ledger.schema.json",
+  "title": "AOA review decision ledger",
+  "type": "object",
+  "required": ["schema_version", "ledger_ref", "workspace_root", "entries"],
+  "properties": {
+    "schema_version": {"const": "aoa_review_decision_ledger_v1"},
+    "ledger_ref": {"type": "string"},
+    "workspace_root": {"type": "string"},
+    "source_queue_ref": {"type": ["string", "null"]},
+    "entries": {"type": "array", "items": {"type": "object"}},
+    "by_decision": {"type": "object", "additionalProperties": {"type": "integer"}},
+    "by_owner": {"type": "object", "additionalProperties": {"type": "integer"}}
+  },
+  "additionalProperties": false
+}

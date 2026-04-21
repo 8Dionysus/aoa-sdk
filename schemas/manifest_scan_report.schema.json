@@ -1,0 +1,135 @@
+{
+  "$defs": {
+    "ManifestDiagnostic": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest_ref": {
+          "title": "Manifest Ref",
+          "type": "string"
+        },
+        "repo": {
+          "title": "Repo",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "manifest_kind": {
+          "default": "unknown",
+          "enum": [
+            "recurrence_component",
+            "hook_binding_set",
+            "agon_recurrence_adapter",
+            "review_surface",
+            "rollout_bundle",
+            "wiring_plan",
+            "unknown"
+          ],
+          "title": "Manifest Kind",
+          "type": "string"
+        },
+        "diagnostic_kind": {
+          "enum": [
+            "loaded_manifest",
+            "known_foreign_manifest",
+            "adapter_required",
+            "manifest_json_error",
+            "invalid_manifest_shape",
+            "unknown_manifest_kind",
+            "owner_repo_mismatch"
+          ],
+          "title": "Diagnostic Kind",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "evidence": {
+          "additionalProperties": true,
+          "title": "Evidence",
+          "type": "object"
+        }
+      },
+      "required": [
+        "manifest_ref",
+        "repo",
+        "path",
+        "diagnostic_kind",
+        "severity",
+        "message"
+      ],
+      "title": "ManifestDiagnostic",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "schema_version": {
+      "const": "aoa_manifest_scan_report_v1",
+      "default": "aoa_manifest_scan_report_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "report_ref": {
+      "title": "Report Ref",
+      "type": "string"
+    },
+    "workspace_root": {
+      "title": "Workspace Root",
+      "type": "string"
+    },
+    "loaded_components": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Loaded Components",
+      "type": "array"
+    },
+    "foreign_manifests": {
+      "items": {
+        "type": "string"
+      },
+      "title": "Foreign Manifests",
+      "type": "array"
+    },
+    "diagnostics": {
+      "items": {
+        "$ref": "#/$defs/ManifestDiagnostic"
+      },
+      "title": "Diagnostics",
+      "type": "array"
+    },
+    "by_kind": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "By Kind",
+      "type": "object"
+    },
+    "by_severity": {
+      "additionalProperties": {
+        "type": "integer"
+      },
+      "title": "By Severity",
+      "type": "object"
+    }
+  },
+  "required": [
+    "report_ref",
+    "workspace_root"
+  ],
+  "title": "ManifestScanReport",
+  "type": "object"
+}

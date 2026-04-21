@@ -7,16 +7,27 @@ from typing import TypeVar
 from pydantic import BaseModel
 
 from ..workspace.discovery import Workspace
+from .graph import GraphClosureReport, GraphDeltaReport, GraphSnapshot
 from .models import (
     BeaconPacket,
     CandidateDossierPacket,
     CandidateLedger,
     ChangeSignal,
     ConnectivityGapReport,
+    DownstreamProjectionBundle,
+    DownstreamProjectionGuardReport,
     HookRunReport,
+    ManifestScanReport,
     ObservationPacket,
+    OwnerReviewDecision,
     OwnerReviewSummary,
     PropagationPlan,
+    RecurrenceKagProjection,
+    RecurrenceRoutingProjection,
+    RecurrenceStatsProjection,
+    ReviewDecisionCloseReport,
+    ReviewDecisionLedger,
+    ReviewSuppressionMemory,
     ReturnHandoff,
     ReviewQueue,
     RolloutWindowBundle,
@@ -162,6 +173,46 @@ def persist_owner_review_summary(
     return write_model(path, summary)
 
 
+def persist_owner_review_decision(
+    workspace: Workspace,
+    decision: OwnerReviewDecision,
+    output: str | None = None,
+) -> Path:
+    label = decision.decision_ref
+    path = output or str(_default_path(workspace, "review-decisions", label))
+    return write_model(path, decision)
+
+
+def persist_review_decision_ledger(
+    workspace: Workspace,
+    ledger: ReviewDecisionLedger,
+    output: str | None = None,
+) -> Path:
+    label = ledger.source_queue_ref or ledger.ledger_ref
+    path = output or str(_default_path(workspace, "review-decision-ledgers", label))
+    return write_model(path, ledger)
+
+
+def persist_review_suppression_memory(
+    workspace: Workspace,
+    memory: ReviewSuppressionMemory,
+    output: str | None = None,
+) -> Path:
+    label = memory.memory_ref
+    path = output or str(_default_path(workspace, "review-suppression-memory", label))
+    return write_model(path, memory)
+
+
+def persist_review_decision_close_report(
+    workspace: Workspace,
+    report: ReviewDecisionCloseReport,
+    output: str | None = None,
+) -> Path:
+    label = report.source_queue_ref or report.report_ref
+    path = output or str(_default_path(workspace, "review-decision-close", label))
+    return write_model(path, report)
+
+
 def persist_wiring_plan(
     workspace: Workspace,
     plan: WiringPlan,
@@ -179,4 +230,88 @@ def persist_rollout_window_bundle(
 ) -> Path:
     label = bundle.bundle_ref
     path = output or str(_default_path(workspace, "rollout-bundles", label))
+    return write_model(path, bundle)
+
+
+def persist_manifest_scan_report(
+    workspace: Workspace,
+    report: ManifestScanReport,
+    output: str | None = None,
+) -> Path:
+    label = report.report_ref
+    path = output or str(_default_path(workspace, "manifest-scans", label))
+    return write_model(path, report)
+
+
+def persist_graph_snapshot(
+    workspace: Workspace, snapshot: GraphSnapshot, output: str | None = None
+) -> Path:
+    label = snapshot.snapshot_ref
+    path = output or str(_default_path(workspace, "graph-snapshots", label))
+    return write_model(path, snapshot)
+
+
+def persist_graph_delta_report(
+    workspace: Workspace, report: GraphDeltaReport, output: str | None = None
+) -> Path:
+    label = report.report_ref
+    path = output or str(_default_path(workspace, "graph-deltas", label))
+    return write_model(path, report)
+
+
+def persist_graph_closure_report(
+    workspace: Workspace, report: GraphClosureReport, output: str | None = None
+) -> Path:
+    label = report.report_ref
+    path = output or str(_default_path(workspace, "graph-closures", label))
+    return write_model(path, report)
+
+
+def persist_routing_projection(
+    workspace: Workspace,
+    projection: RecurrenceRoutingProjection,
+    output: str | None = None,
+) -> Path:
+    label = projection.projection_ref
+    path = output or str(_default_path(workspace, "downstream/routing", label))
+    return write_model(path, projection)
+
+
+def persist_stats_projection(
+    workspace: Workspace,
+    projection: RecurrenceStatsProjection,
+    output: str | None = None,
+) -> Path:
+    label = projection.projection_ref
+    path = output or str(_default_path(workspace, "downstream/stats", label))
+    return write_model(path, projection)
+
+
+def persist_kag_projection(
+    workspace: Workspace,
+    projection: RecurrenceKagProjection,
+    output: str | None = None,
+) -> Path:
+    label = projection.projection_ref
+    path = output or str(_default_path(workspace, "downstream/kag", label))
+    return write_model(path, projection)
+
+
+def persist_projection_guard_report(
+    workspace: Workspace,
+    report: DownstreamProjectionGuardReport,
+    output: str | None = None,
+) -> Path:
+    label = report.report_ref
+    path = output or str(_default_path(workspace, "downstream/guards", label))
+    return write_model(path, report)
+
+
+def persist_downstream_projection_bundle(
+    workspace: Workspace,
+    bundle: DownstreamProjectionBundle,
+    output: str | None = None,
+) -> Path:
+    label = bundle.bundle_ref
+    path = output or str(_default_path(workspace, "downstream/bundles", label))
     return write_model(path, bundle)

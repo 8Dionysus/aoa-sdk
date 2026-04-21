@@ -1,0 +1,70 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8dionysus.local/schemas/graph_delta_report.schema.json",
+  "title": "AOA recurrence graph delta report",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "report_ref",
+    "workspace_root",
+    "before_snapshot_ref",
+    "after_snapshot_ref",
+    "added_nodes",
+    "removed_nodes",
+    "added_edges",
+    "removed_edges",
+    "changed_edges",
+    "summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_graph_delta_report_v1"
+    },
+    "report_ref": {
+      "type": "string"
+    },
+    "workspace_root": {
+      "type": "string"
+    },
+    "before_snapshot_ref": {
+      "type": "string"
+    },
+    "after_snapshot_ref": {
+      "type": "string"
+    },
+    "added_nodes": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "removed_nodes": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "added_edges": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "removed_edges": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "changed_edges": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

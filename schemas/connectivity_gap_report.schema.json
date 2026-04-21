@@ -11,7 +11,8 @@
           "enum": [
             "low",
             "medium",
-            "high"
+            "high",
+            "critical"
           ],
           "title": "Severity",
           "type": "string"
@@ -25,7 +26,12 @@
             "orphan_generated_surface",
             "projected_without_generation",
             "weak_owner_handoff",
-            "missing_target_route"
+            "missing_target_route",
+            "manifest_json_error",
+            "invalid_manifest_shape",
+            "unknown_manifest_kind",
+            "foreign_manifest_requires_adapter",
+            "owner_repo_mismatch"
           ],
           "title": "Gap Kind",
           "type": "string"
@@ -74,6 +80,79 @@
       ],
       "title": "ConnectivityGap",
       "type": "object"
+    },
+    "ManifestDiagnostic": {
+      "additionalProperties": false,
+      "properties": {
+        "manifest_ref": {
+          "title": "Manifest Ref",
+          "type": "string"
+        },
+        "repo": {
+          "title": "Repo",
+          "type": "string"
+        },
+        "path": {
+          "title": "Path",
+          "type": "string"
+        },
+        "manifest_kind": {
+          "default": "unknown",
+          "enum": [
+            "recurrence_component",
+            "hook_binding_set",
+            "agon_recurrence_adapter",
+            "review_surface",
+            "rollout_bundle",
+            "wiring_plan",
+            "unknown"
+          ],
+          "title": "Manifest Kind",
+          "type": "string"
+        },
+        "diagnostic_kind": {
+          "enum": [
+            "loaded_manifest",
+            "known_foreign_manifest",
+            "adapter_required",
+            "manifest_json_error",
+            "invalid_manifest_shape",
+            "unknown_manifest_kind",
+            "owner_repo_mismatch"
+          ],
+          "title": "Diagnostic Kind",
+          "type": "string"
+        },
+        "severity": {
+          "enum": [
+            "low",
+            "medium",
+            "high",
+            "critical"
+          ],
+          "title": "Severity",
+          "type": "string"
+        },
+        "message": {
+          "title": "Message",
+          "type": "string"
+        },
+        "evidence": {
+          "additionalProperties": true,
+          "title": "Evidence",
+          "type": "object"
+        }
+      },
+      "required": [
+        "manifest_ref",
+        "repo",
+        "path",
+        "diagnostic_kind",
+        "severity",
+        "message"
+      ],
+      "title": "ManifestDiagnostic",
+      "type": "object"
     }
   },
   "additionalProperties": false,
@@ -116,6 +195,13 @@
         "$ref": "#/$defs/ConnectivityGap"
       },
       "title": "Gaps",
+      "type": "array"
+    },
+    "manifest_diagnostics": {
+      "items": {
+        "$ref": "#/$defs/ManifestDiagnostic"
+      },
+      "title": "Manifest Diagnostics",
       "type": "array"
     }
   },

@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/recurrence-routing-projection.schema.json",
+  "title": "AoA recurrence routing projection",
+  "type": "object",
+  "required": ["schema_version", "projection_ref", "workspace_root", "owner_hints", "return_hints", "gap_hints"],
+  "properties": {
+    "schema_version": {"const": "aoa_recurrence_routing_projection_v1"},
+    "projection_ref": {"type": "string"},
+    "workspace_root": {"type": "string"},
+    "source_packet_refs": {"type": "array", "items": {"type": "string"}},
+    "owner_hints": {"type": "array", "items": {"$ref": "#/$defs/routing_owner_hint"}},
+    "return_hints": {"type": "array", "items": {"$ref": "#/$defs/routing_return_hint"}},
+    "gap_hints": {"type": "array", "items": {"$ref": "#/$defs/routing_gap_hint"}},
+    "boundary_notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "$defs": {
+    "routing_owner_hint": {
+      "type": "object",
+      "required": ["hint_ref", "owner_repo", "reason", "advisory_only"],
+      "properties": {
+        "hint_ref": {"type": "string"},
+        "owner_repo": {"type": "string"},
+        "component_ref": {"type": ["string", "null"]},
+        "reason": {"type": "string"},
+        "inspect_surfaces": {"type": "array", "items": {"type": "string"}},
+        "source_refs": {"type": "array", "items": {"type": "string"}},
+        "advisory_only": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "routing_return_hint": {
+      "type": "object",
+      "required": ["hint_ref", "owner_repo", "target", "target_kind", "reason", "advisory_only"],
+      "properties": {
+        "hint_ref": {"type": "string"},
+        "owner_repo": {"type": "string"},
+        "component_ref": {"type": ["string", "null"]},
+        "target": {"type": "string"},
+        "target_kind": {"type": "string"},
+        "reason": {"type": "string"},
+        "source_refs": {"type": "array", "items": {"type": "string"}},
+        "advisory_only": {"const": true}
+      },
+      "additionalProperties": false
+    },
+    "routing_gap_hint": {
+      "type": "object",
+      "required": ["hint_ref", "gap_kind", "severity", "recommendation", "advisory_only"],
+      "properties": {
+        "hint_ref": {"type": "string"},
+        "gap_kind": {"type": "string"},
+        "severity": {"type": "string"},
+        "owner_repo": {"type": ["string", "null"]},
+        "component_ref": {"type": ["string", "null"]},
+        "recommendation": {"type": "string"},
+        "evidence_refs": {"type": "array", "items": {"type": "string"}},
+        "advisory_only": {"const": true}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,82 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8dionysus.local/schemas/graph_closure_report.schema.json",
+  "title": "AOA recurrence graph closure report",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "report_ref",
+    "workspace_root",
+    "direct_components",
+    "depth_limit",
+    "max_depth_seen",
+    "nodes",
+    "external_impacts",
+    "cycles",
+    "unresolved_edges",
+    "skipped_edges",
+    "propagation_batches"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_graph_closure_report_v1"
+    },
+    "report_ref": {
+      "type": "string"
+    },
+    "workspace_root": {
+      "type": "string"
+    },
+    "direct_components": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "depth_limit": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "max_depth_seen": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "external_impacts": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "cycles": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "unresolved_edges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "skipped_edges": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "propagation_batches": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false
+}

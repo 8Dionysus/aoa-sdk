@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/downstream-projection-bundle.schema.json",
+  "title": "AoA downstream projection bundle",
+  "type": "object",
+  "required": ["schema_version", "bundle_ref", "workspace_root", "surfaces", "guard_report"],
+  "properties": {
+    "schema_version": {"const": "aoa_downstream_projection_bundle_v1"},
+    "bundle_ref": {"type": "string"},
+    "workspace_root": {"type": "string"},
+    "source_packet_refs": {"type": "array", "items": {"type": "string"}},
+    "surfaces": {"type": "array", "items": {"type": "object"}},
+    "routing": {"type": ["object", "null"]},
+    "stats": {"type": ["object", "null"]},
+    "kag": {"type": ["object", "null"]},
+    "guard_report": {"type": "object"},
+    "boundary_notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

@@ -12,18 +12,31 @@ from .io import (
     persist_candidate_dossier_packet,
     persist_candidate_ledger,
     persist_change_signal,
+    persist_downstream_projection_bundle,
     persist_gap_report,
+    persist_graph_closure_report,
+    persist_graph_delta_report,
+    persist_graph_snapshot,
     persist_hook_run_report,
+    persist_kag_projection,
+    persist_manifest_scan_report,
     persist_observation_packet,
+    persist_owner_review_decision,
     persist_owner_review_summary,
     persist_propagation_plan,
+    persist_projection_guard_report,
     persist_return_handoff,
+    persist_review_decision_close_report,
+    persist_review_decision_ledger,
+    persist_review_suppression_memory,
     persist_review_queue,
+    persist_routing_projection,
     persist_rollout_window_bundle,
+    persist_stats_projection,
     persist_usage_gap_report,
     persist_wiring_plan,
 )
-from .models import HookEvent
+from .models import HookEvent, ReviewDecisionAction
 
 recur_app = typer.Typer(
     help="Plan recurrence propagation, emit beacons, and keep reviewed return handoffs explicit."
@@ -31,7 +44,23 @@ recur_app = typer.Typer(
 hooks_app = typer.Typer(
     help="Run thin observation producers without turning them into a hidden scheduler."
 )
+graph_app = typer.Typer(
+    help="Inspect typed recurrence graph closure, snapshots, and deltas."
+)
+live_app = typer.Typer(
+    help="Collect live owner-authored observation surfaces without mutating canon."
+)
+review_app = typer.Typer(
+    help="Close review beacons with explicit owner decisions and suppression memory."
+)
+project_app = typer.Typer(
+    help="Emit narrow downstream recurrence projections without authority transfer."
+)
 recur_app.add_typer(hooks_app, name="hooks")
+recur_app.add_typer(graph_app, name="graph")
+recur_app.add_typer(live_app, name="live")
+recur_app.add_typer(review_app, name="review")
+recur_app.add_typer(project_app, name="project")
 
 HOOK_EVENTS: tuple[HookEvent, ...] = (
     "manual_run",
@@ -54,6 +83,325 @@ def _parse_hook_event(value: str) -> HookEvent:
             f"unsupported event {value!r}; expected one of: {allowed}"
         )
     return cast(HookEvent, value)
+
+
+@review_app.command("decision-template")
+def recur_review_decision_template(
+    review_queue_path: str = typer.Argument(
+        ..., help="Path to a review-queue JSON file."
+    ),
+    item_ref: str | None = typer.Option(
+        None, "--item-ref", help="Review queue item_ref to close."
+    ),
+    beacon_ref: str | None = typer.Option(
+        None, "--beacon-ref", help="Beacon ref to close."
+    ),
+    decision: str = typer.Option(
+        "defer", "--decision", help="accept|reject|defer|reanchor|split|merge|suppress"
+    ),
+    reviewer: str = typer.Option("owner-review", "--reviewer", help="Reviewer label."),
+    rationale: str = typer.Option("", "--rationale", help="Initial rationale text."),
+    cluster_ref: str | None = typer.Option(
+        None, "--cluster-ref", help="Optional provisional SDK cluster_ref."
+    ),
+    next_review_after: str | None = typer.Option(
+        None, "--next-review-after", help="Optional owner review date/window."
+    ),
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional output path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    decision_packet = api.review_decision_template(
+        review_queue_path,
+        item_ref=item_ref,
+        beacon_ref=beacon_ref,
+        decision=cast(ReviewDecisionAction, decision),
+        reviewer=reviewer,
+        rationale=rationale,
+        cluster_ref=cluster_ref,
+        next_review_after=next_review_after,
+    )
+    report_path = persist_owner_review_decision(
+        workspace, decision_packet, output=report_output
+    )
+    payload = decision_packet.model_dump(mode="json")
+    payload["report_path"] = str(report_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {report_path}")
+    typer.echo(f"decision_ref: {decision_packet.decision_ref}")
+    typer.echo(f"decision: {decision_packet.decision}")
+    typer.echo(f"owner_repo: {decision_packet.owner_repo}")
+
+
+@review_app.command("close")
+def recur_review_close(
+    review_queue_path: str = typer.Argument(
+        ..., help="Path to a review-queue JSON file."
+    ),
+    decision_path: list[str] = typer.Option(
+        None,
+        "--decision",
+        help="Repeatable owner-review-decision JSON path.",
+    ),
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional close-report path."
+    ),
+    ledger_output: str | None = typer.Option(
+        None, "--ledger-output", help="Optional ledger path."
+    ),
+    suppression_output: str | None = typer.Option(
+        None, "--suppression-output", help="Optional suppression-memory path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    report = api.review_close(
+        review_queue_path, decision_paths=list(decision_path or [])
+    )
+    report_path = persist_review_decision_close_report(
+        workspace, report, output=report_output
+    )
+    ledger_path = persist_review_decision_ledger(
+        workspace, report.ledger, output=ledger_output
+    )
+    suppression_path = persist_review_suppression_memory(
+        workspace, report.suppression_memory, output=suppression_output
+    )
+    payload = report.model_dump(mode="json")
+    payload["report_path"] = str(report_path)
+    payload["ledger_path"] = str(ledger_path)
+    payload["suppression_path"] = str(suppression_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {report_path}")
+    typer.echo(f"ledger_path: {ledger_path}")
+    typer.echo(f"suppression_path: {suppression_path}")
+    typer.echo(f"closed: {len(report.closed_item_refs)}")
+    typer.echo(f"unresolved: {len(report.unresolved_item_refs)}")
+    if report.warnings:
+        typer.echo("warnings:")
+        for warning in report.warnings:
+            typer.echo(f"- {warning}")
+
+
+@live_app.command("producers")
+def recur_live_producers(
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    producers = api.live_producers()
+    payload = {"count": len(producers), "producers": producers}
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"producers: {len(producers)}")
+    for item in producers:
+        typer.echo(f"- {item}")
+
+
+@live_app.command("observe")
+def recur_live_observe(
+    producer: list[str] = typer.Option(
+        None,
+        "--producer",
+        help="Repeatable producer filter. Omit to run every live observation producer.",
+    ),
+    max_per_producer: int = typer.Option(
+        200, "--max-per-producer", help="Safety cap per producer."
+    ),
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional output path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    packet = api.live_observations(
+        producers=producer or None,
+        max_observations_per_producer=max_per_producer,
+    )
+    report_path = persist_observation_packet(workspace, packet, output=report_output)
+    payload = packet.model_dump(mode="json")
+    payload["report_path"] = str(report_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {report_path}")
+    typer.echo(f"observations: {len(packet.observations)}")
+    by_signal: dict[str, int] = {}
+    for item in packet.observations:
+        by_signal[item.signal] = by_signal.get(item.signal, 0) + 1
+    for signal, count in sorted(by_signal.items()):
+        typer.echo(f"- {signal}: {count}")
+
+
+@graph_app.command("snapshot")
+def recur_graph_snapshot(
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional output path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    include_manifest_diagnostics: bool = typer.Option(
+        True,
+        "--include-manifest-diagnostics/--skip-manifest-diagnostics",
+        help="Carry manifest diagnostics into the graph snapshot.",
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    snapshot = api.graph_snapshot(
+        include_manifest_diagnostics=include_manifest_diagnostics
+    )
+    report_path = persist_graph_snapshot(workspace, snapshot, output=report_output)
+    payload = snapshot.model_dump(mode="json")
+    payload["report_path"] = str(report_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {report_path}")
+    typer.echo(f"nodes: {snapshot.node_count}")
+    typer.echo(f"edges: {snapshot.edge_count}")
+    if snapshot.manifest_diagnostics:
+        typer.echo(f"manifest_diagnostics: {len(snapshot.manifest_diagnostics)}")
+
+
+@graph_app.command("diff")
+def recur_graph_diff(
+    before_path: str = typer.Argument(..., help="Before graph-snapshot JSON."),
+    after_path: str = typer.Argument(..., help="After graph-snapshot JSON."),
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional output path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    report = api.graph_delta(before_path, after_path)
+    report_path = persist_graph_delta_report(workspace, report, output=report_output)
+    payload = report.model_dump(mode="json")
+    payload["report_path"] = str(report_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {report_path}")
+    typer.echo(f"summary: {report.summary}")
+
+
+@graph_app.command("closure")
+def recur_graph_closure(
+    component: list[str] = typer.Option(
+        None,
+        "--component",
+        help="Repeatable direct component_ref to expand from.",
+    ),
+    depth_limit: int = typer.Option(
+        8, "--depth-limit", help="Maximum typed-edge traversal depth."
+    ),
+    include_optional: bool = typer.Option(
+        True,
+        "--include-optional/--skip-optional",
+        help="Include recommended/advisory edges in closure.",
+    ),
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional output path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    report = api.graph_closure(
+        direct_component_refs=component or [],
+        depth_limit=depth_limit,
+        include_optional=include_optional,
+    )
+    report_path = persist_graph_closure_report(workspace, report, output=report_output)
+    payload = report.model_dump(mode="json")
+    payload["report_path"] = str(report_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {report_path}")
+    typer.echo(f"nodes: {len(report.nodes)}")
+    typer.echo(f"external_impacts: {len(report.external_impacts)}")
+    typer.echo(f"batches: {len(report.propagation_batches)}")
+    if report.cycles:
+        typer.echo(f"cycles: {len(report.cycles)}")
+    if report.unresolved_edges:
+        typer.echo("unresolved_edges:")
+        for item in report.unresolved_edges:
+            typer.echo(f"  - {item}")
+
+
+@recur_app.command("manifest-scan")
+def recur_manifest_scan(
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional output path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    report = api.manifest_scan()
+    report_path = persist_manifest_scan_report(workspace, report, output=report_output)
+    payload = report.model_dump(mode="json")
+    payload["report_path"] = str(report_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {report_path}")
+    typer.echo(f"loaded_components: {len(report.loaded_components)}")
+    typer.echo(f"foreign_manifests: {len(report.foreign_manifests)}")
+    typer.echo(f"diagnostics: {len(report.diagnostics)}")
+    for severity, count in sorted(report.by_severity.items()):
+        typer.echo(f"- {severity}: {count}")
 
 
 @recur_app.command("detect")
@@ -156,13 +504,20 @@ def recur_doctor(
     root: str = typer.Option(
         ".", "--root", help="Workspace root used for federation discovery."
     ),
+    include_manifest_diagnostics: bool = typer.Option(
+        True,
+        "--include-manifest-diagnostics/--skip-manifest-diagnostics",
+        help="Include registry quarantine/foreign/adapter diagnostics in doctor gaps.",
+    ),
     json_output: bool = typer.Option(
         False, "--json", help="Emit machine-readable JSON."
     ),
 ) -> None:
     workspace = Workspace.discover(root)
     api = RecurrenceAPI(workspace)
-    report = api.doctor(signal_path)
+    report = api.doctor(
+        signal_path, include_manifest_diagnostics=include_manifest_diagnostics
+    )
     report_path = persist_gap_report(workspace, report, output=report_output)
     payload = report.model_dump(mode="json")
     payload["report_path"] = str(report_path)
@@ -180,6 +535,7 @@ def recur_doctor(
 
 
 @recur_app.command("return-handoff")
+@recur_app.command("handoff")
 def recur_return_handoff(
     plan_path: str = typer.Argument(..., help="Path to a propagation-plan JSON file."),
     report_output: str | None = typer.Option(
@@ -632,3 +988,225 @@ def recur_hooks_run(
         typer.echo("warnings:")
         for warning in report.warnings:
             typer.echo(f"  - {warning.binding_ref}: {warning.message}")
+
+
+@project_app.command("routing")
+def recur_project_routing(
+    plan_path: str | None = typer.Option(
+        None, "--plan", help="Optional propagation-plan JSON."
+    ),
+    doctor_path: str | None = typer.Option(
+        None, "--doctor", help="Optional connectivity-gap-report JSON."
+    ),
+    handoff_path: str | None = typer.Option(
+        None, "--handoff", help="Optional return-handoff JSON."
+    ),
+    review_queue_path: str | None = typer.Option(
+        None, "--review-queue", help="Optional review-queue JSON."
+    ),
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional output path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    projection = api.routing_projection(
+        plan_or_path=plan_path,
+        gap_report_or_path=doctor_path,
+        return_handoff_or_path=handoff_path,
+        review_queue_or_path=review_queue_path,
+    )
+    report_path = persist_routing_projection(
+        workspace, projection, output=report_output
+    )
+    payload = projection.model_dump(mode="json")
+    payload["report_path"] = str(report_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {report_path}")
+    typer.echo(f"owner_hints: {len(projection.owner_hints)}")
+    typer.echo(f"return_hints: {len(projection.return_hints)}")
+    typer.echo(f"gap_hints: {len(projection.gap_hints)}")
+
+
+@project_app.command("stats")
+def recur_project_stats(
+    doctor_path: str | None = typer.Option(
+        None, "--doctor", help="Optional connectivity-gap-report JSON."
+    ),
+    beacon_path: str | None = typer.Option(
+        None, "--beacon", help="Optional beacon-packet JSON."
+    ),
+    review_queue_path: str | None = typer.Option(
+        None, "--review-queue", help="Optional review-queue JSON."
+    ),
+    review_summary_path: str | None = typer.Option(
+        None, "--review-summary", help="Optional owner-review-summary JSON."
+    ),
+    decision_report_path: str | None = typer.Option(
+        None, "--decision-report", help="Optional review-decision-close-report JSON."
+    ),
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional output path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    projection = api.stats_projection(
+        gap_report_or_path=doctor_path,
+        beacon_or_path=beacon_path,
+        review_queue_or_path=review_queue_path,
+        review_summary_or_path=review_summary_path,
+        decision_report_or_path=decision_report_path,
+    )
+    report_path = persist_stats_projection(workspace, projection, output=report_output)
+    payload = projection.model_dump(mode="json")
+    payload["report_path"] = str(report_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {report_path}")
+    typer.echo(f"coverage: {projection.coverage.total}")
+    typer.echo(f"gaps: {projection.gaps.total}")
+    typer.echo(f"beacons: {projection.beacons.total}")
+    typer.echo(f"review: {projection.review.total}")
+
+
+@project_app.command("kag")
+def recur_project_kag(
+    plan_path: str | None = typer.Option(
+        None, "--plan", help="Optional propagation-plan JSON."
+    ),
+    doctor_path: str | None = typer.Option(
+        None, "--doctor", help="Optional connectivity-gap-report JSON."
+    ),
+    handoff_path: str | None = typer.Option(
+        None, "--handoff", help="Optional return-handoff JSON."
+    ),
+    beacon_path: str | None = typer.Option(
+        None, "--beacon", help="Optional beacon-packet JSON."
+    ),
+    review_queue_path: str | None = typer.Option(
+        None, "--review-queue", help="Optional review-queue JSON."
+    ),
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional output path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    projection = api.kag_projection(
+        plan_or_path=plan_path,
+        gap_report_or_path=doctor_path,
+        return_handoff_or_path=handoff_path,
+        beacon_or_path=beacon_path,
+        review_queue_or_path=review_queue_path,
+    )
+    report_path = persist_kag_projection(workspace, projection, output=report_output)
+    payload = projection.model_dump(mode="json")
+    payload["report_path"] = str(report_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {report_path}")
+    typer.echo(
+        f"donor_refresh_obligations: {len(projection.donor_refresh_obligations)}"
+    )
+    typer.echo(
+        f"retrieval_invalidation_hints: {len(projection.retrieval_invalidation_hints)}"
+    )
+    typer.echo(f"source_strength_hints: {len(projection.source_strength_hints)}")
+
+
+@project_app.command("build")
+def recur_project_build(
+    plan_path: str | None = typer.Option(
+        None, "--plan", help="Optional propagation-plan JSON."
+    ),
+    doctor_path: str | None = typer.Option(
+        None, "--doctor", help="Optional connectivity-gap-report JSON."
+    ),
+    handoff_path: str | None = typer.Option(
+        None, "--handoff", help="Optional return-handoff JSON."
+    ),
+    beacon_path: str | None = typer.Option(
+        None, "--beacon", help="Optional beacon-packet JSON."
+    ),
+    review_queue_path: str | None = typer.Option(
+        None, "--review-queue", help="Optional review-queue JSON."
+    ),
+    review_summary_path: str | None = typer.Option(
+        None, "--review-summary", help="Optional owner-review-summary JSON."
+    ),
+    decision_report_path: str | None = typer.Option(
+        None, "--decision-report", help="Optional review-decision-close-report JSON."
+    ),
+    no_routing: bool = typer.Option(False, "--no-routing", help="Skip routing."),
+    no_stats: bool = typer.Option(False, "--no-stats", help="Skip stats."),
+    no_kag: bool = typer.Option(False, "--no-kag", help="Skip KAG."),
+    report_output: str | None = typer.Option(
+        None, "--report-output", help="Optional bundle output path."
+    ),
+    guard_output: str | None = typer.Option(
+        None, "--guard-output", help="Optional guard report output path."
+    ),
+    root: str = typer.Option(
+        ".", "--root", help="Workspace root used for federation discovery."
+    ),
+    json_output: bool = typer.Option(
+        False, "--json", help="Emit machine-readable JSON."
+    ),
+) -> None:
+    workspace = Workspace.discover(root)
+    api = RecurrenceAPI(workspace)
+    bundle = api.downstream_projection_bundle(
+        plan_or_path=plan_path,
+        gap_report_or_path=doctor_path,
+        return_handoff_or_path=handoff_path,
+        beacon_or_path=beacon_path,
+        review_queue_or_path=review_queue_path,
+        review_summary_or_path=review_summary_path,
+        decision_report_or_path=decision_report_path,
+        include_routing=not no_routing,
+        include_stats=not no_stats,
+        include_kag=not no_kag,
+    )
+    bundle_path = persist_downstream_projection_bundle(
+        workspace,
+        bundle,
+        output=report_output,
+    )
+    guard_path = persist_projection_guard_report(
+        workspace,
+        bundle.guard_report,
+        output=guard_output,
+    )
+    payload = bundle.model_dump(mode="json")
+    payload["report_path"] = str(bundle_path)
+    payload["guard_report_path"] = str(guard_path)
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    typer.echo(f"report_path: {bundle_path}")
+    typer.echo(f"guard_report_path: {guard_path}")
+    typer.echo(f"surfaces: {len(bundle.surfaces)}")
+    typer.echo(f"guard_violations: {len(bundle.guard_report.violations)}")

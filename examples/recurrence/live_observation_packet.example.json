@@ -1,0 +1,46 @@
+{
+  "schema_version": "aoa_observation_packet_v1",
+  "packet_ref": "observations:live:example",
+  "workspace_root": "/srv/workspace",
+  "signal_ref": null,
+  "observations": [
+    {
+      "observation_ref": "obs:live:technique_readiness_watch:0001",
+      "component_ref": "component:techniques:canon-and-intake-beacons",
+      "owner_repo": "aoa-techniques",
+      "observed_at": "2026-04-21T00:00:00Z",
+      "category": "review_signal",
+      "signal": "second_consumer_pressure_seen",
+      "source_inputs": [
+        "promotion-readiness"
+      ],
+      "evidence_refs": [
+        "aoa-techniques:docs/PROMOTION_READINESS_MATRIX.md#L2"
+      ],
+      "attributes": {
+        "producer": "technique_readiness_watch"
+      },
+      "notes": "readiness matrix mentions second-consumer pressure"
+    },
+    {
+      "observation_ref": "obs:live:skill_trigger_surface_watch:0001",
+      "component_ref": "component:skills:bundle-and-activation-beacons",
+      "owner_repo": "aoa-skills",
+      "observed_at": "2026-04-21T00:00:00Z",
+      "category": "usage_gap",
+      "signal": "skill_trigger_gap",
+      "source_inputs": [
+        "description-trigger-evals",
+        "skill-live-receipts"
+      ],
+      "evidence_refs": [
+        "aoa-skills:generated/description_trigger_eval_cases.jsonl#case-1"
+      ],
+      "attributes": {
+        "producer": "skill_trigger_surface_watch",
+        "skill": "example-skill"
+      },
+      "notes": "positive trigger-eval cases exist but no matching skill usage receipt was found"
+    }
+  ]
+}

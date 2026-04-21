@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/owner_review_decision.schema.json",
+  "title": "AOA owner review decision",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "decision_ref",
+    "decided_at",
+    "owner_repo",
+    "target_repo",
+    "input_beacon_refs",
+    "lane",
+    "kind",
+    "component_ref",
+    "decision",
+    "rationale"
+  ],
+  "properties": {
+    "schema_version": {"const": "aoa_owner_review_decision_v1"},
+    "decision_ref": {"type": "string"},
+    "decided_at": {"type": "string", "format": "date-time"},
+    "owner_repo": {"type": "string"},
+    "target_repo": {"type": "string"},
+    "reviewer": {"type": "string"},
+    "queue_ref": {"type": ["string", "null"]},
+    "item_ref": {"type": ["string", "null"]},
+    "input_beacon_refs": {"type": "array", "items": {"type": "string"}},
+    "lane": {"enum": ["technique", "skill", "eval", "playbook", "general"]},
+    "kind": {"type": "string"},
+    "component_ref": {"type": "string"},
+    "decision": {"enum": ["accept", "reject", "defer", "reanchor", "split", "merge", "suppress"]},
+    "rationale": {"type": "string"},
+    "decision_surface": {"type": ["string", "null"]},
+    "evidence_refs": {"type": "array", "items": {"type": "string"}},
+    "source_inputs": {"type": "array", "items": {"type": "string"}},
+    "recommended_actions": {"type": "array", "items": {"type": "string"}},
+    "applied_surfaces": {"type": "array", "items": {"type": "string"}},
+    "followthrough": {"type": "array", "items": {"$ref": "#/$defs/followthrough"}},
+    "suppression_rules": {"type": "array", "items": {"$ref": "#/$defs/suppression_rule"}},
+    "lineage_bridge": {"anyOf": [{"$ref": "#/$defs/lineage_bridge"}, {"type": "null"}]},
+    "next_review_after": {"type": ["string", "null"]},
+    "boundaries_preserved": {"type": "array", "items": {"type": "string"}},
+    "forbidden_implications": {"type": "array", "items": {"type": "string"}},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "followthrough": {
+      "type": "object",
+      "required": ["action_ref", "kind", "target_repo"],
+      "properties": {
+        "action_ref": {"type": "string"},
+        "kind": {"enum": ["update_surface", "create_candidate", "update_trigger_eval", "write_review_note", "open_pr", "rerun_proof", "rebuild_generated", "no_action"]},
+        "target_repo": {"type": "string"},
+        "surface": {"type": ["string", "null"]},
+        "commands": {"type": "array", "items": {"type": "string"}},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "suppression_rule": {
+      "type": "object",
+      "required": ["rule_ref", "scope", "target_repo", "reason"],
+      "properties": {
+        "rule_ref": {"type": "string"},
+        "scope": {"enum": ["beacon", "component", "kind", "owner", "decision_surface"]},
+        "target_repo": {"type": "string"},
+        "component_ref": {"type": ["string", "null"]},
+        "beacon_ref": {"type": ["string", "null"]},
+        "kind": {"type": ["string", "null"]},
+        "decision_surface": {"type": ["string", "null"]},
+        "reason": {"type": "string"},
+        "expires_after": {"type": ["string", "null"]},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    },
+    "lineage_bridge": {
+      "type": "object",
+      "properties": {
+        "cluster_ref": {"type": ["string", "null"]},
+        "owner_shape": {"type": ["string", "null"]},
+        "owner_assigned_ref": {"type": ["string", "null"]},
+        "supersedes": {"type": "array", "items": {"type": "string"}},
+        "merged_into": {"type": ["string", "null"]},
+        "split_into": {"type": "array", "items": {"type": "string"}},
+        "notes": {"type": "string"}
+      },
+      "additionalProperties": false
+    }
+  }
+}

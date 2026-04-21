@@ -1,0 +1,31 @@
+{
+  "schema_version": "aoa_manifest_scan_report_v1",
+  "report_ref": "manifest-scan:20260421T000000Z",
+  "workspace_root": "/srv/workspace",
+  "loaded_components": ["component:skills:activation-boundary"],
+  "foreign_manifests": ["manifest:aoa-skills:manifests/recurrence/hooks/skills.hooks.json"],
+  "diagnostics": [
+    {
+      "manifest_ref": "manifest:aoa-skills:manifests/recurrence/component.skills.activation.json",
+      "repo": "aoa-skills",
+      "path": "manifests/recurrence/component.skills.activation.json",
+      "manifest_kind": "recurrence_component",
+      "diagnostic_kind": "loaded_manifest",
+      "severity": "low",
+      "message": "recurrence component manifest loaded into registry",
+      "evidence": {"component_ref": "component:skills:activation-boundary"}
+    },
+    {
+      "manifest_ref": "manifest:aoa-sdk:manifests/recurrence/agon.observation-only.json",
+      "repo": "aoa-sdk",
+      "path": "manifests/recurrence/agon.observation-only.json",
+      "manifest_kind": "agon_recurrence_adapter",
+      "diagnostic_kind": "adapter_required",
+      "severity": "medium",
+      "message": "Agon-shaped recurrence manifest detected; keep it observation-only until an Agon adapter owns the translation",
+      "evidence": {"keys": ["authority", "component_id", "forbidden_actions", "observation_only", "surface_refs"]}
+    }
+  ],
+  "by_kind": {"agon_recurrence_adapter": 1, "hook_binding_set": 1, "recurrence_component": 1},
+  "by_severity": {"low": 2, "medium": 1}
+}

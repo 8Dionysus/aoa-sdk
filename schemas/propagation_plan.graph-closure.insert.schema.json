@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Propagation plan graph-closure insert",
+  "type": "object",
+  "properties": {
+    "ordered_steps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "batch_order": {
+            "type": "integer"
+          },
+          "graph_depth": {
+            "type": "integer"
+          },
+          "edge_strength": {
+            "enum": [
+              "required",
+              "recommended",
+              "advisory",
+              "forbidden"
+            ]
+          }
+        }
+      }
+    },
+    "graph_closure_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "propagation_batches": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

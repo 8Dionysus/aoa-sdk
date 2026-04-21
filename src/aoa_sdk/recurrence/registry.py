@@ -1,14 +1,22 @@
 from __future__ import annotations
 
 import fnmatch
-import json
 import shlex
+from collections import Counter
 from dataclasses import dataclass
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Iterable
 
 from ..workspace.discovery import Workspace
-from .models import RecurrenceComponent, SurfaceClass
+from .compat import classify_manifest, validate_recurrence_component_payload
+from .models import (
+    ManifestDiagnostic,
+    ManifestKind,
+    ManifestScanReport,
+    RecurrenceComponent,
+    SurfaceClass,
+)
 
 
 SURFACE_GROUPS: tuple[tuple[SurfaceClass, str], ...] = (
@@ -29,10 +37,27 @@ class LoadedComponent:
     component: RecurrenceComponent
 
 
+@dataclass(slots=True)
+class LoadedForeignManifest:
+    manifest_path: Path
+    repo: str
+    manifest_kind: ManifestKind
+    manifest_ref: str
+
+
 class RecurrenceRegistry:
-    def __init__(self, workspace: Workspace, loaded: list[LoadedComponent]) -> None:
+    def __init__(
+        self,
+        workspace: Workspace,
+        loaded: list[LoadedComponent],
+        *,
+        foreign_manifests: list[LoadedForeignManifest] | None = None,
+        diagnostics: list[ManifestDiagnostic] | None = None,
+    ) -> None:
         self.workspace = workspace
         self.loaded = loaded
+        self.foreign_manifests = foreign_manifests or []
+        self.diagnostics = diagnostics or []
         self.by_ref = {item.component.component_ref: item for item in loaded}
 
     def get(self, component_ref: str) -> LoadedComponent | None:
@@ -41,7 +66,15 @@ class RecurrenceRegistry:
     def iter_components(self) -> Iterable[LoadedComponent]:
         return iter(self.loaded)
 
-    def match_path(self, path: str, *, owner_repo: str | None = None) -> list[tuple[LoadedComponent, SurfaceClass]]:
+    def iter_foreign_manifests(self) -> Iterable[LoadedForeignManifest]:
+        return iter(self.foreign_manifests)
+
+    def iter_manifest_diagnostics(self) -> Iterable[ManifestDiagnostic]:
+        return iter(self.diagnostics)
+
+    def match_path(
+        self, path: str | Path, *, owner_repo: str | None = None
+    ) -> list[tuple[LoadedComponent, SurfaceClass]]:
         normalized = normalize_path(path)
         matches: list[tuple[LoadedComponent, SurfaceClass]] = []
         for item in self.loaded:
@@ -56,20 +89,90 @@ class RecurrenceRegistry:
                         break
         return matches
 
+    def manifest_scan_report(self) -> ManifestScanReport:
+        return build_manifest_scan_report(self.workspace, registry=self)
+
 
 def load_registry(workspace: Workspace) -> RecurrenceRegistry:
     loaded: list[LoadedComponent] = []
+    foreign_manifests: list[LoadedForeignManifest] = []
+    diagnostics: list[ManifestDiagnostic] = []
     for repo, repo_root in workspace.repo_roots.items():
         manifest_root = repo_root / "manifests" / "recurrence"
         if not manifest_root.is_dir():
             continue
-        for path in sorted(manifest_root.glob("*.json")):
-            payload = json.loads(path.read_text(encoding="utf-8"))
-            component = RecurrenceComponent.model_validate(payload)
-            if component.owner_repo != repo:
-                component = component.model_copy(update={"owner_repo": repo})
+        for path in sorted(manifest_root.rglob("*.json")):
+            classification = classify_manifest(repo, repo_root, path)
+            diagnostics.extend(classification.diagnostics)
+
+            if classification.payload is None:
+                continue
+
+            if classification.manifest_kind != "recurrence_component":
+                foreign_manifests.append(
+                    LoadedForeignManifest(
+                        manifest_path=path,
+                        repo=repo,
+                        manifest_kind=classification.manifest_kind,
+                        manifest_ref=classification.manifest_ref,
+                    )
+                )
+                continue
+
+            component, component_diagnostics = validate_recurrence_component_payload(
+                repo=repo,
+                repo_root=repo_root,
+                path=path,
+                payload=classification.payload,
+            )
+            diagnostics.extend(component_diagnostics)
+            if component is None:
+                if any(
+                    diagnostic.manifest_kind == "agon_recurrence_adapter"
+                    for diagnostic in component_diagnostics
+                ):
+                    foreign_manifests.append(
+                        LoadedForeignManifest(
+                            manifest_path=path,
+                            repo=repo,
+                            manifest_kind="agon_recurrence_adapter",
+                            manifest_ref=classification.manifest_ref,
+                        )
+                    )
+                continue
+
             loaded.append(LoadedComponent(manifest_path=path, component=component))
-    return RecurrenceRegistry(workspace, loaded)
+    return RecurrenceRegistry(
+        workspace,
+        loaded,
+        foreign_manifests=foreign_manifests,
+        diagnostics=diagnostics,
+    )
+
+
+def build_manifest_scan_report(
+    workspace: Workspace,
+    *,
+    registry: RecurrenceRegistry | None = None,
+) -> ManifestScanReport:
+    registry = registry or load_registry(workspace)
+    by_kind = Counter(item.manifest_kind for item in registry.iter_foreign_manifests())
+    by_kind.update({"recurrence_component": len(list(registry.iter_components()))})
+    by_severity = Counter(item.severity for item in registry.iter_manifest_diagnostics())
+    stamp = datetime.now(timezone.utc).strftime("%Y%m%dT%H%M%SZ")
+    return ManifestScanReport(
+        report_ref=f"manifest-scan:{stamp}",
+        workspace_root=str(workspace.federation_root),
+        loaded_components=sorted(
+            item.component.component_ref for item in registry.iter_components()
+        ),
+        foreign_manifests=sorted(
+            item.manifest_ref for item in registry.iter_foreign_manifests()
+        ),
+        diagnostics=list(registry.iter_manifest_diagnostics()),
+        by_kind=dict(sorted(by_kind.items())),
+        by_severity=dict(sorted(by_severity.items())),
+    )
 
 
 def normalize_path(path: str | Path, *, preserve_trailing_slash: bool = False) -> str:
@@ -110,7 +213,7 @@ def _iter_match_patterns(pattern: str) -> Iterable[str]:
         yield candidate
 
 
-def pattern_matches(pattern: str, path: str) -> bool:
+def pattern_matches(pattern: str, path: str | Path) -> bool:
     normalized_path = normalize_path(path)
     for normalized_pattern in _iter_match_patterns(pattern):
         if normalized_pattern.endswith("/"):
