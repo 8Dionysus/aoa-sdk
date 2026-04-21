@@ -2,30 +2,31 @@ from __future__ import annotations
 
 # ruff: noqa: E402
 
-import importlib
 import importlib.util
 import sys
 import types
 from pathlib import Path
 
 SRC_ROOT = Path(__file__).resolve().parents[1] / "src" / "aoa_sdk"
+TEST_PACKAGE = "_test_aoa_sdk"
+TEST_RECURRENCE_PACKAGE = f"{TEST_PACKAGE}.recurrence"
+TEST_WORKSPACE_PACKAGE = f"{TEST_PACKAGE}.workspace"
+TEST_DISCOVERY_MODULE = f"{TEST_WORKSPACE_PACKAGE}.discovery"
+TEST_ROOTS_MODULE = f"{TEST_WORKSPACE_PACKAGE}.roots"
 
 
 def _install_workspace_stub() -> None:
-    if "aoa_sdk.workspace.discovery" in sys.modules:
+    if TEST_DISCOVERY_MODULE in sys.modules:
         return
 
-    src_parent = str(SRC_ROOT.parent)
-    if src_parent not in sys.path:
-        sys.path.insert(0, src_parent)
-
-    importlib.import_module("aoa_sdk")
-    importlib.import_module("aoa_sdk.recurrence")
-
-    workspace_pkg = types.ModuleType("aoa_sdk.workspace")
+    base_pkg = types.ModuleType(TEST_PACKAGE)
+    base_pkg.__path__ = [str(SRC_ROOT)]
+    recurrence_pkg = types.ModuleType(TEST_RECURRENCE_PACKAGE)
+    recurrence_pkg.__path__ = [str(SRC_ROOT / "recurrence")]
+    workspace_pkg = types.ModuleType(TEST_WORKSPACE_PACKAGE)
     workspace_pkg.__path__ = []
-    discovery = types.ModuleType("aoa_sdk.workspace.discovery")
-    roots = types.ModuleType("aoa_sdk.workspace.roots")
+    discovery = types.ModuleType(TEST_DISCOVERY_MODULE)
+    roots = types.ModuleType(TEST_ROOTS_MODULE)
     roots.KNOWN_REPOS = ()
 
     class Workspace:
@@ -43,11 +44,16 @@ def _install_workspace_stub() -> None:
             )
             return cls(root=root_path, repo_roots=repo_roots)
 
-    discovery.Workspace = Workspace
+    base_pkg.recurrence = recurrence_pkg
+    base_pkg.workspace = workspace_pkg
     workspace_pkg.discovery = discovery
-    sys.modules["aoa_sdk.workspace"] = workspace_pkg
-    sys.modules["aoa_sdk.workspace.discovery"] = discovery
-    sys.modules["aoa_sdk.workspace.roots"] = roots
+    workspace_pkg.roots = roots
+    discovery.Workspace = Workspace
+    sys.modules[TEST_PACKAGE] = base_pkg
+    sys.modules[TEST_RECURRENCE_PACKAGE] = recurrence_pkg
+    sys.modules[TEST_WORKSPACE_PACKAGE] = workspace_pkg
+    sys.modules[TEST_DISCOVERY_MODULE] = discovery
+    sys.modules[TEST_ROOTS_MODULE] = roots
 
 
 _install_workspace_stub()
@@ -62,9 +68,15 @@ def _load_module(name: str, path: Path):
     return module
 
 
-models = _load_module("aoa_sdk.recurrence.models", SRC_ROOT / "recurrence" / "models.py")
-rollout = _load_module("aoa_sdk.recurrence.rollout", SRC_ROOT / "recurrence" / "rollout.py")
-wiring = _load_module("aoa_sdk.recurrence.wiring", SRC_ROOT / "recurrence" / "wiring.py")
+models = _load_module(
+    f"{TEST_RECURRENCE_PACKAGE}.models", SRC_ROOT / "recurrence" / "models.py"
+)
+rollout = _load_module(
+    f"{TEST_RECURRENCE_PACKAGE}.rollout", SRC_ROOT / "recurrence" / "rollout.py"
+)
+wiring = _load_module(
+    f"{TEST_RECURRENCE_PACKAGE}.wiring", SRC_ROOT / "recurrence" / "wiring.py"
+)
 
 ConnectivityGap = models.ConnectivityGap
 ConnectivityGapReport = models.ConnectivityGapReport
@@ -72,7 +84,7 @@ OwnerReviewSummary = models.OwnerReviewSummary
 OwnerReviewSummaryItem = models.OwnerReviewSummaryItem
 build_rollout_window_bundle = rollout.build_rollout_window_bundle
 build_wiring_plan = wiring.build_wiring_plan
-from aoa_sdk.workspace.discovery import Workspace
+Workspace = sys.modules[TEST_DISCOVERY_MODULE].Workspace
 
 
 def test_wiring_plan_emits_expected_scopes(tmp_path: Path) -> None:
