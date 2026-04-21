@@ -3,12 +3,12 @@
   "$id": "https://aoa.local/schemas/recurrence-stats-projection.schema.json",
   "title": "AoA recurrence stats projection",
   "type": "object",
-  "required": ["schema_version", "projection_ref", "workspace_root", "coverage", "gaps", "beacons", "review", "decisions", "surface_strength"],
+  "required": ["schema_version", "projection_ref", "workspace_root", "source_packet_refs", "coverage", "gaps", "beacons", "review", "decisions", "surface_strength"],
   "properties": {
     "schema_version": {"const": "aoa_recurrence_stats_projection_v1"},
     "projection_ref": {"type": "string"},
     "workspace_root": {"type": "string"},
-    "source_packet_refs": {"type": "array", "items": {"type": "string"}},
+    "source_packet_refs": {"type": "array", "minItems": 1, "items": {"type": "string", "minLength": 1}},
     "coverage": {"$ref": "#/$defs/bucket"},
     "gaps": {"$ref": "#/$defs/bucket"},
     "beacons": {"$ref": "#/$defs/bucket"},
@@ -24,10 +24,10 @@
       "properties": {
         "name": {"type": "string"},
         "total": {"type": "integer", "minimum": 0},
-        "by_kind": {"type": "object", "additionalProperties": {"type": "integer"}},
-        "by_owner": {"type": "object", "additionalProperties": {"type": "integer"}},
-        "by_status": {"type": "object", "additionalProperties": {"type": "integer"}},
-        "by_severity": {"type": "object", "additionalProperties": {"type": "integer"}}
+        "by_kind": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+        "by_owner": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+        "by_status": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}},
+        "by_severity": {"type": "object", "additionalProperties": {"type": "integer", "minimum": 0}}
       },
       "additionalProperties": false
     }
