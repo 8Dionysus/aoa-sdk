@@ -1,6 +1,10 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, json, pathlib, sys
+
+import argparse
+import json
+import pathlib
+import sys
 
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 CONFIG = ROOT / 'config/agon_wave7_recurrence_lanes.seed.json'
