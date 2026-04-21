@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -40,10 +41,15 @@ def main() -> int:
     rendered = compact(build_registry())
 
     if args.check:
-        assert OUTPUT.exists(), f"missing {OUTPUT}"
-        assert (
-            OUTPUT.read_text(encoding="utf-8") == rendered
-        ), "generated agon_vds_sdk_helper_candidates.min.json is stale"
+        if not OUTPUT.exists():
+            print(f"missing {OUTPUT}", file=sys.stderr)
+            return 1
+        if OUTPUT.read_text(encoding="utf-8") != rendered:
+            print(
+                "generated agon_vds_sdk_helper_candidates.min.json is stale",
+                file=sys.stderr,
+            )
+            return 1
         print("agon_vds_sdk_helper_candidates.min.json is up to date")
         return 0
 

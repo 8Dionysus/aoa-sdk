@@ -12,6 +12,7 @@ REQUIRED_HELPERS = {
     'agon.sdk.ccs.preview_contradiction_status_candidate',
     'agon.sdk.ccs.preview_closure_eligibility_candidate',
     'agon.sdk.ccs.draft_summon_intent_review_candidate',
+    'agon.sdk.ccs.inspect_stop_lines_candidate',
 }
 
 
