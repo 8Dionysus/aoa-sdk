@@ -1,0 +1,32 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "home_repo": {
+      "const": "aoa-sdk"
+    },
+    "live_protocol": {
+      "const": false
+    },
+    "registry_id": {
+      "const": "agon.ccs_sdk_helper_candidates.registry.v1"
+    },
+    "runtime_effect": {
+      "const": "none"
+    },
+    "wave": {
+      "const": "X"
+    }
+  },
+  "required": [
+    "registry_id",
+    "wave",
+    "home_repo",
+    "live_protocol",
+    "runtime_effect",
+    "helper_candidates",
+    "stop_lines"
+  ],
+  "title": "Agon CCS SDK Helper Candidate Registry",
+  "type": "object"
+}

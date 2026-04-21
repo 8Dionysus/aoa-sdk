@@ -1,0 +1,39 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "forbidden_effects": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "helper_id": {
+      "pattern": "^agon\\.sdk\\.ccs\\.",
+      "type": "string"
+    },
+    "input_surfaces": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "output_candidate": {
+      "type": "string"
+    },
+    "purpose": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "helper_id",
+    "purpose",
+    "input_surfaces",
+    "output_candidate",
+    "forbidden_effects"
+  ],
+  "title": "Agon CCS SDK Helper Candidate",
+  "type": "object"
+}
