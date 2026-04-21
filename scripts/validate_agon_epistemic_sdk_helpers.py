@@ -19,7 +19,6 @@ from build_agon_epistemic_sdk_helpers import (  # noqa: E402
     OUT,
     REGISTRY_ID,
     RUNTIME_POSTURE,
-    SRC,
     WAVE,
     build,
     load_source,
