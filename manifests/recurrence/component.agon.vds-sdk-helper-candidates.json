@@ -1,0 +1,20 @@
+{
+  "component_id": "component.agon.vds-sdk-helper-candidates",
+  "may_emit": [
+    "sdk_helper_review_queue",
+    "owner_summary_candidate"
+  ],
+  "must_not_emit": [
+    "live_verdict",
+    "scar_write",
+    "retention_execution",
+    "rank_mutation",
+    "tos_promotion"
+  ],
+  "observation_intent": "Detect drift in VDS Helper Candidates without granting runtime authority.",
+  "observed_surfaces": [
+    "generated/agon_vds_sdk_helper_candidates.min.json"
+  ],
+  "owner_repo": "aoa-sdk",
+  "status": "seeded_recurrence_observation_component"
+}

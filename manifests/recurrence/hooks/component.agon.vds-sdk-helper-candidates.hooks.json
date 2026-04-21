@@ -1,0 +1,16 @@
+{
+  "component_id": "component.agon.vds-sdk-helper-candidates",
+  "hidden_scheduler_allowed": false,
+  "hook_binding_set_id": "hooks:component.agon.vds-sdk-helper-candidates",
+  "hooks": [
+    {
+      "emits": "sdk_helper_review_queue",
+      "hook_id": "agon.vds.sdk.drift",
+      "watches": [
+        "generated/agon_vds_sdk_helper_candidates.min.json"
+      ]
+    }
+  ],
+  "owner_repo": "aoa-sdk",
+  "runtime_effect": "none"
+}
