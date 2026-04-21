@@ -1,0 +1,23 @@
+{
+  "component_id": "component.agon.wave16.aoa_sdk",
+  "forbidden_actions": [
+    "open_arena_session",
+    "issue_verdict",
+    "write_scar",
+    "mutate_rank",
+    "promote_to_tree_of_sophia",
+    "auto_rewrite_owner_repo",
+    "hidden_scheduler_action"
+  ],
+  "observation_only": true,
+  "repo": "aoa-sdk",
+  "surfaces": [
+    "generated/agon_slc_sdk_helpers.min.json",
+    "config/agon_slc_sdk_helpers.seed.json",
+    "docs/AGON_SLC_SDK_HELPERS.md",
+    "docs/AGON_SLC_SDK_BOUNDARY.md",
+    "docs/AGON_WAVE16_SDK_LANDING.md"
+  ],
+  "title": "Wave XVI aoa-sdk surfaces",
+  "wave": "XVI"
+}
