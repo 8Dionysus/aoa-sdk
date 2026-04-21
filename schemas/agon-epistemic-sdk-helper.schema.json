@@ -1,0 +1,64 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_outputs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "forbidden_effects": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 10,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "helper_for": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "helper_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "live_protocol": {
+      "const": false
+    },
+    "owner_repo": {
+      "const": "aoa-sdk"
+    },
+    "runtime_effect": {
+      "enum": [
+        "none",
+        "candidate_only",
+        "local_dry_run_candidate_only",
+        "local_rehearsal_candidate_only"
+      ]
+    },
+    "status": {
+      "const": "requested_only_helper_candidate"
+    }
+  },
+  "required": [
+    "candidate_outputs",
+    "forbidden_effects",
+    "helper_for",
+    "helper_id",
+    "live_protocol",
+    "owner_repo",
+    "runtime_effect",
+    "status"
+  ],
+  "title": "Agon Epistemic SDK Helper",
+  "type": "object"
+}
