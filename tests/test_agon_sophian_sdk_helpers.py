@@ -1,5 +1,9 @@
 from __future__ import annotations
-import json, pathlib, subprocess, sys
+import json
+import pathlib
+import subprocess
+import sys
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 GENERATED = ROOT / 'generated/agon_sophian_sdk_helpers.min.json'
 SCRIPT = ROOT / 'scripts/build_agon_sophian_sdk_helpers.py'
