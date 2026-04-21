@@ -1,0 +1,10 @@
+{
+  "authority": "observation_only",
+  "component_id": "component.agon.mechanical-trial-sdk-helpers",
+  "observation_intent": "Detect drift in mechanical trial SDK helper candidates.",
+  "repo": "aoa-sdk",
+  "surfaces": [
+    "generated/agon_mechanical_trial_sdk_helper_registry.min.json"
+  ],
+  "wave": "XIII"
+}

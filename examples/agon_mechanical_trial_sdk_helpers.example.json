@@ -1,0 +1,15 @@
+{
+  "durable_scar_write": false,
+  "helper_class": "loader",
+  "hidden_scheduler_action": false,
+  "id": "agon.sdk.trials.load_trial_suite_registry_candidate",
+  "live_protocol": false,
+  "live_verdict_authority": false,
+  "rank_mutation": false,
+  "reads": [
+    "Agents-of-Abyss/generated/agon_mechanical_trial_suite_registry.min.json"
+  ],
+  "retention_execution": false,
+  "runtime_effect": "none",
+  "tos_promotion": false
+}
