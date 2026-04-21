@@ -1,0 +1,42 @@
+{
+  "$id": "https://8dionysus.dev/schemas/agon-sdk-state-packet-binding-registry.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "binding_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "bindings": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "live_protocol": {
+      "const": false
+    },
+    "registry_id": {
+      "const": "agon.sdk_state_packet_bindings.wave9"
+    },
+    "runtime_effect": {
+      "const": "none"
+    },
+    "status": {
+      "const": "requested_only_pre_runtime_sdk_binding"
+    },
+    "wave": {
+      "const": "IX"
+    }
+  },
+  "required": [
+    "registry_id",
+    "status",
+    "wave",
+    "live_protocol",
+    "runtime_effect",
+    "binding_count",
+    "bindings"
+  ],
+  "title": "Agon SDK State Packet Binding Registry",
+  "type": "object"
+}

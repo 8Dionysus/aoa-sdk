@@ -1,0 +1,133 @@
+{
+  "bindings": [
+    {
+      "binding_id": "agon.sdk.packet_registry_loader_candidate",
+      "forbidden_effects": [
+        "create_live_arena_session",
+        "execute_move",
+        "issue_verdict",
+        "grant_closure",
+        "write_durable_scar",
+        "schedule_retention_as_authority",
+        "mutate_rank",
+        "promote_to_tree_of_sophia",
+        "auto_modify_owner_repo"
+      ],
+      "helper_kind": "loader_candidate",
+      "purpose": "Load the center-owned state packet registry for local validation and documentation tooling.",
+      "reads": [
+        "Agents-of-Abyss/generated/agon_state_packet_registry.min.json"
+      ],
+      "writes": []
+    },
+    {
+      "binding_id": "agon.sdk.packet_shape_validator_candidate",
+      "forbidden_effects": [
+        "create_live_arena_session",
+        "execute_move",
+        "issue_verdict",
+        "grant_closure",
+        "write_durable_scar",
+        "schedule_retention_as_authority",
+        "mutate_rank",
+        "promote_to_tree_of_sophia",
+        "auto_modify_owner_repo"
+      ],
+      "helper_kind": "validation_candidate",
+      "purpose": "Validate pre-protocol packet envelopes against center-owned packet shape constraints.",
+      "reads": [
+        "Agents-of-Abyss/schemas/agon-state-packet.schema.json"
+      ],
+      "writes": []
+    },
+    {
+      "binding_id": "agon.sdk.sealed_commit_draft_builder_candidate",
+      "forbidden_effects": [
+        "create_live_arena_session",
+        "execute_move",
+        "issue_verdict",
+        "grant_closure",
+        "write_durable_scar",
+        "schedule_retention_as_authority",
+        "mutate_rank",
+        "promote_to_tree_of_sophia",
+        "auto_modify_owner_repo"
+      ],
+      "helper_kind": "draft_builder_candidate",
+      "purpose": "Prepare a local sealed commit draft object without submitting it to any live session.",
+      "reads": [
+        "aoa-agents/generated/agent_agonic_formation_index.min.json"
+      ],
+      "writes": []
+    },
+    {
+      "binding_id": "agon.sdk.commit_hash_preview_candidate",
+      "forbidden_effects": [
+        "create_live_arena_session",
+        "execute_move",
+        "issue_verdict",
+        "grant_closure",
+        "write_durable_scar",
+        "schedule_retention_as_authority",
+        "mutate_rank",
+        "promote_to_tree_of_sophia",
+        "auto_modify_owner_repo"
+      ],
+      "helper_kind": "hash_preview_candidate",
+      "purpose": "Compute or verify a local commitment hash preview for review tooling only.",
+      "reads": [
+        "local draft packet only"
+      ],
+      "writes": []
+    },
+    {
+      "binding_id": "agon.sdk.reveal_view_draft_builder_candidate",
+      "forbidden_effects": [
+        "create_live_arena_session",
+        "execute_move",
+        "issue_verdict",
+        "grant_closure",
+        "write_durable_scar",
+        "schedule_retention_as_authority",
+        "mutate_rank",
+        "promote_to_tree_of_sophia",
+        "auto_modify_owner_repo"
+      ],
+      "helper_kind": "draft_builder_candidate",
+      "purpose": "Prepare a local reveal view draft object that can be reviewed against a sealed commit draft.",
+      "reads": [
+        "local sealed commit draft only"
+      ],
+      "writes": []
+    },
+    {
+      "binding_id": "agon.sdk.packet_stop_line_inspector_candidate",
+      "forbidden_effects": [
+        "create_live_arena_session",
+        "execute_move",
+        "issue_verdict",
+        "grant_closure",
+        "write_durable_scar",
+        "schedule_retention_as_authority",
+        "mutate_rank",
+        "promote_to_tree_of_sophia",
+        "auto_modify_owner_repo"
+      ],
+      "helper_kind": "inspection_candidate",
+      "purpose": "Inspect whether a packet draft attempts to cross a Wave IX stop-line.",
+      "reads": [
+        "Agents-of-Abyss/generated/agon_state_packet_registry.min.json"
+      ],
+      "writes": []
+    }
+  ],
+  "home_repo": "aoa-sdk",
+  "landed_at": "2026-04-20",
+  "live_protocol": false,
+  "registry_id": "agon.sdk_state_packet_bindings.wave9",
+  "runtime_effect": "none",
+  "status": "requested_only_pre_runtime_sdk_binding",
+  "title": "Agon Wave IX SDK state packet helper candidates",
+  "version": "0.1.0",
+  "wave": "IX"
+}

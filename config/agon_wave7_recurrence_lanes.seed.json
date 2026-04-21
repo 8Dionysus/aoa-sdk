@@ -1,0 +1,99 @@
+{
+  "lanes": [
+    {
+      "component_refs": [
+        "component:agon:court-prebinding-surfaces"
+      ],
+      "lane_ref": "agon.recurrence.lane.court_review",
+      "live_authority": false,
+      "live_protocol": false,
+      "must_not": [
+        "auto_issue_verdict",
+        "auto_open_arena_session"
+      ],
+      "mutates_rank": false,
+      "opens_arena_session": false,
+      "promotes_to_tos": false,
+      "review_surface_types": [
+        "review_queue",
+        "candidate_dossier",
+        "owner_summary"
+      ],
+      "runs_hidden_scheduler": false,
+      "runtime_effect": "none",
+      "status": "seeded_review_lane",
+      "title": "Court review lane",
+      "writes_durable_state": false
+    },
+    {
+      "component_refs": [
+        "component:agon:memory-prebinding-surfaces"
+      ],
+      "lane_ref": "agon.recurrence.lane.memory_candidates",
+      "live_authority": false,
+      "live_protocol": false,
+      "must_not": [
+        "auto_write_scar",
+        "auto_schedule_retention"
+      ],
+      "mutates_rank": false,
+      "opens_arena_session": false,
+      "promotes_to_tos": false,
+      "review_surface_types": [
+        "review_queue",
+        "candidate_dossier",
+        "owner_summary"
+      ],
+      "runs_hidden_scheduler": false,
+      "runtime_effect": "none",
+      "status": "seeded_review_lane",
+      "title": "Memory candidate lane",
+      "writes_durable_state": false
+    },
+    {
+      "component_refs": [
+        "component:agon:stats-prebinding-surfaces"
+      ],
+      "lane_ref": "agon.recurrence.lane.stats_observability",
+      "live_authority": false,
+      "live_protocol": false,
+      "must_not": [
+        "rank_agents",
+        "become_authority"
+      ],
+      "mutates_rank": false,
+      "opens_arena_session": false,
+      "promotes_to_tos": false,
+      "review_surface_types": [
+        "owner_summary",
+        "review_queue"
+      ],
+      "runs_hidden_scheduler": false,
+      "runtime_effect": "none",
+      "status": "seeded_review_lane",
+      "title": "Stats observability lane",
+      "writes_durable_state": false
+    }
+  ],
+  "live_protocol": false,
+  "notes": "Optional recurrence lanes for Wave VII surfaces. These lanes help review; they do not schedule or execute hidden actions.",
+  "owner_repo": "aoa-sdk",
+  "required_stop_lines": [
+    "no_arena_session_creation",
+    "no_sealed_commit_runtime",
+    "no_live_verdict_authority",
+    "no_durable_scar_write",
+    "no_retention_schedule_execution",
+    "no_rank_mutation",
+    "no_tree_of_sophia_promotion",
+    "no_hidden_scheduler_action",
+    "no_stats_as_authority",
+    "no_eval_as_sovereign",
+    "no_memo_as_truth",
+    "sdk_review_lanes_do_not_auto_execute"
+  ],
+  "runtime_effect": "none",
+  "schema_version": "agon_wave7_recurrence_lanes_seed_v1",
+  "status": "seeded_optional_recurrence_review_lanes",
+  "wave": "VII"
+}

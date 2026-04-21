@@ -1,0 +1,25 @@
+{
+  "component_refs": [
+    "component:agon:court-prebinding-surfaces"
+  ],
+  "lane_ref": "agon.recurrence.lane.court_review",
+  "live_authority": false,
+  "live_protocol": false,
+  "must_not": [
+    "auto_issue_verdict",
+    "auto_open_arena_session"
+  ],
+  "mutates_rank": false,
+  "opens_arena_session": false,
+  "promotes_to_tos": false,
+  "review_surface_types": [
+    "review_queue",
+    "candidate_dossier",
+    "owner_summary"
+  ],
+  "runs_hidden_scheduler": false,
+  "runtime_effect": "none",
+  "status": "seeded_review_lane",
+  "title": "Court review lane",
+  "writes_durable_state": false
+}

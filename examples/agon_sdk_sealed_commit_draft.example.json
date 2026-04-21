@@ -1,0 +1,11 @@
+{
+  "draft_packet_type": "agon.sealed_commit",
+  "helper_candidate": "agon.sdk.sealed_commit_draft_builder_candidate",
+  "input_refs": {
+    "actor_formation_ref": "aoa-agents/generated/agent_agonic_formation_index.min.json",
+    "session_model_ref": "Agents-of-Abyss/generated/agon_arena_session_model_registry.min.json"
+  },
+  "live_protocol": false,
+  "runtime_effect": "none",
+  "status": "example_only_no_runtime_effect"
+}

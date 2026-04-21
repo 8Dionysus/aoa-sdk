@@ -1,0 +1,44 @@
+{
+  "$id": "https://8dionysus.dev/schemas/agon-sdk-state-packet-binding.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "binding_id": {
+      "pattern": "^agon\\.sdk\\.",
+      "type": "string"
+    },
+    "forbidden_effects": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "helper_kind": {
+      "type": "string"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "reads": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "writes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    }
+  },
+  "required": [
+    "binding_id",
+    "helper_kind",
+    "purpose",
+    "reads",
+    "writes",
+    "forbidden_effects"
+  ],
+  "title": "Agon SDK State Packet Binding Candidate",
+  "type": "object"
+}
