@@ -1,0 +1,40 @@
+{
+  "schema_version": "recursor-readiness-projection/v1",
+  "generated_at": "2026-04-21T00:00:00Z",
+  "workspace_root": "/srv/workspace",
+  "source_repo": "/srv/workspace/aoa-agents",
+  "status": "pass",
+  "roles": [
+    {
+      "recursor_id": "recursor.witness",
+      "readiness_status": "candidate",
+      "default_kind": "assistant",
+      "arena_eligible": false,
+      "projection_status": "candidate_only",
+      "install_by_default": false
+    },
+    {
+      "recursor_id": "recursor.executor",
+      "readiness_status": "candidate",
+      "default_kind": "assistant",
+      "arena_eligible": false,
+      "projection_status": "candidate_only",
+      "install_by_default": false
+    }
+  ],
+  "pair_activation_status": "readiness_only",
+  "projection_status": "candidate_only",
+  "install_by_default": false,
+  "violations": [],
+  "diagnostics": [],
+  "stop_lines": [
+    "no_arena_session",
+    "no_verdict",
+    "no_scar_write",
+    "no_rank_mutation",
+    "no_assistant_contestant_drift",
+    "no_hidden_scheduler",
+    "no_tos_promotion",
+    "no_codex_projection_absorption"
+  ]
+}

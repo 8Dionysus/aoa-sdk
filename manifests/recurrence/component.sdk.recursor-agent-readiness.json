@@ -1,0 +1,42 @@
+{
+  "schema_version": "aoa_recurrence_component_v2",
+  "manifest_kind": "recurrence_component",
+  "component_ref": "component:sdk:recursor-agent-readiness",
+  "owner_repo": "aoa-sdk",
+  "component_kind": "read_only_control_plane_helper",
+  "authority_level": "helper_only",
+  "source_inputs": [
+    "src/aoa_sdk/recurrence/agent_readiness.py",
+    "src/aoa_sdk/recurrence/recursor_boundary.py",
+    "scripts/recursor_agent_readiness.py",
+    "docs/RECURRENCE_RECURSOR_AGENT_READINESS.md",
+    "docs/RECURSOR_NO_SPAWN_LAW.md"
+  ],
+  "generated_surfaces": [],
+  "proof_surfaces": [
+    "python -m py_compile src/aoa_sdk/recurrence/agent_readiness.py src/aoa_sdk/recurrence/recursor_boundary.py scripts/recursor_agent_readiness.py"
+  ],
+  "consumer_edges": [
+    {
+      "kind": "reads_owner_surface",
+      "target_repo": "aoa-agents",
+      "target": "component:agents:recursor-readiness",
+      "strength": "required"
+    },
+    {
+      "kind": "proved_by_eval",
+      "target_repo": "aoa-evals",
+      "target": "recursor-readiness-boundary-v1",
+      "strength": "recommended"
+    }
+  ],
+  "forbidden_actions": [
+    "spawn_agent",
+    "install_codex_agent_by_default",
+    "open_arena_session",
+    "issue_verdict",
+    "write_scar",
+    "mutate_rank",
+    "hidden_scheduler_action"
+  ]
+}
