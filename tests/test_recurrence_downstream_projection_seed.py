@@ -178,6 +178,31 @@ def test_routing_projection_is_advisory_and_thin() -> None:
         pass
     else:
         raise AssertionError("routing owner hints must carry source surface refs")
+    invalid_empty = projection.model_dump(mode="json")
+    invalid_empty["owner_hints"][0]["inspect_surfaces"] = []
+    invalid_empty["owner_hints"][0]["source_refs"] = []
+    try:
+        Draft202012Validator(schema).validate(invalid_empty)
+    except ValidationError:
+        pass
+    else:
+        raise AssertionError("routing owner hints must carry at least one source ref")
+
+
+def test_routing_projection_allows_empty_inspect_surfaces_with_source_refs() -> None:
+    queue = review_queue()
+    queue.items[0].decision_surface = None
+
+    projection = build_routing_projection(workspace(), review_queue=queue)
+
+    assert projection.owner_hints[0].inspect_surfaces == []
+    assert projection.owner_hints[0].source_refs
+    schema = json.loads(
+        (ROOT / "schemas/recurrence-routing-projection.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    Draft202012Validator(schema).validate(projection.model_dump(mode="json"))
 
 
 def test_stats_projection_is_derived_observability_only() -> None:
