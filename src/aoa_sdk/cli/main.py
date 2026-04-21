@@ -485,6 +485,11 @@ def _print_checkpoint_after_commit_report(report: CheckpointAfterCommitReport) -
             f"post_commit_checkpoint: recorded_closed_session_followthrough kind={report.checkpoint_kind} commit={commit_label} note={report.note_ref} report={report.report_path}"
         )
         return
+    if report.status == "recorded_reviewed_closeout_followthrough":
+        typer.echo(
+            f"post_commit_checkpoint: recorded_reviewed_closeout_followthrough kind={report.checkpoint_kind} commit={commit_label} note={report.note_ref} report={report.report_path}"
+        )
+        return
     if report.status == "skipped_no_active_session":
         typer.echo(
             f"post_commit_checkpoint: skipped_no_active_session kind={report.checkpoint_kind} commit={commit_label} report={report.report_path}"

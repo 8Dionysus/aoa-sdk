@@ -166,6 +166,11 @@ explicit `AOA_CHECKPOINT_KIND=owner_followthrough`, owner-follow-through commit
 text, or an already closed/promoted active checkpoint note records
 `owner_followthrough/public-share` follow-through without rotating or reopening
 the closed note.
+When the active note is already `reviewed` and reviewed closeout has emitted a
+matching owner-handoff for the current repo, explicit `owner_followthrough`
+should also stay report-only: record the follow-through artifact without
+opening a fresh pending checkpoint review just because the note still carries
+through session closeout.
 The hook-created checkpoint starts as `agent_review=pending`; after every
 successful commit, the Codex agent must apply the checkpoint skill protocol and
 write a semantic `aoa checkpoint review-note --auto` entry before treating the commit

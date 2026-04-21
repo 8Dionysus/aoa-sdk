@@ -890,6 +890,50 @@ class CheckpointsAPI:
                 _write_after_commit_report(report_path, report)
                 return report
 
+            if (
+                existing_note is not None
+                and resolved_checkpoint_kind == "owner_followthrough"
+                and existing_note.review_status == "reviewed"
+                and _has_reviewed_closeout_owner_handoff_for_repo(
+                    self.workspace,
+                    session_ref=existing_note.session_ref,
+                    repo_label=repo_label,
+                )
+            ):
+                report = CheckpointAfterCommitReport(
+                    status="recorded_reviewed_closeout_followthrough",
+                    repo_root=str(repo_root_path),
+                    repo_label=repo_label,
+                    report_path=str(report_path),
+                    commit_ref=commit_ref,
+                    commit_sha=commit_metadata["commit_sha"],
+                    commit_short_sha=commit_metadata["commit_short_sha"],
+                    commit_subject=commit_metadata["commit_subject"],
+                    commit_body=commit_metadata["commit_body"],
+                    changed_paths=list(commit_metadata["changed_paths"]),
+                    checkpoint_kind=resolved_checkpoint_kind,
+                    mutation_surface=mutation_surface,
+                    manual_review_requested=False,
+                    captured_at=captured_at,
+                    captured_at_local=captured_at_local,
+                    captured_tz=captured_tz,
+                    session_file=session_file_ref,
+                    runtime_session_id=runtime_session_id,
+                    runtime_session_created_at=runtime_session_created_at,
+                    note_ref=_checkpoint_note_ref_for_capture(
+                        self.workspace,
+                        repo_root,
+                        runtime_session_id=runtime_session_id,
+                    ),
+                    error_text=(
+                        "checkpoint note is reviewed and reviewed closeout already emitted "
+                        f"a matching owner handoff for {repo_label}; owner follow-through "
+                        "was recorded without mutating the reviewed note"
+                    ),
+                )
+                _write_after_commit_report(report_path, report)
+                return report
+
             skill_report = SkillsAPI(self.workspace).dispatch(
                 repo_root=repo_root,
                 phase="checkpoint",
@@ -3181,6 +3225,45 @@ def _build_quest_harvest_outputs(
 
 def _checkpoint_closeout_handoff_root(workspace: Workspace) -> Path:
     return workspace.repo_path("aoa-sdk") / ".aoa" / "closeout" / "handoffs"
+
+
+def _load_closeout_owner_handoff_for_session(
+    workspace: Workspace,
+    *,
+    session_ref: str,
+) -> CloseoutOwnerHandoff | None:
+    handoff_root = _checkpoint_closeout_handoff_root(workspace)
+    if not handoff_root.exists():
+        return None
+    direct_path = handoff_root / f"{_safe_name(session_ref)}.owner-handoff.json"
+    candidate_paths: list[Path] = []
+    if direct_path.exists():
+        candidate_paths.append(direct_path)
+    candidate_paths.extend(
+        sorted(path for path in handoff_root.glob("*.owner-handoff.json") if path != direct_path)
+    )
+    for path in candidate_paths:
+        try:
+            payload = CloseoutOwnerHandoff.model_validate(load_json(path))
+        except Exception:
+            continue
+        if payload.session_ref == session_ref:
+            return payload
+    return None
+
+
+def _has_reviewed_closeout_owner_handoff_for_repo(
+    workspace: Workspace,
+    *,
+    session_ref: str | None,
+    repo_label: str,
+) -> bool:
+    if not session_ref:
+        return False
+    handoff = _load_closeout_owner_handoff_for_session(workspace, session_ref=session_ref)
+    if handoff is None:
+        return False
+    return any(item.owner_repo == repo_label for item in handoff.items)
 
 
 def _checkpoint_owner_follow_through_key(brief: OwnerFollowThroughBrief) -> str:
