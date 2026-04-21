@@ -1,0 +1,15 @@
+{
+  "component_id": "component:agon:duel-kernel-sdk-bindings",
+  "forbidden_actions": [
+    "activate_runtime_service",
+    "issue_verdict",
+    "write_scar",
+    "mutate_rank"
+  ],
+  "hook_binding_set_id": "hooks:component:agon:duel-kernel-sdk-bindings",
+  "producers": [
+    "registry_diff",
+    "candidate_status_check",
+    "stop_line_check"
+  ]
+}
