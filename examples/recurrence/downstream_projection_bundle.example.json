@@ -1,0 +1,28 @@
+{
+  "schema_version": "aoa_downstream_projection_bundle_v1",
+  "bundle_ref": "downstream-projection-bundle:example",
+  "workspace_root": "/srv/workspace",
+  "source_packet_refs": ["plan:example", "doctor:example"],
+  "surfaces": [
+    {
+      "surface_ref": "surface:aoa-routing:recurrence-owner-hints",
+      "target_repo": "aoa-routing",
+      "path": "generated/recurrence_owner_hints.min.json",
+      "posture": "hint_only",
+      "source_packet_refs": ["plan:example"],
+      "notes": ""
+    }
+  ],
+  "routing": null,
+  "stats": null,
+  "kag": null,
+  "guard_report": {
+    "schema_version": "aoa_downstream_projection_guard_report_v1",
+    "report_ref": "downstream-projection-guard:example",
+    "workspace_root": "/srv/workspace",
+    "source_packet_refs": [],
+    "violations": [],
+    "boundary_notes": []
+  },
+  "boundary_notes": ["Downstream projections are narrow projections, not recurrence authority transfer."]
+}

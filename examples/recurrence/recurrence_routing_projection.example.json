@@ -1,0 +1,23 @@
+{
+  "schema_version": "aoa_recurrence_routing_projection_v1",
+  "projection_ref": "recurrence-routing-projection:example",
+  "workspace_root": "/srv/workspace",
+  "source_packet_refs": ["plan:example", "handoff:example"],
+  "owner_hints": [
+    {
+      "hint_ref": "routing-owner-hint:0001",
+      "owner_repo": "aoa-skills",
+      "component_ref": "component:skills:trigger-evals",
+      "reason": "recurrence plan step requires owner-facing revalidate",
+      "inspect_surfaces": ["docs/TRIGGER_EVALS.md"],
+      "source_refs": ["step:skills:trigger-evals", "plan:example"],
+      "advisory_only": true
+    }
+  ],
+  "return_hints": [],
+  "gap_hints": [],
+  "boundary_notes": [
+    "aoa-routing receives bounded owner and return hints only.",
+    "This projection must not export full recurrence graph traversal or author source meaning."
+  ]
+}

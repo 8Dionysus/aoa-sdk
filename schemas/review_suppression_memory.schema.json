@@ -1,0 +1,14 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/review_suppression_memory.schema.json",
+  "title": "AOA review suppression memory",
+  "type": "object",
+  "required": ["schema_version", "memory_ref", "workspace_root", "rules"],
+  "properties": {
+    "schema_version": {"const": "aoa_review_suppression_memory_v1"},
+    "memory_ref": {"type": "string"},
+    "workspace_root": {"type": "string"},
+    "rules": {"type": "array", "items": {"type": "object"}}
+  },
+  "additionalProperties": false
+}

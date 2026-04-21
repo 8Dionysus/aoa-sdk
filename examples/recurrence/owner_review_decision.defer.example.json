@@ -1,0 +1,51 @@
+{
+  "schema_version": "aoa_owner_review_decision_v1",
+  "decision_ref": "decision:aoa-skills:skills.unused_skill.activation_gap:20260421T000000Z",
+  "decided_at": "2026-04-21T00:00:00Z",
+  "owner_repo": "aoa-skills",
+  "target_repo": "aoa-skills",
+  "reviewer": "owner-review",
+  "queue_ref": "review-queue:example",
+  "item_ref": "review-item:0001",
+  "input_beacon_refs": ["skills.unused_skill.activation_gap"],
+  "lane": "skill",
+  "kind": "unused_skill_opportunity",
+  "component_ref": "component:skills:bundle-and-activation-beacons",
+  "decision": "defer",
+  "rationale": "The skill may be explicit-only in this scenario; wait for one more independent receipt before changing the trigger boundary.",
+  "decision_surface": "docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
+  "evidence_refs": ["receipt:001"],
+  "source_inputs": ["generated/description_trigger_eval_cases.jsonl"],
+  "recommended_actions": ["inspect trigger boundary"],
+  "applied_surfaces": [],
+  "followthrough": [
+    {
+      "action_ref": "followthrough:skills:watch-next-receipt",
+      "kind": "write_review_note",
+      "target_repo": "aoa-skills",
+      "surface": "docs/real-runs/",
+      "commands": [],
+      "notes": "Keep watch open until a second independent context appears."
+    }
+  ],
+  "suppression_rules": [],
+  "lineage_bridge": {
+    "cluster_ref": "cluster:skills:unused:001",
+    "owner_shape": "skill_usage_gap_decision",
+    "owner_assigned_ref": null,
+    "supersedes": [],
+    "merged_into": null,
+    "split_into": [],
+    "notes": "Cluster remains provisional."
+  },
+  "next_review_after": "2026-05-07",
+  "boundaries_preserved": [
+    "skill activation boundaries stay in authored skill surfaces",
+    "trigger eval changes remain owner-reviewed"
+  ],
+  "forbidden_implications": [
+    "sdk_does_not_accept_skill",
+    "sdk_does_not_mint_owner_candidate_seed_or_object_ref"
+  ],
+  "notes": "Example only."
+}

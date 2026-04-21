@@ -455,11 +455,18 @@
   },
   "additionalProperties": false,
   "properties": {
+    "manifest_kind": {
+      "const": "recurrence_component",
+      "default": "recurrence_component",
+      "title": "Manifest Kind",
+      "type": "string"
+    },
     "schema_version": {
       "default": "aoa_recurrence_component_v2",
       "enum": [
         "aoa_recurrence_component_v1",
-        "aoa_recurrence_component_v2"
+        "aoa_recurrence_component_v2",
+        "aoa_recurrence_component_v3"
       ],
       "title": "Schema Version",
       "type": "string"

@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8dionysus.local/schemas/graph_snapshot.schema.json",
+  "title": "AOA recurrence graph snapshot",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "snapshot_ref",
+    "workspace_root",
+    "created_at",
+    "node_count",
+    "edge_count",
+    "nodes",
+    "edges"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_graph_snapshot_v1"
+    },
+    "snapshot_ref": {
+      "type": "string"
+    },
+    "workspace_root": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "node_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "edge_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "nodes": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "edges": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "manifest_diagnostics": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  },
+  "additionalProperties": false
+}

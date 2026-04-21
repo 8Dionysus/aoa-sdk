@@ -163,6 +163,12 @@
   },
   "additionalProperties": false,
   "properties": {
+    "manifest_kind": {
+      "const": "hook_binding_set",
+      "default": "hook_binding_set",
+      "title": "Manifest Kind",
+      "type": "string"
+    },
     "schema_version": {
       "const": "aoa_hook_binding_set_v1",
       "default": "aoa_hook_binding_set_v1",

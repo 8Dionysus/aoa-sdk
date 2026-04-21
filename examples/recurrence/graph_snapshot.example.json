@@ -1,0 +1,38 @@
+{
+  "schema_version": "aoa_graph_snapshot_v1",
+  "snapshot_ref": "graph-snapshot:example",
+  "workspace_root": "/srv/workspace",
+  "created_at": "2026-04-21T00:00:00Z",
+  "node_count": 1,
+  "edge_count": 1,
+  "nodes": [
+    {
+      "node_ref": "node:component:skills:activation-boundary",
+      "component_ref": "component:skills:activation-boundary",
+      "owner_repo": "aoa-skills",
+      "description": "",
+      "surface_counts": {
+        "source": 1,
+        "consumer_edges": 1
+      },
+      "tags": []
+    }
+  ],
+  "edges": [
+    {
+      "edge_ref": "edge:example",
+      "source_component_ref": "component:skills:activation-boundary",
+      "source_owner_repo": "aoa-skills",
+      "kind": "evaluated_by",
+      "target": "component:evals:trigger-evals",
+      "target_repo": "aoa-evals",
+      "target_kind": "component",
+      "required": true,
+      "edge_strength": "required",
+      "suggested_action": "revalidate",
+      "suggested_commands": [],
+      "notes": ""
+    }
+  ],
+  "manifest_diagnostics": []
+}

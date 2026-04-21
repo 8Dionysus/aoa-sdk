@@ -1,0 +1,55 @@
+{
+  "schema_version": "aoa_owner_review_decision_v1",
+  "decision_ref": "decision:aoa-evals:evals.overclaim.runtime_claim:20260421T000000Z",
+  "decided_at": "2026-04-21T00:00:00Z",
+  "owner_repo": "aoa-evals",
+  "target_repo": "aoa-evals",
+  "reviewer": "owner-review",
+  "queue_ref": "review-queue:example",
+  "item_ref": "review-item:0002",
+  "input_beacon_refs": ["evals.overclaim.runtime_claim"],
+  "lane": "eval",
+  "kind": "overclaim_alarm",
+  "component_ref": "component:evals:portable-proof-beacons",
+  "decision": "suppress",
+  "rationale": "This beacon repeated on a known local-only runtime fixture and should not recur unless a portable claim surface appears.",
+  "decision_surface": "docs/RUNTIME_BENCH_PROMOTION_GUIDE.md",
+  "evidence_refs": ["runtime:bench:001"],
+  "source_inputs": ["runtime evidence selection"],
+  "recommended_actions": ["keep local-only"],
+  "applied_surfaces": ["docs/RUNTIME_BENCH_PROMOTION_GUIDE.md"],
+  "followthrough": [],
+  "suppression_rules": [
+    {
+      "rule_ref": "suppress:evals.overclaim.runtime_claim.local_only",
+      "scope": "beacon",
+      "target_repo": "aoa-evals",
+      "component_ref": "component:evals:portable-proof-beacons",
+      "beacon_ref": "evals.overclaim.runtime_claim",
+      "kind": "overclaim_alarm",
+      "decision_surface": "docs/RUNTIME_BENCH_PROMOTION_GUIDE.md",
+      "reason": "Known local-only fixture; suppress until portable claim evidence exists.",
+      "expires_after": "2026-06-01",
+      "notes": "Narrow suppression, not a global disable."
+    }
+  ],
+  "lineage_bridge": {
+    "cluster_ref": null,
+    "owner_shape": "eval_claim_boundary_tightening_decision",
+    "owner_assigned_ref": null,
+    "supersedes": [],
+    "merged_into": null,
+    "split_into": [],
+    "notes": "No owner object minted."
+  },
+  "next_review_after": null,
+  "boundaries_preserved": [
+    "runtime evidence remains bounded sidecar until eval ownership gives it proof meaning",
+    "claim wording and verdict semantics stay in aoa-evals"
+  ],
+  "forbidden_implications": [
+    "sdk_does_not_approve_eval",
+    "sdk_does_not_mint_owner_candidate_seed_or_object_ref"
+  ],
+  "notes": "Example only."
+}

@@ -1,0 +1,12 @@
+{
+  "schema_version": "aoa_live_observation_run_v1",
+  "run_ref": "live-observations:example",
+  "workspace_root": "/srv/workspace",
+  "producers": [
+    "technique_readiness_watch",
+    "skill_trigger_surface_watch"
+  ],
+  "observation_packet_ref": "observations:live:example",
+  "observation_count": 2,
+  "notes": "example run summary; owner decisions remain outside SDK"
+}

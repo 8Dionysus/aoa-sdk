@@ -75,6 +75,27 @@
           ],
           "title": "Status",
           "type": "string"
+        },
+        "batch_order": {
+          "default": 0,
+          "title": "Batch Order",
+          "type": "integer"
+        },
+        "graph_depth": {
+          "default": 0,
+          "title": "Graph Depth",
+          "type": "integer"
+        },
+        "edge_strength": {
+          "default": "required",
+          "enum": [
+            "required",
+            "recommended",
+            "advisory",
+            "forbidden"
+          ],
+          "title": "Edge Strength",
+          "type": "string"
         }
       },
       "required": [
@@ -86,6 +107,44 @@
         "reason"
       ],
       "title": "PlanStep",
+      "type": "object"
+    },
+    "PropagationBatch": {
+      "additionalProperties": false,
+      "properties": {
+        "batch_ref": {
+          "title": "Batch Ref",
+          "type": "string"
+        },
+        "order": {
+          "title": "Order",
+          "type": "integer"
+        },
+        "step_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Step Refs",
+          "type": "array"
+        },
+        "depends_on_batch_refs": {
+          "items": {
+            "type": "string"
+          },
+          "title": "Depends On Batch Refs",
+          "type": "array"
+        },
+        "rationale": {
+          "default": "",
+          "title": "Rationale",
+          "type": "string"
+        }
+      },
+      "required": [
+        "batch_ref",
+        "order"
+      ],
+      "title": "PropagationBatch",
       "type": "object"
     }
   },
@@ -149,6 +208,25 @@
         "type": "string"
       },
       "title": "Open Questions",
+      "type": "array"
+    },
+    "graph_closure_ref": {
+      "anyOf": [
+        {
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Graph Closure Ref"
+    },
+    "propagation_batches": {
+      "items": {
+        "$ref": "#/$defs/PropagationBatch"
+      },
+      "title": "Propagation Batches",
       "type": "array"
     },
     "summary": {

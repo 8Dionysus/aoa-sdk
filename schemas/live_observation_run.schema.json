@@ -1,0 +1,41 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/live_observation_run.schema.json",
+  "title": "AoA live observation run summary",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "run_ref",
+    "workspace_root",
+    "producers",
+    "observation_packet_ref"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_live_observation_run_v1"
+    },
+    "run_ref": {
+      "type": "string"
+    },
+    "workspace_root": {
+      "type": "string"
+    },
+    "producers": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "observation_packet_ref": {
+      "type": "string"
+    },
+    "observation_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "notes": {
+      "type": "string"
+    }
+  }
+}

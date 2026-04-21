@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/review_decision_close_report.schema.json",
+  "title": "AOA review decision close report",
+  "type": "object",
+  "required": ["schema_version", "report_ref", "workspace_root", "ledger", "suppression_memory"],
+  "properties": {
+    "schema_version": {"const": "aoa_review_decision_close_report_v1"},
+    "report_ref": {"type": "string"},
+    "workspace_root": {"type": "string"},
+    "source_queue_ref": {"type": ["string", "null"]},
+    "decisions": {"type": "array", "items": {"type": "string"}},
+    "ledger": {"type": "object"},
+    "suppression_memory": {"type": "object"},
+    "closed_item_refs": {"type": "array", "items": {"type": "string"}},
+    "unresolved_item_refs": {"type": "array", "items": {"type": "string"}},
+    "suppressed_beacon_refs": {"type": "array", "items": {"type": "string"}},
+    "warnings": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

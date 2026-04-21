@@ -1,0 +1,16 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/downstream-projection-guard-report.schema.json",
+  "title": "AoA downstream projection guard report",
+  "type": "object",
+  "required": ["schema_version", "report_ref", "workspace_root", "violations"],
+  "properties": {
+    "schema_version": {"const": "aoa_downstream_projection_guard_report_v1"},
+    "report_ref": {"type": "string"},
+    "workspace_root": {"type": "string"},
+    "source_packet_refs": {"type": "array", "items": {"type": "string"}},
+    "violations": {"type": "array", "items": {"type": "object"}},
+    "boundary_notes": {"type": "array", "items": {"type": "string"}}
+  },
+  "additionalProperties": false
+}

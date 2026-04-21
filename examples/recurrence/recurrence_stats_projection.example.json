@@ -1,0 +1,13 @@
+{
+  "schema_version": "aoa_recurrence_stats_projection_v1",
+  "projection_ref": "recurrence-stats-projection:example",
+  "workspace_root": "/srv/workspace",
+  "source_packet_refs": ["doctor:example", "beacons:example"],
+  "coverage": {"name": "component_coverage", "total": 4, "by_kind": {}, "by_owner": {"skills": 1}, "by_status": {}, "by_severity": {}},
+  "gaps": {"name": "connectivity_gaps", "total": 1, "by_kind": {"missing_proof_surface": 1}, "by_owner": {"aoa-skills": 1}, "by_status": {}, "by_severity": {"medium": 1}},
+  "beacons": {"name": "beacon_pressure", "total": 1, "by_kind": {"unused_skill_opportunity": 1}, "by_owner": {"aoa-skills": 1}, "by_status": {"watch": 1}, "by_severity": {}},
+  "review": {"name": "review_queue", "total": 1, "by_kind": {"unused_skill_opportunity": 1}, "by_owner": {"aoa-skills": 1}, "by_status": {"watch": 1}, "by_severity": {"medium": 1}},
+  "decisions": {"name": "review_decisions", "total": 0, "by_kind": {}, "by_owner": {}, "by_status": {}, "by_severity": {}},
+  "surface_strength": "derived_observability_only",
+  "boundary_notes": ["aoa-stats receives counts, windows, and movement summaries only."]
+}

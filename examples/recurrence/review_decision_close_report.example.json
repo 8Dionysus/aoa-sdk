@@ -1,0 +1,26 @@
+{
+  "schema_version": "aoa_review_decision_close_report_v1",
+  "report_ref": "review-decision-close:20260421T000000Z",
+  "workspace_root": "/srv/workspace",
+  "source_queue_ref": "review-queue:example",
+  "decisions": ["decision:aoa-skills:skills.unused_skill.activation_gap:20260421T000000Z"],
+  "ledger": {
+    "schema_version": "aoa_review_decision_ledger_v1",
+    "ledger_ref": "review-decision-ledger:20260421T000000Z",
+    "workspace_root": "/srv/workspace",
+    "source_queue_ref": "review-queue:example",
+    "entries": [],
+    "by_decision": {"defer": 1},
+    "by_owner": {"aoa-skills": 1}
+  },
+  "suppression_memory": {
+    "schema_version": "aoa_review_suppression_memory_v1",
+    "memory_ref": "review-suppression-memory:20260421T000000Z",
+    "workspace_root": "/srv/workspace",
+    "rules": []
+  },
+  "closed_item_refs": ["review-item:0001"],
+  "unresolved_item_refs": ["review-item:0002"],
+  "suppressed_beacon_refs": [],
+  "warnings": []
+}
