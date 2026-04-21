@@ -77,7 +77,6 @@
       "uniqueItems": true
     },
     "entry": {
-      "type": "object",
       "additionalProperties": false,
       "properties": {
         "id": {
@@ -151,6 +150,34 @@
         "standing_floor": {
           "type": "string",
           "minLength": 1
+        },
+        "retention_check_types": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "windows": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "statuses": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "mutation_candidate_types": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "triggers": {
+          "$ref": "#/$defs/stringArray"
+        },
+        "rank_ladder": {
+          "$ref": "#/$defs/namedItemArray"
+        },
+        "earned_jurisdictions": {
+          "$ref": "#/$defs/namedItemArray"
+        },
+        "interlocks": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/interlock"
+          }
         }
       },
       "required": [
@@ -163,6 +190,51 @@
         "live_authority",
         "allowed_effect",
         "forbidden_effects"
+      ],
+      "title": "Agon retention rank SDK helper entry",
+      "type": "object"
+    },
+    "namedItemArray": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/namedItem"
+      }
+    },
+    "namedItem": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "id",
+        "description"
+      ]
+    },
+    "interlock": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "when": {
+          "type": "string",
+          "minLength": 1
+        },
+        "may_emit": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "required": [
+        "when",
+        "may_emit"
       ]
     }
   }

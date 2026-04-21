@@ -20,6 +20,7 @@ EXPECTED_COUNT = 7
 UNIQUE_KEY_FIELD = 'helper_id'
 REQUIRED_STOP_LINES = ['no_live_verdict_authority', 'no_durable_scar_write', 'no_retention_execution', 'no_rank_or_trust_mutation', 'no_tree_of_sophia_promotion', 'no_kag_promotion', 'no_hidden_scheduler_action', 'no_assistant_contestant_drift', 'no_auto_doctrine_rewrite', 'no_school_as_authority', 'no_lineage_as_canon', 'no_campaign_as_live_arena', 'no_center_takeover_of_owner_truth']
 REQUIRED_FORBIDDEN = ['live_verdict_authority', 'durable_scar_write', 'retention_execution', 'rank_mutation', 'trust_mutation', 'tree_of_sophia_promotion', 'kag_promotion', 'hidden_scheduler_action', 'assistant_contestant_drift', 'auto_doctrine_rewrite', 'school_authority', 'lineage_canonization', 'live_campaign_arena']
+REQUIRED_FORBIDDEN_ACTIONS = ['execute', 'mutate', 'promote', 'schedule']
 ALLOWED_RUNTIME = ('none', 'candidate_only', 'local_dry_run_candidate_only', 'local_rehearsal_candidate_only')
 ALLOWED_CANONICAL_STATUS = ('non_canonical_candidate', 'not_canon', 'not_applicable')
 
@@ -78,6 +79,14 @@ def validate_item(item: dict[str, Any]) -> str | None:
         return f'{key} canonical_status must remain non-canonical'
     if item.get('review_status') != 'candidate_only':
         return f'{key} review_status must be candidate_only'
+
+    forbidden_action_err = require_string_list(item.get('forbidden_actions'), 'forbidden_actions', key)
+    if forbidden_action_err:
+        return forbidden_action_err
+    forbidden_actions = set(item['forbidden_actions'])
+    for required in REQUIRED_FORBIDDEN_ACTIONS:
+        if required not in forbidden_actions:
+            return f'{key} missing forbidden action {required}'
 
     stop_err = require_string_list(item.get('stop_lines'), 'stop_lines', key)
     if stop_err:

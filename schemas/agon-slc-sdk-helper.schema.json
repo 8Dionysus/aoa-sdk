@@ -26,11 +26,33 @@
       ]
     },
     "forbidden_actions": {
+      "allOf": [
+        {
+          "contains": {
+            "const": "execute"
+          }
+        },
+        {
+          "contains": {
+            "const": "mutate"
+          }
+        },
+        {
+          "contains": {
+            "const": "promote"
+          }
+        },
+        {
+          "contains": {
+            "const": "schedule"
+          }
+        }
+      ],
       "items": {
         "minLength": 1,
         "type": "string"
       },
-      "minItems": 1,
+      "minItems": 4,
       "type": "array",
       "uniqueItems": true
     },
