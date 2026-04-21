@@ -1,0 +1,17 @@
+{
+  "helper_id": "agon.sdk.ccs.preview_closure_eligibility_candidate",
+  "input_preview": {
+    "closure_right_present": false,
+    "evidence_floor_satisfied": true,
+    "no_open_material_contradiction": false,
+    "trace_integrity_satisfied": true
+  },
+  "output_candidate": {
+    "eligible": false,
+    "reasons": [
+      "open_material_contradiction",
+      "actor_lacks_closure_jurisdiction"
+    ]
+  },
+  "runtime_effect": "none"
+}

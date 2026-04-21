@@ -1,0 +1,24 @@
+{
+  "beacon_rules": [
+    "ccs_sdk_helper_drift",
+    "helper_authority_leak"
+  ],
+  "component_id": "component:agon:ccs-sdk-helper-candidates",
+  "observed_surfaces": [
+    "config/agon_ccs_sdk_helper_candidates.seed.json",
+    "generated/agon_ccs_sdk_helper_candidates.min.json"
+  ],
+  "owner_repo": "aoa-sdk",
+  "status": "seeded_pre_protocol_recurrence_component",
+  "stop_lines": [
+    "no_cli_activation",
+    "no_live_arena_session",
+    "no_runtime_state_transition",
+    "no_verdict_authority",
+    "no_closure_grant",
+    "no_live_summon",
+    "no_memory_write",
+    "no_rank_mutation",
+    "no_hidden_scheduler_action"
+  ]
+}

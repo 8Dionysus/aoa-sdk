@@ -1,0 +1,18 @@
+{
+  "component_id": "component:agon:ccs-sdk-helper-candidates",
+  "forbidden_actions": [
+    "open_session",
+    "issue_verdict",
+    "grant_closure",
+    "initiate_summon",
+    "write_memory"
+  ],
+  "hook_binding_set_id": "hooks:agon:ccs-sdk-helper-candidates",
+  "hook_mode": "observe_only",
+  "observation_producers": [
+    "helper_count",
+    "forbidden_effect_coverage",
+    "stop_line_integrity"
+  ],
+  "owner_repo": "aoa-sdk"
+}
