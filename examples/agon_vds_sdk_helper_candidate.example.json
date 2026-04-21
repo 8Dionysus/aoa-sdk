@@ -1,0 +1,12 @@
+{
+  "helper_class": "loader_candidate",
+  "helper_id": "agon.sdk.vds.load_bridge_registry_candidate",
+  "may_emit": [
+    "loaded_registry_view"
+  ],
+  "must_not_emit": [
+    "runtime_state_transition",
+    "live_verdict"
+  ],
+  "reads": "Agents-of-Abyss/generated/agon_vds_bridge_registry.min.json"
+}
