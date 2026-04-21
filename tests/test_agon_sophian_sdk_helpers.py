@@ -7,6 +7,7 @@ import sys
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 GENERATED = ROOT / 'generated/agon_sophian_sdk_helpers.min.json'
 SCRIPT = ROOT / 'scripts/build_agon_sophian_sdk_helpers.py'
+VALIDATOR = ROOT / 'scripts/validate_agon_sophian_sdk_helpers.py'
 EXPECTED_COUNT = 7
 ITEM_KEY = 'sophian_sdk_helper_candidates'
 
@@ -20,4 +21,9 @@ def test_generated_registry_shape():
 
 def test_builder_check():
     result = subprocess.run([sys.executable, str(SCRIPT), '--check'], cwd=str(ROOT), text=True, capture_output=True)
+    assert result.returncode == 0, result.stderr
+
+
+def test_validator():
+    result = subprocess.run([sys.executable, str(VALIDATOR)], cwd=str(ROOT), text=True, capture_output=True)
     assert result.returncode == 0, result.stderr
