@@ -1,0 +1,29 @@
+{
+  "bindings": [
+    {
+      "does_not_emit": [
+        "verdict",
+        "scar",
+        "rank_mutation",
+        "tos_promotion",
+        "kag_canonization"
+      ],
+      "emits": [
+        "recurrence_observation",
+        "owner_review_candidate",
+        "kag_promotion_pressure_candidate"
+      ],
+      "hook_id": "component.agon.wave17.aoa_sdk.drift_watch",
+      "surface_globs": [
+        "generated/agon_kag_sdk_helpers.min.json",
+        "config/agon_kag_sdk_helpers.seed.json",
+        "docs/AGON_KAG_SDK_HELPERS.md",
+        "docs/AGON_KAG_SDK_BOUNDARY.md",
+        "docs/AGON_WAVE17_SDK_LANDING.md"
+      ]
+    }
+  ],
+  "component_id": "component.agon.wave17.aoa_sdk",
+  "hook_binding_set_id": "component.agon.wave17.aoa_sdk.hooks",
+  "wave": "XVII"
+}

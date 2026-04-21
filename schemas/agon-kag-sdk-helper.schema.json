@@ -1,0 +1,110 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "allowed_actions": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "assistant_contestant_allowed": {
+      "const": false
+    },
+    "authority_posture": {
+      "const": "non_authority"
+    },
+    "canonical_status": {
+      "const": "not_canon"
+    },
+    "forbidden_actions": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "forbidden_effects": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "helper_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "helper_status": {
+      "const": "requested_only_candidate"
+    },
+    "kag_status": {
+      "const": "candidate_only"
+    },
+    "live_protocol": {
+      "const": false
+    },
+    "promotion_requires": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "purpose": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "review_status": {
+      "const": "candidate_only"
+    },
+    "runtime_effect": {
+      "enum": [
+        "none",
+        "candidate_only",
+        "local_dry_run_candidate_only",
+        "local_rehearsal_candidate_only"
+      ]
+    },
+    "source_truth_posture": {
+      "const": "owner_retained"
+    },
+    "stop_lines": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "wave": {
+      "const": "XVII"
+    }
+  },
+  "required": [
+    "allowed_actions",
+    "assistant_contestant_allowed",
+    "authority_posture",
+    "canonical_status",
+    "forbidden_actions",
+    "forbidden_effects",
+    "helper_id",
+    "helper_status",
+    "kag_status",
+    "live_protocol",
+    "promotion_requires",
+    "purpose",
+    "review_status",
+    "runtime_effect",
+    "source_truth_posture",
+    "stop_lines",
+    "wave"
+  ],
+  "title": "agon-kag-sdk-helper.schema.json item contract",
+  "type": "object"
+}
