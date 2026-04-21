@@ -1,0 +1,13 @@
+{
+  "activation_status": "candidate_only",
+  "id": "agon.sdk.duel.draft_mechanical_duel_candidate",
+  "purpose": "Draft a mechanical duel local event-log candidate.",
+  "reads": [
+    "actor formation",
+    "session model",
+    "state packet registry"
+  ],
+  "writes": [
+    "local_candidate_only"
+  ]
+}

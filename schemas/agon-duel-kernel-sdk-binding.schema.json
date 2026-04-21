@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "activation_status": {
+      "type": "string"
+    },
+    "id": {
+      "type": "string"
+    },
+    "purpose": {
+      "type": "string"
+    },
+    "reads": {
+      "type": "array"
+    },
+    "writes": {
+      "type": "array"
+    }
+  },
+  "required": [
+    "id",
+    "purpose",
+    "activation_status"
+  ],
+  "title": "Agon Duel Kernel SDK Binding",
+  "type": "object"
+}

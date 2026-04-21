@@ -1,0 +1,14 @@
+{
+  "authority": "observe_only",
+  "component_id": "component:agon:duel-kernel-sdk-bindings",
+  "owner_repo": "aoa-sdk",
+  "recurrence_watch": [
+    "helper_activation_drift",
+    "sdk_authority_leak",
+    "registry_loader_drift"
+  ],
+  "surface_refs": [
+    "generated/agon_duel_kernel_sdk_bindings.min.json",
+    "docs/AGON_DUEL_KERNEL_SDK_BRIDGE.md"
+  ]
+}
