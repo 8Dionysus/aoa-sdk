@@ -1,6 +1,12 @@
 #!/usr/bin/env python3
 from __future__ import annotations
-import argparse, hashlib, json, pathlib, sys
+
+import argparse
+import hashlib
+import json
+import pathlib
+import sys
+
 ROOT = pathlib.Path(__file__).resolve().parents[1]
 SRC = ROOT / 'config/agon_slc_sdk_helpers.seed.json'
 OUT = ROOT / 'generated/agon_slc_sdk_helpers.min.json'
