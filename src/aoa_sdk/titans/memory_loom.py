@@ -31,7 +31,12 @@ DEFAULT_POLICY = {
 
 
 def utc_now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat().replace("+00:00", "Z")
+    return (
+        datetime.now(timezone.utc)
+        .replace(microsecond=0)
+        .isoformat()
+        .replace("+00:00", "Z")
+    )
 
 
 def stable_id(*parts: str) -> str:
@@ -109,7 +114,9 @@ def make_record(
         raise ValueError(f"unknown titan: {titan}")
     text = normalize_text(text)
     now = utc_now()
-    rid = stable_id(titan, kind, text, source_kind, session_id or "", source_ref or "", now)
+    rid = stable_id(
+        titan, kind, text, source_kind, session_id or "", source_ref or "", now
+    )
     return {
         "record_id": rid,
         "created_at": now,
@@ -124,7 +131,9 @@ def make_record(
         "source_ref": source_ref,
         "session_id": session_id,
         "tags": sorted(set(tags or [])),
-        "confidence": confidence if confidence is not None else DEFAULT_POLICY["default_confidence"],
+        "confidence": confidence
+        if confidence is not None
+        else DEFAULT_POLICY["default_confidence"],
         "authority_note": authority_note,
         "lineage": lineage or {},
     }
@@ -136,13 +145,30 @@ def add_record(index: Dict[str, Any], record: Dict[str, Any]) -> Dict[str, Any]:
     return index
 
 
-def ingest_receipt(index: Dict[str, Any], receipt_path: Path, source_kind: str, summary: str | None, tags: List[str]) -> Dict[str, Any]:
+def ingest_receipt(
+    index: Dict[str, Any],
+    receipt_path: Path,
+    source_kind: str,
+    summary: str | None,
+    tags: List[str],
+) -> Dict[str, Any]:
     data = load_json(receipt_path)
-    session_id = str(data.get("session_id") or data.get("id") or data.get("thread_id") or receipt_path.stem)
+    session_id = str(
+        data.get("session_id")
+        or data.get("id")
+        or data.get("thread_id")
+        or receipt_path.stem
+    )
     text_bits = []
     if summary:
         text_bits.append(summary)
-    for key in ("summary", "final_summary", "closure_summary", "operator_note", "title"):
+    for key in (
+        "summary",
+        "final_summary",
+        "closure_summary",
+        "operator_note",
+        "title",
+    ):
         if data.get(key):
             text_bits.append(normalize_text(data[key]))
     if not text_bits:
@@ -163,7 +189,13 @@ def ingest_receipt(index: Dict[str, Any], receipt_path: Path, source_kind: str, 
     return add_record(index, record)
 
 
-def recall(index: Dict[str, Any], query: str, titan: str | None = None, tag: str | None = None, limit: int = 10) -> List[Dict[str, Any]]:
+def recall(
+    index: Dict[str, Any],
+    query: str,
+    titan: str | None = None,
+    tag: str | None = None,
+    limit: int = 10,
+) -> List[Dict[str, Any]]:
     words = [w.lower() for w in re.findall(r"[\w\-]+", query or "")]
     results = []
     for rec in index.get("records", []):
@@ -173,20 +205,33 @@ def recall(index: Dict[str, Any], query: str, titan: str | None = None, tag: str
             continue
         if tag and tag not in rec.get("tags", []):
             continue
-        hay = " ".join([rec.get("text", ""), rec.get("kind", ""), rec.get("source_kind", ""), " ".join(rec.get("tags", []))]).lower()
+        hay = " ".join(
+            [
+                rec.get("text", ""),
+                rec.get("kind", ""),
+                rec.get("source_kind", ""),
+                " ".join(rec.get("tags", [])),
+            ]
+        ).lower()
         score = sum(1 for w in words if w in hay)
         if not words:
             score = 1
         if score > 0:
             item = dict(rec)
             item["recall_score"] = score + float(rec.get("confidence", 0))
-            item["recall_authority_warning"] = "candidate recall; verify owner-repo or source seed before treating as truth"
+            item["recall_authority_warning"] = (
+                "candidate recall; verify owner-repo or source seed before treating as truth"
+            )
             results.append(item)
-    results.sort(key=lambda r: (r.get("recall_score", 0), r.get("created_at", "")), reverse=True)
+    results.sort(
+        key=lambda r: (r.get("recall_score", 0), r.get("created_at", "")), reverse=True
+    )
     return results[:limit]
 
 
-def redact(index: Dict[str, Any], record_id: str, mode: str, reason: str) -> Dict[str, Any]:
+def redact(
+    index: Dict[str, Any], record_id: str, mode: str, reason: str
+) -> Dict[str, Any]:
     if mode not in {"mask", "tombstone"}:
         raise ValueError("mode must be mask or tombstone")
     for rec in index.get("records", []):
@@ -225,7 +270,9 @@ def digest(index: Dict[str, Any]) -> Dict[str, Any]:
             tags[tag] = tags.get(tag, 0) + 1
     recent = sorted(active, key=lambda r: r.get("created_at", ""), reverse=True)[:5]
     d = {
-        "digest_id": stable_id(index.get("workspace", ""), index.get("updated_at", ""), str(len(records))),
+        "digest_id": stable_id(
+            index.get("workspace", ""), index.get("updated_at", ""), str(len(records))
+        ),
         "created_at": utc_now(),
         "authority": "derived_digest",
         "record_count": len(records),
@@ -234,7 +281,20 @@ def digest(index: Dict[str, Any]) -> Dict[str, Any]:
         "by_titan": by_titan,
         "by_kind": by_kind,
         "top_tags": sorted(tags.items(), key=lambda kv: kv[1], reverse=True)[:10],
-        "recent_records": [{k: r.get(k) for k in ("record_id", "created_at", "titan", "kind", "text", "authority_note")} for r in recent],
+        "recent_records": [
+            {
+                k: r.get(k)
+                for k in (
+                    "record_id",
+                    "created_at",
+                    "titan",
+                    "kind",
+                    "text",
+                    "authority_note",
+                )
+            }
+            for r in recent
+        ],
         "warning": "Digest is a derived memory surface, not owner-repo truth.",
     }
     index.setdefault("digests", []).append(d)
@@ -260,9 +320,15 @@ def validate_index(index: Dict[str, Any]) -> List[str]:
             errors.append(f"unknown titan in record {rid}: {rec.get('titan')}")
         if not rec.get("authority_note"):
             errors.append(f"record missing authority_note: {rid}")
-        if rec.get("titan") == "Forge" and rec.get("lineage", {}).get("gate") not in (None, "mutation"):
+        if rec.get("titan") == "Forge" and rec.get("lineage", {}).get("gate") not in (
+            None,
+            "mutation",
+        ):
             errors.append(f"Forge record has wrong gate: {rid}")
-        if rec.get("titan") == "Delta" and rec.get("lineage", {}).get("gate") not in (None, "judgment"):
+        if rec.get("titan") == "Delta" and rec.get("lineage", {}).get("gate") not in (
+            None,
+            "judgment",
+        ):
             errors.append(f"Delta record has wrong gate: {rid}")
     return errors
 
@@ -283,7 +349,18 @@ def cmd_event(args: argparse.Namespace) -> int:
         if expected != "none" and args.gate != expected:
             raise SystemExit(f"{args.titan} requires gate {expected}, got {args.gate}")
         lineage["gate"] = args.gate
-    record = make_record(titan=args.titan, kind=args.kind, text=args.text, source_kind="manual_event", session_id=args.session_id, source_ref=args.source_ref, tags=split_tags(args.tags), confidence=args.confidence, authority_note=args.authority_note, lineage=lineage)
+    record = make_record(
+        titan=args.titan,
+        kind=args.kind,
+        text=args.text,
+        source_kind="manual_event",
+        session_id=args.session_id,
+        source_ref=args.source_ref,
+        tags=split_tags(args.tags),
+        confidence=args.confidence,
+        authority_note=args.authority_note,
+        lineage=lineage,
+    )
     add_record(idx, record)
     save_json(path, idx)
     print(record["record_id"])
@@ -293,7 +370,9 @@ def cmd_event(args: argparse.Namespace) -> int:
 def cmd_ingest(args: argparse.Namespace) -> int:
     path = Path(args.index)
     idx = load_json(path)
-    ingest_receipt(idx, Path(args.receipt), args.source_kind, args.summary, split_tags(args.tags))
+    ingest_receipt(
+        idx, Path(args.receipt), args.source_kind, args.summary, split_tags(args.tags)
+    )
     save_json(path, idx)
     print("ingested")
     return 0
@@ -302,7 +381,13 @@ def cmd_ingest(args: argparse.Namespace) -> int:
 def cmd_recall(args: argparse.Namespace) -> int:
     idx = load_json(Path(args.index))
     results = recall(idx, args.query, args.titan, args.tag, args.limit)
-    print(json.dumps({"query": args.query, "results": results, "authority": "candidate_only"}, indent=2, ensure_ascii=False))
+    print(
+        json.dumps(
+            {"query": args.query, "results": results, "authority": "candidate_only"},
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
     return 0
 
 
@@ -332,7 +417,17 @@ def cmd_validate(args: argparse.Namespace) -> int:
     if errors:
         print(json.dumps({"ok": False, "errors": errors}, indent=2, ensure_ascii=False))
         return 1
-    print(json.dumps({"ok": True, "records": len(idx.get("records", [])), "status": idx.get("status")}, indent=2, ensure_ascii=False))
+    print(
+        json.dumps(
+            {
+                "ok": True,
+                "records": len(idx.get("records", [])),
+                "status": idx.get("status"),
+            },
+            indent=2,
+            ensure_ascii=False,
+        )
+    )
     return 0
 
 

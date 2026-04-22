@@ -41,7 +41,9 @@ def read_json(path: Path) -> Dict[str, Any]:
 
 def write_json(path: Path, data: Dict[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8")
+    path.write_text(
+        json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
+    )
 
 
 def default_receipt(workspace: str, operator: str) -> Dict[str, Any]:
@@ -59,19 +61,28 @@ def default_receipt(workspace: str, operator: str) -> Dict[str, Any]:
             {
                 "at": stamp,
                 "type": "summon",
-                "message": "Atlas, Sentinel, and Mneme summoned. Forge and Delta locked."
+                "message": "Atlas, Sentinel, and Mneme summoned. Forge and Delta locked.",
             }
         ],
         "status": "open",
         "summary": None,
-        "memory_candidates": []
+        "memory_candidates": [],
     }
 
 
 def validate_receipt(receipt: Dict[str, Any]) -> list[str]:
     errors: list[str] = []
 
-    for key in ["version", "receipt_id", "created_at", "workspace", "operator", "cohort", "events", "status"]:
+    for key in [
+        "version",
+        "receipt_id",
+        "created_at",
+        "workspace",
+        "operator",
+        "cohort",
+        "events",
+        "status",
+    ]:
         if key not in receipt:
             errors.append(f"missing key: {key}")
 
@@ -90,7 +101,8 @@ def validate_receipt(receipt: Dict[str, Any]) -> list[str]:
             errors.append(f"{titan} gate must be {required_gate}, got {gate!r}")
         if state.get("state") == "active":
             matching = [
-                event for event in receipt.get("events", [])
+                event
+                for event in receipt.get("events", [])
                 if event.get("type") == "gate"
                 and event.get("agent") == titan
                 and event.get("gate") == required_gate
@@ -117,10 +129,7 @@ def validate_receipt(receipt: Dict[str, Any]) -> list[str]:
 def cmd_roster(args: argparse.Namespace) -> int:
     roster = {
         "version": 1,
-        "cohort": [
-            {"name": name, **state}
-            for name, state in TITANS.items()
-        ],
+        "cohort": [{"name": name, **state} for name, state in TITANS.items()],
         "default_active": ["Atlas", "Sentinel", "Mneme"],
         "locked": REQUIRED_GATES,
     }
@@ -128,7 +137,9 @@ def cmd_roster(args: argparse.Namespace) -> int:
         print(json.dumps(roster, indent=2, ensure_ascii=False))
     else:
         for item in roster["cohort"]:
-            print(f"{item['name']}: {item['role_key']} state={item['state']} gate={item['gate']}")
+            print(
+                f"{item['name']}: {item['role_key']} state={item['state']} gate={item['gate']}"
+            )
     return 0
 
 
@@ -136,7 +147,9 @@ def cmd_summon(args: argparse.Namespace) -> int:
     receipt = default_receipt(args.workspace, args.operator)
     out = Path(args.out)
     if out.exists() and not args.force:
-        raise SystemExit(f"refusing to overwrite existing receipt without --force: {out}")
+        raise SystemExit(
+            f"refusing to overwrite existing receipt without --force: {out}"
+        )
     write_json(out, receipt)
     print(f"wrote {out}")
     return 0
@@ -157,13 +170,15 @@ def cmd_gate(args: argparse.Namespace) -> int:
         raise SystemExit(f"{args.agent} requires {required} gate, got {args.kind}")
 
     receipt["cohort"][args.agent]["state"] = "active"
-    receipt["events"].append({
-        "at": now(),
-        "type": "gate",
-        "agent": args.agent,
-        "gate": args.kind,
-        "message": args.intent,
-    })
+    receipt["events"].append(
+        {
+            "at": now(),
+            "type": "gate",
+            "agent": args.agent,
+            "gate": args.kind,
+            "message": args.intent,
+        }
+    )
 
     errors = validate_receipt(receipt)
     if errors:
@@ -198,7 +213,9 @@ def cmd_closeout(args: argparse.Namespace) -> int:
     receipt["summary"] = args.summary
     if args.memory_candidate:
         receipt.setdefault("memory_candidates", []).extend(args.memory_candidate)
-    receipt["events"].append({"at": receipt["closed_at"], "type": "closeout", "message": args.summary})
+    receipt["events"].append(
+        {"at": receipt["closed_at"], "type": "closeout", "message": args.summary}
+    )
 
     errors = validate_receipt(receipt)
     if errors:
