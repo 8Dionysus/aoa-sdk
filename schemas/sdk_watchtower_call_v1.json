@@ -17,7 +17,17 @@
       "type": "string"
     },
     "inputs": {
-      "type": "object"
+      "type": "object",
+      "required": [
+        "alarm_id"
+      ],
+      "properties": {
+        "alarm_id": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
     },
     "status": {
       "type": "string"
