@@ -1,0 +1,90 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_outputs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 2,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "forbidden_effects": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 8,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "helper_for": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 2,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "helper_id": {
+      "minLength": 1,
+      "type": "string"
+    },
+    "live_protocol": {
+      "const": false
+    },
+    "owner_repo": {
+      "const": "aoa-sdk"
+    },
+    "pipeline_steps": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "minItems": 4,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "runtime_effect": {
+      "enum": [
+        "none",
+        "candidate_only",
+        "local_dry_run_candidate_only"
+      ]
+    },
+    "seed_zip_refs": {
+      "items": {
+        "minLength": 1,
+        "type": "string"
+      },
+      "maxItems": 3,
+      "minItems": 3,
+      "type": "array",
+      "uniqueItems": true
+    },
+    "status": {
+      "const": "requested_only_helper_candidate"
+    },
+    "wave": {
+      "const": "Wave 1"
+    }
+  },
+  "required": [
+    "candidate_outputs",
+    "forbidden_effects",
+    "helper_for",
+    "helper_id",
+    "live_protocol",
+    "owner_repo",
+    "pipeline_steps",
+    "runtime_effect",
+    "seed_zip_refs",
+    "status",
+    "wave"
+  ],
+  "title": "AoA Wave 1 experience capture pipeline helper",
+  "type": "object"
+}

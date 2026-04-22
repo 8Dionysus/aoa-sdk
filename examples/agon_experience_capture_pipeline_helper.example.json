@@ -1,0 +1,38 @@
+{
+  "candidate_outputs": [
+    "capture_pipeline_helper_api",
+    "pilot_record_ingress_packet"
+  ],
+  "forbidden_effects": [
+    "worker_service_launch",
+    "runtime_activation",
+    "certification_flow",
+    "deployment_mutation",
+    "governance_rewrite",
+    "live_protocol_claim",
+    "generated_transport_noise_copying",
+    "cache_spill_copying"
+  ],
+  "helper_for": [
+    "capture_seed_zip_ingress",
+    "pipeline_seed_zip_review"
+  ],
+  "helper_id": "agon.sdk.experience.capture_pipeline.wave1",
+  "live_protocol": false,
+  "owner_repo": "aoa-sdk",
+  "pipeline_steps": [
+    "ingress",
+    "normalize",
+    "validate",
+    "stage",
+    "review"
+  ],
+  "runtime_effect": "candidate_only",
+  "seed_zip_refs": [
+    "/home/dionysus/Загрузки/aoa-experience-mechanic-seed-v0_1.zip",
+    "/home/dionysus/Загрузки/aoa-experience-runtime-capture-seed-v0_2.zip",
+    "/home/dionysus/Загрузки/aoa-experience-pilot-integration-seed-v0_3.zip"
+  ],
+  "status": "requested_only_helper_candidate",
+  "wave": "Wave 1"
+}
