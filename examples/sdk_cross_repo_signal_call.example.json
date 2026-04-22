@@ -1,0 +1,19 @@
+{
+  "schema_version": "1.0",
+  "kind": "sdk_cross_repo_signal_call",
+  "id": "sdk_cross_repo_signal_call.example",
+  "status": "candidate",
+  "summary": "Example sdk_cross_repo_signal_call object for v0.6 federation harvest seed.",
+  "owner_repo": "aoa-sdk",
+  "evidence_refs": [
+    "receipt://v0.6/sdk_cross_repo_signal_call/example"
+  ],
+  "payload": {
+    "method": "emit_cross_repo_signal",
+    "arguments": [
+      "repo",
+      "family",
+      "severity"
+    ]
+  }
+}

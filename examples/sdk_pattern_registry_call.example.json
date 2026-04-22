@@ -1,0 +1,15 @@
+{
+  "schema_version": "1.0",
+  "kind": "sdk_pattern_registry_call",
+  "id": "sdk_pattern_registry_call.example",
+  "status": "candidate",
+  "summary": "Example sdk_pattern_registry_call object for v0.6 federation harvest seed.",
+  "owner_repo": "aoa-sdk",
+  "evidence_refs": [
+    "receipt://v0.6/sdk_pattern_registry_call/example"
+  ],
+  "payload": {
+    "method": "write_shared_pattern",
+    "authority_required": true
+  }
+}
