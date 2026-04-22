@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-04-22T00:00:00Z",
+  "endpoint": "/office-trains",
+  "evidence_refs": [
+    "generated/multi_office_train_clean_flow/release_train.json"
+  ],
+  "id": "sdk_office_train_api_call_v1_example",
+  "kind": "sdk_office_train_api_call_v1",
+  "method": "prepare_release_train",
+  "notes": "Example artifact for sdk_office_train_api_call_v1.",
+  "owner_repo": "aoa-sdk",
+  "status": "draft",
+  "version": "1.1.0"
+}
