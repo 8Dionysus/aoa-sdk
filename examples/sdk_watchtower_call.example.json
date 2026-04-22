@@ -1,0 +1,8 @@
+{
+  "call_id": "sdk.watch.001",
+  "helper": "evaluate_alarm",
+  "inputs": {
+    "alarm_id": "alarm.drift.001"
+  },
+  "status": "ok"
+}

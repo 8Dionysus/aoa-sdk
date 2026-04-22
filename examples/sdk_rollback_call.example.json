@@ -1,0 +1,8 @@
+{
+  "call_id": "sdk.rollback.001",
+  "helper": "execute_safe_rollback",
+  "inputs": {
+    "trigger_id": "rollback.trigger.001"
+  },
+  "status": "ok"
+}

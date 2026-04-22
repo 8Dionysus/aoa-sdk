@@ -1,0 +1,8 @@
+{
+  "call_id": "sdk.deploy.001",
+  "helper": "create_deployment_plan",
+  "inputs": {
+    "release_id": "assistant.notary.1.1.0"
+  },
+  "status": "ok"
+}
