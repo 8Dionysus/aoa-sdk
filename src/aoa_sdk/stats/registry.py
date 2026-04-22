@@ -18,7 +18,7 @@ from ..models import (
     StatsSummarySurface,
 )
 from ..workspace.discovery import Workspace
-from .regrounding import build_regrounding_signal, select_regrounding_surfaces
+from .regrounding import build_regrounding_signal, is_regrounding_intent, select_regrounding_surfaces
 
 
 class StatsAPI:
@@ -142,6 +142,8 @@ class StatsAPI:
         phase: str = "ingress",
         mutation_surface: str = "none",
     ) -> builtin_list[StatsRegroundingSignal]:
+        if not is_regrounding_intent(intent_text):
+            return []
         coverage = self.source_coverage()
         surfaces = select_regrounding_surfaces(
             surfaces=self.summary_catalog(),

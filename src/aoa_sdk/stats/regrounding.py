@@ -110,7 +110,7 @@ def select_regrounding_surfaces(
     intent_text: str = "",
 ) -> list[StatsSummarySurface]:
     intent = intent_text.casefold()
-    if not _is_regrounding_intent(intent):
+    if not is_regrounding_intent(intent):
         return []
 
     tokens = set(re.findall(r"[a-z0-9_-]+", intent))
@@ -121,6 +121,10 @@ def select_regrounding_surfaces(
         if explicit_match or surface.consumer_risk == "high" or surface.name == "source_coverage_summary":
             selected.append(surface)
     return selected
+
+
+def is_regrounding_intent(intent_text: str) -> bool:
+    return _is_regrounding_intent(intent_text.casefold())
 
 
 def _is_regrounding_intent(intent: str) -> bool:

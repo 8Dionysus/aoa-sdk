@@ -475,6 +475,27 @@ def test_surface_detect_raises_stats_regrounding_hints_for_stats_intent(workspac
     assert "coverage_missing_owner_repos" in report.regrounding_reason_codes
 
 
+def test_surface_detect_skips_malformed_stats_for_non_stats_intent(workspace_root: Path) -> None:
+    _install_stats_regrounding_fixture(workspace_root)
+    coverage_path = (
+        workspace_root
+        / "aoa-stats"
+        / "generated"
+        / "source_coverage_summary.min.json"
+    )
+    coverage_path.write_text("{not-json", encoding="utf-8")
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="plan verify a bounded change",
+    )
+
+    assert report.regrounding_hints == []
+    assert report.regrounding_required is False
+
+
 def test_surface_detect_accepts_runtime_seed_and_profile_shortlist_hints(
     workspace_root: Path,
 ) -> None:
