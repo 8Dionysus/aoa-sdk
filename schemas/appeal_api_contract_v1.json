@@ -1,7 +1,7 @@
 {
   "$schema": "https://json-schema.org/draft/2020-12/schema",
-  "$id": "https://aoa.local/aoa-sdk/schemas/governance_api_contract_v1.json",
-  "title": "Governance Api Contract V1",
+  "$id": "https://aoa.local/aoa-sdk/schemas/appeal_api_contract_v1.json",
+  "title": "Appeal Api Contract V1",
   "type": "object",
   "additionalProperties": false,
   "required": [
@@ -73,7 +73,7 @@
     "kind": {
       "type": "string",
       "minLength": 1,
-      "const": "sdk.governance_api_contract"
+      "const": "sdk.appeal_api_contract"
     },
     "notes": {
       "type": "array",

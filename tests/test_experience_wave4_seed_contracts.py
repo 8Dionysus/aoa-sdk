@@ -12,9 +12,11 @@ ROOT = Path(__file__).resolve().parents[1]
 ENUM_ESCAPE_VALUE = "__wave4_not_allowed__"
 
 WAVE4_CONTRACTS = (
+    ('appeal_api_contract', 'appeal_api_contract_v1.json'),
     ('council_api_contract', 'council_api_contract_v1.json'),
     ('governance_api_contract', 'governance_api_contract_v1.json'),
     ('constitution_runtime_api_call_v1', 'constitution_runtime_api_call_v1.json'),
+    ('veto_api_contract', 'veto_api_contract_v1.json'),
 )
 
 
@@ -273,6 +275,20 @@ class ExperienceWave4SeedContractTests(unittest.TestCase):
                         set_path(mutated, path, [""])
                         self.assert_invalid(schema, mutated, f"{stem} empty string array item at {path}")
         self.assertGreater(exercised, 0, "no wave4 array fields were exercised")
+
+    def test_experience_wave4_schemas_reject_empty_decision_refs(self) -> None:
+        exercised = 0
+        for stem, schema_file in WAVE4_CONTRACTS:
+            schema, example = load_contract(stem, schema_file)
+            decision_refs = example.get("decision_refs")
+            if not isinstance(decision_refs, list):
+                continue
+            exercised += 1
+            with self.subTest(stem=stem):
+                mutated = copy.deepcopy(example)
+                mutated["decision_refs"] = []
+                self.assert_invalid(schema, mutated, f"{stem} empty decision_refs")
+        self.assertGreater(exercised, 0, "no wave4 decision_refs arrays were exercised")
 
     def test_experience_wave4_schemas_reject_const_escapes(self) -> None:
         exercised = 0
