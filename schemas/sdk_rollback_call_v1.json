@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "sdk_rollback_call",
+  "type": "object",
+  "description": "sdk_rollback_call schema for AoA experience deployment watchtower v0.5.",
+  "required": [
+    "call_id",
+    "helper",
+    "inputs",
+    "status"
+  ],
+  "properties": {
+    "call_id": {
+      "type": "string"
+    },
+    "helper": {
+      "type": "string"
+    },
+    "inputs": {
+      "type": "object"
+    },
+    "status": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": true
+}

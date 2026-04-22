@@ -1,0 +1,12 @@
+{
+  "id": "sdk.call.cert.gate.001",
+  "kind": "certification_helper_call",
+  "helper": "evaluate_certification_gate",
+  "inputs": [
+    "release_candidate",
+    "regression_run",
+    "rollback_drill",
+    "authority_actor"
+  ],
+  "output": "experience_certification_gate_v1"
+}
