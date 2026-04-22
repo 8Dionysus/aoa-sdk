@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-04-22T00:00:00Z",
+  "endpoint": "/handoff-graphs",
+  "evidence_refs": [
+    "generated/multi_office_train_clean_flow/release_train.json"
+  ],
+  "id": "sdk_handoff_graph_api_call_v1_example",
+  "kind": "sdk_handoff_graph_api_call_v1",
+  "method": "validate_handoff_graph",
+  "notes": "Example artifact for sdk_handoff_graph_api_call_v1.",
+  "owner_repo": "aoa-sdk",
+  "status": "draft",
+  "version": "1.1.0"
+}
