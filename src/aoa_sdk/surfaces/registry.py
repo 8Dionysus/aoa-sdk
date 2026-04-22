@@ -5,7 +5,7 @@ import re
 from pathlib import Path
 from typing import Literal, cast
 
-from ..errors import InvalidSurface, RepoNotFound, SurfaceNotFound
+from ..errors import IncompatibleSurfaceVersion, InvalidSurface, RepoNotFound, SurfaceNotFound
 from ..models import (
     CheckpointLineageHint,
     CheckpointCandidateCluster,
@@ -24,6 +24,7 @@ from ..models import (
 from ..routing.hints import load_owner_layer_shortlist_hints
 from ..skills.detector import detect_skills
 from ..skills.session import load_session
+from ..stats import StatsAPI
 from ..workspace.discovery import Workspace
 from .heuristics import EXPLICIT_LAYER_RULES_BY_TOKEN, HEURISTIC_RULES
 
@@ -134,6 +135,12 @@ class SurfacesAPI:
         active_skill_names = _load_active_skill_names(self.workspace, session_file=session_file)
         shortlist_hints = _load_shortlist_hints(self.workspace) if include_shortlist else []
         skill_receipt_contexts = _load_core_skill_receipt_contexts(self.workspace)
+        regrounding_hints = _load_stats_regrounding_hints(
+            self.workspace,
+            intent_text=intent_text,
+            phase=phase,
+            mutation_surface=mutation_surface,
+        )
         items = _derive_surface_items(
             skill_report=skill_report,
             surface_phase=phase,
@@ -178,6 +185,11 @@ class SurfacesAPI:
             active_skill_names=active_skill_names,
             immediate_skill_dispatch=[item.skill_name for item in skill_report.activate_now],
             items=items,
+            regrounding_hints=regrounding_hints,
+            regrounding_required=any(
+                hint.decision == "reground_required" for hint in regrounding_hints
+            ),
+            regrounding_reason_codes=_regrounding_reason_codes(regrounding_hints),
             checkpoint_should_capture=checkpoint_should_capture,
             candidate_clusters=candidate_clusters,
             promotion_recommendation=_checkpoint_promotion_recommendation(
@@ -1063,6 +1075,30 @@ def _load_shortlist_hints(workspace: Workspace) -> list[RoutingOwnerLayerShortli
         return load_owner_layer_shortlist_hints(workspace)
     except (RepoNotFound, SurfaceNotFound):
         return []
+
+
+def _load_stats_regrounding_hints(
+    workspace: Workspace,
+    *,
+    intent_text: str,
+    phase: str,
+    mutation_surface: str,
+):
+    try:
+        return StatsAPI(workspace).regrounding_signals_for_intent(
+            intent_text=intent_text,
+            phase=phase,
+            mutation_surface=mutation_surface,
+        )
+    except (RepoNotFound, SurfaceNotFound, IncompatibleSurfaceVersion):
+        return []
+
+
+def _regrounding_reason_codes(regrounding_hints) -> list[str]:
+    codes: list[str] = []
+    for hint in regrounding_hints:
+        codes.extend(hint.reason_codes)
+    return list(dict.fromkeys(codes))
 
 
 def _load_core_skill_receipt_contexts(workspace: Workspace) -> dict[str, dict[str, object]]:

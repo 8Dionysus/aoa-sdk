@@ -10,12 +10,15 @@ from ..models import (
     StatsForkCalibration,
     StatsGeneratedFrom,
     StatsObjectSummaryEntry,
+    StatsRegroundingSignal,
     StatsRepeatedWindow,
     StatsRouteProgression,
+    StatsSourceCoverageSummary,
     StatsSurfaceDetectionWindow,
     StatsSummarySurface,
 )
 from ..workspace.discovery import Workspace
+from .regrounding import build_regrounding_signal, select_regrounding_surfaces
 
 
 class StatsAPI:
@@ -107,6 +110,52 @@ class StatsAPI:
     def summary_catalog(self) -> builtin_list[StatsSummarySurface]:
         data = load_surface(self.workspace, "aoa-stats.summary_surface_catalog.min")
         return [StatsSummarySurface.model_validate(item) for item in data.get("surfaces", [])]
+
+    def source_coverage(self) -> StatsSourceCoverageSummary:
+        data = load_surface(self.workspace, "aoa-stats.source_coverage_summary.min")
+        return StatsSourceCoverageSummary.model_validate(data)
+
+    def surface_profile(self, surface_name: str) -> StatsSummarySurface:
+        for surface in self.summary_catalog():
+            if surface.name == surface_name or surface.surface_ref == surface_name:
+                return surface
+        raise RecordNotFound(f"Unknown stats summary surface profile: {surface_name}")
+
+    def regrounding_signal(
+        self,
+        surface_name: str,
+        *,
+        phase: str = "ingress",
+        mutation_surface: str = "none",
+    ) -> StatsRegroundingSignal:
+        return build_regrounding_signal(
+            surface=self.surface_profile(surface_name),
+            coverage=self.source_coverage(),
+            phase=phase,  # type: ignore[arg-type]
+            mutation_surface=mutation_surface,  # type: ignore[arg-type]
+        )
+
+    def regrounding_signals_for_intent(
+        self,
+        *,
+        intent_text: str,
+        phase: str = "ingress",
+        mutation_surface: str = "none",
+    ) -> builtin_list[StatsRegroundingSignal]:
+        coverage = self.source_coverage()
+        surfaces = select_regrounding_surfaces(
+            surfaces=self.summary_catalog(),
+            intent_text=intent_text,
+        )
+        return [
+            build_regrounding_signal(
+                surface=surface,
+                coverage=coverage,
+                phase=phase,  # type: ignore[arg-type]
+                mutation_surface=mutation_surface,  # type: ignore[arg-type]
+            )
+            for surface in surfaces
+        ]
 
     def surface_detection(
         self,

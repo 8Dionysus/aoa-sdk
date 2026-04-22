@@ -71,6 +71,36 @@ class RoutingOwnerLayerShortlistHint(BaseModel):
     ambiguity: Literal["clear", "ambiguous"] = "clear"
 
 
+class RoutingStatsRegroundingAction(BaseModel):
+    verb: str
+    target_repo: str
+    target_ref: str
+
+
+class RoutingStatsRegroundingHint(BaseModel):
+    hint_id: str
+    surface_name: str
+    surface_ref: str | None = None
+    recommended_action: Literal["reground_before_using_stats"]
+    reason_codes: list[str] = Field(default_factory=list)
+    owner_truth_inputs: list[str] = Field(default_factory=list)
+    primary_action: RoutingStatsRegroundingAction
+    fallback_actions: list[RoutingStatsRegroundingAction] = Field(default_factory=list)
+    advisory_only: bool
+    authority_note: str
+
+
+class RoutingStatsRegroundingHintsPayload(BaseModel):
+    schema_version: Literal["aoa_routing_stats_regrounding_hints_v1"]
+    schema_ref: str
+    owner_repo: Literal["aoa-routing"]
+    surface_kind: Literal["stats_regrounding_hints"]
+    source_inputs: list[dict[str, Any]] = Field(default_factory=list)
+    coverage_thin_signal_flags: list[str] = Field(default_factory=list)
+    hints: list[RoutingStatsRegroundingHint] = Field(default_factory=list)
+    boundary_notes: list[str] = Field(default_factory=list)
+
+
 class RegistryEntry(BaseModel):
     kind: str
     id: str
@@ -879,6 +909,11 @@ class StatsSummarySurface(BaseModel):
     schema_ref: str
     primary_question: str
     derivation_rule: str
+    input_posture: str | None = None
+    owner_truth_inputs: list[str] = Field(default_factory=list)
+    authority_ceiling: str | None = None
+    consumer_risk: Literal["low", "medium", "high"] | None = None
+    live_state_capable: bool | None = None
 
     @model_validator(mode="before")
     @classmethod
@@ -893,6 +928,63 @@ class StatsSummarySurface(BaseModel):
         if "path" not in payload and isinstance(legacy_path, str):
             payload["path"] = legacy_path
         return payload
+
+
+class StatsSourceCoverageOwner(BaseModel):
+    owner_repo: str
+    receipt_count: int
+    share_of_total_receipts: float
+    coverage_class: str
+    event_kind_counts: dict[str, int] = Field(default_factory=dict)
+    first_observed_at: str | None = None
+    last_observed_at: str | None = None
+
+
+class StatsSourceCoverageSummary(BaseModel):
+    schema_version: Literal["aoa_stats_source_coverage_summary_v1"]
+    generated_from: StatsGeneratedFrom
+    source_mode: str
+    input_registry_ref: str | None = None
+    expected_owner_repos: list[str] = Field(default_factory=list)
+    missing_owner_repos: list[str] = Field(default_factory=list)
+    unexpected_owner_repos: list[str] = Field(default_factory=list)
+    active_receipt_total: int
+    observed_owner_repo_count: int
+    expected_owner_repo_count: int | None = None
+    owner_repo_counts: dict[str, int] = Field(default_factory=dict)
+    event_kind_counts: dict[str, int] = Field(default_factory=dict)
+    owners: list[StatsSourceCoverageOwner] = Field(default_factory=list)
+    thin_signal_flags: list[str] = Field(default_factory=list)
+
+
+class StatsRegroundingAction(BaseModel):
+    action_ref: str
+    owner_repo: str | None = None
+    target_ref: str
+    action_kind: Literal["inspect_owner_truth", "inspect_source_coverage", "inspect_surface_profile"]
+    reason: str
+
+
+class StatsRegroundingSignal(BaseModel):
+    schema_version: Literal["aoa_stats_regrounding_signal_v1"] = "aoa_stats_regrounding_signal_v1"
+    surface_name: str
+    surface_ref: str | None = None
+    decision: Literal["clear", "reground_recommended", "reground_required"]
+    phase: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"] = "ingress"
+    mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none"
+    reason_codes: list[str] = Field(default_factory=list)
+    source_refs: list[str] = Field(default_factory=list)
+    owner_truth_inputs: list[str] = Field(default_factory=list)
+    authority_ceiling: str | None = None
+    consumer_risk: Literal["low", "medium", "high"] | None = None
+    input_posture: str | None = None
+    live_state_capable: bool | None = None
+    coverage_thin_signal_flags: list[str] = Field(default_factory=list)
+    next_actions: list[StatsRegroundingAction] = Field(default_factory=list)
+    boundary_note: str = (
+        "This signal constrains derived-summary use; it is not an eval verdict "
+        "and does not replace owner-local truth."
+    )
 
 
 class ProjectCoreKernelGovernanceContract(BaseModel):
@@ -1191,6 +1283,9 @@ class SurfaceDetectionReport(BaseModel):
     active_skill_names: list[str] = Field(default_factory=list)
     immediate_skill_dispatch: list[str] = Field(default_factory=list)
     items: list[SurfaceOpportunityItem] = Field(default_factory=list)
+    regrounding_hints: list[StatsRegroundingSignal] = Field(default_factory=list)
+    regrounding_required: bool = False
+    regrounding_reason_codes: list[str] = Field(default_factory=list)
     checkpoint_should_capture: bool = False
     candidate_clusters: list["CheckpointCandidateCluster"] = Field(default_factory=list)
     promotion_recommendation: Literal["none", "local_note", "dionysus_note", "harvest_handoff"] = "none"

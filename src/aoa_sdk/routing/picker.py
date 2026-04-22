@@ -4,12 +4,20 @@ from typing import Any
 
 from ..compatibility import load_surface
 from ..loaders import extract_records, find_record
-from ..models import RegistryEntry, RoutingHint, RoutingOwnerLayerShortlistHint
+from ..models import (
+    RegistryEntry,
+    RoutingHint,
+    RoutingOwnerLayerShortlistHint,
+    RoutingStatsRegroundingHint,
+    RoutingStatsRegroundingHintsPayload,
+)
 from .hints import (
     hint_for_kind,
     load_cross_repo_registry,
     load_owner_layer_shortlist_hints,
     load_routing_hints,
+    load_stats_regrounding_hints,
+    load_stats_regrounding_hints_payload,
     rank_registry_entries,
 )
 
@@ -45,6 +53,23 @@ class RoutingAPI:
         if owner_repo is not None:
             entries = [entry for entry in entries if entry.owner_repo == owner_repo]
         return entries
+
+    def stats_regrounding_hints_payload(self) -> RoutingStatsRegroundingHintsPayload:
+        return load_stats_regrounding_hints_payload(self.workspace)
+
+    def stats_regrounding_hints(
+        self,
+        *,
+        surface_name: str | None = None,
+    ) -> list[RoutingStatsRegroundingHint]:
+        entries = load_stats_regrounding_hints(self.workspace)
+        if surface_name is None:
+            return entries
+        return [
+            entry
+            for entry in entries
+            if surface_name in {entry.surface_name, entry.surface_ref, entry.hint_id}
+        ]
 
     def pick(self, *, kind: str, query: str) -> list[RegistryEntry]:
         hint = hint_for_kind(self.workspace, kind)

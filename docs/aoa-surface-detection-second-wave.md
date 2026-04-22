@@ -12,6 +12,8 @@ The second wave adds three bounded enrichments around the existing
 - richer `surface_detection_context` references preserved from
   `aoa-skills` core-skill receipts
 - descriptive observability from `aoa-stats.surface_detection_summary.min`
+- stats re-grounding hints derived from `aoa-stats` surface profiles and
+  source coverage
 - reviewed checkpoint-note preservation through local session-growth notes and
   closeout handoff references
 
@@ -32,6 +34,14 @@ typed advisory read. It is not a verdict engine.
 - closeout handoff target volume
 - repeated-pattern and promotion-discussion signals
 
+`sdk.stats.regrounding_signal()` reads `source_coverage_summary` and the target
+surface profile as a policy input. In pre-mutation or public-share contexts,
+thin coverage and high-risk profiles can require a re-grounding read before a
+consumer relies on derived stats.
+
+`sdk.routing.stats_regrounding_hints()` exposes router-owned advisory next-read
+hints for those stats surfaces. It is not a verdict engine.
+
 ## Hard Invariants
 
 - `aoa skills ...` stays skill-only
@@ -39,6 +49,7 @@ typed advisory read. It is not a verdict engine.
 - `manual-equivalent` never becomes `activated`
 - non-skill items never enter `immediate_skill_dispatch`
 - routing shortlist hints are advisory only
+- routing stats re-grounding hints are advisory only
 - `aoa-stats` remains descriptive only
 
 ## Example
