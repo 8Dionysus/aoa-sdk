@@ -1,6 +1,13 @@
 from __future__ import annotations
 
-from aoa_sdk.titans.incarnation_spine import gate_titan, new_receipt, validate_gate_payload, validate_memory_record, validate_receipt
+from aoa_sdk.titans.incarnation_spine import (
+    cli,
+    gate_titan,
+    new_receipt,
+    validate_gate_payload,
+    validate_memory_record,
+    validate_receipt,
+)
 
 
 def test_receipt_carries_all_founder_incarnations():
@@ -23,6 +30,31 @@ def test_forge_gate_requires_payload_contract():
 def test_delta_gate_requires_evidence_refs():
     errors = validate_gate_payload("Delta", "judgment", {"claim": "x"})
     assert "Delta gate requires non-empty evidence_refs" in errors
+
+
+def test_gate_payload_rejects_non_object_without_traceback(tmp_path, capsys):
+    receipt = tmp_path / "receipt.json"
+    payload = tmp_path / "payload.json"
+    payload.write_text("[]\n", encoding="utf-8")
+
+    assert cli(["new", "--workspace", "/srv", "--operator", "test", "--out", str(receipt)]) == 0
+    result = cli(
+        [
+            "gate",
+            "--receipt",
+            str(receipt),
+            "--titan",
+            "Forge",
+            "--kind",
+            "mutation",
+            "--payload",
+            str(payload),
+        ]
+    )
+
+    assert result == 2
+    captured = capsys.readouterr()
+    assert "gate payload must be a JSON object" in captured.out
 
 
 def test_memory_record_requires_provenance():

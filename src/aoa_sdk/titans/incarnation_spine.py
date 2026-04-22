@@ -133,8 +133,10 @@ def _non_empty_list(value: Any) -> bool:
     return isinstance(value, list) and bool(value) and all(isinstance(x, str) and x.strip() for x in value)
 
 
-def validate_gate_payload(titan_name: str, gate_kind: str, payload: Mapping[str, Any]) -> list[str]:
+def validate_gate_payload(titan_name: str, gate_kind: str, payload: Any) -> list[str]:
     errors: list[str] = []
+    if not isinstance(payload, Mapping):
+        return ["gate payload must be a JSON object"]
     if titan_name == "Forge":
         if gate_kind != "mutation":
             errors.append("Forge requires mutation gate")
@@ -162,10 +164,11 @@ def validate_gate_payload(titan_name: str, gate_kind: str, payload: Mapping[str,
     return errors
 
 
-def gate_titan(receipt: dict[str, Any], *, titan_name: str, gate_kind: str, payload: Mapping[str, Any], approved_by: str | None = None) -> dict[str, Any]:
+def gate_titan(receipt: dict[str, Any], *, titan_name: str, gate_kind: str, payload: Any, approved_by: str | None = None) -> dict[str, Any]:
     errors = validate_gate_payload(titan_name, gate_kind, payload)
     if errors:
         raise ValueError("; ".join(errors))
+    assert isinstance(payload, Mapping)
     matches = [i for i in receipt.get("incarnations", []) if i.get("titan_name") == titan_name]
     if len(matches) != 1:
         raise ValueError(f"expected exactly one incarnation for {titan_name}")
@@ -276,6 +279,10 @@ def cli(argv: list[str] | None = None) -> int:
     if args.cmd == "gate":
         receipt = read_json(Path(args.receipt))
         payload = read_json(Path(args.payload))
+        errors = validate_gate_payload(args.titan, args.kind, payload)
+        if errors:
+            print(json.dumps({"status": "fail", "errors": errors}, ensure_ascii=False, indent=2))
+            return 2
         write_json(Path(args.receipt), gate_titan(receipt, titan_name=args.titan, gate_kind=args.kind, payload=payload, approved_by=args.approved_by))
         return 0
     if args.cmd == "validate":

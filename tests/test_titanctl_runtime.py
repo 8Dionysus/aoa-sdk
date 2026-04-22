@@ -62,3 +62,19 @@ def test_titanctl_summon_validate_gate_closeout(tmp_path):
     assert data["cohort"]["Delta"]["state"] == "active"
     assert data["gate_events"][0]["payload"]["mutation_surface"]
     assert data["gate_events"][1]["payload"]["evidence_refs"]
+
+
+def test_titanctl_standalone_roster_does_not_import_package_root():
+    script = Path(__file__).resolve().parents[1] / "scripts" / "titanctl.py"
+
+    result = subprocess.run(
+        [sys.executable, "-S", str(script), "roster", "--json"],
+        text=True,
+        stdout=subprocess.PIPE,
+        stderr=subprocess.PIPE,
+        check=False,
+    )
+
+    assert result.returncode == 0, result.stderr
+    data = json.loads(result.stdout)
+    assert data["schema_version"] == "titan_roster/v2"
