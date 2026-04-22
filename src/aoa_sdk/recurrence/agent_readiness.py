@@ -14,6 +14,7 @@ from typing import Any, Dict, List, Optional
 from .recursor_boundary import (
     BOUNDARY_STOP_LINES,
     boundary_status,
+    check_pair_contract,
     check_projection_candidate,
     check_role_contract,
 )
@@ -117,6 +118,8 @@ def build_recursor_readiness_projection(workspace_root: str | Path) -> Dict[str,
         for role in roles.get("roles", []):
             if isinstance(role, dict):
                 violations.extend(check_role_contract(role))
+    if isinstance(pair, dict):
+        violations.extend(check_pair_contract(pair))
     if isinstance(projection, dict):
         violations.extend(check_projection_candidate(projection))
 
