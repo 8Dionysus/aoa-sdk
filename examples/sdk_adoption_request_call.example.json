@@ -1,0 +1,24 @@
+{
+  "schema_id": "sdk_adoption_request_call_v1",
+  "kind": "sdk_adoption_request_call",
+  "version": "1.0",
+  "status": "proposed",
+  "summary": "Example sdk_adoption_request_call object for Experience Adoption Forge v0.7.",
+  "refs": {
+    "source": "experience.shared_pattern_registry",
+    "owner": "aoa-sdk",
+    "related": [
+      "experience.v0.6.federation_harvest",
+      "experience.v0.7.adoption_forge"
+    ]
+  },
+  "payload": {
+    "wave": "v0.7",
+    "repo": "aoa-sdk",
+    "pattern_ref": "pattern.shared.wrong_surface_to_owner_landing.v1",
+    "owner_surface": "aoa-sdk",
+    "requires_owner_consent": true,
+    "rollback_required": true,
+    "retention_cycles": 3
+  }
+}
