@@ -1,7 +1,8 @@
 #!/usr/bin/env python3
-"""titanctl: local Titan runtime receipt and gate seed.
+"""titanctl: local Titan runtime receipt and gate helper.
 
-No external dependencies. This is intentionally small enough to audit.
+The CLI keeps the earlier summon/gate/note/closeout shape, but the persisted
+receipt now uses the Titan incarnation spine v2 contract.
 """
 
 from __future__ import annotations
@@ -9,128 +10,180 @@ from __future__ import annotations
 import argparse
 import json
 import sys
-import uuid
-from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict
+from typing import Any, Dict, Mapping
+
+ROOT = Path(__file__).resolve().parents[1]
+SRC = ROOT / "src"
+if str(SRC) not in sys.path:
+    sys.path.insert(0, str(SRC))
+
+from aoa_sdk.titans.incarnation_spine import (  # noqa: E402
+    DEFAULT_ACTIVE,
+    LOCKED,
+    TITAN_BEARERS,
+    cohort_projection,
+    gate_titan,
+    new_receipt,
+    utc_now,
+    validate_gate_payload,
+    validate_receipt as validate_spine_receipt,
+)
 
 
 TITANS = {
-    "Atlas": {"role_key": "architect", "state": "active", "gate": "none"},
-    "Sentinel": {"role_key": "reviewer", "state": "active", "gate": "none"},
-    "Mneme": {"role_key": "memory-keeper", "state": "active", "gate": "none"},
-    "Forge": {"role_key": "coder", "state": "locked", "gate": "mutation"},
-    "Delta": {"role_key": "evaluator", "state": "locked", "gate": "judgment"},
+    name: {
+        "bearer_id": data["bearer_id"],
+        "role_key": data["role_key"],
+        "role_class": data["role_class"],
+        "state": "locked" if name in LOCKED else "active",
+        "gate": LOCKED.get(name, "none"),
+    }
+    for name, data in TITAN_BEARERS.items()
 }
 
-REQUIRED_GATES = {"Forge": "mutation", "Delta": "judgment"}
-
-
-def now() -> str:
-    return datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+REQUIRED_GATES = dict(LOCKED)
 
 
 def read_json(path: Path) -> Dict[str, Any]:
     try:
-        return json.loads(path.read_text(encoding="utf-8"))
+        data = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         raise SystemExit(f"receipt not found: {path}")
     except json.JSONDecodeError as exc:
         raise SystemExit(f"invalid JSON in {path}: {exc}")
+    if not isinstance(data, dict):
+        raise SystemExit(f"receipt must be a JSON object: {path}")
+    return data
 
 
-def write_json(path: Path, data: Dict[str, Any]) -> None:
+def write_json(path: Path, data: Mapping[str, Any]) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(
         json.dumps(data, indent=2, ensure_ascii=False) + "\n", encoding="utf-8"
     )
 
 
-def default_receipt(workspace: str, operator: str) -> Dict[str, Any]:
-    stamp = now()
-    receipt_id = f"titan-session-{stamp.replace(':', '').replace('+', 'Z')}-{uuid.uuid4().hex[:8]}"
-    return {
-        "version": 1,
-        "receipt_id": receipt_id,
-        "created_at": stamp,
-        "closed_at": None,
-        "workspace": workspace,
-        "operator": operator,
-        "cohort": TITANS,
-        "events": [
-            {
-                "at": stamp,
-                "type": "summon",
-                "message": "Atlas, Sentinel, and Mneme summoned. Forge and Delta locked.",
-            }
-        ],
-        "status": "open",
-        "summary": None,
-        "memory_candidates": [],
+def sync_projection(receipt: Dict[str, Any]) -> Dict[str, Any]:
+    receipt["cohort"] = cohort_projection(receipt)
+    return receipt
+
+
+def append_event(
+    receipt: Dict[str, Any],
+    *,
+    event_type: str,
+    message: str,
+    agent: str | None = None,
+    gate: str | None = None,
+) -> None:
+    event: Dict[str, Any] = {
+        "at": utc_now(),
+        "type": event_type,
+        "message": message,
     }
+    if agent:
+        event["agent"] = agent
+    if gate:
+        event["gate"] = gate
+    receipt.setdefault("events", []).append(event)
 
 
-def validate_receipt(receipt: Dict[str, Any]) -> list[str]:
-    errors: list[str] = []
+def default_receipt(workspace: str, operator: str) -> Dict[str, Any]:
+    receipt = new_receipt(
+        workspace=workspace,
+        operator=operator,
+        source_ref="scripts/titanctl.py:summon",
+    )
+    append_event(
+        receipt,
+        event_type="summon",
+        message=(
+            "Atlas, Sentinel, and Mneme summoned as named Titan incarnations. "
+            "Forge and Delta remain locked behind payload gates."
+        ),
+    )
+    return sync_projection(receipt)
 
-    for key in [
-        "version",
-        "receipt_id",
-        "created_at",
-        "workspace",
-        "operator",
-        "cohort",
-        "events",
-        "status",
-    ]:
-        if key not in receipt:
-            errors.append(f"missing key: {key}")
 
-    if receipt.get("version") != 1:
-        errors.append("version must be 1")
+def validate_receipt(receipt: Mapping[str, Any]) -> list[str]:
+    errors = validate_spine_receipt(receipt)
 
-    cohort = receipt.get("cohort", {})
-    for titan in TITANS:
-        if titan not in cohort:
-            errors.append(f"missing titan: {titan}")
-
-    for titan, required_gate in REQUIRED_GATES.items():
-        state = cohort.get(titan, {})
-        gate = state.get("gate")
-        if gate != required_gate:
-            errors.append(f"{titan} gate must be {required_gate}, got {gate!r}")
-        if state.get("state") == "active":
-            matching = [
-                event
-                for event in receipt.get("events", [])
-                if event.get("type") == "gate"
-                and event.get("agent") == titan
-                and event.get("gate") == required_gate
-            ]
-            if not matching:
-                errors.append(f"{titan} active without recorded {required_gate} gate")
-
-    for titan in ["Atlas", "Sentinel", "Mneme"]:
-        state = cohort.get(titan, {})
-        if state.get("state") != "active":
-            errors.append(f"{titan} should be active in default service cohort")
-        if state.get("gate") != "none":
-            errors.append(f"{titan} gate should be none")
-
-    if receipt.get("status") not in {"open", "closed"}:
-        errors.append("status must be open or closed")
+    if receipt.get("status") not in {"open", "closed", "aborted"}:
+        errors.append("status must be open, closed, or aborted")
 
     if receipt.get("status") == "closed" and not receipt.get("closed_at"):
         errors.append("closed receipt requires closed_at")
 
+    cohort = receipt.get("cohort")
+    if cohort is not None and not isinstance(cohort, Mapping):
+        errors.append("cohort projection must be an object when present")
+
+    by_name = {
+        inc.get("titan_name"): inc
+        for inc in receipt.get("incarnations", [])
+        if isinstance(inc, Mapping)
+    }
+    for titan, required_gate in REQUIRED_GATES.items():
+        inc = by_name.get(titan)
+        if not isinstance(inc, Mapping):
+            continue
+        if inc.get("state") == "active":
+            matching = [
+                event
+                for event in receipt.get("gate_events", [])
+                if event.get("titan_name") == titan
+                and event.get("gate_kind") == required_gate
+            ]
+            if not matching:
+                errors.append(f"{titan} active without recorded {required_gate} gate")
+
+    for titan in DEFAULT_ACTIVE:
+        inc = by_name.get(titan)
+        if isinstance(inc, Mapping) and inc.get("state") != "active":
+            errors.append(f"{titan} should be active in default service cohort")
+
     return errors
+
+
+def read_payload(path: str) -> Dict[str, Any]:
+    payload = read_json(Path(path))
+    if not isinstance(payload, dict):
+        raise SystemExit(f"payload must be a JSON object: {path}")
+    return payload
+
+
+def fallback_gate_payload(args: argparse.Namespace, receipt: Mapping[str, Any]) -> Dict[str, Any]:
+    approval_ref = args.approval_ref or (
+        f"titanctl:{receipt.get('session_id', 'session')}:"
+        f"{args.agent.lower()}:{args.kind}"
+    )
+    intent = args.intent.strip()
+    if args.agent == "Forge":
+        return {
+            "mutation_surface": args.mutation_surface or "operator_declared",
+            "scope": args.scope or [intent],
+            "expected_files": args.expected_file or ["operator-scoped"],
+            "rollback_note": args.rollback_note
+            or f"Rollback the operator-scoped mutation opened by {approval_ref}.",
+            "approval_ref": approval_ref,
+            "test_plan": args.test_plan or ["operator validation"],
+        }
+    if args.agent == "Delta":
+        return {
+            "claim": args.claim or intent,
+            "criteria": args.criterion or ["operator-declared judgment criteria"],
+            "evidence_refs": args.evidence_ref or [approval_ref],
+            "verdict_scope": args.verdict_scope or "operator-declared judgment scope",
+        }
+    raise SystemExit(f"{args.agent} does not accept runtime gates")
 
 
 def cmd_roster(args: argparse.Namespace) -> int:
     roster = {
-        "version": 1,
+        "schema_version": "titan_roster/v2",
         "cohort": [{"name": name, **state} for name, state in TITANS.items()],
-        "default_active": ["Atlas", "Sentinel", "Mneme"],
+        "default_active": list(DEFAULT_ACTIVE),
         "locked": REQUIRED_GATES,
     }
     if args.json:
@@ -138,7 +191,9 @@ def cmd_roster(args: argparse.Namespace) -> int:
     else:
         for item in roster["cohort"]:
             print(
-                f"{item['name']}: {item['role_key']} state={item['state']} gate={item['gate']}"
+                f"{item['name']}: {item['role_key']} "
+                f"bearer={item['bearer_id']} "
+                f"state={item['state']} gate={item['gate']}"
             )
     return 0
 
@@ -169,16 +224,28 @@ def cmd_gate(args: argparse.Namespace) -> int:
     if args.kind != required:
         raise SystemExit(f"{args.agent} requires {required} gate, got {args.kind}")
 
-    receipt["cohort"][args.agent]["state"] = "active"
-    receipt["events"].append(
-        {
-            "at": now(),
-            "type": "gate",
-            "agent": args.agent,
-            "gate": args.kind,
-            "message": args.intent,
-        }
+    payload = read_payload(args.payload) if args.payload else fallback_gate_payload(args, receipt)
+    errors = validate_gate_payload(args.agent, args.kind, payload)
+    if errors:
+        for err in errors:
+            print(f"error: {err}", file=sys.stderr)
+        return 2
+
+    receipt = gate_titan(
+        receipt,
+        titan_name=args.agent,
+        gate_kind=args.kind,
+        payload=payload,
+        approved_by=args.approved_by,
     )
+    append_event(
+        receipt,
+        event_type="gate",
+        agent=args.agent,
+        gate=args.kind,
+        message=args.intent,
+    )
+    sync_projection(receipt)
 
     errors = validate_receipt(receipt)
     if errors:
@@ -196,11 +263,8 @@ def cmd_note(args: argparse.Namespace) -> int:
     receipt = read_json(path)
     if receipt.get("status") != "open":
         raise SystemExit("cannot add note to closed receipt")
-    event = {"at": now(), "type": "note", "message": args.message}
-    if args.agent:
-        event["agent"] = args.agent
-    receipt["events"].append(event)
-    write_json(path, receipt)
+    append_event(receipt, event_type="note", agent=args.agent, message=args.message)
+    write_json(path, sync_projection(receipt))
     print(f"noted {path}")
     return 0
 
@@ -209,13 +273,12 @@ def cmd_closeout(args: argparse.Namespace) -> int:
     path = Path(args.receipt)
     receipt = read_json(path)
     receipt["status"] = "closed"
-    receipt["closed_at"] = now()
+    receipt["closed_at"] = utc_now()
     receipt["summary"] = args.summary
     if args.memory_candidate:
         receipt.setdefault("memory_candidates", []).extend(args.memory_candidate)
-    receipt["events"].append(
-        {"at": receipt["closed_at"], "type": "closeout", "message": args.summary}
-    )
+    append_event(receipt, event_type="closeout", message=args.summary)
+    sync_projection(receipt)
 
     errors = validate_receipt(receipt)
     if errors:
@@ -260,6 +323,18 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--agent", required=True, choices=["Forge", "Delta"])
     p.add_argument("--kind", required=True, choices=["mutation", "judgment"])
     p.add_argument("--intent", required=True)
+    p.add_argument("--payload", help="Path to a structured gate payload JSON object")
+    p.add_argument("--approved-by")
+    p.add_argument("--approval-ref")
+    p.add_argument("--mutation-surface")
+    p.add_argument("--scope", action="append")
+    p.add_argument("--expected-file", action="append")
+    p.add_argument("--rollback-note")
+    p.add_argument("--test-plan", action="append")
+    p.add_argument("--claim")
+    p.add_argument("--criterion", action="append")
+    p.add_argument("--evidence-ref", action="append")
+    p.add_argument("--verdict-scope")
     p.set_defaults(func=cmd_gate)
 
     p = sub.add_parser("note")

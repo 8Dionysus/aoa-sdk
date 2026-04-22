@@ -1,0 +1,65 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_agent_packet.schema.json",
+  "title": "AoA Titan agent packet",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "packet_id",
+    "phase_id",
+    "titan_name",
+    "packet_kind",
+    "source_refs",
+    "summary",
+    "authority"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "titan_agent_packet/v1"
+    },
+    "packet_id": {
+      "type": "string",
+      "pattern": "^packet:"
+    },
+    "phase_id": {
+      "type": "string"
+    },
+    "titan_name": {
+      "enum": [
+        "Atlas",
+        "Sentinel",
+        "Mneme",
+        "Forge",
+        "Delta"
+      ]
+    },
+    "packet_kind": {
+      "enum": [
+        "route_frame",
+        "risk_frame",
+        "provenance_frame",
+        "mutation_frame",
+        "verdict_frame"
+      ]
+    },
+    "source_refs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "summary": {
+      "type": "string"
+    },
+    "authority": {
+      "enum": [
+        "candidate",
+        "evidence_summary",
+        "operator_note"
+      ]
+    }
+  }
+}

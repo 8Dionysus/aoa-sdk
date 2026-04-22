@@ -1,0 +1,11 @@
+{
+  "claim": "The bounded fixture is regression-safe.",
+  "criteria": [
+    "targeted test passes",
+    "schema remains valid"
+  ],
+  "evidence_refs": [
+    "pytest:tests/test_example.py"
+  ],
+  "verdict_scope": "bounded fixture only"
+}

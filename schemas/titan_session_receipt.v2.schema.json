@@ -1,0 +1,68 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_session_receipt.v2.schema.json",
+  "title": "AoA Titan session receipt v2",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "session_id",
+    "workspace",
+    "operator",
+    "created_at",
+    "incarnations",
+    "gate_events",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "titan_session_receipt/v2"
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^titan-session:"
+    },
+    "workspace": {
+      "type": "string"
+    },
+    "operator": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "source_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "incarnations": {
+      "type": "array",
+      "minItems": 5,
+      "maxItems": 5,
+      "items": {
+        "$ref": "titan_incarnation_record.schema.json"
+      }
+    },
+    "gate_events": {
+      "type": "array",
+      "items": {
+        "$ref": "titan_gate_event.schema.json"
+      }
+    },
+    "packets": {
+      "type": "array"
+    },
+    "memory_candidates": {
+      "type": "array"
+    },
+    "status": {
+      "enum": [
+        "open",
+        "closed",
+        "aborted"
+      ]
+    }
+  }
+}

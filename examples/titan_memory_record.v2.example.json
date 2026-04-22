@@ -1,0 +1,13 @@
+{
+  "record_id": "mem:titan:example",
+  "bearer_id": "titan:mneme:founder",
+  "titan_name": "Mneme",
+  "role_key": "memory-keeper",
+  "memory_kind": "lesson_candidate",
+  "claim": "Visible replay must not infer hidden compaction history.",
+  "authority": "candidate",
+  "source_refs": [
+    "current_session_visible_export.md#Compaction-Markers"
+  ],
+  "session_id": "titan-session:example"
+}
