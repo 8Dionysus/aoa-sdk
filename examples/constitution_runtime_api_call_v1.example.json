@@ -1,0 +1,6 @@
+{
+  "actor_id": "codex",
+  "call_id": "api_001",
+  "decision": "denied",
+  "operation": "resolve_authority"
+}
