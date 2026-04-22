@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/aoa-sdk/schemas/constitution_runtime_api_call_v1.json",
+  "title": "constitution_runtime_api_call_v1",
+  "description": "Seed schema for constitution_runtime_api_call_v1 in Experience Constitution Runtime v0.9.",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "actor_id",
+    "call_id",
+    "decision",
+    "operation"
+  ],
+  "properties": {
+    "actor_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "call_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision": {
+      "type": "string",
+      "minLength": 1,
+      "enum": [
+        "denied"
+      ]
+    },
+    "operation": {
+      "type": "string",
+      "minLength": 1
+    }
+  }
+}
