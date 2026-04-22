@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Titan Retention Policy",
+  "type": "object",
+  "required": [
+    "authority",
+    "retention",
+    "redaction_modes"
+  ],
+  "properties": {
+    "authority": {
+      "const": "candidate_only"
+    },
+    "retention": {
+      "type": "string"
+    },
+    "redaction_modes": {
+      "type": "array",
+      "items": {
+        "enum": [
+          "mask",
+          "tombstone"
+        ]
+      }
+    },
+    "max_records": {
+      "type": "integer"
+    }
+  }
+}

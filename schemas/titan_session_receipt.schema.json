@@ -1,0 +1,163 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8dionysus.github.io/schemas/titan_session_receipt.schema.json",
+  "title": "Titan Session Receipt",
+  "type": "object",
+  "required": [
+    "version",
+    "receipt_id",
+    "created_at",
+    "workspace",
+    "operator",
+    "cohort",
+    "events",
+    "status"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "receipt_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "closed_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "workspace": {
+      "type": "string"
+    },
+    "operator": {
+      "type": "string"
+    },
+    "cohort": {
+      "type": "object",
+      "required": [
+        "Atlas",
+        "Sentinel",
+        "Mneme",
+        "Forge",
+        "Delta"
+      ],
+      "properties": {
+        "Atlas": {
+          "$ref": "#/$defs/titanState"
+        },
+        "Sentinel": {
+          "$ref": "#/$defs/titanState"
+        },
+        "Mneme": {
+          "$ref": "#/$defs/titanState"
+        },
+        "Forge": {
+          "$ref": "#/$defs/titanState"
+        },
+        "Delta": {
+          "$ref": "#/$defs/titanState"
+        }
+      },
+      "additionalProperties": false
+    },
+    "events": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/event"
+      }
+    },
+    "status": {
+      "enum": [
+        "open",
+        "closed"
+      ]
+    },
+    "summary": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "memory_candidates": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "$defs": {
+    "titanState": {
+      "type": "object",
+      "required": [
+        "role_key",
+        "state",
+        "gate"
+      ],
+      "properties": {
+        "role_key": {
+          "type": "string"
+        },
+        "state": {
+          "enum": [
+            "active",
+            "locked"
+          ]
+        },
+        "gate": {
+          "enum": [
+            "none",
+            "mutation",
+            "judgment"
+          ]
+        }
+      },
+      "additionalProperties": false
+    },
+    "event": {
+      "type": "object",
+      "required": [
+        "at",
+        "type",
+        "message"
+      ],
+      "properties": {
+        "at": {
+          "type": "string"
+        },
+        "type": {
+          "enum": [
+            "summon",
+            "gate",
+            "closeout",
+            "note",
+            "validation"
+          ]
+        },
+        "agent": {
+          "enum": [
+            "Atlas",
+            "Sentinel",
+            "Mneme",
+            "Forge",
+            "Delta"
+          ]
+        },
+        "gate": {
+          "enum": [
+            "mutation",
+            "judgment"
+          ]
+        },
+        "message": {
+          "type": "string"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

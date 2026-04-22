@@ -1,0 +1,45 @@
+{
+  "version": 1,
+  "receipt_id": "titan-session-example-2026-04-22",
+  "created_at": "2026-04-22T12:00:00Z",
+  "closed_at": null,
+  "workspace": "/srv",
+  "operator": "Dionysus",
+  "cohort": {
+    "Atlas": {
+      "role_key": "architect",
+      "state": "active",
+      "gate": "none"
+    },
+    "Sentinel": {
+      "role_key": "reviewer",
+      "state": "active",
+      "gate": "none"
+    },
+    "Mneme": {
+      "role_key": "memory-keeper",
+      "state": "active",
+      "gate": "none"
+    },
+    "Forge": {
+      "role_key": "coder",
+      "state": "locked",
+      "gate": "mutation"
+    },
+    "Delta": {
+      "role_key": "evaluator",
+      "state": "locked",
+      "gate": "judgment"
+    }
+  },
+  "events": [
+    {
+      "at": "2026-04-22T12:00:00Z",
+      "type": "summon",
+      "message": "Atlas, Sentinel, and Mneme summoned. Forge and Delta locked."
+    }
+  ],
+  "status": "open",
+  "summary": null,
+  "memory_candidates": []
+}

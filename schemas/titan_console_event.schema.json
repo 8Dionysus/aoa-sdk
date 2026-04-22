@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Titan Console Event",
+  "type": "object",
+  "required": [
+    "ts",
+    "actor",
+    "type",
+    "note"
+  ],
+  "properties": {
+    "ts": {
+      "type": "string"
+    },
+    "actor": {
+      "enum": [
+        "operator",
+        "Atlas",
+        "Sentinel",
+        "Mneme",
+        "Forge",
+        "Delta",
+        "console"
+      ]
+    },
+    "type": {
+      "enum": [
+        "observation",
+        "risk",
+        "memory",
+        "mutation",
+        "judgment",
+        "approval",
+        "closeout",
+        "system"
+      ]
+    },
+    "note": {
+      "type": "string"
+    },
+    "metadata": {
+      "type": "object"
+    }
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Titan Operator Approval",
+  "type": "object",
+  "required": [
+    "ts",
+    "titan",
+    "gate",
+    "reason",
+    "approved_by"
+  ],
+  "properties": {
+    "ts": {
+      "type": "string"
+    },
+    "titan": {
+      "enum": [
+        "Forge",
+        "Delta"
+      ]
+    },
+    "gate": {
+      "enum": [
+        "mutation",
+        "judgment"
+      ]
+    },
+    "reason": {
+      "type": "string"
+    },
+    "approved_by": {
+      "type": "string"
+    }
+  }
+}

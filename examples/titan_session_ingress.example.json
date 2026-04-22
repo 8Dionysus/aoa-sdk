@@ -1,0 +1,20 @@
+{
+  "version": 1,
+  "session_kind": "titan_service_cohort",
+  "summon_prompt_ref": "8Dionysus/.codex/prompts/titan-summon.service-cohort.v0.md",
+  "default_roster": [
+    "Atlas",
+    "Sentinel",
+    "Mneme"
+  ],
+  "conditional_roster": {
+    "Forge": "mutation_intent",
+    "Delta": "judgment_intent"
+  },
+  "boundaries": [
+    "no_hidden_arena",
+    "no_silent_mutation",
+    "no_proof_sovereignty",
+    "no_memory_canonization"
+  ]
+}

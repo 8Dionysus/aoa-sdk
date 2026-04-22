@@ -1,0 +1,21 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Titan Recall Result",
+  "type": "object",
+  "required": [
+    "query",
+    "authority",
+    "results"
+  ],
+  "properties": {
+    "query": {
+      "type": "string"
+    },
+    "authority": {
+      "const": "candidate_only"
+    },
+    "results": {
+      "type": "array"
+    }
+  }
+}

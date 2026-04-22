@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Titan Memory Record",
+  "type": "object",
+  "required": [
+    "record_id",
+    "created_at",
+    "status",
+    "titan",
+    "kind",
+    "text",
+    "source_kind",
+    "authority_note"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string"
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "updated_at": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "candidate",
+        "confirmed",
+        "redacted",
+        "tombstone"
+      ]
+    },
+    "titan": {
+      "type": "string",
+      "enum": [
+        "Atlas",
+        "Sentinel",
+        "Mneme",
+        "Forge",
+        "Delta"
+      ]
+    },
+    "role": {
+      "type": "string"
+    },
+    "lane": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "text": {
+      "type": "string"
+    },
+    "source_kind": {
+      "type": "string"
+    },
+    "source_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "session_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "tags": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    },
+    "confidence": {
+      "type": "number"
+    },
+    "authority_note": {
+      "type": "string"
+    },
+    "lineage": {
+      "type": "object"
+    }
+  }
+}

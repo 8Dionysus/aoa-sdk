@@ -34,6 +34,7 @@ Use the shortest route by need:
 - checkpoint-aware session-growth note capture and promotion: `docs/session-growth-checkpoints.md` and `docs/checkpoint-note-promotion.md`
 - antifragility control-plane and closeout contracts: `docs/antifragility-control-plane.md`, `docs/antifragility-closeout-seam.md`, `tests/fixtures/antifragility/stress_dispatch_input.example.json`, `tests/fixtures/antifragility/stress_dispatch_result.example.json`, and `tests/fixtures/antifragility/stress_closeout_manifest.example.json`
 - RPG typed consumer slice: `docs/RPG_SDK_ADDENDUM.md`, `docs/RPG_SURFACE_PATHS.md`, and `src/aoa_sdk/rpg/`
+- Titan runtime harness, operator console, app-server bridge, identity ledger, and Memory Loom control-plane surfaces: `docs/TITAN_RUNTIME_HARNESS.md`, `docs/TITAN_OPERATOR_CONSOLE.md`, `docs/TITAN_APPSERVER_BRIDGE.md`, `docs/TITAN_IDENTITY_LEDGER.md`, `docs/TITAN_MEMORY_LOOM.md`, `src/aoa_sdk/titans/`, and `scripts/titanctl.py`
 - federation effects and obligations: `docs/ecosystem-impact.md`
 - original seed blueprint and historical design context: `docs/blueprint.md`
 - local agent instructions: `AGENTS.md`
@@ -58,6 +59,7 @@ Use the shortest route by need:
 - public support, release scope, and CI tiers: `docs/RELEASE_CI_POSTURE.md`
 - bounded federation release audit and publish helper: `docs/RELEASING.md`, `aoa release audit /srv --phase preflight --all --json`, and `aoa release publish /srv --repo aoa-sdk --dry-run --json`
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
+- Titan runtime and bridge helpers that stay subordinate to role, memory, proof, and owner-repo truth: `src/aoa_sdk/titans/`, `scripts/titanctl.py`, `scripts/titan_console.py`, `scripts/titan_appserver_bridge.py`, `scripts/titan_memory_loom.py`, `scripts/titan_lineage.py`, and `tests/test_titan_*.py`
 - local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - reviewed closeout followthrough hints that stay advisory: `docs/closeout-followthrough-map.md`, `examples/closeout_owner_followthrough_map.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`

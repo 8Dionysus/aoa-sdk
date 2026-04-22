@@ -1,0 +1,4 @@
+{"jsonrpc":"2.0","id":1,"result":{"threadId":"thread-bridge-smoke"}}
+{"method":"turn/started","params":{"threadId":"thread-bridge-smoke","turnId":"turn-bridge-smoke"}}
+{"method":"item/approval/requested","params":{"requestId":"approval-bridge-1","type":"command","summary":"run validation command"}}
+{"method":"item/created","params":{"threadId":"thread-bridge-smoke","turnId":"turn-bridge-smoke","item":{"type":"message","role":"assistant","summary":"Atlas reports structure"}}}

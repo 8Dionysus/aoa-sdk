@@ -1,0 +1,22 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Titan Recall Query",
+  "type": "object",
+  "required": [
+    "query"
+  ],
+  "properties": {
+    "query": {
+      "type": "string"
+    },
+    "titan": {
+      "type": "string"
+    },
+    "tag": {
+      "type": "string"
+    },
+    "limit": {
+      "type": "integer"
+    }
+  }
+}

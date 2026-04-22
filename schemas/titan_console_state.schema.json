@@ -1,0 +1,57 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Titan Console State",
+  "type": "object",
+  "required": [
+    "version",
+    "session_id",
+    "workspace",
+    "operator",
+    "status",
+    "titans",
+    "events",
+    "approvals",
+    "created_at"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "workspace": {
+      "type": "string"
+    },
+    "operator": {
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "open",
+        "closed"
+      ]
+    },
+    "created_at": {
+      "type": "string"
+    },
+    "closed_at": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "titans": {
+      "type": "object"
+    },
+    "events": {
+      "type": "array"
+    },
+    "approvals": {
+      "type": "array"
+    },
+    "digest": {
+      "type": "object"
+    }
+  }
+}

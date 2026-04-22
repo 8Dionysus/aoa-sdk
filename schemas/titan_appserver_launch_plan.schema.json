@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Titan App-Server Launch Plan",
+  "type": "object",
+  "required": [
+    "version",
+    "transport",
+    "messages"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "transport": {
+      "enum": [
+        "stdio",
+        "websocket"
+      ]
+    },
+    "messages": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    }
+  }
+}

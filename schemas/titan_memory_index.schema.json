@@ -1,0 +1,46 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Titan Memory Index",
+  "type": "object",
+  "required": [
+    "version",
+    "kind",
+    "authority",
+    "records",
+    "policy",
+    "status"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer"
+    },
+    "kind": {
+      "const": "titan_memory_index"
+    },
+    "authority": {
+      "const": "candidate_only"
+    },
+    "records": {
+      "type": "array",
+      "items": {
+        "$ref": "titan_memory_record.schema.json"
+      }
+    },
+    "redactions": {
+      "type": "array"
+    },
+    "digests": {
+      "type": "array"
+    },
+    "policy": {
+      "type": "object"
+    },
+    "status": {
+      "type": "string",
+      "enum": [
+        "open",
+        "closed"
+      ]
+    }
+  }
+}
