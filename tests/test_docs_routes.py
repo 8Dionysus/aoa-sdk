@@ -51,6 +51,9 @@ def test_surface_detection_routes_are_documented_as_additive_and_skill_only() ->
     assert "docs/aoa-surface-detection-second-wave.md" in readme
     assert "docs/aoa-surface-detection-heuristics.md" in readme
     assert "docs/aoa-surface-detection-closeout-handoff.md" in readme
+    assert "docs/AGON_WAVE1_EXPERIENCE_CAPTURE_PIPELINE.md" in readme
+    assert "schemas/agon-experience-capture-pipeline-helper.schema.json" in readme
+    assert "examples/agon_experience_capture_pipeline_helper.example.json" in readme
     assert "docs/session-growth-checkpoints.md" in readme
     assert "docs/checkpoint-note-promotion.md" in readme
     assert "It does not make `aoa skills detect/dispatch/enter/guard` mean anything other than skills." in readme

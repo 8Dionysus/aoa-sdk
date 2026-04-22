@@ -37,6 +37,7 @@ Use the shortest route by need:
 - Titan runtime harness, operator console, app-server bridge, identity ledger, and Memory Loom control-plane surfaces: `docs/TITAN_RUNTIME_HARNESS.md`, `docs/TITAN_OPERATOR_CONSOLE.md`, `docs/TITAN_APPSERVER_BRIDGE.md`, `docs/TITAN_IDENTITY_LEDGER.md`, `docs/TITAN_MEMORY_LOOM.md`, `src/aoa_sdk/titans/`, and `scripts/titanctl.py`
 - federation effects and obligations: `docs/ecosystem-impact.md`
 - original seed blueprint and historical design context: `docs/blueprint.md`
+- Wave 1 AoA experience capture/pipeline helper seam: `docs/AGON_WAVE1_EXPERIENCE_CAPTURE_PIPELINE.md`, `schemas/agon-experience-capture-pipeline-helper.schema.json`, and `examples/agon_experience_capture_pipeline_helper.example.json`
 - local agent instructions: `AGENTS.md`
 
 ## Route by need
