@@ -16,6 +16,66 @@ def _surface_item(report: SurfaceDetectionReport, surface_ref: str):
     return next(item for item in report.items if item.surface_ref == surface_ref)
 
 
+def _install_stats_regrounding_fixture(workspace_root: Path) -> None:
+    stats_root = workspace_root / "aoa-stats"
+    generated = stats_root / "generated"
+    generated.mkdir(parents=True, exist_ok=True)
+    (stats_root / "README.md").write_text("# aoa-stats\n", encoding="utf-8")
+    (generated / "summary_surface_catalog.min.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "aoa_stats_summary_surface_catalog_v2",
+                "schema_ref": "schemas/summary-surface-catalog.schema.json",
+                "owner_repo": "aoa-stats",
+                "surface_kind": "runtime_surface",
+                "authority_ref": "docs/ARCHITECTURE.md",
+                "generated_from": {"receipt_input_paths": [], "total_receipts": 1, "latest_observed_at": "2026-04-05T10:00:00Z"},
+                "validation_refs": [],
+                "surfaces": [
+                    {
+                        "name": "surface_detection_summary",
+                        "surface_ref": "generated/surface_detection_summary.min.json",
+                        "schema_ref": "schemas/surface-detection-summary.schema.json",
+                        "primary_question": "What second-wave surface-detection signals are accumulating without turning stats into routing authority?",
+                        "derivation_rule": "aggregate advisory surface_detection_context payloads",
+                        "input_posture": "receipt_backed_live",
+                        "owner_truth_inputs": ["aoa-skills core skill application receipts"],
+                        "authority_ceiling": "Weaker than owner-local route decisions and weaker than aoa-sdk or aoa-routing dispatch surfaces.",
+                        "consumer_risk": "high",
+                        "live_state_capable": True,
+                    }
+                ],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    (generated / "source_coverage_summary.min.json").write_text(
+        json.dumps(
+            {
+                "schema_version": "aoa_stats_source_coverage_summary_v1",
+                "generated_from": {"receipt_input_paths": [], "total_receipts": 1, "latest_observed_at": "2026-04-05T10:00:00Z"},
+                "source_mode": "registry_backed_receipt_feed",
+                "input_registry_ref": "config/live_receipt_sources.json",
+                "expected_owner_repos": ["aoa-skills", "aoa-evals"],
+                "missing_owner_repos": ["aoa-evals"],
+                "unexpected_owner_repos": [],
+                "active_receipt_total": 1,
+                "observed_owner_repo_count": 1,
+                "expected_owner_repo_count": 2,
+                "owner_repo_counts": {"aoa-skills": 1},
+                "event_kind_counts": {"core_skill_application_receipt": 1},
+                "owners": [],
+                "thin_signal_flags": ["missing_owner_repos"],
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+
 def test_surface_detection_and_handoff_models_round_trip(
     workspace_root: Path,
     install_host_skills,
@@ -394,6 +454,46 @@ def test_surface_detect_consumes_owner_layer_shortlist_without_changing_truth(
         "aoa-playbooks.playbook_registry.min",
         "aoa-techniques.technique_promotion_readiness.min",
     }
+
+
+def test_surface_detect_raises_stats_regrounding_hints_for_stats_intent(workspace_root: Path) -> None:
+    _install_stats_regrounding_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="pre-mutation",
+        mutation_surface="code",
+        intent_text="use stats surface_detection_summary before mutation",
+    )
+
+    assert report.regrounding_required is True
+    assert [hint.surface_name for hint in report.regrounding_hints] == [
+        "surface_detection_summary"
+    ]
+    assert report.regrounding_hints[0].decision == "reground_required"
+    assert "coverage_missing_owner_repos" in report.regrounding_reason_codes
+
+
+def test_surface_detect_skips_malformed_stats_for_non_stats_intent(workspace_root: Path) -> None:
+    _install_stats_regrounding_fixture(workspace_root)
+    coverage_path = (
+        workspace_root
+        / "aoa-stats"
+        / "generated"
+        / "source_coverage_summary.min.json"
+    )
+    coverage_path.write_text("{not-json", encoding="utf-8")
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="plan verify a bounded change",
+    )
+
+    assert report.regrounding_hints == []
+    assert report.regrounding_required is False
 
 
 def test_surface_detect_accepts_runtime_seed_and_profile_shortlist_hints(

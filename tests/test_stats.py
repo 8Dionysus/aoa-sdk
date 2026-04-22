@@ -165,8 +165,50 @@ def install_stats_fixture(workspace_root: Path) -> Path:
                     "schema_ref": "schemas/surface-detection-summary.schema.json",
                     "primary_question": "What second-wave surface-detection signals are accumulating without turning stats into routing authority?",
                     "derivation_rule": "aggregate advisory surface_detection_context payloads on finish-stage core_skill_application_receipt envelopes by observed date",
-                }
+                },
+                {
+                    "name": "source_coverage_summary",
+                    "path": "generated/source_coverage_summary.min.json",
+                    "schema_ref": "schemas/source-coverage-summary.schema.json",
+                    "primary_question": "Which owner repos and receipt families are actually entering the active stats feed, and where is the stats layer still blind?",
+                    "derivation_rule": "aggregate active receipts by object_ref.repo and event_kind, then compare observed owners against the configured live source registry when present",
+                },
             ],
+        },
+        "source_coverage_summary.min.json": {
+            "schema_version": "aoa_stats_source_coverage_summary_v1",
+            "generated_from": generated_from,
+            "source_mode": "registry_backed_receipt_feed",
+            "input_registry_ref": "config/live_receipt_sources.json",
+            "expected_owner_repos": ["aoa-evals", "aoa-skills"],
+            "missing_owner_repos": [],
+            "unexpected_owner_repos": [],
+            "active_receipt_total": 2,
+            "observed_owner_repo_count": 2,
+            "expected_owner_repo_count": 2,
+            "owner_repo_counts": {"aoa-evals": 1, "aoa-skills": 1},
+            "event_kind_counts": {"eval_result_receipt": 1, "harvest_packet_receipt": 1},
+            "owners": [
+                {
+                    "owner_repo": "aoa-evals",
+                    "receipt_count": 1,
+                    "share_of_total_receipts": 0.5,
+                    "coverage_class": "active",
+                    "event_kind_counts": {"eval_result_receipt": 1},
+                    "first_observed_at": "2026-04-05T10:35:00Z",
+                    "last_observed_at": "2026-04-05T10:35:00Z",
+                },
+                {
+                    "owner_repo": "aoa-skills",
+                    "receipt_count": 1,
+                    "share_of_total_receipts": 0.5,
+                    "coverage_class": "active",
+                    "event_kind_counts": {"harvest_packet_receipt": 1},
+                    "first_observed_at": "2026-04-05T10:20:00Z",
+                    "last_observed_at": "2026-04-05T10:20:00Z",
+                },
+            ],
+            "thin_signal_flags": [],
         },
         "surface_detection_summary.min.json": {
             "schema_version": "aoa_stats_surface_detection_summary_v1",
@@ -246,6 +288,29 @@ def install_stats_fixture(workspace_root: Path) -> Path:
     )
     for entry in live_catalog["surfaces"]:
         entry.pop("path", None)
+        if entry["name"] == "surface_detection_summary":
+            entry.update(
+                {
+                    "input_posture": "receipt_backed_live",
+                    "owner_truth_inputs": ["aoa-skills core skill application receipts"],
+                    "authority_ceiling": "Weaker than owner-local route decisions and weaker than aoa-sdk or aoa-routing dispatch surfaces.",
+                    "consumer_risk": "high",
+                    "live_state_capable": True,
+                }
+            )
+        elif entry["name"] == "source_coverage_summary":
+            entry.update(
+                {
+                    "input_posture": "registry_backed_coverage_audit",
+                    "owner_truth_inputs": [
+                        "config/live_receipt_sources.json",
+                        "owner-local receipts across the active registry",
+                    ],
+                    "authority_ceiling": "Weaker than the owner-local receipt logs and weaker than the live source registry it audits.",
+                    "consumer_risk": "medium",
+                    "live_state_capable": True,
+                }
+            )
     live_surface_detection = dict(live_surfaces["surface_detection_summary.min.json"])
     live_surface_detection["generated_from"] = live_generated_from
     live_surface_detection["windows"] = [
@@ -296,6 +361,16 @@ def install_stats_fixture(workspace_root: Path) -> Path:
     live_route["generated_from"] = live_generated_from
     live_fork = dict(live_surfaces["fork_calibration_summary.min.json"])
     live_fork["generated_from"] = live_generated_from
+    live_source_coverage = dict(live_surfaces["source_coverage_summary.min.json"])
+    live_source_coverage.update(
+        {
+            "generated_from": live_generated_from,
+            "missing_owner_repos": ["aoa-memo"],
+            "active_receipt_total": 3,
+            "owner_repo_counts": {"aoa-evals": 1, "aoa-skills": 2},
+            "thin_signal_flags": ["missing_owner_repos"],
+        }
+    )
     for name, payload in {
         "object_summary.min.json": live_object_summary,
         "core_skill_application_summary.min.json": live_core_skill,
@@ -303,6 +378,7 @@ def install_stats_fixture(workspace_root: Path) -> Path:
         "route_progression_summary.min.json": live_route,
         "fork_calibration_summary.min.json": live_fork,
         "automation_pipeline_summary.min.json": live_automation,
+        "source_coverage_summary.min.json": live_source_coverage,
         "surface_detection_summary.min.json": live_surface_detection,
         "summary_surface_catalog.min.json": live_catalog,
     }.items():
@@ -325,13 +401,17 @@ def test_stats_api_reads_generated_surfaces(workspace_root: Path) -> None:
     assert {item.name for item in sdk.stats.summary_catalog()} == {
         "automation_pipeline_summary",
         "core_skill_application_summary",
+        "source_coverage_summary",
         "surface_detection_summary",
     }
     assert {item.surface_ref for item in sdk.stats.summary_catalog()} == {
         "generated/automation_pipeline_summary.min.json",
         "generated/core_skill_application_summary.min.json",
+        "generated/source_coverage_summary.min.json",
         "generated/surface_detection_summary.min.json",
     }
+    assert sdk.stats.source_coverage().thin_signal_flags == ["missing_owner_repos"]
+    assert sdk.stats.surface_profile("surface_detection_summary").consumer_risk == "high"
 
 
 def test_stats_compatibility_checks_green_when_repo_is_present(workspace_root: Path) -> None:
@@ -356,6 +436,10 @@ def test_stats_compatibility_checks_green_when_repo_is_present(workspace_root: P
     assert (
         report["aoa-stats.surface_detection_summary.min"].detected_version
         == "aoa_stats_surface_detection_summary_v1"
+    )
+    assert (
+        report["aoa-stats.source_coverage_summary.min"].detected_version
+        == "aoa_stats_source_coverage_summary_v1"
     )
     assert report["aoa-stats.summary_surface_catalog.min"].compatible is True
     assert (
@@ -383,4 +467,48 @@ def test_stats_catalog_legacy_v1_remains_readable_without_state_override(workspa
         "generated/core_skill_application_summary.min.json",
         "generated/automation_pipeline_summary.min.json",
         "generated/surface_detection_summary.min.json",
+        "generated/source_coverage_summary.min.json",
     ]
+
+
+def test_stats_regrounding_signal_requires_regrounding_for_thin_premutation(workspace_root: Path) -> None:
+    install_stats_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    signal = sdk.stats.regrounding_signal(
+        "surface_detection_summary",
+        phase="pre-mutation",
+        mutation_surface="code",
+    )
+
+    assert signal.decision == "reground_required"
+    assert "high_consumer_risk" in signal.reason_codes
+    assert "coverage_missing_owner_repos" in signal.reason_codes
+    assert signal.owner_truth_inputs == ["aoa-skills core skill application receipts"]
+    assert {action.action_kind for action in signal.next_actions} >= {
+        "inspect_surface_profile",
+        "inspect_source_coverage",
+        "inspect_owner_truth",
+    }
+
+
+def test_stats_regrounding_signal_stays_clear_for_low_risk_healthy_feed(workspace_root: Path) -> None:
+    install_stats_fixture(workspace_root)
+    coverage_path = workspace_root / "aoa-stats" / "state" / "generated" / "source_coverage_summary.min.json"
+    coverage = json.loads(coverage_path.read_text(encoding="utf-8"))
+    coverage["thin_signal_flags"] = []
+    coverage["missing_owner_repos"] = []
+    coverage_path.write_text(json.dumps(coverage, indent=2) + "\n", encoding="utf-8")
+    catalog_path = workspace_root / "aoa-stats" / "state" / "generated" / "summary_surface_catalog.min.json"
+    catalog = json.loads(catalog_path.read_text(encoding="utf-8"))
+    for surface in catalog["surfaces"]:
+        if surface["name"] == "source_coverage_summary":
+            surface["consumer_risk"] = "low"
+    catalog_path.write_text(json.dumps(catalog, indent=2) + "\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    signal = sdk.stats.regrounding_signal("source_coverage_summary")
+
+    assert signal.decision == "clear"
+    assert signal.reason_codes == []

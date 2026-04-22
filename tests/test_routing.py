@@ -29,3 +29,19 @@ def test_inspect_and_expand_skill_use_routing_hints(workspace_root: Path) -> Non
         "verification",
     ]
     assert [section["key"] for section in verification_only["sections"]] == ["verification"]
+
+
+def test_stats_regrounding_hints_read_routing_advisory_surface(workspace_root: Path) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    payload = sdk.routing.stats_regrounding_hints_payload()
+    hints = sdk.routing.stats_regrounding_hints(
+        surface_name="core_skill_application_summary",
+    )
+
+    assert payload.coverage_thin_signal_flags == []
+    assert [hint.hint_id for hint in hints] == [
+        "stats-reground:core_skill_application_summary",
+    ]
+    assert hints[0].advisory_only is True
+    assert hints[0].primary_action.target_repo == "aoa-skills"

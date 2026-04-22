@@ -195,6 +195,19 @@ def _print_surface_detection_report(report: SurfaceDetectionReport) -> None:
         "immediate_skill_dispatch: "
         f"{', '.join(report.immediate_skill_dispatch) if report.immediate_skill_dispatch else 'none'}"
     )
+    typer.echo(f"regrounding_required: {'yes' if report.regrounding_required else 'no'}")
+    if report.regrounding_hints:
+        typer.echo("regrounding_hints:")
+        for hint in report.regrounding_hints:
+            typer.echo(f"  - {hint.surface_name}: {hint.decision}")
+            typer.echo(
+                "    reason_codes: "
+                f"{', '.join(hint.reason_codes) if hint.reason_codes else 'none'}"
+            )
+            if hint.owner_truth_inputs:
+                typer.echo(f"    owner_truth_inputs: {', '.join(hint.owner_truth_inputs)}")
+    else:
+        typer.echo("regrounding_hints: none")
     if report.phase == "checkpoint":
         typer.echo(f"checkpoint_kind: {report.checkpoint_kind or 'none'}")
         typer.echo(f"checkpoint_should_capture: {'yes' if report.checkpoint_should_capture else 'no'}")

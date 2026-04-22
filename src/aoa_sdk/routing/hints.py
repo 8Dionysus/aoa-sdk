@@ -5,7 +5,13 @@ import re
 from ..compatibility import load_surface
 from ..errors import UnknownKind
 from ..loaders import extract_records
-from ..models import RegistryEntry, RoutingHint, RoutingOwnerLayerShortlistHint
+from ..models import (
+    RegistryEntry,
+    RoutingHint,
+    RoutingOwnerLayerShortlistHint,
+    RoutingStatsRegroundingHint,
+    RoutingStatsRegroundingHintsPayload,
+)
 from ..workspace.discovery import Workspace
 
 
@@ -23,6 +29,15 @@ def load_cross_repo_registry(workspace: Workspace) -> list[RegistryEntry]:
 def load_owner_layer_shortlist_hints(workspace: Workspace) -> list[RoutingOwnerLayerShortlistHint]:
     data = load_surface(workspace, "aoa-routing.owner_layer_shortlist.min")
     return [RoutingOwnerLayerShortlistHint.model_validate(item) for item in data.get("hints", [])]
+
+
+def load_stats_regrounding_hints_payload(workspace: Workspace) -> RoutingStatsRegroundingHintsPayload:
+    data = load_surface(workspace, "aoa-routing.stats_regrounding_hints.min")
+    return RoutingStatsRegroundingHintsPayload.model_validate(data)
+
+
+def load_stats_regrounding_hints(workspace: Workspace) -> list[RoutingStatsRegroundingHint]:
+    return load_stats_regrounding_hints_payload(workspace).hints
 
 
 def hint_for_kind(workspace: Workspace, kind: str) -> RoutingHint:

@@ -68,6 +68,7 @@ Use the shortest route by need:
 - checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, `aoa checkpoint mark/append/after-commit/review-note/status/promote`, `aoa checkpoint install-hook`, `aoa checkpoint hook-status`, the auto checkpoint bridge on `aoa skills guard`, and the explicit `aoa skills enter --checkpoint-kind` / `--append-note` overrides
 - explicit checkpoint-to-closeout bridge orchestration: `docs/session-growth-checkpoints.md`, `docs/session-closeout.md`, `aoa checkpoint build-closeout-context`, and `aoa checkpoint execute-closeout-chain`
 - second-wave shortlist, receipt-context, and observability seams that stay advisory: `docs/aoa-surface-detection-second-wave.md`, `sdk.routing.owner_layer_shortlist()`, and `sdk.stats.surface_detection()`
+- stats-driven re-grounding policy: `docs/STATS_REGROUNDING_POLICY.md`, `sdk.stats.source_coverage()`, `sdk.stats.surface_profile()`, `sdk.stats.regrounding_signal()`, and `sdk.routing.stats_regrounding_hints()`
 - antifragility stress-context doctrine and fixtures that stay narrowing-only: `docs/antifragility-control-plane.md`, `docs/antifragility-closeout-seam.md`, `tests/fixtures/antifragility/stress_dispatch_input.example.json`, `tests/fixtures/antifragility/stress_dispatch_result.example.json`, and `tests/fixtures/antifragility/stress_closeout_manifest.example.json`
 - via negativa pruning checklist: `docs/VIA_NEGATIVA_CHECKLIST.md`
 - deterministic first-wave heuristics for proof, recall, recurring routes, role posture, and repeated practice: `docs/aoa-surface-detection-heuristics.md` and `src/aoa_sdk/surfaces/heuristics.py`
@@ -196,6 +197,14 @@ surface_report = sdk.surfaces.detect(
     repo_root="/srv/aoa-sdk",
     phase="ingress",
     intent_text="verify recurring handoff proof",
+)
+stats_signal = sdk.stats.regrounding_signal(
+    "surface_detection_summary",
+    phase="pre-mutation",
+    mutation_surface="code",
+)
+stats_route_hints = sdk.routing.stats_regrounding_hints(
+    surface_name="surface_detection_summary",
 )
 checkpoint_report = sdk.surfaces.detect(
     repo_root="/srv/aoa-sdk",

@@ -88,6 +88,7 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-routing.federation_entrypoints.min"].compatible is True
     assert report["aoa-routing.return_navigation_hints.min"].compatible is True
     assert report["aoa-routing.owner_layer_shortlist.min"].compatible is True
+    assert report["aoa-routing.stats_regrounding_hints.min"].compatible is True
     assert report["Dionysus.seed_route_map.min"].compatible is True
     assert report["8Dionysus.public_route_map.min"].compatible is True
     assert report["Agents-of-Abyss.center_entry_map.min"].compatible is True
@@ -121,6 +122,10 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-evals.runtime_candidate_template_index.min"].compatible is True
     assert report["aoa-evals.runtime_candidate_intake.min"].detected_version == 1
     assert report["aoa-evals.runtime_candidate_intake.min"].compatible is True
+    assert (
+        report["aoa-stats.source_coverage_summary.min"].detected_version
+        == "aoa_stats_source_coverage_summary_v1"
+    )
     assert report["aoa-skills.project_core_skill_kernel.min"].detected_version == 1
     assert report["aoa-skills.project_core_skill_kernel.min"].compatible is True
     assert report["aoa-skills.project_foundation_profile.min"].detected_version == 1
@@ -222,6 +227,7 @@ def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surf
     assert routing_checks["aoa-routing.federation_entrypoints.min"].compatible is True
     assert routing_checks["aoa-routing.return_navigation_hints.min"].compatible is True
     assert routing_checks["aoa-routing.owner_layer_shortlist.min"].compatible is True
+    assert routing_checks["aoa-routing.stats_regrounding_hints.min"].compatible is True
     assert agent_checks["aoa-agents.codex_projection_manifest"].detected_version == 2
     assert agent_checks["aoa-agents.codex_projection_manifest"].compatible is True
     assert aoa_center_checks["Agents-of-Abyss.center_entry_map.min"].compatible is True

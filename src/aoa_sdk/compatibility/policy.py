@@ -27,6 +27,13 @@ SURFACE_COMPATIBILITY_RULES = {
         version_field="schema_version",
         supported_versions=[1, "aoa_routing_owner_layer_shortlist_v2"],
     ),
+    "aoa-routing.stats_regrounding_hints.min": SurfaceCompatibilityRule(
+        surface_id="aoa-routing.stats_regrounding_hints.min",
+        repo="aoa-routing",
+        relative_path="generated/stats_regrounding_hints.min.json",
+        version_field="schema_version",
+        supported_versions=["aoa_routing_stats_regrounding_hints_v1"],
+    ),
     "aoa-routing.federation_entrypoints.min": SurfaceCompatibilityRule(
         surface_id="aoa-routing.federation_entrypoints.min",
         repo="aoa-routing",
@@ -490,6 +497,14 @@ SURFACE_COMPATIBILITY_RULES = {
         preferred_relative_paths=["state/generated/surface_detection_summary.min.json"],
         version_field="schema_version",
         supported_versions=["aoa_stats_surface_detection_summary_v1"],
+    ),
+    "aoa-stats.source_coverage_summary.min": SurfaceCompatibilityRule(
+        surface_id="aoa-stats.source_coverage_summary.min",
+        repo="aoa-stats",
+        relative_path="generated/source_coverage_summary.min.json",
+        preferred_relative_paths=["state/generated/source_coverage_summary.min.json"],
+        version_field="schema_version",
+        supported_versions=["aoa_stats_source_coverage_summary_v1"],
     ),
     "aoa-stats.summary_surface_catalog.min": SurfaceCompatibilityRule(
         surface_id="aoa-stats.summary_surface_catalog.min",
