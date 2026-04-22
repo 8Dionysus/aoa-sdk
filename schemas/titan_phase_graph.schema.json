@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_phase_graph.schema.json",
+  "title": "AoA Titan phase graph",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "phase_graph_id",
+    "source_ref",
+    "visible_only",
+    "counts",
+    "phases"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "titan_phase_graph/v1"
+    },
+    "phase_graph_id": {
+      "type": "string"
+    },
+    "source_ref": {
+      "type": "string"
+    },
+    "visible_only": {
+      "const": true
+    },
+    "counts": {
+      "type": "object"
+    },
+    "phases": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "phase_id",
+          "kind",
+          "evidence_refs",
+          "summary"
+        ]
+      }
+    }
+  }
+}

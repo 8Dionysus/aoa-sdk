@@ -1,0 +1,93 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_memory_record.v2.schema.json",
+  "title": "AoA Titan memory record v2",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "record_id",
+    "bearer_id",
+    "titan_name",
+    "role_key",
+    "memory_kind",
+    "claim",
+    "authority"
+  ],
+  "properties": {
+    "record_id": {
+      "type": "string"
+    },
+    "bearer_id": {
+      "type": "string",
+      "pattern": "^titan:"
+    },
+    "titan_name": {
+      "enum": [
+        "Atlas",
+        "Sentinel",
+        "Mneme",
+        "Forge",
+        "Delta"
+      ]
+    },
+    "role_key": {
+      "type": "string"
+    },
+    "memory_kind": {
+      "enum": [
+        "session_fact",
+        "lesson_candidate",
+        "route_variant",
+        "risk_pattern",
+        "repair_recipe",
+        "proof_gap",
+        "lineage_event"
+      ]
+    },
+    "claim": {
+      "type": "string",
+      "minLength": 1
+    },
+    "authority": {
+      "enum": [
+        "candidate",
+        "route_to_source"
+      ]
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "receipt_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    }
+  },
+  "anyOf": [
+    {
+      "required": [
+        "source_refs"
+      ],
+      "properties": {
+        "source_refs": {
+          "minItems": 1
+        }
+      }
+    },
+    {
+      "required": [
+        "receipt_id"
+      ]
+    },
+    {
+      "required": [
+        "session_id"
+      ]
+    }
+  ]
+}

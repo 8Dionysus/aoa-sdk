@@ -48,6 +48,17 @@ def test_titanctl_summon_validate_gate_closeout(tmp_path):
     assert result.returncode == 0, result.stderr
 
     data = json.loads(receipt.read_text())
+    assert data["schema_version"] == "titan_session_receipt/v2"
     assert data["status"] == "closed"
+    assert {i["titan_name"] for i in data["incarnations"]} == {
+        "Atlas",
+        "Sentinel",
+        "Mneme",
+        "Forge",
+        "Delta",
+    }
+    assert data["cohort"]["Atlas"]["bearer_id"] == "titan:atlas:founder"
     assert data["cohort"]["Forge"]["state"] == "active"
     assert data["cohort"]["Delta"]["state"] == "active"
+    assert data["gate_events"][0]["payload"]["mutation_surface"]
+    assert data["gate_events"][1]["payload"]["evidence_refs"]

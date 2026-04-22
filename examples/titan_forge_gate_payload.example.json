@@ -1,0 +1,15 @@
+{
+  "mutation_surface": "aoa-sdk/scripts",
+  "scope": [
+    "add bounded fixture"
+  ],
+  "expected_files": [
+    "scripts/example.py",
+    "tests/test_example.py"
+  ],
+  "rollback_note": "Revert the single implementation commit.",
+  "approval_ref": "operator:approved:example",
+  "test_plan": [
+    "python -m pytest -q tests/test_example.py"
+  ]
+}

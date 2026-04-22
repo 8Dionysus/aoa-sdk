@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_incarnation_record.schema.json",
+  "title": "AoA Titan incarnation record",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "incarnation_id",
+    "session_id",
+    "bearer_id",
+    "titan_name",
+    "role_key",
+    "role_class",
+    "state",
+    "created_at"
+  ],
+  "properties": {
+    "incarnation_id": {
+      "type": "string",
+      "pattern": "^inc:"
+    },
+    "session_id": {
+      "type": "string",
+      "pattern": "^titan-session:"
+    },
+    "bearer_id": {
+      "type": "string",
+      "pattern": "^titan:"
+    },
+    "titan_name": {
+      "enum": [
+        "Atlas",
+        "Sentinel",
+        "Mneme",
+        "Forge",
+        "Delta"
+      ]
+    },
+    "role_key": {
+      "enum": [
+        "architect",
+        "reviewer",
+        "memory-keeper",
+        "coder",
+        "evaluator"
+      ]
+    },
+    "role_class": {
+      "enum": [
+        "structure",
+        "review",
+        "memory",
+        "implementation",
+        "judgment"
+      ]
+    },
+    "state": {
+      "enum": [
+        "active",
+        "locked",
+        "closed",
+        "fallen",
+        "retired"
+      ]
+    },
+    "gate_required": {
+      "type": [
+        "string",
+        "null"
+      ],
+      "enum": [
+        "mutation",
+        "judgment",
+        null
+      ]
+    },
+    "thread_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "turn_id": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "source_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "created_at": {
+      "type": "string"
+    }
+  }
+}

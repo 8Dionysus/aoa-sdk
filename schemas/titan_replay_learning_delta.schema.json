@@ -1,0 +1,45 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_replay_learning_delta.schema.json",
+  "title": "AoA Titan replay learning delta",
+  "type": "object",
+  "additionalProperties": true,
+  "required": [
+    "schema_version",
+    "delta_id",
+    "kind",
+    "summary",
+    "source_refs",
+    "recommended_owner",
+    "promotion_status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "titan_learning_delta/v1"
+    },
+    "delta_id": {
+      "type": "string"
+    },
+    "kind": {
+      "type": "string"
+    },
+    "summary": {
+      "type": "string"
+    },
+    "source_refs": {
+      "type": "array",
+      "minItems": 1
+    },
+    "recommended_owner": {
+      "type": "string"
+    },
+    "promotion_status": {
+      "enum": [
+        "candidate",
+        "rejected",
+        "reviewed",
+        "owner_accepted"
+      ]
+    }
+  }
+}
