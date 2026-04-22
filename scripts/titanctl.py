@@ -8,6 +8,7 @@ receipt now uses the Titan incarnation spine v2 contract.
 from __future__ import annotations
 
 import argparse
+import importlib.util
 import json
 import sys
 from pathlib import Path
@@ -15,20 +16,31 @@ from typing import Any, Dict, Mapping
 
 ROOT = Path(__file__).resolve().parents[1]
 SRC = ROOT / "src"
-if str(SRC) not in sys.path:
-    sys.path.insert(0, str(SRC))
 
-from aoa_sdk.titans.incarnation_spine import (  # noqa: E402
-    DEFAULT_ACTIVE,
-    LOCKED,
-    TITAN_BEARERS,
-    cohort_projection,
-    gate_titan,
-    new_receipt,
-    utc_now,
-    validate_gate_payload,
-    validate_receipt as validate_spine_receipt,
-)
+
+def _load_incarnation_spine() -> Any:
+    module_path = SRC / "aoa_sdk" / "titans" / "incarnation_spine.py"
+    spec = importlib.util.spec_from_file_location(
+        "_aoa_sdk_titan_incarnation_spine", module_path
+    )
+    if spec is None or spec.loader is None:
+        raise RuntimeError(f"cannot load Titan spine module: {module_path}")
+    module = importlib.util.module_from_spec(spec)
+    sys.modules[spec.name] = module
+    spec.loader.exec_module(module)
+    return module
+
+
+_SPINE = _load_incarnation_spine()
+DEFAULT_ACTIVE = _SPINE.DEFAULT_ACTIVE
+LOCKED = _SPINE.LOCKED
+TITAN_BEARERS = _SPINE.TITAN_BEARERS
+cohort_projection = _SPINE.cohort_projection
+gate_titan = _SPINE.gate_titan
+new_receipt = _SPINE.new_receipt
+utc_now = _SPINE.utc_now
+validate_gate_payload = _SPINE.validate_gate_payload
+validate_spine_receipt = _SPINE.validate_receipt
 
 
 TITANS = {
@@ -45,15 +57,20 @@ TITANS = {
 REQUIRED_GATES = dict(LOCKED)
 
 
-def read_json(path: Path) -> Dict[str, Any]:
+def read_json(path: Path) -> Any:
     try:
         data = json.loads(path.read_text(encoding="utf-8"))
     except FileNotFoundError:
         raise SystemExit(f"receipt not found: {path}")
     except json.JSONDecodeError as exc:
         raise SystemExit(f"invalid JSON in {path}: {exc}")
+    return data
+
+
+def read_json_object(path: Path, label: str) -> Dict[str, Any]:
+    data = read_json(path)
     if not isinstance(data, dict):
-        raise SystemExit(f"receipt must be a JSON object: {path}")
+        raise SystemExit(f"{label} must be a JSON object: {path}")
     return data
 
 
@@ -147,10 +164,7 @@ def validate_receipt(receipt: Mapping[str, Any]) -> list[str]:
 
 
 def read_payload(path: str) -> Dict[str, Any]:
-    payload = read_json(Path(path))
-    if not isinstance(payload, dict):
-        raise SystemExit(f"payload must be a JSON object: {path}")
-    return payload
+    return read_json_object(Path(path), "payload")
 
 
 def fallback_gate_payload(args: argparse.Namespace, receipt: Mapping[str, Any]) -> Dict[str, Any]:
@@ -212,7 +226,7 @@ def cmd_summon(args: argparse.Namespace) -> int:
 
 def cmd_gate(args: argparse.Namespace) -> int:
     path = Path(args.receipt)
-    receipt = read_json(path)
+    receipt = read_json_object(path, "receipt")
 
     if receipt.get("status") != "open":
         raise SystemExit("cannot gate a closed receipt")
@@ -260,7 +274,7 @@ def cmd_gate(args: argparse.Namespace) -> int:
 
 def cmd_note(args: argparse.Namespace) -> int:
     path = Path(args.receipt)
-    receipt = read_json(path)
+    receipt = read_json_object(path, "receipt")
     if receipt.get("status") != "open":
         raise SystemExit("cannot add note to closed receipt")
     append_event(receipt, event_type="note", agent=args.agent, message=args.message)
@@ -271,7 +285,7 @@ def cmd_note(args: argparse.Namespace) -> int:
 
 def cmd_closeout(args: argparse.Namespace) -> int:
     path = Path(args.receipt)
-    receipt = read_json(path)
+    receipt = read_json_object(path, "receipt")
     receipt["status"] = "closed"
     receipt["closed_at"] = utc_now()
     receipt["summary"] = args.summary
@@ -293,7 +307,7 @@ def cmd_closeout(args: argparse.Namespace) -> int:
 
 
 def cmd_validate(args: argparse.Namespace) -> int:
-    receipt = read_json(Path(args.receipt))
+    receipt = read_json_object(Path(args.receipt), "receipt")
     errors = validate_receipt(receipt)
     if errors:
         for err in errors:
