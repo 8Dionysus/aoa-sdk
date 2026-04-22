@@ -1,0 +1,44 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://8dionysus.github.io/schemas/titan_runtime_event.schema.json",
+  "title": "Titan Runtime Event",
+  "type": "object",
+  "required": [
+    "at",
+    "type",
+    "message"
+  ],
+  "properties": {
+    "at": {
+      "type": "string"
+    },
+    "type": {
+      "enum": [
+        "summon",
+        "gate",
+        "closeout",
+        "note",
+        "validation"
+      ]
+    },
+    "agent": {
+      "enum": [
+        "Atlas",
+        "Sentinel",
+        "Mneme",
+        "Forge",
+        "Delta"
+      ]
+    },
+    "gate": {
+      "enum": [
+        "mutation",
+        "judgment"
+      ]
+    },
+    "message": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

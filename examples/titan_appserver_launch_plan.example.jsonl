@@ -1,0 +1,4 @@
+{"method":"initialize","id":0,"params":{"clientInfo":{"name":"abyss_console","title":"Abyss Console","version":"0.1.0"}}}
+{"method":"initialized","params":{}}
+{"method":"thread/start","id":1,"params":{"model":"gpt-5.4","cwd":"/srv","serviceName":"abyss_console"}}
+{"method":"turn/start","id":2,"params":{"threadId":"${thread.id}","input":[{"type":"text","text":"Titan console start prompt goes here."}]}}

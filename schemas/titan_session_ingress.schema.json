@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Titan Session Ingress",
+  "type": "object",
+  "required": [
+    "version",
+    "session_kind",
+    "summon_prompt_ref",
+    "default_roster",
+    "conditional_roster",
+    "boundaries"
+  ],
+  "properties": {
+    "version": {
+      "type": "integer",
+      "const": 1
+    },
+    "session_kind": {
+      "type": "string",
+      "const": "titan_service_cohort"
+    },
+    "summon_prompt_ref": {
+      "type": "string"
+    },
+    "default_roster": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "enum": [
+          "Atlas",
+          "Sentinel",
+          "Mneme"
+        ]
+      }
+    },
+    "conditional_roster": {
+      "type": "object",
+      "required": [
+        "Forge",
+        "Delta"
+      ],
+      "properties": {
+        "Forge": {
+          "type": "string",
+          "const": "mutation_intent"
+        },
+        "Delta": {
+          "type": "string",
+          "const": "judgment_intent"
+        }
+      },
+      "additionalProperties": false
+    },
+    "boundaries": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,9 @@
+{
+  "session_id": "example-session",
+  "titan": "Mneme",
+  "summary": "Memory Loom example receipt.",
+  "tags": [
+    "example",
+    "memory"
+  ]
+}
