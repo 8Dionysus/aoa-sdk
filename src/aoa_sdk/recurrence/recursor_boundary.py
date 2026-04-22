@@ -16,6 +16,22 @@ GLOBAL_FORBIDDEN_ACTIONS = {
     "promote_to_tree_of_sophia",
     "hidden_scheduler_action",
 }
+ROLE_REQUIRED_STOP_LINES = {
+    "projection_candidate_is_not_install",
+    "assistant_is_not_contestant",
+}
+PAIR_REQUIRED_SEPARATION = {
+    "witness_cannot_apply_mutations",
+    "executor_cannot_close_review",
+    "executor_cannot_self_verify_without_external_check",
+    "neither_can_spawn_additional_agents",
+}
+PAIR_REQUIRED_HANDOFF_ORDER = {
+    "witness_preflight",
+    "executor_bounded_work",
+    "witness_trace_check",
+    "owner_or_main_codex_review",
+}
 PROJECTION_REQUIRED_ROLES = {"recursor.witness", "recursor.executor"}
 PROJECTION_REQUIRED_FORBIDDEN = {
     "global": {
@@ -48,6 +64,12 @@ BOUNDARY_STOP_LINES = [
 ]
 
 
+def _string_set(value: Any) -> set[str]:
+    if not isinstance(value, list):
+        return set()
+    return {str(item) for item in value}
+
+
 def check_role_contract(role: Dict[str, Any]) -> List[Dict[str, Any]]:
     """Return boundary violations for a recursor role contract."""
     violations: List[Dict[str, Any]] = []
@@ -58,6 +80,10 @@ def check_role_contract(role: Dict[str, Any]) -> List[Dict[str, Any]]:
             {"kind": kind, "severity": severity, "recursor_id": rid, "message": message}
         )
 
+    if role.get("schema_version") != "recursor-role-contract/v1":
+        add("invalid_role_schema", "Role must use recursor-role-contract/v1.")
+    if role.get("owner_repo") != "aoa-agents":
+        add("invalid_role_owner", "Role owner_repo must be aoa-agents.")
     if role.get("readiness_status") != "candidate":
         add("recursor_not_candidate", "Recursor readiness seed only allows candidate status.")
     form = role.get("default_form", {})
@@ -75,7 +101,9 @@ def check_role_contract(role: Dict[str, Any]) -> List[Dict[str, Any]]:
         add("projection_installs_by_default", "Projection candidates must not install by default.")
     if projection.get("requires_owner_review") is not True:
         add("projection_no_owner_review", "Projection candidate must require owner review.")
-    forbidden = set(role.get("forbidden_actions", []))
+    if role.get("receipts_required") is not True:
+        add("receipts_not_required", "Recursor role must require receipts.")
+    forbidden = _string_set(role.get("forbidden_actions", []))
     missing = GLOBAL_FORBIDDEN_ACTIONS - forbidden
     if rid == "recursor.witness":
         missing |= {"apply_patch", "close_review_decision"} - forbidden
@@ -86,6 +114,42 @@ def check_role_contract(role: Dict[str, Any]) -> List[Dict[str, Any]]:
     memory = role.get("memory_policy", {})
     if memory.get("direct_durable_write_allowed") is not False:
         add("recursor_direct_memory_write", "Recursor cannot directly write durable memory.")
+    stop_lines = _string_set(role.get("stop_lines", []))
+    missing_stop_lines = ROLE_REQUIRED_STOP_LINES - stop_lines
+    if missing_stop_lines:
+        add("missing_role_stop_lines", f"Missing stop-lines: {sorted(missing_stop_lines)}")
+    return violations
+
+
+def check_pair_contract(pair: Dict[str, Any]) -> List[Dict[str, Any]]:
+    """Return boundary violations for the witness/executor pair contract."""
+    violations: List[Dict[str, Any]] = []
+
+    def add(kind: str, message: str, severity: str = "critical") -> None:
+        violations.append({"kind": kind, "severity": severity, "message": message})
+
+    if pair.get("schema_version") != "recursor-pair-contract/v1":
+        add("invalid_pair_schema", "Pair must use recursor-pair-contract/v1.")
+    if pair.get("pair_ref") != "recursor_pair:witness_executor:v1":
+        add("invalid_pair_ref", "Pair must use recursor_pair:witness_executor:v1.")
+    roles = pair.get("roles", {})
+    if not isinstance(roles, dict):
+        add("invalid_pair_roles_shape", "Pair roles must be an object.")
+        roles = {}
+    if roles.get("witness") != "recursor.witness" or roles.get("executor") != "recursor.executor":
+        add("invalid_pair_roles", "Pair must bind witness and executor exactly.")
+    if pair.get("activation_status") != "readiness_only":
+        add("pair_not_readiness_only", "Pair activation_status must remain readiness_only.")
+
+    separation = _string_set(pair.get("required_separation", []))
+    missing_separation = PAIR_REQUIRED_SEPARATION - separation
+    if missing_separation:
+        add("missing_pair_separation", f"Missing pair separation: {sorted(missing_separation)}")
+
+    handoff_order = _string_set(pair.get("handoff_order", []))
+    missing_handoff = PAIR_REQUIRED_HANDOFF_ORDER - handoff_order
+    if missing_handoff:
+        add("missing_pair_handoff_order", f"Missing pair handoff order: {sorted(missing_handoff)}")
     return violations
 
 
@@ -120,13 +184,13 @@ def check_projection_candidate(projection: Dict[str, Any]) -> List[Dict[str, Any
         rid = str(agent.get("recursor_id", "<missing>"))
         if agent.get("activation_status") != "candidate_only":
             add("projection_agent_not_candidate_only", f"{rid} must remain candidate_only.")
-        forbidden = set(agent.get("forbidden", []))
+        forbidden = _string_set(agent.get("forbidden", []))
         required_forbidden = set(PROJECTION_REQUIRED_FORBIDDEN["global"])
         required_forbidden |= PROJECTION_REQUIRED_FORBIDDEN.get(rid, set())
         missing = required_forbidden - forbidden
         if missing:
             add("projection_agent_missing_forbidden", f"{rid} missing forbidden tokens: {sorted(missing)}")
-        activation_requires = set(agent.get("activation_requires", []))
+        activation_requires = _string_set(agent.get("activation_requires", []))
         missing_activation = PROJECTION_REQUIRED_ACTIVATION - activation_requires
         if missing_activation:
             add("projection_agent_missing_activation_guard", f"{rid} missing activation guards: {sorted(missing_activation)}")
