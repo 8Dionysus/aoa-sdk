@@ -70,7 +70,8 @@
           "type": "string"
         },
         "authority_required": {
-          "type": "boolean"
+          "type": "boolean",
+          "const": true
         }
       }
     }

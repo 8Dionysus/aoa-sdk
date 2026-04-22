@@ -70,7 +70,8 @@
           "type": "string"
         },
         "submit_only": {
-          "type": "boolean"
+          "type": "boolean",
+          "const": true
         }
       }
     }
