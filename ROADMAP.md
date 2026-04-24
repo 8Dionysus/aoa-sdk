@@ -28,7 +28,7 @@ The current landed surface already includes:
 
 ### Current release contour
 
-The live direction for `v0.2.2` is control-plane hardening. Its current
+The live direction for `v0.2.3` is control-plane hardening. Its current
 release contour is:
 
 - workspace topology and the compact control-plane capsule:

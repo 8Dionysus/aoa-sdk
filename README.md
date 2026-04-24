@@ -6,7 +6,7 @@ Typed Python SDK for the AoA federation.
 
 This repository was seeded from the `Dionysus` starter artifacts on 2026-03-31. It is now the live development home for the SDK itself.
 
-> Current release: `v0.2.2`. See [CHANGELOG](CHANGELOG.md) for release notes.
+> Current release: `v0.2.3`. See [CHANGELOG](CHANGELOG.md) for release notes.
 
 ## Start here
 

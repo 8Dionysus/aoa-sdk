@@ -872,7 +872,7 @@ def _resolve_checkpoint_git_boundary(boundary: str) -> Literal["push", "merge"]:
 
 @app.command()
 def version() -> None:
-    print("aoa-sdk 0.2.2")
+    print("aoa-sdk 0.2.3")
 
 
 @release_app.command("audit")

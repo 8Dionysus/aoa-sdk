@@ -6,6 +6,54 @@ The format is intentionally simple and human-first.
 
 ## [Unreleased]
 
+## [0.2.3] - 2026-04-23
+
+### Summary
+
+- this patch expands the SDK control plane across Agon recurrence lanes,
+  helper candidates, state-packet bindings, verdict-delta and sealed-commit
+  helpers, duel-kernel bindings, mechanical-trial helpers, retention-rank
+  helpers, KAG/Sophian helper surfaces, and typed Experience adoption APIs
+- recurrence projections, reviewed-closeout carry, stats re-grounding,
+  recursor readiness, Titan runtime harnesses, Titan incarnation CLI support,
+  and Experience capture/deployment/watchtower/release helper contracts are
+  hardened
+- `aoa-sdk` remains a bounded typed access and orchestration layer for
+  sibling-owned surfaces rather than a source-owning runtime or doctrine repo
+
+### Added
+
+- Agon recurrence adapter registry, Wave VII/IX recurrence lanes, state-packet
+  SDK bridges, verdict-delta and sealed-commit helper candidates, duel-kernel
+  SDK bindings, mechanical-trial helpers, retention-rank helpers,
+  KAG/Sophian helpers, and Wave XV epistemic SDK helper surfaces
+- recurrence control-plane seeds, graph/manifest compatibility inserts,
+  downstream projections, live-observation producers, recursor readiness
+  helpers, stats re-grounding policy, and source-ref-aware routing inspection
+- Titan runtime harness surfaces, Titan incarnation spine runtime support, and
+  Titan CLI gate handling
+- Experience capture pipeline helpers plus certification, deployment,
+  federation, adoption, governance, watchtower, rollback, release, dashboard,
+  and ToS dossier API contracts
+
+### Changed
+
+- SDK review follow-ups, recurrence projection schemas, helper imports,
+  closeout follow-through capture, helper contract inputs, wave3 typed
+  adoption coverage, wave4 API contract coverage, stats re-grounding behavior,
+  and Titan CLI gate handling were tightened for the current control-plane
+  release line
+
+### Validation
+
+- `python scripts/release_check.py`
+
+### Notes
+
+- this patch changes control-plane helper behavior and release metadata only;
+  sibling repositories remain authoritative for their own objects, evidence,
+  roles, runtime records, and doctrine
+
 ## [0.2.2] - 2026-04-19
 
 ### Summary
