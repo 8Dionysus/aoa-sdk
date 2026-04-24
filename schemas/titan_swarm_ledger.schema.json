@@ -1,0 +1,99 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_swarm_ledger.schema.json",
+  "title": "Titan swarm ledger",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "ledger_id",
+    "session_id",
+    "roster",
+    "tasks",
+    "reports",
+    "findings",
+    "grades",
+    "timeouts",
+    "status"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "titan_swarm_ledger/v1"
+    },
+    "ledger_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "session_id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summon_id": {
+      "type": "string"
+    },
+    "operator": {
+      "type": "string"
+    },
+    "source_ref": {
+      "type": [
+        "string",
+        "null"
+      ]
+    },
+    "roster": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      },
+      "minItems": 5
+    },
+    "tasks": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "reports": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "findings": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "finding_lifecycle": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "grades": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "timeouts": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "memory_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "status": {
+      "enum": [
+        "open",
+        "closed"
+      ]
+    }
+  },
+  "additionalProperties": true
+}

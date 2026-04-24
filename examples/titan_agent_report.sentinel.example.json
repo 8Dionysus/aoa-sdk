@@ -1,0 +1,22 @@
+{
+  "schema_version": "titan_agent_report/v1",
+  "report_id": "report:sentinel:example",
+  "task_id": "task:sentinel:example",
+  "titan_name": "Sentinel",
+  "source_refs": [
+    "diff:reports/planting/example"
+  ],
+  "summary": "Partial closeout review found no overclaim in the cited excerpt.",
+  "findings": [
+    {
+      "finding_id": "finding:example",
+      "severity": "P2",
+      "claim": "Closeout wording distinguishes owner truth from retained seed lineage.",
+      "evidence_refs": [
+        "diff:reports/planting/example"
+      ],
+      "recommended_action": "Keep landed/lineage language explicit.",
+      "status": "reported"
+    }
+  ]
+}

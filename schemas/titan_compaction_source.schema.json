@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_compaction_source.schema.json",
+  "title": "Titan compaction recovered source",
+  "type": "object",
+  "required": [
+    "source_kind",
+    "chronology_confidence",
+    "tool_trace_available"
+  ],
+  "properties": {
+    "source_kind": {
+      "enum": [
+        "full_visible_export",
+        "compaction_recovered_message_history",
+        "raw_jsonl_child_log"
+      ]
+    },
+    "chronology_confidence": {
+      "enum": [
+        "full_trace_order",
+        "message_order_only",
+        "partial"
+      ]
+    },
+    "tool_trace_available": {
+      "enum": [
+        "available",
+        "after_recovery_boundary",
+        "partial",
+        "unavailable"
+      ]
+    },
+    "notes": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      }
+    }
+  },
+  "additionalProperties": false
+}

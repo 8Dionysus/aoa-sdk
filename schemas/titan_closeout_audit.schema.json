@@ -1,0 +1,42 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_closeout_audit.schema.json",
+  "title": "Titan closeout audit",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "closeout_id",
+    "ledger_id",
+    "session_id",
+    "counts",
+    "memory_candidates",
+    "summary"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "titan_closeout_audit/v1"
+    },
+    "closeout_id": {
+      "type": "string"
+    },
+    "ledger_id": {
+      "type": "string"
+    },
+    "session_id": {
+      "type": "string"
+    },
+    "counts": {
+      "type": "object"
+    },
+    "memory_candidates": {
+      "type": "array",
+      "items": {
+        "type": "object"
+      }
+    },
+    "summary": {
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

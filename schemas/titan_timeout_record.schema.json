@@ -1,0 +1,66 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_timeout_record.schema.json",
+  "title": "Titan timeout record",
+  "type": "object",
+  "required": [
+    "timeout_id",
+    "titan_name",
+    "task_id",
+    "wait_count",
+    "timeout_count",
+    "turn_aborted",
+    "interrupt_used",
+    "final_verdict_returned",
+    "scope_width"
+  ],
+  "properties": {
+    "timeout_id": {
+      "type": "string"
+    },
+    "titan_name": {
+      "enum": [
+        "Atlas",
+        "Sentinel",
+        "Mneme",
+        "Forge",
+        "Delta"
+      ]
+    },
+    "task_id": {
+      "type": "string"
+    },
+    "wait_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "timeout_count": {
+      "type": "integer",
+      "minimum": 0
+    },
+    "turn_aborted": {
+      "type": "boolean"
+    },
+    "interrupt_used": {
+      "type": "boolean"
+    },
+    "final_verdict_returned": {
+      "type": "boolean"
+    },
+    "scope_width": {
+      "enum": [
+        "narrow",
+        "medium",
+        "broad",
+        "unknown"
+      ]
+    },
+    "diff_excerpt_present": {
+      "type": "boolean"
+    },
+    "residual_question_present": {
+      "type": "boolean"
+    }
+  },
+  "additionalProperties": false
+}
