@@ -1,0 +1,76 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa.local/schemas/titan_grade_record.schema.json",
+  "title": "Titan grade record",
+  "type": "object",
+  "required": [
+    "grade_id",
+    "titan_name",
+    "grade",
+    "reason",
+    "titan_fault",
+    "orchestration_fault",
+    "prompt_fault",
+    "tooling_fault",
+    "timeout_fault"
+  ],
+  "properties": {
+    "grade_id": {
+      "type": "string"
+    },
+    "titan_name": {
+      "enum": [
+        "Atlas",
+        "Sentinel",
+        "Mneme",
+        "Forge",
+        "Delta"
+      ]
+    },
+    "grade": {
+      "enum": [
+        "D-",
+        "D",
+        "D+",
+        "C-",
+        "C",
+        "C+",
+        "B-",
+        "B",
+        "B+",
+        "A-",
+        "A",
+        "A+",
+        "S-",
+        "S",
+        "S+"
+      ]
+    },
+    "reason": {
+      "type": "string",
+      "minLength": 1
+    },
+    "titan_fault": {
+      "type": "boolean"
+    },
+    "orchestration_fault": {
+      "type": "boolean"
+    },
+    "prompt_fault": {
+      "type": "boolean"
+    },
+    "tooling_fault": {
+      "type": "boolean"
+    },
+    "timeout_fault": {
+      "type": "boolean"
+    },
+    "next_prompt_rule": {
+      "type": [
+        "string",
+        "null"
+      ]
+    }
+  },
+  "additionalProperties": false
+}

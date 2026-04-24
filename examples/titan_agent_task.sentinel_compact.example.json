@@ -1,0 +1,21 @@
+{
+  "task_id": "task:sentinel:example",
+  "titan_name": "Sentinel",
+  "bearer_id": "titan:sentinel:founder",
+  "role_key": "reviewer",
+  "mode": "compact_review",
+  "scope": [
+    "Dionysus reports/planting closeout diff"
+  ],
+  "question": "Do these diff excerpts overclaim landed owner truth?",
+  "expected_output": "titan_agent_report.v1",
+  "diff_excerpt_required": true,
+  "residual_question_required": false,
+  "source_refs": [
+    "diff:reports/planting/example"
+  ],
+  "must_not": [
+    "expand scope",
+    "claim final closure without evidence"
+  ]
+}
