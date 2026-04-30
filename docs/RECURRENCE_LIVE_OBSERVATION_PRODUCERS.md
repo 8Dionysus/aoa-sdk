@@ -17,10 +17,10 @@ The producers are not a scheduler, not an owner decision engine, and not an agen
 ## CLI
 
 ```bash
-aoa recur live producers --root /srv/workspace --json
+aoa recur live producers --root /srv/AbyssOS/workspace --json
 
 aoa recur live observe \
-  --root /srv/workspace \
+  --root /srv/AbyssOS/workspace \
   --producer technique_readiness_watch \
   --producer skill_trigger_surface_watch \
   --json
@@ -30,7 +30,7 @@ Script fallback:
 
 ```bash
 python scripts/collect_live_recurrence_observations.py \
-  --workspace-root /srv/workspace \
+  --workspace-root /srv/AbyssOS/workspace \
   --json
 ```
 

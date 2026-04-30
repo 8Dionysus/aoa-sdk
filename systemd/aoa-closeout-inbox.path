@@ -2,8 +2,8 @@
 Description=Watch aoa-sdk closeout inbox for reviewed manifests
 
 [Path]
-PathExistsGlob=/srv/aoa-sdk/.aoa/closeout/inbox/*.json
-PathChanged=/srv/aoa-sdk/.aoa/closeout/inbox
+PathExistsGlob=/srv/AbyssOS/aoa-sdk/.aoa/closeout/inbox/*.json
+PathChanged=/srv/AbyssOS/aoa-sdk/.aoa/closeout/inbox
 Unit=aoa-closeout-inbox.service
 
 [Install]

@@ -13,11 +13,11 @@ from aoa_sdk.a2a.rebase import (
 
 
 def test_codex_local_target_uses_project_level_paths() -> None:
-    target = build_codex_local_target("coder", workspace_root="/srv")
+    target = build_codex_local_target("coder", workspace_root="/srv/AbyssOS")
 
-    assert target.config_path == "/srv/.codex/agents/coder.toml"
-    assert target.install_surface == "/srv/.codex/agents"
-    assert target.workspace_marker == "/srv/AOA_WORKSPACE_ROOT"
+    assert target.config_path == "/srv/AbyssOS/.codex/agents/coder.toml"
+    assert target.install_surface == "/srv/AbyssOS/.codex/agents"
+    assert target.workspace_marker == "/srv/AbyssOS/AOA_WORKSPACE_ROOT"
     assert target.mcp_servers == ["aoa_workspace"]
     assert (
         "aoa-agents/generated/codex_agents/projection_manifest.json"
@@ -38,7 +38,7 @@ def test_closeout_request_and_runtime_receipt_keep_canonical_mapping() -> None:
         desired_role="reviewer", expected_outputs=["verification_result"]
     )
     decision = assess_summon(passport, intent)
-    target = build_codex_local_target("reviewer", workspace_root="/srv")
+    target = build_codex_local_target("reviewer", workspace_root="/srv/AbyssOS")
     result = RemoteTaskResult(
         task_id="task-child-1",
         state="failed",
@@ -85,5 +85,5 @@ def test_closeout_request_and_runtime_receipt_keep_canonical_mapping() -> None:
     assert receipt["event_kind"] == "runtime_wave_closeout_receipt"
     assert receipt["payload"]["execution_surface"] == "codex_local"
     assert receipt["payload"]["return_reentry_mode"] == "checkpoint_relaunch"
-    assert receipt["payload"]["codex_config_path"] == "/srv/.codex/agents/reviewer.toml"
+    assert receipt["payload"]["codex_config_path"] == "/srv/AbyssOS/.codex/agents/reviewer.toml"
     assert request["memo_export_plan"]["contains_raw_trace"] is False

@@ -4,7 +4,7 @@
   "wave": "fourteenth_wave",
   "created_at": "2026-04-22T00:00:00Z",
   "updated_at": "2026-04-22T00:00:00Z",
-  "workspace": "/srv",
+  "workspace": "/srv/AbyssOS",
   "operator": "Dionysus",
   "authority": "candidate_only",
   "policy": {

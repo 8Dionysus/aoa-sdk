@@ -84,9 +84,9 @@ If a deeper directory defines its own `AGENTS.md`, follow the nearest one.
 
 ## Workspace topology
 
-- The usual federation root is `/srv`, where `aoa-sdk` and sibling AoA repositories live as peer directories.
+- The usual federation root is `/srv/AbyssOS`, where `aoa-sdk` and sibling AoA repositories live as peer directories.
 - `abyss-stack` is the important exception: the source checkout lives at `~/src/abyss-stack`.
-- `/srv/abyss-stack` is a deployed runtime mirror, not the preferred source checkout.
+- `/srv/AbyssOS/abyss-stack` is a deployed runtime mirror, not the preferred source checkout.
 - If both paths exist, prefer editing `~/src/abyss-stack`.
 - `src/aoa_sdk/workspace/discovery.py`, `.aoa/workspace.toml`, and `docs/workspace-layout.md` must stay aligned.
 
@@ -237,26 +237,26 @@ need, role posture questions, or recurring-scenario signals, run one additive
 surface pass:
 
 ```bash
-aoa surfaces detect /srv/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
-aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/aoa-sdk --json
-aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/aoa-sdk --json
-aoa skills guard /srv/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green --root /srv/aoa-sdk --json
-aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json
-aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
-aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv --json
-aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --auto --root /srv --json
-aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json
-aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json
-aoa checkpoint git-boundary-check /srv/aoa-sdk --boundary push --root /srv --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green --root /srv/AbyssOS/aoa-sdk --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json
+aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv/AbyssOS --json
+aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD --auto --root /srv/AbyssOS --json
+aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json
+aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
+aoa checkpoint git-boundary-check /srv/AbyssOS/aoa-sdk --boundary push --root /srv/AbyssOS --json
 ```
 
 Use `aoa surfaces handoff` only after review:
 
 ```bash
-aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json --session-ref session:2026-04-07-surface-first-wave --reviewed --root /srv/aoa-sdk --json
+aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json --session-ref session:2026-04-07-surface-first-wave --reviewed --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Truth rules for this loop:
@@ -299,9 +299,9 @@ python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
 python -m pytest -q
 python -m ruff check .
-aoa workspace inspect /srv/aoa-sdk
-aoa compatibility check /srv/aoa-sdk
-aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
+aoa workspace inspect /srv/AbyssOS/aoa-sdk
+aoa compatibility check /srv/AbyssOS/aoa-sdk
+aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json
 ```
 
 When release or CI-facing surfaces change, also run:

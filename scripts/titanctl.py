@@ -326,7 +326,7 @@ def build_parser() -> argparse.ArgumentParser:
     p.set_defaults(func=cmd_roster)
 
     p = sub.add_parser("summon")
-    p.add_argument("--workspace", default="/srv")
+    p.add_argument("--workspace", default="/srv/AbyssOS")
     p.add_argument("--operator", default="Dionysus")
     p.add_argument("--out", required=True)
     p.add_argument("--force", action="store_true")

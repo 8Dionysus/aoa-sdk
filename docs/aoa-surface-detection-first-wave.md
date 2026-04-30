@@ -59,10 +59,10 @@ aoa-sdk/.aoa/surface-detection/{label}.{phase}.latest.json
 ## Commands
 
 ```bash
-aoa surfaces detect /srv/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase in-flight --intent-text "recall prior proof" --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase in-flight --intent-text "recall prior proof" --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Use `docs/aoa-surface-detection-heuristics.md` for the deterministic ruleset and

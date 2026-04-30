@@ -15,11 +15,11 @@ event_id       append-only lineage event
 
 ```bash
 python scripts/titan_lineage.py list \
-  --bearers /srv/aoa-agents/config/titan_bearers.v0.json
+  --bearers /srv/AbyssOS/aoa-agents/config/titan_bearers.v0.json
 
 python scripts/titan_lineage.py fall \
-  --bearers /srv/aoa-agents/config/titan_bearers.v0.json \
-  --ledger /srv/aoa-agents/config/titan_lineage_ledger.v0.json \
+  --bearers /srv/AbyssOS/aoa-agents/config/titan_bearers.v0.json \
+  --ledger /srv/AbyssOS/aoa-agents/config/titan_lineage_ledger.v0.json \
   --bearer-id titan:forge:founder \
   --summary "Forge exceeded mutation scope during pilot." \
   --lesson "Require expected_files before mutation gate." \

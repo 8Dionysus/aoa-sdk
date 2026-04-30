@@ -31,7 +31,7 @@ read; it does not decide policy.
 ```python
 from aoa_sdk import AoASDK
 
-sdk = AoASDK.from_workspace("/srv/aoa-sdk")
+sdk = AoASDK.from_workspace("/srv/AbyssOS/aoa-sdk")
 
 coverage = sdk.stats.source_coverage()
 profile = sdk.stats.surface_profile("surface_detection_summary")

@@ -100,7 +100,7 @@ class SummonIntent:
     review_required: bool = True
     transport_preference: TransportPreference = "codex_local"
     require_progression: bool = False
-    workspace_root: str = "/srv"
+    workspace_root: str = "/srv/AbyssOS"
 
 
 @dataclass(slots=True)

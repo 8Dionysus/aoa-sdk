@@ -19,7 +19,7 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'workspace topology metadata',
         '.aoa/workspace.toml',
         'no hidden path guessing',
-        '/srv/abyss-stack is a deployed runtime mirror',
+        '/srv/AbyssOS/abyss-stack is a deployed runtime mirror',
     ),
     'src/aoa_sdk/AGENTS.md': (
         'typed control-plane facades',

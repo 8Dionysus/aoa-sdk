@@ -6,7 +6,7 @@
 
 - `/srv/<repo>` is the normal source-checkout location for the AoA federation repositories.
 - `~/src/abyss-stack` is the source checkout for `abyss-stack`.
-- `/srv/abyss-stack` is a deployed runtime mirror and should not be treated as the authored source checkout.
+- `/srv/AbyssOS/abyss-stack` is a deployed runtime mirror and should not be treated as the authored source checkout.
 
 ## Machine-readable contract
 
@@ -47,7 +47,7 @@ discovery code or MCP server names ad hoc. For the owner split, see
 Use the CLI to confirm what the SDK will actually resolve:
 
 ```bash
-aoa workspace inspect /srv/aoa-sdk
+aoa workspace inspect /srv/AbyssOS/aoa-sdk
 ```
 
 This prints the workspace root, federation root, manifest path, and every resolved repository path.

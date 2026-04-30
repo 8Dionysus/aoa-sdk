@@ -37,7 +37,7 @@ def test_sdk_a2a_bridge_validates_against_live_aoa_summon_contract() -> None:
         codex_trace_ref="aoa-sdk/.aoa/skill-runtime-sessions/example-trace.json",
     )
     decision = sdk.a2a.assess_summon(passport, intent)
-    target = sdk.a2a.build_codex_local_target("reviewer", workspace_root="/srv")
+    target = sdk.a2a.build_codex_local_target("reviewer", workspace_root="/srv/AbyssOS")
     remote_task = RemoteTaskResult(
         task_id="task-child-1",
         state="failed",

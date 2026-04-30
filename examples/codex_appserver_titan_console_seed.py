@@ -33,7 +33,7 @@ def emit(proc: subprocess.Popen, message: dict) -> None:
 
 def main() -> int:
     parser = argparse.ArgumentParser(description="Titan console seed for Codex app-server")
-    parser.add_argument("--cwd", default="/srv")
+    parser.add_argument("--cwd", default="/srv/AbyssOS")
     parser.add_argument("--model", default="gpt-5.4")
     parser.add_argument("--prompt-file")
     parser.add_argument("--dry-run", action="store_true")

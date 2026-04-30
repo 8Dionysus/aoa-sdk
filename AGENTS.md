@@ -48,7 +48,7 @@ It does not own:
 - Stay on the control plane.
 - Prefer explicit config and manifest-driven behavior over magical discovery.
 - Keep source checkouts distinct from deployed runtime mirrors.
-- Usual federation root is `/srv`; `abyss-stack` source may live at `~/src/abyss-stack`, while `/srv/abyss-stack` can be a runtime mirror.
+- Usual federation root is `/srv/AbyssOS`; `abyss-stack` source may live at `~/src/abyss-stack`, while `/srv/AbyssOS/abyss-stack` can be a runtime mirror.
 - Non-skill surfaces may be loaded, suggested, or handed off. They do not become executable-now activation authority.
 
 ## Surface Detection Loop
@@ -56,17 +56,17 @@ It does not own:
 Use these compact anchors when a task touches checkpoint, handoff, or additive surface detection behavior:
 
 ```bash
-aoa surfaces detect /srv/aoa-sdk --phase ingress
-aoa surfaces detect /srv/aoa-sdk --phase checkpoint
-aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note
-aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/aoa-sdk --json
-aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/aoa-sdk --json
-aoa skills guard /srv/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green
-aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json
-aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
-aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --auto
-aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json
-aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json
+aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD --auto
+aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json
+aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
 ```
 
 `aoa skills ...` remains skill-only. checkpoint notes stay lower-authority than harvest verdicts; `skipped_no_active_session` and `agent_review=pending` are session-local signals, not final review. A checkpoint note is a session-local ledger for harvest, progression, and quest hints through `checkpoint_capture.session_end_skill_targets`, `checkpoint_capture.progression_axis_signals`, and `checkpoint_capture.session_end_next_honest_move`. Keep `aoa-session-progression-lift` and `aoa-checkpoint-closeout-bridge` as reviewed-closeout helpers, remember that `manual-equivalent` never becomes `activated`, and routing shortlist hints stay advisory only.
@@ -80,9 +80,9 @@ python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
 python -m pytest -q
 python -m ruff check .
-aoa workspace inspect /srv/aoa-sdk
-aoa compatibility check /srv/aoa-sdk
-aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
+aoa workspace inspect /srv/AbyssOS/aoa-sdk
+aoa compatibility check /srv/AbyssOS/aoa-sdk
+aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json
 ```
 
 When release or CI-facing surfaces change, also run:

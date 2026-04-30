@@ -1,6 +1,6 @@
 {
   "schema_version": "aoa_sdk_codex_plane_deploy_status_snapshot_v1",
-  "workspace_root": "/srv",
+  "workspace_root": "/srv/AbyssOS",
   "trust_posture": "trusted_ready",
   "latest_trust_state_ref": "cptrust-2026-04-11T210400Z-root-srv",
   "latest_rollout_receipt_ref": "cprollout-2026-04-11T210700Z-root-srv",

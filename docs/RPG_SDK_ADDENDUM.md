@@ -55,7 +55,7 @@ The new public entrypoint is:
 ```python
 from aoa_sdk import AoASDK
 
-sdk = AoASDK.from_workspace("/srv/aoa-sdk")
+sdk = AoASDK.from_workspace("/srv/AbyssOS/aoa-sdk")
 overlay = sdk.rpg.vocabulary()
 build = sdk.rpg.latest_build("AOA-A-0002")
 ledger = sdk.rpg.ledger("AOA-A-0002")

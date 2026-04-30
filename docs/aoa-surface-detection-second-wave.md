@@ -57,10 +57,10 @@ hints for those stats surfaces. It is not a verdict engine.
 ```python
 from aoa_sdk import AoASDK
 
-sdk = AoASDK.from_workspace("/srv/aoa-sdk")
+sdk = AoASDK.from_workspace("/srv/AbyssOS/aoa-sdk")
 
 report = sdk.surfaces.detect(
-    repo_root="/srv/aoa-sdk",
+    repo_root="/srv/AbyssOS/aoa-sdk",
     phase="ingress",
     intent_text="prove and recall a recurring route",
     include_shortlist=True,
