@@ -21,6 +21,6 @@ They can preserve review pressure and boundary checks, but they must not become 
 Common gates:
 
 ```bash
-aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json
+aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
 python -m pytest -q
 ```

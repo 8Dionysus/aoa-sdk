@@ -11,7 +11,7 @@ from aoa_sdk.titans.incarnation_spine import (
 
 
 def test_receipt_carries_all_founder_incarnations():
-    receipt = new_receipt(workspace="/srv", operator="Dionysus", source_ref="test")
+    receipt = new_receipt(workspace="/srv/AbyssOS", operator="Dionysus", source_ref="test")
     assert validate_receipt(receipt) == []
     by_name = {i["titan_name"]: i for i in receipt["incarnations"]}
     assert by_name["Atlas"]["bearer_id"] == "titan:atlas:founder"
@@ -23,7 +23,7 @@ def test_forge_gate_requires_payload_contract():
     errors = validate_gate_payload("Forge", "mutation", {"scope": ["x"]})
     assert "Forge gate requires non-empty expected_files" in errors
     payload = {"mutation_surface": "repo", "scope": ["bounded change"], "expected_files": ["a.py"], "rollback_note": "revert commit", "approval_ref": "approval:1", "test_plan": ["pytest"]}
-    receipt = gate_titan(new_receipt(workspace="/srv", operator="D"), titan_name="Forge", gate_kind="mutation", payload=payload)
+    receipt = gate_titan(new_receipt(workspace="/srv/AbyssOS", operator="D"), titan_name="Forge", gate_kind="mutation", payload=payload)
     assert receipt["gate_events"][0]["titan_name"] == "Forge"
 
 
@@ -37,7 +37,7 @@ def test_gate_payload_rejects_non_object_without_traceback(tmp_path, capsys):
     payload = tmp_path / "payload.json"
     payload.write_text("[]\n", encoding="utf-8")
 
-    assert cli(["new", "--workspace", "/srv", "--operator", "test", "--out", str(receipt)]) == 0
+    assert cli(["new", "--workspace", "/srv/AbyssOS", "--operator", "test", "--out", str(receipt)]) == 0
     result = cli(
         [
             "gate",

@@ -18,9 +18,9 @@ def test_readme_lists_full_current_state_battery() -> None:
         "python scripts/validate_workspace_control_plane.py",
         "python -m pytest -q",
         "python -m ruff check .",
-        "aoa workspace inspect /srv/aoa-sdk",
-        "aoa compatibility check /srv/aoa-sdk",
-        "aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json",
+        "aoa workspace inspect /srv/AbyssOS/aoa-sdk",
+        "aoa compatibility check /srv/AbyssOS/aoa-sdk",
+        "aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json",
     ]
     for command in commands:
         assert command in readme
@@ -31,8 +31,8 @@ def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
 
     assert "python scripts/build_workspace_control_plane.py --check" in agents
     assert "python scripts/validate_workspace_control_plane.py" in agents
-    assert "aoa compatibility check /srv/aoa-sdk" in agents
-    assert "aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json" in agents
+    assert "aoa compatibility check /srv/AbyssOS/aoa-sdk" in agents
+    assert "aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json" in agents
 
 
 def test_readme_lists_sibling_canary_surfaces() -> None:
@@ -57,24 +57,24 @@ def test_surface_detection_routes_are_documented_as_additive_and_skill_only() ->
     assert "docs/session-growth-checkpoints.md" in readme
     assert "docs/checkpoint-note-promotion.md" in readme
     assert "It does not make `aoa skills detect/dispatch/enter/guard` mean anything other than skills." in readme
-    assert "aoa surfaces detect /srv/aoa-sdk --phase ingress" in readme
-    assert "aoa skills detect /srv/aoa-sdk --phase checkpoint" in readme
-    assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint" in readme
-    assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in readme
-    assert 'aoa skills enter /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --root /srv --json' in readme
-    assert 'aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv --json' in readme
-    assert 'aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv --json' in readme
-    assert "aoa skills guard /srv/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in readme
-    assert 'aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv --json' in readme
-    assert "aoa checkpoint append /srv/aoa-sdk" in readme
-    assert "aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json" in readme
-    assert "aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD" in readme
-    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json" in readme
-    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json" in readme
-    assert "aoa checkpoint build-closeout-context /srv/aoa-sdk" in readme
-    assert "aoa checkpoint execute-closeout-chain /srv/aoa-sdk" in readme
-    assert "aoa checkpoint promote /srv/aoa-sdk --target dionysus-note" in readme
-    assert "aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json" in readme
+    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress" in readme
+    assert "aoa skills detect /srv/AbyssOS/aoa-sdk --phase checkpoint" in readme
+    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint" in readme
+    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in readme
+    assert 'aoa skills enter /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --root /srv/AbyssOS --json' in readme
+    assert 'aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/AbyssOS --json' in readme
+    assert 'aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/AbyssOS --json' in readme
+    assert "aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in readme
+    assert 'aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/AbyssOS --json' in readme
+    assert "aoa checkpoint append /srv/AbyssOS/aoa-sdk" in readme
+    assert "aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json" in readme
+    assert "aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD" in readme
+    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in readme
+    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in readme
+    assert "aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk" in readme
+    assert "aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk" in readme
+    assert "aoa checkpoint promote /srv/AbyssOS/aoa-sdk --target dionysus-note" in readme
+    assert "aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json" in readme
     assert "sdk.stats.surface_detection()" in readme
     assert "carries harvest, progression, and upgrade candidates through the session" in readme
     assert "plain `git commit`" in readme
@@ -91,17 +91,17 @@ def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:
     agents = read_text("AGENTS.md")
 
     assert "## Surface Detection Loop" in agents
-    assert "aoa surfaces detect /srv/aoa-sdk --phase ingress" in agents
-    assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint" in agents
-    assert "aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in agents
-    assert 'aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/aoa-sdk --json' in agents
-    assert 'aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/aoa-sdk --json' in agents
-    assert "aoa skills guard /srv/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in agents
-    assert 'aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json' in agents
-    assert "aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json" in agents
-    assert "aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD" in agents
-    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json" in agents
-    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json" in agents
+    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress" in agents
+    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint" in agents
+    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in agents
+    assert 'aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json' in agents
+    assert 'aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json' in agents
+    assert "aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in agents
+    assert 'aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/AbyssOS/aoa-sdk --json' in agents
+    assert "aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json" in agents
+    assert "aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD" in agents
+    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in agents
+    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in agents
     assert "aoa skills ...` remains skill-only" in agents
     assert "checkpoint notes stay lower-authority than harvest verdicts" in agents
     assert "skipped_no_active_session" in agents
@@ -144,13 +144,13 @@ def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
     assert "plain `git commit` can trigger one active-session-only checkpoint pass" in checkpoints
     assert "post-commit-report.json" in checkpoints
     assert "aoa-sdk/.aoa/session-growth/post-commit-status/<repo>.latest.json" in checkpoints
-    assert "aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json" in checkpoints
-    assert "aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD" in checkpoints
-    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json" in checkpoints
-    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json" in checkpoints
+    assert "aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json" in checkpoints
+    assert "aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD" in checkpoints
+    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in checkpoints
+    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in checkpoints
     assert "real intermediate findings, candidate notes, stats hints" in checkpoints
-    assert "aoa checkpoint build-closeout-context /srv/aoa-sdk" in checkpoints
-    assert "aoa checkpoint execute-closeout-chain /srv/aoa-sdk" in checkpoints
+    assert "aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk" in checkpoints
+    assert "aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk" in checkpoints
     assert "aoa-checkpoint-closeout-bridge" in checkpoints
     assert "continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref" in checkpoints
     assert "reanchor_need" in checkpoints

@@ -18,7 +18,7 @@ def test_titanctl_summon_validate_gate_closeout(tmp_path):
     script = Path(__file__).resolve().parents[1] / "scripts" / "titanctl.py"
     receipt = tmp_path / "receipt.json"
 
-    result = run_titanctl(script, "summon", "--workspace", "/srv", "--operator", "test", "--out", str(receipt))
+    result = run_titanctl(script, "summon", "--workspace", "/srv/AbyssOS", "--operator", "test", "--out", str(receipt))
     assert result.returncode == 0, result.stderr
 
     result = run_titanctl(script, "validate", "--receipt", str(receipt))

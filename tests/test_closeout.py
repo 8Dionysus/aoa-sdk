@@ -1247,7 +1247,7 @@ def test_closeout_api_run_builds_owner_follow_through_from_harvest_packet(
                         "chosen_next_artifact": "playbooks/project-foundation-workspace-landing/PLAYBOOK.md",
                         "nearest_wrong_target": "skill",
                         "owner_reason": "The surviving object is a multi-step route rather than a leaf workflow.",
-                        "evidence_anchors": ["/srv/8Dionysus/docs/WORKSPACE_INSTALL.md"],
+                        "evidence_anchors": ["/srv/AbyssOS/8Dionysus/docs/WORKSPACE_INSTALL.md"],
                     }
                 ]
             },

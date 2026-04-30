@@ -13,10 +13,10 @@ This seed hardens recurrence from direct edge walking into typed graph closure. 
 ## Commands
 
 ```bash
-aoa recur graph snapshot --root /srv/workspace --json
-aoa recur graph closure --root /srv/workspace --component component:skills:activation-boundary --json
-aoa recur graph diff before.snapshot.json after.snapshot.json --root /srv/workspace --json
-python scripts/build_recurrence_graph_snapshot.py --workspace-root /srv/workspace --json
+aoa recur graph snapshot --root /srv/AbyssOS/workspace --json
+aoa recur graph closure --root /srv/AbyssOS/workspace --component component:skills:activation-boundary --json
+aoa recur graph diff before.snapshot.json after.snapshot.json --root /srv/AbyssOS/workspace --json
+python scripts/build_recurrence_graph_snapshot.py --workspace-root /srv/AbyssOS/workspace --json
 ```
 
 ## What changed

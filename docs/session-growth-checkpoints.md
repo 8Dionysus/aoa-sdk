@@ -174,25 +174,25 @@ decision packets.
 ## Commands
 
 ```bash
-aoa skills detect /srv/aoa-sdk --phase checkpoint --intent-text "plan verify a bounded change" --root /srv/aoa-sdk --json
-aoa skills enter /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --root /srv/aoa-sdk --json
-aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/aoa-sdk --json
-aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/aoa-sdk --json
-aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
-aoa skills guard /srv/aoa-sdk --intent-text "recurring owner follow-through after green verify" --mutation-surface code --checkpoint-kind verify_green --root /srv/aoa-sdk --json
-aoa checkpoint mark /srv/aoa-sdk --kind pr_opened --intent-text "opened PR after protected main rejected direct push" --mutation-surface public-share --root /srv/aoa-sdk --json
-aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
-aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
-aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv --json
-aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --auto --root /srv --json
-aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json
-aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json
-aoa checkpoint git-boundary-check /srv/aoa-sdk --boundary merge --root /srv --json
-aoa checkpoint build-closeout-context /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
-aoa checkpoint execute-closeout-chain /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
-aoa checkpoint status /srv/aoa-sdk --root /srv/aoa-sdk --json
+aoa skills detect /srv/AbyssOS/aoa-sdk --phase checkpoint --intent-text "plan verify a bounded change" --root /srv/AbyssOS/aoa-sdk --json
+aoa skills enter /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --root /srv/AbyssOS/aoa-sdk --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring owner follow-through after green verify" --mutation-surface code --checkpoint-kind verify_green --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint mark /srv/AbyssOS/aoa-sdk --kind pr_opened --intent-text "opened PR after protected main rejected direct push" --mutation-surface public-share --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint append /srv/AbyssOS/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json
+aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv/AbyssOS --json
+aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD --auto --root /srv/AbyssOS --json
+aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json
+aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
+aoa checkpoint git-boundary-check /srv/AbyssOS/aoa-sdk --boundary merge --root /srv/AbyssOS --json
+aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint status /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 ## Promotion read

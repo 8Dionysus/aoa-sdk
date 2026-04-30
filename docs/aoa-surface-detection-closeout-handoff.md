@@ -79,9 +79,9 @@ owner refresh.
 ## Commands
 
 ```bash
-aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json \
+aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json \
   --session-ref session:2026-04-07-surface-first-wave \
   --reviewed \
-  --root /srv/aoa-sdk \
+  --root /srv/AbyssOS/aoa-sdk \
   --json
 ```

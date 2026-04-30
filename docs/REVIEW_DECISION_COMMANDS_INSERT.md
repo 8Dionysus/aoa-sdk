@@ -12,7 +12,7 @@ aoa recur review decision-template .aoa/recurrence/review-queues/latest.json \
 Fallback script before CLI merge:
 
 ```bash
-python scripts/review_decision_closure.py --workspace-root /srv/workspace template \
+python scripts/review_decision_closure.py --workspace-root /srv/AbyssOS/workspace template \
   --queue .aoa/recurrence/review-queues/latest.json \
   --item-ref review-item:0001 \
   --decision defer \

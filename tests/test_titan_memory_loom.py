@@ -12,7 +12,7 @@ from aoa_sdk.titans.memory_loom import (
 
 
 def test_memory_loom_candidate_recall_and_redaction():
-    idx = new_index("/srv", "Dionysus")
+    idx = new_index("/srv/AbyssOS", "Dionysus")
     rec = make_record(
         titan="Mneme",
         kind="note",
@@ -32,7 +32,7 @@ def test_memory_loom_candidate_recall_and_redaction():
 
 
 def test_forge_and_delta_gate_metadata_allowed_only_when_expected():
-    idx = new_index("/srv", "Dionysus")
+    idx = new_index("/srv/AbyssOS", "Dionysus")
     forge = make_record(
         titan="Forge",
         kind="mutation_note",

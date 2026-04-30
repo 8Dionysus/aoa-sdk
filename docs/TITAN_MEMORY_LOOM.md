@@ -7,12 +7,12 @@ It ingests receipts and events into candidate-grade records, supports recall que
 ## CLI
 
 ```bash
-python scripts/titan_memory_loom.py init --workspace /srv --operator Dionysus --out /srv/.titan/memory/index.json
-python scripts/titan_memory_loom.py event --index /srv/.titan/memory/index.json --titan Mneme --kind note --text "A seed landed."
-python scripts/titan_memory_loom.py recall --index /srv/.titan/memory/index.json --query seed
-python scripts/titan_memory_loom.py digest --index /srv/.titan/memory/index.json
-python scripts/titan_memory_loom.py redact --index /srv/.titan/memory/index.json --record-id <id> --reason "operator requested mask"
-python scripts/titan_memory_loom.py close --index /srv/.titan/memory/index.json
+python scripts/titan_memory_loom.py init --workspace /srv/AbyssOS --operator Dionysus --out /srv/AbyssOS/.titan/memory/index.json
+python scripts/titan_memory_loom.py event --index /srv/AbyssOS/.titan/memory/index.json --titan Mneme --kind note --text "A seed landed."
+python scripts/titan_memory_loom.py recall --index /srv/AbyssOS/.titan/memory/index.json --query seed
+python scripts/titan_memory_loom.py digest --index /srv/AbyssOS/.titan/memory/index.json
+python scripts/titan_memory_loom.py redact --index /srv/AbyssOS/.titan/memory/index.json --record-id <id> --reason "operator requested mask"
+python scripts/titan_memory_loom.py close --index /srv/AbyssOS/.titan/memory/index.json
 ```
 
 ## Authority

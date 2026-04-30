@@ -16,11 +16,11 @@ Use the shortest route by need:
 - compact control-plane capsule: `generated/workspace_control_plane.min.json`
 - workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
 - compatibility posture: `docs/versioning.md`
-- recurrence manifest compatibility gate: `docs/RECURRENCE_HARDENING_COMPATIBILITY.md`, `aoa recur manifest-scan --root /srv --json`, and `python scripts/validate_recurrence_manifests.py --workspace-root /srv`
-- recurrence graph closure and snapshots: `docs/RECURRENCE_GRAPH_CLOSURE_AND_SNAPSHOT.md`, `aoa recur graph snapshot --root /srv --json`, and `aoa recur graph closure --root /srv --component component:<owner>:<name> --json`
-- recurrence live observation producers: `docs/RECURRENCE_LIVE_OBSERVATION_PRODUCERS.md`, `aoa recur live producers --root /srv --json`, and `python scripts/collect_live_recurrence_observations.py --workspace-root /srv --json`
-- recurrence review decision closure: `docs/RECURRENCE_REVIEW_DECISION_CLOSURE.md`, `aoa recur review decision-template --root /srv`, and `python scripts/review_decision_closure.py --workspace-root /srv template`
-- recurrence downstream projections: `docs/RECURRENCE_DOWNSTREAM_PROJECTIONS.md`, `aoa recur project build --root /srv --json`, and `python scripts/build_downstream_recurrence_projections.py --workspace-root /srv --json`
+- recurrence manifest compatibility gate: `docs/RECURRENCE_HARDENING_COMPATIBILITY.md`, `aoa recur manifest-scan --root /srv/AbyssOS --json`, and `python scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS`
+- recurrence graph closure and snapshots: `docs/RECURRENCE_GRAPH_CLOSURE_AND_SNAPSHOT.md`, `aoa recur graph snapshot --root /srv/AbyssOS --json`, and `aoa recur graph closure --root /srv/AbyssOS --component component:<owner>:<name> --json`
+- recurrence live observation producers: `docs/RECURRENCE_LIVE_OBSERVATION_PRODUCERS.md`, `aoa recur live producers --root /srv/AbyssOS --json`, and `python scripts/collect_live_recurrence_observations.py --workspace-root /srv/AbyssOS --json`
+- recurrence review decision closure: `docs/RECURRENCE_REVIEW_DECISION_CLOSURE.md`, `aoa recur review decision-template --root /srv/AbyssOS`, and `python scripts/review_decision_closure.py --workspace-root /srv/AbyssOS template`
+- recurrence downstream projections: `docs/RECURRENCE_DOWNSTREAM_PROJECTIONS.md`, `aoa recur project build --root /srv/AbyssOS --json`, and `python scripts/build_downstream_recurrence_projections.py --workspace-root /srv/AbyssOS --json`
 - recurrence eval-suite handoff: `docs/RECURRENCE_EVAL_SUITE_HANDOFF.md` and `aoa-evals/bundles/aoa-recurrence-control-plane-integrity/`
 - current direction and hardening lanes: `ROADMAP.md`
 - release protocol and bounded publication path: `docs/RELEASING.md`
@@ -46,22 +46,22 @@ Use the shortest route by need:
 - current direction and control-plane hardening: `ROADMAP.md`
 - machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
 - project-level Codex workspace orientation via MCP: `docs/codex-workspace-mcp.md`, `src/aoa_sdk/codex/workspace_mcp.py`, and `scripts/aoa_workspace_mcp_server.py`
-- portable sibling-workspace bootstrap for non-`/srv` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`
+- portable sibling-workspace bootstrap for non-`/srv/AbyssOS` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`
 - Codex-plane portability boundary when the live root changes: `docs/CODEX_PLANE_PORTABILITY.md` and `8Dionysus/docs/CODEX_PLANE_REGENERATION.md`
 - live Codex-plane rollout status at the current workspace root: `docs/CODEX_PLANE_DEPLOY_STATUS.md`, `docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`, `docs/codex_rollout_campaign_refs.md`, `schemas/codex_plane_deploy_status_snapshot_v1.json`, `examples/codex_plane_deploy_status_snapshot.example.json`, and `src/aoa_sdk/codex/registry.py`
 - source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
-- compatibility rules and local checks: `docs/versioning.md`, `scripts/sibling_canary_matrix.json`, `scripts/run_sibling_canary.py`, `.github/workflows/latest-sibling-canary.yml`, `aoa compatibility check /srv/aoa-sdk`, and `aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json`
-- recurrence manifest compatibility: `docs/RECURRENCE_CONTROL_PLANE.md`, `docs/RECURRENCE_HARDENING_COMPATIBILITY.md`, `schemas/manifest_scan_report.schema.json`, `src/aoa_sdk/recurrence/compat.py`, `aoa recur manifest-scan --root /srv --json`, and `python scripts/validate_recurrence_manifests.py --workspace-root /srv`
-- recurrence graph inspection: `docs/RECURRENCE_GRAPH_CLOSURE_AND_SNAPSHOT.md`, `schemas/graph_snapshot.schema.json`, `schemas/graph_closure_report.schema.json`, `schemas/graph_delta_report.schema.json`, `src/aoa_sdk/recurrence/graph.py`, `aoa recur graph snapshot --root /srv --json`, `aoa recur graph closure --root /srv --component component:<owner>:<name> --json`, and `python scripts/build_recurrence_graph_snapshot.py --workspace-root /srv --json`
-- recurrence live observations: `docs/RECURRENCE_LIVE_OBSERVATION_PRODUCERS.md`, `schemas/live_observation_run.schema.json`, `src/aoa_sdk/recurrence/live_observations.py`, `aoa recur live observe --root /srv --json`, and `python scripts/collect_live_recurrence_observations.py --workspace-root /srv --json`
-- recurrence review decision closure: `docs/RECURRENCE_REVIEW_DECISION_CLOSURE.md`, `schemas/owner_review_decision.schema.json`, `schemas/review_decision_close_report.schema.json`, `src/aoa_sdk/recurrence/decisions.py`, `aoa recur review decision-template --root /srv`, `aoa recur review close --root /srv`, and `python scripts/review_decision_closure.py --workspace-root /srv template`
-- recurrence downstream projections: `docs/RECURRENCE_DOWNSTREAM_PROJECTIONS.md`, `schemas/downstream-projection-bundle.schema.json`, `schemas/downstream-projection-guard-report.schema.json`, `src/aoa_sdk/recurrence/projections.py`, `aoa recur project routing|stats|kag|build --root /srv`, and `python scripts/build_downstream_recurrence_projections.py --workspace-root /srv --json`
+- compatibility rules and local checks: `docs/versioning.md`, `scripts/sibling_canary_matrix.json`, `scripts/run_sibling_canary.py`, `.github/workflows/latest-sibling-canary.yml`, `aoa compatibility check /srv/AbyssOS/aoa-sdk`, and `aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json`
+- recurrence manifest compatibility: `docs/RECURRENCE_CONTROL_PLANE.md`, `docs/RECURRENCE_HARDENING_COMPATIBILITY.md`, `schemas/manifest_scan_report.schema.json`, `src/aoa_sdk/recurrence/compat.py`, `aoa recur manifest-scan --root /srv/AbyssOS --json`, and `python scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS`
+- recurrence graph inspection: `docs/RECURRENCE_GRAPH_CLOSURE_AND_SNAPSHOT.md`, `schemas/graph_snapshot.schema.json`, `schemas/graph_closure_report.schema.json`, `schemas/graph_delta_report.schema.json`, `src/aoa_sdk/recurrence/graph.py`, `aoa recur graph snapshot --root /srv/AbyssOS --json`, `aoa recur graph closure --root /srv/AbyssOS --component component:<owner>:<name> --json`, and `python scripts/build_recurrence_graph_snapshot.py --workspace-root /srv/AbyssOS --json`
+- recurrence live observations: `docs/RECURRENCE_LIVE_OBSERVATION_PRODUCERS.md`, `schemas/live_observation_run.schema.json`, `src/aoa_sdk/recurrence/live_observations.py`, `aoa recur live observe --root /srv/AbyssOS --json`, and `python scripts/collect_live_recurrence_observations.py --workspace-root /srv/AbyssOS --json`
+- recurrence review decision closure: `docs/RECURRENCE_REVIEW_DECISION_CLOSURE.md`, `schemas/owner_review_decision.schema.json`, `schemas/review_decision_close_report.schema.json`, `src/aoa_sdk/recurrence/decisions.py`, `aoa recur review decision-template --root /srv/AbyssOS`, `aoa recur review close --root /srv/AbyssOS`, and `python scripts/review_decision_closure.py --workspace-root /srv/AbyssOS template`
+- recurrence downstream projections: `docs/RECURRENCE_DOWNSTREAM_PROJECTIONS.md`, `schemas/downstream-projection-bundle.schema.json`, `schemas/downstream-projection-guard-report.schema.json`, `src/aoa_sdk/recurrence/projections.py`, `aoa recur project routing|stats|kag|build --root /srv/AbyssOS`, and `python scripts/build_downstream_recurrence_projections.py --workspace-root /srv/AbyssOS --json`
 - recurrence eval-suite handoff to the proof layer: `docs/RECURRENCE_EVAL_SUITE_HANDOFF.md`, with proof ownership remaining in `aoa-evals`
 - public support, release scope, and CI tiers: `docs/RELEASE_CI_POSTURE.md`
 - bounded federation release audit and publish helper: `docs/RELEASING.md`, `aoa release audit /srv --phase preflight --all --json`, and `aoa release publish /srv --repo aoa-sdk --dry-run --json`
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
 - Titan runtime and bridge helpers that stay subordinate to role, memory, proof, and owner-repo truth: `src/aoa_sdk/titans/`, `scripts/titanctl.py`, `scripts/titan_console.py`, `scripts/titan_appserver_bridge.py`, `scripts/titan_memory_loom.py`, `scripts/titan_lineage.py`, and `tests/test_titan_*.py`
-- local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
+- local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/AbyssOS/aoa-sdk`, `aoa compatibility check /srv/AbyssOS/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
 - reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
 - reviewed closeout followthrough hints that stay advisory: `docs/closeout-followthrough-map.md`, `examples/closeout_owner_followthrough_map.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
 - component-refresh control-plane carry that stays hint-only or reviewed-only: `docs/COMPONENT_DRIFT_HINTS.md`, `examples/component_drift_hints.example.json`, `examples/component_refresh_followthrough_decision.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
@@ -164,9 +164,9 @@ python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
 python -m pytest -q
 python -m ruff check .
-aoa workspace inspect /srv/aoa-sdk
-aoa compatibility check /srv/aoa-sdk
-aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
+aoa workspace inspect /srv/AbyssOS/aoa-sdk
+aoa compatibility check /srv/AbyssOS/aoa-sdk
+aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json
 ```
 
 CI also reinforces this path with:
@@ -181,7 +181,7 @@ python -m build
 ```python
 from aoa_sdk import AoASDK
 
-sdk = AoASDK.from_workspace("/srv/aoa-sdk")
+sdk = AoASDK.from_workspace("/srv/AbyssOS/aoa-sdk")
 
 matches = sdk.routing.pick(kind="skill", query="bounded repo change")
 preview = sdk.skills.disclose("aoa-change-protocol")
@@ -192,12 +192,12 @@ foundation = sdk.skills.project_foundation()
 risk_ring = sdk.skills.project_risk_guard_ring()
 risk_ring_governance = sdk.skills.project_risk_guard_ring_governance()
 dispatch = sdk.skills.detect(
-    repo_root="/srv/aoa-sdk",
+    repo_root="/srv/AbyssOS/aoa-sdk",
     phase="ingress",
     intent_text="plan verify a bounded change",
 )
 surface_report = sdk.surfaces.detect(
-    repo_root="/srv/aoa-sdk",
+    repo_root="/srv/AbyssOS/aoa-sdk",
     phase="ingress",
     intent_text="verify recurring handoff proof",
 )
@@ -210,24 +210,24 @@ stats_route_hints = sdk.routing.stats_regrounding_hints(
     surface_name="surface_detection_summary",
 )
 checkpoint_report = sdk.surfaces.detect(
-    repo_root="/srv/aoa-sdk",
+    repo_root="/srv/AbyssOS/aoa-sdk",
     phase="checkpoint",
     checkpoint_kind="commit",
     intent_text="recurring owner follow-through after green verify",
 )
 checkpoint_skill_report = sdk.skills.detect(
-    repo_root="/srv/aoa-sdk",
+    repo_root="/srv/AbyssOS/aoa-sdk",
     phase="checkpoint",
     intent_text="plan verify a bounded change",
 )
-checkpoint_note = sdk.checkpoints.status(repo_root="/srv/aoa-sdk")
+checkpoint_note = sdk.checkpoints.status(repo_root="/srv/AbyssOS/aoa-sdk")
 closeout_context = sdk.checkpoints.build_closeout_context(
-    repo_root="/srv/aoa-sdk",
+    repo_root="/srv/AbyssOS/aoa-sdk",
     reviewed_artifact_path="/srv/path/to/reviewed_session_artifact.md",
 )
 next_kernel_decision = closeout_context.followthrough_decision
 closeout_execution = sdk.checkpoints.execute_closeout_chain(
-    repo_root="/srv/aoa-sdk",
+    repo_root="/srv/AbyssOS/aoa-sdk",
     reviewed_artifact_path="/srv/path/to/reviewed_session_artifact.md",
 )
 shortlist = sdk.routing.owner_layer_shortlist(signal="scenario-recurring")
@@ -253,9 +253,9 @@ canonical transport surfaces are present or fixture-staged.
 
 ## Workspace topology
 
-- the usual editable federation root is `/srv`
+- the usual editable federation root is `/srv/AbyssOS`
 - `abyss-stack` is the important exception: the source checkout lives at `~/src/abyss-stack`
-- `/srv/abyss-stack` is a deployed runtime mirror, not the preferred source checkout
+- `/srv/AbyssOS/abyss-stack` is a deployed runtime mirror, not the preferred source checkout
 - `.aoa/workspace.toml` is the machine-readable workspace manifest
 
 ## Local commands
@@ -263,8 +263,8 @@ canonical transport surfaces are present or fixture-staged.
 Inspect the resolved workspace layout:
 
 ```bash
-aoa workspace inspect /srv/aoa-sdk
-aoa workspace inspect /srv/aoa-sdk --json
+aoa workspace inspect /srv/AbyssOS/aoa-sdk
+aoa workspace inspect /srv/AbyssOS/aoa-sdk --json
 ```
 
 Run the workspace-level Codex MCP server:
@@ -284,84 +284,84 @@ aoa workspace bootstrap /work/my-aoa --execute --json
 Check consumed surface compatibility across the local workspace:
 
 ```bash
-aoa compatibility check /srv/aoa-sdk
-aoa compatibility check /srv/aoa-sdk --repo aoa-skills --json
+aoa compatibility check /srv/AbyssOS/aoa-sdk
+aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json
 python scripts/run_sibling_canary.py --repo-root . --matrix scripts/sibling_canary_matrix.json
 ```
 
 Run one reviewed session closeout manifest:
 
 ```bash
-aoa closeout run /srv/path/to/closeout.json --root /srv/aoa-sdk --json
+aoa closeout run /srv/path/to/closeout.json --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Process the canonical closeout inbox:
 
 ```bash
-aoa closeout process-inbox /srv/aoa-sdk --json
+aoa closeout process-inbox /srv/AbyssOS/aoa-sdk --json
 ```
 
 Queue one reviewed closeout manifest for automatic inbox processing:
 
 ```bash
-aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md --session-ref session:2026-04-06-session-growth --receipt-dir /srv/path/to/receipts --root /srv/aoa-sdk --json
-aoa closeout submit-reviewed /srv/path/to/W4-closeout.md --session-ref session:qwen-local-pilot-v1:W4:closeout --audit-ref /srv/path/to/W4-closeout.json --allow-empty --root /srv/aoa-sdk --json
-aoa closeout build-manifest /srv/path/to/closeout.request.json --root /srv/aoa-sdk --enqueue --json
-aoa closeout enqueue-current /srv/path/to/closeout.json --root /srv/aoa-sdk --json
-aoa closeout status /srv/aoa-sdk --json
+aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md --session-ref session:2026-04-06-session-growth --receipt-dir /srv/path/to/receipts --root /srv/AbyssOS/aoa-sdk --json
+aoa closeout submit-reviewed /srv/path/to/W4-closeout.md --session-ref session:qwen-local-pilot-v1:W4:closeout --audit-ref /srv/path/to/W4-closeout.json --allow-empty --root /srv/AbyssOS/aoa-sdk --json
+aoa closeout build-manifest /srv/path/to/closeout.request.json --root /srv/AbyssOS/aoa-sdk --enqueue --json
+aoa closeout enqueue-current /srv/path/to/closeout.json --root /srv/AbyssOS/aoa-sdk --json
+aoa closeout status /srv/AbyssOS/aoa-sdk --json
 python scripts/install_closeout_units.py --overwrite --enable
 ```
 
 Inspect one phase-aware foundation detection pass:
 
 ```bash
-aoa skills detect /srv/aoa-sdk --phase ingress --intent-text "plan verify a bounded change" --root /srv/aoa-sdk --json
-aoa skills detect /srv/aoa-sdk --phase checkpoint --intent-text "plan verify a bounded change" --root /srv/aoa-sdk --json
-aoa skills dispatch /srv/aoa-sdk --phase pre-mutation --intent-text "refresh generated contracts" --mutation-surface repo-config --root /srv/aoa-sdk --json
+aoa skills detect /srv/AbyssOS/aoa-sdk --phase ingress --intent-text "plan verify a bounded change" --root /srv/AbyssOS/aoa-sdk --json
+aoa skills detect /srv/AbyssOS/aoa-sdk --phase checkpoint --intent-text "plan verify a bounded change" --root /srv/AbyssOS/aoa-sdk --json
+aoa skills dispatch /srv/AbyssOS/aoa-sdk --phase pre-mutation --intent-text "refresh generated contracts" --mutation-surface repo-config --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Start one workspace session and persist the ingress/guard reports:
 
 ```bash
-aoa skills enter /srv --intent-text "plan a cross-repo change" --root /srv --json
-aoa skills enter /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --root /srv --json
-aoa skills guard /srv/aoa-sdk --intent-text "regenerate compatibility surfaces" --mutation-surface repo-config --root /srv --json
-aoa skills guard /srv/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv --json
-aoa skills guard /srv/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv --json
-aoa skills guard /srv/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green --root /srv --json
-aoa skills guard /srv/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv --json
+aoa skills enter /srv --intent-text "plan a cross-repo change" --root /srv/AbyssOS --json
+aoa skills enter /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --root /srv/AbyssOS --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "regenerate compatibility surfaces" --mutation-surface repo-config --root /srv/AbyssOS --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/AbyssOS --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/AbyssOS --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green --root /srv/AbyssOS --json
+aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/AbyssOS --json
 ```
 
 Run one additive surface-detection pass without changing the skill-only lane:
 
 ```bash
-aoa surfaces detect /srv/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
-aoa surfaces detect /srv/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Capture or promote one checkpoint-aware local note:
 
 ```bash
-aoa checkpoint mark /srv/aoa-sdk --kind pr_opened --intent-text "opened PR after protected main rejected direct push" --mutation-surface public-share --root /srv/aoa-sdk --json
-aoa checkpoint append /srv/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/aoa-sdk --json
-aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --root /srv --json
-aoa checkpoint after-commit /srv/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv --json
-aoa checkpoint review-note /srv/aoa-sdk --commit-ref HEAD --auto --root /srv --json
-aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv --json
-aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv --json
-aoa checkpoint git-boundary-check /srv/aoa-sdk --boundary push --root /srv --json
-aoa checkpoint build-closeout-context /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
-aoa checkpoint execute-closeout-chain /srv/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/aoa-sdk --json
-aoa checkpoint status /srv/aoa-sdk --root /srv/aoa-sdk --json
-aoa checkpoint promote /srv/aoa-sdk --target dionysus-note --root /srv/aoa-sdk --json
+aoa checkpoint mark /srv/AbyssOS/aoa-sdk --kind pr_opened --intent-text "opened PR after protected main rejected direct push" --mutation-surface public-share --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint append /srv/AbyssOS/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json
+aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv/AbyssOS --json
+aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD --auto --root /srv/AbyssOS --json
+aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json
+aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
+aoa checkpoint git-boundary-check /srv/AbyssOS/aoa-sdk --boundary push --root /srv/AbyssOS --json
+aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint status /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint promote /srv/AbyssOS/aoa-sdk --target dionysus-note --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Build one reviewed-only closeout handoff from a persisted surface report:
 
 ```bash
-aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json --session-ref session:2026-04-07-surface-first-wave --reviewed --root /srv/aoa-sdk --json
+aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json --session-ref session:2026-04-07-surface-first-wave --reviewed --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Install for development:

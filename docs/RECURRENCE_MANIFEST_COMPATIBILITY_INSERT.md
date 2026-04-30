@@ -5,8 +5,8 @@ Add this insert to `RECURRENCE_CONTROL_PLANE.md` or the local recurrence landing
 Before recurrence expands into graph closure, run a manifest compatibility scan:
 
 ```bash
-aoa recur manifest-scan --root /srv/workspace --json
-python scripts/validate_recurrence_manifests.py --workspace-root /srv/workspace --json
+aoa recur manifest-scan --root /srv/AbyssOS/workspace --json
+python scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS/workspace --json
 ```
 
 The scan is successful when:

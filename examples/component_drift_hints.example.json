@@ -1,7 +1,7 @@
 {
   "schema_version": "aoa_component_drift_hint_set_v1",
   "session_ref": "session:2026-04-12-component-refresh-alpha",
-  "repo_root": "/srv",
+  "repo_root": "/srv/AbyssOS",
   "hints": [
     {
       "hint_ref": "hint:2026-04-12:codex-plane",

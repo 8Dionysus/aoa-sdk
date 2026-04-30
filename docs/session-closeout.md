@@ -164,7 +164,7 @@ aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md \
   --session-ref session:2026-04-06-session-growth \
   --receipt-dir /srv/path/to/receipts \
   --audit-ref /srv/path/to/route_summary.md \
-  --root /srv/aoa-sdk \
+  --root /srv/AbyssOS/aoa-sdk \
   --json
 ```
 
@@ -187,7 +187,7 @@ aoa closeout submit-reviewed /srv/path/to/W4-closeout.md \
   --audit-ref /srv/path/to/W4-closeout.json \
   --trigger runtime-wave-closeout \
   --allow-empty \
-  --root /srv/aoa-sdk \
+  --root /srv/AbyssOS/aoa-sdk \
   --json
 ```
 
@@ -201,9 +201,9 @@ Build one explicit checkpoint-to-closeout evidence bundle without publishing
 anything yet:
 
 ```bash
-aoa checkpoint build-closeout-context /srv/aoa-sdk \
+aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk \
   --reviewed-artifact /srv/path/to/reviewed_session_artifact.md \
-  --root /srv/aoa-sdk \
+  --root /srv/AbyssOS/aoa-sdk \
   --json
 ```
 
@@ -231,29 +231,29 @@ Execute the explicit reviewed-closeout skill chain without publishing or
 refreshing stats:
 
 ```bash
-aoa checkpoint execute-closeout-chain /srv/aoa-sdk \
+aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk \
   --reviewed-artifact /srv/path/to/reviewed_session_artifact.md \
-  --root /srv/aoa-sdk \
+  --root /srv/AbyssOS/aoa-sdk \
   --json
 ```
 
 Run one manifest directly:
 
 ```bash
-aoa closeout run /srv/path/to/closeout.json --root /srv/aoa-sdk --json
+aoa closeout run /srv/path/to/closeout.json --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Queue one reviewed manifest into the canonical inbox:
 
 ```bash
-aoa closeout enqueue-current /srv/path/to/closeout.json --root /srv/aoa-sdk --json
+aoa closeout enqueue-current /srv/path/to/closeout.json --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Build one canonical manifest from a reviewed closeout request and enqueue it:
 
 ```bash
 aoa closeout build-manifest /srv/path/to/closeout.request.json \
-  --root /srv/aoa-sdk \
+  --root /srv/AbyssOS/aoa-sdk \
   --enqueue \
   --json
 ```
@@ -264,7 +264,7 @@ Submit one reviewed artifact plus receipt bundle directly:
 aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md \
   --session-ref session:2026-04-06-session-growth \
   --receipt-dir /srv/path/to/receipts \
-  --root /srv/aoa-sdk \
+  --root /srv/AbyssOS/aoa-sdk \
   --json
 ```
 
@@ -275,20 +275,20 @@ aoa closeout submit-reviewed /srv/path/to/W4-closeout.md \
   --session-ref session:qwen-local-pilot-v1:W4:closeout \
   --audit-ref /srv/path/to/W4-closeout.json \
   --allow-empty \
-  --root /srv/aoa-sdk \
+  --root /srv/AbyssOS/aoa-sdk \
   --json
 ```
 
 Process the canonical queue under `aoa-sdk/.aoa/closeout/`:
 
 ```bash
-aoa closeout process-inbox /srv/aoa-sdk --json
+aoa closeout process-inbox /srv/AbyssOS/aoa-sdk --json
 ```
 
 Inspect the queue state:
 
 ```bash
-aoa closeout status /srv/aoa-sdk --json
+aoa closeout status /srv/AbyssOS/aoa-sdk --json
 ```
 
 The queue layout is:
@@ -313,7 +313,7 @@ Install the user-level inbox watcher when the machine should auto-process new
 reviewed manifests as soon as they land in the canonical inbox:
 
 ```bash
-python /srv/aoa-sdk/scripts/install_closeout_units.py --overwrite --enable
+python /srv/AbyssOS/aoa-sdk/scripts/install_closeout_units.py --overwrite --enable
 ```
 
 ## Surface detection handoff
@@ -330,10 +330,10 @@ observations for the session-growth kernel without pretending those owner-layer
 candidates were activated:
 
 ```bash
-aoa surfaces handoff /srv/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json \
+aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json \
   --session-ref session:2026-04-07-surface-first-wave \
   --reviewed \
-  --root /srv/aoa-sdk \
+  --root /srv/AbyssOS/aoa-sdk \
   --json
 ```
 

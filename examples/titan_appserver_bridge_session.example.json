@@ -1,7 +1,7 @@
 {
   "version": 1,
   "session_id": "titan-bridge-example",
-  "workspace_root": "/srv",
+  "workspace_root": "/srv/AbyssOS",
   "titans": [
     {
       "name": "Atlas",

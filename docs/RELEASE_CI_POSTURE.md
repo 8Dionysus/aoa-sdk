@@ -48,11 +48,11 @@ Use the tiers below when you need to verify a current SDK claim:
 
 | tier | purpose | surface |
 |---|---|---|
-| Tier 1 | local control-plane battery | `python -m pytest -q`, `python -m ruff check .`, `aoa workspace inspect /srv/aoa-sdk`, `aoa compatibility check /srv/aoa-sdk` |
+| Tier 1 | local control-plane battery | `python -m pytest -q`, `python -m ruff check .`, `aoa workspace inspect /srv/AbyssOS/aoa-sdk`, `aoa compatibility check /srv/AbyssOS/aoa-sdk` |
 | Tier 2 | release reinforcement | `python -m mypy src`, `python -m build`, `.github/workflows/repo-validation.yml` |
 | Tier 3 | live sibling drift detection | `python scripts/run_sibling_canary.py --repo-root . --matrix scripts/sibling_canary_matrix.json`, `.github/workflows/latest-sibling-canary.yml` |
 
-For a repo-scoped compatibility view, use `aoa compatibility check /srv/aoa-sdk --repo <repo> --json`.
+For a repo-scoped compatibility view, use `aoa compatibility check /srv/AbyssOS/aoa-sdk --repo <repo> --json`.
 
 ## Release audit surface
 

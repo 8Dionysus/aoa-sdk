@@ -195,14 +195,14 @@ This changelog entry uses the release-prep merge date.
 
 ### Changed
 
-- workspace discovery now prefers the git source checkout at `~/src/abyss-stack` over the deployed runtime mirror at `/srv/abyss-stack`
+- workspace discovery now prefers the git source checkout at `~/src/abyss-stack` over the deployed runtime mirror at `/srv/AbyssOS/abyss-stack`
 - package and CLI version surfaces are now aligned to `0.1.0` for the first repository release
 
 ### Validation
 
 - `pytest -q`
 - `python -m ruff check .`
-- `aoa workspace inspect /srv/aoa-sdk`
+- `aoa workspace inspect /srv/AbyssOS/aoa-sdk`
 
 ### Notes
 

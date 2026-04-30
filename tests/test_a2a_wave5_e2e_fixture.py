@@ -39,7 +39,7 @@ def test_e2e_fixture_preserves_full_return_contract_chain() -> None:
     assert fixture["live_automation"] is False
     assert fixture["summon_request"]["summon_request"]["playbook_ref"] == "AOA-P-0031"
     assert fixture["summon_decision"]["lane"] == "codex_local_reviewed"
-    assert fixture["codex_local_target"]["config_path"] == "/srv/.codex/agents/reviewer.toml"
+    assert fixture["codex_local_target"]["config_path"] == "/srv/AbyssOS/.codex/agents/reviewer.toml"
     assert fixture["child_task_result"]["reviewed"] is True
     assert fixture["return_plan"]["next_hop"] == "aoa-checkpoint-closeout-bridge"
     assert fixture["return_plan"]["navigation_target"] == (

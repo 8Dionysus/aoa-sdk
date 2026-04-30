@@ -16,4 +16,4 @@ Do the work.
 
 | # | Timestamp | Exit | CWD | Command |
 | ---: | --- | ---: | --- | --- |
-| 1 | `2026-04-22T00:00:00Z` | `0` | `/srv` | `echo ok` |
+| 1 | `2026-04-22T00:00:00Z` | `0` | `/srv/AbyssOS` | `echo ok` |

@@ -8,9 +8,9 @@ def test_builder_and_session():
     b = AppServerJsonRpcBuilder()
     assert b.initialize()["method"] == "initialize"
     assert (
-        b.thread_start(cwd="/srv")["params"]["sandboxPolicy"]["networkAccess"] is False
+        b.thread_start(cwd="/srv/AbyssOS")["params"]["sandboxPolicy"]["networkAccess"] is False
     )
-    s = TitanAppServerBridgeSession.new("/srv")
+    s = TitanAppServerBridgeSession.new("/srv/AbyssOS")
     s.ingest({"jsonrpc": "2.0", "id": 1, "result": {"threadId": "t1"}})
     s.ingest({"method": "turn/started", "params": {"threadId": "t1", "turnId": "u1"}})
     s.ingest(

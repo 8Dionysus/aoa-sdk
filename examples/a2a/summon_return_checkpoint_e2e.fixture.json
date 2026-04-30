@@ -52,7 +52,7 @@
       "review_required": true,
       "transport_preference": "codex_local",
       "require_progression": false,
-      "workspace_root": "/srv"
+      "workspace_root": "/srv/AbyssOS"
     },
     "expected_outputs": [
       "verification_result",
@@ -91,11 +91,11 @@
     "codex_local_target": {
       "agent_id": "reviewer",
       "role": "reviewer",
-      "workspace_root": "/srv",
-      "workspace_marker": "/srv/AOA_WORKSPACE_ROOT",
-      "project_codex_root": "/srv/.codex",
-      "config_path": "/srv/.codex/agents/reviewer.toml",
-      "install_surface": "/srv/.codex/agents",
+      "workspace_root": "/srv/AbyssOS",
+      "workspace_marker": "/srv/AbyssOS/AOA_WORKSPACE_ROOT",
+      "project_codex_root": "/srv/AbyssOS/.codex",
+      "config_path": "/srv/AbyssOS/.codex/agents/reviewer.toml",
+      "install_surface": "/srv/AbyssOS/.codex/agents",
       "sandbox_mode": "read-only",
       "mcp_servers": [
         "aoa_workspace",
@@ -399,11 +399,11 @@
   "codex_local_target": {
     "agent_id": "reviewer",
     "role": "reviewer",
-    "workspace_root": "/srv",
-    "workspace_marker": "/srv/AOA_WORKSPACE_ROOT",
-    "project_codex_root": "/srv/.codex",
-    "config_path": "/srv/.codex/agents/reviewer.toml",
-    "install_surface": "/srv/.codex/agents",
+    "workspace_root": "/srv/AbyssOS",
+    "workspace_marker": "/srv/AbyssOS/AOA_WORKSPACE_ROOT",
+    "project_codex_root": "/srv/AbyssOS/.codex",
+    "config_path": "/srv/AbyssOS/.codex/agents/reviewer.toml",
+    "install_surface": "/srv/AbyssOS/.codex/agents",
     "sandbox_mode": "read-only",
     "mcp_servers": [
       "aoa_workspace",
@@ -901,7 +901,7 @@
       "cohort_pattern=checkpoint_cohort",
       "returned_artifacts=verification_result,bounded_plan,transition_decision",
       "codex_role=reviewer",
-      "codex_config_path=/srv/.codex/agents/reviewer.toml",
+      "codex_config_path=/srv/AbyssOS/.codex/agents/reviewer.toml",
       "return_anchor=bounded_plan",
       "return_reentry_mode=checkpoint_relaunch",
       "memo_writeback_targets=5",
@@ -950,11 +950,11 @@
     "codex_local_target": {
       "agent_id": "reviewer",
       "role": "reviewer",
-      "workspace_root": "/srv",
-      "workspace_marker": "/srv/AOA_WORKSPACE_ROOT",
-      "project_codex_root": "/srv/.codex",
-      "config_path": "/srv/.codex/agents/reviewer.toml",
-      "install_surface": "/srv/.codex/agents",
+      "workspace_root": "/srv/AbyssOS",
+      "workspace_marker": "/srv/AbyssOS/AOA_WORKSPACE_ROOT",
+      "project_codex_root": "/srv/AbyssOS/.codex",
+      "config_path": "/srv/AbyssOS/.codex/agents/reviewer.toml",
+      "install_surface": "/srv/AbyssOS/.codex/agents",
       "sandbox_mode": "read-only",
       "mcp_servers": [
         "aoa_workspace",
@@ -1035,7 +1035,7 @@
       "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/wave5-a2a-return-checkpoint/checkpoint-note.json",
       "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/wave5-a2a-return-checkpoint/codex-trace.json",
       "codex_role": "reviewer",
-      "codex_config_path": "/srv/.codex/agents/reviewer.toml"
+      "codex_config_path": "/srv/AbyssOS/.codex/agents/reviewer.toml"
     }
   },
   "runtime_closeout_dry_run_receipt_contract": {

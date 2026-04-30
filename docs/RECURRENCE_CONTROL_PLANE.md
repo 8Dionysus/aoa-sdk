@@ -52,8 +52,8 @@ Run the gate before graph closure, observation producers, or downstream
 projection work:
 
 ```bash
-aoa recur manifest-scan --root /srv --json
-python scripts/validate_recurrence_manifests.py --workspace-root /srv
+aoa recur manifest-scan --root /srv/AbyssOS --json
+python scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS
 ```
 
 `adapter_required` Agon diagnostics are observation-only. They must not create
@@ -69,31 +69,31 @@ propagation batches before planner or review work. Snapshots record graph shape
 for comparison; deltas are review input, not routing authority.
 
 ```bash
-aoa recur graph snapshot --root /srv --json
-aoa recur graph closure --root /srv --component component:<owner>:<name> --depth-limit 8 --json
-aoa recur graph diff before.snapshot.json after.snapshot.json --root /srv --json
-python scripts/build_recurrence_graph_snapshot.py --workspace-root /srv --json
+aoa recur graph snapshot --root /srv/AbyssOS --json
+aoa recur graph closure --root /srv/AbyssOS --component component:<owner>:<name> --depth-limit 8 --json
+aoa recur graph diff before.snapshot.json after.snapshot.json --root /srv/AbyssOS --json
+python scripts/build_recurrence_graph_snapshot.py --workspace-root /srv/AbyssOS --json
 ```
 
 ## Wave-one commands
 
 ```bash
-aoa recur manifest-scan --root /srv --json
-aoa recur graph snapshot --root /srv --json
-aoa recur graph closure --root /srv --component component:<owner>:<name> --depth-limit 8 --json
-aoa recur graph diff before.snapshot.json after.snapshot.json --root /srv --json
-aoa recur live producers --root /srv --json
-aoa recur live observe --root /srv --json
-aoa recur review decision-template /srv/aoa-sdk/.aoa/recurrence/review-queues/latest.json --item-ref review-item:0001 --decision defer --root /srv --json
-aoa recur review close /srv/aoa-sdk/.aoa/recurrence/review-queues/latest.json --decision /srv/aoa-sdk/.aoa/recurrence/review-decisions/decision.example.json --root /srv --json
-aoa recur project routing --root /srv --json
-aoa recur project stats --root /srv --json
-aoa recur project kag --root /srv --json
-aoa recur project build --root /srv --json
-aoa recur detect /srv/8Dionysus --from git:HEAD~1..HEAD --root /srv --json
-aoa recur plan /srv/aoa-sdk/.aoa/recurrence/signals/8Dionysus.latest.json --root /srv --json
-aoa recur doctor /srv/aoa-sdk/.aoa/recurrence/signals/8Dionysus.latest.json --root /srv --json
-aoa recur handoff /srv/aoa-sdk/.aoa/recurrence/plans/component.codex-plane.shared-root.latest.json --reviewed --root /srv --json
+aoa recur manifest-scan --root /srv/AbyssOS --json
+aoa recur graph snapshot --root /srv/AbyssOS --json
+aoa recur graph closure --root /srv/AbyssOS --component component:<owner>:<name> --depth-limit 8 --json
+aoa recur graph diff before.snapshot.json after.snapshot.json --root /srv/AbyssOS --json
+aoa recur live producers --root /srv/AbyssOS --json
+aoa recur live observe --root /srv/AbyssOS --json
+aoa recur review decision-template /srv/AbyssOS/aoa-sdk/.aoa/recurrence/review-queues/latest.json --item-ref review-item:0001 --decision defer --root /srv/AbyssOS --json
+aoa recur review close /srv/AbyssOS/aoa-sdk/.aoa/recurrence/review-queues/latest.json --decision /srv/AbyssOS/aoa-sdk/.aoa/recurrence/review-decisions/decision.example.json --root /srv/AbyssOS --json
+aoa recur project routing --root /srv/AbyssOS --json
+aoa recur project stats --root /srv/AbyssOS --json
+aoa recur project kag --root /srv/AbyssOS --json
+aoa recur project build --root /srv/AbyssOS --json
+aoa recur detect /srv/AbyssOS/8Dionysus --from git:HEAD~1..HEAD --root /srv/AbyssOS --json
+aoa recur plan /srv/AbyssOS/aoa-sdk/.aoa/recurrence/signals/8Dionysus.latest.json --root /srv/AbyssOS --json
+aoa recur doctor /srv/AbyssOS/aoa-sdk/.aoa/recurrence/signals/8Dionysus.latest.json --root /srv/AbyssOS --json
+aoa recur handoff /srv/AbyssOS/aoa-sdk/.aoa/recurrence/plans/component.codex-plane.shared-root.latest.json --reviewed --root /srv/AbyssOS --json
 ```
 
 ## Honesty rules

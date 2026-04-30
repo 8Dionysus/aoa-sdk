@@ -62,7 +62,7 @@ def build_summon_return_checkpoint_fixture(
         reviewed_artifact_path=REVIEWED_ARTIFACT_PATH,
     )
     decision = assess_summon(passport, intent)
-    codex_target = build_codex_local_target("reviewer", workspace_root="/srv")
+    codex_target = build_codex_local_target("reviewer", workspace_root="/srv/AbyssOS")
     remote_task = RemoteTaskResult(
         task_id="task-wave5-a2a-return-child",
         state="failed",

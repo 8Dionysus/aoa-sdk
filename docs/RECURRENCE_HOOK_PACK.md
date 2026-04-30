@@ -67,8 +67,8 @@ hook itself owns execution.
 ## CLI
 
 ```bash
-aoa recur hooks list --event session_stop --root /srv/federation
-aoa recur hooks run --event session_stop --root /srv/federation --json
+aoa recur hooks list --event session_stop --root /srv/AbyssOS/federation
+aoa recur hooks run --event session_stop --root /srv/AbyssOS/federation --json
 aoa recur observe --hook-run /srv/federation/aoa-sdk/.aoa/recurrence/hooks/session_stop.latest.json --json
 ```
 

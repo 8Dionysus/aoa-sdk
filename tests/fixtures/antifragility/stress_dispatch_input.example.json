@@ -1,7 +1,7 @@
 {
   "intent_text": "stabilize a degraded hybrid-query path without widening automation",
   "phase": "pre-mutation",
-  "repo_root": "/srv/aoa-sdk",
+  "repo_root": "/srv/AbyssOS/aoa-sdk",
   "mutation_surface": "repo-config",
   "stress_context": {
     "active": true,

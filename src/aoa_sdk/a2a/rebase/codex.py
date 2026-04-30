@@ -38,7 +38,7 @@ ROLE_DEFAULTS = {
 def build_codex_local_target(
     role: str,
     *,
-    workspace_root: str = "/srv",
+    workspace_root: str = "/srv/AbyssOS",
     agent_id: str | None = None,
     projection_entry: Mapping[str, Any] | None = None,
 ) -> CodexLocalAgentTarget:

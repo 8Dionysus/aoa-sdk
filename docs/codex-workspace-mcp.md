@@ -32,8 +32,8 @@ python -m pip install -e '.[mcp]'
 python scripts/aoa_workspace_mcp_server.py
 ```
 
-For the `/srv` federation workspace, the project-level Codex config should wire
-the server from [`/srv/.codex/config.toml`](/srv/.codex/config.toml) with:
+For the `/srv/AbyssOS` federation workspace, the project-level Codex config should wire
+the server from [`/srv/AbyssOS/.codex/config.toml`](/srv/AbyssOS/.codex/config.toml) with:
 
 ```toml
 [mcp_servers.aoa_workspace]
