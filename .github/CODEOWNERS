@@ -1,0 +1,22 @@
+# Narrow ownership map for governance-critical SDK surfaces.
+/.agents/ @8Dionysus
+/.aoa/ @8Dionysus
+/.github/ @8Dionysus
+/config/ @8Dionysus
+/docs/ @8Dionysus
+/examples/ @8Dionysus
+/generated/ @8Dionysus
+/githooks/ @8Dionysus
+/manifests/ @8Dionysus
+/quests/ @8Dionysus
+/schemas/ @8Dionysus
+/scripts/ @8Dionysus
+/src/ @8Dionysus
+/systemd/ @8Dionysus
+/tests/ @8Dionysus
+
+/AGENTS.md @8Dionysus
+/CHANGELOG.md @8Dionysus
+/README.md @8Dionysus
+/ROADMAP.md @8Dionysus
+/pyproject.toml @8Dionysus
