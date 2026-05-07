@@ -71,6 +71,22 @@ aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
 
 `aoa skills ...` remains skill-only. checkpoint notes stay lower-authority than harvest verdicts; `skipped_no_active_session` and `agent_review=pending` are session-local signals, not final review. A checkpoint note is a session-local ledger for harvest, progression, and quest hints through `checkpoint_capture.session_end_skill_targets`, `checkpoint_capture.progression_axis_signals`, and `checkpoint_capture.session_end_next_honest_move`. Keep `aoa-session-progression-lift` and `aoa-checkpoint-closeout-bridge` as reviewed-closeout helpers, remember that `manual-equivalent` never becomes `activated`, and routing shortlist hints stay advisory only.
 
+## GitHub landing workflow
+
+Root `AGENTS.md` owns the repository-wide branch, PR, CI, and merge route.
+`.github/AGENTS.md` owns the GitHub-native files that support it.
+
+When the user asks to commit, push, and merge in this repository, use this route:
+
+1. Start from a branch based on the current `origin/main`. If the worktree is already dirty, inventory it first and carry forward only the intended diff.
+2. Commit the intended change with a message that names the changed surface.
+3. Push the branch and open a pull request that states changed surfaces, validation run, skipped checks, and remaining risk.
+4. Wait for GitHub `Repo Validation` and any required GitHub checks. If a check fails, fix the branch and wait for the new result.
+5. Merge through GitHub after green validation. Use squash unless repository settings report a different required method; report the method that landed.
+6. Return to `main`, fast-forward from `origin/main`, and confirm the worktree is clean before closeout.
+
+If GitHub status or merge permissions cannot be observed, stop the landing route and report the exact blocker instead of guessing.
+
 ## Verify
 
 Minimum validation for code, topology, or reviewed-handoff changes:
