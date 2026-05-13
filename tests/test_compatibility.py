@@ -150,6 +150,22 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-kag.federation_spine.min"].compatible is True
 
 
+def test_center_entry_map_current_v2_is_compatible(workspace_root: Path) -> None:
+    seed_center_capsule_fixtures(workspace_root)
+    surface_path = workspace_root / "Agents-of-Abyss" / "generated" / "center_entry_map.min.json"
+    payload = json.loads(surface_path.read_text(encoding="utf-8"))
+    payload["schema_version"] = "aoa_center_entry_map_v2"
+    payload["route_contract_ref"] = "docs/START_HERE_ROUTE_CONTRACT.md"
+    surface_path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.compatibility.check("Agents-of-Abyss.center_entry_map.min")
+
+    assert report.compatible is True
+    assert report.detected_version == "aoa_center_entry_map_v2"
+
+
 def test_assert_compatible_raises_on_version_mismatch(workspace_root: Path) -> None:
     target = workspace_root / "aoa-skills" / "generated" / "runtime_discovery_index.json"
     target.write_text(
