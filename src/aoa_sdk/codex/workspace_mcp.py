@@ -102,7 +102,10 @@ REPO_HINTS: dict[str, dict[str, Any]] = {
     "abyss-stack": {
         "role": "runtime-substrate-source",
         "surface": "runtime substrate source checkout and diagnostic surfaces",
-        "entry_candidates": ["generated/diagnostic_surface_catalog.min.json", "README.md"],
+        "entry_candidates": [
+            "mechanics/diagnostic-spine/parts/diagnostic-surfaces/generated/diagnostic_surface_catalog.min.json",
+            "README.md",
+        ],
     },
 }
 

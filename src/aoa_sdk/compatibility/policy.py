@@ -76,7 +76,7 @@ SURFACE_COMPATIBILITY_RULES = {
         repo="Agents-of-Abyss",
         relative_path="generated/center_entry_map.min.json",
         version_field="schema_version",
-        supported_versions=["aoa_center_entry_map_v1"],
+        supported_versions=["aoa_center_entry_map_v1", "aoa_center_entry_map_v2"],
     ),
     "Tree-of-Sophia.root_entry_map.min": SurfaceCompatibilityRule(
         surface_id="Tree-of-Sophia.root_entry_map.min",
@@ -88,7 +88,11 @@ SURFACE_COMPATIBILITY_RULES = {
     "abyss-stack.diagnostic_surface_catalog.min": SurfaceCompatibilityRule(
         surface_id="abyss-stack.diagnostic_surface_catalog.min",
         repo="abyss-stack",
-        relative_path="generated/diagnostic_surface_catalog.min.json",
+        relative_path=(
+            "mechanics/diagnostic-spine/parts/diagnostic-surfaces/generated/"
+            "diagnostic_surface_catalog.min.json"
+        ),
+        preferred_relative_paths=["generated/diagnostic_surface_catalog.min.json"],
         version_field="schema_version",
         supported_versions=["abyss_stack_diagnostic_surface_catalog_v1"],
     ),

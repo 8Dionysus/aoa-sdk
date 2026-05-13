@@ -69,6 +69,10 @@ CHECKPOINT_HOOK_MARKERS: dict[str, str] = {
     "pre-push": "# aoa-sdk checkpoint pre-push hook v1",
     "pre-merge-commit": "# aoa-sdk checkpoint pre-merge-commit hook v1",
 }
+CHECKPOINT_HOOK_WORKSPACE_ROOT_PLACEHOLDERS = (
+    "__AOA_CHECKPOINT_WORKSPACE_ROOT__",
+    "<workspace-root>",
+)
 PROMOTION_TARGETS = ("dionysus-note", "harvest-handoff")
 DATE_RE = re.compile(r"(\d{4}-\d{2}-\d{2})")
 SESSION_REF_RE = re.compile(r'"session_ref"\s*:\s*"([^"]+)"|session_ref:\s*`?([^`\s]+)`?|Session ref:\s*`?([^`\n]+)`?')
@@ -2030,13 +2034,31 @@ def _hook_template_path(
     workspace: Workspace,
     hook_name: Literal["post-commit", "pre-push", "pre-merge-commit"],
 ) -> Path:
-    workspace_candidate = workspace.repo_path("aoa-sdk") / "githooks" / hook_name
-    if workspace_candidate.exists():
-        return workspace_candidate
+    public_entry_root = _repo_path_if_available(workspace, "8Dionysus")
+    if public_entry_root is not None:
+        public_entry_candidate = public_entry_root / "config" / "git_hooks" / f"{hook_name}.sh"
+        if public_entry_candidate.exists():
+            return public_entry_candidate
+
+    workspace_candidate: Path | None = None
+    sdk_root = _repo_path_if_available(workspace, "aoa-sdk")
+    if sdk_root is not None:
+        workspace_candidate = sdk_root / "githooks" / hook_name
+        if workspace_candidate.exists():
+            return workspace_candidate
     package_candidate = Path(__file__).resolve().parents[3] / "githooks" / hook_name
     if package_candidate.exists():
         return package_candidate
-    return workspace_candidate
+    if workspace_candidate is not None:
+        return workspace_candidate
+    return package_candidate
+
+
+def _repo_path_if_available(workspace: Workspace, repo_name: str) -> Path | None:
+    try:
+        return workspace.repo_path(repo_name)
+    except RepoNotFound:
+        return None
 
 
 def _write_skill_detection_report(path: Path, report: object) -> None:
@@ -5395,7 +5417,10 @@ def _render_checkpoint_hook(
     marker = CHECKPOINT_HOOK_MARKERS[hook_name]
     if marker not in template:
         raise ValueError(f"{hook_name} hook template is missing the aoa-sdk version marker")
-    return template.replace("__AOA_CHECKPOINT_WORKSPACE_ROOT__", str(workspace.federation_root))
+    rendered = template
+    for placeholder in CHECKPOINT_HOOK_WORKSPACE_ROOT_PLACEHOLDERS:
+        rendered = rendered.replace(placeholder, str(workspace.federation_root))
+    return rendered
 
 
 def _ensure_repo_not_dirty(repo_root: Path, *, repo_name: str) -> None:

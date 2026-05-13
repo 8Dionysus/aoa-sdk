@@ -1731,7 +1731,7 @@ def checkpoint_install_hook(
     overwrite: bool = typer.Option(
         False,
         "--overwrite",
-        help="Replace stale existing hook files with the current aoa-sdk template.",
+        help="Replace stale existing hook files with the current managed checkpoint hook template.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
