@@ -260,6 +260,8 @@ def _target_matches_source(
 ) -> bool:
     if mode == "symlink":
         return target_dir.is_symlink() and target_dir.resolve() == source_dir.resolve()
+    if target_dir.is_symlink():
+        return False
     if not target_dir.is_dir():
         return False
     return _dir_digest(source_dir) == _dir_digest(target_dir)

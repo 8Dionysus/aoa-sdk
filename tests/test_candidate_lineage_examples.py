@@ -35,6 +35,18 @@ def test_closeout_candidate_lineage_map_example_validates_against_schema() -> No
     )
 
 
+def test_closeout_candidate_lineage_map_schema_allows_empty_reviewed_maps() -> None:
+    schema = load_json("schemas/closeout_candidate_lineage_map.schema.json")
+    Draft202012Validator(schema).validate(
+        {
+            "schema_version": "aoa_closeout_candidate_lineage_map_v1",
+            "session_ref": "session:no-candidates",
+            "reviewed": True,
+            "candidate_lineage_map": [],
+        }
+    )
+
+
 def test_closeout_owner_followthrough_map_example_validates_against_schema() -> None:
     validate_example(
         "schemas/closeout_owner_followthrough_map.schema.json",

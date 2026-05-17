@@ -65,6 +65,30 @@ def test_new_validate_and_gates(tmp_path):
     )
 
 
+def test_gate_rejects_closed_state(tmp_path):
+    state = tmp_path / "state.json"
+    run(
+        "new", "--workspace", str(tmp_path), "--operator", "tester", "--out", str(state)
+    )
+    run("close", "--state", str(state), "--reason", "done")
+
+    result = run(
+        "gate",
+        "--state",
+        str(state),
+        "--titan",
+        "Forge",
+        "--gate",
+        "mutation",
+        "--reason",
+        "late mutation",
+        check=False,
+    )
+
+    assert result.returncode != 0
+    assert "state is closed" in result.stderr
+
+
 def test_appserver_plan(tmp_path):
     prompt = tmp_path / "prompt.md"
     prompt.write_text("Summon Atlas, Sentinel, and Mneme.", encoding="utf-8")

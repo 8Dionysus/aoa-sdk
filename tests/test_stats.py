@@ -471,6 +471,17 @@ def test_stats_catalog_legacy_v1_remains_readable_without_state_override(workspa
     ]
 
 
+def test_stats_api_uses_one_snapshot_mode_when_live_state_is_partial(workspace_root: Path) -> None:
+    install_stats_fixture(workspace_root)
+    partial_live = workspace_root / "aoa-stats" / "state" / "generated" / "object_summary.min.json"
+    partial_live.unlink()
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    assert sdk.stats.generated_from().total_receipts == 2
+    assert sdk.stats.core_skill_applications(skill_name="aoa-session-donor-harvest")[0].application_count == 1
+
+
 def test_stats_regrounding_signal_requires_regrounding_for_thin_premutation(workspace_root: Path) -> None:
     install_stats_fixture(workspace_root)
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")

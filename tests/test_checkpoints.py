@@ -1584,7 +1584,7 @@ def test_checkpoint_status_archives_stale_current_note_when_runtime_session_chan
     assert not (second_note_dir / "checkpoint-note.json").exists()
 
 
-def test_checkpoint_status_archives_stale_legacy_fallback_when_scoped_note_exists(workspace_root: Path) -> None:
+def test_checkpoint_status_prefers_scoped_note_without_parsing_legacy_fallback(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     session_file = _write_runtime_session_file(
         workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json",
@@ -1596,20 +1596,8 @@ def test_checkpoint_status_archives_stale_legacy_fallback_when_scoped_note_exist
         repo_label="aoa-sdk",
         runtime_session_id="runtime-session-live",
     )
-    _write_checkpoint_history_entry(
-        note_dir=legacy_note_dir,
-        session_ref="session:test-stale",
-        runtime_session_id="runtime-session-stale",
-        repo_root=workspace_root / "aoa-sdk",
-        repo_label="aoa-sdk",
-        candidate_id="candidate:route:aoa-playbooks-playbook-registry-stale",
-        candidate_kind="route",
-        owner_hint="aoa-playbooks",
-        display_name="Stale recurring route candidate",
-        source_surface_ref="aoa-playbooks.playbook_registry.min",
-        evidence_refs=["aoa-playbooks.playbook_registry.min"],
-        progression_axis_signals=[],
-    )
+    legacy_note_dir.mkdir(parents=True)
+    (legacy_note_dir / "checkpoint-note.jsonl").write_text("{not-json\n", encoding="utf-8")
     _write_checkpoint_history_entry(
         note_dir=scoped_note_dir,
         session_ref="session:test-live",
@@ -1631,14 +1619,11 @@ def test_checkpoint_status_archives_stale_legacy_fallback_when_scoped_note_exist
     )
 
     archive_dirs = sorted((workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "archive").glob("aoa-sdk-*"))
-    archived_payload = json.loads((archive_dirs[-1] / "checkpoint-note.jsonl").read_text(encoding="utf-8").splitlines()[0])
 
     assert note.runtime_session_id == "runtime-session-live"
     assert note.session_ref == "session:test-live"
-    assert archive_dirs
-    assert archived_payload["runtime_session_id"] == "runtime-session-stale"
-    assert archived_payload["session_ref"] == "session:test-stale"
-    assert not (legacy_note_dir / "checkpoint-note.jsonl").exists()
+    assert archive_dirs == []
+    assert (legacy_note_dir / "checkpoint-note.jsonl").exists()
     assert (scoped_note_dir / "checkpoint-note.json").exists()
 
 
@@ -2159,7 +2144,7 @@ def test_build_closeout_context_uses_note_handoff_and_receipts(workspace_root: P
     assert "candidate_ref" not in route_lineage.model_dump()
     assert route_followthrough.cluster_ref == route_lineage.cluster_ref
     assert route_followthrough.nearest_wrong_target == route_lineage.nearest_wrong_target
-    assert route_followthrough.recommended_owner_status_surface == "aoa-skills:reviewed_owner_landing_bundle"
+    assert route_followthrough.recommended_owner_status_surface == "aoa-playbooks:reviewed_owner_landing_bundle"
     assert route_followthrough.requested_next_decision_class == {
         "early": "land_direct",
         "reanchor": "reanchor_owner",
@@ -2317,6 +2302,21 @@ def test_build_closeout_context_aggregates_runtime_session_notes_across_repo_lab
         promote_if=["write back only bounded, provenance-aware memory; memory is not proof"],
         defer_reason="thin evidence should stay local until another checkpoint confirms the same candidate",
     )
+    legacy_note_dir = _checkpoint_note_dir(workspace_root, repo_label="aoa-routing")
+    _write_checkpoint_history_entry(
+        note_dir=legacy_note_dir,
+        session_ref="session:test-runtime-fan-in-closeout",
+        runtime_session_id=runtime_session_id,
+        repo_root=workspace_root / "aoa-routing",
+        repo_label="aoa-routing",
+        candidate_id="candidate:route:legacy-unscoped-should-not-attach",
+        candidate_kind="route",
+        owner_hint="aoa-playbooks",
+        display_name="Legacy unscoped route candidate",
+        source_surface_ref="aoa-routing.owner_layer_shortlist.min",
+        evidence_refs=["aoa-routing.owner_layer_shortlist.min"],
+        progression_axis_signals=[],
+    )
 
     sdk.checkpoints.status(
         repo_root=str(workspace_root / "aoa-sdk"),
@@ -2341,10 +2341,12 @@ def test_build_closeout_context_aggregates_runtime_session_notes_across_repo_lab
     assert {
         Path(ref).parent.name for ref in context.checkpoint_note_refs
     } == {"aoa-sdk", "aoa-memo"}
+    assert str((legacy_note_dir / "checkpoint-note.json").resolve()) not in context.checkpoint_note_refs
     assert set(context.candidate_map.harvest_candidate_ids) == {
         "candidate:route:aoa-playbooks-playbook-registry-min",
         "candidate:recall:aoa-memo-memory-catalog-min",
     }
+    assert "candidate:route:legacy-unscoped-should-not-attach" not in context.candidate_map.harvest_candidate_ids
     assert set(context.candidate_map.progression_candidate_ids) == {
         "candidate:route:aoa-playbooks-playbook-registry-min",
         "candidate:recall:aoa-memo-memory-catalog-min",

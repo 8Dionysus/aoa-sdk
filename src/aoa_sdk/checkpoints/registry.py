@@ -169,6 +169,14 @@ FOLLOWTHROUGH_DECISION_BY_STATUS: dict[
     "thin-evidence": "prove_first",
     "stable": "land_direct",
 }
+OWNER_STATUS_SURFACE_BY_REPO = {
+    "aoa-agents": "aoa-agents:reviewed_owner_landing_bundle",
+    "aoa-evals": "aoa-evals:reviewed_owner_landing_bundle",
+    "aoa-memo": "aoa-memo:reviewed_owner_landing_bundle",
+    "aoa-playbooks": "aoa-playbooks:reviewed_owner_landing_bundle",
+    "aoa-skills": "aoa-skills:reviewed_owner_landing_bundle",
+    "aoa-techniques": "aoa-techniques:reviewed_owner_landing_bundle",
+}
 KERNEL_SIGNAL_SKILLS: tuple[FollowthroughSkillName, ...] = (
     "aoa-session-route-forks",
     "aoa-session-self-diagnose",
@@ -232,7 +240,10 @@ def _build_owner_followthrough_map(
             owner_shape=hint.owner_shape,
             nearest_wrong_target=hint.nearest_wrong_target,
             status_posture=hint.status_posture,
-            recommended_owner_status_surface="aoa-skills:reviewed_owner_landing_bundle",
+            recommended_owner_status_surface=OWNER_STATUS_SURFACE_BY_REPO.get(
+                hint.owner_hypothesis,
+                f"{hint.owner_hypothesis}:reviewed_owner_landing_bundle",
+            ),
             requested_next_decision_class=_requested_followthrough_decision_class(hint),
             evidence_refs=list(hint.evidence_refs),
         )
@@ -1987,6 +1998,8 @@ def _resolve_runtime_checkpoint_paths_for_label(
     legacy_paths = _checkpoint_paths_for_label(workspace, repo_label, runtime_session_id=None)
     if scoped_paths.current_dir == legacy_paths.current_dir:
         return scoped_paths
+    if scoped_paths.jsonl.exists():
+        return scoped_paths
     legacy_note: SessionCheckpointNote | None = None
     if legacy_paths.jsonl.exists():
         legacy_note = _load_checkpoint_note(legacy_paths.note_json)
@@ -1996,8 +2009,6 @@ def _resolve_runtime_checkpoint_paths_for_label(
         # exists, even if their payload happens to mention the same session id.
         if migrate_legacy and legacy_note.runtime_session_id is not None:
             _archive_current_checkpoint(legacy_paths)
-        return scoped_paths
-    if scoped_paths.jsonl.exists():
         return scoped_paths
     if not legacy_paths.jsonl.exists():
         return scoped_paths
@@ -4116,14 +4127,15 @@ def _load_runtime_checkpoint_notes_for_closeout(
                 )
                 seen_dirs.add(paths.current_dir)
                 candidate_paths.append(paths)
-    for current_dir in sorted(path for path in current_root.iterdir() if path.is_dir()):
-        if not (current_dir / "checkpoint-note.jsonl").exists():
-            continue
-        paths = _checkpoint_paths_for_label(api.workspace, current_dir.name, runtime_session_id=None)
-        if paths.current_dir in seen_dirs:
-            continue
-        candidate_paths.append(paths)
-        seen_dirs.add(paths.current_dir)
+    else:
+        for current_dir in sorted(path for path in current_root.iterdir() if path.is_dir()):
+            if not (current_dir / "checkpoint-note.jsonl").exists():
+                continue
+            paths = _checkpoint_paths_for_label(api.workspace, current_dir.name, runtime_session_id=None)
+            if paths.current_dir in seen_dirs:
+                continue
+            candidate_paths.append(paths)
+            seen_dirs.add(paths.current_dir)
 
     for paths in candidate_paths:
         if not paths.jsonl.exists():

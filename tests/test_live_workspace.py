@@ -14,6 +14,20 @@ LIVE_WORKSPACE_ROOT = Path(__file__).resolve().parents[1]
 
 def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green() -> None:
     sdk, expected_abyss_stack_source = _live_sdk_or_skip()
+    _require_live_repos(
+        sdk,
+        [
+            "8Dionysus",
+            "Dionysus",
+            "aoa-kag",
+            "aoa-memo",
+            "aoa-playbooks",
+            "aoa-routing",
+            "aoa-skills",
+            "aoa-stats",
+            "aoa-techniques",
+        ],
+    )
     report = {entry.surface_id: entry for entry in sdk.compatibility.check_all()}
 
     assert sdk.workspace.repo_path("abyss-stack") == expected_abyss_stack_source
@@ -83,6 +97,7 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
 
 def test_live_workspace_rpg_slice_reports_missing_future_transport_surfaces_honestly() -> None:
     sdk, expected_abyss_stack_source = _live_sdk_or_skip()
+    _require_live_repos(sdk, ["Agents-of-Abyss"])
     report = {entry.surface_id: entry for entry in sdk.rpg.compatibility.check_all()}
 
     expected_surface_ids = {
@@ -125,3 +140,11 @@ def _live_sdk_or_skip() -> tuple[AoASDK, Path]:
         pytest.skip("preferred abyss-stack source checkout is unavailable")
 
     return AoASDK.from_workspace(LIVE_WORKSPACE_ROOT), expected_abyss_stack_source
+
+
+def _require_live_repos(sdk: AoASDK, repo_names: list[str]) -> None:
+    for repo_name in repo_names:
+        try:
+            sdk.workspace.repo_path(repo_name)
+        except Exception:
+            pytest.skip(f"live workspace dependency is unavailable: {repo_name}")

@@ -1,5 +1,6 @@
 from aoa_sdk.titans.appserver_bridge import (
     AppServerJsonRpcBuilder,
+    BRIDGE_TITAN_ROSTER,
     TitanAppServerBridgeSession,
 )
 
@@ -31,3 +32,32 @@ def test_builder_and_session():
     s.unlock("Forge", "mutation", "ok")
     s.unlock("Delta", "judgment", "ok")
     assert not s.validate()
+
+
+def test_from_dict_copies_default_titan_roster() -> None:
+    first = TitanAppServerBridgeSession.from_dict(
+        {"session_id": "s1", "workspace_root": "/srv/AbyssOS"}
+    )
+    first.unlock("Forge", "mutation", "ok")
+
+    second = TitanAppServerBridgeSession.from_dict(
+        {"session_id": "s2", "workspace_root": "/srv/AbyssOS"}
+    )
+
+    assert next(titan for titan in BRIDGE_TITAN_ROSTER if titan["name"] == "Forge")["state"] == "locked"
+    assert next(titan for titan in second.titans if titan["name"] == "Forge")["state"] == "locked"
+
+
+def test_validate_reports_missing_titans_without_crashing() -> None:
+    session = TitanAppServerBridgeSession.from_dict(
+        {
+            "session_id": "s1",
+            "workspace_root": "/srv/AbyssOS",
+            "titans": [{"name": "Atlas", "role": "architect", "state": "active"}],
+        }
+    )
+
+    errors = session.validate()
+
+    assert "missing titan Forge" in errors
+    assert "missing titan Delta" in errors

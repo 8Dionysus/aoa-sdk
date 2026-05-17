@@ -230,6 +230,17 @@ def test_stats_projection_no_input_path_keeps_schema_provenance() -> None:
     Draft202012Validator(schema).validate(projection.model_dump(mode="json"))
 
 
+def test_stats_projection_schema_allows_empty_source_packet_refs() -> None:
+    projection = build_stats_projection(workspace()).model_dump(mode="json")
+    projection["source_packet_refs"] = []
+    schema = json.loads(
+        (ROOT / "schemas/recurrence-stats-projection.schema.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    Draft202012Validator(schema).validate(projection)
+
+
 def test_kag_projection_regrounds_without_claiming_canon() -> None:
     projection = build_kag_projection(
         workspace(),

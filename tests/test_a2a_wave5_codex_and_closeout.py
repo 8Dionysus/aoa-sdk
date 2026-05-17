@@ -4,6 +4,7 @@ from aoa_sdk.a2a.rebase import (
     SummonIntent,
     assess_summon,
     build_codex_local_target,
+    build_checkpoint_bridge_plan,
     build_memo_export_plan,
     build_reviewed_closeout_request,
     build_return_plan,
@@ -87,3 +88,50 @@ def test_closeout_request_and_runtime_receipt_keep_canonical_mapping() -> None:
     assert receipt["payload"]["return_reentry_mode"] == "checkpoint_relaunch"
     assert receipt["payload"]["codex_config_path"] == "/srv/AbyssOS/.codex/agents/reviewer.toml"
     assert request["memo_export_plan"]["contains_raw_trace"] is False
+
+
+def test_runtime_receipt_keeps_return_refs_when_bridge_refs_are_unset() -> None:
+    passport = QuestPassport(
+        difficulty="d1_patch",
+        risk="r1_repo_local",
+        control_mode="codex_supervised",
+        delegate_tier="executor",
+        route_anchor="bounded_plan",
+        expected_artifacts=["verification_result"],
+    )
+    intent = SummonIntent(
+        desired_role="reviewer", expected_outputs=["verification_result"]
+    )
+    decision = assess_summon(passport, intent)
+    result = RemoteTaskResult(
+        task_id="task-child-1",
+        state="failed",
+        agent_id="reviewer",
+        endpoint="codex://local/reviewer",
+        returned_artifacts=["verification_result"],
+    )
+    return_plan = build_return_plan(
+        result,
+        decision,
+        checkpoint_note_ref="aoa-sdk/.aoa/session-growth/current/example/checkpoint-note.json",
+        codex_trace_ref="aoa-sdk/.aoa/skill-runtime-sessions/example-trace.json",
+    )
+    bridge_plan = build_checkpoint_bridge_plan(
+        session_ref="session:example",
+        reviewed_artifact_path="/srv/notes/reviewed.md",
+        checkpoint_note_ref=None,
+        codex_trace_ref=None,
+        surviving_checkpoint_clusters=[],
+    )
+
+    receipt = build_runtime_wave_closeout_receipt(
+        result,
+        decision,
+        session_ref="session:example",
+        reviewed_artifact_path="/srv/notes/reviewed.md",
+        return_plan=return_plan,
+        checkpoint_bridge_plan=bridge_plan,
+    )
+
+    assert receipt["payload"]["checkpoint_note_ref"] == return_plan.checkpoint_note_ref
+    assert receipt["payload"]["codex_trace_ref"] == return_plan.codex_trace_ref

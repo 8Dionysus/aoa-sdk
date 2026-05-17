@@ -191,6 +191,8 @@ def cmd_event(a):
 def cmd_gate(a):
     p = Path(a.state)
     s = read(p)
+    if s.get("status") == "closed":
+        raise SystemExit("state is closed")
     exp = ROSTER[a.titan]["gate"]
     if exp != a.gate:
         raise SystemExit(f"{a.titan} requires gate={exp}, not {a.gate}")

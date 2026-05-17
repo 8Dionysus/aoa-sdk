@@ -5,6 +5,7 @@ from aoa_sdk.a2a.rebase import (
     assess_summon,
     build_checkpoint_bridge_plan,
     build_checkpoint_context_bundle,
+    build_summon_request_payload,
     build_return_plan,
     build_transition_decision_payload,
 )
@@ -85,3 +86,28 @@ def test_checkpoint_bridge_plan_keeps_fixed_order() -> None:
     ]
     assert bundle["mechanical_bridge_only"] is True
     assert bundle["agent_skill_application_required"] is True
+
+
+def test_summon_request_override_updates_nested_audit_refs() -> None:
+    passport = QuestPassport(
+        difficulty="d1_patch",
+        risk="r1_repo_local",
+        control_mode="codex_supervised",
+        delegate_tier="executor",
+        route_anchor="bounded_plan",
+        expected_artifacts=["verification_result"],
+    )
+    intent = SummonIntent(
+        desired_role="reviewer",
+        expected_outputs=["verification_result"],
+        audit_refs=["audit:original"],
+    )
+
+    payload = build_summon_request_payload(
+        passport,
+        intent,
+        audit_refs=["audit:override"],
+    )
+
+    assert payload["audit_refs"] == ["audit:override"]
+    assert payload["summon_request"]["audit_refs"] == ["audit:override"]

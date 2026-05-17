@@ -30,13 +30,23 @@ def progression_allows(
 
     reasons: list[str] = []
 
+    unknown_difficulties = [
+        item for item in overlay.unlocked_difficulties if item not in DIFFICULTY_ORDER
+    ]
+    if unknown_difficulties:
+        reasons.append("unknown_difficulty_unlock")
+    unknown_risks = [item for item in overlay.unlocked_risks if item not in RISK_ORDER]
+    if unknown_risks:
+        reasons.append("unknown_risk_unlock")
+
     max_difficulty = max(
-        (DIFFICULTY_ORDER[item] for item in overlay.unlocked_difficulties), default=-1
+        (DIFFICULTY_ORDER[item] for item in overlay.unlocked_difficulties if item in DIFFICULTY_ORDER),
+        default=-1,
     )
     if DIFFICULTY_ORDER[passport.difficulty] > max_difficulty:
         reasons.append("difficulty_not_unlocked")
 
-    max_risk = max((RISK_ORDER[item] for item in overlay.unlocked_risks), default=-1)
+    max_risk = max((RISK_ORDER[item] for item in overlay.unlocked_risks if item in RISK_ORDER), default=-1)
     if RISK_ORDER[passport.risk] > max_risk:
         reasons.append("risk_not_unlocked")
 
