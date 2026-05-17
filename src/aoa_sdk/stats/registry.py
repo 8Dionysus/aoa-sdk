@@ -3,7 +3,9 @@ from __future__ import annotations
 from builtins import list as builtin_list
 
 from ..compatibility import load_surface
-from ..errors import RecordNotFound
+from ..compatibility.policy import SURFACE_COMPATIBILITY_RULES, _evaluate_data
+from ..errors import IncompatibleSurfaceVersion, RecordNotFound, RepoNotFound, SurfaceNotFound
+from ..loaders import load_json
 from ..models import (
     StatsAutomationPipeline,
     StatsCoreSkillApplication,
@@ -21,12 +23,25 @@ from ..workspace.discovery import Workspace
 from .regrounding import build_regrounding_signal, is_regrounding_intent, select_regrounding_surfaces
 
 
+STATS_SURFACE_IDS = (
+    "aoa-stats.object_summary.min",
+    "aoa-stats.core_skill_application_summary.min",
+    "aoa-stats.repeated_window_summary.min",
+    "aoa-stats.route_progression_summary.min",
+    "aoa-stats.fork_calibration_summary.min",
+    "aoa-stats.automation_pipeline_summary.min",
+    "aoa-stats.surface_detection_summary.min",
+    "aoa-stats.source_coverage_summary.min",
+    "aoa-stats.summary_surface_catalog.min",
+)
+
+
 class StatsAPI:
     def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
 
     def generated_from(self) -> StatsGeneratedFrom:
-        data = load_surface(self.workspace, "aoa-stats.summary_surface_catalog.min")
+        data = self._load_stats_surface("aoa-stats.summary_surface_catalog.min")
         return StatsGeneratedFrom.model_validate(data.get("generated_from", {}))
 
     def object_summary(
@@ -108,11 +123,11 @@ class StatsAPI:
         raise RecordNotFound(f"Unknown stats automation pipeline: {pipeline_ref}")
 
     def summary_catalog(self) -> builtin_list[StatsSummarySurface]:
-        data = load_surface(self.workspace, "aoa-stats.summary_surface_catalog.min")
+        data = self._load_stats_surface("aoa-stats.summary_surface_catalog.min")
         return [StatsSummarySurface.model_validate(item) for item in data.get("surfaces", [])]
 
     def source_coverage(self) -> StatsSourceCoverageSummary:
-        data = load_surface(self.workspace, "aoa-stats.source_coverage_summary.min")
+        data = self._load_stats_surface("aoa-stats.source_coverage_summary.min")
         return StatsSourceCoverageSummary.model_validate(data)
 
     def surface_profile(self, surface_name: str) -> StatsSummarySurface:
@@ -173,29 +188,63 @@ class StatsAPI:
         raise RecordNotFound(f"Unknown stats surface detection window: {window_date}")
 
     def _object_summary_entries(self) -> builtin_list[StatsObjectSummaryEntry]:
-        data = load_surface(self.workspace, "aoa-stats.object_summary.min")
+        data = self._load_stats_surface("aoa-stats.object_summary.min")
         return [StatsObjectSummaryEntry.model_validate(item) for item in data.get("objects", [])]
 
     def _core_skill_application_entries(self) -> builtin_list[StatsCoreSkillApplication]:
-        data = load_surface(self.workspace, "aoa-stats.core_skill_application_summary.min")
+        data = self._load_stats_surface("aoa-stats.core_skill_application_summary.min")
         return [StatsCoreSkillApplication.model_validate(item) for item in data.get("skills", [])]
 
     def _repeated_window_entries(self) -> builtin_list[StatsRepeatedWindow]:
-        data = load_surface(self.workspace, "aoa-stats.repeated_window_summary.min")
+        data = self._load_stats_surface("aoa-stats.repeated_window_summary.min")
         return [StatsRepeatedWindow.model_validate(item) for item in data.get("windows", [])]
 
     def _route_progression_entries(self) -> builtin_list[StatsRouteProgression]:
-        data = load_surface(self.workspace, "aoa-stats.route_progression_summary.min")
+        data = self._load_stats_surface("aoa-stats.route_progression_summary.min")
         return [StatsRouteProgression.model_validate(item) for item in data.get("routes", [])]
 
     def _fork_calibration_entries(self) -> builtin_list[StatsForkCalibration]:
-        data = load_surface(self.workspace, "aoa-stats.fork_calibration_summary.min")
+        data = self._load_stats_surface("aoa-stats.fork_calibration_summary.min")
         return [StatsForkCalibration.model_validate(item) for item in data.get("routes", [])]
 
     def _automation_pipeline_entries(self) -> builtin_list[StatsAutomationPipeline]:
-        data = load_surface(self.workspace, "aoa-stats.automation_pipeline_summary.min")
+        data = self._load_stats_surface("aoa-stats.automation_pipeline_summary.min")
         return [StatsAutomationPipeline.model_validate(item) for item in data.get("pipelines", [])]
 
     def _surface_detection_entries(self) -> builtin_list[StatsSurfaceDetectionWindow]:
-        data = load_surface(self.workspace, "aoa-stats.surface_detection_summary.min")
+        data = self._load_stats_surface("aoa-stats.surface_detection_summary.min")
         return [StatsSurfaceDetectionWindow.model_validate(item) for item in data.get("windows", [])]
+
+    def _load_stats_surface(self, surface_id: str):
+        rule = SURFACE_COMPATIBILITY_RULES[surface_id]
+        relative_path = self._stats_relative_path(surface_id)
+        try:
+            data = load_json(self.workspace.surface_path(rule.repo, relative_path))
+        except (RepoNotFound, SurfaceNotFound):
+            data = load_surface(self.workspace, surface_id)
+            return data
+        result = _evaluate_data(rule, data, resolved_relative_path=relative_path)
+        if not result.compatible:
+            raise IncompatibleSurfaceVersion(
+                f"Incompatible surface {surface_id}: {result.reason}"
+            )
+        return data
+
+    def _stats_relative_path(self, surface_id: str) -> str:
+        rule = SURFACE_COMPATIBILITY_RULES[surface_id]
+        if self._use_live_stats_snapshot() and rule.preferred_relative_paths:
+            return rule.preferred_relative_paths[0]
+        return rule.relative_path
+
+    def _use_live_stats_snapshot(self) -> bool:
+        for surface_id in STATS_SURFACE_IDS:
+            rule = SURFACE_COMPATIBILITY_RULES[surface_id]
+            if not rule.preferred_relative_paths:
+                continue
+            try:
+                path = self.workspace.surface_path(rule.repo, rule.preferred_relative_paths[0])
+            except RepoNotFound:
+                return False
+            if not path.is_file():
+                return False
+        return True

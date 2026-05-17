@@ -25,6 +25,9 @@
     "session_id": {
       "type": "string"
     },
+    "created_at": {
+      "type": "string"
+    },
     "counts": {
       "type": "object"
     },

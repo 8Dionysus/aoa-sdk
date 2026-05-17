@@ -169,8 +169,15 @@ def add_report(ledger: dict[str, Any], report: Mapping[str, Any]) -> dict[str, A
     titan_name = str(report.get("titan_name") or "")
     if titan_name not in TITAN_BEARERS:
         raise ValueError("report must name a known titan_name")
-    if not report.get("task_id"):
+    task_id = str(report.get("task_id") or "")
+    if not task_id:
         raise ValueError("report must reference task_id")
+    task_contracts = [task for task in ledger.get("tasks", []) if isinstance(task, Mapping)]
+    matching_task = next((task for task in task_contracts if str(task.get("task_id") or "") == task_id), None)
+    if matching_task is None:
+        raise ValueError("report task_id must reference an existing task")
+    if str(matching_task.get("titan_name") or "") != titan_name:
+        raise ValueError("report titan_name must match the referenced task")
     source_refs = report.get("source_refs")
     if not isinstance(source_refs, list) or not source_refs:
         raise ValueError("report requires non-empty source_refs")
@@ -179,7 +186,7 @@ def add_report(ledger: dict[str, Any], report: Mapping[str, Any]) -> dict[str, A
     normalized["schema_version"] = normalized.get("schema_version", "titan_agent_report/v1")
     normalized["report_id"] = report_id
     normalized["created_at"] = normalized.get("created_at", utc_now())
-    ledger.setdefault("reports", []).append(normalized)
+    findings: list[TitanFinding] = []
     for raw in normalized.get("findings", []):
         if not isinstance(raw, Mapping):
             continue
@@ -197,7 +204,9 @@ def add_report(ledger: dict[str, Any], report: Mapping[str, Any]) -> dict[str, A
             raise ValueError(f"invalid finding status: {finding.status}")
         if not finding.evidence_refs:
             raise ValueError("finding requires evidence_refs")
-        ledger.setdefault("findings", []).append(asdict(finding))
+        findings.append(finding)
+    ledger.setdefault("reports", []).append(normalized)
+    ledger.setdefault("findings", []).extend(asdict(finding) for finding in findings)
     return ledger
 
 

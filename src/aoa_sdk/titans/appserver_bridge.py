@@ -56,6 +56,10 @@ BRIDGE_TITAN_ROSTER: List[Dict[str, Any]] = [
 ]
 
 
+def _copy_titan_roster(entries: List[Dict[str, Any]]) -> List[Dict[str, Any]]:
+    return [dict(entry) for entry in entries]
+
+
 @dataclass
 class AppServerJsonRpcBuilder:
     client_name: str = "abyss_titan_appserver_bridge"
@@ -228,7 +232,7 @@ class TitanAppServerBridgeSession:
     thread_id: Optional[str] = None
     turn_id: Optional[str] = None
     titans: List[Dict[str, Any]] = field(
-        default_factory=lambda: [dict(x) for x in BRIDGE_TITAN_ROSTER]
+        default_factory=lambda: _copy_titan_roster(BRIDGE_TITAN_ROSTER)
     )
     events: List[Dict[str, Any]] = field(default_factory=list)
     approvals: List[Dict[str, Any]] = field(default_factory=list)
@@ -256,7 +260,7 @@ class TitanAppServerBridgeSession:
             data.get("transport", "stdio"),
             data.get("thread_id"),
             data.get("turn_id"),
-            list(data.get("titans", BRIDGE_TITAN_ROSTER)),
+            _copy_titan_roster(data.get("titans", BRIDGE_TITAN_ROSTER)),
             list(data.get("events", [])),
             list(data.get("approvals", [])),
             list(data.get("gates", [])),
@@ -389,16 +393,19 @@ class TitanAppServerBridgeSession:
 
     def validate(self):
         errors = []
-        names = {t["name"] for t in self.titans}
+        roster = {t.get("name"): t for t in self.titans}
+        names = set(roster)
         for req in ["Atlas", "Sentinel", "Mneme", "Forge", "Delta"]:
             if req not in names:
                 errors.append(f"missing titan {req}")
-        if self.titan("Forge").get("state") == "active" and not any(
+        forge = roster.get("Forge")
+        delta = roster.get("Delta")
+        if forge is not None and forge.get("state") == "active" and not any(
             g.get("titan") == "Forge" and g.get("gate") == "mutation"
             for g in self.gates
         ):
             errors.append("Forge active without mutation gate")
-        if self.titan("Delta").get("state") == "active" and not any(
+        if delta is not None and delta.get("state") == "active" and not any(
             g.get("titan") == "Delta" and g.get("gate") == "judgment"
             for g in self.gates
         ):

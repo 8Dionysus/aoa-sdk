@@ -86,6 +86,51 @@ def test_workspace_bootstrap_execute_installs_foundation_and_agents(workspace_ro
     assert (workspace_root / ".agents" / "skills" / "aoa-checkpoint-closeout-bridge").is_symlink()
 
 
+def test_workspace_bootstrap_rejects_unknown_install_mode(workspace_root: Path) -> None:
+    _seed_bootstrap_workspace(workspace_root)
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        ["workspace", "bootstrap", str(workspace_root), "--mode", "symink", "--json"],
+    )
+
+    assert result.exit_code != 0
+    assert "Invalid value" in result.output
+
+
+def test_workspace_bootstrap_copy_mode_replaces_existing_skill_symlink(
+    workspace_root: Path,
+) -> None:
+    _seed_bootstrap_workspace(workspace_root)
+    runner = CliRunner()
+
+    result = runner.invoke(
+        app,
+        ["workspace", "bootstrap", str(workspace_root), "--execute", "--json"],
+    )
+    assert result.exit_code == 0, result.output
+
+    result = runner.invoke(
+        app,
+        [
+            "workspace",
+            "bootstrap",
+            str(workspace_root),
+            "--mode",
+            "copy",
+            "--execute",
+            "--overwrite",
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0, result.output
+    installed_skill = workspace_root / ".agents" / "skills" / "aoa-change-protocol"
+    assert installed_skill.is_dir()
+    assert not installed_skill.is_symlink()
+
+
 def test_compatibility_check_can_emit_repo_filtered_json(workspace_root: Path) -> None:
     runner = CliRunner()
     result = runner.invoke(

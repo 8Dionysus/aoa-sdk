@@ -37,6 +37,7 @@ def build_summon_request_payload(
     request_payload = to_jsonable(intent)
     request_payload["expected_outputs"] = list(resolved_outputs)
     request_payload["reviewed_artifact_path"] = resolved_reviewed_artifact_path
+    request_payload["audit_refs"] = list(audit_refs or intent.audit_refs)
 
     return {
         "quest_passport": to_jsonable(passport),

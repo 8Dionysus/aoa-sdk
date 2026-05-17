@@ -150,6 +150,40 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-kag.federation_spine.min"].compatible is True
 
 
+def test_diagnostic_surface_catalog_prefers_part_local_path_over_legacy_fallback(
+    workspace_root: Path,
+) -> None:
+    stack_root = workspace_root / "src" / "abyss-stack"
+    legacy_path = stack_root / "generated" / "diagnostic_surface_catalog.min.json"
+    legacy_path.write_text(
+        json.dumps({"schema_version": "stale_legacy_diagnostic_surface_catalog_v0"}) + "\n",
+        encoding="utf-8",
+    )
+    part_local_path = (
+        stack_root
+        / "mechanics"
+        / "diagnostic-spine"
+        / "parts"
+        / "diagnostic-surfaces"
+        / "generated"
+        / "diagnostic_surface_catalog.min.json"
+    )
+    part_local_path.parent.mkdir(parents=True, exist_ok=True)
+    part_local_path.write_text(
+        json.dumps({"schema_version": "abyss_stack_diagnostic_surface_catalog_v1"}) + "\n",
+        encoding="utf-8",
+    )
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    report = sdk.compatibility.check("abyss-stack.diagnostic_surface_catalog.min")
+
+    assert report.compatible is True
+    assert report.resolved_relative_path == (
+        "mechanics/diagnostic-spine/parts/diagnostic-surfaces/generated/"
+        "diagnostic_surface_catalog.min.json"
+    )
+
+
 def test_center_entry_map_current_v2_is_compatible(workspace_root: Path) -> None:
     seed_center_capsule_fixtures(workspace_root)
     surface_path = workspace_root / "Agents-of-Abyss" / "generated" / "center_entry_map.min.json"

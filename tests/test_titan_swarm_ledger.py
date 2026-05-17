@@ -100,3 +100,81 @@ def test_report_requires_source_refs() -> None:
         assert "source_refs" in str(exc)
     else:
         raise AssertionError("source-less report should fail")
+
+
+def test_report_must_reference_existing_task_id() -> None:
+    ledger = new_ledger(session_id="session:test", operator="Dionysus")
+
+    try:
+        add_report(
+            ledger,
+            {
+                "task_id": "task:missing",
+                "titan_name": "Mneme",
+                "source_refs": ["receipt:1"],
+                "findings": [],
+            },
+        )
+    except ValueError as exc:
+        assert "existing task" in str(exc)
+    else:
+        raise AssertionError("orphan report should fail")
+
+
+def test_report_titan_must_match_referenced_task() -> None:
+    ledger = new_ledger(session_id="session:test", operator="Dionysus")
+    add_task(
+        ledger,
+        titan_name="Mneme",
+        mode="provenance_check",
+        scope=["receipt"],
+        question="What should be remembered?",
+    )
+    task_id = ledger["tasks"][0]["task_id"]
+
+    try:
+        add_report(
+            ledger,
+            {
+                "task_id": task_id,
+                "titan_name": "Sentinel",
+                "source_refs": ["receipt:1"],
+                "findings": [],
+            },
+        )
+    except ValueError as exc:
+        assert "match the referenced task" in str(exc)
+    else:
+        raise AssertionError("cross-titan report should fail")
+
+
+def test_report_with_invalid_finding_does_not_partially_mutate_ledger() -> None:
+    ledger = new_ledger(session_id="session:test", operator="Dionysus")
+    add_task(
+        ledger,
+        titan_name="Sentinel",
+        mode="compact_review",
+        scope=["diff"],
+        question="Any issue?",
+        diff_excerpt_required=True,
+        source_refs=["diff:1"],
+    )
+    task_id = ledger["tasks"][0]["task_id"]
+
+    try:
+        add_report(
+            ledger,
+            {
+                "task_id": task_id,
+                "titan_name": "Sentinel",
+                "source_refs": ["diff:1"],
+                "findings": [{"claim": "missing evidence refs"}],
+            },
+        )
+    except ValueError as exc:
+        assert "evidence_refs" in str(exc)
+    else:
+        raise AssertionError("invalid finding should fail")
+
+    assert ledger.get("reports", []) == []
+    assert ledger.get("findings", []) == []

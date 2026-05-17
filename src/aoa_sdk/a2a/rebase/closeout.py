@@ -81,8 +81,10 @@ def build_runtime_wave_closeout_receipt(
             }
         )
     if checkpoint_bridge_plan:
-        payload["checkpoint_note_ref"] = checkpoint_bridge_plan.checkpoint_note_ref
-        payload["codex_trace_ref"] = checkpoint_bridge_plan.codex_trace_ref
+        if checkpoint_bridge_plan.checkpoint_note_ref is not None:
+            payload["checkpoint_note_ref"] = checkpoint_bridge_plan.checkpoint_note_ref
+        if checkpoint_bridge_plan.codex_trace_ref is not None:
+            payload["codex_trace_ref"] = checkpoint_bridge_plan.codex_trace_ref
     if codex_target:
         payload["codex_role"] = codex_target.role
         payload["codex_config_path"] = codex_target.config_path

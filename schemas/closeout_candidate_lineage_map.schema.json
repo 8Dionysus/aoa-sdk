@@ -23,7 +23,6 @@
     },
     "candidate_lineage_map": {
       "type": "array",
-      "minItems": 1,
       "items": {
         "type": "object",
         "additionalProperties": false,

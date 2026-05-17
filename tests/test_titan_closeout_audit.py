@@ -1,6 +1,14 @@
 from __future__ import annotations
 
+import json
+from pathlib import Path
+
+from jsonschema import Draft202012Validator
+
 from aoa_sdk.titans.swarm_ledger import add_grade, add_timeout, new_ledger, validate_ledger
+
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
 
 
 def test_grade_records_orchestration_fault_separately_from_titan_fault() -> None:
@@ -41,3 +49,19 @@ def test_timeout_record_tracks_prompt_compression_features() -> None:
     timeout = ledger["timeouts"][0]
     assert timeout["scope_width"] == "broad"
     assert timeout["diff_excerpt_present"] is False
+
+
+def test_titan_closeout_audit_schema_accepts_emitted_created_at() -> None:
+    schema = json.loads((REPO_ROOT / "schemas/titan_closeout_audit.schema.json").read_text(encoding="utf-8"))
+    Draft202012Validator(schema).validate(
+        {
+            "schema_version": "titan_closeout_audit/v1",
+            "closeout_id": "closeout:test",
+            "ledger_id": "ledger:test",
+            "session_id": "session:test",
+            "created_at": "2026-05-17T16:00:00Z",
+            "counts": {},
+            "memory_candidates": [],
+            "summary": "closed",
+        }
+    )

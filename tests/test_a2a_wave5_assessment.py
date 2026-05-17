@@ -79,3 +79,31 @@ def test_progression_gate_passes_with_unlocks() -> None:
     assert (
         decision.lane == "codex_local_leaf" or decision.lane == "codex_local_reviewed"
     )
+
+
+def test_progression_gate_denies_unknown_unlock_labels_without_crashing() -> None:
+    passport = QuestPassport(
+        difficulty="d2_slice",
+        risk="r1_repo_local",
+        control_mode="codex_supervised",
+        delegate_tier="executor",
+        route_anchor="bounded_plan",
+        expected_artifacts=["verification_result"],
+    )
+    intent = SummonIntent(
+        desired_role="reviewer",
+        expected_outputs=["verification_result"],
+        require_progression=True,
+    )
+    progression = ProgressionOverlay(
+        agent_id="reviewer",
+        unlocked_difficulties=["d0_probe", "d99_unknown"],
+        unlocked_risks=["r0_readonly", "r9_unknown"],
+        unlocked_cohorts=["solo"],
+    )
+
+    decision = assess_summon(passport, intent, progression=progression)
+
+    assert decision.allowed is False
+    assert "unknown_difficulty_unlock" in decision.reason_codes
+    assert "unknown_risk_unlock" in decision.reason_codes

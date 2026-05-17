@@ -964,7 +964,7 @@ def workspace_inspect(
 @workspace_app.command("bootstrap")
 def workspace_bootstrap(
     target_root: str = typer.Argument(..., help="Sibling-workspace root that already contains the public repos."),
-    mode: str = typer.Option("symlink", "--mode", help="Foundation install mode: symlink or copy."),
+    mode: Literal["symlink", "copy"] = typer.Option("symlink", "--mode", help="Foundation install mode: symlink or copy."),
     execute: bool = typer.Option(False, "--execute", help="Apply the bootstrap plan instead of only reporting it."),
     overwrite: bool = typer.Option(
         False,
@@ -990,7 +990,7 @@ def workspace_bootstrap(
 ) -> None:
     report = bootstrap_workspace(
         target_root,
-        mode=mode,  # type: ignore[arg-type]
+        mode=mode,
         execute=execute,
         overwrite=overwrite,
         write_agents=write_agents,
