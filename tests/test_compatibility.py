@@ -192,15 +192,27 @@ def test_memo_writeback_surfaces_prefer_mechanics_paths_over_legacy_fallback(
         json.dumps({"contract_type": "checkpoint_to_memory_contract"}) + "\n",
         encoding="utf-8",
     )
-    mechanics_example = (
+    writeback_example = (
         memo_root
         / "mechanics"
         / "writeback"
         / "examples"
         / "checkpoint_to_memory_contract.example.json"
     )
-    mechanics_example.parent.mkdir(parents=True, exist_ok=True)
-    mechanics_example.write_text(
+    writeback_example.parent.mkdir(parents=True, exist_ok=True)
+    writeback_example.write_text(
+        json.dumps({"contract_type": "checkpoint_to_memory_contract"}) + "\n",
+        encoding="utf-8",
+    )
+    checkpoint_example = (
+        memo_root
+        / "mechanics"
+        / "checkpoint"
+        / "examples"
+        / "checkpoint_to_memory_contract.example.json"
+    )
+    checkpoint_example.parent.mkdir(parents=True, exist_ok=True)
+    checkpoint_example.write_text(
         json.dumps(
             {
                 "contract_type": "checkpoint_to_memory_contract",
@@ -232,7 +244,7 @@ def test_memo_writeback_surfaces_prefer_mechanics_paths_over_legacy_fallback(
     assert contract.compatible is True
     assert (
         contract.resolved_relative_path
-        == "mechanics/writeback/examples/checkpoint_to_memory_contract.example.json"
+        == "mechanics/checkpoint/examples/checkpoint_to_memory_contract.example.json"
     )
     for surface_id in preferred_paths:
         report = sdk.compatibility.check(surface_id)
