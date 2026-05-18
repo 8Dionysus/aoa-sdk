@@ -184,6 +184,64 @@ def test_diagnostic_surface_catalog_prefers_part_local_path_over_legacy_fallback
     )
 
 
+def test_memo_writeback_surfaces_prefer_mechanics_paths_over_legacy_fallback(
+    workspace_root: Path,
+) -> None:
+    memo_root = workspace_root / "aoa-memo"
+    (memo_root / "examples" / "checkpoint_to_memory_contract.example.json").write_text(
+        json.dumps({"contract_type": "checkpoint_to_memory_contract"}) + "\n",
+        encoding="utf-8",
+    )
+    mechanics_example = (
+        memo_root
+        / "mechanics"
+        / "writeback"
+        / "examples"
+        / "checkpoint_to_memory_contract.example.json"
+    )
+    mechanics_example.parent.mkdir(parents=True, exist_ok=True)
+    mechanics_example.write_text(
+        json.dumps(
+            {
+                "contract_type": "checkpoint_to_memory_contract",
+                "contract_id": "checkpoint-to-memory-v1",
+                "mapping_rules": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    preferred_paths = {
+        "aoa-memo.runtime_writeback_targets.min": "runtime_writeback_targets.min.json",
+        "aoa-memo.runtime_writeback_intake.min": "runtime_writeback_intake.min.json",
+        "aoa-memo.runtime_writeback_governance.min": "runtime_writeback_governance.min.json",
+    }
+    for filename in preferred_paths.values():
+        (memo_root / "generated" / filename).write_text(
+            json.dumps({"schema_version": 0}) + "\n",
+            encoding="utf-8",
+        )
+        preferred = memo_root / "mechanics" / "writeback" / "generated" / filename
+        preferred.parent.mkdir(parents=True, exist_ok=True)
+        preferred.write_text(json.dumps({"schema_version": 1}) + "\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    contract = sdk.compatibility.check("aoa-memo.checkpoint_to_memory_contract.example")
+
+    assert contract.compatible is True
+    assert (
+        contract.resolved_relative_path
+        == "mechanics/writeback/examples/checkpoint_to_memory_contract.example.json"
+    )
+    for surface_id in preferred_paths:
+        report = sdk.compatibility.check(surface_id)
+        assert report.compatible is True
+        assert report.resolved_relative_path == (
+            "mechanics/writeback/generated/" + preferred_paths[surface_id]
+        )
+
+
 def test_center_entry_map_current_v2_is_compatible(workspace_root: Path) -> None:
     seed_center_capsule_fixtures(workspace_root)
     surface_path = workspace_root / "Agents-of-Abyss" / "generated" / "center_entry_map.min.json"

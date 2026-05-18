@@ -344,15 +344,22 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-memo.checkpoint_to_memory_contract.example",
         repo="aoa-memo",
         relative_path="examples/checkpoint_to_memory_contract.example.json",
+        preferred_relative_paths=[
+            "mechanics/writeback/examples/checkpoint_to_memory_contract.example.json"
+        ],
         version_field=None,
         supported_versions=[],
         required_top_level_keys=["contract_type", "contract_id", "mapping_rules"],
-        notes="Unversioned example contract; treated as strict-shape local-first dependency.",
+        notes=(
+            "Unversioned example contract; prefer mechanics/writeback ownership path "
+            "while retaining legacy examples/ fallback."
+        ),
     ),
     "aoa-memo.runtime_writeback_targets.min": SurfaceCompatibilityRule(
         surface_id="aoa-memo.runtime_writeback_targets.min",
         repo="aoa-memo",
         relative_path="generated/runtime_writeback_targets.min.json",
+        preferred_relative_paths=["mechanics/writeback/generated/runtime_writeback_targets.min.json"],
         version_field="schema_version",
         supported_versions=[1],
     ),
@@ -360,6 +367,7 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-memo.runtime_writeback_intake.min",
         repo="aoa-memo",
         relative_path="generated/runtime_writeback_intake.min.json",
+        preferred_relative_paths=["mechanics/writeback/generated/runtime_writeback_intake.min.json"],
         version_field="schema_version",
         supported_versions=[1],
     ),
@@ -367,6 +375,7 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-memo.runtime_writeback_governance.min",
         repo="aoa-memo",
         relative_path="generated/runtime_writeback_governance.min.json",
+        preferred_relative_paths=["mechanics/writeback/generated/runtime_writeback_governance.min.json"],
         version_field="schema_version",
         supported_versions=[1],
     ),
