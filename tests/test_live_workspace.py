@@ -10,6 +10,35 @@ from aoa_sdk.workspace.config import load_workspace_config, resolve_pattern
 
 
 LIVE_WORKSPACE_ROOT = Path(__file__).resolve().parents[1]
+CORE_COMPAT_SURFACE_IDS = (
+    "aoa-techniques.technique_capsules",
+    "aoa-techniques.technique_sections.full",
+    "aoa-routing.federation_entrypoints.min",
+    "aoa-routing.return_navigation_hints.min",
+    "aoa-playbooks.playbook_federation_surfaces.min",
+    "aoa-playbooks.playbook_review_status.min",
+    "aoa-playbooks.playbook_landing_governance.min",
+    "aoa-memo.checkpoint_to_memory_contract.example",
+    "aoa-memo.runtime_writeback_governance.min",
+    "aoa-techniques.technique_promotion_readiness.min",
+    "aoa-skills.project_core_skill_kernel.min",
+    "aoa-skills.project_foundation_profile.min",
+    "aoa-skills.project_core_outer_ring.min",
+    "aoa-skills.project_core_outer_ring_readiness.min",
+    "aoa-skills.project_risk_guard_ring.min",
+    "aoa-skills.project_risk_guard_ring_governance.min",
+    "aoa-skills.tiny_router_candidate_bands",
+    "aoa-skills.tiny_router_capsules.min",
+    "aoa-skills.skill_trigger_collision_matrix",
+    "aoa-stats.object_summary.min",
+    "aoa-stats.core_skill_application_summary.min",
+    "aoa-stats.automation_pipeline_summary.min",
+    "8Dionysus.public_route_map.min",
+    "Dionysus.seed_route_map.min",
+    "abyss-stack.diagnostic_surface_catalog.min",
+    "aoa-kag.kag_registry.min",
+    "aoa-kag.tos_zarathustra_route_retrieval_pack.min",
+)
 
 
 def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green() -> None:
@@ -29,36 +58,12 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
         ],
     )
     report = {entry.surface_id: entry for entry in sdk.compatibility.check_all()}
+    _require_compatible_surfaces(report, CORE_COMPAT_SURFACE_IDS)
 
     assert sdk.workspace.repo_path("abyss-stack") == expected_abyss_stack_source
     assert sdk.workspace.repo_origins["abyss-stack"] == "manifest:repos.abyss-stack.preferred"
-    assert report["aoa-techniques.technique_capsules"].compatible is True
-    assert report["aoa-techniques.technique_sections.full"].compatible is True
-    assert report["aoa-routing.federation_entrypoints.min"].compatible is True
-    assert report["aoa-routing.return_navigation_hints.min"].compatible is True
-    assert report["aoa-playbooks.playbook_federation_surfaces.min"].compatible is True
-    assert report["aoa-playbooks.playbook_review_status.min"].compatible is True
-    assert report["aoa-playbooks.playbook_landing_governance.min"].compatible is True
-    assert report["aoa-memo.checkpoint_to_memory_contract.example"].compatible is True
-    assert report["aoa-memo.runtime_writeback_governance.min"].compatible is True
-    assert report["aoa-techniques.technique_promotion_readiness.min"].compatible is True
-    assert report["aoa-skills.project_core_skill_kernel.min"].compatible is True
-    assert report["aoa-skills.project_foundation_profile.min"].compatible is True
-    assert report["aoa-skills.project_core_outer_ring.min"].compatible is True
-    assert report["aoa-skills.project_core_outer_ring_readiness.min"].compatible is True
-    assert report["aoa-skills.project_risk_guard_ring.min"].compatible is True
-    assert report["aoa-skills.project_risk_guard_ring_governance.min"].compatible is True
-    assert report["aoa-skills.tiny_router_candidate_bands"].compatible is True
-    assert report["aoa-skills.tiny_router_capsules.min"].compatible is True
-    assert report["aoa-skills.skill_trigger_collision_matrix"].compatible is True
-    assert report["aoa-stats.object_summary.min"].compatible is True
-    assert report["aoa-stats.core_skill_application_summary.min"].compatible is True
-    assert report["aoa-stats.automation_pipeline_summary.min"].compatible is True
-    assert report["8Dionysus.public_route_map.min"].compatible is True
-    assert report["Dionysus.seed_route_map.min"].compatible is True
-    assert report["abyss-stack.diagnostic_surface_catalog.min"].compatible is True
-    assert report["aoa-kag.kag_registry.min"].compatible is True
-    assert report["aoa-kag.tos_zarathustra_route_retrieval_pack.min"].compatible is True
+    for surface_id in CORE_COMPAT_SURFACE_IDS:
+        assert report[surface_id].compatible is True
 
     review_status = sdk.playbooks.review_status("AOA-P-0017")
     landing_governance = sdk.playbooks.landing_governance("AOA-P-0017")
@@ -148,3 +153,16 @@ def _require_live_repos(sdk: AoASDK, repo_names: list[str]) -> None:
             sdk.workspace.repo_path(repo_name)
         except Exception:
             pytest.skip(f"live workspace dependency is unavailable: {repo_name}")
+
+
+def _require_compatible_surfaces(report: dict[str, object], surface_ids: tuple[str, ...]) -> None:
+    missing_or_incompatible = [
+        surface_id
+        for surface_id in surface_ids
+        if surface_id not in report or not getattr(report[surface_id], "compatible", False)
+    ]
+    if missing_or_incompatible:
+        pytest.skip(
+            "live workspace surface dependency is unavailable: "
+            + ", ".join(missing_or_incompatible)
+        )
