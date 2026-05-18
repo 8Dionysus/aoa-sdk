@@ -345,13 +345,14 @@ SURFACE_COMPATIBILITY_RULES = {
         repo="aoa-memo",
         relative_path="examples/checkpoint_to_memory_contract.example.json",
         preferred_relative_paths=[
+            "mechanics/checkpoint/examples/checkpoint_to_memory_contract.example.json",
             "mechanics/writeback/examples/checkpoint_to_memory_contract.example.json"
         ],
         version_field=None,
         supported_versions=[],
         required_top_level_keys=["contract_type", "contract_id", "mapping_rules"],
         notes=(
-            "Unversioned example contract; prefer mechanics/writeback ownership path "
+            "Unversioned example contract; prefer mechanic-owned checkpoint/writeback paths "
             "while retaining legacy examples/ fallback."
         ),
     ),
