@@ -89,3 +89,29 @@ def test_memo_runtime_writeback_governance_resolves_through_targets_and_intake(
         assert governance.intake_posture == "review_candidate_only"
         assert governance.governance_passed is True
         assert governance.blockers == []
+
+
+def test_memo_writeback_map_source_files_follow_preferred_contract_path(
+    workspace_root: Path,
+) -> None:
+    memo_root = workspace_root / "aoa-memo"
+    legacy_contract = memo_root / "examples" / "checkpoint_to_memory_contract.example.json"
+    preferred_contract = (
+        memo_root
+        / "mechanics"
+        / "checkpoint"
+        / "examples"
+        / "checkpoint_to_memory_contract.example.json"
+    )
+    writeback_doc = memo_root / "mechanics" / "writeback" / "docs" / "RUNTIME_WRITEBACK_SEAM.md"
+    preferred_contract.parent.mkdir(parents=True, exist_ok=True)
+    writeback_doc.parent.mkdir(parents=True, exist_ok=True)
+    preferred_contract.write_text(legacy_contract.read_text(encoding="utf-8"), encoding="utf-8")
+    writeback_doc.write_text("# Runtime Writeback Seam\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    writeback = sdk.memo.writeback_map("checkpoint_export")
+
+    assert str(preferred_contract) in writeback.source_files
+    assert str(legacy_contract) not in writeback.source_files
+    assert str(writeback_doc) in writeback.source_files

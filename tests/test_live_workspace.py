@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from pathlib import Path
+from types import SimpleNamespace
 
 import pytest
 
@@ -156,13 +157,44 @@ def _require_live_repos(sdk: AoASDK, repo_names: list[str]) -> None:
 
 
 def _require_compatible_surfaces(report: dict[str, object], surface_ids: tuple[str, ...]) -> None:
-    missing_or_incompatible = [
+    missing = [
         surface_id
         for surface_id in surface_ids
-        if surface_id not in report or not getattr(report[surface_id], "compatible", False)
+        if surface_id not in report
     ]
-    if missing_or_incompatible:
+    if missing:
         pytest.skip(
             "live workspace surface dependency is unavailable: "
-            + ", ".join(missing_or_incompatible)
+            + ", ".join(missing)
         )
+    incompatible = [
+        surface_id
+        for surface_id in surface_ids
+        if not getattr(report[surface_id], "compatible", False)
+    ]
+    if incompatible:
+        details = [
+            f"{surface_id}: {getattr(report[surface_id], 'reason', 'incompatible')}"
+            for surface_id in incompatible
+        ]
+        raise AssertionError(
+            "live workspace surface dependency is incompatible: "
+            + "; ".join(details)
+        )
+
+
+def test_require_compatible_surfaces_skips_only_missing_surfaces() -> None:
+    with pytest.raises(pytest.skip.Exception):
+        _require_compatible_surfaces({}, ("missing.surface",))
+
+
+def test_require_compatible_surfaces_fails_incompatible_surfaces() -> None:
+    report = {
+        "present.surface": SimpleNamespace(
+            compatible=False,
+            reason="Detected unsupported version.",
+        )
+    }
+
+    with pytest.raises(AssertionError, match="present\\.surface"):
+        _require_compatible_surfaces(report, ("present.surface",))
