@@ -3,7 +3,7 @@ from __future__ import annotations
 from builtins import list as builtin_list
 import re
 
-from ..compatibility import load_surface
+from ..compatibility import CompatibilityAPI, load_surface
 from ..errors import RecordNotFound
 from ..models import (
     MemoCapsule,
@@ -156,7 +156,8 @@ class MemoAPI:
         raise RecordNotFound(f"Unknown memo object section bundle: {id_or_title}")
 
     def writeback_map(self, runtime_surface: str) -> MemoWritebackMap:
-        data = load_surface(self.workspace, "aoa-memo.checkpoint_to_memory_contract.example")
+        contract_surface_id = "aoa-memo.checkpoint_to_memory_contract.example"
+        data = load_surface(self.workspace, contract_surface_id)
         for item in data.get("mapping_rules", []):
             if item.get("runtime_surface") != runtime_surface:
                 continue
@@ -167,11 +168,21 @@ class MemoAPI:
                 runtime_boundary=data.get("runtime_boundary", {}),
                 mapping=MemoWritebackRule.model_validate(item),
                 source_files=[
-                    str(self.workspace.surface_path("aoa-memo", "examples/checkpoint_to_memory_contract.example.json")),
-                    str(self.workspace.surface_path("aoa-memo", "docs/RUNTIME_WRITEBACK_SEAM.md")),
+                    self._resolved_surface_file(contract_surface_id),
+                    str(
+                        self.workspace.surface_path(
+                            "aoa-memo",
+                            "mechanics/writeback/docs/RUNTIME_WRITEBACK_SEAM.md",
+                        )
+                    ),
                 ],
             )
         raise RecordNotFound(f"Unknown memo writeback runtime surface: {runtime_surface}")
+
+    def _resolved_surface_file(self, surface_id: str) -> str:
+        report = CompatibilityAPI(self.workspace).check(surface_id)
+        relative_path = report.resolved_relative_path or report.relative_path
+        return str(self.workspace.surface_path(report.repo, relative_path))
 
     def writeback_targets(self) -> builtin_list[MemoWritebackTarget]:
         data = load_surface(self.workspace, "aoa-memo.runtime_writeback_targets.min")
