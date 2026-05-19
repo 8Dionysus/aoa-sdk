@@ -160,7 +160,7 @@ def _require_compatible_surfaces(report: dict[str, object], surface_ids: tuple[s
     missing = [
         surface_id
         for surface_id in surface_ids
-        if surface_id not in report
+        if surface_id not in report or getattr(report[surface_id], "exists", True) is False
     ]
     if missing:
         pytest.skip(
@@ -188,9 +188,23 @@ def test_require_compatible_surfaces_skips_only_missing_surfaces() -> None:
         _require_compatible_surfaces({}, ("missing.surface",))
 
 
+def test_require_compatible_surfaces_skips_existing_report_for_missing_surface() -> None:
+    report = {
+        "missing.surface": SimpleNamespace(
+            exists=False,
+            compatible=False,
+            reason="Surface file is missing.",
+        )
+    }
+
+    with pytest.raises(pytest.skip.Exception):
+        _require_compatible_surfaces(report, ("missing.surface",))
+
+
 def test_require_compatible_surfaces_fails_incompatible_surfaces() -> None:
     report = {
         "present.surface": SimpleNamespace(
+            exists=True,
             compatible=False,
             reason="Detected unsupported version.",
         )
