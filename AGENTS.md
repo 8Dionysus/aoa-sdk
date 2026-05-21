@@ -46,7 +46,7 @@ It does not own:
 ## Memory route
 
 For control-plane recall, continuity, compaction recovery, comparison with past
-work, or preserved lessons, start with `aoa_memo` and the workspace memory map.
+work, or preserved lessons, start with `aoa-memo` and the workspace memory map.
 Session grounding routes through `.aoa`; local candidate writing routes through
 this repository's `memo/` port when that port exists; durable reviewed memory
 lands through `aoa-memo`.
