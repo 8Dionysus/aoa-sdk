@@ -12,7 +12,9 @@ It is configuration for explicit discovery, not a hidden source of truth for rep
 
 - Keep `.aoa/workspace.toml`, `docs/workspace-layout.md`, and `src/aoa_sdk/workspace/discovery.py` aligned.
 - Prefer explicit config over no hidden path guessing.
-- Preserve the split between source checkouts and runtime mirrors: /srv/abyss-stack is a deployed runtime mirror, not the preferred source checkout.
+- Preserve the split between source checkouts and runtime mirrors:
+  /srv/AbyssOS/abyss-stack is a deployed runtime mirror, not the preferred source
+  checkout.
 - Keep `/srv` assumptions documented and overrideable.
 - Do not add machine-local secrets, private paths, or unreviewable heuristics.
 
