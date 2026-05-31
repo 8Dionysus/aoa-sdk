@@ -16,7 +16,7 @@ This repository owns:
 - workspace discovery, topology resolution, compatibility checks, versioning posture, and CLI inspection surfaces
 - the compact control-plane capsule at `generated/workspace_control_plane.min.json`
 - the mechanics topology skeleton under `mechanics/`, including package route
-  cards and `mechanics/topology.json`
+  cards, source-family routes, and `mechanics/topology.json`
 - additive surface detection and reviewed closeout handoff helpers that remain owner-subordinate
 
 It does not own:

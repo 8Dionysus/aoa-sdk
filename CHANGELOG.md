@@ -92,8 +92,13 @@ Tracking starts with the community-docs baseline for this repository.
   `TOPOLOGY_PREP.md`, `topology.json`, a validator, and regression tests.
 - `AOA-SDK-D-0005` as the parent-boundary correction decision, superseding the
   first skeleton's parent package set.
+- `AOA-SDK-D-0006` as the source-family crosswalk decision, making every
+  `src/aoa_sdk/*` family route through a parent mechanic without promoting
+  module names into parents.
 - Regression coverage for decision-index freshness, design-route presence,
   canonical sibling compatibility paths, and memo source-file path selection.
+- Mechanics topology validation now checks live `src/aoa_sdk/*` source-family
+  coverage in addition to the parent package set and demoted parent candidates.
 
 ### Changed
 

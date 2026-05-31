@@ -102,6 +102,11 @@ tests, compatibility checks, or handoff artifacts.
 Mechanics do not replace the Python source lane. They route operation pressure
 around it.
 
+Every `src/aoa_sdk/*` family must have a route in
+`mechanics/topology.json#source_family_routes`. A source family name alone is
+not evidence for a parent mechanic; it may be a facade, loader, command entry,
+or part of a shared parent operation.
+
 Top-level mechanics follow the shared AoA parent vocabulary when that
 vocabulary already carries the operation. Local SDK lanes such as
 compatibility, skill routing, surface detection, workspace topology, closeout,

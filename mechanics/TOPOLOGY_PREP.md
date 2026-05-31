@@ -11,7 +11,7 @@ The first pass used tracked files only, so transient caches and local runtime
 artifacts do not shape the skeleton.
 
 ```text
-tracked files: 1000
+tracked files: 1056
 ```
 
 Top-level tracked distribution:
@@ -23,25 +23,26 @@ Top-level tracked distribution:
 | `.github` | 7 | CI and GitHub landing surfaces |
 | root singletons | 9 | public entry, design, route law, release, package metadata |
 | `config` | 12 | Agon seed inputs |
-| `docs` | 152 | authored boundaries, API contracts, recurrence, Agon, Titan, closeout, release |
+| `docs` | 154 | authored boundaries, API contracts, decisions, recurrence, Agon, Titan, closeout, release |
 | `examples` | 112 | public-safe fixtures and schema examples |
 | `generated` | 14 | lower-authority control-plane companions |
 | `githooks` | 4 | optional active-session git boundary integration |
 | `manifests` | 21 | recurrence component and hook manifests |
+| `mechanics` | 52 | operation topology cards, parts, provenance, and validator inputs |
 | `quests` | 12 | Agon helper quest candidates |
 | `schemas` | 122 | SDK helper contract schemas |
-| `scripts` | 49 | builders, validators, operators, release checks |
+| `scripts` | 50 | builders, validators, operators, release checks |
 | `src` | 106 | importable typed SDK source |
 | `systemd` | 3 | optional bounded closeout inbox automation |
-| `tests` | 164 | regression, fixture, schema, CLI, and route checks |
+| `tests` | 165 | regression, fixture, schema, CLI, and route checks |
 
 Extension distribution:
 
 | Extension | Count | Reading |
 | --- | ---: | --- |
-| `.json` | 356 | schemas, examples, generated companions, config, manifests, fixtures |
-| `.md` | 286 | route cards, docs, decisions, skill exports, examples |
-| `.py` | 240 | SDK source, tests, builders, validators, operator scripts |
+| `.json` | 357 | schemas, examples, generated companions, config, manifests, fixtures |
+| `.md` | 339 | route cards, docs, decisions, mechanics, skill exports, examples |
+| `.py` | 242 | SDK source, tests, builders, validators, operator scripts |
 | `.svg` | 50 | documentation and skill assets |
 | `.yaml` | 44 | skill metadata and workflow support |
 | no extension | 5 | license and hook/runtime command files |
@@ -81,7 +82,7 @@ district.
 | `skills` | 6 | discovery, disclosure, activation, detector, and runtime session support |
 | `workspace` | 5 | root discovery, config, roots, and portable bootstrap |
 | `rpg` | 4 | typed RPG registry, models, and surface-path helpers |
-| root package | 4 | SDK public API, models, errors, package init |
+| root package | 5 | SDK public API, models, errors, package init, source route card |
 | `surfaces` | 3 | additive surface registry and heuristics |
 | `stats` | 3 | source coverage, profile, and regrounding signals |
 | `routing` | 3 | picker and hints over loaded surfaces |
@@ -99,6 +100,39 @@ district.
 | `cli` | 2 | command surface |
 | `checkpoints` | 2 | checkpoint registry |
 | `agents` | 2 | phase binding facade |
+
+## Source Family Route Crosswalk
+
+Every tracked `src/aoa_sdk/*` source family has one primary mechanic route.
+This prevents a module family from being mistaken for a parent mechanic solely
+because it has files.
+
+| Source family | Primary mechanic | Reading |
+| --- | --- | --- |
+| root package | `boundary-bridge` | public API, model labels, errors, and source route law are facade/truth-label surfaces |
+| `a2a` | `checkpoint` | summon return and re-entry helpers are checkpoint/closeout return parts |
+| `agents` | `boundary-bridge` | phase bindings read sibling-owned surfaces |
+| `checkpoints` | `checkpoint` | checkpoint registry and review gates are the parent operation |
+| `cli` | `boundary-bridge` | cross-mechanic command facade; follow the command's owning mechanic after entry |
+| `closeout` | `checkpoint` | reviewed closeout is a checkpoint bridge part |
+| `codex` | `codex-projection` | workspace MCP and deploy-status readers project Codex-facing state |
+| `compatibility` | `boundary-bridge` | compatibility policy bridges consumed sibling surfaces |
+| `evals` | `boundary-bridge` | eval readers are typed handles over proof-owner surfaces |
+| `governed_runs` | `boundary-bridge` | governed-run artifacts bridge abyss-stack and playbook review targets |
+| `kag` | `boundary-bridge` | KAG readers expose owner surfaces without canonization authority |
+| `loaders` | `boundary-bridge` | JSON loaders are surface-access substrate for facades |
+| `memo` | `boundary-bridge` | memo readers expose memory-owner surfaces |
+| `playbooks` | `boundary-bridge` | playbook readers expose activation, handoff, and governance surfaces |
+| `recurrence` | `recurrence` | manifests, graph, hooks, projections, review, and observation form the parent operation |
+| `release` | `release-support` | audit and publish helpers support release gates |
+| `routing` | `boundary-bridge` | routing hints bridge tasks to owner surfaces |
+| `rpg` | `rpg` | RPG typed consumer helpers form the RPG parent operation |
+| `skills` | `boundary-bridge` | discovery and dispatch remain below `aoa-skills` ownership |
+| `stats` | `boundary-bridge` | stats readers expose `aoa-stats` surfaces without owning stats truth |
+| `surfaces` | `boundary-bridge` | detection reports are advisory bridge and handoff surfaces |
+| `techniques` | `boundary-bridge` | technique readiness readers expose `aoa-techniques` surfaces |
+| `titans` | `titan` | Titan helper families form the Titan parent operation |
+| `workspace` | `runtime-seam` | root discovery, config, and bootstrap are runtime/source seam surfaces |
 
 ## Contract Family Inventory
 

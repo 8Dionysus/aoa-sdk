@@ -71,10 +71,14 @@ python scripts/generate_decision_indexes.py --check
 
 ## Active Mechanics Decision
 
-The corrected mechanics topology is recorded in
-`AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`. It supersedes the
-first inventory-based skeleton's parent package set while preserving the same
-route-only rule: no source payload moved into `mechanics/`.
+The corrected parent mechanics topology is recorded in
+`AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`. The source-family
+coverage guard is recorded in
+`AOA-SDK-D-0006-mechanics-source-family-crosswalk.md`.
+
+Together they supersede the first inventory-based skeleton's parent package set
+while preserving the same route-only rule: no source payload moved into
+`mechanics/`.
 
 ## Addressing
 

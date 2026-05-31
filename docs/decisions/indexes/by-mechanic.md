@@ -30,6 +30,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) | 2026-05-31 | compatibility, sibling topology, generated route | compatibility policy, control-plane, sibling read path | source topology, compatibility check, canonical path | accepted |
 | [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | source topology, mechanics topology, release check | accepted |
 
 ## checkpoint
 
@@ -37,6 +38,7 @@ Grouped by `Mechanic parents` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | source topology, mechanics topology, release check | accepted |
 
 ## closeout
 
@@ -55,6 +57,7 @@ Grouped by `Mechanic parents` metadata.
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | source topology, mechanics topology, release check | accepted |
 
 ## compatibility
 
@@ -88,6 +91,7 @@ Grouped by `Mechanic parents` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | source topology, mechanics topology, release check | accepted |
 
 ## release-support
 
@@ -95,6 +99,7 @@ Grouped by `Mechanic parents` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | source topology, mechanics topology, release check | accepted |
 
 ## rpg
 
@@ -102,12 +107,14 @@ Grouped by `Mechanic parents` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | source topology, mechanics topology, release check | accepted |
 
 ## runtime-seam
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | source topology, mechanics topology, release check | accepted |
 
 ## skill-routing
 
@@ -127,6 +134,7 @@ Grouped by `Mechanic parents` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | source topology, mechanics topology, release check | accepted |
 
 ## workspace-topology
 

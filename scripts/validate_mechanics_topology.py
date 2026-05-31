@@ -84,6 +84,33 @@ def _path_exists(repo_root: Path, rel_path: str) -> bool:
     return (repo_root / rel_path).exists()
 
 
+def _source_families(repo_root: Path) -> set[str]:
+    source_root = repo_root / "src" / "aoa_sdk"
+    families: set[str] = set()
+    root_files = False
+    if not source_root.is_dir():
+        return families
+
+    for path in source_root.iterdir():
+        name = path.name
+        if name == "__pycache__" or name.endswith(".pyc"):
+            continue
+        if path.is_dir():
+            families.add(name)
+        elif path.is_file():
+            root_files = True
+
+    if root_files:
+        families.add("root-package")
+    return families
+
+
+def _source_family_surface(family: str) -> str:
+    if family == "root-package":
+        return "src/aoa_sdk/api.py"
+    return f"src/aoa_sdk/{family}"
+
+
 def validate(repo_root: Path = REPO_ROOT) -> list[str]:
     repo_root = repo_root.resolve()
     issues: list[str] = []
@@ -106,6 +133,20 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
     if not isinstance(parent_rule, str) or "SDK-specific lanes become parts" not in parent_rule:
         issues.append("mechanics/topology.json: missing parent boundary rule")
 
+    source_family_routes = topology.get("source_family_routes")
+    if not isinstance(source_family_routes, dict):
+        issues.append("mechanics/topology.json: source_family_routes must be an object")
+        source_family_routes = {}
+    else:
+        actual_families = _source_families(repo_root)
+        routed_families = set(source_family_routes)
+        missing_routes = sorted(actual_families - routed_families)
+        extra_routes = sorted(routed_families - actual_families)
+        for family in missing_routes:
+            issues.append(f"mechanics/topology.json: missing source family route for {family}")
+        for family in extra_routes:
+            issues.append(f"mechanics/topology.json: source family route has no source family {family}")
+
     demoted = topology.get("demoted_parent_candidates")
     if not isinstance(demoted, dict):
         issues.append("mechanics/topology.json: demoted_parent_candidates must be an object")
@@ -122,6 +163,7 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
         return issues
 
     package_slugs: list[str] = []
+    package_source_surfaces: dict[str, set[str]] = {}
     for item in packages:
         if not isinstance(item, dict):
             issues.append("mechanics/topology.json: each package must be an object")
@@ -170,6 +212,7 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
         if not isinstance(source_surfaces, list) or not source_surfaces:
             issues.append(f"mechanics/topology.json: {slug} has no source_surfaces")
         else:
+            package_source_surfaces[slug] = {rel_path for rel_path in source_surfaces if isinstance(rel_path, str)}
             for rel_path in source_surfaces:
                 if not isinstance(rel_path, str) or not rel_path:
                     issues.append(f"mechanics/topology.json: {slug} has invalid source surface")
@@ -191,6 +234,31 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
             f"expected {expected!r}, found {package_slugs!r}"
         )
 
+    expected_set = set(EXPECTED_PACKAGES)
+    if isinstance(source_family_routes, dict):
+        for family, route in source_family_routes.items():
+            if not isinstance(route, dict):
+                issues.append(f"mechanics/topology.json: source family route {family} must be an object")
+                continue
+            primary = route.get("primary_mechanic")
+            if primary not in expected_set:
+                issues.append(f"mechanics/topology.json: source family route {family} has invalid primary mechanic")
+                continue
+            secondary = route.get("secondary_mechanics", [])
+            if secondary is not None:
+                if not isinstance(secondary, list) or any(item not in expected_set for item in secondary):
+                    issues.append(f"mechanics/topology.json: source family route {family} has invalid secondary mechanics")
+            reason = route.get("reason")
+            if not isinstance(reason, str) or not reason:
+                issues.append(f"mechanics/topology.json: source family route {family} missing reason")
+            surface = _source_family_surface(family)
+            primary_surfaces = package_source_surfaces.get(primary, set())
+            if surface not in primary_surfaces:
+                issues.append(
+                    f"mechanics/topology.json: source family route {family} points to {primary}, "
+                    f"but {surface} is not listed in that package source_surfaces"
+                )
+
     root_readme = repo_root / MECHANICS_DIR / "README.md"
     if root_readme.is_file():
         text = root_readme.read_text(encoding="utf-8")
@@ -201,11 +269,15 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
     topology_prep = repo_root / MECHANICS_DIR / "TOPOLOGY_PREP.md"
     if topology_prep.is_file():
         text = topology_prep.read_text(encoding="utf-8")
-        if "tracked files: 1000" not in text:
+        if "tracked files: 1056" not in text:
             issues.append("mechanics/TOPOLOGY_PREP.md: missing tracked-file inventory")
         for slug in EXPECTED_PACKAGES:
             if f"`{slug}`" not in text:
                 issues.append(f"mechanics/TOPOLOGY_PREP.md: missing package {slug}")
+        for family in _source_families(repo_root):
+            label = "root package" if family == "root-package" else f"`{family}`"
+            if label not in text:
+                issues.append(f"mechanics/TOPOLOGY_PREP.md: missing source family {family}")
 
     return issues
 

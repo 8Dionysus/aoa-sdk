@@ -144,7 +144,8 @@ For repository-shape, source-home, route-law, or mechanics topology changes, rea
 - `generated/` remains derived.
 - `scripts/` owns deterministic builders and validators.
 - `tests/` owns regression proof for expected behavior.
-- `mechanics/` owns repeatable operation topology, not SDK source code.
+- `mechanics/` owns repeatable operation topology, not SDK source code. Its
+  topology map also owns source-family routing.
 
 ## Canonical Card Shape
 

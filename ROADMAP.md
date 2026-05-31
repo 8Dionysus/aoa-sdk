@@ -52,6 +52,10 @@ release contour is:
   `mechanics/README.md`, `mechanics/TOPOLOGY_PREP.md`,
   `mechanics/topology.json`, `scripts/validate_mechanics_topology.py`, and
   `docs/decisions/AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`
+- source-family crosswalk coverage for every `src/aoa_sdk/*` family:
+  `mechanics/topology.json`,
+  `docs/decisions/AOA-SDK-D-0006-mechanics-source-family-crosswalk.md`, and
+  `tests/test_mechanics_topology.py`
 - Codex-plane deploy-state and rollout reference boundaries:
   `docs/CODEX_PLANE_DEPLOY_STATUS.md`,
   `docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`,

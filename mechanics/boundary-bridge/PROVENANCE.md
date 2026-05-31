@@ -3,10 +3,17 @@
 ## Source Surfaces
 
 - `docs/boundaries.md`
+- `src/aoa_sdk/AGENTS.md`
+- `src/aoa_sdk/__init__.py`
+- `src/aoa_sdk/api.py`
+- `src/aoa_sdk/errors.py`
+- `src/aoa_sdk/models.py`
 - `src/aoa_sdk/agents/`
+- `src/aoa_sdk/cli/`
 - `src/aoa_sdk/evals/`
 - `src/aoa_sdk/governed_runs/`
 - `src/aoa_sdk/kag/`
+- `src/aoa_sdk/loaders/`
 - `src/aoa_sdk/memo/`
 - `src/aoa_sdk/playbooks/`
 - `src/aoa_sdk/routing/`
@@ -17,8 +24,12 @@
 - `src/aoa_sdk/techniques/`
 - `tests/test_agents.py`
 - `tests/test_evals.py`
+- `tests/test_governed_runs.py`
+- `tests/test_kag.py`
 - `tests/test_memo.py`
+- `tests/test_playbooks.py`
 - `tests/test_routing.py`
+- `tests/test_techniques.py`
 
 ## Stronger Owners
 
