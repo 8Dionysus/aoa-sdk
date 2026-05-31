@@ -69,6 +69,12 @@ Check generated parity before closeout:
 python scripts/generate_decision_indexes.py --check
 ```
 
+## Active Mechanics Decision
+
+The first mechanics topology skeleton is recorded in
+`AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md`. It is route-only: no
+source payload moved into `mechanics/` in that decision.
+
 ## Addressing
 
 Full canonical-ID decision paths are the active source files:

@@ -15,6 +15,8 @@ This repository owns:
 - typed SDK facades over consumed federation surfaces
 - workspace discovery, topology resolution, compatibility checks, versioning posture, and CLI inspection surfaces
 - the compact control-plane capsule at `generated/workspace_control_plane.min.json`
+- the mechanics topology skeleton under `mechanics/`, including package route
+  cards and `mechanics/topology.json`
 - additive surface detection and reviewed closeout handoff helpers that remain owner-subordinate
 
 It does not own:
@@ -25,8 +27,8 @@ It does not own:
 ## Start here
 
 1. `README.md`
-2. `DESIGN.md` when repository shape, source-home placement, or future
-   mechanics topology changes
+2. `DESIGN.md` when repository shape, source-home placement, or mechanics
+   topology changes
 3. `DESIGN.AGENTS.md` when agent-facing guidance, local cards, validation
    posture, or closeout shape changes
 4. `docs/boundaries.md`
@@ -34,9 +36,11 @@ It does not own:
 6. `docs/versioning.md`
 7. `ROADMAP.md`
 8. `docs/decisions/README.md` when topology, owner split, route-law, workflow, or validator authority changes
-9. `.aoa/workspace.toml`
-10. source files and tests you plan to touch
-11. `docs/AGENTS_ROOT_REFERENCE.md` for preserved full root guidance, especially checkpoint-hook and closeout-loop details
+9. `mechanics/README.md` when repeatable SDK operation topology or package
+   routing changes
+10. `.aoa/workspace.toml`
+11. source files and tests you plan to touch
+12. `docs/AGENTS_ROOT_REFERENCE.md` for preserved full root guidance, especially checkpoint-hook and closeout-loop details
 
 
 ## AGENTS stack law
@@ -78,8 +82,8 @@ boundary docs, generated companions, validators, or sibling-owner truth.
 ## Design review
 
 Use `DESIGN.md` when a change alters repository shape, source-home placement,
-source versus generated authority, compatibility posture, or future
-`mechanics/` package placement.
+source versus generated authority, compatibility posture, or `mechanics/`
+package placement.
 
 Use `DESIGN.AGENTS.md` when a change alters the root-to-local `AGENTS.md`
 mesh, reading order, route-card shape, validation posture, closeout
@@ -130,6 +134,7 @@ Minimum validation for code, topology, or reviewed-handoff changes:
 
 ```bash
 python scripts/generate_decision_indexes.py --check
+python scripts/validate_mechanics_topology.py
 python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
 python -m pytest -q

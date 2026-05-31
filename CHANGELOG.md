@@ -9,7 +9,7 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
-- This unreleased line carries the post-`v0.2.3` control-plane refactor span:
+- The May 31 reconciliation point covered the post-`v0.2.3` control-plane refactor span:
   22 first-parent commits and 382 changed tracked paths from `v0.2.3..main`,
   including the May 31 decision/design landing and the earlier portable
   skill, session-growth, memo-compatibility, live-workspace, and route-card
@@ -18,6 +18,9 @@ Tracking starts with the community-docs baseline for this repository.
   the refactored AoA repositories: decisions explain why, design surfaces
   explain system and agent-facing form, generated indexes stay derived, and
   root documents stay route-focused.
+- `aoa-sdk` now has a first mechanics topology skeleton after full tracked-file
+  inventory: package cards route 15 repeatable SDK operations without moving
+  payload or widening SDK ownership.
 - The SDK remains a bounded typed control plane for sibling-owned surfaces. It
   can discover, validate, inspect, and hand off source-owned artifacts, but it
   still does not own routing truth, skill execution meaning, proof verdicts,
@@ -48,6 +51,9 @@ Tracking starts with the community-docs baseline for this repository.
 - Decision records now live under canonical `AOA-SDK-D-####` filenames with
   generated lookup indexes by number, date, surface, SDK facet, mechanic
   parent, and guard family.
+- Mechanics now live under `mechanics/` as route-only operation topology, with
+  source-surface provenance, candidate parts, package-local route cards, and a
+  dedicated topology validator.
 - Compatibility policy now follows refactored sibling owner paths for
   `aoa-memo` memory, memory-object, checkpoint-to-memory, runtime-writeback,
   and `aoa-evals` runtime-candidate surfaces instead of treating old
@@ -60,9 +66,9 @@ Tracking starts with the community-docs baseline for this repository.
 
 - `src/aoa_sdk/` stays the importable SDK source home; a future top-level
   `sdk/` district is not added merely to mirror the package name.
-- Future `mechanics/` packages should name repeatable SDK operations, not
-  absorb typed SDK source, generated companions, release tooling, or sibling
-  source truth by theme.
+- `mechanics/` packages name repeatable SDK operations. The first skeleton
+  does not absorb typed SDK source, generated companions, release tooling, or
+  sibling source truth by theme.
 - Local compatibility repairs should move the canonical path to the stronger
   owner-local path. Hidden compatibility fallback is not a substitute for
   acknowledging sibling topology drift.
@@ -70,7 +76,7 @@ Tracking starts with the community-docs baseline for this repository.
 ### Added
 
 - Root `DESIGN.md` as the SDK system-form surface for source homes, generated
-  companions, control-plane boundaries, and the future mechanics split.
+  companions, control-plane boundaries, and the mechanics split.
 - Root `DESIGN.AGENTS.md` as the agent-facing design surface for route-card
   shape, validation posture, closeout expectations, and future local guidance
   growth.
@@ -78,6 +84,9 @@ Tracking starts with the community-docs baseline for this repository.
   local `AGENTS.md`, index contract, generated read models, release-check
   wiring, and initial decisions for decisions-before-mechanics,
   design-before-mechanics, and refactored sibling surface paths.
+- `mechanics/` as the SDK operation-topology skeleton with root and
+  package-local `AGENTS.md`, `README.md`, `PARTS.md`, `PROVENANCE.md`,
+  `TOPOLOGY_PREP.md`, `topology.json`, a validator, and regression tests.
 - Regression coverage for decision-index freshness, design-route presence,
   canonical sibling compatibility paths, and memo source-file path selection.
 
@@ -88,6 +97,8 @@ Tracking starts with the community-docs baseline for this repository.
   instead of carrying the full explanation inline.
 - `scripts/release_check.py` now checks generated decision indexes before the
   rest of the release gate.
+- `scripts/release_check.py` now checks mechanics topology before the rest of
+  the release gate.
 - `scripts/validate_nested_agents.py` recognizes `DESIGN.AGENTS.md` as an
   active agent-facing guidance surface.
 - `src/aoa_sdk/codex/workspace_mcp.py` and `src/aoa_sdk/routing/picker.py`
@@ -112,6 +123,7 @@ Tracking starts with the community-docs baseline for this repository.
 ### Validation
 
 - `python scripts/generate_decision_indexes.py --check`
+- `python scripts/validate_mechanics_topology.py`
 - `python scripts/build_workspace_control_plane.py --check`
 - `python scripts/validate_workspace_control_plane.py`
 - `python -m pytest -q`
