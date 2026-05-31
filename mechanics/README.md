@@ -12,7 +12,9 @@ outside, and which validator proves the crossing?
 
 ## Source Basis
 
-This topology was derived from the tracked `aoa-sdk` file inventory:
+This topology was derived from the tracked `aoa-sdk` file inventory and then
+corrected against live mechanics sources in `Agents-of-Abyss`, `aoa-agents`,
+`aoa-memo`, `aoa-evals`, `aoa-skills`, and `aoa-techniques`:
 
 - 1000 tracked files.
 - 20 top-level districts or singleton root surfaces.
@@ -23,6 +25,8 @@ This topology was derived from the tracked `aoa-sdk` file inventory:
 - matching schema, example, generated, script, manifest, quest, and test
   families for recurrence, Agon, Titan, Experience APIs, checkpoint/closeout,
   A2A return, workspace, and release support.
+- sibling mechanics repeatedly put narrow lanes under parent `PARTS.md` rather
+  than promoting every file family to a parent package.
 
 The detailed inventory and derivation rules live in
 [`TOPOLOGY_PREP.md`](TOPOLOGY_PREP.md). The machine-readable package map lives
@@ -32,21 +36,18 @@ in [`topology.json`](topology.json).
 
 | Mechanic | Name type | Operation |
 | --- | --- | --- |
-| [`workspace-topology`](workspace-topology/README.md) | SDK-local | workspace root, sibling lookup, runtime mirror, and control-plane capsule topology |
-| [`compatibility`](compatibility/README.md) | SDK-local | consumed sibling-surface compatibility and canonical-path drift checks |
-| [`boundary-bridge`](boundary-bridge/README.md) | shared | typed facade owner split between SDK handles and sibling meaning |
-| [`skill-routing`](skill-routing/README.md) | SDK-local | portable skill discovery, disclosure, activation, and phase-aware dispatch |
-| [`surface-detection`](surface-detection/README.md) | SDK-local | additive owner-layer surface detection and reviewed handoff |
-| [`checkpoint`](checkpoint/README.md) | shared | session checkpoint capture, review-note gates, and closeout context bridge |
-| [`closeout`](closeout/README.md) | shared | reviewed session closeout request, inbox, manifest, and owner followthrough |
-| [`recurrence`](recurrence/README.md) | shared | recurrence manifests, hooks, graph, review, projections, and live observations |
-| [`agon`](agon/README.md) | shared | Agon SDK helper candidates, registries, quests, and candidate-only helper packs |
-| [`titan`](titan/README.md) | shared | Titan runtime harness, console, appserver, memory, session, and swarm helpers |
+| [`agon`](agon/README.md) | shared | Agon SDK helper candidates, registries, recurrence adapters, and candidate-only helper packs |
+| [`antifragility`](antifragility/README.md) | shared | stress-context, degraded-mode, via negativa, and closeout stress carry |
+| [`boundary-bridge`](boundary-bridge/README.md) | shared | typed facades, compatibility policy, skill bridge, surface handoff, and owner split |
+| [`checkpoint`](checkpoint/README.md) | shared | session checkpoint capture, review gates, closeout bridge, and return re-entry |
+| [`codex-projection`](codex-projection/README.md) | shared | Codex workspace MCP, deploy-status reads, portability, and rollout refs |
 | [`experience`](experience/README.md) | shared | Experience API helper contracts and adoption/deployment/governance calls |
-| [`a2a-return`](a2a-return/README.md) | SDK-local | A2A summon, checkpoint, reviewed closeout, and return packet bridge |
-| [`rpg`](rpg/README.md) | shared | RPG typed consumer slice and surface path helper boundary |
-| [`codex-plane`](codex-plane/README.md) | SDK-local | Codex workspace MCP, deploy-status reads, portability, and rollout refs |
+| [`questbook`](questbook/README.md) | shared | quest source records and durable owner-followthrough obligations |
+| [`recurrence`](recurrence/README.md) | shared | recurrence manifests, hooks, graph, review, projections, and live observations |
 | [`release-support`](release-support/README.md) | shared | changelog, release audit, CI posture, build, and publication gates |
+| [`rpg`](rpg/README.md) | shared | RPG typed consumer slice and surface path helper boundary |
+| [`runtime-seam`](runtime-seam/README.md) | shared | workspace root, source/runtime mirror boundary, capsule, bootstrap, and local automation seams |
+| [`titan`](titan/README.md) | shared | Titan runtime harness, console, appserver, memory, session, and swarm helpers |
 
 ## Skeleton Contract
 
@@ -69,16 +70,24 @@ The package cards use a common shape:
 - Validation
 - Next route
 
-## Shared Versus SDK-Local Names
+## Parent Versus Part Rule
 
-Shared names are kept when the SDK operation is the same recurring AoA
-mechanic shape already visible in refactored sibling repositories:
-`boundary-bridge`, `checkpoint`, `recurrence`, `agon`, `titan`,
-`experience`, `rpg`, and `release-support`.
+Top-level package names follow the shared AoA mechanics vocabulary unless a
+repo-local mechanic has a genuinely independent operation, owner split,
+stop-line, and validator.
 
-SDK-local names are used where the operation is specific to the SDK control
-plane: `workspace-topology`, `compatibility`, `skill-routing`,
-`surface-detection`, `a2a-return`, and `codex-plane`.
+The first skeleton over-promoted several SDK-local lanes. The corrected route
+is:
+
+| Former parent candidate | Correct route |
+| --- | --- |
+| `workspace-topology` | `runtime-seam` part |
+| `compatibility` | `boundary-bridge` part |
+| `skill-routing` | `boundary-bridge` part |
+| `surface-detection` | `boundary-bridge` part |
+| `closeout` | `checkpoint` part |
+| `a2a-return` | `checkpoint` part |
+| `codex-plane` | `codex-projection` part |
 
 ## Validation
 

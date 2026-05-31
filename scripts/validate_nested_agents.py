@@ -69,16 +69,16 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'mechanics/topology.json',
         'python scripts/validate_mechanics_topology.py',
     ),
-    'mechanics/a2a-return/AGENTS.md': (
-        'A2A return mechanic',
-        'Stay on the control plane',
-        'role, memo, proof, progression, or stress truth',
-        'python scripts/validate_mechanics_topology.py',
-    ),
     'mechanics/agon/AGENTS.md': (
         'Agon mechanic',
         'Stay on the control plane',
         'candidate-only',
+        'python scripts/validate_mechanics_topology.py',
+    ),
+    'mechanics/antifragility/AGENTS.md': (
+        'Antifragility mechanic',
+        'Stay on the control plane',
+        'stress fixtures proof verdicts',
         'python scripts/validate_mechanics_topology.py',
     ),
     'mechanics/boundary-bridge/AGENTS.md': (
@@ -93,28 +93,22 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'session-local',
         'python scripts/validate_mechanics_topology.py',
     ),
-    'mechanics/closeout/AGENTS.md': (
-        'closeout mechanic',
-        'Stay on the control plane',
-        'mechanical',
-        'python scripts/validate_mechanics_topology.py',
-    ),
-    'mechanics/codex-plane/AGENTS.md': (
-        'Codex-plane mechanic',
+    'mechanics/codex-projection/AGENTS.md': (
+        'Codex Projection mechanic',
         'Stay on the control plane',
         'not make SDK Codex reads a Codex runtime',
-        'python scripts/validate_mechanics_topology.py',
-    ),
-    'mechanics/compatibility/AGENTS.md': (
-        'compatibility mechanic',
-        'Stay on the control plane',
-        'Do not add hidden fallback',
         'python scripts/validate_mechanics_topology.py',
     ),
     'mechanics/experience/AGENTS.md': (
         'Experience mechanic',
         'Stay on the control plane',
         'API helper calls as contracts',
+        'python scripts/validate_mechanics_topology.py',
+    ),
+    'mechanics/questbook/AGENTS.md': (
+        'Questbook mechanic',
+        'Stay on the control plane',
+        'Keep quest source records in `quests/`',
         'python scripts/validate_mechanics_topology.py',
     ),
     'mechanics/recurrence/AGENTS.md': (
@@ -135,28 +129,16 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'gameplay, frontend, or RPG runtime authority',
         'python scripts/validate_mechanics_topology.py',
     ),
-    'mechanics/skill-routing/AGENTS.md': (
-        'skill-routing mechanic',
+    'mechanics/runtime-seam/AGENTS.md': (
+        'Runtime Seam mechanic',
         'Stay on the control plane',
-        'Keep `aoa skills ...` skill-only',
-        'python scripts/validate_mechanics_topology.py',
-    ),
-    'mechanics/surface-detection/AGENTS.md': (
-        'surface-detection mechanic',
-        'Stay on the control plane',
-        'Keep detection additive and advisory',
+        'Do not make path guessing stronger than `.aoa/workspace.toml`',
         'python scripts/validate_mechanics_topology.py',
     ),
     'mechanics/titan/AGENTS.md': (
         'Titan mechanic',
         'Stay on the control plane',
         'runtime, role, identity, or memory authority',
-        'python scripts/validate_mechanics_topology.py',
-    ),
-    'mechanics/workspace-topology/AGENTS.md': (
-        'workspace topology mechanic',
-        'Stay on the control plane',
-        'Do not make path guessing stronger than `.aoa/workspace.toml`',
         'python scripts/validate_mechanics_topology.py',
     ),
 }

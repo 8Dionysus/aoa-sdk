@@ -2,18 +2,18 @@
 
 ## Applies to
 
-`mechanics/codex-plane/`.
+`mechanics/codex-projection/`.
 
 ## Role
 
-Route the SDK-local Codex-plane mechanic for workspace MCP, deploy-status
-snapshots, portability boundaries, rollout references, and local Codex status
-reads.
+Route the shared Codex Projection mechanic for SDK Codex workspace MCP,
+deploy-status snapshots, portability boundaries, rollout references, and
+Codex-facing control-plane reads.
 
 ## Read before editing
 
 - `mechanics/AGENTS.md`
-- `mechanics/codex-plane/README.md`
+- `mechanics/codex-projection/README.md`
 - `docs/codex-workspace-mcp.md`
 - `docs/CODEX_PLANE_DEPLOY_STATUS.md`
 - `src/aoa_sdk/codex/`
@@ -23,7 +23,7 @@ reads.
 
 - Stay on the control plane.
 - Do not make SDK Codex reads a Codex runtime or deploy authority.
-- Keep live host deployment and sibling rollout authority outside SDK.
+- Keep host deployment and sibling rollout authority outside SDK.
 
 ## Validation
 

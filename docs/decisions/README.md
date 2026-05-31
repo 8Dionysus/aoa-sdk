@@ -71,9 +71,10 @@ python scripts/generate_decision_indexes.py --check
 
 ## Active Mechanics Decision
 
-The first mechanics topology skeleton is recorded in
-`AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md`. It is route-only: no
-source payload moved into `mechanics/` in that decision.
+The corrected mechanics topology is recorded in
+`AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`. It supersedes the
+first inventory-based skeleton's parent package set while preserving the same
+route-only rule: no source payload moved into `mechanics/`.
 
 ## Addressing
 

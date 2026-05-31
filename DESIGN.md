@@ -102,10 +102,12 @@ tests, compatibility checks, or handoff artifacts.
 Mechanics do not replace the Python source lane. They route operation pressure
 around it.
 
-Shared AoA mechanics should keep shared names when the operation is truly the
-same recurring shape. Local SDK mechanics are allowed only when the operation
-has its own trigger, input, output, owner split, stop-line, validation, and
-reason that cannot be represented as a part of a shared mechanic.
+Top-level mechanics follow the shared AoA parent vocabulary when that
+vocabulary already carries the operation. Local SDK lanes such as
+compatibility, skill routing, surface detection, workspace topology, closeout,
+A2A return, or Codex deploy status should live as parts unless they can prove
+an independent parent operation, owner split, stop-line, and validator that
+cannot be represented inside a shared parent.
 
 ## Design as Operation
 

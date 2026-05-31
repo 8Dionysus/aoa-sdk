@@ -32,13 +32,15 @@ Grouped by `Guard families` metadata.
 
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | accepted |
 
 ## nested agents
 
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | accepted |
 
 ## rationale route
 
@@ -50,7 +52,8 @@ Grouped by `Guard families` metadata.
 
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | accepted |
 
 ## route law
 
@@ -65,4 +68,5 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0001 - Decision Rationale Lane Before Mechanics](../AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md) | 2026-05-31 | root/topology, docs route, validation guard | decision lane, control-plane, mechanics prep | none | accepted |
 | [AOA-SDK-D-0002 - Root Design Surfaces Before Mechanics](../AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md) | 2026-05-31 | root/topology, design route, agent guidance | design surface, agent surface, mechanics prep, source home | none | accepted |
 | [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) | 2026-05-31 | compatibility, sibling topology, generated route | compatibility policy, control-plane, sibling read path | boundary-bridge | accepted |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | accepted |

@@ -7,7 +7,7 @@ Status: skeleton.
 ### Operation
 
 Build and validate Agon SDK helper candidates, registries, recurrence adapters,
-state-packet bridges, generated companions, and helper quest seeds.
+state-packet bridges, and generated companions.
 
 ### Trigger
 
@@ -18,7 +18,6 @@ example, quest, or SDK helper test changes.
 
 - SDK helper candidate schemas and examples
 - generated helper registries from local seeds
-- candidate-only quest surfaces
 - SDK stop-line documentation for Agon helper bridges
 
 ### Stronger owner split
@@ -43,7 +42,6 @@ mechanical-trial, and state-packet meaning.
 - registries
 - recurrence-adapter
 - state-packet-bindings
-- quest-seeds
 
 ### Must not claim
 

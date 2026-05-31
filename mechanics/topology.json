@@ -2,42 +2,30 @@
   "schema_version": "aoa_sdk_mechanics_topology_v1",
   "status": "skeleton",
   "payload_moved": false,
+  "parent_boundary_rule": "Top-level mechanics follow the shared AoA parent vocabulary unless a repo-local parent has an independent operation, owner split, and validator. SDK-specific lanes become parts.",
+  "supersedes": {
+    "decision": "AOA-SDK-D-0004",
+    "reason": "The first skeleton promoted several SDK-local lanes to parents even though sibling sources treat them as parts of shared mechanics."
+  },
   "source_basis": {
     "tracked_files": 1000,
-    "top_level_districts": {
-      ".agents": 211,
-      ".aoa": 2,
-      ".github": 7,
-      "root_singletons": 9,
-      "config": 12,
-      "docs": 152,
-      "examples": 112,
-      "generated": 14,
-      "githooks": 4,
-      "manifests": 21,
-      "quests": 12,
-      "schemas": 122,
-      "scripts": 49,
-      "src": 106,
-      "systemd": 3,
-      "tests": 164
-    },
-    "extension_counts": {
-      ".json": 356,
-      ".md": 286,
-      ".py": 240,
-      ".svg": 50,
-      ".yaml": 44,
-      "none": 5,
-      ".yml": 5,
-      ".example": 5,
-      ".toml": 3,
-      ".jsonl": 2,
-      ".service": 1,
-      ".path": 1,
-      ".gitkeep": 1,
-      ".gitignore": 1
-    }
+    "sibling_sources_rechecked": [
+      "Agents-of-Abyss/mechanics",
+      "aoa-agents/mechanics",
+      "aoa-memo/mechanics",
+      "aoa-evals/mechanics",
+      "aoa-skills/mechanics",
+      "aoa-techniques/mechanics"
+    ]
+  },
+  "demoted_parent_candidates": {
+    "workspace-topology": "runtime-seam/workspace-root-resolution",
+    "compatibility": "boundary-bridge/compatibility-policy",
+    "skill-routing": "boundary-bridge/skill-runtime-bridge",
+    "surface-detection": "boundary-bridge/surface-detection-handoff",
+    "closeout": "checkpoint/closeout-bridge",
+    "a2a-return": "checkpoint/return-reentry",
+    "codex-plane": "codex-projection/deploy-status"
   },
   "required_package_files": [
     "AGENTS.md",
@@ -47,173 +35,183 @@
   ],
   "packages": [
     {
-      "slug": "workspace-topology",
-      "name_type": "sdk-local",
-      "operation": "Resolve workspace roots, sibling lookup, runtime mirrors, overrides, and the compact control-plane capsule.",
+      "slug": "agon",
+      "name_type": "shared",
+      "operation": "Build and validate Agon SDK helper candidates, registries, recurrence adapters, state-packet bridges, and generated companions.",
       "source_surfaces": [
-        ".aoa/workspace.toml",
-        "docs/workspace-layout.md",
-        "generated/workspace_control_plane.min.json",
-        "scripts/build_workspace_control_plane.py",
-        "scripts/validate_workspace_control_plane.py",
-        "src/aoa_sdk/workspace",
-        "tests/test_workspace.py",
-        "tests/test_workspace_control_plane.py"
+        "config",
+        "docs/AGON_WAVE1_EXPERIENCE_CAPTURE_PIPELINE.md",
+        "generated/agon_recurrence_adapter_registry.min.json",
+        "schemas/agon-recurrence-adapter-registry.schema.json",
+        "scripts/build_agon_recurrence_adapter_registry.py",
+        "scripts/validate_agon_recurrence_adapter.py",
+        "tests/test_agon_recurrence_adapter.py"
       ],
       "candidate_parts": [
-        "workspace-root-resolution",
-        "control-plane-capsule",
-        "portable-bootstrap"
+        "helper-candidates",
+        "registries",
+        "recurrence-adapter",
+        "state-packet-bindings"
       ],
       "validation": [
-        "python scripts/build_workspace_control_plane.py --check",
-        "python scripts/validate_workspace_control_plane.py",
-        "python -m pytest -q tests/test_workspace.py tests/test_workspace_control_plane.py"
+        "python -m pytest -q tests/test_agon_recurrence_adapter.py tests/test_agon_wave7_recurrence_lanes.py"
       ]
     },
     {
-      "slug": "compatibility",
-      "name_type": "sdk-local",
-      "operation": "Check consumed sibling surface paths, stable SDK surface IDs, and version posture without hidden fallback.",
+      "slug": "antifragility",
+      "name_type": "shared",
+      "operation": "Route SDK stress-context, degraded-mode, via negativa, and closeout stress carry below owner remediation.",
       "source_surfaces": [
-        "docs/versioning.md",
-        "docs/boundaries.md",
-        "scripts/run_sibling_canary.py",
-        "scripts/sibling_canary_matrix.json",
-        "src/aoa_sdk/compatibility",
-        "tests/test_compatibility.py",
-        "tests/test_sibling_canary.py"
+        "docs/antifragility-control-plane.md",
+        "docs/antifragility-closeout-seam.md",
+        "docs/VIA_NEGATIVA_CHECKLIST.md",
+        "tests/fixtures/antifragility",
+        "tests/test_antifragility_public_surface.py"
       ],
       "candidate_parts": [
-        "canonical-path-policy",
-        "sibling-canary",
-        "version-posture"
+        "stress-context",
+        "closeout-seam",
+        "via-negativa"
       ],
       "validation": [
-        "aoa compatibility check /srv/AbyssOS/aoa-sdk",
-        "aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json",
-        "python -m pytest -q tests/test_compatibility.py tests/test_sibling_canary.py"
+        "python -m pytest -q tests/test_antifragility_public_surface.py"
       ]
     },
     {
       "slug": "boundary-bridge",
       "name_type": "shared",
-      "operation": "Keep SDK typed facades as handles while sibling repositories retain meaning.",
+      "operation": "Keep SDK typed facades, compatibility checks, skill bridges, and surface handoffs as handles while sibling repositories retain meaning.",
       "source_surfaces": [
         "docs/boundaries.md",
+        "docs/versioning.md",
+        "docs/skill-runtime-recommendation-gap.md",
+        "docs/aoa-surface-detection-first-wave.md",
         "src/aoa_sdk/agents",
+        "src/aoa_sdk/compatibility",
         "src/aoa_sdk/evals",
-        "src/aoa_sdk/governed_runs",
-        "src/aoa_sdk/kag",
         "src/aoa_sdk/memo",
-        "src/aoa_sdk/playbooks",
         "src/aoa_sdk/routing",
+        "src/aoa_sdk/skills",
         "src/aoa_sdk/stats",
-        "src/aoa_sdk/techniques",
-        "tests/test_agents.py",
-        "tests/test_evals.py",
-        "tests/test_memo.py",
-        "tests/test_routing.py"
+        "src/aoa_sdk/surfaces",
+        "tests/test_compatibility.py",
+        "tests/test_skills.py",
+        "tests/test_surfaces.py"
       ],
       "candidate_parts": [
         "typed-facades",
         "truth-labels",
+        "compatibility-policy",
+        "skill-runtime-bridge",
+        "surface-detection-handoff",
         "owner-return-routes"
       ],
       "validation": [
-        "python -m pytest -q tests/test_agents.py tests/test_evals.py tests/test_memo.py tests/test_routing.py"
-      ]
-    },
-    {
-      "slug": "skill-routing",
-      "name_type": "sdk-local",
-      "operation": "Detect, disclose, activate, guard, and dispatch portable skills while keeping skill meaning in aoa-skills.",
-      "source_surfaces": [
-        ".agents/skills",
-        "docs/skill-runtime-recommendation-gap.md",
-        "docs/skill-runtime-recommendation-gap-fix-spec.md",
-        "src/aoa_sdk/skills",
-        "tests/test_skills.py",
-        "tests/test_skill_reference_contracts.py"
-      ],
-      "candidate_parts": [
-        "discovery",
-        "disclosure",
-        "activation",
-        "phase-dispatch",
-        "runtime-session"
-      ],
-      "validation": [
-        "python -m pytest -q tests/test_skills.py tests/test_skill_reference_contracts.py"
-      ]
-    },
-    {
-      "slug": "surface-detection",
-      "name_type": "sdk-local",
-      "operation": "Detect non-skill owner-layer candidates and route reviewed handoffs without changing skill activation meaning.",
-      "source_surfaces": [
-        "docs/aoa-surface-detection-first-wave.md",
-        "docs/aoa-surface-detection-second-wave.md",
-        "docs/aoa-surface-detection-heuristics.md",
-        "docs/aoa-surface-detection-closeout-handoff.md",
-        "src/aoa_sdk/surfaces",
-        "tests/test_surfaces.py",
-        "tests/test_surfaces_cli.py"
-      ],
-      "candidate_parts": [
-        "first-wave-heuristics",
-        "second-wave-shortlist",
-        "reviewed-handoff"
-      ],
-      "validation": [
-        "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress",
-        "python -m pytest -q tests/test_surfaces.py tests/test_surfaces_cli.py"
+        "python -m pytest -q tests/test_compatibility.py tests/test_skills.py tests/test_surfaces.py tests/test_routing.py"
       ]
     },
     {
       "slug": "checkpoint",
       "name_type": "shared",
-      "operation": "Capture session-growth checkpoint notes, guard git boundaries, require review, and build closeout context.",
+      "operation": "Capture session checkpoints, gate review, bridge reviewed closeout, and route return/re-entry packets without owner-truth transfer.",
       "source_surfaces": [
         "docs/session-growth-checkpoints.md",
         "docs/checkpoint-note-promotion.md",
+        "docs/session-closeout.md",
+        "docs/A2A_WAVE5_CODEX_RETURN_CHECKPOINT.md",
+        "docs/RETURN_REENTRY_SEAM.md",
         "githooks",
         "schemas/checkpoint_lineage_hint.schema.json",
+        "src/aoa_sdk/a2a",
         "src/aoa_sdk/checkpoints",
+        "src/aoa_sdk/closeout",
+        "systemd",
         "tests/test_checkpoint_cli.py",
-        "tests/test_checkpoints.py"
+        "tests/test_checkpoints.py",
+        "tests/test_closeout.py",
+        "tests/test_a2a_wave5_checkpoint_and_return.py"
       ],
       "candidate_parts": [
         "capture",
         "git-boundary",
         "review-note",
-        "closeout-context"
+        "closeout-context",
+        "closeout-bridge",
+        "return-reentry"
       ],
       "validation": [
-        "python -m pytest -q tests/test_checkpoint_cli.py tests/test_checkpoints.py"
+        "python -m pytest -q tests/test_checkpoint_cli.py tests/test_checkpoints.py tests/test_closeout.py tests/test_a2a_wave5_checkpoint_and_return.py"
       ]
     },
     {
-      "slug": "closeout",
+      "slug": "codex-projection",
       "name_type": "shared",
-      "operation": "Assemble reviewed closeout requests, manifests, inbox processing, and owner followthrough handoffs.",
+      "operation": "Project SDK workspace orientation into Codex-facing MCP, deploy-status, portability, and rollout read surfaces.",
       "source_surfaces": [
-        "docs/session-closeout.md",
-        "docs/closeout-followthrough-map.md",
-        "scripts/install_closeout_units.py",
-        "scripts/process_closeout_inbox.py",
-        "src/aoa_sdk/closeout",
-        "systemd",
-        "tests/test_closeout.py"
+        "docs/codex-workspace-mcp.md",
+        "docs/CODEX_PLANE_DEPLOY_STATUS.md",
+        "docs/CODEX_PLANE_PORTABILITY.md",
+        "examples/codex_plane_deploy_status_snapshot.example.json",
+        "schemas/codex_plane_deploy_status_snapshot_v1.json",
+        "scripts/aoa_workspace_mcp_server.py",
+        "src/aoa_sdk/codex",
+        "tests/test_codex_workspace_mcp.py",
+        "tests/test_codex_deploy_status.py"
       ],
       "candidate_parts": [
-        "request-assembly",
-        "manifest-assembly",
-        "inbox-processing",
+        "workspace-mcp",
+        "deploy-status",
+        "portability",
+        "rollout-refs"
+      ],
+      "validation": [
+        "python -m pytest -q tests/test_codex_workspace_mcp.py tests/test_codex_deploy_status.py"
+      ]
+    },
+    {
+      "slug": "experience",
+      "name_type": "shared",
+      "operation": "Maintain Experience API helper contracts for adoption, deployment, governance, watchtower, rollback, and release calls.",
+      "source_surfaces": [
+        "docs/EXPERIENCE_ADOPTION_API.md",
+        "docs/EXPERIENCE_DEPLOYMENT_API.md",
+        "examples/sdk_adoption_request_call.example.json",
+        "schemas/sdk_adoption_request_call_v1.json",
+        "tests/test_experience_wave2_seed_contracts.py",
+        "tests/test_experience_wave3_seed_contracts.py",
+        "tests/test_experience_wave4_seed_contracts.py",
+        "tests/test_experience_wave5_seed_contracts.py"
+      ],
+      "candidate_parts": [
+        "adoption",
+        "deployment",
+        "governance",
+        "watchtower",
+        "rollback",
+        "release"
+      ],
+      "validation": [
+        "python -m pytest -q tests/test_experience_wave2_seed_contracts.py tests/test_experience_wave3_seed_contracts.py tests/test_experience_wave4_seed_contracts.py tests/test_experience_wave5_seed_contracts.py"
+      ]
+    },
+    {
+      "slug": "questbook",
+      "name_type": "shared",
+      "operation": "Route SDK quest source records and durable followthrough obligations without owner acceptance claims.",
+      "source_surfaces": [
+        "quests",
+        "mechanics/agon/README.md",
+        "mechanics/agon/PARTS.md",
+        "ROADMAP.md"
+      ],
+      "candidate_parts": [
+        "quest-source-store",
+        "agon-helper-quests",
         "owner-followthrough"
       ],
       "validation": [
-        "python -m pytest -q tests/test_closeout.py"
+        "python scripts/validate_mechanics_topology.py",
+        "python -m pytest -q tests/test_mechanics_topology.py"
       ]
     },
     {
@@ -245,28 +243,78 @@
       ]
     },
     {
-      "slug": "agon",
+      "slug": "release-support",
       "name_type": "shared",
-      "operation": "Build and validate Agon SDK helper candidates, registries, recurrence adapters, state packets, and quest seeds.",
+      "operation": "Keep changelog, release audit, CI posture, build, and publication support bounded and reproducible.",
       "source_surfaces": [
-        "config",
-        "docs/AGON_WAVE1_EXPERIENCE_CAPTURE_PIPELINE.md",
-        "generated/agon_recurrence_adapter_registry.min.json",
-        "quests",
-        "schemas/agon-recurrence-adapter-registry.schema.json",
-        "scripts/build_agon_recurrence_adapter_registry.py",
-        "scripts/validate_agon_recurrence_adapter.py",
-        "tests/test_agon_recurrence_adapter.py"
+        "CHANGELOG.md",
+        "docs/RELEASING.md",
+        "docs/RELEASE_CI_POSTURE.md",
+        ".github/workflows/repo-validation.yml",
+        "scripts/release_check.py",
+        "src/aoa_sdk/release",
+        "tests/test_release.py",
+        "tests/test_roadmap_parity.py"
       ],
       "candidate_parts": [
-        "helper-candidates",
-        "registries",
-        "recurrence-adapter",
-        "state-packet-bindings",
-        "quest-seeds"
+        "changelog",
+        "release-audit",
+        "ci-posture",
+        "package-build",
+        "publication"
       ],
       "validation": [
-        "python -m pytest -q tests/test_agon_recurrence_adapter.py tests/test_agon_wave7_recurrence_lanes.py"
+        "python scripts/release_check.py",
+        "python -m pytest -q tests/test_release.py tests/test_roadmap_parity.py"
+      ]
+    },
+    {
+      "slug": "rpg",
+      "name_type": "shared",
+      "operation": "Provide the RPG typed consumer slice and surface-path helpers without becoming gameplay runtime.",
+      "source_surfaces": [
+        "docs/RPG_SDK_ADDENDUM.md",
+        "docs/RPG_SURFACE_PATHS.md",
+        "src/aoa_sdk/rpg",
+        "tests/test_rpg_api.py"
+      ],
+      "candidate_parts": [
+        "typed-registry",
+        "surface-paths",
+        "consumer-api"
+      ],
+      "validation": [
+        "python -m pytest -q tests/test_rpg_api.py"
+      ]
+    },
+    {
+      "slug": "runtime-seam",
+      "name_type": "shared",
+      "operation": "Keep SDK workspace roots, source/runtime mirror boundaries, control-plane capsule, portable bootstrap, and local automation seams explicit.",
+      "source_surfaces": [
+        ".aoa/workspace.toml",
+        "docs/workspace-layout.md",
+        "generated/workspace_control_plane.min.json",
+        "githooks",
+        "scripts/build_workspace_control_plane.py",
+        "scripts/validate_workspace_control_plane.py",
+        "src/aoa_sdk/workspace",
+        "systemd",
+        "tests/test_workspace.py",
+        "tests/test_workspace_control_plane.py",
+        "tests/test_live_workspace.py"
+      ],
+      "candidate_parts": [
+        "workspace-root-resolution",
+        "control-plane-capsule",
+        "portable-bootstrap",
+        "runtime-mirror-boundary",
+        "local-automation-seam"
+      ],
+      "validation": [
+        "python scripts/build_workspace_control_plane.py --check",
+        "python scripts/validate_workspace_control_plane.py",
+        "python -m pytest -q tests/test_workspace.py tests/test_workspace_control_plane.py tests/test_live_workspace.py"
       ]
     },
     {
@@ -293,125 +341,6 @@
       ],
       "validation": [
         "python -m pytest -q tests/test_titan_console.py tests/test_titanctl_runtime.py"
-      ]
-    },
-    {
-      "slug": "experience",
-      "name_type": "shared",
-      "operation": "Maintain Experience API helper contracts for adoption, deployment, governance, watchtower, rollback, and release calls.",
-      "source_surfaces": [
-        "docs/EXPERIENCE_ADOPTION_API.md",
-        "docs/EXPERIENCE_DEPLOYMENT_API.md",
-        "examples/sdk_adoption_request_call.example.json",
-        "schemas/sdk_adoption_request_call_v1.json",
-        "tests/test_experience_wave2_seed_contracts.py",
-        "tests/test_experience_wave3_seed_contracts.py",
-        "tests/test_experience_wave4_seed_contracts.py",
-        "tests/test_experience_wave5_seed_contracts.py"
-      ],
-      "candidate_parts": [
-        "adoption",
-        "deployment",
-        "governance",
-        "watchtower",
-        "rollback",
-        "release"
-      ],
-      "validation": [
-        "python -m pytest -q tests/test_experience_wave2_seed_contracts.py tests/test_experience_wave3_seed_contracts.py tests/test_experience_wave4_seed_contracts.py tests/test_experience_wave5_seed_contracts.py"
-      ]
-    },
-    {
-      "slug": "a2a-return",
-      "name_type": "sdk-local",
-      "operation": "Assemble A2A summon, checkpoint bridge, reviewed closeout, and return transition packets.",
-      "source_surfaces": [
-        "docs/A2A_WAVE5_CODEX_RETURN_CHECKPOINT.md",
-        "docs/RETURN_REENTRY_SEAM.md",
-        "examples/a2a",
-        "src/aoa_sdk/a2a",
-        "tests/test_a2a_sdk_api.py",
-        "tests/test_a2a_wave5_checkpoint_and_return.py",
-        "tests/test_a2a_wave5_e2e_fixture.py"
-      ],
-      "candidate_parts": [
-        "summon-target",
-        "checkpoint-bridge",
-        "reviewed-closeout",
-        "return-transition"
-      ],
-      "validation": [
-        "python -m pytest -q tests/test_a2a_sdk_api.py tests/test_a2a_wave5_checkpoint_and_return.py tests/test_a2a_wave5_e2e_fixture.py"
-      ]
-    },
-    {
-      "slug": "rpg",
-      "name_type": "shared",
-      "operation": "Provide the RPG typed consumer slice and surface-path helpers without becoming gameplay runtime.",
-      "source_surfaces": [
-        "docs/RPG_SDK_ADDENDUM.md",
-        "docs/RPG_SURFACE_PATHS.md",
-        "src/aoa_sdk/rpg",
-        "tests/test_rpg_api.py"
-      ],
-      "candidate_parts": [
-        "typed-registry",
-        "surface-paths",
-        "consumer-api"
-      ],
-      "validation": [
-        "python -m pytest -q tests/test_rpg_api.py"
-      ]
-    },
-    {
-      "slug": "codex-plane",
-      "name_type": "sdk-local",
-      "operation": "Expose Codex workspace MCP, deploy-status snapshots, portability boundaries, and rollout references.",
-      "source_surfaces": [
-        "docs/codex-workspace-mcp.md",
-        "docs/CODEX_PLANE_DEPLOY_STATUS.md",
-        "docs/CODEX_PLANE_PORTABILITY.md",
-        "examples/codex_plane_deploy_status_snapshot.example.json",
-        "schemas/codex_plane_deploy_status_snapshot_v1.json",
-        "scripts/aoa_workspace_mcp_server.py",
-        "src/aoa_sdk/codex",
-        "tests/test_codex_workspace_mcp.py",
-        "tests/test_codex_deploy_status.py"
-      ],
-      "candidate_parts": [
-        "workspace-mcp",
-        "deploy-status",
-        "portability",
-        "rollout-refs"
-      ],
-      "validation": [
-        "python -m pytest -q tests/test_codex_workspace_mcp.py tests/test_codex_deploy_status.py"
-      ]
-    },
-    {
-      "slug": "release-support",
-      "name_type": "shared",
-      "operation": "Keep changelog, release audit, CI posture, build, and publication support bounded and reproducible.",
-      "source_surfaces": [
-        "CHANGELOG.md",
-        "docs/RELEASING.md",
-        "docs/RELEASE_CI_POSTURE.md",
-        ".github/workflows/repo-validation.yml",
-        "scripts/release_check.py",
-        "src/aoa_sdk/release",
-        "tests/test_release.py",
-        "tests/test_roadmap_parity.py"
-      ],
-      "candidate_parts": [
-        "changelog",
-        "release-audit",
-        "ci-posture",
-        "package-build",
-        "publication"
-      ],
-      "validation": [
-        "python scripts/release_check.py",
-        "python -m pytest -q tests/test_release.py tests/test_roadmap_parity.py"
       ]
     }
   ]

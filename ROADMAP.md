@@ -48,10 +48,10 @@ release contour is:
   `scripts/generate_decision_indexes.py`
 - root design surfaces that enabled mechanics:
   `DESIGN.md` and `DESIGN.AGENTS.md`
-- mechanics topology skeleton after full inventory:
+- corrected mechanics topology skeleton after full inventory and sibling-source reread:
   `mechanics/README.md`, `mechanics/TOPOLOGY_PREP.md`,
   `mechanics/topology.json`, `scripts/validate_mechanics_topology.py`, and
-  `docs/decisions/AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md`
+  `docs/decisions/AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`
 - Codex-plane deploy-state and rollout reference boundaries:
   `docs/CODEX_PLANE_DEPLOY_STATUS.md`,
   `docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`,
