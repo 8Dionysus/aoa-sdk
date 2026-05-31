@@ -65,6 +65,31 @@ def test_design_lane_is_routed_before_mechanics() -> None:
     assert "Create root `DESIGN.md` and `DESIGN.AGENTS.md` before introducing" in decision
 
 
+def test_changelog_records_current_unreleased_contour() -> None:
+    changelog = read_text("CHANGELOG.md")
+
+    required_sections = [
+        "### Summary",
+        "### Reconciliation Basis",
+        "### Final Route Sweep",
+        "### Control-Plane Authority And Boundary",
+        "### Added",
+        "### Changed",
+        "### Moved Or Retired",
+        "### Validation",
+        "### Notes",
+    ]
+    for section in required_sections:
+        assert section in changelog
+    assert "22 first-parent commits and 382 changed tracked paths" in changelog
+    assert "DESIGN.md" in changelog
+    assert "DESIGN.AGENTS.md" in changelog
+    assert "docs/decisions/" in changelog
+    assert "root-level generated paths" in changelog
+    assert "active routes" in changelog
+    assert "This unreleased section is a release-ready reconciliation surface" in changelog
+
+
 def test_readme_lists_sibling_canary_surfaces() -> None:
     readme = read_text("README.md")
 

@@ -3,8 +3,132 @@
 All notable changes to `aoa-sdk` will be documented in this file.
 
 The format is intentionally simple and human-first.
+Tracking starts with the community-docs baseline for this repository.
 
 ## [Unreleased]
+
+### Summary
+
+- This unreleased line carries the post-`v0.2.3` control-plane refactor span:
+  22 first-parent commits and 382 changed tracked paths from `v0.2.3..main`,
+  including the May 31 decision/design landing and the earlier portable
+  skill, session-growth, memo-compatibility, live-workspace, and route-card
+  hardening work.
+- `aoa-sdk` now has the same explicit rationale/design spine expected from
+  the refactored AoA repositories: decisions explain why, design surfaces
+  explain system and agent-facing form, generated indexes stay derived, and
+  root documents stay route-focused.
+- The SDK remains a bounded typed control plane for sibling-owned surfaces. It
+  can discover, validate, inspect, and hand off source-owned artifacts, but it
+  still does not own routing truth, skill execution meaning, proof verdicts,
+  durable memory truth, role authority, playbook law, stats state, KAG
+  meaning, or runtime behavior.
+
+### Reconciliation Basis
+
+- Reconciled against `git log --first-parent v0.2.3..HEAD`, the current
+  `CHANGELOG.md`, the landed decision records under `docs/decisions/`, root
+  route cards, compatibility policy, workspace fixtures, and the current
+  release gate instead of trusting PR titles alone.
+- Current post-`v0.2.3` public span includes PR-backed work through #135:
+  portable AoA skill foundation, session-growth and GitHub landing support,
+  dry-run helper guards, refreshed shared skill exports, audit fixes, memo
+  compatibility follow-ups, live workspace missing-surface handling, memory
+  route trigger law, and the decision/design/canonical-surface landing.
+- The largest current topology change is not a package version bump. It is the
+  shift from implicit root prose and stale sibling paths toward explicit
+  owner-surface routing, decision rationale, design law, and canonical sibling
+  compatibility paths.
+
+### Final Route Sweep
+
+- Root entry now routes structural questions through `DESIGN.md`,
+  agent-facing guidance questions through `DESIGN.AGENTS.md`, and rationale
+  changes through `docs/decisions/README.md`.
+- Decision records now live under canonical `AOA-SDK-D-####` filenames with
+  generated lookup indexes by number, date, surface, SDK facet, mechanic
+  parent, and guard family.
+- Compatibility policy now follows refactored sibling owner paths for
+  `aoa-memo` memory, memory-object, checkpoint-to-memory, runtime-writeback,
+  and `aoa-evals` runtime-candidate surfaces instead of treating old
+  root-level generated paths as active routes.
+- Test workspace fixtures, KAG handoff/regrounding refs, playbook federation
+  refs, and sample review packet refs now point at those canonical owner
+  paths so tests exercise current topology.
+
+### Control-Plane Authority And Boundary
+
+- `src/aoa_sdk/` stays the importable SDK source home; a future top-level
+  `sdk/` district is not added merely to mirror the package name.
+- Future `mechanics/` packages should name repeatable SDK operations, not
+  absorb typed SDK source, generated companions, release tooling, or sibling
+  source truth by theme.
+- Local compatibility repairs should move the canonical path to the stronger
+  owner-local path. Hidden compatibility fallback is not a substitute for
+  acknowledging sibling topology drift.
+
+### Added
+
+- Root `DESIGN.md` as the SDK system-form surface for source homes, generated
+  companions, control-plane boundaries, and the future mechanics split.
+- Root `DESIGN.AGENTS.md` as the agent-facing design surface for route-card
+  shape, validation posture, closeout expectations, and future local guidance
+  growth.
+- `docs/decisions/` as the canonical rationale lane, including template,
+  local `AGENTS.md`, index contract, generated read models, release-check
+  wiring, and initial decisions for decisions-before-mechanics,
+  design-before-mechanics, and refactored sibling surface paths.
+- Regression coverage for decision-index freshness, design-route presence,
+  canonical sibling compatibility paths, and memo source-file path selection.
+
+### Changed
+
+- Root `AGENTS.md`, `README.md`, `ROADMAP.md`, and `docs/boundaries.md` now
+  route structural, design, and decision questions to their owning surfaces
+  instead of carrying the full explanation inline.
+- `scripts/release_check.py` now checks generated decision indexes before the
+  rest of the release gate.
+- `scripts/validate_nested_agents.py` recognizes `DESIGN.AGENTS.md` as an
+  active agent-facing guidance surface.
+- `src/aoa_sdk/codex/workspace_mcp.py` and `src/aoa_sdk/routing/picker.py`
+  now route memo catalog inspection to the refactored `generated/memory/`
+  surface.
+- `src/aoa_sdk/compatibility/policy.py` now uses canonical refactored paths
+  for migrated memo and eval surfaces while preserving stable SDK surface IDs.
+
+### Moved Or Retired
+
+- Test fixtures for `aoa-memo` memory readers moved from root-level
+  `generated/` into `generated/memory/` and `generated/memory-objects/`.
+- Test fixtures for `aoa-memo` checkpoint and runtime-writeback surfaces moved
+  into their mechanics part-local homes under `mechanics/checkpoint/parts/`
+  and `mechanics/writeback/parts/`.
+- Test fixtures for `aoa-evals` runtime-candidate readers moved into the
+  audit mechanic's `candidate-readers` part-local generated lane.
+- Old root-level migrated memo/eval paths are retired from active SDK
+  compatibility for these surfaces; workspaces exposing only those paths now
+  fail compatibility as topology drift.
+
+### Validation
+
+- `python scripts/generate_decision_indexes.py --check`
+- `python scripts/build_workspace_control_plane.py --check`
+- `python scripts/validate_workspace_control_plane.py`
+- `python -m pytest -q`
+- `python -m ruff check .`
+- `python -m mypy src`
+- `python -m build`
+- `aoa compatibility check /srv/AbyssOS/aoa-sdk`
+- `python scripts/release_check.py`
+- GitHub `Repo Validation` for PR #135.
+
+### Notes
+
+- This unreleased section is a release-ready reconciliation surface, not a new
+  tag. The current public release remains `v0.2.3` until version surfaces,
+  tags, and GitHub Release publication are intentionally advanced together.
+- The May 31 canonical-path landing intentionally rejected hidden fallback for
+  migrated `aoa-memo` and `aoa-evals` surfaces.
 
 ## [0.2.3] - 2026-04-23
 
