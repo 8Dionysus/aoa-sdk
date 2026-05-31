@@ -20,19 +20,28 @@ def test_live_mechanics_topology_is_valid() -> None:
 
 def test_mechanics_package_set_is_explicit() -> None:
     assert mechanics_validator.EXPECTED_PACKAGES == (
+        "agon",
+        "antifragility",
+        "boundary-bridge",
+        "checkpoint",
+        "codex-projection",
+        "experience",
+        "questbook",
+        "recurrence",
+        "release-support",
+        "rpg",
+        "runtime-seam",
+        "titan",
+    )
+
+
+def test_demoted_parent_candidates_are_explicit_parts() -> None:
+    assert mechanics_validator.DEMOTED_PARENT_CANDIDATES == (
         "workspace-topology",
         "compatibility",
-        "boundary-bridge",
         "skill-routing",
         "surface-detection",
-        "checkpoint",
         "closeout",
-        "recurrence",
-        "agon",
-        "titan",
-        "experience",
         "a2a-return",
-        "rpg",
         "codex-plane",
-        "release-support",
     )

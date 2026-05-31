@@ -1,4 +1,4 @@
-# Codex Plane Mechanic
+# Codex Projection Mechanic
 
 Status: skeleton.
 
@@ -6,8 +6,8 @@ Status: skeleton.
 
 ### Operation
 
-Expose Codex workspace MCP, deploy-status snapshots, portability boundaries,
-and rollout references as bounded SDK control-plane reads.
+Project SDK workspace orientation into Codex-facing read surfaces: workspace
+MCP, deploy-status snapshots, portability boundaries, and rollout references.
 
 ### Trigger
 
@@ -35,8 +35,7 @@ repo authority remain outside SDK ownership.
 - `schemas/codex_plane_deploy_status_snapshot_v1.json`
 - `scripts/aoa_workspace_mcp_server.py`
 - `src/aoa_sdk/codex/`
-- `tests/test_codex_workspace_mcp.py`
-- `tests/test_codex_deploy_status.py`
+- Codex tests under `tests/`
 
 ### Candidate parts
 

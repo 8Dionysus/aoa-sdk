@@ -1,4 +1,4 @@
-# Codex Plane Provenance
+# Codex Projection Provenance
 
 ## Source Surfaces
 
@@ -19,5 +19,5 @@ truth. The SDK owns typed local readouts.
 
 ## Notes
 
-This is SDK-local because Codex-plane readouts are specific to the SDK control
-plane and its workspace MCP shape.
+The previous `codex-plane` parent was too local. The shared parent is
+`codex-projection`; SDK plane status lives as parts under it.

@@ -10,7 +10,10 @@
 - `src/aoa_sdk/memo/`
 - `src/aoa_sdk/playbooks/`
 - `src/aoa_sdk/routing/`
+- `src/aoa_sdk/compatibility/`
+- `src/aoa_sdk/skills/`
 - `src/aoa_sdk/stats/`
+- `src/aoa_sdk/surfaces/`
 - `src/aoa_sdk/techniques/`
 - `tests/test_agents.py`
 - `tests/test_evals.py`
@@ -26,3 +29,8 @@ validation, and handoff readability.
 
 This shared mechanic name matches the repeated AoA boundary pattern: bridge the
 surface, keep ownership outside.
+
+The first SDK skeleton incorrectly promoted `compatibility`, `skill-routing`,
+and `surface-detection` to parent mechanics. They are bridge parts because
+they route sibling surfaces, skill exports, and owner-layer hints without
+owning their meaning.

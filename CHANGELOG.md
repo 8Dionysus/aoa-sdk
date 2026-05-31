@@ -18,9 +18,9 @@ Tracking starts with the community-docs baseline for this repository.
   the refactored AoA repositories: decisions explain why, design surfaces
   explain system and agent-facing form, generated indexes stay derived, and
   root documents stay route-focused.
-- `aoa-sdk` now has a first mechanics topology skeleton after full tracked-file
-  inventory: package cards route 15 repeatable SDK operations without moving
-  payload or widening SDK ownership.
+- `aoa-sdk` now has a corrected mechanics topology skeleton after full
+  tracked-file inventory and sibling-source reread: package cards route 12
+  shared AoA parent mechanics, while SDK-specific lanes stay as parts.
 - The SDK remains a bounded typed control plane for sibling-owned surfaces. It
   can discover, validate, inspect, and hand off source-owned artifacts, but it
   still does not own routing truth, skill execution meaning, proof verdicts,
@@ -54,6 +54,9 @@ Tracking starts with the community-docs baseline for this repository.
 - Mechanics now live under `mechanics/` as route-only operation topology, with
   source-surface provenance, candidate parts, package-local route cards, and a
   dedicated topology validator.
+- The first over-specific parent candidates are corrected: `workspace-topology`,
+  `compatibility`, `skill-routing`, `surface-detection`, `closeout`,
+  `a2a-return`, and `codex-plane` route as parts under shared parents.
 - Compatibility policy now follows refactored sibling owner paths for
   `aoa-memo` memory, memory-object, checkpoint-to-memory, runtime-writeback,
   and `aoa-evals` runtime-candidate surfaces instead of treating old
@@ -87,6 +90,8 @@ Tracking starts with the community-docs baseline for this repository.
 - `mechanics/` as the SDK operation-topology skeleton with root and
   package-local `AGENTS.md`, `README.md`, `PARTS.md`, `PROVENANCE.md`,
   `TOPOLOGY_PREP.md`, `topology.json`, a validator, and regression tests.
+- `AOA-SDK-D-0005` as the parent-boundary correction decision, superseding the
+  first skeleton's parent package set.
 - Regression coverage for decision-index freshness, design-route presence,
   canonical sibling compatibility paths, and memo source-file path selection.
 

@@ -11,7 +11,8 @@ sibling repositories retain meaning.
 
 ### Trigger
 
-Use this mechanic when a typed facade, registry, route hint, stats read, or
+Use this mechanic when a typed facade, registry, compatibility rule, skill
+runtime bridge, surface-detection handoff, route hint, stats read, or
 sibling-owned generated reader changes.
 
 ### SDK owns
@@ -19,6 +20,9 @@ sibling-owned generated reader changes.
 - typed loading and facade shape
 - local truth labels
 - source references and route hints
+- compatibility checks over consumed sibling surfaces
+- skill runtime bridge behavior below `aoa-skills`
+- additive surface detection and reviewed owner handoff
 - owner return path after stronger claims appear
 
 ### Stronger owner split
@@ -37,7 +41,10 @@ retain their domain meaning.
 - `src/aoa_sdk/memo/`
 - `src/aoa_sdk/playbooks/`
 - `src/aoa_sdk/routing/`
+- `src/aoa_sdk/compatibility/`
+- `src/aoa_sdk/skills/`
 - `src/aoa_sdk/stats/`
+- `src/aoa_sdk/surfaces/`
 - `src/aoa_sdk/techniques/`
 - facade tests under `tests/`
 
@@ -45,17 +52,20 @@ retain their domain meaning.
 
 - typed-facades
 - truth-labels
+- compatibility-policy
+- skill-runtime-bridge
+- surface-detection-handoff
 - owner-return-routes
 
 ### Must not claim
 
-This mechanic must not turn loaded sibling catalogs into SDK source truth or
-change sibling semantics by changing a Python facade.
+This mechanic must not turn loaded sibling catalogs, compatibility checks,
+skill wrappers, or surface hints into SDK source truth.
 
 ### Validation
 
 ```bash
-python -m pytest -q tests/test_agents.py tests/test_evals.py tests/test_memo.py tests/test_routing.py
+python -m pytest -q tests/test_agents.py tests/test_evals.py tests/test_memo.py tests/test_routing.py tests/test_compatibility.py tests/test_skills.py tests/test_surfaces.py
 ```
 
 ### Next route

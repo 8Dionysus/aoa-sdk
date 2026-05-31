@@ -8,50 +8,66 @@ Grouped by `Mechanic parents` metadata.
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 
 ## agon
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+
+## antifragility
+
+| Decision | Date | Surface classes | SDK facets | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 
 ## boundary-bridge
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) | 2026-05-31 | compatibility, sibling topology, generated route | compatibility policy, control-plane, sibling read path | source topology, compatibility check, canonical path | accepted |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 
 ## checkpoint
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 
 ## closeout
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 
 ## codex-plane
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
+
+## codex-projection
+
+| Decision | Date | Surface classes | SDK facets | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 
 ## compatibility
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 
 ## experience
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 
 ## none
 
@@ -60,44 +76,60 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0001 - Decision Rationale Lane Before Mechanics](../AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md) | 2026-05-31 | root/topology, docs route, validation guard | decision lane, control-plane, mechanics prep | rationale route, index parity, source topology | accepted |
 | [AOA-SDK-D-0002 - Root Design Surfaces Before Mechanics](../AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md) | 2026-05-31 | root/topology, design route, agent guidance | design surface, agent surface, mechanics prep, source home | source topology, route law, agent mesh | accepted |
 
+## questbook
+
+| Decision | Date | Surface classes | SDK facets | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+
 ## recurrence
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 
 ## release-support
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 
 ## rpg
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+
+## runtime-seam
+
+| Decision | Date | Surface classes | SDK facets | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 
 ## skill-routing
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 
 ## surface-detection
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
 
 ## titan
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 
 ## workspace-topology
 
 | Decision | Date | Surface classes | SDK facets | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, control-plane, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | superseded |

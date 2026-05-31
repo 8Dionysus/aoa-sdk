@@ -14,7 +14,7 @@ def test_root_design_surfaces_define_sdk_shape_with_mechanics() -> None:
     design = read_text("DESIGN.md")
     agents_design = read_text("DESIGN.AGENTS.md")
     decision = read_text("docs/decisions/AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md")
-    mechanics_decision = read_text("docs/decisions/AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md")
+    mechanics_decision = read_text("docs/decisions/AOA-SDK-D-0005-mechanics-parent-boundary-correction.md")
 
     assert "`DESIGN.md` describes the system form of `aoa-sdk`." in design
     assert "The importable SDK source home is `src/aoa_sdk/`." in design
@@ -23,7 +23,7 @@ def test_root_design_surfaces_define_sdk_shape_with_mechanics() -> None:
     assert "`DESIGN.AGENTS.md` describes the desired form of agent-facing guidance" in agents_design
     assert "`mechanics/` owns repeatable operation topology, not SDK source code" in agents_design
     assert "Create root `DESIGN.md` and `DESIGN.AGENTS.md` before introducing" in decision
-    assert "Add `mechanics/` now as a route-only operation topology skeleton." in mechanics_decision
+    assert "Correct `aoa-sdk` mechanics to 12 top-level parent packages" in mechanics_decision
 
 
 def test_root_routes_point_to_design_surfaces() -> None:

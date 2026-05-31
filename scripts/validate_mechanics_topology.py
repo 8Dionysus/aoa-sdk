@@ -14,21 +14,28 @@ MECHANICS_DIR = Path("mechanics")
 TOPOLOGY_PATH = MECHANICS_DIR / "topology.json"
 
 EXPECTED_PACKAGES = (
+    "agon",
+    "antifragility",
+    "boundary-bridge",
+    "checkpoint",
+    "codex-projection",
+    "experience",
+    "questbook",
+    "recurrence",
+    "release-support",
+    "rpg",
+    "runtime-seam",
+    "titan",
+)
+
+DEMOTED_PARENT_CANDIDATES = (
     "workspace-topology",
     "compatibility",
-    "boundary-bridge",
     "skill-routing",
     "surface-detection",
-    "checkpoint",
     "closeout",
-    "recurrence",
-    "agon",
-    "titan",
-    "experience",
     "a2a-return",
-    "rpg",
     "codex-plane",
-    "release-support",
 )
 
 REQUIRED_ROOT_FILES = (
@@ -95,6 +102,19 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
         issues.append("mechanics/topology.json: status must be skeleton")
     if topology.get("payload_moved") is not False:
         issues.append("mechanics/topology.json: payload_moved must be false")
+    parent_rule = topology.get("parent_boundary_rule")
+    if not isinstance(parent_rule, str) or "SDK-specific lanes become parts" not in parent_rule:
+        issues.append("mechanics/topology.json: missing parent boundary rule")
+
+    demoted = topology.get("demoted_parent_candidates")
+    if not isinstance(demoted, dict):
+        issues.append("mechanics/topology.json: demoted_parent_candidates must be an object")
+    else:
+        for slug in DEMOTED_PARENT_CANDIDATES:
+            if slug not in demoted:
+                issues.append(f"mechanics/topology.json: missing demoted parent candidate {slug}")
+            if (repo_root / MECHANICS_DIR / slug).exists():
+                issues.append(f"mechanics/{slug}: demoted parent candidate must not exist as top-level package")
 
     packages = topology.get("packages")
     if not isinstance(packages, list):

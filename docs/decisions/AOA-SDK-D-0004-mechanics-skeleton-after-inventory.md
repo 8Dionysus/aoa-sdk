@@ -2,7 +2,7 @@
 
 ## Status
 
-Accepted.
+Superseded by `AOA-SDK-D-0005`.
 
 ## Index Metadata
 
@@ -12,7 +12,7 @@ Accepted.
 - SDK facets: mechanics topology, control-plane, source inventory, agent surface
 - Mechanic parents: workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support
 - Guard families: source topology, mechanics topology, nested agents, release check
-- Posture: accepted
+- Posture: superseded
 
 ## Context
 
@@ -86,6 +86,9 @@ cosmetic analogy.
 
 ## Consequences
 
+- This first skeleton was corrected by `AOA-SDK-D-0005` because several
+  SDK-local lanes were promoted to parent mechanics when they should have been
+  parts of shared AoA mechanics.
 - Future agents can route changes by operation before editing scattered source
   surfaces.
 - Mechanics package cards can name triggers, SDK ownership, stronger owners,

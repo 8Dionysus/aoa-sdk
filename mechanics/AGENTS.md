@@ -30,9 +30,11 @@ Mechanics are route maps. They are not the importable SDK source home.
 - Keep `src/aoa_sdk/` as the importable Python source home.
 - Keep generated companions lower authority than their builders and sources.
 - Keep sibling-owned meaning in the sibling repository.
-- Use shared AoA mechanic names when this SDK operation is the same recurring
-  shape; use SDK-local names only when the operation has its own trigger,
-  input, output, owner split, stop-line, and validation route.
+- Top-level package names follow the shared AoA mechanics vocabulary. A
+  repo-local top-level mechanic needs evidence that it cannot be a part of an
+  existing shared parent.
+- File-family pressure routes through `PARTS.md`; it does not create a parent
+  package by itself.
 - Do not create physical `parts/` payload directories until a later landing
   moves or adds reviewed payload with a package-local validator.
 - Do not treat topology cards as proof that a source surface has moved.

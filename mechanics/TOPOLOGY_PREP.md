@@ -110,8 +110,8 @@ Schema families:
 | titan | 31 | `titan` |
 | agon | 24 | `agon` |
 | experience API | 22 | `experience` |
-| checkpoint and closeout | 6 | `checkpoint`, `closeout` |
-| workspace | 1 | `workspace-topology` |
+| checkpoint and closeout | 6 | `checkpoint` |
+| workspace | 1 | `runtime-seam` |
 
 Example families:
 
@@ -121,8 +121,8 @@ Example families:
 | experience API | 23 | `experience` |
 | titan | 17 | `titan` |
 | agon | 11 | `agon` |
-| checkpoint and closeout | 7 | `checkpoint`, `closeout` |
-| A2A return | 5 | `a2a-return` |
+| checkpoint and closeout | 7 | `checkpoint` |
+| A2A return | 5 | `checkpoint` |
 
 Test families:
 
@@ -130,10 +130,10 @@ Test families:
 | --- | ---: | --- |
 | Agon | 13 | `agon` |
 | recurrence | 12 | `recurrence` |
-| control plane | 11 | `workspace-topology`, `compatibility`, `boundary-bridge` |
+| control plane | 11 | `runtime-seam`, `boundary-bridge` |
 | Titan | 8 | `titan` |
-| A2A | 6 | `a2a-return` |
-| checkpoint and closeout | 5 | `checkpoint`, `closeout` |
+| A2A | 6 | `checkpoint` |
+| checkpoint and closeout | 5 | `checkpoint` |
 | Experience | 4 | `experience` |
 | release support | 2 | `release-support` |
 
@@ -148,31 +148,47 @@ The skeleton uses a package only when the operation has all of these:
 - current source surfaces that can be named today;
 - a stop-line that prevents SDK source or sibling meaning absorption;
 - at least one validation route.
+- an AoA parent vocabulary match when sibling sources already provide the
+  operation parent.
 
 If an operation is only a module name, it stays in `src/aoa_sdk/`.
 If an operation is only a document theme, it stays in `docs/`.
+If an operation is a narrow SDK lane inside a shared AoA mechanic, it becomes a
+part in that mechanic rather than a top-level package.
 If an operation already belongs to a sibling owner, SDK mechanics may route the
 handoff but must not claim the meaning.
 
-## First Skeleton Packages
+## Corrected Parent Packages
 
 | Mechanic | Trigger | SDK owns | Stronger owner split |
 | --- | --- | --- | --- |
-| `workspace-topology` | workspace root, mirror, or bootstrap changes | explicit local path resolution and control-plane capsule | host layout, sibling repo content, runtime mirror deployment |
-| `compatibility` | consumed sibling surface path or version drift | stable surface IDs and checks over consumed paths | sibling topology and meaning |
-| `boundary-bridge` | typed facade or source-owner boundary changes | SDK handle, typed model, truth label, handoff route | sibling source truth and policy |
-| `skill-routing` | skill discovery, disclosure, activation, guard, or dispatch changes | skill-only portable helper behavior | `aoa-skills` skill canon and activation meaning |
-| `surface-detection` | non-skill owner-layer candidate detection or handoff | additive hints, shortlist, receipts, reviewed handoff route | eval, memo, playbook, agent, technique, and owner-layer meaning |
-| `checkpoint` | mid-session note capture, hook, review-note, or bridge context changes | session-local capture and fail-closed review gates | durable memory, proof, progression, and owner verdicts |
-| `closeout` | reviewed closeout request, inbox, manifest, or followthrough changes | mechanical request/inbox/manifest assembly and owner handoff | reviewed owner receipts, harvest, memory, proof, and progression meaning |
-| `recurrence` | recurrence manifests, hooks, graph, review, projections, observations | SDK recurrence control-plane helpers and validators | owner component truth and eval-suite proof |
-| `agon` | Agon helper candidate, registry, quest, or seed update | candidate-only SDK helper packs and generated registries | Agon doctrine, verdict, duel, KAG, Sophian, and state-packet meaning |
-| `titan` | Titan harness, console, appserver, memory, session, or swarm helper changes | bounded Titan control-plane API and CLI surfaces | Titan runtime, identity, memory, and role authority |
+| `agon` | Agon helper candidate, registry, or seed update | candidate-only SDK helper packs and generated registries | Agon doctrine, verdict, duel, KAG, Sophian, and state-packet meaning |
+| `antifragility` | stress-context, degraded-mode, via negativa, or closeout stress carry changes | public-safe fixtures and control-plane stress routes | owner remediation, proof, deletion, runtime response |
+| `boundary-bridge` | typed facade, compatibility, skill bridge, or surface handoff changes | SDK handle, typed model, truth label, checks, handoff route | sibling source truth and policy |
+| `checkpoint` | mid-session note capture, hook, review-note, closeout bridge, or return re-entry changes | session-local capture, fail-closed gates, bridge context, return packets | durable memory, proof, progression, and owner verdicts |
+| `codex-projection` | Codex MCP, deploy status, portability, or rollout ref change | typed local Codex-facing read and MCP exposure | Codex runtime, host deployment, and sibling rollout authority |
 | `experience` | SDK API helper contract for adoption, deployment, governance, release | typed call contracts, schemas, examples, validation | Experience owner truth and operational decisions |
-| `a2a-return` | summon, checkpoint, reviewed closeout, or return transition changes | return packet bridge and local typed assembly | A2A role handoff, memo proof, progression, and stress verdict meaning |
-| `rpg` | RPG typed consumer or surface-path change | typed registry and path helper | RPG runtime/gameplay semantics |
-| `codex-plane` | Codex workspace MCP, deploy status, rollout ref, or portability change | typed local read and MCP exposure | Codex runtime, host deployment, and sibling rollout authority |
+| `questbook` | quest source record or owner-followthrough obligation change | SDK quest source-store route and candidate helper quest routing | owner acceptance, completion, proof, release, memory |
+| `recurrence` | recurrence manifests, hooks, graph, review, projections, observations | SDK recurrence control-plane helpers and validators | owner component truth and eval-suite proof |
 | `release-support` | changelog, release audit, CI, build, or publish helper changes | bounded release audit and support posture | GitHub release truth, package publication, and sibling releases |
+| `rpg` | RPG typed consumer or surface-path change | typed registry and path helper | RPG runtime/gameplay semantics |
+| `runtime-seam` | workspace root, mirror, bootstrap, capsule, or local automation seam changes | explicit local path resolution, control-plane capsule, and local seam routing | host layout, sibling repo content, runtime mirror deployment |
+| `titan` | Titan harness, console, appserver, memory, session, or swarm helper changes | bounded Titan control-plane API and CLI surfaces | Titan runtime, identity, memory, and role authority |
+
+## Demoted Parent Candidates
+
+The first SDK skeleton promoted several lanes by file-family pressure. The
+source mechanics show these belong as parts:
+
+| Former parent candidate | Correct route |
+| --- | --- |
+| `workspace-topology` | `runtime-seam/workspace-root-resolution` |
+| `compatibility` | `boundary-bridge/compatibility-policy` |
+| `skill-routing` | `boundary-bridge/skill-runtime-bridge` |
+| `surface-detection` | `boundary-bridge/surface-detection-handoff` |
+| `closeout` | `checkpoint/closeout-bridge` |
+| `a2a-return` | `checkpoint/return-reentry` |
+| `codex-plane` | `codex-projection/deploy-status` |
 
 ## Payload Movement Rule
 
