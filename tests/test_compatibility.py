@@ -184,74 +184,85 @@ def test_diagnostic_surface_catalog_prefers_part_local_path_over_legacy_fallback
     )
 
 
-def test_memo_writeback_surfaces_prefer_mechanics_paths_over_legacy_fallback(
+def test_memo_generated_readers_use_canonical_refactored_paths(
     workspace_root: Path,
 ) -> None:
-    memo_root = workspace_root / "aoa-memo"
-    (memo_root / "examples" / "checkpoint_to_memory_contract.example.json").write_text(
-        json.dumps({"contract_type": "checkpoint_to_memory_contract"}) + "\n",
-        encoding="utf-8",
-    )
-    writeback_example = (
-        memo_root
-        / "mechanics"
-        / "writeback"
-        / "examples"
-        / "checkpoint_to_memory_contract.example.json"
-    )
-    writeback_example.parent.mkdir(parents=True, exist_ok=True)
-    writeback_example.write_text(
-        json.dumps({"contract_type": "checkpoint_to_memory_contract"}) + "\n",
-        encoding="utf-8",
-    )
-    checkpoint_example = (
-        memo_root
-        / "mechanics"
-        / "checkpoint"
-        / "examples"
-        / "checkpoint_to_memory_contract.example.json"
-    )
-    checkpoint_example.parent.mkdir(parents=True, exist_ok=True)
-    checkpoint_example.write_text(
-        json.dumps(
-            {
-                "contract_type": "checkpoint_to_memory_contract",
-                "contract_id": "checkpoint-to-memory-v1",
-                "mapping_rules": [],
-            }
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-
-    preferred_paths = {
-        "aoa-memo.runtime_writeback_targets.min": "runtime_writeback_targets.min.json",
-        "aoa-memo.runtime_writeback_intake.min": "runtime_writeback_intake.min.json",
-        "aoa-memo.runtime_writeback_governance.min": "runtime_writeback_governance.min.json",
+    expected_paths = {
+        "aoa-memo.memory_catalog.min": "generated/memory/memory_catalog.min.json",
+        "aoa-memo.memory_capsules": "generated/memory/memory_capsules.json",
+        "aoa-memo.memory_sections.full": "generated/memory/memory_sections.full.json",
+        "aoa-memo.memory_object_catalog.min": "generated/memory-objects/memory_object_catalog.min.json",
+        "aoa-memo.memory_object_capsules": "generated/memory-objects/memory_object_capsules.json",
+        "aoa-memo.memory_object_sections.full": "generated/memory-objects/memory_object_sections.full.json",
     }
-    for filename in preferred_paths.values():
-        (memo_root / "generated" / filename).write_text(
-            json.dumps({"schema_version": 0}) + "\n",
-            encoding="utf-8",
-        )
-        preferred = memo_root / "mechanics" / "writeback" / "generated" / filename
-        preferred.parent.mkdir(parents=True, exist_ok=True)
-        preferred.write_text(json.dumps({"schema_version": 1}) + "\n", encoding="utf-8")
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    for surface_id, expected_path in expected_paths.items():
+        rule = SURFACE_COMPATIBILITY_RULES[surface_id]
+        assert rule.relative_path == expected_path
+        assert rule.preferred_relative_paths == []
+        report = sdk.compatibility.check(surface_id)
+        assert report.compatible is True
+        assert report.resolved_relative_path == expected_path
+
+
+def test_memo_writeback_surfaces_use_canonical_mechanics_paths(
+    workspace_root: Path,
+) -> None:
+    expected_paths = {
+        "aoa-memo.runtime_writeback_targets.min": (
+            "mechanics/writeback/parts/runtime-and-temperature/generated/"
+            "runtime_writeback_targets.min.json"
+        ),
+        "aoa-memo.runtime_writeback_intake.min": (
+            "mechanics/writeback/parts/runtime-and-temperature/generated/"
+            "runtime_writeback_intake.min.json"
+        ),
+        "aoa-memo.runtime_writeback_governance.min": (
+            "mechanics/writeback/parts/runtime-and-temperature/generated/"
+            "runtime_writeback_governance.min.json"
+        ),
+    }
 
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     contract = sdk.compatibility.check("aoa-memo.checkpoint_to_memory_contract.example")
 
+    contract_rule = SURFACE_COMPATIBILITY_RULES["aoa-memo.checkpoint_to_memory_contract.example"]
+    assert contract_rule.preferred_relative_paths == []
     assert contract.compatible is True
     assert (
         contract.resolved_relative_path
-        == "mechanics/checkpoint/examples/checkpoint_to_memory_contract.example.json"
+        == "mechanics/checkpoint/parts/checkpoint-to-memory-mapping/examples/"
+        "checkpoint_to_memory_contract.example.json"
     )
-    for surface_id in preferred_paths:
+    for surface_id, expected_path in expected_paths.items():
+        rule = SURFACE_COMPATIBILITY_RULES[surface_id]
+        assert rule.relative_path == expected_path
+        assert rule.preferred_relative_paths == []
         report = sdk.compatibility.check(surface_id)
         assert report.compatible is True
-        assert report.resolved_relative_path == (
-            "mechanics/writeback/generated/" + preferred_paths[surface_id]
-        )
+        assert report.resolved_relative_path == expected_path
+
+
+def test_eval_runtime_candidate_readers_use_canonical_audit_part_paths(
+    workspace_root: Path,
+) -> None:
+    expected_paths = {
+        "aoa-evals.runtime_candidate_template_index.min": (
+            "mechanics/audit/parts/candidate-readers/generated/"
+            "runtime_candidate_template_index.min.json"
+        ),
+        "aoa-evals.runtime_candidate_intake.min": "mechanics/audit/parts/candidate-readers/generated/runtime_candidate_intake.min.json",
+    }
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    for surface_id, expected_path in expected_paths.items():
+        rule = SURFACE_COMPATIBILITY_RULES[surface_id]
+        assert rule.relative_path == expected_path
+        assert rule.preferred_relative_paths == []
+        report = sdk.compatibility.check(surface_id)
+        assert report.compatible is True
+        assert report.resolved_relative_path == expected_path
 
 
 def test_center_entry_map_current_v2_is_compatible(workspace_root: Path) -> None:
@@ -412,7 +423,16 @@ def test_compatibility_accepts_legacy_and_v2_stats_and_routing_capsules(workspac
 
 def test_unversioned_checkpoint_writeback_contract_requires_required_keys(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    contract_path = workspace_root / "aoa-memo" / "examples" / "checkpoint_to_memory_contract.example.json"
+    contract_path = (
+        workspace_root
+        / "aoa-memo"
+        / "mechanics"
+        / "checkpoint"
+        / "parts"
+        / "checkpoint-to-memory-mapping"
+        / "examples"
+        / "checkpoint_to_memory_contract.example.json"
+    )
     contract_path.write_text(
         json.dumps(
             {

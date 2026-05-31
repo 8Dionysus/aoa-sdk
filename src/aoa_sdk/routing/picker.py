@@ -29,8 +29,8 @@ ROUTING_ACTION_SURFACE_IDS = {
     ("aoa-skills", "generated/skill_sections.full.json"): "aoa-skills.skill_sections.full",
     ("aoa-evals", "generated/eval_capsules.json"): "aoa-evals.eval_capsules",
     ("aoa-evals", "generated/eval_sections.full.json"): "aoa-evals.eval_sections.full",
-    ("aoa-memo", "generated/memory_catalog.min.json"): "aoa-memo.memory_catalog.min",
-    ("aoa-memo", "generated/memory_sections.full.json"): "aoa-memo.memory_sections.full",
+    ("aoa-memo", "generated/memory/memory_catalog.min.json"): "aoa-memo.memory_catalog.min",
+    ("aoa-memo", "generated/memory/memory_sections.full.json"): "aoa-memo.memory_sections.full",
 }
 
 

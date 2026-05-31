@@ -19,6 +19,10 @@ repositories remain authoritative.
 - typed loaders over published surfaces
 - local workspace discovery and sibling-repo resolution
 - shared Python models for stable consumer use
+- root system-design and agent-surface design posture in `DESIGN.md` and
+  `DESIGN.AGENTS.md`
+- durable rationale for SDK-owned topology, route-law, compatibility, and
+  validation choices
 - session and orchestration helpers that preserve source ownership
 - policy-aware guards around approval, mutation, and trust posture
 - adapters that can change transport without changing ownership
@@ -29,6 +33,9 @@ repositories remain authoritative.
 
 - authored markdown as the primary runtime API
 - copied catalogs from sibling repositories
+- decision notes that pretend to be active source truth
+- design notes that pretend to replace active SDK source, validators, or
+  sibling-owner truth
 - hidden ranking, routing, or memory policy
 - daemon or service responsibilities
 - project-specific overlays inside portable-core modules
