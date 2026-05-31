@@ -301,84 +301,95 @@ SURFACE_COMPATIBILITY_RULES = {
     "aoa-memo.memory_catalog.min": SurfaceCompatibilityRule(
         surface_id="aoa-memo.memory_catalog.min",
         repo="aoa-memo",
-        relative_path="generated/memory_catalog.min.json",
+        relative_path="generated/memory/memory_catalog.min.json",
         version_field="catalog_version",
         supported_versions=[1],
+        notes="Canonical refactored memory generated lane.",
     ),
     "aoa-memo.memory_capsules": SurfaceCompatibilityRule(
         surface_id="aoa-memo.memory_capsules",
         repo="aoa-memo",
-        relative_path="generated/memory_capsules.json",
+        relative_path="generated/memory/memory_capsules.json",
         version_field="capsule_version",
         supported_versions=[1],
+        notes="Canonical refactored memory generated lane.",
     ),
     "aoa-memo.memory_sections.full": SurfaceCompatibilityRule(
         surface_id="aoa-memo.memory_sections.full",
         repo="aoa-memo",
-        relative_path="generated/memory_sections.full.json",
+        relative_path="generated/memory/memory_sections.full.json",
         version_field="sections_version",
         supported_versions=[1],
+        notes="Canonical refactored memory generated lane.",
     ),
     "aoa-memo.memory_object_catalog.min": SurfaceCompatibilityRule(
         surface_id="aoa-memo.memory_object_catalog.min",
         repo="aoa-memo",
-        relative_path="generated/memory_object_catalog.min.json",
+        relative_path="generated/memory-objects/memory_object_catalog.min.json",
         version_field="catalog_version",
         supported_versions=[1],
+        notes="Canonical refactored memory-object generated lane.",
     ),
     "aoa-memo.memory_object_capsules": SurfaceCompatibilityRule(
         surface_id="aoa-memo.memory_object_capsules",
         repo="aoa-memo",
-        relative_path="generated/memory_object_capsules.json",
+        relative_path="generated/memory-objects/memory_object_capsules.json",
         version_field="capsule_version",
         supported_versions=[1],
+        notes="Canonical refactored memory-object generated lane.",
     ),
     "aoa-memo.memory_object_sections.full": SurfaceCompatibilityRule(
         surface_id="aoa-memo.memory_object_sections.full",
         repo="aoa-memo",
-        relative_path="generated/memory_object_sections.full.json",
+        relative_path="generated/memory-objects/memory_object_sections.full.json",
         version_field="sections_version",
         supported_versions=[1],
+        notes="Canonical refactored memory-object generated lane.",
     ),
     "aoa-memo.checkpoint_to_memory_contract.example": SurfaceCompatibilityRule(
         surface_id="aoa-memo.checkpoint_to_memory_contract.example",
         repo="aoa-memo",
-        relative_path="examples/checkpoint_to_memory_contract.example.json",
-        preferred_relative_paths=[
-            "mechanics/checkpoint/examples/checkpoint_to_memory_contract.example.json",
-            "mechanics/writeback/examples/checkpoint_to_memory_contract.example.json"
-        ],
+        relative_path=(
+            "mechanics/checkpoint/parts/checkpoint-to-memory-mapping/examples/"
+            "checkpoint_to_memory_contract.example.json"
+        ),
         version_field=None,
         supported_versions=[],
         required_top_level_keys=["contract_type", "contract_id", "mapping_rules"],
-        notes=(
-            "Unversioned example contract; prefer mechanic-owned checkpoint/writeback paths "
-            "while retaining legacy examples/ fallback."
-        ),
+        notes="Unversioned example contract at canonical checkpoint mechanic part path.",
     ),
     "aoa-memo.runtime_writeback_targets.min": SurfaceCompatibilityRule(
         surface_id="aoa-memo.runtime_writeback_targets.min",
         repo="aoa-memo",
-        relative_path="generated/runtime_writeback_targets.min.json",
-        preferred_relative_paths=["mechanics/writeback/generated/runtime_writeback_targets.min.json"],
+        relative_path=(
+            "mechanics/writeback/parts/runtime-and-temperature/generated/"
+            "runtime_writeback_targets.min.json"
+        ),
         version_field="schema_version",
         supported_versions=[1],
+        notes="Canonical runtime-and-temperature part-local surface.",
     ),
     "aoa-memo.runtime_writeback_intake.min": SurfaceCompatibilityRule(
         surface_id="aoa-memo.runtime_writeback_intake.min",
         repo="aoa-memo",
-        relative_path="generated/runtime_writeback_intake.min.json",
-        preferred_relative_paths=["mechanics/writeback/generated/runtime_writeback_intake.min.json"],
+        relative_path=(
+            "mechanics/writeback/parts/runtime-and-temperature/generated/"
+            "runtime_writeback_intake.min.json"
+        ),
         version_field="schema_version",
         supported_versions=[1],
+        notes="Canonical runtime-and-temperature part-local surface.",
     ),
     "aoa-memo.runtime_writeback_governance.min": SurfaceCompatibilityRule(
         surface_id="aoa-memo.runtime_writeback_governance.min",
         repo="aoa-memo",
-        relative_path="generated/runtime_writeback_governance.min.json",
-        preferred_relative_paths=["mechanics/writeback/generated/runtime_writeback_governance.min.json"],
+        relative_path=(
+            "mechanics/writeback/parts/runtime-and-temperature/generated/"
+            "runtime_writeback_governance.min.json"
+        ),
         version_field="schema_version",
         supported_versions=[1],
+        notes="Canonical runtime-and-temperature part-local surface.",
     ),
     "aoa-evals.eval_catalog.min": SurfaceCompatibilityRule(
         surface_id="aoa-evals.eval_catalog.min",
@@ -411,16 +422,23 @@ SURFACE_COMPATIBILITY_RULES = {
     "aoa-evals.runtime_candidate_template_index.min": SurfaceCompatibilityRule(
         surface_id="aoa-evals.runtime_candidate_template_index.min",
         repo="aoa-evals",
-        relative_path="generated/runtime_candidate_template_index.min.json",
+        relative_path=(
+            "mechanics/audit/parts/candidate-readers/generated/"
+            "runtime_candidate_template_index.min.json"
+        ),
         version_field="schema_version",
         supported_versions=[1],
+        notes="Canonical audit candidate-readers part-local surface.",
     ),
     "aoa-evals.runtime_candidate_intake.min": SurfaceCompatibilityRule(
         surface_id="aoa-evals.runtime_candidate_intake.min",
         repo="aoa-evals",
-        relative_path="generated/runtime_candidate_intake.min.json",
+        relative_path=(
+            "mechanics/audit/parts/candidate-readers/generated/runtime_candidate_intake.min.json"
+        ),
         version_field="schema_version",
         supported_versions=[1],
+        notes="Canonical audit candidate-readers part-local surface.",
     ),
     "aoa-skills.project_core_skill_kernel.min": SurfaceCompatibilityRule(
         surface_id="aoa-skills.project_core_skill_kernel.min",

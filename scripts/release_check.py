@@ -9,6 +9,7 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 COMMANDS = [
+    ("generate decision indexes", [sys.executable, "scripts/generate_decision_indexes.py", "--check"]),
     ("build workspace control plane", [sys.executable, "scripts/build_workspace_control_plane.py", "--check"]),
     ("validate workspace control plane", [sys.executable, "scripts/validate_workspace_control_plane.py"]),
     ("run tests", [sys.executable, "-m", "pytest", "-q"]),

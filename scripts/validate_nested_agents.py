@@ -51,6 +51,12 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         '$schema',
         'owner-subordinate',
     ),
+    'docs/decisions/AGENTS.md': (
+        'durable rationale',
+        'AOA-SDK-D-####',
+        'Index Metadata',
+        'python scripts/generate_decision_indexes.py --check',
+    ),
 }
 ADVISORY_AGENT_DIRS: tuple[str, ...] = ('.agents/skills', 'config', 'docs', 'examples', 'manifests/recurrence', 'quests', 'scripts', 'tests')
 HEADING_PREFIXES = ("# AGENTS.md", "# AGENTS")

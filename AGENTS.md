@@ -25,13 +25,18 @@ It does not own:
 ## Start here
 
 1. `README.md`
-2. `docs/boundaries.md`
-3. `docs/workspace-layout.md`
-4. `docs/versioning.md`
-5. `ROADMAP.md`
-6. `.aoa/workspace.toml`
-7. source files and tests you plan to touch
-8. `docs/AGENTS_ROOT_REFERENCE.md` for preserved full root guidance, especially checkpoint-hook and closeout-loop details
+2. `DESIGN.md` when repository shape, source-home placement, or future
+   mechanics topology changes
+3. `DESIGN.AGENTS.md` when agent-facing guidance, local cards, validation
+   posture, or closeout shape changes
+4. `docs/boundaries.md`
+5. `docs/workspace-layout.md`
+6. `docs/versioning.md`
+7. `ROADMAP.md`
+8. `docs/decisions/README.md` when topology, owner split, route-law, workflow, or validator authority changes
+9. `.aoa/workspace.toml`
+10. source files and tests you plan to touch
+11. `docs/AGENTS_ROOT_REFERENCE.md` for preserved full root guidance, especially checkpoint-hook and closeout-loop details
 
 
 ## AGENTS stack law
@@ -58,6 +63,30 @@ lands through `aoa-memo`.
 - Keep source checkouts distinct from deployed runtime mirrors.
 - Usual federation root is `/srv/AbyssOS`; `abyss-stack` source may live at `~/src/abyss-stack`, while `/srv/AbyssOS/abyss-stack` can be a runtime mirror.
 - Non-skill surfaces may be loaded, suggested, or handed off. They do not become executable-now activation authority.
+
+## Decision review
+
+After structural, ownership, workflow, route-law, validator-authority,
+public-contract, compatibility, or topology changes, check whether future
+agents need a decision record to understand why the path was chosen. Use
+`docs/decisions/AGENTS.md`, `docs/decisions/README.md`, and
+`docs/decisions/TEMPLATE.md`.
+
+Decision records explain rationale. They do not replace active SDK source,
+boundary docs, generated companions, validators, or sibling-owner truth.
+
+## Design review
+
+Use `DESIGN.md` when a change alters repository shape, source-home placement,
+source versus generated authority, compatibility posture, or future
+`mechanics/` package placement.
+
+Use `DESIGN.AGENTS.md` when a change alters the root-to-local `AGENTS.md`
+mesh, reading order, route-card shape, validation posture, closeout
+expectations, or agent-facing design law.
+
+Design surfaces describe form. They do not override active source code,
+validators, decisions, nested route cards, or sibling-owner truth.
 
 ## Surface Detection Loop
 
@@ -100,6 +129,7 @@ If GitHub status or merge permissions cannot be observed, stop the landing route
 Minimum validation for code, topology, or reviewed-handoff changes:
 
 ```bash
+python scripts/generate_decision_indexes.py --check
 python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
 python -m pytest -q

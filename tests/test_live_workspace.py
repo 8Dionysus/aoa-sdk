@@ -87,7 +87,10 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert technique_readiness.readiness_passed is True
     assert len(technique_readiness_entries) >= 90
     assert foundation.foundation_id == "project-foundation-v1"
-    assert len(foundation.skills) == 23
+    assert foundation.skill_count == len(foundation.skills)
+    assert len(foundation.skills) >= 23
+    assert "aoa-change-protocol" in foundation.skills
+    assert "aoa-sanitized-share" in foundation.skills
     assert outer_ring.ring_id == "project-core-engineering-ring-v1"
     assert len(outer_ring.skills) == 10
     assert len(outer_ring_readiness) == 10

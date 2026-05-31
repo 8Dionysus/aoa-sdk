@@ -13,6 +13,11 @@ This repository was seeded from the `Dionysus` starter artifacts on 2026-03-31. 
 Use the shortest route by need:
 
 - ownership and scope: `docs/boundaries.md`
+- system design and source-home posture: `DESIGN.md`
+- agent-facing guidance design: `DESIGN.AGENTS.md`
+- durable topology and route rationale: `docs/decisions/README.md`,
+  `docs/decisions/indexes/by-number.md`, and
+  `python scripts/generate_decision_indexes.py --check`
 - compact control-plane capsule: `generated/workspace_control_plane.min.json`
 - workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
 - compatibility posture: `docs/versioning.md`
@@ -44,6 +49,11 @@ Use the shortest route by need:
 
 - compact control-plane capsule for low-context routing: `generated/workspace_control_plane.min.json`
 - current direction and control-plane hardening: `ROADMAP.md`
+- system form and future mechanics posture: `DESIGN.md`
+- agent-facing route-card form: `DESIGN.AGENTS.md`
+- decision rationale lane for topology, route-law, compatibility, and
+  mechanics-prep choices: `docs/decisions/README.md`,
+  `docs/decisions/AGENTS.md`, and `docs/decisions/indexes/`
 - machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
 - project-level Codex workspace orientation via MCP: `docs/codex-workspace-mcp.md`, `src/aoa_sdk/codex/workspace_mcp.py`, and `scripts/aoa_workspace_mcp_server.py`
 - portable sibling-workspace bootstrap for non-`/srv/AbyssOS` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`
@@ -96,6 +106,10 @@ This repository is the source of truth for:
 - typed loaders and facades over source-owned federation surfaces
 - workspace discovery and topology resolution
 - compatibility checks across consumed local surfaces
+- system-design and agent-surface design posture under `DESIGN.md` and
+  `DESIGN.AGENTS.md`
+- durable rationale for SDK-owned topology, route-law, compatibility, and
+  validation choices under `docs/decisions/`
 - bounded activation, disclosure, and orchestration helpers
 - reviewed-session closeout helpers that publish owner-local receipts and refresh live stats
 - reviewed-session inbox automation that stays subordinate to reviewed manifests and owner-owned publishers
@@ -160,6 +174,7 @@ For the shortest statement of what the SDK publicly supports, what an SDK releas
 Use this read-only/current-state battery:
 
 ```bash
+python scripts/generate_decision_indexes.py --check
 python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
 python -m pytest -q

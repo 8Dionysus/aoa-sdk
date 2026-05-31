@@ -16,6 +16,10 @@ The current landed surface already includes:
 
 - workspace discovery and topology resolution grounded in
   `.aoa/workspace.toml`
+- root design surfaces, `DESIGN.md` and `DESIGN.AGENTS.md`, that name SDK
+  system form and agent-facing guidance form before mechanics land
+- canonical decision rationale lane under `docs/decisions/` with generated
+  lookup indexes
 - typed compatibility checks and workspace inspection
 - the compact control-plane capsule at
   `generated/workspace_control_plane.min.json`
@@ -34,6 +38,14 @@ release contour is:
 - workspace topology and the compact control-plane capsule:
   `.aoa/workspace.toml`, `docs/workspace-layout.md`, and
   `generated/workspace_control_plane.min.json`
+- decision rationale lane before mechanics:
+  `docs/decisions/README.md`,
+  `docs/decisions/AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md`,
+  `docs/decisions/AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md`,
+  `docs/decisions/indexes/`, and
+  `scripts/generate_decision_indexes.py`
+- root design surfaces before mechanics:
+  `DESIGN.md` and `DESIGN.AGENTS.md`
 - Codex-plane deploy-state and rollout reference boundaries:
   `docs/CODEX_PLANE_DEPLOY_STATUS.md`,
   `docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`,
@@ -72,8 +84,12 @@ Goals:
 
 - keep `ROADMAP.md` as the root-level current-direction door
 - keep `README.md` and `AGENTS.md` short and route-first
+- keep `DESIGN.md` and `DESIGN.AGENTS.md` as the root design route before
+  mechanics topology starts moving files
 - keep `docs/blueprint.md` explicit as seed history rather than current-state
   authority
+- keep structural rationale in `docs/decisions/` before mechanics topology
+  starts moving files
 
 ### Wave 2: control-plane contract hardening
 

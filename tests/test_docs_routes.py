@@ -29,10 +29,40 @@ def test_readme_lists_full_current_state_battery() -> None:
 def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
     agents = read_text("AGENTS.md")
 
+    assert "python scripts/generate_decision_indexes.py --check" in agents
     assert "python scripts/build_workspace_control_plane.py --check" in agents
     assert "python scripts/validate_workspace_control_plane.py" in agents
     assert "aoa compatibility check /srv/AbyssOS/aoa-sdk" in agents
     assert "aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json" in agents
+
+
+def test_decision_lane_is_routed_before_mechanics() -> None:
+    readme = read_text("README.md")
+    agents = read_text("AGENTS.md")
+    roadmap = read_text("ROADMAP.md")
+    decision = read_text("docs/decisions/AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md")
+
+    assert "docs/decisions/README.md" in readme
+    assert "docs/decisions/README.md" in agents
+    assert "docs/decisions/indexes/" in roadmap
+    assert "Create `docs/decisions/` as the canonical rationale lane" in decision
+    assert "before" in decision
+    assert "introducing `mechanics/`" in decision
+
+
+def test_design_lane_is_routed_before_mechanics() -> None:
+    readme = read_text("README.md")
+    agents = read_text("AGENTS.md")
+    roadmap = read_text("ROADMAP.md")
+    decision = read_text("docs/decisions/AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md")
+
+    assert "DESIGN.md" in readme
+    assert "DESIGN.AGENTS.md" in readme
+    assert "DESIGN.md" in agents
+    assert "DESIGN.AGENTS.md" in agents
+    assert "DESIGN.md" in roadmap
+    assert "DESIGN.AGENTS.md" in roadmap
+    assert "Create root `DESIGN.md` and `DESIGN.AGENTS.md` before introducing" in decision
 
 
 def test_readme_lists_sibling_canary_surfaces() -> None:

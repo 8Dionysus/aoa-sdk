@@ -31,8 +31,8 @@
   ],
   "contract_refs": [
     "aoa-playbooks/generated/playbook_review_packet_contracts.min.json",
-    "aoa-evals/generated/runtime_candidate_template_index.min.json",
-    "aoa-memo/generated/runtime_writeback_targets.min.json"
+    "aoa-evals/mechanics/audit/parts/candidate-readers/generated/runtime_candidate_template_index.min.json",
+    "aoa-memo/mechanics/writeback/parts/runtime-and-temperature/generated/runtime_writeback_targets.min.json"
   ],
   "recommended_review_targets": [
     {

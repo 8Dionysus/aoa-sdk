@@ -60,7 +60,7 @@ REPO_HINTS: dict[str, dict[str, Any]] = {
     "aoa-memo": {
         "role": "memory-derived",
         "surface": "memory catalogs and writeback governance surfaces",
-        "entry_candidates": ["README.md", "generated/memory_catalog.min.json"],
+        "entry_candidates": ["README.md", "generated/memory/memory_catalog.min.json"],
     },
     "aoa-evals": {
         "role": "evaluation-canon",
