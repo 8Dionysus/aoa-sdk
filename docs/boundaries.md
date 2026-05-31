@@ -23,6 +23,8 @@ repositories remain authoritative.
   `DESIGN.AGENTS.md`
 - durable rationale for SDK-owned topology, route-law, compatibility, and
   validation choices
+- mechanics topology cards that map repeatable SDK operations back to their
+  active source surfaces
 - session and orchestration helpers that preserve source ownership
 - policy-aware guards around approval, mutation, and trust posture
 - adapters that can change transport without changing ownership
@@ -36,6 +38,8 @@ repositories remain authoritative.
 - decision notes that pretend to be active source truth
 - design notes that pretend to replace active SDK source, validators, or
   sibling-owner truth
+- mechanics packages that pretend source payload moved or that SDK owns sibling
+  meaning
 - hidden ranking, routing, or memory policy
 - daemon or service responsibilities
 - project-specific overlays inside portable-core modules

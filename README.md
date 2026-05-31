@@ -18,6 +18,9 @@ Use the shortest route by need:
 - durable topology and route rationale: `docs/decisions/README.md`,
   `docs/decisions/indexes/by-number.md`, and
   `python scripts/generate_decision_indexes.py --check`
+- mechanics topology skeleton: `mechanics/README.md`,
+  `mechanics/TOPOLOGY_PREP.md`, `mechanics/topology.json`, and
+  `python scripts/validate_mechanics_topology.py`
 - compact control-plane capsule: `generated/workspace_control_plane.min.json`
 - workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
 - compatibility posture: `docs/versioning.md`
@@ -49,11 +52,14 @@ Use the shortest route by need:
 
 - compact control-plane capsule for low-context routing: `generated/workspace_control_plane.min.json`
 - current direction and control-plane hardening: `ROADMAP.md`
-- system form and future mechanics posture: `DESIGN.md`
+- system form and mechanics posture: `DESIGN.md`
 - agent-facing route-card form: `DESIGN.AGENTS.md`
 - decision rationale lane for topology, route-law, compatibility, and
-  mechanics-prep choices: `docs/decisions/README.md`,
+  mechanics choices: `docs/decisions/README.md`,
   `docs/decisions/AGENTS.md`, and `docs/decisions/indexes/`
+- mechanics operation topology skeleton: `mechanics/README.md`,
+  `mechanics/TOPOLOGY_PREP.md`, `mechanics/topology.json`, and
+  `python scripts/validate_mechanics_topology.py`
 - machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
 - project-level Codex workspace orientation via MCP: `docs/codex-workspace-mcp.md`, `src/aoa_sdk/codex/workspace_mcp.py`, and `scripts/aoa_workspace_mcp_server.py`
 - portable sibling-workspace bootstrap for non-`/srv/AbyssOS` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`
@@ -110,6 +116,8 @@ This repository is the source of truth for:
   `DESIGN.AGENTS.md`
 - durable rationale for SDK-owned topology, route-law, compatibility, and
   validation choices under `docs/decisions/`
+- repeatable SDK operation topology under `mechanics/`, with package cards
+  that route source surfaces without moving payload
 - bounded activation, disclosure, and orchestration helpers
 - reviewed-session closeout helpers that publish owner-local receipts and refresh live stats
 - reviewed-session inbox automation that stays subordinate to reviewed manifests and owner-owned publishers
@@ -161,6 +169,8 @@ This repository is the source of truth for:
 - It does not replace `aoa-routing`.
 - It does not become the source of truth for skills, evals, memo, playbooks, agents, or KAG.
 - It does not make `aoa skills detect/dispatch/enter/guard` mean anything other than skills.
+- It does not use mechanics cards to imply payload moved or sibling meaning
+  became SDK-owned.
 - It does not become a service runtime or hidden monolith.
 
 The SDK stays on the control plane: load, type, validate, activate, and hand off.
@@ -175,6 +185,7 @@ Use this read-only/current-state battery:
 
 ```bash
 python scripts/generate_decision_indexes.py --check
+python scripts/validate_mechanics_topology.py
 python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
 python -m pytest -q

@@ -14,6 +14,7 @@ def test_readme_lists_full_current_state_battery() -> None:
     readme = read_text("README.md")
 
     commands = [
+        "python scripts/validate_mechanics_topology.py",
         "python scripts/build_workspace_control_plane.py --check",
         "python scripts/validate_workspace_control_plane.py",
         "python -m pytest -q",
@@ -30,6 +31,7 @@ def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
     agents = read_text("AGENTS.md")
 
     assert "python scripts/generate_decision_indexes.py --check" in agents
+    assert "python scripts/validate_mechanics_topology.py" in agents
     assert "python scripts/build_workspace_control_plane.py --check" in agents
     assert "python scripts/validate_workspace_control_plane.py" in agents
     assert "aoa compatibility check /srv/AbyssOS/aoa-sdk" in agents
@@ -88,6 +90,8 @@ def test_changelog_records_current_unreleased_contour() -> None:
     assert "root-level generated paths" in changelog
     assert "active routes" in changelog
     assert "This unreleased section is a release-ready reconciliation surface" in changelog
+    assert "mechanics topology skeleton" in changelog
+    assert "python scripts/validate_mechanics_topology.py" in changelog
 
 
 def test_readme_lists_sibling_canary_surfaces() -> None:

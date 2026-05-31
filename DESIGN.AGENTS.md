@@ -75,9 +75,13 @@ Current protected local cards include:
 - `docs/decisions/AGENTS.md`
 - `generated/AGENTS.md`
 - `githooks/AGENTS.md`
+- `mechanics/AGENTS.md`
 - `schemas/AGENTS.md`
 - `src/aoa_sdk/AGENTS.md`
 - `systemd/AGENTS.md`
+
+The `mechanics/` package-local cards listed in `mechanics/topology.json` are
+also protected route surfaces.
 
 Future durable editable districts should either add a local card or be
 explicitly exempted by the validator and root route.
@@ -98,11 +102,11 @@ authority than their builders and authored sources.
 When generated output changes, the agent should find the builder, source input,
 and check command that produced it.
 
-### Future Mechanic Cards
+### Mechanic Cards
 
-When `mechanics/` lands, the root `mechanics/AGENTS.md` and package-local cards
-should name operation owner, input, output, source surfaces, stronger owners,
-legacy bridges, validation, and closeout.
+The root `mechanics/AGENTS.md` and package-local cards name operation owner,
+input, output, source surfaces, stronger owners, legacy bridges, validation,
+and closeout.
 
 A mechanic card should not claim importable SDK source ownership. That remains
 in `src/aoa_sdk/` unless a later decision creates a different source home.
@@ -118,7 +122,7 @@ For ordinary SDK changes, the intended order is:
 5. broader release or compatibility gates when the change is structural,
    generated, route-facing, or release-facing.
 
-For repository-shape, source-home, route-law, or mechanics-prep changes, read:
+For repository-shape, source-home, route-law, or mechanics topology changes, read:
 
 1. root `AGENTS.md`;
 2. `DESIGN.md`;
@@ -140,7 +144,7 @@ For repository-shape, source-home, route-law, or mechanics-prep changes, read:
 - `generated/` remains derived.
 - `scripts/` owns deterministic builders and validators.
 - `tests/` owns regression proof for expected behavior.
-- future `mechanics/` owns repeatable operation topology, not SDK source code.
+- `mechanics/` owns repeatable operation topology, not SDK source code.
 
 ## Canonical Card Shape
 
@@ -178,7 +182,7 @@ Agent guidance must not:
   progression verdicts;
 - convert `aoa skills ...` into a non-skill activation route;
 - make the SDK a runtime service, daemon, or hidden agent runner;
-- introduce top-level `sdk/` or `mechanics/` by cosmetic analogy;
+- introduce top-level `sdk/` or widen `mechanics/` by cosmetic analogy;
 - bury semantic changes under "docs-only" wording.
 
 ## Decision Review
@@ -198,7 +202,7 @@ design surface names what validation should prove:
 - required local route cards exist and preserve owner boundaries;
 - generated companions are reproducible;
 - decision indexes are current;
-- source-home and mechanics-prep changes have rationale;
+- source-home and mechanics topology changes have rationale;
 - compatibility checks do not hide missing sibling surfaces;
 - release-facing changes run broad gates after narrow checks.
 

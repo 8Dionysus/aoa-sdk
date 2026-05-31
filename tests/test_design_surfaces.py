@@ -10,18 +10,20 @@ def read_text(relative_path: str) -> str:
     return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
 
 
-def test_root_design_surfaces_define_sdk_shape_before_mechanics() -> None:
+def test_root_design_surfaces_define_sdk_shape_with_mechanics() -> None:
     design = read_text("DESIGN.md")
     agents_design = read_text("DESIGN.AGENTS.md")
     decision = read_text("docs/decisions/AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md")
+    mechanics_decision = read_text("docs/decisions/AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md")
 
     assert "`DESIGN.md` describes the system form of `aoa-sdk`." in design
     assert "The importable SDK source home is `src/aoa_sdk/`." in design
-    assert "Future `mechanics/` packages should name repeatable SDK operations" in design
+    assert "`mechanics/` packages name repeatable SDK operations" in design
     assert "A top-level `sdk/` district should not be introduced merely because" in design
     assert "`DESIGN.AGENTS.md` describes the desired form of agent-facing guidance" in agents_design
-    assert "future `mechanics/` owns repeatable operation topology, not SDK source code" in agents_design
+    assert "`mechanics/` owns repeatable operation topology, not SDK source code" in agents_design
     assert "Create root `DESIGN.md` and `DESIGN.AGENTS.md` before introducing" in decision
+    assert "Add `mechanics/` now as a route-only operation topology skeleton." in mechanics_decision
 
 
 def test_root_routes_point_to_design_surfaces() -> None:
@@ -38,3 +40,5 @@ def test_root_routes_point_to_design_surfaces() -> None:
     assert "DESIGN.AGENTS.md" in roadmap
     assert "DESIGN.md" in boundaries
     assert "DESIGN.AGENTS.md" in boundaries
+    assert "mechanics/" in readme
+    assert "mechanics/" in agents

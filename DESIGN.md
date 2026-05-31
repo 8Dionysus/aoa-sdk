@@ -8,8 +8,8 @@ It is not the public entrypoint, charter, roadmap, release note, decision
 record, generated capsule, or agent instruction file.
 
 Use it when the question is repository shape, owner boundaries, source-home
-placement, generated companions, compatibility posture, or how future
-`mechanics/` packages should relate to the SDK source lane.
+placement, generated companions, compatibility posture, or how `mechanics/`
+packages should relate to the SDK source lane.
 
 Adjacent routes:
 
@@ -19,6 +19,7 @@ Adjacent routes:
 - current direction: `ROADMAP.md`
 - owner boundaries: `docs/boundaries.md`
 - durable rationale: `docs/decisions/`
+- mechanics operation topology: `mechanics/`
 - importable SDK source: `src/aoa_sdk/`
 - generated control-plane capsule: `generated/workspace_control_plane.min.json`
 
@@ -67,7 +68,8 @@ and where does the next stronger claim return?
 | root surfaces | public entry, route law, design form, roadmap direction, release posture |
 | `src/aoa_sdk/` | importable typed SDK source home and CLI behavior |
 | `docs/` | authored explanation for boundaries, workspace layout, compatibility, release, checkpoint, closeout, and control-plane posture |
-| `docs/decisions/` | durable rationale for topology, route-law, source-home, validation, and mechanics-prep choices |
+| `docs/decisions/` | durable rationale for topology, route-law, source-home, validation, and mechanics choices |
+| `mechanics/` | repeatable SDK operation topology; skeleton cards, source maps, and package route law |
 | `.aoa/` | workspace metadata and local control-plane runtime artifacts, not hidden source truth |
 | `schemas/` | SDK helper contract schemas |
 | `examples/` | public-safe contract examples and fixtures |
@@ -76,8 +78,6 @@ and where does the next stronger claim return?
 | `tests/` | regression and contract checks |
 | `githooks/` | optional local git-boundary integration that stays active-session-only |
 | `systemd/` | optional user-service units for bounded local automation |
-| future `mechanics/` | repeatable SDK operation topology after rationale, design, route cards, and validators justify the package |
-
 Each class may support the others. No class should silently steal another
 class's authority.
 
@@ -95,9 +95,9 @@ rename `src/aoa_sdk/` by cosmetic analogy.
 
 ## Mechanics Posture
 
-Future `mechanics/` packages should name repeatable SDK operations that cross
-several surfaces: source, docs, schemas, examples, generated companions,
-scripts, tests, compatibility checks, or handoff artifacts.
+`mechanics/` packages name repeatable SDK operations that cross several
+surfaces: source, docs, schemas, examples, generated companions, scripts,
+tests, compatibility checks, or handoff artifacts.
 
 Mechanics do not replace the Python source lane. They route operation pressure
 around it.
@@ -172,17 +172,18 @@ back to stronger authored or source-owned surfaces.
 A new helper is healthy when it makes drift more visible. If it only hides
 sibling change behind permissive fallback behavior, it weakens the SDK.
 
-### 7. Mechanics after rationale and design
+### 7. Mechanics after rationale and design, before payload movement
 
-Mechanics packages should land after the decision and design surfaces can name
-why the package exists, what it owns, which stronger owners remain outside, and
-how the move is validated.
+Mechanics packages land after the decision and design surfaces can name why the
+package exists, what it owns, which stronger owners remain outside, and how the
+move is validated. Payload moves need a separate package-local reason and
+validator.
 
 ### 8. Python source stays boring
 
 `src/aoa_sdk/` should remain a normal Python source home. Domain-specific
 operation topology belongs in docs, generated companions, scripts, tests, or
-future mechanics when those surfaces have a real owner role.
+mechanics when those surfaces have a real owner role.
 
 ### 9. Runtime remains outside
 
@@ -203,7 +204,7 @@ A generated capsule can find its builder.
 A compatibility failure can find the missing sibling surface.
 A checkpoint note can find its review boundary.
 A handoff can find the owner repository.
-A future mechanic can find its decision and validator.
+A mechanic can find its decision and validator.
 A topological question can find why the route exists.
 
 ## Bad Design Smells Like
@@ -246,7 +247,7 @@ Agents should consult this file when a change alters:
 - typed facade boundaries;
 - compatibility semantics;
 - checkpoint, closeout, release, or handoff posture;
-- future `mechanics/` package placement;
+- `mechanics/` package placement;
 - agent-facing layer design.
 
 This file does not override local owner truth. It tells agents what kind of
