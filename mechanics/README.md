@@ -16,17 +16,21 @@ This topology was derived from the tracked `aoa-sdk` file inventory and then
 corrected against live mechanics sources in `Agents-of-Abyss`, `aoa-agents`,
 `aoa-memo`, `aoa-evals`, `aoa-skills`, and `aoa-techniques`:
 
-- 1000 tracked files.
-- 20 top-level districts or singleton root surfaces.
-- 356 JSON files, 286 Markdown files, and 240 Python files.
+- 1056 tracked files.
+- 25 top-level districts or singleton root surfaces.
+- 357 JSON files, 339 Markdown files, and 242 Python files.
 - active source clusters under `src/aoa_sdk/` for recurrence, A2A, Titan,
   skills, workspace, RPG, surfaces, stats, routing, Codex, release,
-  compatibility, checkpoint, closeout, and sibling facades.
+  compatibility, checkpoint, closeout, loaders, command facades, and sibling
+  facades.
 - matching schema, example, generated, script, manifest, quest, and test
   families for recurrence, Agon, Titan, Experience APIs, checkpoint/closeout,
   A2A return, workspace, and release support.
 - sibling mechanics repeatedly put narrow lanes under parent `PARTS.md` rather
   than promoting every file family to a parent package.
+- `topology.json` carries a `source_family_routes` crosswalk for every
+  `src/aoa_sdk/*` family, including root-package files, so new source families
+  cannot silently evade a mechanic route.
 
 The detailed inventory and derivation rules live in
 [`TOPOLOGY_PREP.md`](TOPOLOGY_PREP.md). The machine-readable package map lives

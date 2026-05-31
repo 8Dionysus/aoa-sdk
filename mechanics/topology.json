@@ -8,7 +8,7 @@
     "reason": "The first skeleton promoted several SDK-local lanes to parents even though sibling sources treat them as parts of shared mechanics."
   },
   "source_basis": {
-    "tracked_files": 1000,
+    "tracked_files": 1056,
     "sibling_sources_rechecked": [
       "Agents-of-Abyss/mechanics",
       "aoa-agents/mechanics",
@@ -17,6 +17,110 @@
       "aoa-skills/mechanics",
       "aoa-techniques/mechanics"
     ]
+  },
+  "source_family_routes": {
+    "root-package": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "public API, models, errors, and root package guidance are typed facade and truth-label surfaces"
+    },
+    "a2a": {
+      "primary_mechanic": "checkpoint",
+      "reason": "A2A summon, return, and re-entry helpers are checkpoint and closeout return parts"
+    },
+    "agents": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "agent phase bindings read sibling-owned surfaces without taking owner meaning"
+    },
+    "checkpoints": {
+      "primary_mechanic": "checkpoint",
+      "reason": "checkpoint registry and review gates are the checkpoint parent operation"
+    },
+    "cli": {
+      "primary_mechanic": "boundary-bridge",
+      "secondary_mechanics": [
+        "checkpoint",
+        "recurrence",
+        "runtime-seam",
+        "release-support"
+      ],
+      "reason": "the CLI is a cross-mechanic command facade, not an independent parent operation"
+    },
+    "closeout": {
+      "primary_mechanic": "checkpoint",
+      "reason": "reviewed closeout remains a checkpoint bridge part"
+    },
+    "codex": {
+      "primary_mechanic": "codex-projection",
+      "reason": "Codex workspace MCP and deploy-status readers are projection surfaces"
+    },
+    "compatibility": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "compatibility checks bridge consumed sibling surfaces"
+    },
+    "evals": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "eval readers are typed handles over aoa-evals owned proof surfaces"
+    },
+    "governed_runs": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "governed run readers bridge abyss-stack artifacts and playbook review targets"
+    },
+    "kag": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "KAG readers expose aoa-kag surfaces without canonization authority"
+    },
+    "loaders": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "shared JSON loaders are the surface access substrate for typed facades"
+    },
+    "memo": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "memo readers expose aoa-memo memory surfaces without owning memory truth"
+    },
+    "playbooks": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "playbook readers expose aoa-playbooks activation and governance surfaces"
+    },
+    "recurrence": {
+      "primary_mechanic": "recurrence",
+      "reason": "recurrence manifests, graphs, hooks, projections, and review APIs form the recurrence parent operation"
+    },
+    "release": {
+      "primary_mechanic": "release-support",
+      "reason": "release audit and publish helpers support release gates"
+    },
+    "routing": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "routing hints bridge tasks to sibling-owned surfaces"
+    },
+    "rpg": {
+      "primary_mechanic": "rpg",
+      "reason": "RPG typed consumer helpers form the RPG parent operation"
+    },
+    "skills": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "skill discovery and dispatch remain below aoa-skills ownership"
+    },
+    "stats": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "stats readers expose aoa-stats surfaces without owning stats truth"
+    },
+    "surfaces": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "surface detection remains an advisory bridge and handoff part"
+    },
+    "techniques": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "technique promotion readiness readers expose aoa-techniques surfaces"
+    },
+    "titans": {
+      "primary_mechanic": "titan",
+      "reason": "Titan runtime harness, console, memory, session, and swarm helpers form the Titan parent operation"
+    },
+    "workspace": {
+      "primary_mechanic": "runtime-seam",
+      "reason": "workspace root discovery, config, and bootstrap are runtime/source seam surfaces"
+    }
   },
   "demoted_parent_candidates": {
     "workspace-topology": "runtime-seam/workspace-root-resolution",
@@ -83,23 +187,39 @@
       "operation": "Keep SDK typed facades, compatibility checks, skill bridges, and surface handoffs as handles while sibling repositories retain meaning.",
       "source_surfaces": [
         "docs/boundaries.md",
+        "src/aoa_sdk/AGENTS.md",
+        "src/aoa_sdk/__init__.py",
+        "src/aoa_sdk/api.py",
+        "src/aoa_sdk/errors.py",
+        "src/aoa_sdk/models.py",
         "docs/versioning.md",
         "docs/skill-runtime-recommendation-gap.md",
         "docs/aoa-surface-detection-first-wave.md",
         "src/aoa_sdk/agents",
+        "src/aoa_sdk/cli",
         "src/aoa_sdk/compatibility",
         "src/aoa_sdk/evals",
+        "src/aoa_sdk/governed_runs",
+        "src/aoa_sdk/kag",
+        "src/aoa_sdk/loaders",
         "src/aoa_sdk/memo",
+        "src/aoa_sdk/playbooks",
         "src/aoa_sdk/routing",
         "src/aoa_sdk/skills",
         "src/aoa_sdk/stats",
         "src/aoa_sdk/surfaces",
+        "src/aoa_sdk/techniques",
         "tests/test_compatibility.py",
+        "tests/test_governed_runs.py",
+        "tests/test_kag.py",
+        "tests/test_playbooks.py",
         "tests/test_skills.py",
-        "tests/test_surfaces.py"
+        "tests/test_surfaces.py",
+        "tests/test_techniques.py"
       ],
       "candidate_parts": [
         "typed-facades",
+        "surface-loaders",
         "truth-labels",
         "compatibility-policy",
         "skill-runtime-bridge",

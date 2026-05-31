@@ -45,3 +45,28 @@ def test_demoted_parent_candidates_are_explicit_parts() -> None:
         "a2a-return",
         "codex-plane",
     )
+
+
+def test_source_family_routes_cover_current_sdk_source_tree() -> None:
+    topology = mechanics_validator._read_json(  # noqa: SLF001
+        REPO_ROOT / mechanics_validator.TOPOLOGY_PATH,
+        [],
+    )
+    assert set(topology["source_family_routes"]) == mechanics_validator._source_families(REPO_ROOT)  # noqa: SLF001
+
+
+def test_boundary_bridge_covers_sibling_facade_source_families() -> None:
+    topology = mechanics_validator._read_json(  # noqa: SLF001
+        REPO_ROOT / mechanics_validator.TOPOLOGY_PATH,
+        [],
+    )
+    boundary_bridge = next(item for item in topology["packages"] if item["slug"] == "boundary-bridge")
+    source_surfaces = set(boundary_bridge["source_surfaces"])
+
+    assert {
+        "src/aoa_sdk/governed_runs",
+        "src/aoa_sdk/kag",
+        "src/aoa_sdk/loaders",
+        "src/aoa_sdk/playbooks",
+        "src/aoa_sdk/techniques",
+    }.issubset(source_surfaces)

@@ -33,6 +33,9 @@ Mechanics are route maps. They are not the importable SDK source home.
 - Top-level package names follow the shared AoA mechanics vocabulary. A
   repo-local top-level mechanic needs evidence that it cannot be a part of an
   existing shared parent.
+- Every tracked `src/aoa_sdk/*` family routes through
+  `mechanics/topology.json#source_family_routes`. Add or update that route
+  before claiming a new source family is covered.
 - File-family pressure routes through `PARTS.md`; it does not create a parent
   package by itself.
 - Do not create physical `parts/` payload directories until a later landing
