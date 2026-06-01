@@ -1,57 +1,69 @@
 # Questbook Mechanic
 
-Status: skeleton.
+Status: active package.
 
 ## Mechanic Card
 
 ### Operation
 
-Route SDK quest source records and durable followthrough obligations while
-keeping owner acceptance outside the quest record itself.
+Keep SDK obligations visible, lane-routed, and returnable through root
+`quests/`, root `QUESTBOOK.md`, and future generated quest readers.
 
 ### Trigger
 
-Use this mechanic when root `quests/` records, quest source-store posture,
-Agon helper quest candidates, or owner-followthrough quest pressure changes.
+Open this mechanic when a helper follow-through, owner handoff, checkpoint
+return, or reviewed closeout pressure needs a durable source record instead of
+being hidden in a part-local payload directory or roadmap prose.
 
 ### SDK owns
 
-- SDK quest source records under `quests/`
-- quest source-store route posture
-- candidate helper quest routing back to owning mechanics
+The SDK owns quest source placement for SDK obligations, human index posture,
+lifecycle vocabulary, dispatch-reader posture, and validation that source
+quest records do not become runtime or owner authority.
 
 ### Stronger owner split
 
-Agon, release, checkpoint, memory, proof, and other owner repositories decide
-acceptance, completion, and durable meaning.
+Agon doctrine, verdicts, rank, retention, KAG promotion, Tree of Sophia canon,
+proof verdicts, memory truth, release publication, and sibling owner acceptance
+remain outside this mechanic.
 
 ### Current source surfaces
 
-- `quests/`
-- `mechanics/agon/README.md`
-- `mechanics/agon/PARTS.md`
-- `ROADMAP.md`
+- `QUESTBOOK.md`
+- `quests/README.md`
+- `quests/AGENTS.md`
+- `quests/agon/README.md`
+- `quests/agon/ready/`
+- `mechanics/questbook/PARTS.md`
+- `mechanics/questbook/parts/quest-source-store/`
+- `mechanics/questbook/parts/public-obligation-index/`
+- `mechanics/questbook/parts/lifecycle-dispatch-posture/`
 
 ### Candidate parts
 
-- quest-source-store
-- agon-helper-quests
-- owner-followthrough
+- `quest-source-store`
+- `public-obligation-index`
+- `lifecycle-dispatch-posture`
 
 ### Must not claim
 
-This mechanic must not treat a quest record as owner acceptance, proof,
-release readiness, or completed followthrough.
+- Do not use quest records as proof verdicts, owner acceptance, or release
+  readiness.
+- Do not hide source quest records under helper part payload homes.
+- Do not add generated quest readers without a source-derived builder and
+  validator.
+- Do not mint top-level quest aliases outside lane/state directories.
 
 ### Validation
 
 ```bash
 python scripts/validate_mechanics_topology.py
-python -m pytest -q tests/test_mechanics_topology.py
+python scripts/validate_nested_agents.py --strict-advisory --fail-on-untracked
+python -m pytest -q tests/test_mechanics_topology.py tests/test_design_surfaces.py
 ```
 
 ### Next route
 
-Agon helper quest pressure routes to `mechanics/agon/`; release pressure routes
-to `mechanics/release-support/`; checkpoint residues route to
-`mechanics/checkpoint/`.
+Use `quests/<lane>/<state>/` for source records, `QUESTBOOK.md` for human
+visibility, and the owning mechanic part for helper contracts or runtime
+validation.

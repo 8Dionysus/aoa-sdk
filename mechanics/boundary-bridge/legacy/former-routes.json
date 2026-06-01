@@ -1,0 +1,24 @@
+{
+  "schema_version": "aoa_sdk_mechanics_legacy_routes_v1",
+  "parent": "boundary-bridge",
+  "entries": [
+    {
+      "former_name": "compatibility",
+      "active_route": "boundary-bridge/consumed-surface-posture-gate",
+      "status": "distilled",
+      "rationale": "Compatibility posture is a bridge policy part, not an independent SDK parent mechanic."
+    },
+    {
+      "former_name": "skill-routing",
+      "active_route": "boundary-bridge/skill-runtime-bridge",
+      "status": "distilled",
+      "rationale": "Skill runtime routing is a bridge part below aoa-skills meaning, not an independent SDK parent mechanic."
+    },
+    {
+      "former_name": "surface-detection",
+      "active_route": "boundary-bridge/owner-layer-signal-handoff",
+      "status": "distilled",
+      "rationale": "Surface detection is an advisory handoff bridge, not an independent SDK parent mechanic."
+    }
+  ]
+}

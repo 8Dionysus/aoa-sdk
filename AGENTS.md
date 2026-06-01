@@ -13,10 +13,13 @@ It helps the federation stay legible without becoming the source of truth for si
 This repository owns:
 
 - typed SDK facades over consumed federation surfaces
+- the SDK source-home topology under `sdk/`, including
+  `sdk/source_home.manifest.json`, branch route cards, and SDK posture routes
 - workspace discovery, topology resolution, compatibility checks, versioning posture, and CLI inspection surfaces
 - the compact control-plane capsule at `generated/workspace_control_plane.min.json`
-- the mechanics topology skeleton under `mechanics/`, including package route
-  cards, source-family routes, and `mechanics/topology.json`
+- the mechanics topology under `mechanics/`, including package route cards,
+  source-family routes, part-local artifact homes, `mechanics/topology.json`,
+  and `mechanics/ARTIFACT_TOPOLOGY.md`
 - additive surface detection and reviewed closeout handoff helpers that remain owner-subordinate
 
 It does not own:
@@ -36,11 +39,14 @@ It does not own:
 6. `docs/versioning.md`
 7. `ROADMAP.md`
 8. `docs/decisions/README.md` when topology, owner split, route-law, workflow, or validator authority changes
-9. `mechanics/README.md` when repeatable SDK operation topology or package
+9. `sdk/README.md` and `sdk/source_home.manifest.json` when SDK source-home
+   posture, public-interface, facade-boundary, runtime-entry, or distribution
+   topology changes
+10. `mechanics/README.md` when repeatable SDK operation topology or package
    routing changes
-10. `.aoa/workspace.toml`
-11. source files and tests you plan to touch
-12. `docs/AGENTS_ROOT_REFERENCE.md` for preserved full root guidance, especially checkpoint-hook and closeout-loop details
+11. `.aoa/workspace.toml`
+12. source files and tests you plan to touch
+13. `docs/AGENTS_ROOT_REFERENCE.md` for preserved full root guidance, especially checkpoint-hook and closeout-loop details
 
 
 ## AGENTS stack law
@@ -134,6 +140,7 @@ Minimum validation for code, topology, or reviewed-handoff changes:
 
 ```bash
 python scripts/generate_decision_indexes.py --check
+python scripts/validate_sdk_source_home.py
 python scripts/validate_mechanics_topology.py
 python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
@@ -155,6 +162,8 @@ python scripts/release_check.py
 ## Report
 
 State which typed facade, discovery rule, compatibility surface, CLI behavior, checkpoint boundary, or handoff helper changed, whether anything moved closer to activation, and what validation ran.
+For `sdk/` changes, also state which source-home branch changed and whether
+implementation or mechanic payload moved.
 
 ## Full reference
 

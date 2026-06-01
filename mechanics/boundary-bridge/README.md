@@ -1,6 +1,6 @@
 # Boundary Bridge Mechanic
 
-Status: skeleton.
+Status: active topology with part-local payload.
 
 ## Mechanic Card
 
@@ -11,18 +11,19 @@ sibling repositories retain meaning.
 
 ### Trigger
 
-Use this mechanic when a typed facade, registry, compatibility rule, skill
-runtime bridge, surface-detection handoff, route hint, stats read, or
-sibling-owned generated reader changes.
+Use this mechanic when a typed facade, registry, consumed-surface posture gate,
+skill runtime bridge, technique promotion readiness reader, owner-layer signal
+handoff, route hint, stats read, or sibling-owned generated reader changes.
 
 ### SDK owns
 
 - typed loading and facade shape
 - local truth labels
 - source references and route hints
-- compatibility checks over consumed sibling surfaces
+- consumed-surface posture gates
 - skill runtime bridge behavior below `aoa-skills`
-- additive surface detection and reviewed owner handoff
+- technique promotion readiness reader behavior below `aoa-techniques`
+- additive owner-layer signal review and handoff
 - owner return path after stronger claims appear
 
 ### Stronger owner split
@@ -53,17 +54,20 @@ retain their domain meaning.
 - `src/aoa_sdk/stats/`
 - `src/aoa_sdk/surfaces/`
 - `src/aoa_sdk/techniques/`
-- facade tests under `tests/`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`
+- `mechanics/boundary-bridge/parts/skill-runtime-bridge/`
+- `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/`
+- `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/`
+- facade and compatibility tests under `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/`
+- skill runtime bridge tests under `mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/`
+- skill reference contract tests under `mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/`
 
 ### Candidate parts
 
-- typed-facades
-- surface-loaders
-- truth-labels
-- compatibility-policy
+- consumed-surface-posture-gate
 - skill-runtime-bridge
-- surface-detection-handoff
-- owner-return-routes
+- technique-promotion-readiness-reader
+- owner-layer-signal-handoff
 
 ### Must not claim
 
@@ -73,7 +77,7 @@ skill wrappers, or surface hints into SDK source truth.
 ### Validation
 
 ```bash
-python -m pytest -q tests/test_agents.py tests/test_evals.py tests/test_governed_runs.py tests/test_kag.py tests/test_memo.py tests/test_playbooks.py tests/test_routing.py tests/test_compatibility.py tests/test_skills.py tests/test_surfaces.py tests/test_techniques.py
+python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_agent_phase_binding_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_posture_cli.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_eval_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_governed_run_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_kag_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_memo_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_playbook_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_surface_actions.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge_cli.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_reference_contracts.py mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py
 ```
 
 ### Next route

@@ -15,37 +15,42 @@ Use the shortest route by need:
 - ownership and scope: `docs/boundaries.md`
 - system design and source-home posture: `DESIGN.md`
 - agent-facing guidance design: `DESIGN.AGENTS.md`
+- SDK source home and checked posture tree: `sdk/README.md`,
+  `sdk/SDK_SHAPE.md`, `sdk/source_home.manifest.json`, and
+  `python scripts/validate_sdk_source_home.py`
 - durable topology and route rationale: `docs/decisions/README.md`,
   `docs/decisions/indexes/by-number.md`, and
   `python scripts/generate_decision_indexes.py --check`
-- mechanics topology skeleton: `mechanics/README.md`,
-  `mechanics/TOPOLOGY_PREP.md`, `mechanics/topology.json`, and
+- mechanics topology and artifact placement: `mechanics/README.md`,
+  `mechanics/ARTIFACT_TOPOLOGY.md`, `mechanics/TOPOLOGY_PREP.md`,
+  `mechanics/topology.json`, and
   `python scripts/validate_mechanics_topology.py`
 - compact control-plane capsule: `generated/workspace_control_plane.min.json`
 - workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
 - compatibility posture: `docs/versioning.md`
-- recurrence manifest compatibility gate: `docs/RECURRENCE_HARDENING_COMPATIBILITY.md`, `aoa recur manifest-scan --root /srv/AbyssOS --json`, and `python scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS`
-- recurrence graph closure and snapshots: `docs/RECURRENCE_GRAPH_CLOSURE_AND_SNAPSHOT.md`, `aoa recur graph snapshot --root /srv/AbyssOS --json`, and `aoa recur graph closure --root /srv/AbyssOS --component component:<owner>:<name> --json`
-- recurrence live observation producers: `docs/RECURRENCE_LIVE_OBSERVATION_PRODUCERS.md`, `aoa recur live producers --root /srv/AbyssOS --json`, and `python scripts/collect_live_recurrence_observations.py --workspace-root /srv/AbyssOS --json`
-- recurrence review decision closure: `docs/RECURRENCE_REVIEW_DECISION_CLOSURE.md`, `aoa recur review decision-template --root /srv/AbyssOS`, and `python scripts/review_decision_closure.py --workspace-root /srv/AbyssOS template`
-- recurrence downstream projections: `docs/RECURRENCE_DOWNSTREAM_PROJECTIONS.md`, `aoa recur project build --root /srv/AbyssOS --json`, and `python scripts/build_downstream_recurrence_projections.py --workspace-root /srv/AbyssOS --json`
-- recurrence eval-suite handoff: `docs/RECURRENCE_EVAL_SUITE_HANDOFF.md` and `aoa-evals/bundles/aoa-recurrence-control-plane-integrity/`
+- recurrence manifest compatibility gate: `mechanics/recurrence/parts/component-manifest-gate/docs/hardening-compatibility.md`, `aoa recur manifest-scan --root /srv/AbyssOS --json`, and `python mechanics/recurrence/parts/component-manifest-gate/scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS`
+- recurrence graph closure and snapshots: `mechanics/recurrence/parts/graph-closure-snapshot/docs/graph-closure-and-snapshot.md`, `aoa recur graph snapshot --root /srv/AbyssOS --json`, and `aoa recur graph closure --root /srv/AbyssOS --component component:<owner>:<name> --json`
+- recurrence live observation producers: `mechanics/recurrence/parts/live-observation-producers/docs/live-observation-producers.md`, `aoa recur live producers --root /srv/AbyssOS --json`, and `python mechanics/recurrence/parts/live-observation-producers/scripts/collect_live_recurrence_observations.py --workspace-root /srv/AbyssOS --json`
+- recurrence review decision closure: `mechanics/recurrence/parts/review-decision-closure/docs/review-decision-closure.md`, `aoa recur review decision-template --root /srv/AbyssOS`, and `python mechanics/recurrence/parts/review-decision-closure/scripts/review_decision_closure.py --workspace-root /srv/AbyssOS template`
+- recurrence downstream projections: `mechanics/recurrence/parts/downstream-projection-guard/docs/downstream-projections.md`, `aoa recur project build --root /srv/AbyssOS --json`, and `python mechanics/recurrence/parts/downstream-projection-guard/scripts/build_downstream_recurrence_projections.py --workspace-root /srv/AbyssOS --json`
+- recurrence eval-suite handoff: `mechanics/recurrence/parts/downstream-projection-guard/docs/eval-suite-handoff.md` and `aoa-evals/bundles/aoa-recurrence-control-plane-integrity/`
 - current direction and hardening lanes: `ROADMAP.md`
 - release protocol and bounded publication path: `docs/RELEASING.md`
 - release, support, and CI posture: `docs/RELEASE_CI_POSTURE.md`
-- reviewed session closeout orchestration: `docs/session-closeout.md`
-- reviewed closeout followthrough map toward owner-status surfaces: `docs/closeout-followthrough-map.md`, `schemas/closeout_owner_followthrough_map.schema.json`, and `examples/closeout_owner_followthrough_map.example.json`
-- component drift hints and reviewed refresh decisions that stay weaker than owner refresh law: `docs/COMPONENT_DRIFT_HINTS.md`, `schemas/component_drift_hint_set.schema.json`, `examples/component_drift_hints.example.json`, `schemas/component_refresh_followthrough_decision_set.schema.json`, and `examples/component_refresh_followthrough_decision.example.json`
-- reviewed continuity hints after closeout reread: `docs/SELF_AGENCY_CONTINUITY_CARRY.md`, `schemas/closeout_continuity_window.schema.json`, and `examples/closeout_continuity_window.example.json`
-- reviewed next-kernel decision after closeout reread: `docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md`, `schemas/closeout_followthrough_decision.schema.json`, and `examples/closeout_followthrough_decision.example.json`
-- additive surface detection and reviewed owner-layer handoff: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-second-wave.md`, `docs/aoa-surface-detection-heuristics.md`, and `docs/aoa-surface-detection-closeout-handoff.md`
-- checkpoint-aware session-growth note capture and promotion: `docs/session-growth-checkpoints.md` and `docs/checkpoint-note-promotion.md`
-- antifragility control-plane and closeout contracts: `docs/antifragility-control-plane.md`, `docs/antifragility-closeout-seam.md`, `tests/fixtures/antifragility/stress_dispatch_input.example.json`, `tests/fixtures/antifragility/stress_dispatch_result.example.json`, and `tests/fixtures/antifragility/stress_closeout_manifest.example.json`
-- RPG typed consumer slice: `docs/RPG_SDK_ADDENDUM.md`, `docs/RPG_SURFACE_PATHS.md`, and `src/aoa_sdk/rpg/`
-- Titan runtime harness, operator console, app-server bridge, identity ledger, and Memory Loom control-plane surfaces: `docs/TITAN_RUNTIME_HARNESS.md`, `docs/TITAN_OPERATOR_CONSOLE.md`, `docs/TITAN_APPSERVER_BRIDGE.md`, `docs/TITAN_IDENTITY_LEDGER.md`, `docs/TITAN_MEMORY_LOOM.md`, `src/aoa_sdk/titans/`, and `scripts/titanctl.py`
+- reviewed session closeout orchestration: `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`
+- candidate lineage carry below owner identity minting: `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/candidate-lineage-carry.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/checkpoint_lineage_hint.schema.json`, and `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/checkpoint_lineage_hint.example.json`
+- reviewed closeout context carry toward owner-status surfaces: `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/owner-followthrough-map.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_owner_followthrough_map.schema.json`, and `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_owner_followthrough_map.example.json`
+- component refresh followthrough that stays weaker than owner refresh law: `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/component-refresh-followthrough.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/component_drift_hint_set.schema.json`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/component_drift_hints.example.json`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/component_refresh_followthrough_decision_set.schema.json`, and `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/component_refresh_followthrough_decision.example.json`
+- self-agency continuity carry after closeout reread: `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/self-agency-continuity-carry.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_continuity_window.schema.json`, and `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_continuity_window.example.json`
+- next-kernel followthrough decision after closeout reread: `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/next-kernel-followthrough-decision.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_followthrough_decision.schema.json`, and `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_followthrough_decision.example.json`
+- additive surface detection and reviewed owner-layer handoff: `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/initial-surface-detection-boundary.md`, `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md`, `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-heuristics.md`, and `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md`
+- checkpoint-aware session-growth note capture and promotion: `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md` and `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md`
+- antifragility stress-posture dispatch and reviewed closeout carry: `mechanics/antifragility/parts/stress-posture-dispatch-gate/docs/stress-posture-dispatch-gate.md`, `mechanics/antifragility/parts/stress-posture-dispatch-gate/examples/stress-posture-dispatch-request.example.json`, `mechanics/antifragility/parts/stress-posture-dispatch-gate/examples/stress-posture-dispatch-decision.example.json`, `mechanics/antifragility/parts/reviewed-stress-closeout-carry/docs/reviewed-stress-closeout-carry.md`, and `mechanics/antifragility/parts/reviewed-stress-closeout-carry/examples/reviewed-stress-closeout-manifest.example.json`
+- RPG typed consumer slice: `mechanics/rpg/parts/typed-consumer-api/docs/typed-consumer-api-boundary.md`, `mechanics/rpg/parts/surface-path-transport/docs/surface-path-transport.md`, and `src/aoa_sdk/rpg/`
+- Titan runtime harness, operator console, app-server bridge, identity ledger, Memory Loom, replay, and swarm control-plane surfaces: `src/aoa_sdk/titans/` and `mechanics/titan/parts/`
 - federation effects and obligations: `docs/ecosystem-impact.md`
 - original seed blueprint and historical design context: `docs/blueprint.md`
-- Wave 1 AoA experience capture/pipeline helper seam: `docs/AGON_WAVE1_EXPERIENCE_CAPTURE_PIPELINE.md`, `schemas/agon-experience-capture-pipeline-helper.schema.json`, and `examples/agon_experience_capture_pipeline_helper.example.json`
+- AoA experience capture/pipeline helper seam: `mechanics/experience/parts/capture-pipeline-helper/docs/capture-pipeline-helper.md`, `mechanics/experience/parts/capture-pipeline-helper/schemas/capture-pipeline-helper.schema.json`, and `mechanics/experience/parts/capture-pipeline-helper/examples/capture-pipeline-helper.example.json`
 - local agent instructions: `AGENTS.md`
 
 ## Route by need
@@ -54,52 +59,57 @@ Use the shortest route by need:
 - current direction and control-plane hardening: `ROADMAP.md`
 - system form and mechanics posture: `DESIGN.md`
 - agent-facing route-card form: `DESIGN.AGENTS.md`
+- SDK source-home topology: `sdk/README.md`, `sdk/AGENTS.md`,
+  `sdk/source_home.manifest.json`, `sdk/public-interface/`,
+  `sdk/facade-boundary/`, `sdk/runtime-entry/`, and `sdk/distribution/`
 - decision rationale lane for topology, route-law, compatibility, and
   mechanics choices: `docs/decisions/README.md`,
   `docs/decisions/AGENTS.md`, and `docs/decisions/indexes/`
-- mechanics operation topology skeleton: `mechanics/README.md`,
-  `mechanics/TOPOLOGY_PREP.md`, `mechanics/topology.json`, and
+- mechanics operation topology and artifact placement: `mechanics/README.md`,
+  `mechanics/ARTIFACT_TOPOLOGY.md`, `mechanics/TOPOLOGY_PREP.md`,
+  `mechanics/topology.json`, and
   `python scripts/validate_mechanics_topology.py`
 - machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
-- project-level Codex workspace orientation via MCP: `docs/codex-workspace-mcp.md`, `src/aoa_sdk/codex/workspace_mcp.py`, and `scripts/aoa_workspace_mcp_server.py`
+- project-level Codex workspace orientation via MCP: `mechanics/codex-projection/parts/workspace-mcp-server/docs/workspace-mcp-server.md`, `src/aoa_sdk/codex/workspace_mcp.py`, and `mechanics/codex-projection/parts/workspace-mcp-server/scripts/aoa_workspace_mcp_server.py`
 - portable sibling-workspace bootstrap for non-`/srv/AbyssOS` installs: `aoa workspace bootstrap`, `src/aoa_sdk/workspace/bootstrap.py`, and `8Dionysus/docs/WORKSPACE_INSTALL.md`
-- Codex-plane portability boundary when the live root changes: `docs/CODEX_PLANE_PORTABILITY.md` and `8Dionysus/docs/CODEX_PLANE_REGENERATION.md`
-- live Codex-plane rollout status at the current workspace root: `docs/CODEX_PLANE_DEPLOY_STATUS.md`, `docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`, `docs/codex_rollout_campaign_refs.md`, `schemas/codex_plane_deploy_status_snapshot_v1.json`, `examples/codex_plane_deploy_status_snapshot.example.json`, and `src/aoa_sdk/codex/registry.py`
+- Codex Projection portability boundary when the live root changes: `mechanics/codex-projection/parts/portability-boundary/docs/portability-boundary.md` and `8Dionysus/docs/CODEX_PLANE_REGENERATION.md`
+- live Codex Projection rollout status at the current workspace root: `mechanics/codex-projection/parts/live-rollout-status-readout/docs/live-rollout-status-readout.md`, `mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/deploy-operation-boundary-note.md`, `mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/rollout-campaign-refs.md`, `mechanics/codex-projection/parts/live-rollout-status-readout/schemas/live-rollout-status-snapshot.schema.json`, `mechanics/codex-projection/parts/live-rollout-status-readout/examples/live-rollout-status-snapshot.example.json`, and `src/aoa_sdk/codex/registry.py`
 - source ownership and federation effects: `docs/boundaries.md` and `docs/ecosystem-impact.md`
-- compatibility rules and local checks: `docs/versioning.md`, `scripts/sibling_canary_matrix.json`, `scripts/run_sibling_canary.py`, `.github/workflows/latest-sibling-canary.yml`, `aoa compatibility check /srv/AbyssOS/aoa-sdk`, and `aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json`
-- recurrence manifest compatibility: `docs/RECURRENCE_CONTROL_PLANE.md`, `docs/RECURRENCE_HARDENING_COMPATIBILITY.md`, `schemas/manifest_scan_report.schema.json`, `src/aoa_sdk/recurrence/compat.py`, `aoa recur manifest-scan --root /srv/AbyssOS --json`, and `python scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS`
-- recurrence graph inspection: `docs/RECURRENCE_GRAPH_CLOSURE_AND_SNAPSHOT.md`, `schemas/graph_snapshot.schema.json`, `schemas/graph_closure_report.schema.json`, `schemas/graph_delta_report.schema.json`, `src/aoa_sdk/recurrence/graph.py`, `aoa recur graph snapshot --root /srv/AbyssOS --json`, `aoa recur graph closure --root /srv/AbyssOS --component component:<owner>:<name> --json`, and `python scripts/build_recurrence_graph_snapshot.py --workspace-root /srv/AbyssOS --json`
-- recurrence live observations: `docs/RECURRENCE_LIVE_OBSERVATION_PRODUCERS.md`, `schemas/live_observation_run.schema.json`, `src/aoa_sdk/recurrence/live_observations.py`, `aoa recur live observe --root /srv/AbyssOS --json`, and `python scripts/collect_live_recurrence_observations.py --workspace-root /srv/AbyssOS --json`
-- recurrence review decision closure: `docs/RECURRENCE_REVIEW_DECISION_CLOSURE.md`, `schemas/owner_review_decision.schema.json`, `schemas/review_decision_close_report.schema.json`, `src/aoa_sdk/recurrence/decisions.py`, `aoa recur review decision-template --root /srv/AbyssOS`, `aoa recur review close --root /srv/AbyssOS`, and `python scripts/review_decision_closure.py --workspace-root /srv/AbyssOS template`
-- recurrence downstream projections: `docs/RECURRENCE_DOWNSTREAM_PROJECTIONS.md`, `schemas/downstream-projection-bundle.schema.json`, `schemas/downstream-projection-guard-report.schema.json`, `src/aoa_sdk/recurrence/projections.py`, `aoa recur project routing|stats|kag|build --root /srv/AbyssOS`, and `python scripts/build_downstream_recurrence_projections.py --workspace-root /srv/AbyssOS --json`
-- recurrence eval-suite handoff to the proof layer: `docs/RECURRENCE_EVAL_SUITE_HANDOFF.md`, with proof ownership remaining in `aoa-evals`
-- public support, release scope, and CI tiers: `docs/RELEASE_CI_POSTURE.md`
-- bounded federation release audit and publish helper: `docs/RELEASING.md`, `aoa release audit /srv --phase preflight --all --json`, and `aoa release publish /srv --repo aoa-sdk --dry-run --json`
+- compatibility rules and local checks: `docs/versioning.md`, `mechanics/release-support/parts/public-support-ci-posture/config/sibling_canary_matrix.json`, `mechanics/release-support/parts/public-support-ci-posture/scripts/run_sibling_canary.py`, `.github/workflows/latest-sibling-canary.yml`, `aoa compatibility check /srv/AbyssOS/aoa-sdk`, and `aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json`
+- recurrence manifest compatibility: `mechanics/recurrence/parts/component-manifest-gate/docs/control-plane.md`, `mechanics/recurrence/parts/component-manifest-gate/docs/hardening-compatibility.md`, `mechanics/recurrence/parts/component-manifest-gate/schemas/manifest_scan_report.schema.json`, `src/aoa_sdk/recurrence/compat.py`, `aoa recur manifest-scan --root /srv/AbyssOS --json`, and `python mechanics/recurrence/parts/component-manifest-gate/scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS`
+- recurrence graph inspection: `mechanics/recurrence/parts/graph-closure-snapshot/docs/graph-closure-and-snapshot.md`, `mechanics/recurrence/parts/graph-closure-snapshot/schemas/graph_snapshot.schema.json`, `mechanics/recurrence/parts/graph-closure-snapshot/schemas/graph_closure_report.schema.json`, `mechanics/recurrence/parts/graph-closure-snapshot/schemas/graph_delta_report.schema.json`, `src/aoa_sdk/recurrence/graph.py`, `aoa recur graph snapshot --root /srv/AbyssOS --json`, `aoa recur graph closure --root /srv/AbyssOS --component component:<owner>:<name> --json`, and `python mechanics/recurrence/parts/graph-closure-snapshot/scripts/build_recurrence_graph_snapshot.py --workspace-root /srv/AbyssOS --json`
+- recurrence live observations: `mechanics/recurrence/parts/live-observation-producers/docs/live-observation-producers.md`, `mechanics/recurrence/parts/live-observation-producers/schemas/live_observation_run.schema.json`, `src/aoa_sdk/recurrence/live_observations.py`, `aoa recur live observe --root /srv/AbyssOS --json`, and `python mechanics/recurrence/parts/live-observation-producers/scripts/collect_live_recurrence_observations.py --workspace-root /srv/AbyssOS --json`
+- technique publication observation boundary: `mechanics/recurrence/parts/hook-observation-pack/docs/technique-publication-observation-boundary.md`
+- recurrence review decision closure: `mechanics/recurrence/parts/review-decision-closure/docs/review-decision-closure.md`, `mechanics/recurrence/parts/review-decision-closure/schemas/owner_review_decision.schema.json`, `mechanics/recurrence/parts/review-decision-closure/schemas/review_decision_close_report.schema.json`, `src/aoa_sdk/recurrence/decisions.py`, `aoa recur review decision-template --root /srv/AbyssOS`, `aoa recur review close --root /srv/AbyssOS`, and `python mechanics/recurrence/parts/review-decision-closure/scripts/review_decision_closure.py --workspace-root /srv/AbyssOS template`
+- recurrence downstream projections: `mechanics/recurrence/parts/downstream-projection-guard/docs/downstream-projections.md`, `mechanics/recurrence/parts/downstream-projection-guard/schemas/downstream-projection-bundle.schema.json`, `mechanics/recurrence/parts/downstream-projection-guard/schemas/downstream-projection-guard-report.schema.json`, `src/aoa_sdk/recurrence/projections.py`, `aoa recur project routing|stats|kag|build --root /srv/AbyssOS`, and `python mechanics/recurrence/parts/downstream-projection-guard/scripts/build_downstream_recurrence_projections.py --workspace-root /srv/AbyssOS --json`
+- recurrence eval-suite handoff to the proof layer: `mechanics/recurrence/parts/downstream-projection-guard/docs/eval-suite-handoff.md`, with proof ownership remaining in `aoa-evals`
+- public support, release scope, and CI tiers: `mechanics/release-support/parts/public-support-ci-posture/docs/public-support-ci-posture.md` and `docs/RELEASE_CI_POSTURE.md`
+- bounded federation release audit and publish helper: `mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md`, `docs/RELEASING.md`, `aoa release audit /srv --phase preflight --all --json`, and `aoa release publish /srv --repo aoa-sdk --dry-run --json`
 - typed facade and downstream-consumer entrypoints: `src/aoa_sdk/`, `tests/`, and the example under `Current slice`
-- Titan runtime and bridge helpers that stay subordinate to role, memory, proof, and owner-repo truth: `src/aoa_sdk/titans/`, `scripts/titanctl.py`, `scripts/titan_console.py`, `scripts/titan_appserver_bridge.py`, `scripts/titan_memory_loom.py`, `scripts/titan_lineage.py`, and `tests/test_titan_*.py`
+- Titan runtime and bridge helpers that stay subordinate to role, memory, proof, and owner-repo truth: `src/aoa_sdk/titans/`, `mechanics/titan/README.md`, and `mechanics/titan/parts/`
 - local validation and workspace inspection: `python scripts/build_workspace_control_plane.py --check`, `python scripts/validate_workspace_control_plane.py`, `aoa workspace inspect /srv/AbyssOS/aoa-sdk`, `aoa compatibility check /srv/AbyssOS/aoa-sdk`, `python -m pytest -q`, and `python -m ruff check .`
-- reviewed session closeout queue and reports: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
-- reviewed closeout followthrough hints that stay advisory: `docs/closeout-followthrough-map.md`, `examples/closeout_owner_followthrough_map.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
-- component-refresh control-plane carry that stays hint-only or reviewed-only: `docs/COMPONENT_DRIFT_HINTS.md`, `examples/component_drift_hints.example.json`, `examples/component_refresh_followthrough_decision.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
-- hint-only self-agency continuity carry after reviewed closeout: `docs/SELF_AGENCY_CONTINUITY_CARRY.md`, `examples/closeout_continuity_window.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
-- deterministic next-kernel hints after reviewed closeout: `docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md`, `examples/closeout_followthrough_decision.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
-- additive owner-layer surface detection without changing `aoa skills ...` meaning: `docs/aoa-surface-detection-first-wave.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
-- checkpoint-aware local session-growth note capture and promotion: `docs/session-growth-checkpoints.md`, `docs/checkpoint-note-promotion.md`, `aoa checkpoint mark/append/after-commit/review-note/status/promote`, `aoa checkpoint install-hook`, `aoa checkpoint hook-status`, the auto checkpoint bridge on `aoa skills guard`, and the explicit `aoa skills enter --checkpoint-kind` / `--append-note` overrides
-- explicit checkpoint-to-closeout bridge orchestration: `docs/session-growth-checkpoints.md`, `docs/session-closeout.md`, `aoa checkpoint build-closeout-context`, and `aoa checkpoint execute-closeout-chain`
-- second-wave shortlist, receipt-context, and observability seams that stay advisory: `docs/aoa-surface-detection-second-wave.md`, `sdk.routing.owner_layer_shortlist()`, and `sdk.stats.surface_detection()`
-- stats-driven re-grounding policy: `docs/STATS_REGROUNDING_POLICY.md`, `sdk.stats.source_coverage()`, `sdk.stats.surface_profile()`, `sdk.stats.regrounding_signal()`, and `sdk.routing.stats_regrounding_hints()`
-- antifragility stress-context doctrine and fixtures that stay narrowing-only: `docs/antifragility-control-plane.md`, `docs/antifragility-closeout-seam.md`, `tests/fixtures/antifragility/stress_dispatch_input.example.json`, `tests/fixtures/antifragility/stress_dispatch_result.example.json`, and `tests/fixtures/antifragility/stress_closeout_manifest.example.json`
-- via negativa pruning checklist: `docs/VIA_NEGATIVA_CHECKLIST.md`
-- deterministic first-wave heuristics for proof, recall, recurring routes, role posture, and repeated practice: `docs/aoa-surface-detection-heuristics.md` and `src/aoa_sdk/surfaces/heuristics.py`
-- reviewed-only closeout handoff for surviving surface notes: `docs/aoa-surface-detection-closeout-handoff.md`, `aoa surfaces handoff`, and `docs/session-closeout.md`
-- reviewed session auto-closeout inbox: `docs/session-closeout.md`, `aoa closeout enqueue-current`, `aoa closeout status`, and `scripts/install_closeout_units.py`
-- reviewed session manifest assembly: `docs/session-closeout.md` and `aoa closeout build-manifest`
-- reviewed session request assembly from receipt bundles or audit-only reviewed artifacts: `docs/session-closeout.md` and `aoa closeout submit-reviewed`
-- kernel-aware next-step brief after reviewed closeout: `docs/session-closeout.md`, `aoa closeout run`, and `aoa closeout process-inbox`
-- persistent owner follow-through handoffs after harvest or quest promotion: `docs/session-closeout.md`, `.aoa/closeout/handoffs/`, `aoa closeout run`, and `aoa closeout process-inbox`
+- reviewed session closeout queue and reports: `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`, `aoa closeout run`, and `aoa closeout process-inbox`
+- reviewed closeout context carry that stays advisory: `mechanics/checkpoint/parts/reviewed-closeout-context-carry/README.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/owner-followthrough-map.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_owner_followthrough_map.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
+- component-refresh control-plane carry that stays hint-only or reviewed-only: `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/component-refresh-followthrough.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/component_drift_hints.example.json`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/component_refresh_followthrough_decision.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
+- hint-only self-agency continuity carry after reviewed closeout: `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/self-agency-continuity-carry.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_continuity_window.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
+- deterministic next-kernel followthrough decision after reviewed closeout: `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/next-kernel-followthrough-decision.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_followthrough_decision.example.json`, and `closeout-context.json` under `.aoa/session-growth/current/.../`
+- additive owner-layer surface detection without changing `aoa skills ...` meaning: `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/initial-surface-detection-boundary.md`, `aoa surfaces detect`, and `src/aoa_sdk/surfaces/`
+- checkpoint-aware local session-growth note capture and promotion: `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md`, `aoa checkpoint mark/append/after-commit/review-note/status/promote`, `aoa checkpoint install-hook`, `aoa checkpoint hook-status`, the auto checkpoint bridge on `aoa skills guard`, and the explicit `aoa skills enter --checkpoint-kind` / `--append-note` overrides
+- explicit checkpoint-to-closeout bridge orchestration: `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`, `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`, `aoa checkpoint build-closeout-context`, and `aoa checkpoint execute-closeout-chain`
+- enrichment-layer shortlist, receipt-context, and observability seams that stay advisory: `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md`, `sdk.routing.owner_layer_shortlist()`, and `sdk.stats.surface_detection()`
+- stats-driven re-grounding policy: `mechanics/recurrence/parts/downstream-projection-guard/docs/stats-regrounding-policy.md`, `sdk.stats.source_coverage()`, `sdk.stats.surface_profile()`, `sdk.stats.regrounding_signal()`, and `sdk.routing.stats_regrounding_hints()`
+- antifragility stress-posture doctrine and examples that stay narrowing-only: `mechanics/antifragility/parts/stress-posture-dispatch-gate/docs/stress-posture-dispatch-gate.md`, `mechanics/antifragility/parts/stress-posture-dispatch-gate/examples/stress-posture-dispatch-request.example.json`, `mechanics/antifragility/parts/stress-posture-dispatch-gate/examples/stress-posture-dispatch-decision.example.json`, `mechanics/antifragility/parts/reviewed-stress-closeout-carry/docs/reviewed-stress-closeout-carry.md`, and `mechanics/antifragility/parts/reviewed-stress-closeout-carry/examples/reviewed-stress-closeout-manifest.example.json`
+- via negativa pruning checklist: `mechanics/antifragility/parts/via-negativa/docs/via-negativa-checklist.md`
+- deterministic initial-boundary heuristics for proof, recall, recurring routes, role posture, and repeated practice: `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-heuristics.md` and `src/aoa_sdk/surfaces/heuristics.py`
+- reviewed-only closeout handoff for surviving surface notes: `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md`, `aoa surfaces handoff`, and `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`
+- reviewed session auto-closeout inbox: `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`, `aoa closeout enqueue-current`, `aoa closeout status`, and `mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/install_closeout_units.py`
+- reviewed session manifest assembly: `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md` and `aoa closeout build-manifest`
+- reviewed session request assembly from receipt bundles or audit-only reviewed artifacts: `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md` and `aoa closeout submit-reviewed`
+- kernel-aware next-step brief after reviewed closeout: `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`, `aoa closeout run`, and `aoa closeout process-inbox`
+- persistent owner follow-through handoffs after harvest or quest promotion: `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`, `.aoa/closeout/handoffs/`, `aoa closeout run`, and `aoa closeout process-inbox`
 - workspace session ingress and pre-mutation guard wrappers: `aoa skills enter`, `aoa skills guard`, and `src/aoa_sdk/cli/main.py`
-- router recommendation versus host skill-availability gap: `docs/skill-runtime-recommendation-gap.md`, `aoa skills enter`, `aoa skills guard`, and `src/aoa_sdk/skills/detector.py`
-- first implementation spec for the recommendation-availability gap: `docs/skill-runtime-recommendation-gap-fix-spec.md`, `src/aoa_sdk/models.py`, `src/aoa_sdk/skills/detector.py`, and `src/aoa_sdk/cli/main.py`
+- skill runtime recommendation actionability gap: `mechanics/boundary-bridge/parts/skill-runtime-bridge/docs/recommendation-actionability-gap.md`, `aoa skills enter`, `aoa skills guard`, and `src/aoa_sdk/skills/detector.py`
+- host actionability reporting design for skill recommendations: `mechanics/boundary-bridge/parts/skill-runtime-bridge/docs/host-actionability-reporting-design.md`, `src/aoa_sdk/models.py`, `src/aoa_sdk/skills/detector.py`, and `src/aoa_sdk/cli/main.py`
 - project foundation structure and layer order: `sdk.skills.project_foundation()` and the `aoa-skills` generated foundation surface
 - project-core outer-ring structure and readiness: `sdk.skills.project_core_outer_ring()`, `sdk.skills.project_core_outer_ring_readiness()`, and the `aoa-skills` generated project-core ring surfaces
 - project risk guard ring structure and governance: `sdk.skills.project_risk_guard_ring()`, `sdk.skills.project_risk_guard_ring_governance()`, and the `aoa-skills` generated risk-ring surfaces
@@ -110,6 +120,8 @@ Use the shortest route by need:
 This repository is the source of truth for:
 
 - typed loaders and facades over source-owned federation surfaces
+- source-home posture under `sdk/` for public-interface, facade-boundary,
+  runtime-entry, and distribution route shape
 - workspace discovery and topology resolution
 - compatibility checks across consumed local surfaces
 - system-design and agent-surface design posture under `DESIGN.md` and
@@ -131,9 +143,9 @@ This repository is the source of truth for:
 - phase-aware skill detection and dispatch that only auto-activates `explicit-preferred` foundation skills and keeps `explicit-only` skills in visible confirmation lanes
 - persisted workspace-level ingress and guard reports under `aoa-sdk/.aoa/skill-dispatch/` so outer wrappers and root-level agents can reuse one stable session-start surface
 - default skill runtime session storage under `aoa-sdk/.aoa/skill-runtime-sessions/<codex-thread>.json` when `CODEX_THREAD_ID` is available, otherwise under `aoa-sdk/.aoa/skill-runtime-session.json`
-- additive first-wave and second-wave surface detection under `aoa-sdk/.aoa/surface-detection/` that keeps `aoa skills ...` skill-only while surfacing eval, memo, playbook, agent, and technique candidates as non-executable hints or reviewed handoffs
+- additive initial-boundary and enrichment-layer surface detection under `aoa-sdk/.aoa/surface-detection/` that keeps `aoa skills ...` skill-only while surfacing eval, memo, playbook, agent, and technique candidates as non-executable hints or reviewed handoffs
 - local checkpoint-note capture under `aoa-sdk/.aoa/session-growth/current/` that keeps mid-session growth work below harvest-verdict authority until reviewed promotion, carries harvest, progression, and upgrade candidates through the session, records provisional progression-axis movement, rotates `current` by active checkpoint session rather than day-only naming, and leaves candidate movement plus stats refresh to reviewed closeout
-- active-session-only post-commit checkpoint capture for plain `git commit`, writing one runtime-scoped `post-commit-report.json` when a session exists, one structured auto-observation inside the checkpoint note, and one fallback status artifact under `aoa-sdk/.aoa/session-growth/post-commit-status/` when capture skips or fails before note state is available
+- active-session-only post-commit checkpoint capture for plain `git commit`, writing one runtime-scoped `post-commit-report.json` when a session exists, one structured auto-observation inside the checkpoint note, and one post-commit status artifact under `aoa-sdk/.aoa/session-growth/post-commit-status/` when capture skips or fails before note state is available
 - with an active runtime session, legacy unscoped `current/<repo>` checkpoint ledgers are quarantine-only migration evidence and do not auto-attach to the live session
 - agent-authored post-commit checkpoint reviews through `aoa checkpoint review-note`; `--auto` now lets the Codex agent promote the matching `auto_observation` into a full semantic review without retyping summary/findings by hand, while manual flags still remain available for richer followthrough
 - when a checkpoint note still has pending agent reviews, the session-growth next-step guidance now points to `aoa checkpoint review-note --auto` first instead of prematurely steering into reviewed closeout
@@ -177,7 +189,7 @@ The SDK stays on the control plane: load, type, validate, activate, and hand off
 
 ## Public support and release posture
 
-For the shortest statement of what the SDK publicly supports, what an SDK release may honestly claim, and which CI tiers reinforce those claims, use `docs/RELEASE_CI_POSTURE.md`.
+For the shortest statement of what the SDK publicly supports, what an SDK release may honestly claim, and which CI tiers reinforce those claims, use `mechanics/release-support/parts/public-support-ci-posture/docs/public-support-ci-posture.md`; `docs/RELEASE_CI_POSTURE.md` is the root route door.
 
 ## Verify current repo state
 
@@ -185,6 +197,7 @@ Use this read-only/current-state battery:
 
 ```bash
 python scripts/generate_decision_indexes.py --check
+python scripts/validate_sdk_source_home.py
 python scripts/validate_mechanics_topology.py
 python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
@@ -259,7 +272,7 @@ closeout_execution = sdk.checkpoints.execute_closeout_chain(
 shortlist = sdk.routing.owner_layer_shortlist(signal="scenario-recurring")
 surface_handoff = sdk.surfaces.build_closeout_handoff(
     surface_report,
-    session_ref="session:2026-04-07-surface-first-wave",
+    session_ref="session:2026-04-07-surface-initial-boundary",
 )
 verify_binding = sdk.agents.binding_for_phase("verify")
 playbook = sdk.playbooks.get("bounded-change-safe")
@@ -297,7 +310,7 @@ Run the workspace-level Codex MCP server:
 
 ```bash
 python -m pip install -e '.[mcp]'
-python scripts/aoa_workspace_mcp_server.py
+python mechanics/codex-projection/parts/workspace-mcp-server/scripts/aoa_workspace_mcp_server.py
 ```
 
 Plan or apply one portable sibling-workspace bootstrap:
@@ -312,7 +325,7 @@ Check consumed surface compatibility across the local workspace:
 ```bash
 aoa compatibility check /srv/AbyssOS/aoa-sdk
 aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json
-python scripts/run_sibling_canary.py --repo-root . --matrix scripts/sibling_canary_matrix.json
+python mechanics/release-support/parts/public-support-ci-posture/scripts/run_sibling_canary.py --repo-root .
 ```
 
 Run one reviewed session closeout manifest:
@@ -335,7 +348,7 @@ aoa closeout submit-reviewed /srv/path/to/W4-closeout.md --session-ref session:q
 aoa closeout build-manifest /srv/path/to/closeout.request.json --root /srv/AbyssOS/aoa-sdk --enqueue --json
 aoa closeout enqueue-current /srv/path/to/closeout.json --root /srv/AbyssOS/aoa-sdk --json
 aoa closeout status /srv/AbyssOS/aoa-sdk --json
-python scripts/install_closeout_units.py --overwrite --enable
+python mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/install_closeout_units.py --overwrite --enable
 ```
 
 Inspect one phase-aware foundation detection pass:
@@ -387,7 +400,7 @@ aoa checkpoint promote /srv/AbyssOS/aoa-sdk --target dionysus-note --root /srv/A
 Build one reviewed-only closeout handoff from a persisted surface report:
 
 ```bash
-aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json --session-ref session:2026-04-07-surface-first-wave --reviewed --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json --session-ref session:2026-04-07-surface-initial-boundary --reviewed --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Install for development:

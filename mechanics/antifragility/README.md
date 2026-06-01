@@ -1,24 +1,24 @@
 # Antifragility Mechanic
 
-Status: skeleton.
+Status: active topology with part-local payload.
 
 ## Mechanic Card
 
 ### Operation
 
-Keep SDK stress-context, degraded-mode, via negativa, and closeout stress carry
-bounded, inspectable, and weaker than owner remediation.
+Keep SDK stress-posture dispatch, reviewed stress closeout carry, and via
+negativa pruning bounded, inspectable, and weaker than owner remediation.
 
 ### Trigger
 
-Use this mechanic when antifragility docs, stress fixtures, via negativa
-checklists, or closeout stress seam contracts change.
+Use this mechanic when SDK stress dispatch examples, reviewed stress closeout
+carry, via negativa checklists, or antifragility route cards change.
 
 ### SDK owns
 
-- public-safe stress-context fixtures
-- SDK antifragility control-plane posture
-- closeout stress carry route docs
+- public-safe stress-posture dispatch examples
+- SDK antifragility control-plane posture docs
+- reviewed stress closeout carry route docs and example manifest
 - via negativa checklist routing
 
 ### Stronger owner split
@@ -28,16 +28,14 @@ durable memory.
 
 ### Current source surfaces
 
-- `docs/antifragility-control-plane.md`
-- `docs/antifragility-closeout-seam.md`
-- `docs/VIA_NEGATIVA_CHECKLIST.md`
-- `tests/fixtures/antifragility/`
-- `tests/test_antifragility_public_surface.py`
+- `mechanics/antifragility/parts/stress-posture-dispatch-gate/`
+- `mechanics/antifragility/parts/reviewed-stress-closeout-carry/`
+- `mechanics/antifragility/parts/via-negativa/`
 
 ### Candidate parts
 
-- stress-context
-- closeout-seam
+- stress-posture-dispatch-gate
+- reviewed-stress-closeout-carry
 - via-negativa
 
 ### Must not claim
@@ -48,7 +46,7 @@ approval, runtime activation, or owner-local remediation.
 ### Validation
 
 ```bash
-python -m pytest -q tests/test_antifragility_public_surface.py
+python -m pytest -q mechanics/antifragility/parts/stress-posture-dispatch-gate/tests/test_stress_posture_dispatch_gate.py mechanics/antifragility/parts/reviewed-stress-closeout-carry/tests/test_reviewed_stress_closeout_carry.py mechanics/antifragility/parts/via-negativa/tests/test_via_negativa_checklist.py
 ```
 
 ### Next route

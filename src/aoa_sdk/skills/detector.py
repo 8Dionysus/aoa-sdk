@@ -186,7 +186,7 @@ def detect_skills(
                 host_availability=_host_availability_for_skill(
                     skill_name,
                     host_inventory=host_inventory,
-                    manual_fallback_allowed=False,
+                    manual_equivalence_allowed=False,
                 ),
             )
             if (
@@ -229,7 +229,7 @@ def detect_skills(
                 host_availability=_host_availability_for_skill(
                     skill_name,
                     host_inventory=host_inventory,
-                    manual_fallback_allowed=True,
+                    manual_equivalence_allowed=True,
                 ),
             )
         )
@@ -439,7 +439,7 @@ def _risk_gate_items(
             host_availability=_host_availability_for_skill(
                 skill_name,
                 host_inventory=host_inventory,
-                manual_fallback_allowed=True,
+                manual_equivalence_allowed=True,
             ),
         )
         for skill_name in required
@@ -500,7 +500,7 @@ def _closeout_must_confirm(
             host_availability=_host_availability_for_skill(
                 skill_name,
                 host_inventory=host_inventory,
-                manual_fallback_allowed=True,
+                manual_equivalence_allowed=True,
             ),
         )
     ]
@@ -608,7 +608,7 @@ def _checkpoint_bridge_must_confirm(
         host_availability=_host_availability_for_skill(
             skill_name,
             host_inventory=host_inventory,
-            manual_fallback_allowed=True,
+            manual_equivalence_allowed=True,
         ),
     )
 
@@ -684,26 +684,26 @@ def _host_availability_for_skill(
     skill_name: str,
     *,
     host_inventory: _HostInventory,
-    manual_fallback_allowed: bool,
+    manual_equivalence_allowed: bool,
 ) -> SkillHostAvailability:
     if not host_inventory.is_provided:
         return SkillHostAvailability(
             status="unknown",
             source="not-provided",
-            manual_fallback_allowed=False,
+            manual_equivalence_allowed=False,
             reason="no host skill inventory was supplied",
         )
     if skill_name in (host_inventory.available_skills or set()):
         return SkillHostAvailability(
             status="host-executable",
             source=host_inventory.source,
-            manual_fallback_allowed=False,
+            manual_equivalence_allowed=False,
             reason=_inventory_reason_phrase(host_inventory, present=True),
         )
     return SkillHostAvailability(
         status="router-only",
         source=host_inventory.source,
-        manual_fallback_allowed=manual_fallback_allowed,
+        manual_equivalence_allowed=manual_equivalence_allowed,
         reason=_inventory_reason_phrase(host_inventory, present=False),
     )
 
@@ -777,7 +777,7 @@ def _demote_non_executable_activate_now(
                 update={
                     "reason": f"{item.reason}; host inventory is router-only for this skill",
                     "host_availability": item.host_availability.model_copy(
-                        update={"manual_fallback_allowed": True}
+                        update={"manual_equivalence_allowed": True}
                     ),
                 }
             )

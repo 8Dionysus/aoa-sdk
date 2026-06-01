@@ -1,6 +1,6 @@
 # Runtime Seam Mechanic
 
-Status: skeleton.
+Status: active topology with part-local payload.
 
 ## Mechanic Card
 
@@ -37,29 +37,29 @@ ownership remain outside SDK truth.
 - `scripts/build_workspace_control_plane.py`
 - `scripts/validate_workspace_control_plane.py`
 - `src/aoa_sdk/workspace/`
-- `githooks/`
-- `systemd/`
-- workspace tests under `tests/`
+- `mechanics/runtime-seam/parts/workspace-root-resolution/`
+- `mechanics/runtime-seam/parts/portable-workspace-bootstrap/`
+- `mechanics/runtime-seam/parts/control-plane-capsule/`
+- `mechanics/runtime-seam/parts/runtime-mirror-boundary/`
+- workspace tests under `mechanics/runtime-seam/parts/*/tests/`
 
 ### Candidate parts
 
 - workspace-root-resolution
+- portable-workspace-bootstrap
 - control-plane-capsule
-- portable-bootstrap
 - runtime-mirror-boundary
-- local-automation-seam
 
 ### Must not claim
 
-This mechanic must not hide path discovery, rewrite sibling source ownership,
-or make optional hooks/user units a service runtime.
+This mechanic must not hide path discovery or rewrite sibling source ownership.
 
 ### Validation
 
 ```bash
 python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
-python -m pytest -q tests/test_workspace.py tests/test_workspace_control_plane.py tests/test_live_workspace.py
+python -m pytest -q mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution_cli.py mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py
 ```
 
 ### Next route

@@ -1,0 +1,16 @@
+{
+  "component_id": "component:agon.retention-rank-sdk-helpers",
+  "hidden_scheduler_allowed": false,
+  "observes": [
+    "mechanics/agon/parts/verdict-retention-rank-review-helpers/generated/agon_retention_rank_sdk_helpers.min.json",
+    "mechanics/agon/parts/verdict-retention-rank-review-helpers/config/agon_retention_rank_sdk_helpers.seed.json"
+  ],
+  "owner_review_required": true,
+  "recurrence_role": "observe_retention_rank_pressure_without_authority",
+  "stop_lines": [
+    "no_hidden_scheduler_action",
+    "no_rank_or_trust_mutation",
+    "no_assistant_contestant_drift"
+  ],
+  "surface_role": "retention_rank_review_helpers"
+}

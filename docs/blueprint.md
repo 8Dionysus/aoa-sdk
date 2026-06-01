@@ -265,14 +265,21 @@ aoa-sdk/
         playbooks.py
         memo.py
         evals.py
+  mechanics/
+    boundary-bridge/
+      parts/
+        consumed-surface-posture-gate/
+          tests/
+            test_routing_surface_actions.py
+            test_agent_phase_binding_surface_reader.py
+            test_playbook_surface_reader.py
+            test_memo_surface_reader.py
+            test_eval_surface_reader.py
+        skill-runtime-bridge/
+          tests/
+            test_skill_runtime_bridge.py
   tests/
     test_workspace.py
-    test_routing.py
-    test_skills.py
-    test_agents.py
-    test_playbooks.py
-    test_memo.py
-    test_evals.py
     test_runtime.py
 ```
 
@@ -661,11 +668,10 @@ aoa-sdk/
   src/aoa_sdk/agents/phase_bindings.py
   src/aoa_sdk/agents/artifacts.py
 
-  tests/test_workspace.py
-  tests/test_routing_hints.py
-  tests/test_skill_discovery.py
-  tests/test_skill_activation.py
-  tests/test_phase_bindings.py
+  mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py
+  mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_surface_actions.py
+  mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge.py
+  mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_agent_phase_binding_surface_reader.py
 ```
 
 The first commit should already pass on:

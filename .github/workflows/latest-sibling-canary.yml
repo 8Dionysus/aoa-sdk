@@ -82,4 +82,4 @@ jobs:
 
       - name: Run sibling canary
         working-directory: workspace/aoa-sdk
-        run: python scripts/run_sibling_canary.py --repo-root . --matrix scripts/sibling_canary_matrix.json
+        run: python mechanics/release-support/parts/public-support-ci-posture/scripts/run_sibling_canary.py --repo-root .

@@ -70,7 +70,7 @@ old physical topology as a second supported route.
 ## Source Surfaces
 
 - `src/aoa_sdk/compatibility/policy.py`
-- `tests/test_compatibility.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py`
 - `docs/decisions/README.md`
 - `docs/boundaries.md`
 - `DESIGN.md`
@@ -85,6 +85,6 @@ compatibility path drift into sibling source ownership or hidden SDK fallback.
 
 ```bash
 python scripts/generate_decision_indexes.py --check
-python -m pytest -q tests/test_compatibility.py tests/test_decision_indexes.py
+python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py tests/test_decision_indexes.py
 aoa compatibility check /srv/AbyssOS/aoa-sdk
 ```

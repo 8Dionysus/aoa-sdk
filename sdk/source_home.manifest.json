@@ -1,0 +1,385 @@
+{
+  "$schema": "https://aoa-sdk/schemas/sdk-source-home.schema.json",
+  "schema_version": "aoa_sdk_source_home_v1",
+  "owner_repo": "aoa-sdk",
+  "home": "sdk/",
+  "role": "source-authored home for SDK-owned posture, public interface boundaries, facade boundaries, runtime entry posture, and distribution promises",
+  "home_rules": [
+    "The SDK source home is tree-shaped and branch-owned.",
+    "The importable Python implementation remains under src/aoa_sdk/.",
+    "Repeatable operation topology remains under mechanics/.",
+    "Every source-home branch must have a local AGENTS.md, README.md, family README routes, and explicit validation.",
+    "Generated readers, mechanics payload, and sibling-owned meaning remain outside sdk/."
+  ],
+  "branches": [
+    {
+      "id": "public_interface",
+      "path": "sdk/public-interface",
+      "role": "Public API, CLI, and model contract posture for SDK consumers.",
+      "families": [
+        "python_api_contract",
+        "cli_contract",
+        "model_contract"
+      ],
+      "owner_surface": "sdk/public-interface/AGENTS.md",
+      "stop_lines": [
+        "Do not define behavior here that is not implemented and tested under src/aoa_sdk/.",
+        "Do not turn public interface posture into sibling-source authority."
+      ]
+    },
+    {
+      "id": "facade_boundary",
+      "path": "sdk/facade-boundary",
+      "role": "Sibling-reader, compatibility, and truth-label boundary posture.",
+      "families": [
+        "sibling_surface_readers",
+        "compatibility_policy",
+        "truth_label_posture"
+      ],
+      "owner_surface": "sdk/facade-boundary/AGENTS.md",
+      "stop_lines": [
+        "Do not make loaded sibling surfaces SDK source truth.",
+        "Do not hide path drift behind permissive fallback behavior."
+      ]
+    },
+    {
+      "id": "runtime_entry",
+      "path": "sdk/runtime-entry",
+      "role": "Workspace, Codex, and reviewed closeout entry posture that stays below runtime authority.",
+      "families": [
+        "workspace_context",
+        "codex_entrypoints",
+        "closeout_entrypoints"
+      ],
+      "owner_surface": "sdk/runtime-entry/AGENTS.md",
+      "stop_lines": [
+        "Do not turn entrypoints into runtime workers.",
+        "Do not make checkpoint or closeout carry stronger than reviewed owner truth."
+      ]
+    },
+    {
+      "id": "distribution",
+      "path": "sdk/distribution",
+      "role": "Package, release, and public support promise posture.",
+      "families": [
+        "package_contract",
+        "release_posture",
+        "public_support"
+      ],
+      "owner_surface": "sdk/distribution/AGENTS.md",
+      "stop_lines": [
+        "Do not treat dry-run release helpers as published release truth.",
+        "Do not make support posture broader than tested public surfaces."
+      ]
+    }
+  ],
+  "stronger_owner_routes": [
+    {
+      "pressure": "skill meaning or workflow doctrine",
+      "route": "aoa-skills"
+    },
+    {
+      "pressure": "technique meaning or promotion canon",
+      "route": "aoa-techniques"
+    },
+    {
+      "pressure": "proof verdict or eval canon",
+      "route": "aoa-evals"
+    },
+    {
+      "pressure": "durable memory truth or recall policy",
+      "route": "aoa-memo"
+    },
+    {
+      "pressure": "agent role source meaning",
+      "route": "aoa-agents"
+    },
+    {
+      "pressure": "runtime worker, service, or infrastructure behavior",
+      "route": "abyss-stack"
+    }
+  ],
+  "families": [
+    {
+      "id": "python_api_contract",
+      "branch": "public_interface",
+      "path": "sdk/public-interface/python-api",
+      "source_kind": "public_api_posture",
+      "meaning": "Route contract for importable SDK entrypoints and object construction posture.",
+      "owner_surface": "sdk/public-interface/AGENTS.md",
+      "implementation_routes": [
+        "src/aoa_sdk/__init__.py",
+        "src/aoa_sdk/api.py"
+      ],
+      "mechanic_routes": [
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python -m pytest -q"
+      ],
+      "stop_lines": [
+        "Do not document an API promise that is not implemented and tested."
+      ]
+    },
+    {
+      "id": "cli_contract",
+      "branch": "public_interface",
+      "path": "sdk/public-interface/cli-contract",
+      "source_kind": "cli_posture",
+      "meaning": "Route contract for CLI commands as public SDK control-plane entrypoints.",
+      "owner_surface": "sdk/public-interface/AGENTS.md",
+      "implementation_routes": [
+        "src/aoa_sdk/cli"
+      ],
+      "mechanic_routes": [
+        "mechanics/runtime-seam/parts/workspace-root-resolution",
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle",
+        "mechanics/release-support/parts/release-audit-publish-helper"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python -m pytest -q"
+      ],
+      "stop_lines": [
+        "Do not let CLI convenience bypass owner review or validation gates."
+      ]
+    },
+    {
+      "id": "model_contract",
+      "branch": "public_interface",
+      "path": "sdk/public-interface/model-contract",
+      "source_kind": "typed_model_posture",
+      "meaning": "Route contract for typed models, truth labels, aliases, and public schema posture.",
+      "owner_surface": "sdk/public-interface/AGENTS.md",
+      "implementation_routes": [
+        "src/aoa_sdk/models.py",
+        "schemas"
+      ],
+      "mechanic_routes": [
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python -m pytest -q"
+      ],
+      "stop_lines": [
+        "Do not make compatibility input aliases active output names."
+      ]
+    },
+    {
+      "id": "sibling_surface_readers",
+      "branch": "facade_boundary",
+      "path": "sdk/facade-boundary/sibling-surface-readers",
+      "source_kind": "facade_boundary",
+      "meaning": "Route contract for typed readers over sibling-owned generated and authored surfaces.",
+      "owner_surface": "sdk/facade-boundary/AGENTS.md",
+      "implementation_routes": [
+        "src/aoa_sdk/agents",
+        "src/aoa_sdk/evals",
+        "src/aoa_sdk/memo",
+        "src/aoa_sdk/playbooks",
+        "src/aoa_sdk/routing",
+        "src/aoa_sdk/skills",
+        "src/aoa_sdk/techniques"
+      ],
+      "mechanic_routes": [
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
+        "mechanics/boundary-bridge/parts/skill-runtime-bridge",
+        "mechanics/boundary-bridge/parts/technique-promotion-readiness-reader"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests"
+      ],
+      "stop_lines": [
+        "Do not absorb sibling meaning into SDK reader names."
+      ]
+    },
+    {
+      "id": "compatibility_policy",
+      "branch": "facade_boundary",
+      "path": "sdk/facade-boundary/compatibility-policy",
+      "source_kind": "compatibility_posture",
+      "meaning": "Route contract for compatibility checks that fail on silent drift.",
+      "owner_surface": "sdk/facade-boundary/AGENTS.md",
+      "implementation_routes": [
+        "src/aoa_sdk/compatibility",
+        "docs/versioning.md"
+      ],
+      "mechanic_routes": [
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
+        "mechanics/release-support/parts/public-support-ci-posture"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "aoa compatibility check /srv/AbyssOS/aoa-sdk"
+      ],
+      "stop_lines": [
+        "Do not turn missing source surfaces into silent pass conditions."
+      ]
+    },
+    {
+      "id": "truth_label_posture",
+      "branch": "facade_boundary",
+      "path": "sdk/facade-boundary/truth-label-posture",
+      "source_kind": "truth_label_posture",
+      "meaning": "Route contract for source, generated, candidate, manual, reviewed, activated, and advisory labels.",
+      "owner_surface": "sdk/facade-boundary/AGENTS.md",
+      "implementation_routes": [
+        "src/aoa_sdk/models.py",
+        "docs/boundaries.md"
+      ],
+      "mechanic_routes": [
+        "mechanics/boundary-bridge/parts/owner-layer-signal-handoff",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python -m pytest -q"
+      ],
+      "stop_lines": [
+        "Do not let labels imply owner acceptance without owner proof."
+      ]
+    },
+    {
+      "id": "workspace_context",
+      "branch": "runtime_entry",
+      "path": "sdk/runtime-entry/workspace-context",
+      "source_kind": "workspace_entry_posture",
+      "meaning": "Route contract for workspace root discovery, overrides, and runtime/source mirror boundaries.",
+      "owner_surface": "sdk/runtime-entry/AGENTS.md",
+      "implementation_routes": [
+        "src/aoa_sdk/workspace",
+        ".aoa/workspace.toml",
+        "docs/workspace-layout.md"
+      ],
+      "mechanic_routes": [
+        "mechanics/runtime-seam/parts/workspace-root-resolution",
+        "mechanics/runtime-seam/parts/runtime-mirror-boundary"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python scripts/validate_workspace_control_plane.py"
+      ],
+      "stop_lines": [
+        "Do not make path guessing stronger than explicit workspace config."
+      ]
+    },
+    {
+      "id": "codex_entrypoints",
+      "branch": "runtime_entry",
+      "path": "sdk/runtime-entry/codex-entrypoints",
+      "source_kind": "codex_entry_posture",
+      "meaning": "Route contract for Codex-facing project orientation and MCP entrypoints.",
+      "owner_surface": "sdk/runtime-entry/AGENTS.md",
+      "implementation_routes": [
+        "src/aoa_sdk/codex"
+      ],
+      "mechanic_routes": [
+        "mechanics/codex-projection/parts/workspace-mcp-server",
+        "mechanics/codex-projection/parts/live-rollout-status-readout",
+        "mechanics/codex-projection/parts/portability-boundary"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python -m pytest -q mechanics/codex-projection/parts/workspace-mcp-server/tests"
+      ],
+      "stop_lines": [
+        "Do not turn SDK Codex reads into a Codex runtime."
+      ]
+    },
+    {
+      "id": "closeout_entrypoints",
+      "branch": "runtime_entry",
+      "path": "sdk/runtime-entry/closeout-entrypoints",
+      "source_kind": "reviewed_closeout_entry_posture",
+      "meaning": "Route contract for checkpoint and reviewed closeout entrypoints below owner truth.",
+      "owner_surface": "sdk/runtime-entry/AGENTS.md",
+      "implementation_routes": [
+        "src/aoa_sdk/checkpoints",
+        "src/aoa_sdk/closeout",
+        "src/aoa_sdk/a2a"
+      ],
+      "mechanic_routes": [
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle",
+        "mechanics/checkpoint/parts/reviewed-session-handoff-runner",
+        "mechanics/checkpoint/parts/child-task-reentry"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python -m pytest -q mechanics/checkpoint/parts"
+      ],
+      "stop_lines": [
+        "Do not treat checkpoint or closeout artifacts as memory, proof, or owner verdicts."
+      ]
+    },
+    {
+      "id": "package_contract",
+      "branch": "distribution",
+      "path": "sdk/distribution/package-contract",
+      "source_kind": "package_posture",
+      "meaning": "Route contract for package metadata, build shape, and import distribution promises.",
+      "owner_surface": "sdk/distribution/AGENTS.md",
+      "implementation_routes": [
+        "pyproject.toml",
+        "src/aoa_sdk"
+      ],
+      "mechanic_routes": [
+        "mechanics/release-support/parts/release-audit-publish-helper"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python -m build"
+      ],
+      "stop_lines": [
+        "Do not claim package publication before external publication proof exists."
+      ]
+    },
+    {
+      "id": "release_posture",
+      "branch": "distribution",
+      "path": "sdk/distribution/release-posture",
+      "source_kind": "release_posture",
+      "meaning": "Route contract for release audit, changelog, and publish helper posture.",
+      "owner_surface": "sdk/distribution/AGENTS.md",
+      "implementation_routes": [
+        "CHANGELOG.md",
+        "docs/RELEASING.md",
+        "src/aoa_sdk/release"
+      ],
+      "mechanic_routes": [
+        "mechanics/release-support/parts/release-audit-publish-helper"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python scripts/release_check.py"
+      ],
+      "stop_lines": [
+        "Do not treat dry-run output as a GitHub Release or package upload."
+      ]
+    },
+    {
+      "id": "public_support",
+      "branch": "distribution",
+      "path": "sdk/distribution/public-support",
+      "source_kind": "support_posture",
+      "meaning": "Route contract for public support scope, release semantics, and CI tier posture.",
+      "owner_surface": "sdk/distribution/AGENTS.md",
+      "implementation_routes": [
+        "docs/RELEASE_CI_POSTURE.md",
+        ".github/workflows"
+      ],
+      "mechanic_routes": [
+        "mechanics/release-support/parts/public-support-ci-posture"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python -m pytest -q mechanics/release-support/parts/public-support-ci-posture/tests"
+      ],
+      "stop_lines": [
+        "Do not broaden public support claims beyond tested surfaces."
+      ]
+    }
+  ]
+}

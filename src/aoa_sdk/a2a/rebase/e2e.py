@@ -3,7 +3,7 @@ from __future__ import annotations
 from .checkpoint import build_checkpoint_bridge_plan, build_checkpoint_context_bundle
 from .closeout import (
     build_reviewed_closeout_request,
-    build_runtime_wave_closeout_receipt,
+    build_runtime_return_closeout_receipt,
     plan_owner_publications,
 )
 from .codex import build_codex_local_target
@@ -15,17 +15,17 @@ from .returning import build_return_plan, build_transition_decision_payload
 from .utils import to_jsonable
 
 
-FIXTURE_ID = "wave5-a2a-summon-return-checkpoint-e2e"
-SESSION_REF = "session:wave5-a2a-return-checkpoint-e2e"
+FIXTURE_ID = "a2a-summon-return-checkpoint-e2e"
+SESSION_REF = "session:a2a-return-checkpoint-e2e"
 CHECKPOINT_NOTE_REF = (
     "aoa-sdk/.aoa/session-growth/current/"
-    "wave5-a2a-return-checkpoint/checkpoint-note.json"
+    "a2a-return-checkpoint/checkpoint-note.json"
 )
 CODEX_TRACE_REF = (
     "aoa-sdk/.aoa/skill-runtime-sessions/"
-    "wave5-a2a-return-checkpoint/codex-trace.json"
+    "a2a-return-checkpoint/codex-trace.json"
 )
-REVIEWED_ARTIFACT_PATH = "/srv/notes/wave5-a2a-reviewed-child-return.md"
+REVIEWED_ARTIFACT_PATH = "/srv/notes/a2a-reviewed-child-return.md"
 OBSERVED_AT = "2026-04-14T00:00:00.000Z"
 
 
@@ -45,7 +45,7 @@ def build_summon_return_checkpoint_fixture(
         desired_role="reviewer",
         skill_refs=["aoa-summon", "aoa-checkpoint-closeout-bridge"],
         expected_outputs=["verification_result", "bounded_plan"],
-        parent_task_id="parent:wave5-a2a-return-checkpoint",
+        parent_task_id="parent:a2a-return-checkpoint",
         session_ref=SESSION_REF,
         reviewed_artifact_path=REVIEWED_ARTIFACT_PATH,
         audit_refs=[
@@ -64,16 +64,16 @@ def build_summon_return_checkpoint_fixture(
     decision = assess_summon(passport, intent)
     codex_target = build_codex_local_target("reviewer", workspace_root="/srv/AbyssOS")
     remote_task = RemoteTaskResult(
-        task_id="task-wave5-a2a-return-child",
+        task_id="task-a2a-return-child",
         state="failed",
         agent_id="reviewer",
         endpoint="codex://local/reviewer",
         returned_artifacts=["verification_result", "bounded_plan", "transition_decision"],
-        context_id="ctx-wave5-a2a-return-checkpoint",
-        parent_task_id="parent:wave5-a2a-return-checkpoint",
+        context_id="ctx-a2a-return-checkpoint",
+        parent_task_id="parent:a2a-return-checkpoint",
         artifact_refs=[
-            "/srv/artifacts/wave5-a2a/verification_result.json",
-            "/srv/artifacts/wave5-a2a/bounded_plan.md",
+            "/srv/artifacts/a2a-return-checkpoint/verification_result.json",
+            "/srv/artifacts/a2a-return-checkpoint/bounded_plan.md",
         ],
     )
     return_plan = build_return_plan(
@@ -104,16 +104,16 @@ def build_summon_return_checkpoint_fixture(
     )
     publication_plan = plan_owner_publications(
         runtime_receipt_paths=[
-            "/srv/receipts/wave5-a2a/runtime_wave_closeout_receipt.json"
+            "/srv/receipts/a2a-return-checkpoint/runtime_return_closeout_receipt.json"
         ],
         eval_receipt_paths=[
-            "/srv/receipts/wave5-a2a/a2a_return_eval_packet.json"
+            "/srv/receipts/a2a-return-checkpoint/a2a_return_eval_packet.json"
         ],
         playbook_receipt_paths=[
-            "/srv/receipts/wave5-a2a/playbook_review_harvest_receipt.json"
+            "/srv/receipts/a2a-return-checkpoint/playbook_review_harvest_receipt.json"
         ],
         memo_receipt_paths=[
-            "/srv/receipts/wave5-a2a/memo_writeback_receipt.json"
+            "/srv/receipts/a2a-return-checkpoint/memo_writeback_receipt.json"
         ],
     )
     reviewed_closeout_request = build_reviewed_closeout_request(
@@ -124,14 +124,14 @@ def build_summon_return_checkpoint_fixture(
         publication_plan=publication_plan,
         audit_refs=[
             REVIEWED_ARTIFACT_PATH,
-            "repo:aoa-sdk/examples/a2a/summon_return_checkpoint_e2e.fixture.json",
+            "repo:aoa-sdk/mechanics/checkpoint/parts/child-task-reentry/examples/summon_return_checkpoint_e2e.fixture.json",
         ],
         memo_export_plan=memo_export_plan,
         return_plan=return_plan,
         checkpoint_bridge_plan=checkpoint_bridge_plan,
         codex_target=codex_target,
     )
-    runtime_wave_closeout_receipt = build_runtime_wave_closeout_receipt(
+    runtime_return_closeout_receipt = build_runtime_return_closeout_receipt(
         remote_task,
         decision,
         session_ref=SESSION_REF,
@@ -160,7 +160,7 @@ def build_summon_return_checkpoint_fixture(
         "eval_anchor": "aoa-a2a-summon-return-checkpoint",
         "owner_refs": {
             "summon_contract": "repo:aoa-skills/skills/aoa-summon/SKILL.md",
-            "sdk_helper": "repo:aoa-sdk/docs/A2A_WAVE5_CODEX_RETURN_CHECKPOINT.md",
+            "sdk_helper": "repo:aoa-sdk/mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md",
             "playbook": "repo:aoa-playbooks/playbooks/a2a-summon-return-checkpoint/PLAYBOOK.md",
             "eval_hook": "repo:aoa-evals/examples/artifact_to_verdict_hook.a2a-summon-return-checkpoint.example.json",
             "memo_writeback": "repo:aoa-memo/docs/A2A_CHILD_RETURN_WRITEBACK.md",
@@ -208,7 +208,7 @@ def build_summon_return_checkpoint_fixture(
         },
         "owner_publication_plan": [to_jsonable(plan) for plan in publication_plan],
         "reviewed_closeout_request": reviewed_closeout_request,
-        "runtime_wave_closeout_receipt": runtime_wave_closeout_receipt,
+        "runtime_return_closeout_receipt": runtime_return_closeout_receipt,
         "runtime_closeout_dry_run_receipt_contract": {
             "artifact_kind": "aoa.runtime-a2a-return-closeout-dry-run",
             "dry_run": True,

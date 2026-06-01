@@ -1,68 +1,79 @@
 # Recurrence Mechanic
 
-Status: skeleton.
+Status: active topology with part-local payload.
 
 ## Mechanic Card
 
 ### Operation
 
-Manage recurrence manifests, hook packs, graph closure, review decisions,
-downstream projections, live observations, and recursor readiness.
+Keep the SDK side of recurrence as a typed, review-only control plane: manifest
+gate, hook observation, technique publication observation boundaries, graph
+closure, live observations, beacon pressure, owner review surfaces, decision
+closure, downstream projection guards, wiring handoffs, and recursor readiness
+scans.
 
 ### Trigger
 
-Use this mechanic when recurrence manifests, recurrence CLI behavior, graph
-snapshots, owner review decisions, projections, live observation producers, or
-recursor readiness changes.
+Use this mechanic when a recurrence component, observation producer, graph,
+beacon, review queue, owner decision closure, projection, rollout handoff, or
+recursor readiness helper changes.
 
 ### SDK owns
 
-- recurrence control-plane helpers
-- manifest compatibility scanning
-- graph snapshot and closure readers
-- owner-review decision templates and closure reports
-- downstream projection builders
-- live observation collection helpers
+- manifest loading, compatibility diagnostics, and mixed-shape quarantine
+- hook and live observation readouts
+- graph snapshot and closure helpers
+- beacon pressure, review queue packaging, and closure ledgers
+- downstream projection builders and guard reports
+- wiring, rollout, and return handoff packet shapes
+- read-only recursor readiness scans
 
 ### Stronger owner split
 
-Component owners own recurrence truth. `aoa-evals` owns proof of recurrence
-control-plane integrity.
+Component owners own source truth and accepted follow-through. `aoa-evals` owns
+bounded proof. `aoa-routing`, `aoa-stats`, and `aoa-kag` consume only thin
+advisory projections.
 
 ### Current source surfaces
 
-- `docs/RECURRENCE_CONTROL_PLANE.md`
-- `docs/RECURRENCE_HARDENING_COMPATIBILITY.md`
-- `examples/recurrence/`
-- `manifests/recurrence/`
-- recurrence schemas under `schemas/`
-- `scripts/validate_recurrence_manifests.py`
 - `src/aoa_sdk/recurrence/`
-- recurrence tests under `tests/`
+- `mechanics/recurrence/parts/`
+- `mechanics/recurrence/parts/component-manifest-gate/manifests/`
+- `mechanics/recurrence/parts/hook-observation-pack/docs/technique-publication-observation-boundary.md`
+- `mechanics/recurrence/parts/*/schemas/`
+- `mechanics/recurrence/parts/*/examples/`
+- `mechanics/recurrence/parts/*/scripts/`
+- `mechanics/recurrence/parts/*/tests/`
 
 ### Candidate parts
 
-- manifest-compatibility
-- hook-pack
-- graph-closure
-- review-decision
-- downstream-projections
-- live-observations
-- recursor-readiness
+These are active SDK parts, not candidate parent mechanics:
+
+- `component-manifest-gate`
+- `hook-observation-pack`
+- `graph-closure-snapshot`
+- `live-observation-producers`
+- `beacon-candidate-pressure`
+- `owner-review-surface`
+- `review-decision-closure`
+- `downstream-projection-guard`
+- `wiring-rollout-handoff`
+- `recursor-readiness`
 
 ### Must not claim
 
-This mechanic must not make recurrence projections source truth for routing,
-stats, KAG, or owner components.
+This mechanic must not make recurrence outputs source truth, hidden schedulers,
+owner decisions, routing authority, stats authority, KAG canon, or recursor
+activation.
 
 ### Validation
 
 ```bash
-python scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS
-python -m pytest -q tests/test_recurrence_registry.py tests/test_recurrence_seed.py
+python mechanics/recurrence/parts/component-manifest-gate/scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS --json
+python -m pytest -q mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_registry.py mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_seed.py
 ```
 
 ### Next route
 
 Projection or proof changes route to the owning downstream repository or
-`aoa-evals` eval-suite handoff.
+`aoa-evals`; owner follow-through routes to the target owner repo.

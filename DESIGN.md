@@ -20,6 +20,7 @@ Adjacent routes:
 - owner boundaries: `docs/boundaries.md`
 - durable rationale: `docs/decisions/`
 - mechanics operation topology: `mechanics/`
+- SDK source home: `sdk/`
 - importable SDK source: `src/aoa_sdk/`
 - generated control-plane capsule: `generated/workspace_control_plane.min.json`
 
@@ -47,6 +48,8 @@ The repository should appear as a compact control-plane console:
 
 - a clear public entry route;
 - a visible source-owner boundary;
+- a tree-shaped SDK source home for public-interface, facade-boundary,
+  runtime-entry, and distribution posture;
 - a Python package with typed facades and loaders;
 - authored docs for workspace, compatibility, release, and handoff posture;
 - decision records for durable topology rationale;
@@ -66,32 +69,37 @@ and where does the next stronger claim return?
 | District | Role |
 | --- | --- |
 | root surfaces | public entry, route law, design form, roadmap direction, release posture |
-| `src/aoa_sdk/` | importable typed SDK source home and CLI behavior |
-| `docs/` | authored explanation for boundaries, workspace layout, compatibility, release, checkpoint, closeout, and control-plane posture |
+| `sdk/` | source-authored SDK home for public-interface, facade-boundary, runtime-entry, and distribution posture |
+| `src/aoa_sdk/` | importable typed SDK implementation and CLI behavior |
+| `docs/` | authored root explanation for boundaries, workspace layout, compatibility, release route doors, decisions, and control-plane posture |
 | `docs/decisions/` | durable rationale for topology, route-law, source-home, validation, and mechanics choices |
-| `mechanics/` | repeatable SDK operation topology; skeleton cards, source maps, and package route law |
+| `mechanics/` | repeatable SDK operation topology, part-local artifact homes, source maps, and package route law |
 | `.aoa/` | workspace metadata and local control-plane runtime artifacts, not hidden source truth |
-| `schemas/` | SDK helper contract schemas |
-| `examples/` | public-safe contract examples and fixtures |
+| `schemas/` | shared SDK helper contract schemas and root-published generated contracts |
+| `examples/` | public-safe shared examples and cross-mechanic fixtures when present |
 | `generated/` | derived control-plane companions and compact read models |
-| `scripts/` | deterministic builders, validators, release helpers, and operator utilities |
-| `tests/` | regression and contract checks |
-| `githooks/` | optional local git-boundary integration that stays active-session-only |
-| `systemd/` | optional user-service units for bounded local automation |
+| `quests/` | lane/state source quest records and durable SDK obligations |
+| `scripts/` | deterministic repo-wide builders, validators, release helpers, and shared operator utilities |
+| `tests/` | repo-wide regression, route, and contract checks |
+| `mechanics/<parent>/parts/<part>/` | single-mechanic config, docs, schemas, examples, generated companions, manifests, helper contracts, scripts, tests, and local automation templates |
 Each class may support the others. No class should silently steal another
 class's authority.
 
 ## SDK Source Home Rule
 
-The importable SDK source home is `src/aoa_sdk/`.
+The SDK source home is `sdk/`.
 
-A top-level `sdk/` district should not be introduced merely because this
-repository is named `aoa-sdk` or because sibling repositories have domain
-source homes such as `agents/`, `memo/`, `evals/`, `skills/`, or `techniques/`.
+It is a tree-shaped route home for SDK-owned posture: public interface,
+facade boundary, runtime entry, and distribution promises. Its checked contract
+is `sdk/source_home.manifest.json`, and its nearest route law starts at
+`sdk/AGENTS.md`.
 
-If a future top-level `sdk/` directory appears, it needs a distinct owner role,
-route card, validation path, and decision record. It must not duplicate or
-rename `src/aoa_sdk/` by cosmetic analogy.
+The importable SDK implementation remains `src/aoa_sdk/`.
+
+`sdk/` must not duplicate, rename, or absorb `src/aoa_sdk/`. It must not use
+mechanic `PARTS.md` vocabulary. Its branches route to implementation,
+mechanic, docs, release, or stronger-owner surfaces; they do not replace
+those surfaces.
 
 ## Mechanics Posture
 
@@ -101,6 +109,13 @@ tests, compatibility checks, or handoff artifacts.
 
 Mechanics do not replace the Python source lane. They route operation pressure
 around it.
+
+Single-mechanic payload belongs below the owning part. If a file is a Git hook
+template, user unit template, schema, fixture, generated companion, operator
+script, or regression for one operation, the active route should be
+`mechanics/<parent>/parts/<part>/<district>/...`. External tool-native
+filenames may remain native inside that route, but they must not become root
+district names by inertia.
 
 Every `src/aoa_sdk/*` family must have a route in
 `mechanics/topology.json#source_family_routes`. A source family name alone is
@@ -177,20 +192,26 @@ back to stronger authored or source-owned surfaces.
 ### 6. Compatibility before convenience
 
 A new helper is healthy when it makes drift more visible. If it only hides
-sibling change behind permissive fallback behavior, it weakens the SDK.
+sibling change behind permissive alternate path behavior, it weakens the SDK.
 
-### 7. Mechanics after rationale and design, before payload movement
+### 7. Mechanics after rationale and design, with explicit payload movement
 
 Mechanics packages land after the decision and design surfaces can name why the
 package exists, what it owns, which stronger owners remain outside, and how the
-move is validated. Payload moves need a separate package-local reason and
-validator.
+move is validated. Payload moves need a package-local part, active contract,
+artifact-topology receipt, and validator.
+
+Single-mechanic artifacts should move from root technical districts into
+`mechanics/<parent>/parts/<part>/<district>/...` once the part owns their
+role. Root paths remain only for public, repo-wide, shared, or tooling-facing
+contracts.
 
 ### 8. Python source stays boring
 
-`src/aoa_sdk/` should remain a normal Python source home. Domain-specific
-operation topology belongs in docs, generated companions, scripts, tests, or
-mechanics when those surfaces have a real owner role.
+`src/aoa_sdk/` should remain a normal Python implementation home.
+SDK source-home posture belongs in `sdk/`. Domain-specific operation topology
+belongs in docs, generated companions, scripts, tests, or mechanics when those
+surfaces have a real owner role.
 
 ### 9. Runtime remains outside
 
@@ -217,13 +238,15 @@ A topological question can find why the route exists.
 ## Bad Design Smells Like
 
 - SDK helpers presented as source truth;
-- hidden path guessing or silent sibling fallback;
+- hidden path guessing or silent sibling alternate-path acceptance;
 - generated files cited as authority;
 - checkpoint or closeout artifacts treated as reviewed memory, proof, or
   progression verdicts;
 - runtime language pretending the SDK is a service body;
-- a top-level `sdk/` directory introduced as cosmetic symmetry;
-- mechanics packages that only rename folders without an operation owner;
+- `sdk/` used as a second implementation tree or as cosmetic symmetry;
+- `sdk/` branches without `AGENTS.md`, manifest coverage, and validation;
+- mechanics packages or parts that only rename folders without an operation
+  owner and validation route;
 - compatibility checks that pass by ignoring missing owner surfaces;
 - broad "agentic" behavior without truth labels, review, or return routes.
 
@@ -239,6 +262,7 @@ agent-facing guidance layer.
 [`docs/workspace-layout.md`](docs/workspace-layout.md) explains workspace
 discovery.
 [`docs/versioning.md`](docs/versioning.md) explains compatibility posture.
+[`sdk/`](sdk/README.md) is the source-authored SDK home.
 
 `DESIGN.md` holds the system form of the SDK control plane.
 

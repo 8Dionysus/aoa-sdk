@@ -17,15 +17,9 @@ Accepted.
 ## Context
 
 The first SDK mechanics skeleton correctly avoided moving payload, but it
-promoted too many SDK-local file-family lanes into parent mechanics:
-
-- `workspace-topology`
-- `compatibility`
-- `skill-routing`
-- `surface-detection`
-- `closeout`
-- `a2a-return`
-- `codex-plane`
+promoted too many SDK-local file-family lanes into parent mechanics. Those
+former names now live in package-local legacy indexes instead of active route
+maps.
 
 After rereading live mechanics sources in `Agents-of-Abyss`, `aoa-agents`,
 `aoa-memo`, `aoa-evals`, `aoa-skills`, and `aoa-techniques`, the pattern is
@@ -59,17 +53,23 @@ Correct `aoa-sdk` mechanics to 12 top-level parent packages:
 - `runtime-seam`
 - `titan`
 
-Demote the over-specific first-pass parents:
+Demote the over-specific first-pass parents into topological part routes:
 
-| Former parent candidate | Correct route |
+| Active parent | Active route |
 | --- | --- |
-| `workspace-topology` | `runtime-seam/workspace-root-resolution` |
-| `compatibility` | `boundary-bridge/compatibility-policy` |
-| `skill-routing` | `boundary-bridge/skill-runtime-bridge` |
-| `surface-detection` | `boundary-bridge/surface-detection-handoff` |
-| `closeout` | `checkpoint/closeout-bridge` |
-| `a2a-return` | `checkpoint/return-reentry` |
-| `codex-plane` | `codex-projection/deploy-status` |
+| `runtime-seam` | `runtime-seam/workspace-root-resolution` |
+| `runtime-seam` | `runtime-seam/portable-workspace-bootstrap` |
+| `runtime-seam` | `runtime-seam/control-plane-capsule` |
+| `runtime-seam` | `runtime-seam/runtime-mirror-boundary` |
+| `boundary-bridge` | `boundary-bridge/consumed-surface-posture-gate` |
+| `boundary-bridge` | `boundary-bridge/skill-runtime-bridge` |
+| `boundary-bridge` | `boundary-bridge/owner-layer-signal-handoff` |
+| `checkpoint` | `checkpoint/session-growth-checkpoint-cycle` |
+| `checkpoint` | `checkpoint/reviewed-session-handoff-runner` |
+| `checkpoint` | `checkpoint/child-task-reentry` |
+| `checkpoint` | `checkpoint/reviewed-closeout-context-carry` |
+| `codex-projection` | `codex-projection/workspace-mcp-server` |
+| `codex-projection` | `codex-projection/live-rollout-status-readout` |
 
 ## Rationale
 
@@ -82,7 +82,7 @@ This matches the sibling-source rule:
 
 `runtime-seam` and `codex-projection` are not new local inventions. They come
 from the refactored `aoa-agents` mechanics vocabulary and fit SDK surfaces
-better than `workspace-topology` and `codex-plane`.
+better than file-family parent buckets.
 
 `antifragility` and `questbook` were missing from the first SDK skeleton even
 though the repository already had real antifragility docs/fixtures and a root
@@ -95,8 +95,8 @@ though the repository already had real antifragility docs/fixtures and a root
 - SDK-specific routes stay visible as parts instead of becoming parallel axes.
 - Decision `AOA-SDK-D-0004` is superseded for parent package shape, but remains
   useful as the record of the first inventory-based landing.
-- Validators now fail if demoted parent candidates reappear as top-level
-  packages.
+- Validators now fail if former parent names reappear as top-level packages or
+  active topology maps.
 - No payload moves in this correction.
 
 ## Source Surfaces

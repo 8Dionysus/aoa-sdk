@@ -1,14 +1,14 @@
 # aoa-sdk Mechanics
 
-Status: skeleton.
+Status: active topology with part-local payload.
 
 `mechanics/` names repeatable SDK operations that already span several
-repository districts. It does not move payload out of `src/aoa_sdk/`, `docs/`,
-`schemas/`, `examples/`, `generated/`, `scripts/`, or `tests/`.
+repository districts. It now also hosts functioning part-local payload when a
+single mechanic part owns the artifact.
 
-The skeleton exists so future work can ask a narrower question: which
-operation is changing, what does the SDK own, what stronger owner remains
-outside, and which validator proves the crossing?
+The topology exists so future work can ask a narrower question: which operation
+is changing, what does the SDK own, what stronger owner remains outside, where
+does the active artifact live, and which validator proves the crossing?
 
 ## Source Basis
 
@@ -33,34 +33,43 @@ corrected against live mechanics sources in `Agents-of-Abyss`, `aoa-agents`,
   cannot silently evade a mechanic route.
 
 The detailed inventory and derivation rules live in
-[`TOPOLOGY_PREP.md`](TOPOLOGY_PREP.md). The machine-readable package map lives
-in [`topology.json`](topology.json).
+[`TOPOLOGY_PREP.md`](TOPOLOGY_PREP.md). The active placement law and migration
+ledger live in [`ARTIFACT_TOPOLOGY.md`](ARTIFACT_TOPOLOGY.md). The
+machine-readable package map lives in [`topology.json`](topology.json).
 
 ## Package Registry
 
 | Mechanic | Name type | Operation |
 | --- | --- | --- |
 | [`agon`](agon/README.md) | shared | Agon SDK helper candidates, registries, recurrence adapters, and candidate-only helper packs |
-| [`antifragility`](antifragility/README.md) | shared | stress-context, degraded-mode, via negativa, and closeout stress carry |
-| [`boundary-bridge`](boundary-bridge/README.md) | shared | typed facades, compatibility policy, skill bridge, surface handoff, and owner split |
-| [`checkpoint`](checkpoint/README.md) | shared | session checkpoint capture, review gates, closeout bridge, and return re-entry |
-| [`codex-projection`](codex-projection/README.md) | shared | Codex workspace MCP, deploy-status reads, portability, and rollout refs |
+| [`antifragility`](antifragility/README.md) | shared | stress-posture dispatch, reviewed stress closeout carry, and via negativa pruning |
+| [`boundary-bridge`](boundary-bridge/README.md) | shared | typed facades, compatibility policy, skill runtime bridge, surface handoff, and owner split |
+| [`checkpoint`](checkpoint/README.md) | shared | session checkpoint capture, review gates, closeout bridge, return re-entry, and reviewed context carry |
+| [`codex-projection`](codex-projection/README.md) | shared | workspace MCP server, live rollout status readouts, portability boundaries, and rollout reference handoffs |
 | [`experience`](experience/README.md) | shared | Experience API helper contracts and adoption/deployment/governance calls |
-| [`questbook`](questbook/README.md) | shared | quest source records and durable owner-followthrough obligations |
+| [`questbook`](questbook/README.md) | shared | source quest records, public obligation index posture, lifecycle vocabulary, and future dispatch-reader posture |
 | [`recurrence`](recurrence/README.md) | shared | recurrence manifests, hooks, graph, review, projections, and live observations |
-| [`release-support`](release-support/README.md) | shared | changelog, release audit, CI posture, build, and publication gates |
+| [`release-support`](release-support/README.md) | shared | changelog, release audit/publish helpers, public support CI posture, build, and publication gates |
 | [`rpg`](rpg/README.md) | shared | RPG typed consumer slice and surface path helper boundary |
 | [`runtime-seam`](runtime-seam/README.md) | shared | workspace root, source/runtime mirror boundary, capsule, bootstrap, and local automation seams |
 | [`titan`](titan/README.md) | shared | Titan runtime harness, console, appserver, memory, session, and swarm helpers |
 
-## Skeleton Contract
+## Package Contract
 
-Every package in this skeleton has:
+Every package has:
 
 - `AGENTS.md` for local route law.
 - `README.md` for the operation card.
 - `PARTS.md` for candidate sub-operations.
 - `PROVENANCE.md` for current source surfaces and stronger-owner notes.
+
+Functioning part-local payload also has:
+
+- `parts/AGENTS.md` for part district route law.
+- `parts/README.md` for the active/candidate part index.
+- `parts/<part>/README.md` for role, input, output, owner, and next route.
+- `parts/<part>/CONTRACT.md` for may/must-not boundaries.
+- `parts/<part>/VALIDATION.md` for executable proof.
 
 The package cards use a common shape:
 
@@ -80,18 +89,17 @@ Top-level package names follow the shared AoA mechanics vocabulary unless a
 repo-local mechanic has a genuinely independent operation, owner split,
 stop-line, and validator.
 
-The first skeleton over-promoted several SDK-local lanes. The corrected route
-is:
-
-| Former parent candidate | Correct route |
-| --- | --- |
-| `workspace-topology` | `runtime-seam` part |
-| `compatibility` | `boundary-bridge` part |
-| `skill-routing` | `boundary-bridge` part |
-| `surface-detection` | `boundary-bridge` part |
-| `closeout` | `checkpoint` part |
-| `a2a-return` | `checkpoint` part |
-| `codex-plane` | `codex-projection` part |
+Former parent-name candidates are not active route ids. Their lookup record
+lives only in package-local `legacy/INDEX.md` files. Active routes use
+topological part names such as `runtime-seam/workspace-root-resolution`,
+`boundary-bridge/consumed-surface-posture-gate`,
+`boundary-bridge/skill-runtime-bridge`,
+`boundary-bridge/owner-layer-signal-handoff`,
+`checkpoint/reviewed-session-handoff-runner`,
+`checkpoint/reviewed-closeout-context-carry`,
+`release-support/release-audit-publish-helper`,
+`release-support/public-support-ci-posture`, and
+`codex-projection/live-rollout-status-readout`.
 
 ## Validation
 
@@ -101,5 +109,11 @@ python -m pytest -q tests/test_mechanics_topology.py
 ```
 
 The validator checks the package registry, package files, required card
-sections, root topology map, source-surface references, and nested route-card
-registration.
+sections, root topology map, part-local contracts when present,
+source-surface references, nested route-card registration, and the root
+technical-district allowlist. New single-mechanic payload must land under a
+topologically named `mechanics/<parent>/parts/<part>/` owner route instead of
+quietly re-opening root `docs/`, `scripts/`, `tests/`, `config/`, `examples/`,
+`manifests/`, `githooks/`, or `systemd/` lanes. Root `quests/` is open only
+as the Questbook source-record district; helper payload still belongs in
+part-local mechanics homes.

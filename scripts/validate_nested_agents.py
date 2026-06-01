@@ -33,17 +33,41 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         "Do not add secrets",
         "weaker than source-owned repository docs",
     ),
-    'githooks/AGENTS.md': (
+    '.agents/skills/AGENTS.md': (
+        'bundled skill export surfaces',
+        'not the source of truth for skill doctrine',
+        'Route SDK behavior changes through `skill-runtime-bridge`',
+        'python -m pytest -q mechanics/boundary-bridge/parts/skill-runtime-bridge/tests',
+    ),
+    'docs/AGENTS.md': (
+        'Root docs are public route',
+        'part-local docs lane',
+        'historical note',
+        'python -m pytest -q tests/test_docs_routes.py tests/test_design_surfaces.py',
+    ),
+    'scripts/AGENTS.md': (
+        'repo-wide builders, validators, release gates',
+        'single-mechanic scripts',
+        'mechanics/<parent>/parts/<part>/scripts/',
+        'python scripts/release_check.py',
+    ),
+    'tests/AGENTS.md': (
+        'Root tests prove repo-wide routes',
+        'single-mechanic regressions',
+        'mechanics/<parent>/parts/<part>/tests/',
+        'python -m pytest -q tests',
+    ),
+    'mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/AGENTS.md': (
         'post-commit',
         'active-session-only',
         'must not create a new session',
         'never run closeout, promotion, harvest, push, or release',
     ),
-    'systemd/AGENTS.md': (
-        'systemd path and service units',
+    'mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/AGENTS.md': (
+        'closeout inbox user unit templates',
         'aoa-closeout-inbox.path',
         'aoa-closeout-inbox.service',
-        'systemd-analyze --user verify',
+        'systemd-analyze --user verify mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units',
     ),
     'generated/AGENTS.md': (
         'generated control-plane summaries',
@@ -52,7 +76,7 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'python scripts/build_workspace_control_plane.py --check',
     ),
     'schemas/AGENTS.md': (
-        'SDK helper contract schemas',
+        'root-published SDK helper contract schemas',
         'schema changes are contract changes',
         '$schema',
         'owner-subordinate',
@@ -62,6 +86,42 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'AOA-SDK-D-####',
         'Index Metadata',
         'python scripts/generate_decision_indexes.py --check',
+    ),
+    'quests/AGENTS.md': (
+        'SDK source quest record district',
+        'Stay on the control plane',
+        'quests/<lane>/<state>/<quest-file>',
+        'python scripts/validate_mechanics_topology.py',
+    ),
+    'sdk/AGENTS.md': (
+        'source-authored SDK home',
+        'Do not add `PARTS.md` to `sdk/`',
+        'sdk/source_home.manifest.json',
+        'python scripts/validate_sdk_source_home.py',
+    ),
+    'sdk/public-interface/AGENTS.md': (
+        'public SDK contract posture',
+        'src/aoa_sdk/',
+        'Do not document a supported entrypoint',
+        'python scripts/validate_sdk_source_home.py',
+    ),
+    'sdk/facade-boundary/AGENTS.md': (
+        'SDK facades read sibling-owned surfaces',
+        'truth labels',
+        'Route source-meaning changes to the sibling owner',
+        'python scripts/validate_sdk_source_home.py',
+    ),
+    'sdk/runtime-entry/AGENTS.md': (
+        'Workspace, Codex, and reviewed closeout entry posture',
+        'below runtime authority',
+        'Do not make path guessing stronger than `.aoa/workspace.toml`',
+        'python scripts/validate_sdk_source_home.py',
+    ),
+    'sdk/distribution/AGENTS.md': (
+        'package, release, and public support posture',
+        'Do not treat dry-run output as a GitHub Release',
+        'python scripts/release_check.py',
+        'python scripts/validate_sdk_source_home.py',
     ),
     'mechanics/AGENTS.md': (
         'SDK operation topology layer',
@@ -75,10 +135,22 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'candidate-only',
         'python scripts/validate_mechanics_topology.py',
     ),
+    'mechanics/agon/parts/AGENTS.md': (
+        'functioning Agon SDK operation parts',
+        'Stay on the control plane',
+        'old root paths',
+        'python scripts/validate_mechanics_topology.py',
+    ),
     'mechanics/antifragility/AGENTS.md': (
         'Antifragility mechanic',
         'Stay on the control plane',
         'stress fixtures proof verdicts',
+        'python scripts/validate_mechanics_topology.py',
+    ),
+    'mechanics/antifragility/parts/AGENTS.md': (
+        'Functioning Antifragility parts',
+        'Stay on the control plane',
+        'old root paths',
         'python scripts/validate_mechanics_topology.py',
     ),
     'mechanics/boundary-bridge/AGENTS.md': (
@@ -87,10 +159,34 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'Do not make a facade a source owner',
         'python scripts/validate_mechanics_topology.py',
     ),
+    'mechanics/boundary-bridge/parts/AGENTS.md': (
+        'Boundary Bridge Parts Route',
+        'owner-layer-signal-handoff',
+        'source-owned truth',
+        'reviewed handoff packets only',
+    ),
+    'mechanics/boundary-bridge/legacy/AGENTS.md': (
+        'Boundary Bridge mechanics parent names',
+        'Stay on the control plane',
+        'Do not treat former parent names as active route ids',
+        'python scripts/validate_mechanics_topology.py',
+    ),
     'mechanics/checkpoint/AGENTS.md': (
         'checkpoint mechanic',
         'Stay on the control plane',
         'session-local',
+        'python scripts/validate_mechanics_topology.py',
+    ),
+    'mechanics/checkpoint/parts/AGENTS.md': (
+        'Checkpoint Parts Route',
+        'child-task-reentry',
+        'owner verdict authority',
+        'Do not strengthen a checkpoint packet',
+    ),
+    'mechanics/checkpoint/legacy/AGENTS.md': (
+        'Checkpoint mechanics parent names',
+        'Stay on the control plane',
+        'Do not treat former parent names as active route ids',
         'python scripts/validate_mechanics_topology.py',
     ),
     'mechanics/codex-projection/AGENTS.md': (
@@ -99,16 +195,40 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'not make SDK Codex reads a Codex runtime',
         'python scripts/validate_mechanics_topology.py',
     ),
+    'mechanics/codex-projection/parts/AGENTS.md': (
+        'functioning Codex Projection parts',
+        'Stay on the control plane',
+        'external rollout artifact names as compatibility inputs',
+        'python scripts/validate_mechanics_topology.py',
+    ),
+    'mechanics/codex-projection/legacy/AGENTS.md': (
+        'Codex Projection mechanics parent names',
+        'Stay on the control plane',
+        'Do not treat former parent names as active route ids',
+        'python scripts/validate_mechanics_topology.py',
+    ),
     'mechanics/experience/AGENTS.md': (
         'Experience mechanic',
         'Stay on the control plane',
         'API helper calls as contracts',
         'python scripts/validate_mechanics_topology.py',
     ),
-    'mechanics/questbook/AGENTS.md': (
-        'Questbook mechanic',
+    'mechanics/experience/parts/AGENTS.md': (
+        'functioning Experience SDK helper-contract parts',
         'Stay on the control plane',
-        'Keep quest source records in `quests/`',
+        'active routes',
+        'python scripts/validate_mechanics_topology.py',
+    ),
+    'mechanics/questbook/AGENTS.md': (
+        'Questbook is the SDK operation package',
+        'Stay on the control plane',
+        'Source quest records live in root `quests/`',
+        'python scripts/validate_mechanics_topology.py',
+    ),
+    'mechanics/questbook/parts/AGENTS.md': (
+        'Questbook parts keep root quest source records',
+        'Stay on the control plane',
+        'future dispatch readers',
         'python scripts/validate_mechanics_topology.py',
     ),
     'mechanics/recurrence/AGENTS.md': (
@@ -117,16 +237,34 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'Keep component truth with owner surfaces',
         'python scripts/validate_mechanics_topology.py',
     ),
+    'mechanics/recurrence/parts/AGENTS.md': (
+        'mechanics/recurrence/parts/',
+        'Route recurrence payload by active owner part',
+        'Keep `src/aoa_sdk/recurrence/` as the importable SDK source package',
+        'python scripts/validate_mechanics_topology.py',
+    ),
     'mechanics/release-support/AGENTS.md': (
         'release-support mechanic',
         'Stay on the control plane',
         'GitHub Release or package publication',
         'python scripts/validate_mechanics_topology.py',
     ),
+    'mechanics/release-support/parts/AGENTS.md': (
+        'Release Support Parts Route',
+        'release-audit-publish-helper',
+        'public-support-ci-posture',
+        'do not invent release state',
+    ),
     'mechanics/rpg/AGENTS.md': (
         'RPG mechanic',
         'Stay on the control plane',
         'gameplay, frontend, or RPG runtime authority',
+        'python scripts/validate_mechanics_topology.py',
+    ),
+    'mechanics/rpg/parts/AGENTS.md': (
+        'Functioning RPG parts',
+        'Stay on the control plane',
+        'old root paths',
         'python scripts/validate_mechanics_topology.py',
     ),
     'mechanics/runtime-seam/AGENTS.md': (
@@ -135,14 +273,32 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'Do not make path guessing stronger than `.aoa/workspace.toml`',
         'python scripts/validate_mechanics_topology.py',
     ),
+    'mechanics/runtime-seam/parts/AGENTS.md': (
+        'Runtime Seam Parts Route',
+        'workspace path resolution',
+        'portable workspace bootstrap',
+        'Do not hide path guessing',
+    ),
+    'mechanics/runtime-seam/legacy/AGENTS.md': (
+        'Runtime Seam mechanics parent names',
+        'Stay on the control plane',
+        'Do not treat former parent names as active route ids',
+        'python scripts/validate_mechanics_topology.py',
+    ),
     'mechanics/titan/AGENTS.md': (
         'Titan mechanic',
         'Stay on the control plane',
         'runtime, role, identity, or memory authority',
         'python scripts/validate_mechanics_topology.py',
     ),
+    'mechanics/titan/parts/AGENTS.md': (
+        'Route active Titan SDK helper parts',
+        'Stay on the control plane',
+        'Do not add root active Titan docs',
+        'python scripts/validate_mechanics_topology.py',
+    ),
 }
-ADVISORY_AGENT_DIRS: tuple[str, ...] = ('.agents/skills', 'config', 'docs', 'examples', 'manifests/recurrence', 'quests', 'scripts', 'tests')
+ADVISORY_AGENT_DIRS: tuple[str, ...] = ('config', 'examples', 'manifests/recurrence')
 HEADING_PREFIXES = ("# AGENTS.md", "# AGENTS")
 IGNORED_DIRS = {".git", ".venv", "__pycache__", ".pytest_cache", ".mypy_cache"}
 

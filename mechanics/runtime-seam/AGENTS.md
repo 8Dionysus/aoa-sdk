@@ -17,6 +17,10 @@ and local automation seams.
 - `.aoa/workspace.toml`
 - `docs/workspace-layout.md`
 - `generated/workspace_control_plane.min.json`
+- `mechanics/runtime-seam/parts/workspace-root-resolution/README.md`
+- `mechanics/runtime-seam/parts/portable-workspace-bootstrap/README.md`
+- `mechanics/runtime-seam/parts/control-plane-capsule/README.md`
+- `mechanics/runtime-seam/parts/runtime-mirror-boundary/README.md`
 - `src/aoa_sdk/workspace/`
 
 ## Boundaries
@@ -32,7 +36,7 @@ and local automation seams.
 python scripts/validate_mechanics_topology.py
 python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
-python -m pytest -q tests/test_workspace.py tests/test_workspace_control_plane.py tests/test_live_workspace.py
+python -m pytest -q mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution_cli.py mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py
 ```
 
 ## Closeout

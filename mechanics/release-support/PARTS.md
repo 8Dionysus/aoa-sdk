@@ -4,8 +4,5 @@
 
 | Part | Current surfaces | Future payload condition |
 | --- | --- | --- |
-| changelog | `CHANGELOG.md` | only if changelog sections become generated read models |
-| release-audit | `src/aoa_sdk/release/`, release tests | only if audit packets need schema examples |
-| ci-posture | `.github/workflows/`, `docs/RELEASE_CI_POSTURE.md` | only if CI posture gets package-local checks |
-| package-build | `pyproject.toml`, `python -m build` | only if build metadata needs contract tests |
-| publication | `docs/RELEASING.md`, release publish helper | only if publication dry-runs need stable fixtures |
+| release-audit-publish-helper | `mechanics/release-support/parts/release-audit-publish-helper/`, `src/aoa_sdk/release/`, `scripts/release_check.py`, `.github/workflows/release-artifacts.yml`, `.github/workflows/release-cadence-audit.yml` | active; verifies and publishes release surfaces without inventing release state |
+| public-support-ci-posture | `mechanics/release-support/parts/public-support-ci-posture/`, `docs/RELEASE_CI_POSTURE.md`, `.github/workflows/` | active; keeps support, release semantics, sibling-canary drift detection, and CI tiers short and checkable |

@@ -69,16 +69,19 @@ Before making changes, read in this order:
 3. `docs/workspace-layout.md`
 4. `docs/versioning.md`
 5. `ROADMAP.md`
-6. `.aoa/workspace.toml`
-7. the source files and tests you plan to touch
+6. `sdk/README.md` and `sdk/source_home.manifest.json` when SDK source-home
+   posture changes
+7. `.aoa/workspace.toml`
+8. the source files and tests you plan to touch
 
 Then branch by task:
 
-- reviewed closeout handoff or session-growth targets: `docs/aoa-surface-detection-closeout-handoff.md`, `docs/session-growth-checkpoints.md`, `docs/COMPONENT_DRIFT_HINTS.md`, `docs/SELF_AGENCY_CONTINUITY_CARRY.md`, and `docs/checkpoint-note-promotion.md`
-- additive surface detection: `docs/aoa-surface-detection-first-wave.md`, `docs/aoa-surface-detection-second-wave.md`, and `docs/aoa-surface-detection-heuristics.md`
-- RPG / progression readers: `docs/RPG_SDK_ADDENDUM.md` and `docs/RPG_SURFACE_PATHS.md`
-- release, CI, or compatibility posture: `docs/RELEASE_CI_POSTURE.md` and `docs/ecosystem-impact.md`
-- federation release audit or publish work: `docs/RELEASING.md` and `scripts/release_check.py`
+- reviewed closeout handoff or session-growth targets: `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/component-refresh-followthrough.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/self-agency-continuity-carry.md`, and `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md`
+- additive surface detection: `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/initial-surface-detection-boundary.md`, `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md`, and `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-heuristics.md`
+- RPG / progression readers: `mechanics/rpg/parts/typed-consumer-api/docs/typed-consumer-api-boundary.md` and `mechanics/rpg/parts/surface-path-transport/docs/surface-path-transport.md`
+- release, CI, or compatibility posture: `mechanics/release-support/parts/public-support-ci-posture/docs/public-support-ci-posture.md`, `docs/RELEASE_CI_POSTURE.md`, and `docs/ecosystem-impact.md`
+- federation release audit or publish work: `mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md`, `docs/RELEASING.md`, and `scripts/release_check.py`
+- SDK source-home posture: `sdk/AGENTS.md`, `sdk/SDK_SHAPE.md`, `sdk/source_home.manifest.json`, and `scripts/validate_sdk_source_home.py`
 
 If a deeper directory defines its own `AGENTS.md`, follow the nearest one.
 
@@ -110,12 +113,15 @@ It must not silently convert growth vocabulary into live policy.
 The most important objects in this repository are:
 
 - workspace discovery and topology code under `src/aoa_sdk/workspace/`
+- SDK source-home posture under `sdk/`
 - typed surface facades under `src/aoa_sdk/`
 - `.aoa/workspace.toml`
 - `ROADMAP.md`
 - `generated/workspace_control_plane.min.json`
 - topology, boundary, and versioning docs under `docs/`
-- additive surface-detection docs and heuristics under `docs/aoa-surface-detection-*.md` and `src/aoa_sdk/surfaces/`
+- additive surface-detection docs and heuristics under
+  `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/` and
+  `src/aoa_sdk/surfaces/`
 - tests that prove discovery, compatibility, typed read paths, and reviewed handoff shape
 
 ## Hard NO
@@ -256,7 +262,7 @@ aoa checkpoint git-boundary-check /srv/AbyssOS/aoa-sdk --boundary push --root /s
 Use `aoa surfaces handoff` only after review:
 
 ```bash
-aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json --session-ref session:2026-04-07-surface-first-wave --reviewed --root /srv/AbyssOS/aoa-sdk --json
+aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json --session-ref session:2026-04-07-surface-initial-boundary --reviewed --root /srv/AbyssOS/aoa-sdk --json
 ```
 
 Truth rules for this loop:
@@ -265,7 +271,7 @@ Truth rules for this loop:
 - `aoa skills ...` remains skill-only
 - checkpoint notes stay lower-authority than harvest verdicts and core receipts
 - `manual-equivalent` never becomes `activated`
-- non-skill surfaces never become executable-now in wave one
+- non-skill surfaces never become executable-now in the initial boundary
 - routing shortlist hints stay advisory only
 - reviewed closeout handoff never auto-runs from `aoa closeout run`
 - surviving items keep their existing truth labels through handoff

@@ -16,6 +16,10 @@ compatibility policy for every surface it consumes.
    dependencies.
 6. Route-directed public surfaces must resolve through the compatibility map;
    routed reads must not fall back to raw path loads.
+7. When a consumed sibling surface has moved into a part-local mechanics home,
+   the active compatibility rule should name that canonical part-local path.
+   Old root generated copies may remain as external history, while active
+   compatibility reads use the canonical owner path.
 
 ## Why This Exists
 
@@ -45,7 +49,7 @@ mean:
 - owner-local builders and validators remain visible only as validation support,
   not as the public capsule path
 
-For the current routing and stats ABI normalization wave, compatibility also
+For the current routing and stats ABI normalization pass, compatibility also
 uses a bounded dual-read posture:
 
 - v2 `schema_version` envelopes are canonical for emitted routing federation
@@ -58,6 +62,12 @@ uses a bounded dual-read posture:
 Today that second mode is still needed for
 `aoa-playbooks/generated/playbook_activation_surfaces.min.json`.
 
+For `abyss-stack.diagnostic_surface_catalog.min`, the canonical path is the
+diagnostic-spine part-local generated catalog:
+`mechanics/diagnostic-spine/parts/diagnostic-surfaces/generated/diagnostic_surface_catalog.min.json`.
+The old root `generated/diagnostic_surface_catalog.min.json` path is external
+history, not an active compatibility input.
+
 ## Operational Expectation
 
 - Loader functions for supported surfaces should go through the compatibility
@@ -66,7 +76,8 @@ Today that second mode is still needed for
   loader.
 - CLI commands and orchestration helpers should depend only on surfaces already
   covered by the compatibility map.
-- The explicit sibling canary matrix in `scripts/sibling_canary_matrix.json`
+- The explicit sibling canary matrix in
+  `mechanics/release-support/parts/public-support-ci-posture/config/sibling_canary_matrix.json`
   and the scheduled lane in `.github/workflows/latest-sibling-canary.yml`
   should stay aligned with the current compatibility surface set.
 

@@ -4,6 +4,7 @@ from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+CARRY_PART = "mechanics/checkpoint/parts/reviewed-closeout-context-carry"
 
 
 def read_text(relative_path: str) -> str:
@@ -15,6 +16,7 @@ def test_readme_lists_full_current_state_battery() -> None:
 
     commands = [
         "python scripts/validate_mechanics_topology.py",
+        "python scripts/validate_sdk_source_home.py",
         "python scripts/build_workspace_control_plane.py --check",
         "python scripts/validate_workspace_control_plane.py",
         "python -m pytest -q",
@@ -31,6 +33,7 @@ def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
     agents = read_text("AGENTS.md")
 
     assert "python scripts/generate_decision_indexes.py --check" in agents
+    assert "python scripts/validate_sdk_source_home.py" in agents
     assert "python scripts/validate_mechanics_topology.py" in agents
     assert "python scripts/build_workspace_control_plane.py --check" in agents
     assert "python scripts/validate_workspace_control_plane.py" in agents
@@ -90,7 +93,8 @@ def test_changelog_records_current_unreleased_contour() -> None:
     assert "root-level generated paths" in changelog
     assert "active routes" in changelog
     assert "This unreleased section is a release-ready reconciliation surface" in changelog
-    assert "mechanics topology skeleton" in changelog
+    assert "mechanics topology" in changelog
+    assert "mechanics/ARTIFACT_TOPOLOGY.md" in changelog
     assert "python scripts/validate_mechanics_topology.py" in changelog
 
 
@@ -98,23 +102,32 @@ def test_readme_lists_sibling_canary_surfaces() -> None:
     readme = read_text("README.md")
 
     assert "generated/workspace_control_plane.min.json" in readme
-    assert "scripts/sibling_canary_matrix.json" in readme
-    assert "scripts/run_sibling_canary.py" in readme
+    assert (
+        "mechanics/release-support/parts/public-support-ci-posture/"
+        "config/sibling_canary_matrix.json"
+    ) in readme
+    assert (
+        "mechanics/release-support/parts/public-support-ci-posture/"
+        "scripts/run_sibling_canary.py"
+    ) in readme
     assert ".github/workflows/latest-sibling-canary.yml" in readme
 
 
 def test_surface_detection_routes_are_documented_as_additive_and_skill_only() -> None:
     readme = read_text("README.md")
 
-    assert "docs/aoa-surface-detection-first-wave.md" in readme
-    assert "docs/aoa-surface-detection-second-wave.md" in readme
-    assert "docs/aoa-surface-detection-heuristics.md" in readme
-    assert "docs/aoa-surface-detection-closeout-handoff.md" in readme
-    assert "docs/AGON_WAVE1_EXPERIENCE_CAPTURE_PIPELINE.md" in readme
-    assert "schemas/agon-experience-capture-pipeline-helper.schema.json" in readme
-    assert "examples/agon_experience_capture_pipeline_helper.example.json" in readme
-    assert "docs/session-growth-checkpoints.md" in readme
-    assert "docs/checkpoint-note-promotion.md" in readme
+    assert "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/initial-surface-detection-boundary.md" in readme
+    assert "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md" in readme
+    assert "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-heuristics.md" in readme
+    assert "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md" in readme
+    assert "mechanics/experience/parts/capture-pipeline-helper/docs/capture-pipeline-helper.md" in readme
+    assert "mechanics/experience/parts/capture-pipeline-helper/schemas/capture-pipeline-helper.schema.json" in readme
+    assert "mechanics/experience/parts/capture-pipeline-helper/examples/capture-pipeline-helper.example.json" in readme
+    assert "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md" in readme
+    assert (
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md"
+        in readme
+    )
     assert "It does not make `aoa skills detect/dispatch/enter/guard` mean anything other than skills." in readme
     assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress" in readme
     assert "aoa skills detect /srv/AbyssOS/aoa-sdk --phase checkpoint" in readme
@@ -176,20 +189,24 @@ def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:
 
 
 def test_session_closeout_explicitly_keeps_surface_handoff_separate() -> None:
-    closeout = read_text("docs/session-closeout.md")
+    closeout = read_text(
+        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md"
+    )
 
     assert "`aoa closeout run` does not auto-run `aoa surfaces handoff`" in closeout
     assert "`aoa surfaces handoff` is reviewed-only" in closeout
     assert "`checkpoint_note_ref`" in closeout
-    assert "docs/aoa-surface-detection-closeout-handoff.md" in closeout
-    assert "docs/aoa-surface-detection-second-wave.md" in closeout
+    assert "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md" in closeout
+    assert "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md" in closeout
     assert "`owner_followthrough_map`" in closeout
     assert "`followthrough_decision`" in closeout
     assert "without minting `candidate_ref`, `seed_ref`, or `object_ref`" in closeout
 
 
 def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
-    checkpoints = read_text("docs/session-growth-checkpoints.md")
+    checkpoints = read_text(
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md"
+    )
 
     assert "carry harvest, progression, and upgrade candidates through the end of the session" in checkpoints
     assert "candidate movement and stats refresh stay reviewed-closeout decisions" in checkpoints
@@ -213,51 +230,54 @@ def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
     assert "aoa-checkpoint-closeout-bridge" in checkpoints
     assert "continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref" in checkpoints
     assert "reanchor_need" in checkpoints
-    assert "docs/SELF_AGENCY_CONTINUITY_CARRY.md" in checkpoints
+    assert f"{CARRY_PART}/docs/self-agency-continuity-carry.md" in checkpoints
 
 
-def test_readme_routes_to_closeout_followthrough_map() -> None:
+def test_readme_routes_to_reviewed_closeout_context_carry() -> None:
     readme = read_text("README.md")
-    carry = read_text("docs/CANDIDATE_LINEAGE_CARRY.md")
-    component_carry = read_text("docs/COMPONENT_DRIFT_HINTS.md")
-    followthrough = read_text("docs/closeout-followthrough-map.md")
-    kernel_rules = read_text("docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md")
-    continuity = read_text("docs/SELF_AGENCY_CONTINUITY_CARRY.md")
+    carry = read_text(f"{CARRY_PART}/docs/candidate-lineage-carry.md")
+    component_carry = read_text(f"{CARRY_PART}/docs/component-refresh-followthrough.md")
+    followthrough = read_text(f"{CARRY_PART}/docs/owner-followthrough-map.md")
+    kernel_rules = read_text(f"{CARRY_PART}/docs/next-kernel-followthrough-decision.md")
+    continuity = read_text(f"{CARRY_PART}/docs/self-agency-continuity-carry.md")
 
-    assert "docs/closeout-followthrough-map.md" in readme
-    assert "docs/COMPONENT_DRIFT_HINTS.md" in readme
-    assert "schemas/component_drift_hint_set.schema.json" in readme
-    assert "examples/component_drift_hints.example.json" in readme
-    assert "schemas/component_refresh_followthrough_decision_set.schema.json" in readme
-    assert "examples/component_refresh_followthrough_decision.example.json" in readme
-    assert "schemas/closeout_owner_followthrough_map.schema.json" in readme
-    assert "examples/closeout_owner_followthrough_map.example.json" in readme
-    assert "docs/SELF_AGENCY_CONTINUITY_CARRY.md" in readme
-    assert "schemas/closeout_continuity_window.schema.json" in readme
-    assert "examples/closeout_continuity_window.example.json" in readme
-    assert "docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md" in readme
-    assert "schemas/closeout_followthrough_decision.schema.json" in readme
-    assert "examples/closeout_followthrough_decision.example.json" in readme
+    assert f"{CARRY_PART}/docs/owner-followthrough-map.md" in readme
+    assert f"{CARRY_PART}/docs/component-refresh-followthrough.md" in readme
+    assert f"{CARRY_PART}/schemas/component_drift_hint_set.schema.json" in readme
+    assert f"{CARRY_PART}/examples/component_drift_hints.example.json" in readme
+    assert f"{CARRY_PART}/schemas/component_refresh_followthrough_decision_set.schema.json" in readme
+    assert f"{CARRY_PART}/examples/component_refresh_followthrough_decision.example.json" in readme
+    assert f"{CARRY_PART}/schemas/closeout_owner_followthrough_map.schema.json" in readme
+    assert f"{CARRY_PART}/examples/closeout_owner_followthrough_map.example.json" in readme
+    assert f"{CARRY_PART}/docs/self-agency-continuity-carry.md" in readme
+    assert f"{CARRY_PART}/schemas/closeout_continuity_window.schema.json" in readme
+    assert f"{CARRY_PART}/examples/closeout_continuity_window.example.json" in readme
+    assert f"{CARRY_PART}/docs/next-kernel-followthrough-decision.md" in readme
+    assert f"{CARRY_PART}/schemas/closeout_followthrough_decision.schema.json" in readme
+    assert f"{CARRY_PART}/examples/closeout_followthrough_decision.example.json" in readme
     assert "owner repo, route class" in component_carry
     assert "weaker than owner refresh laws and owner" in component_carry
     assert "owner_followthrough_map" in carry
     assert "must not carry `candidate_ref`" in followthrough
-    assert "docs/COMPONENT_DRIFT_HINTS.md" in followthrough
+    assert f"{CARRY_PART}/docs/component-refresh-followthrough.md" in followthrough
     assert "It does not execute that class" in kernel_rules
-    assert "docs/COMPONENT_DRIFT_HINTS.md" in kernel_rules
+    assert f"{CARRY_PART}/docs/component-refresh-followthrough.md" in kernel_rules
     assert "It does not define self-agency meaning." in continuity
     assert "do not turn this carry into runtime self-modification authority" in continuity
 
 
-def test_codex_plane_portability_boundary_stays_routeable() -> None:
+def test_codex_projection_portability_boundary_stays_routeable() -> None:
     readme = read_text("README.md")
     workspace_layout = read_text("docs/workspace-layout.md")
-    portability = read_text("docs/CODEX_PLANE_PORTABILITY.md")
+    portability_ref = (
+        "mechanics/codex-projection/parts/portability-boundary/docs/portability-boundary.md"
+    )
+    portability = read_text(portability_ref)
 
-    assert "docs/CODEX_PLANE_PORTABILITY.md" in readme
+    assert portability_ref in readme
     assert "8Dionysus/docs/CODEX_PLANE_REGENERATION.md" in readme
     assert "Workspace discovery overrides in `aoa-sdk` are not a substitute for" in workspace_layout
-    assert "Codex-plane deployment regeneration" in workspace_layout
+    assert "Codex Projection deployment regeneration" in workspace_layout
     assert "`aoa-sdk` owns:" in portability
     assert "It does not own:" in portability
     assert "8Dionysus/.codex/config.toml" in portability
@@ -265,23 +285,38 @@ def test_codex_plane_portability_boundary_stays_routeable() -> None:
     assert "Do not patch SDK code or MCP server names" in portability
 
 
-def test_codex_plane_deploy_status_routes_from_readme() -> None:
+def test_codex_projection_live_rollout_status_routes_from_readme() -> None:
     readme = read_text("README.md")
-    status_doc = read_text("docs/CODEX_PLANE_DEPLOY_STATUS.md")
-    campaign_doc = read_text("docs/codex_rollout_campaign_refs.md")
+    status_ref = (
+        "mechanics/codex-projection/parts/live-rollout-status-readout/docs/live-rollout-status-readout.md"
+    )
+    boundary_ref = (
+        "mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/deploy-operation-boundary-note.md"
+    )
+    campaign_ref = (
+        "mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/rollout-campaign-refs.md"
+    )
+    schema_ref = (
+        "mechanics/codex-projection/parts/live-rollout-status-readout/schemas/live-rollout-status-snapshot.schema.json"
+    )
+    example_ref = (
+        "mechanics/codex-projection/parts/live-rollout-status-readout/examples/live-rollout-status-snapshot.example.json"
+    )
+    status_doc = read_text(status_ref)
+    campaign_doc = read_text(campaign_ref)
 
-    assert "docs/CODEX_PLANE_DEPLOY_STATUS.md" in readme
-    assert "docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md" in readme
-    assert "docs/codex_rollout_campaign_refs.md" in readme
-    assert "schemas/codex_plane_deploy_status_snapshot_v1.json" in readme
-    assert "examples/codex_plane_deploy_status_snapshot.example.json" in readme
+    assert status_ref in readme
+    assert boundary_ref in readme
+    assert campaign_ref in readme
+    assert schema_ref in readme
+    assert example_ref in readme
     assert "src/aoa_sdk/codex/registry.py" in readme
-    assert "typed live read over deploy-local Codex-plane rollout" in status_doc
+    assert "typed live read over deploy-local Codex rollout" in status_doc
     assert "It does not own rollout authority." in status_doc
     assert "`/.codex/generated/rollout/codex_plane_trust_state.current.json`" in status_doc
     assert "`rerollout`" in status_doc
-    boundary_doc = read_text("docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md")
-    assert "`aoa-sdk` may surface typed references related to Codex-plane rollout operations." in boundary_doc
+    boundary_doc = read_text(boundary_ref)
+    assert "`aoa-sdk` may surface typed references related to Codex rollout operations." in boundary_doc
     assert "It does not own:" in boundary_doc
     assert "rollout success authority" in boundary_doc
     assert "`campaign_ref`" in boundary_doc

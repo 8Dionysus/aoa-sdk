@@ -3,7 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
+from pydantic import AliasChoices, BaseModel, Field, model_validator
 
 class SurfaceRef(BaseModel):
     repo: str
@@ -78,6 +78,8 @@ class RoutingStatsRegroundingAction(BaseModel):
 
 
 class RoutingStatsRegroundingHint(BaseModel):
+    model_config = {"populate_by_name": True}
+
     hint_id: str
     surface_name: str
     surface_ref: str | None = None
@@ -85,7 +87,10 @@ class RoutingStatsRegroundingHint(BaseModel):
     reason_codes: list[str] = Field(default_factory=list)
     owner_truth_inputs: list[str] = Field(default_factory=list)
     primary_action: RoutingStatsRegroundingAction
-    fallback_actions: list[RoutingStatsRegroundingAction] = Field(default_factory=list)
+    secondary_actions: list[RoutingStatsRegroundingAction] = Field(
+        default_factory=list,
+        validation_alias=AliasChoices("secondary_actions", "fallback_actions"),
+    )
     advisory_only: bool
     authority_note: str
 
@@ -176,6 +181,8 @@ class SkillDisclosure(BaseModel):
 
 
 class SkillHostAvailability(BaseModel):
+    model_config = {"populate_by_name": True}
+
     status: Literal["host-executable", "router-only", "unknown"]
     source: Literal[
         "host-manifest",
@@ -185,7 +192,9 @@ class SkillHostAvailability(BaseModel):
         "user-install",
         "not-provided",
     ]
-    manual_fallback_allowed: bool
+    manual_equivalence_allowed: bool = Field(
+        validation_alias=AliasChoices("manual_equivalence_allowed", "manual_fallback_allowed")
+    )
     reason: str
 
 
@@ -224,6 +233,8 @@ class SkillSession(BaseModel):
 
 
 class PlaybookCard(BaseModel):
+    model_config = {"populate_by_name": True}
+
     id: str
     name: str
     status: str
@@ -235,11 +246,13 @@ class PlaybookCard(BaseModel):
     required_skill_families: list[str] = Field(default_factory=list)
     evaluation_posture: str
     memory_posture: str
-    fallback_mode: str
+    recovery_mode: str = Field(validation_alias=AliasChoices("recovery_mode", "fallback_mode"))
     expected_artifacts: list[str] = Field(default_factory=list)
 
 
 class PlaybookActivationSurface(BaseModel):
+    model_config = {"populate_by_name": True}
+
     surface_type: str
     playbook_id: str
     name: str
@@ -250,7 +263,7 @@ class PlaybookActivationSurface(BaseModel):
     expected_artifacts: list[str] = Field(default_factory=list)
     evaluation_posture: str
     memory_posture: str
-    fallback_mode: str
+    recovery_mode: str = Field(validation_alias=AliasChoices("recovery_mode", "fallback_mode"))
     eval_anchors: list[str] = Field(default_factory=list)
     return_posture: str
     return_anchor_artifacts: list[str] = Field(default_factory=list)
@@ -1172,7 +1185,7 @@ class SkillDispatchItem(BaseModel):
         default_factory=lambda: SkillHostAvailability(
             status="unknown",
             source="not-provided",
-            manual_fallback_allowed=False,
+            manual_equivalence_allowed=False,
             reason="no host skill inventory was supplied",
         )
     )
@@ -1193,10 +1206,12 @@ class SkillDetectionReport(BaseModel):
 
 
 class SurfaceOpportunityExecutionHint(BaseModel):
+    model_config = {"populate_by_name": True}
+
     lane: Literal[
         "skill-dispatch",
         "inspect-expand-use",
-        "manual-fallback",
+        "manual-equivalence",
         "closeout-harvest",
         "defer",
     ]
@@ -1204,8 +1219,14 @@ class SurfaceOpportunityExecutionHint(BaseModel):
     requires_confirmation: bool = False
     existing_command: str | None = None
     existing_surface: str | None = None
-    manual_fallback_allowed: bool = False
-    manual_fallback_note: str | None = None
+    manual_equivalence_allowed: bool = Field(
+        default=False,
+        validation_alias=AliasChoices("manual_equivalence_allowed", "manual_fallback_allowed"),
+    )
+    manual_equivalence_note: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("manual_equivalence_note", "manual_fallback_note"),
+    )
     host_availability_status: Literal["host-executable", "router-only", "unknown"] | None = None
 
 
@@ -1388,9 +1409,9 @@ class CloseoutFollowthroughDecision(BaseModel):
         return self
 
 
-class CodexPlaneDeployStatusSnapshot(BaseModel):
-    schema_version: Literal["aoa_sdk_codex_plane_deploy_status_snapshot_v1"] = (
-        "aoa_sdk_codex_plane_deploy_status_snapshot_v1"
+class CodexProjectionLiveRolloutStatusSnapshot(BaseModel):
+    schema_version: Literal["aoa_sdk_codex_projection_live_rollout_status_snapshot_v1"] = (
+        "aoa_sdk_codex_projection_live_rollout_status_snapshot_v1"
     )
     workspace_root: str
     trust_posture: Literal[

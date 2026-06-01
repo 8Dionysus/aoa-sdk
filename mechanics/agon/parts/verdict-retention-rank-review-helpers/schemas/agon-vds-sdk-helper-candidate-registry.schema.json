@@ -1,0 +1,31 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "additionalProperties": true,
+  "properties": {
+    "helpers": {
+      "minItems": 6,
+      "type": "array"
+    },
+    "live_protocol": {
+      "const": false
+    },
+    "registry_id": {
+      "const": "agon.vds_sdk_helper_candidates.registry.v1"
+    },
+    "runtime_effect": {
+      "const": "none"
+    },
+    "surface_role": {
+      "const": "verdict_delta_scar_helper_candidates"
+    }
+  },
+  "required": [
+    "registry_id",
+    "surface_role",
+    "live_protocol",
+    "runtime_effect",
+    "helpers"
+  ],
+  "title": "Agon VDS SDK Helper Candidate Registry",
+  "type": "object"
+}

@@ -4,17 +4,104 @@
 
 Grouped by `Surface classes` metadata.
 
+## A2A contract
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0039 - A2A Quest Passport Secondary Tier Naming](../AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md) | 2026-06-01 | A2A rebase, child-task reentry, active naming, request payload | checkpoint | active naming, route clarity, part validation | accepted |
+
+## active naming
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0020 - Technique Publication Observation Boundary Localization](../AOA-SDK-D-0020-technique-publication-observation-boundary-localization.md) | 2026-06-01 | mechanics topology, recurrence, hook observation | recurrence | mechanics topology, docs routes, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0037 - Workspace MCP Surface Crosswalk Secondary Route Naming](../AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md) | 2026-06-01 | workspace MCP, active naming, route selection, agent guidance | codex-projection | active naming, fallback removal, route clarity, part validation | accepted |
+| [AOA-SDK-D-0038 - Manual Equivalence Active Lane Naming](../AOA-SDK-D-0038-manual-equivalence-active-lane-naming.md) | 2026-06-01 | skill runtime bridge, owner-layer signal handoff, active naming, compatibility input | boundary-bridge | active naming, compatibility alias, route clarity, part validation | accepted |
+| [AOA-SDK-D-0039 - A2A Quest Passport Secondary Tier Naming](../AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md) | 2026-06-01 | A2A rebase, child-task reentry, active naming, request payload | checkpoint | active naming, route clarity, part validation | accepted |
+| [AOA-SDK-D-0040 - Sibling Fallback Field Input Alias Normalization](../AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md) | 2026-06-01 | routing stats reader, playbook reader, active naming, compatibility posture | boundary-bridge | active naming, compatibility alias, sibling owner boundary, part validation | accepted |
+| [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) | 2026-06-01 | antifragility stress posture, reviewed stress carry, active naming, owner boundary | antifragility | active naming, source ref preservation, owner boundary, part validation | accepted |
+
 ## agent guidance
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0002 - Root Design Surfaces Before Mechanics](../AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md) | 2026-05-31 | design surface, agent surface, mechanics prep, source home | none | source topology, route law, agent mesh | accepted |
+| [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) | 2026-06-01 | nested agents, root technical districts, mechanics topology | boundary-bridge, release-support, runtime-seam | nested agents, root-surface hygiene, active naming | accepted |
+
+## agent route cards
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
+
+## artifact placement
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0007 - Mechanic Artifact Localization](../AOA-SDK-D-0007-mechanic-artifact-localization.md) | 2026-05-31 | mechanics topology, artifact localization, part-local validation, root technical districts | agon | mechanics topology, nested agents, generated parity, part validation | accepted |
+| [AOA-SDK-D-0008 - Codex Projection Artifact Localization](../AOA-SDK-D-0008-codex-projection-artifact-localization.md) | 2026-05-31 | mechanics topology, artifact localization, codex projection, root technical districts | codex-projection | mechanics topology, nested agents, part validation, schema validation | accepted |
+| [AOA-SDK-D-0009 - Agon and Experience Part Localization](../AOA-SDK-D-0009-agon-experience-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Agon helpers, Experience helpers, root technical districts | agon, experience, questbook | mechanics topology, part validation, schema validation, generated registry parity | accepted |
+| [AOA-SDK-D-0010 - Experience Helper Contract Part Localization](../AOA-SDK-D-0010-experience-helper-contract-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Experience helpers, root technical districts, schema validation | experience | mechanics topology, part validation, schema validation | accepted |
+| [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Titan helpers, root technical districts, CLI helper scripts | titan | mechanics topology, part validation, schema validation, script smoke | accepted |
+| [AOA-SDK-D-0012 - Recurrence Control Plane Part Localization](../AOA-SDK-D-0012-recurrence-control-plane-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, recurrence control plane, manifest gate, downstream projections, recursor readiness | recurrence | mechanics topology, manifest compatibility, part validation, schema validation, script smoke | accepted |
+| [AOA-SDK-D-0013 - Boundary Bridge And Checkpoint Active Part Localization](../AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md) | 2026-05-31 | mechanics topology, boundary bridge, checkpoint, A2A, surface detection | boundary-bridge, checkpoint | mechanics topology, workspace control plane, part validation, docs routes, API naming | accepted |
+| [AOA-SDK-D-0014 - Antifragility Active Part Localization](../AOA-SDK-D-0014-antifragility-active-part-localization.md) | 2026-06-01 | mechanics topology, antifragility, control-plane stress posture, closeout carry | antifragility | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0015 - RPG Typed Consumer Part Localization](../AOA-SDK-D-0015-rpg-typed-consumer-part-localization.md) | 2026-06-01 | mechanics topology, RPG, typed consumer API, surface path transport | rpg | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0016 - Checkpoint Closeout Context Carry Localization](../AOA-SDK-D-0016-checkpoint-closeout-context-carry-localization.md) | 2026-06-01 | mechanics topology, checkpoint, reviewed closeout context carry | checkpoint | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0017 - Skill Runtime Bridge Part Localization](../AOA-SDK-D-0017-skill-runtime-bridge-part-localization.md) | 2026-06-01 | mechanics topology, boundary bridge, skill runtime bridge | boundary-bridge | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0018 - Release Support Part Localization](../AOA-SDK-D-0018-release-support-part-localization.md) | 2026-06-01 | mechanics topology, release support, release audit, public support posture | release-support | mechanics topology, part validation, docs routes, active naming, release check | accepted |
+| [AOA-SDK-D-0019 - Codex Workspace MCP Server Localization](../AOA-SDK-D-0019-codex-workspace-mcp-server-localization.md) | 2026-06-01 | mechanics topology, Codex Projection, workspace MCP server | codex-projection | mechanics topology, part validation, docs routes, active naming, MCP wiring | accepted |
+| [AOA-SDK-D-0020 - Technique Publication Observation Boundary Localization](../AOA-SDK-D-0020-technique-publication-observation-boundary-localization.md) | 2026-06-01 | mechanics topology, recurrence, hook observation | recurrence | mechanics topology, docs routes, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0021 - Technique Promotion Readiness Reader Localization](../AOA-SDK-D-0021-technique-promotion-readiness-reader-localization.md) | 2026-06-01 | mechanics topology, Boundary Bridge, techniques facade | boundary-bridge | mechanics topology, part validation, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0022 - Reviewed Session Handoff Runner Localization](../AOA-SDK-D-0022-reviewed-session-handoff-runner-localization.md) | 2026-06-01 | mechanics topology, checkpoint, reviewed session handoff runner | checkpoint | mechanics topology, part validation, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0023 - Session Growth Checkpoint Cycle Localization](../AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md) | 2026-06-01 | mechanics topology, checkpoint, workspace control plane | checkpoint | mechanics topology, docs routes, generated parity, active naming | accepted |
+| [AOA-SDK-D-0027 - Public Support CI Posture Test Localization](../AOA-SDK-D-0027-public-support-ci-posture-test-localization.md) | 2026-06-01 | mechanics topology, release support, public support posture | release-support | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0029 - Recurrence Change Signal Schema Localization](../AOA-SDK-D-0029-recurrence-change-signal-schema-localization.md) | 2026-06-01 | mechanics topology, recurrence, component manifest gate | recurrence | mechanics topology, schema placement, active naming | accepted |
+| [AOA-SDK-D-0030 - Checkpoint Local Automation Template Localization](../AOA-SDK-D-0030-checkpoint-local-automation-template-localization.md) | 2026-06-01 | mechanics topology, checkpoint, managed hooks, closeout runner | checkpoint | mechanics topology, active naming, root-surface hygiene | accepted |
+| [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) | 2026-06-01 | mechanics topology, release support, compatibility, public support | release-support | root-surface hygiene, compatibility drift, active naming | accepted |
+
+## checkpoint
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0039 - A2A Quest Passport Secondary Tier Naming](../AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md) | 2026-06-01 | A2A rebase, child-task reentry, active naming, request payload | checkpoint | active naming, route clarity, part validation | accepted |
+
+## ci
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) | 2026-06-01 | mechanics topology, release support, compatibility, public support | release-support | root-surface hygiene, compatibility drift, active naming | accepted |
+
+## CLI
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0028 - CLI Surface Test Localization](../AOA-SDK-D-0028-cli-surface-test-localization.md) | 2026-06-01 | mechanics topology, runtime seam, boundary bridge | runtime-seam, boundary-bridge | mechanics topology, part validation, active naming, root-surface hygiene | accepted |
+
+## Codex projection
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0037 - Workspace MCP Surface Crosswalk Secondary Route Naming](../AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md) | 2026-06-01 | workspace MCP, active naming, route selection, agent guidance | codex-projection | active naming, fallback removal, route clarity, part validation | accepted |
 
 ## compatibility
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) | 2026-05-31 | compatibility policy, control-plane, sibling read path | boundary-bridge | source topology, compatibility check, canonical path | accepted |
+| [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) | 2026-06-01 | compatibility posture, workspace MCP, active naming, sibling path routing | boundary-bridge, codex-projection | compatibility, active naming, root-surface hygiene, part validation | accepted |
+
+## compatibility accounting
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) | 2026-06-01 | antifragility stress posture, reviewed stress carry, active naming, owner boundary | antifragility | active naming, source ref preservation, owner boundary, part validation | accepted |
+
+## compatibility input
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0040 - Sibling Fallback Field Input Alias Normalization](../AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md) | 2026-06-01 | routing stats reader, playbook reader, active naming, compatibility posture | boundary-bridge | active naming, compatibility alias, sibling owner boundary, part validation | accepted |
 
 ## design route
 
@@ -28,19 +115,104 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0001 - Decision Rationale Lane Before Mechanics](../AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md) | 2026-05-31 | decision lane, control-plane, mechanics prep | none | rationale route, index parity, source topology | accepted |
 
+## external source ref
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) | 2026-06-01 | antifragility stress posture, reviewed stress carry, active naming, owner boundary | antifragility | active naming, source ref preservation, owner boundary, part validation | accepted |
+
+## generated companion
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0023 - Session Growth Checkpoint Cycle Localization](../AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md) | 2026-06-01 | mechanics topology, checkpoint, workspace control plane | checkpoint | mechanics topology, docs routes, generated parity, active naming | accepted |
+| [AOA-SDK-D-0026 - Runtime Seam Test Surface Localization](../AOA-SDK-D-0026-runtime-seam-test-surface-localization.md) | 2026-06-01 | mechanics topology, workspace, runtime seam | runtime-seam | mechanics topology, generated parity, root-surface hygiene | accepted |
+
 ## generated route
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) | 2026-05-31 | compatibility policy, control-plane, sibling read path | boundary-bridge | source topology, compatibility check, canonical path | accepted |
 
+## local automation
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0030 - Checkpoint Local Automation Template Localization](../AOA-SDK-D-0030-checkpoint-local-automation-template-localization.md) | 2026-06-01 | mechanics topology, checkpoint, managed hooks, closeout runner | checkpoint | mechanics topology, active naming, root-surface hygiene | accepted |
+
+## MCP readout
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0037 - Workspace MCP Surface Crosswalk Secondary Route Naming](../AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md) | 2026-06-01 | workspace MCP, active naming, route selection, agent guidance | codex-projection | active naming, fallback removal, route clarity, part validation | accepted |
+
 ## mechanics
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | mechanics topology, control-plane, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | accepted |
 | [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | mechanics topology, source family routing, parent boundary, boundary bridge | boundary-bridge, checkpoint, codex-projection, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, release check | accepted |
+| [AOA-SDK-D-0007 - Mechanic Artifact Localization](../AOA-SDK-D-0007-mechanic-artifact-localization.md) | 2026-05-31 | mechanics topology, artifact localization, part-local validation, root technical districts | agon | mechanics topology, nested agents, generated parity, part validation | accepted |
+| [AOA-SDK-D-0008 - Codex Projection Artifact Localization](../AOA-SDK-D-0008-codex-projection-artifact-localization.md) | 2026-05-31 | mechanics topology, artifact localization, codex projection, root technical districts | codex-projection | mechanics topology, nested agents, part validation, schema validation | accepted |
+| [AOA-SDK-D-0009 - Agon and Experience Part Localization](../AOA-SDK-D-0009-agon-experience-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Agon helpers, Experience helpers, root technical districts | agon, experience, questbook | mechanics topology, part validation, schema validation, generated registry parity | accepted |
+| [AOA-SDK-D-0010 - Experience Helper Contract Part Localization](../AOA-SDK-D-0010-experience-helper-contract-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Experience helpers, root technical districts, schema validation | experience | mechanics topology, part validation, schema validation | accepted |
+| [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Titan helpers, root technical districts, CLI helper scripts | titan | mechanics topology, part validation, schema validation, script smoke | accepted |
+| [AOA-SDK-D-0012 - Recurrence Control Plane Part Localization](../AOA-SDK-D-0012-recurrence-control-plane-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, recurrence control plane, manifest gate, downstream projections, recursor readiness | recurrence | mechanics topology, manifest compatibility, part validation, schema validation, script smoke | accepted |
+| [AOA-SDK-D-0013 - Boundary Bridge And Checkpoint Active Part Localization](../AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md) | 2026-05-31 | mechanics topology, boundary bridge, checkpoint, A2A, surface detection | boundary-bridge, checkpoint | mechanics topology, workspace control plane, part validation, docs routes, API naming | accepted |
+| [AOA-SDK-D-0014 - Antifragility Active Part Localization](../AOA-SDK-D-0014-antifragility-active-part-localization.md) | 2026-06-01 | mechanics topology, antifragility, control-plane stress posture, closeout carry | antifragility | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0015 - RPG Typed Consumer Part Localization](../AOA-SDK-D-0015-rpg-typed-consumer-part-localization.md) | 2026-06-01 | mechanics topology, RPG, typed consumer API, surface path transport | rpg | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0016 - Checkpoint Closeout Context Carry Localization](../AOA-SDK-D-0016-checkpoint-closeout-context-carry-localization.md) | 2026-06-01 | mechanics topology, checkpoint, reviewed closeout context carry | checkpoint | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0017 - Skill Runtime Bridge Part Localization](../AOA-SDK-D-0017-skill-runtime-bridge-part-localization.md) | 2026-06-01 | mechanics topology, boundary bridge, skill runtime bridge | boundary-bridge | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0018 - Release Support Part Localization](../AOA-SDK-D-0018-release-support-part-localization.md) | 2026-06-01 | mechanics topology, release support, release audit, public support posture | release-support | mechanics topology, part validation, docs routes, active naming, release check | accepted |
+| [AOA-SDK-D-0019 - Codex Workspace MCP Server Localization](../AOA-SDK-D-0019-codex-workspace-mcp-server-localization.md) | 2026-06-01 | mechanics topology, Codex Projection, workspace MCP server | codex-projection | mechanics topology, part validation, docs routes, active naming, MCP wiring | accepted |
+| [AOA-SDK-D-0020 - Technique Publication Observation Boundary Localization](../AOA-SDK-D-0020-technique-publication-observation-boundary-localization.md) | 2026-06-01 | mechanics topology, recurrence, hook observation | recurrence | mechanics topology, docs routes, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0021 - Technique Promotion Readiness Reader Localization](../AOA-SDK-D-0021-technique-promotion-readiness-reader-localization.md) | 2026-06-01 | mechanics topology, Boundary Bridge, techniques facade | boundary-bridge | mechanics topology, part validation, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0022 - Reviewed Session Handoff Runner Localization](../AOA-SDK-D-0022-reviewed-session-handoff-runner-localization.md) | 2026-06-01 | mechanics topology, checkpoint, reviewed session handoff runner | checkpoint | mechanics topology, part validation, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0023 - Session Growth Checkpoint Cycle Localization](../AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md) | 2026-06-01 | mechanics topology, checkpoint, workspace control plane | checkpoint | mechanics topology, docs routes, generated parity, active naming | accepted |
+| [AOA-SDK-D-0024 - Checkpoint Test Surface Localization](../AOA-SDK-D-0024-checkpoint-test-surface-localization.md) | 2026-06-01 | mechanics topology, checkpoint, CLI | checkpoint | mechanics topology, active naming, root-surface hygiene | accepted |
+| [AOA-SDK-D-0025 - Consumed Surface Posture Gate Test Localization](../AOA-SDK-D-0025-consumed-surface-posture-gate-test-localization.md) | 2026-06-01 | mechanics topology, compatibility, typed facades | boundary-bridge | mechanics topology, active naming, source-owner boundary | accepted |
+| [AOA-SDK-D-0026 - Runtime Seam Test Surface Localization](../AOA-SDK-D-0026-runtime-seam-test-surface-localization.md) | 2026-06-01 | mechanics topology, workspace, runtime seam | runtime-seam | mechanics topology, generated parity, root-surface hygiene | accepted |
+| [AOA-SDK-D-0027 - Public Support CI Posture Test Localization](../AOA-SDK-D-0027-public-support-ci-posture-test-localization.md) | 2026-06-01 | mechanics topology, release support, public support posture | release-support | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0028 - CLI Surface Test Localization](../AOA-SDK-D-0028-cli-surface-test-localization.md) | 2026-06-01 | mechanics topology, runtime seam, boundary bridge | runtime-seam, boundary-bridge | mechanics topology, part validation, active naming, root-surface hygiene | accepted |
+| [AOA-SDK-D-0029 - Recurrence Change Signal Schema Localization](../AOA-SDK-D-0029-recurrence-change-signal-schema-localization.md) | 2026-06-01 | mechanics topology, recurrence, component manifest gate | recurrence | mechanics topology, schema placement, active naming | accepted |
+| [AOA-SDK-D-0030 - Checkpoint Local Automation Template Localization](../AOA-SDK-D-0030-checkpoint-local-automation-template-localization.md) | 2026-06-01 | mechanics topology, checkpoint, managed hooks, closeout runner | checkpoint | mechanics topology, active naming, root-surface hygiene | accepted |
+| [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) | 2026-06-01 | mechanics topology, release support, compatibility, public support | release-support | root-surface hygiene, compatibility drift, active naming | accepted |
+| [AOA-SDK-D-0033 - Questbook Parent Withdrawal After Quest Localization](../AOA-SDK-D-0033-questbook-parent-withdrawal-after-quest-localization.md) | 2026-06-01 | mechanics topology, parent set, quest routing, active naming | agon | parent boundary, root-surface hygiene, active naming | superseded |
+| [AOA-SDK-D-0034 - Active Mechanics Topology Status Naming](../AOA-SDK-D-0034-active-mechanics-topology-status-naming.md) | 2026-06-01 | mechanics topology, active naming, route validation | all | active naming, root-surface hygiene, mechanics topology | accepted |
+| [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) | 2026-06-01 | compatibility posture, workspace MCP, active naming, sibling path routing | boundary-bridge, codex-projection | compatibility, active naming, root-surface hygiene, part validation | accepted |
+| [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | mechanics topology, root district hygiene, active naming, artifact placement | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
+| [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | mechanics topology, questbook, root quests, active naming | questbook, agon, checkpoint | root source store, parent boundary, lifecycle posture, validation | accepted |
+
+## parent boundary
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0033 - Questbook Parent Withdrawal After Quest Localization](../AOA-SDK-D-0033-questbook-parent-withdrawal-after-quest-localization.md) | 2026-06-01 | mechanics topology, parent set, quest routing, active naming | agon | parent boundary, root-surface hygiene, active naming | superseded |
+
+## public API naming
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0013 - Boundary Bridge And Checkpoint Active Part Localization](../AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md) | 2026-05-31 | mechanics topology, boundary bridge, checkpoint, A2A, surface detection | boundary-bridge, checkpoint | mechanics topology, workspace control plane, part validation, docs routes, API naming | accepted |
+
+## quest source store
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | mechanics topology, questbook, root quests, active naming | questbook, agon, checkpoint | root source store, parent boundary, lifecycle posture, validation | accepted |
+
+## root district
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | mechanics topology, questbook, root quests, active naming | questbook, agon, checkpoint | root source store, parent boundary, lifecycle posture, validation | accepted |
+
+## root technical districts
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | mechanics topology, root district hygiene, active naming, artifact placement | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
 
 ## root/topology
 
@@ -53,8 +225,26 @@ Grouped by `Surface classes` metadata.
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | mechanics topology, control-plane, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | accepted |
+
+## runtime entrypoint
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) | 2026-06-01 | compatibility posture, workspace MCP, active naming, sibling path routing | boundary-bridge, codex-projection | compatibility, active naming, root-surface hygiene, part validation | accepted |
+
+## schema
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0029 - Recurrence Change Signal Schema Localization](../AOA-SDK-D-0029-recurrence-change-signal-schema-localization.md) | 2026-06-01 | mechanics topology, recurrence, component manifest gate | recurrence | mechanics topology, schema placement, active naming | accepted |
+
+## sibling surface
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0040 - Sibling Fallback Field Input Alias Normalization](../AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md) | 2026-06-01 | routing stats reader, playbook reader, active naming, compatibility posture | boundary-bridge | active naming, compatibility alias, sibling owner boundary, part validation | accepted |
 
 ## sibling topology
 
@@ -62,25 +252,122 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) | 2026-05-31 | compatibility policy, control-plane, sibling read path | boundary-bridge | source topology, compatibility check, canonical path | accepted |
 
+## skill runtime bridge
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0038 - Manual Equivalence Active Lane Naming](../AOA-SDK-D-0038-manual-equivalence-active-lane-naming.md) | 2026-06-01 | skill runtime bridge, owner-layer signal handoff, active naming, compatibility input | boundary-bridge | active naming, compatibility alias, route clarity, part validation | accepted |
+
+## source home
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
+
 ## source inventory
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | mechanics topology, source family routing, parent boundary, boundary bridge | boundary-bridge, checkpoint, codex-projection, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, release check | accepted |
 
+## stress evidence
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) | 2026-06-01 | antifragility stress posture, reviewed stress carry, active naming, owner boundary | antifragility | active naming, source ref preservation, owner boundary, part validation | accepted |
+
+## surface detection
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0038 - Manual Equivalence Active Lane Naming](../AOA-SDK-D-0038-manual-equivalence-active-lane-naming.md) | 2026-06-01 | skill runtime bridge, owner-layer signal handoff, active naming, compatibility input | boundary-bridge | active naming, compatibility alias, route clarity, part validation | accepted |
+
+## test placement
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0024 - Checkpoint Test Surface Localization](../AOA-SDK-D-0024-checkpoint-test-surface-localization.md) | 2026-06-01 | mechanics topology, checkpoint, CLI | checkpoint | mechanics topology, active naming, root-surface hygiene | accepted |
+| [AOA-SDK-D-0025 - Consumed Surface Posture Gate Test Localization](../AOA-SDK-D-0025-consumed-surface-posture-gate-test-localization.md) | 2026-06-01 | mechanics topology, compatibility, typed facades | boundary-bridge | mechanics topology, active naming, source-owner boundary | accepted |
+| [AOA-SDK-D-0026 - Runtime Seam Test Surface Localization](../AOA-SDK-D-0026-runtime-seam-test-surface-localization.md) | 2026-06-01 | mechanics topology, workspace, runtime seam | runtime-seam | mechanics topology, generated parity, root-surface hygiene | accepted |
+| [AOA-SDK-D-0028 - CLI Surface Test Localization](../AOA-SDK-D-0028-cli-surface-test-localization.md) | 2026-06-01 | mechanics topology, runtime seam, boundary bridge | runtime-seam, boundary-bridge | mechanics topology, part validation, active naming, root-surface hygiene | accepted |
+
 ## topology
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | mechanics topology, control-plane, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | accepted |
 | [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | mechanics topology, source family routing, parent boundary, boundary bridge | boundary-bridge, checkpoint, codex-projection, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, release check | accepted |
+| [AOA-SDK-D-0007 - Mechanic Artifact Localization](../AOA-SDK-D-0007-mechanic-artifact-localization.md) | 2026-05-31 | mechanics topology, artifact localization, part-local validation, root technical districts | agon | mechanics topology, nested agents, generated parity, part validation | accepted |
+| [AOA-SDK-D-0008 - Codex Projection Artifact Localization](../AOA-SDK-D-0008-codex-projection-artifact-localization.md) | 2026-05-31 | mechanics topology, artifact localization, codex projection, root technical districts | codex-projection | mechanics topology, nested agents, part validation, schema validation | accepted |
+| [AOA-SDK-D-0009 - Agon and Experience Part Localization](../AOA-SDK-D-0009-agon-experience-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Agon helpers, Experience helpers, root technical districts | agon, experience, questbook | mechanics topology, part validation, schema validation, generated registry parity | accepted |
+| [AOA-SDK-D-0010 - Experience Helper Contract Part Localization](../AOA-SDK-D-0010-experience-helper-contract-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Experience helpers, root technical districts, schema validation | experience | mechanics topology, part validation, schema validation | accepted |
+| [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Titan helpers, root technical districts, CLI helper scripts | titan | mechanics topology, part validation, schema validation, script smoke | accepted |
+| [AOA-SDK-D-0012 - Recurrence Control Plane Part Localization](../AOA-SDK-D-0012-recurrence-control-plane-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, recurrence control plane, manifest gate, downstream projections, recursor readiness | recurrence | mechanics topology, manifest compatibility, part validation, schema validation, script smoke | accepted |
+| [AOA-SDK-D-0013 - Boundary Bridge And Checkpoint Active Part Localization](../AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md) | 2026-05-31 | mechanics topology, boundary bridge, checkpoint, A2A, surface detection | boundary-bridge, checkpoint | mechanics topology, workspace control plane, part validation, docs routes, API naming | accepted |
+| [AOA-SDK-D-0014 - Antifragility Active Part Localization](../AOA-SDK-D-0014-antifragility-active-part-localization.md) | 2026-06-01 | mechanics topology, antifragility, control-plane stress posture, closeout carry | antifragility | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0015 - RPG Typed Consumer Part Localization](../AOA-SDK-D-0015-rpg-typed-consumer-part-localization.md) | 2026-06-01 | mechanics topology, RPG, typed consumer API, surface path transport | rpg | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0016 - Checkpoint Closeout Context Carry Localization](../AOA-SDK-D-0016-checkpoint-closeout-context-carry-localization.md) | 2026-06-01 | mechanics topology, checkpoint, reviewed closeout context carry | checkpoint | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0017 - Skill Runtime Bridge Part Localization](../AOA-SDK-D-0017-skill-runtime-bridge-part-localization.md) | 2026-06-01 | mechanics topology, boundary bridge, skill runtime bridge | boundary-bridge | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0018 - Release Support Part Localization](../AOA-SDK-D-0018-release-support-part-localization.md) | 2026-06-01 | mechanics topology, release support, release audit, public support posture | release-support | mechanics topology, part validation, docs routes, active naming, release check | accepted |
+| [AOA-SDK-D-0019 - Codex Workspace MCP Server Localization](../AOA-SDK-D-0019-codex-workspace-mcp-server-localization.md) | 2026-06-01 | mechanics topology, Codex Projection, workspace MCP server | codex-projection | mechanics topology, part validation, docs routes, active naming, MCP wiring | accepted |
+| [AOA-SDK-D-0020 - Technique Publication Observation Boundary Localization](../AOA-SDK-D-0020-technique-publication-observation-boundary-localization.md) | 2026-06-01 | mechanics topology, recurrence, hook observation | recurrence | mechanics topology, docs routes, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0021 - Technique Promotion Readiness Reader Localization](../AOA-SDK-D-0021-technique-promotion-readiness-reader-localization.md) | 2026-06-01 | mechanics topology, Boundary Bridge, techniques facade | boundary-bridge | mechanics topology, part validation, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0022 - Reviewed Session Handoff Runner Localization](../AOA-SDK-D-0022-reviewed-session-handoff-runner-localization.md) | 2026-06-01 | mechanics topology, checkpoint, reviewed session handoff runner | checkpoint | mechanics topology, part validation, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0023 - Session Growth Checkpoint Cycle Localization](../AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md) | 2026-06-01 | mechanics topology, checkpoint, workspace control plane | checkpoint | mechanics topology, docs routes, generated parity, active naming | accepted |
+| [AOA-SDK-D-0024 - Checkpoint Test Surface Localization](../AOA-SDK-D-0024-checkpoint-test-surface-localization.md) | 2026-06-01 | mechanics topology, checkpoint, CLI | checkpoint | mechanics topology, active naming, root-surface hygiene | accepted |
+| [AOA-SDK-D-0025 - Consumed Surface Posture Gate Test Localization](../AOA-SDK-D-0025-consumed-surface-posture-gate-test-localization.md) | 2026-06-01 | mechanics topology, compatibility, typed facades | boundary-bridge | mechanics topology, active naming, source-owner boundary | accepted |
+| [AOA-SDK-D-0026 - Runtime Seam Test Surface Localization](../AOA-SDK-D-0026-runtime-seam-test-surface-localization.md) | 2026-06-01 | mechanics topology, workspace, runtime seam | runtime-seam | mechanics topology, generated parity, root-surface hygiene | accepted |
+| [AOA-SDK-D-0027 - Public Support CI Posture Test Localization](../AOA-SDK-D-0027-public-support-ci-posture-test-localization.md) | 2026-06-01 | mechanics topology, release support, public support posture | release-support | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0028 - CLI Surface Test Localization](../AOA-SDK-D-0028-cli-surface-test-localization.md) | 2026-06-01 | mechanics topology, runtime seam, boundary bridge | runtime-seam, boundary-bridge | mechanics topology, part validation, active naming, root-surface hygiene | accepted |
+| [AOA-SDK-D-0029 - Recurrence Change Signal Schema Localization](../AOA-SDK-D-0029-recurrence-change-signal-schema-localization.md) | 2026-06-01 | mechanics topology, recurrence, component manifest gate | recurrence | mechanics topology, schema placement, active naming | accepted |
+| [AOA-SDK-D-0030 - Checkpoint Local Automation Template Localization](../AOA-SDK-D-0030-checkpoint-local-automation-template-localization.md) | 2026-06-01 | mechanics topology, checkpoint, managed hooks, closeout runner | checkpoint | mechanics topology, active naming, root-surface hygiene | accepted |
+| [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) | 2026-06-01 | mechanics topology, release support, compatibility, public support | release-support | root-surface hygiene, compatibility drift, active naming | accepted |
+| [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) | 2026-06-01 | nested agents, root technical districts, mechanics topology | boundary-bridge, release-support, runtime-seam | nested agents, root-surface hygiene, active naming | accepted |
+| [AOA-SDK-D-0033 - Questbook Parent Withdrawal After Quest Localization](../AOA-SDK-D-0033-questbook-parent-withdrawal-after-quest-localization.md) | 2026-06-01 | mechanics topology, parent set, quest routing, active naming | agon | parent boundary, root-surface hygiene, active naming | superseded |
+| [AOA-SDK-D-0034 - Active Mechanics Topology Status Naming](../AOA-SDK-D-0034-active-mechanics-topology-status-naming.md) | 2026-06-01 | mechanics topology, active naming, route validation | all | active naming, root-surface hygiene, mechanics topology | accepted |
+| [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) | 2026-06-01 | compatibility posture, workspace MCP, active naming, sibling path routing | boundary-bridge, codex-projection | compatibility, active naming, root-surface hygiene, part validation | accepted |
+| [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | mechanics topology, root district hygiene, active naming, artifact placement | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
+| [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | mechanics topology, questbook, root quests, active naming | questbook, agon, checkpoint | root source store, parent boundary, lifecycle posture, validation | accepted |
+| [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
+
+## typed model
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0038 - Manual Equivalence Active Lane Naming](../AOA-SDK-D-0038-manual-equivalence-active-lane-naming.md) | 2026-06-01 | skill runtime bridge, owner-layer signal handoff, active naming, compatibility input | boundary-bridge | active naming, compatibility alias, route clarity, part validation | accepted |
+| [AOA-SDK-D-0039 - A2A Quest Passport Secondary Tier Naming](../AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md) | 2026-06-01 | A2A rebase, child-task reentry, active naming, request payload | checkpoint | active naming, route clarity, part validation | accepted |
+| [AOA-SDK-D-0040 - Sibling Fallback Field Input Alias Normalization](../AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md) | 2026-06-01 | routing stats reader, playbook reader, active naming, compatibility posture | boundary-bridge | active naming, compatibility alias, sibling owner boundary, part validation | accepted |
+
+## validation
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0034 - Active Mechanics Topology Status Naming](../AOA-SDK-D-0034-active-mechanics-topology-status-naming.md) | 2026-06-01 | mechanics topology, active naming, route validation | all | active naming, root-surface hygiene, mechanics topology | accepted |
+| [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
 
 ## validation guard
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0001 - Decision Rationale Lane Before Mechanics](../AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md) | 2026-05-31 | decision lane, control-plane, mechanics prep | none | rationale route, index parity, source topology | accepted |
-| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | mechanics topology, control-plane, source inventory, agent surface | workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support | source topology, mechanics topology, nested agents, release check | superseded |
+| [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | mechanics topology, control-plane, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | accepted |
 | [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | mechanics topology, source family routing, parent boundary, boundary bridge | boundary-bridge, checkpoint, codex-projection, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, release check | accepted |
+| [AOA-SDK-D-0007 - Mechanic Artifact Localization](../AOA-SDK-D-0007-mechanic-artifact-localization.md) | 2026-05-31 | mechanics topology, artifact localization, part-local validation, root technical districts | agon | mechanics topology, nested agents, generated parity, part validation | accepted |
+| [AOA-SDK-D-0008 - Codex Projection Artifact Localization](../AOA-SDK-D-0008-codex-projection-artifact-localization.md) | 2026-05-31 | mechanics topology, artifact localization, codex projection, root technical districts | codex-projection | mechanics topology, nested agents, part validation, schema validation | accepted |
+| [AOA-SDK-D-0009 - Agon and Experience Part Localization](../AOA-SDK-D-0009-agon-experience-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Agon helpers, Experience helpers, root technical districts | agon, experience, questbook | mechanics topology, part validation, schema validation, generated registry parity | accepted |
+| [AOA-SDK-D-0010 - Experience Helper Contract Part Localization](../AOA-SDK-D-0010-experience-helper-contract-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Experience helpers, root technical districts, schema validation | experience | mechanics topology, part validation, schema validation | accepted |
+| [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, Titan helpers, root technical districts, CLI helper scripts | titan | mechanics topology, part validation, schema validation, script smoke | accepted |
+| [AOA-SDK-D-0012 - Recurrence Control Plane Part Localization](../AOA-SDK-D-0012-recurrence-control-plane-part-localization.md) | 2026-05-31 | mechanics topology, artifact localization, recurrence control plane, manifest gate, downstream projections, recursor readiness | recurrence | mechanics topology, manifest compatibility, part validation, schema validation, script smoke | accepted |
+| [AOA-SDK-D-0014 - Antifragility Active Part Localization](../AOA-SDK-D-0014-antifragility-active-part-localization.md) | 2026-06-01 | mechanics topology, antifragility, control-plane stress posture, closeout carry | antifragility | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0015 - RPG Typed Consumer Part Localization](../AOA-SDK-D-0015-rpg-typed-consumer-part-localization.md) | 2026-06-01 | mechanics topology, RPG, typed consumer API, surface path transport | rpg | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0016 - Checkpoint Closeout Context Carry Localization](../AOA-SDK-D-0016-checkpoint-closeout-context-carry-localization.md) | 2026-06-01 | mechanics topology, checkpoint, reviewed closeout context carry | checkpoint | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0017 - Skill Runtime Bridge Part Localization](../AOA-SDK-D-0017-skill-runtime-bridge-part-localization.md) | 2026-06-01 | mechanics topology, boundary bridge, skill runtime bridge | boundary-bridge | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0018 - Release Support Part Localization](../AOA-SDK-D-0018-release-support-part-localization.md) | 2026-06-01 | mechanics topology, release support, release audit, public support posture | release-support | mechanics topology, part validation, docs routes, active naming, release check | accepted |
+| [AOA-SDK-D-0019 - Codex Workspace MCP Server Localization](../AOA-SDK-D-0019-codex-workspace-mcp-server-localization.md) | 2026-06-01 | mechanics topology, Codex Projection, workspace MCP server | codex-projection | mechanics topology, part validation, docs routes, active naming, MCP wiring | accepted |
+| [AOA-SDK-D-0021 - Technique Promotion Readiness Reader Localization](../AOA-SDK-D-0021-technique-promotion-readiness-reader-localization.md) | 2026-06-01 | mechanics topology, Boundary Bridge, techniques facade | boundary-bridge | mechanics topology, part validation, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0022 - Reviewed Session Handoff Runner Localization](../AOA-SDK-D-0022-reviewed-session-handoff-runner-localization.md) | 2026-06-01 | mechanics topology, checkpoint, reviewed session handoff runner | checkpoint | mechanics topology, part validation, active naming, owner boundary | accepted |
+| [AOA-SDK-D-0027 - Public Support CI Posture Test Localization](../AOA-SDK-D-0027-public-support-ci-posture-test-localization.md) | 2026-06-01 | mechanics topology, release support, public support posture | release-support | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) | 2026-06-01 | nested agents, root technical districts, mechanics topology | boundary-bridge, release-support, runtime-seam | nested agents, root-surface hygiene, active naming | accepted |
+| [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | mechanics topology, root district hygiene, active naming, artifact placement | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |

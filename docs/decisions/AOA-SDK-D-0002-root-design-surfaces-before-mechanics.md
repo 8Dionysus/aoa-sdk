@@ -4,6 +4,9 @@
 
 Accepted.
 
+Partially superseded by `AOA-SDK-D-0043` for the top-level `sdk/` source-home
+rule.
+
 ## Index Metadata
 
 - Decision ID: AOA-SDK-D-0002
@@ -24,10 +27,14 @@ system form from `README.md`, `AGENTS.md`, `ROADMAP.md`, and scattered docs.
 Without `DESIGN.AGENTS.md`, route-card changes would have no local design
 surface explaining how root and nested guidance should cooperate.
 
-The missing layer also leaves an important SDK-specific question too implicit:
-the importable source home is already `src/aoa_sdk/`. A top-level `sdk/`
-directory should not appear by analogy with sibling domain homes unless it has
-a distinct owner role and decision.
+The missing layer also left an important SDK-specific question too implicit:
+at that point the importable implementation lane was already `src/aoa_sdk/`.
+A cosmetic sibling-analogy directory should not appear unless it has a
+distinct owner role and decision.
+
+`AOA-SDK-D-0043` later supplies that distinct owner role, route-card mesh,
+manifest, and validator. The original warning remains valid only against
+cosmetic `sdk/` symmetry.
 
 ## Options Considered
 
@@ -47,9 +54,12 @@ Create root `DESIGN.md` and `DESIGN.AGENTS.md` before introducing
 `DESIGN.AGENTS.md` owns the desired form of agent-facing guidance within the
 repository.
 
-`src/aoa_sdk/` remains the importable SDK source home. A future top-level
-`sdk/` district requires a distinct role, local route card, validation path,
-and decision record.
+`src/aoa_sdk/` remains the importable SDK implementation lane.
+
+This decision originally required a future top-level `sdk/` district to have a
+distinct role, local route card, validation path, and decision record.
+`AOA-SDK-D-0043` satisfies that condition and establishes `sdk/` as the
+checked SDK source-home tree.
 
 ## Rationale
 
@@ -71,7 +81,8 @@ rename or absorb it.
   mechanics.
 - Agent-facing card changes can be reviewed against `DESIGN.AGENTS.md`.
 - `src/aoa_sdk/` is explicitly protected from cosmetic top-level `sdk/`
-  pressure.
+  pressure. After `AOA-SDK-D-0043`, the active split is `sdk/` for SDK
+  source-home posture and `src/aoa_sdk/` for importable Python implementation.
 - Mechanics work should now update or cite decisions and design surfaces when
   it changes owner split, package names, validation authority, or source-home
   posture.
@@ -92,10 +103,10 @@ rename or absorb it.
 
 ## Follow-Up Route
 
-Use `DESIGN.md`, `DESIGN.AGENTS.md`, and this decision before creating
-`mechanics/` or any top-level SDK support district. The next mechanics
-decision should name whether each package is a shared AoA mechanic, a
-mechanic part, or a justified local SDK mechanic.
+Use `DESIGN.md`, `DESIGN.AGENTS.md`, this decision, and `AOA-SDK-D-0043`
+before changing `sdk/`, `mechanics/`, or any top-level SDK support district.
+Mechanics decisions should name whether each package is a shared AoA mechanic,
+a mechanic part, or a justified local SDK mechanic.
 
 ## Verification
 

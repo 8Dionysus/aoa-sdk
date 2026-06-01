@@ -1,28 +1,31 @@
 # Checkpoint Mechanic
 
-Status: skeleton.
+Status: active topology with part-local payload.
 
 ## Mechanic Card
 
 ### Operation
 
 Capture session-growth checkpoint notes, guard git boundaries, require semantic
-review, build explicit closeout context, and route A2A return/re-entry packets.
+review, build explicit review-context bundles, route child-task re-entry
+packets, and carry reviewed closeout context without minting owner truth.
 
 ### Trigger
 
 Use this mechanic when checkpoint CLI behavior, hook integration, pending
-review gates, active-session aggregation, closeout-context construction,
-reviewed closeout, or A2A return/re-entry packets change.
+review gates, active-session aggregation, review-context construction,
+reviewed session handoff, child-task re-entry packets, or reviewed closeout
+context carry changes.
 
 ### SDK owns
 
 - session-local checkpoint capture
 - active-session git boundary checks
 - review-note and promotion fail-closed gates
-- mechanical closeout-context bundle assembly
-- reviewed closeout request/inbox/manifest assembly
-- A2A checkpoint and return packet assembly
+- mechanical review-context bundle assembly
+- reviewed session handoff request/inbox/manifest assembly
+- child-task checkpoint and re-entry packet assembly
+- reviewed closeout context carry schemas, examples, and advisory maps
 
 ### Stronger owner split
 
@@ -31,27 +34,31 @@ status remain outside SDK checkpoint authority.
 
 ### Current source surfaces
 
-- `docs/session-growth-checkpoints.md`
-- `docs/checkpoint-note-promotion.md`
-- `docs/session-closeout.md`
-- `docs/A2A_WAVE5_CODEX_RETURN_CHECKPOINT.md`
-- `docs/RETURN_REENTRY_SEAM.md`
-- `githooks/`
-- `schemas/checkpoint_lineage_hint.schema.json`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`
+- `mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md`
+- `mechanics/checkpoint/parts/child-task-reentry/docs/return-reentry.md`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/`
+- `mechanics/checkpoint/parts/reviewed-closeout-context-carry/`
 - `src/aoa_sdk/checkpoints/`
 - `src/aoa_sdk/closeout/`
 - `src/aoa_sdk/a2a/`
-- `tests/test_checkpoint_cli.py`
-- `tests/test_checkpoints.py`
+- `mechanics/checkpoint/parts/child-task-reentry/`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py`
 
 ### Candidate parts
 
-- capture
-- git-boundary
-- review-note
-- closeout-context
-- closeout-bridge
-- return-reentry
+- session-growth-checkpoint-cycle
+- reviewed-session-handoff-runner
+- child-task-reentry
+- reviewed-closeout-context-carry
 
 ### Must not claim
 
@@ -61,11 +68,11 @@ allow promotion while semantic checkpoint review is still pending.
 ### Validation
 
 ```bash
-python -m pytest -q tests/test_checkpoint_cli.py tests/test_checkpoints.py tests/test_closeout.py tests/test_a2a_wave5_checkpoint_and_return.py
+python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_sdk_api.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_skill_contract.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_assessment.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_checkpoint_and_return.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_codex_and_closeout.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_e2e_fixture.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py
 ```
 
 ### Next route
 
 If checkpoint evidence survives review, route it through closeout, memory,
 proof, progression, or owner surfaces rather than strengthening the checkpoint
-ledger itself.
+ledger or reviewed carry packet itself.

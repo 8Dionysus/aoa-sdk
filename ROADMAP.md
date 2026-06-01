@@ -20,7 +20,9 @@ The current landed surface already includes:
   system form and agent-facing guidance form for mechanics work
 - canonical decision rationale lane under `docs/decisions/` with generated
   lookup indexes
-- mechanics topology skeleton under `mechanics/`, grounded in full tracked-file
+- checked SDK source-home tree under `sdk/`, validated by
+  `scripts/validate_sdk_source_home.py`
+- active mechanics topology under `mechanics/`, grounded in full tracked-file
   inventory and validated by `scripts/validate_mechanics_topology.py`
 - typed compatibility checks and workspace inspection
 - the compact control-plane capsule at
@@ -28,8 +30,8 @@ The current landed surface already includes:
 - bounded `aoa skills enter` / `aoa skills guard` wrappers
 - additive `aoa surfaces detect` and reviewed closeout handoff helpers that
   stay weaker than owner truth
-- checkpoint capture, review-note, and explicit closeout-bridge surfaces
-- typed Codex-plane deploy-status reads plus bounded release audit and publish
+- checkpoint capture, review-note, and explicit reviewed-session handoff runner surfaces
+- typed Codex Projection live rollout status reads plus bounded release audit and publish
   helpers
 
 ### Current release contour
@@ -48,7 +50,11 @@ release contour is:
   `scripts/generate_decision_indexes.py`
 - root design surfaces that enabled mechanics:
   `DESIGN.md` and `DESIGN.AGENTS.md`
-- corrected mechanics topology skeleton after full inventory and sibling-source reread:
+- SDK source-home posture:
+  `sdk/README.md`, `sdk/SDK_SHAPE.md`, `sdk/source_home.manifest.json`,
+  `scripts/validate_sdk_source_home.py`, and
+  `docs/decisions/AOA-SDK-D-0043-sdk-source-home-tree.md`
+- corrected active mechanics topology after full inventory and sibling-source reread:
   `mechanics/README.md`, `mechanics/TOPOLOGY_PREP.md`,
   `mechanics/topology.json`, `scripts/validate_mechanics_topology.py`, and
   `docs/decisions/AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`
@@ -56,27 +62,32 @@ release contour is:
   `mechanics/topology.json`,
   `docs/decisions/AOA-SDK-D-0006-mechanics-source-family-crosswalk.md`, and
   `tests/test_mechanics_topology.py`
-- Codex-plane deploy-state and rollout reference boundaries:
-  `docs/CODEX_PLANE_DEPLOY_STATUS.md`,
-  `docs/CODEX_DEPLOY_OPERATION_BOUNDARY_NOTE.md`,
-  `docs/codex_rollout_campaign_refs.md`,
-  `schemas/codex_plane_deploy_status_snapshot_v1.json`,
-  `examples/codex_plane_deploy_status_snapshot.example.json`, and
+- Codex Projection live rollout status and rollout reference boundaries:
+  `mechanics/codex-projection/parts/live-rollout-status-readout/docs/live-rollout-status-readout.md`,
+  `mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/deploy-operation-boundary-note.md`,
+  `mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/rollout-campaign-refs.md`,
+  `mechanics/codex-projection/parts/live-rollout-status-readout/schemas/live-rollout-status-snapshot.schema.json`,
+  `mechanics/codex-projection/parts/live-rollout-status-readout/examples/live-rollout-status-snapshot.example.json`, and
   `src/aoa_sdk/codex/registry.py`
-- reviewed closeout followthrough, component-refresh carry, continuity carry,
-  and next-kernel hints:
-  `docs/closeout-followthrough-map.md`, `docs/COMPONENT_DRIFT_HINTS.md`,
-  `docs/SELF_AGENCY_CONTINUITY_CARRY.md`,
-  `docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md`,
-  `schemas/closeout_owner_followthrough_map.schema.json`,
-  `schemas/closeout_continuity_window.schema.json`, and
-  `schemas/closeout_followthrough_decision.schema.json`
+- reviewed closeout context carry, component-refresh followthrough,
+  self-agency continuity carry, and next-kernel followthrough decision:
+  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/README.md`,
+  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/owner-followthrough-map.md`,
+  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/component-refresh-followthrough.md`,
+  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/self-agency-continuity-carry.md`,
+  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/next-kernel-followthrough-decision.md`,
+  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_owner_followthrough_map.schema.json`,
+  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_continuity_window.schema.json`, and
+  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_followthrough_decision.schema.json`
 - checkpoint, surface-detection, and reviewed handoff guidance:
-  `docs/session-growth-checkpoints.md`,
-  `docs/checkpoint-note-promotion.md`, `docs/session-closeout.md`, and
-  `docs/aoa-surface-detection-closeout-handoff.md`
-- bounded release and CI posture: `docs/RELEASING.md` and
-  `docs/RELEASE_CI_POSTURE.md`
+  `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`,
+  `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md`,
+  `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`, and
+  `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md`
+- bounded release and CI posture:
+  `mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md`,
+  `mechanics/release-support/parts/public-support-ci-posture/docs/public-support-ci-posture.md`,
+  `docs/RELEASING.md`, and `docs/RELEASE_CI_POSTURE.md`
 
 Roadmap drift is an SDK-layer risk because downstream agents use this file to
 choose whether a change belongs on the control plane. It still must not turn
@@ -88,21 +99,22 @@ subordinate while cross-repo growth becomes denser.
 
 ## Current cycle
 
-### Wave 1: current-direction consolidation
+### Stage 1: current-direction consolidation
 
 Goals:
 
 - keep `ROADMAP.md` as the root-level current-direction door
 - keep `README.md` and `AGENTS.md` short and route-first
 - keep `DESIGN.md` and `DESIGN.AGENTS.md` as the root design route for
-  mechanics topology
+  SDK source-home and mechanics topology
+- keep `sdk/` as the checked SDK source-home tree, not an implementation or
+  mechanics payload lane
 - keep `docs/blueprint.md` explicit as seed history rather than current-state
   authority
-- keep structural rationale in `docs/decisions/` and keep the first mechanics
-  skeleton route-only until a later payload move has its own package-local
-  reason and validator
+- keep structural rationale in `docs/decisions/` and keep mechanics payload
+  moves tied to package-local reason and validator surfaces
 
-### Wave 2: control-plane contract hardening
+### Stage 2: control-plane contract hardening
 
 Goals:
 
@@ -118,11 +130,11 @@ Exit signals:
 - docs, tests, and the control-plane capsule stay aligned
 - current repo direction no longer depends on reading the seed blueprint first
 
-### Wave 3: closeout and owner-followthrough discipline
+### Stage 3: closeout and owner-followthrough discipline
 
 Goals:
 
-- keep checkpoint capture, review-note, and explicit closeout bridge bounded
+- keep checkpoint capture, review-note, and explicit reviewed session handoff bounded
 - keep owner followthrough, continuity carry, and component-refresh hints
   reviewed and source-subordinate
 - preserve explicit truth labels across loaded, suggested, manual-equivalent,
@@ -135,12 +147,12 @@ Exit signals:
 - no closeout helper silently becomes policy, activation, or progression
   authority
 
-### Wave 4: portability and rollout posture
+### Stage 4: portability and rollout posture
 
 Goals:
 
 - keep sibling-workspace bootstrap and discovery overrides legible
-- keep Codex-plane portability and deploy-status reads typed and bounded
+- keep Codex Projection portability and live rollout status reads typed and bounded
 - keep release audit and publish helpers subordinate to owner-repo truth
 
 ## Standing discipline

@@ -1,11 +1,11 @@
 {
   "schema_version": "aoa_sdk_mechanics_topology_v1",
-  "status": "skeleton",
-  "payload_moved": false,
+  "status": "active-part-localized-topology",
+  "payload_movement_status": "complete",
   "parent_boundary_rule": "Top-level mechanics follow the shared AoA parent vocabulary unless a repo-local parent has an independent operation, owner split, and validator. SDK-specific lanes become parts.",
   "supersedes": {
     "decision": "AOA-SDK-D-0004",
-    "reason": "The first skeleton promoted several SDK-local lanes to parents even though sibling sources treat them as parts of shared mechanics."
+    "reason": "The first inventory pass promoted several SDK-local lanes to parents even though sibling sources treat them as parts of shared mechanics."
   },
   "source_basis": {
     "tracked_files": 1056,
@@ -25,7 +25,7 @@
     },
     "a2a": {
       "primary_mechanic": "checkpoint",
-      "reason": "A2A summon, return, and re-entry helpers are checkpoint and closeout return parts"
+      "reason": "A2A summon, return, and re-entry helpers are checkpoint child-task reentry parts"
     },
     "agents": {
       "primary_mechanic": "boundary-bridge",
@@ -47,15 +47,15 @@
     },
     "closeout": {
       "primary_mechanic": "checkpoint",
-      "reason": "reviewed closeout remains a checkpoint bridge part"
+      "reason": "reviewed session handoff remains below checkpoint review"
     },
     "codex": {
       "primary_mechanic": "codex-projection",
-      "reason": "Codex workspace MCP and deploy-status readers are projection surfaces"
+      "reason": "Codex workspace MCP and live rollout status readouts are projection surfaces"
     },
     "compatibility": {
       "primary_mechanic": "boundary-bridge",
-      "reason": "compatibility checks bridge consumed sibling surfaces"
+      "reason": "consumed-surface posture gates bridge sibling surfaces"
     },
     "evals": {
       "primary_mechanic": "boundary-bridge",
@@ -107,7 +107,7 @@
     },
     "surfaces": {
       "primary_mechanic": "boundary-bridge",
-      "reason": "surface detection remains an advisory bridge and handoff part"
+      "reason": "owner-layer signal discovery remains an advisory bridge and handoff part"
     },
     "techniques": {
       "primary_mechanic": "boundary-bridge",
@@ -122,15 +122,93 @@
       "reason": "workspace root discovery, config, and bootstrap are runtime/source seam surfaces"
     }
   },
-  "demoted_parent_candidates": {
-    "workspace-topology": "runtime-seam/workspace-root-resolution",
-    "compatibility": "boundary-bridge/compatibility-policy",
-    "skill-routing": "boundary-bridge/skill-runtime-bridge",
-    "surface-detection": "boundary-bridge/surface-detection-handoff",
-    "closeout": "checkpoint/closeout-bridge",
-    "a2a-return": "checkpoint/return-reentry",
-    "codex-plane": "codex-projection/deploy-status"
+  "active_part_routes": {
+    "runtime-seam": [
+      "workspace-root-resolution",
+      "portable-workspace-bootstrap",
+      "control-plane-capsule",
+      "runtime-mirror-boundary"
+    ],
+    "boundary-bridge": [
+      "consumed-surface-posture-gate",
+      "skill-runtime-bridge",
+      "technique-promotion-readiness-reader",
+      "owner-layer-signal-handoff"
+    ],
+    "antifragility": [
+      "stress-posture-dispatch-gate",
+      "reviewed-stress-closeout-carry",
+      "via-negativa"
+    ],
+    "checkpoint": [
+      "session-growth-checkpoint-cycle",
+      "reviewed-session-handoff-runner",
+      "child-task-reentry",
+      "reviewed-closeout-context-carry"
+    ],
+    "codex-projection": [
+      "workspace-mcp-server",
+      "live-rollout-status-readout",
+      "portability-boundary",
+      "owner-rollout-reference-handoff"
+    ],
+    "agon": [
+      "center-law-preview-helpers",
+      "state-packet-review-bindings",
+      "recurrence-adapter",
+      "duel-kernel-review-bindings",
+      "verdict-retention-rank-review-helpers",
+      "epistemic-kag-review-helpers",
+      "school-lineage-campaign-review-helpers",
+      "sophian-threshold-review-helpers"
+    ],
+    "experience": [
+      "capture-pipeline-helper",
+      "adoption-federation-helper-contracts",
+      "deployment-watchtower-helper-contracts",
+      "governance-runtime-helper-contracts",
+      "office-release-train-helper-contracts"
+    ],
+    "questbook": [
+      "quest-source-store",
+      "public-obligation-index",
+      "lifecycle-dispatch-posture"
+    ],
+    "titan": [
+      "incarnation-identity-runtime-helper-contracts",
+      "operator-console-helper-contracts",
+      "appserver-bridge-helper-contracts",
+      "memory-loom-recall-helper-contracts",
+      "session-praxis-replay-helper-contracts",
+      "swarm-ledger-closeout-helper-contracts"
+    ],
+    "recurrence": [
+      "component-manifest-gate",
+      "hook-observation-pack",
+      "graph-closure-snapshot",
+      "live-observation-producers",
+      "beacon-candidate-pressure",
+      "owner-review-surface",
+      "review-decision-closure",
+      "downstream-projection-guard",
+      "wiring-rollout-handoff",
+      "recursor-readiness"
+    ],
+    "release-support": [
+      "release-audit-publish-helper",
+      "public-support-ci-posture"
+    ],
+    "rpg": [
+      "typed-consumer-api",
+      "surface-path-transport"
+    ]
   },
+  "legacy_route_indexes": [
+    "mechanics/runtime-seam/legacy/INDEX.md",
+    "mechanics/boundary-bridge/legacy/INDEX.md",
+    "mechanics/checkpoint/legacy/INDEX.md",
+    "mechanics/codex-projection/legacy/INDEX.md"
+  ],
   "required_package_files": [
     "AGENTS.md",
     "README.md",
@@ -143,48 +221,84 @@
       "name_type": "shared",
       "operation": "Build and validate Agon SDK helper candidates, registries, recurrence adapters, state-packet bridges, and generated companions.",
       "source_surfaces": [
-        "config",
-        "docs/AGON_WAVE1_EXPERIENCE_CAPTURE_PIPELINE.md",
-        "generated/agon_recurrence_adapter_registry.min.json",
-        "schemas/agon-recurrence-adapter-registry.schema.json",
-        "scripts/build_agon_recurrence_adapter_registry.py",
-        "scripts/validate_agon_recurrence_adapter.py",
-        "tests/test_agon_recurrence_adapter.py"
+        "mechanics/agon/parts/center-law-preview-helpers",
+        "mechanics/agon/parts/state-packet-review-bindings",
+        "mechanics/agon/parts/recurrence-adapter",
+        "mechanics/agon/parts/duel-kernel-review-bindings",
+        "mechanics/agon/parts/verdict-retention-rank-review-helpers",
+        "mechanics/agon/parts/epistemic-kag-review-helpers",
+        "mechanics/agon/parts/school-lineage-campaign-review-helpers",
+        "mechanics/agon/parts/sophian-threshold-review-helpers"
       ],
       "candidate_parts": [
-        "helper-candidates",
-        "registries",
+        "center-law-preview-helpers",
+        "state-packet-review-bindings",
         "recurrence-adapter",
-        "state-packet-bindings"
+        "duel-kernel-review-bindings",
+        "verdict-retention-rank-review-helpers",
+        "epistemic-kag-review-helpers",
+        "school-lineage-campaign-review-helpers",
+        "sophian-threshold-review-helpers"
       ],
       "validation": [
-        "python -m pytest -q tests/test_agon_recurrence_adapter.py tests/test_agon_wave7_recurrence_lanes.py"
+        "python mechanics/agon/parts/center-law-preview-helpers/scripts/build_agon_ccs_sdk_helper_candidates.py --check",
+        "python mechanics/agon/parts/center-law-preview-helpers/scripts/validate_agon_ccs_sdk_helper_candidates.py",
+        "python mechanics/agon/parts/state-packet-review-bindings/scripts/build_agon_sdk_state_packet_bindings.py --check",
+        "python mechanics/agon/parts/state-packet-review-bindings/scripts/validate_agon_sdk_state_packet_bindings.py",
+        "python mechanics/agon/parts/recurrence-adapter/scripts/build_agon_recurrence_adapter_registry.py --check",
+        "python mechanics/agon/parts/recurrence-adapter/scripts/validate_agon_recurrence_adapter.py",
+        "python mechanics/agon/parts/recurrence-adapter/scripts/build_agon_recurrence_prebinding_review_lanes.py --check",
+        "python mechanics/agon/parts/recurrence-adapter/scripts/validate_agon_recurrence_prebinding_review_lanes.py",
+        "python mechanics/agon/parts/duel-kernel-review-bindings/scripts/build_agon_duel_kernel_sdk_bindings.py --check",
+        "python mechanics/agon/parts/duel-kernel-review-bindings/scripts/validate_agon_duel_kernel_sdk_bindings.py",
+        "python mechanics/agon/parts/duel-kernel-review-bindings/scripts/build_agon_mechanical_trial_sdk_helpers.py --check",
+        "python mechanics/agon/parts/duel-kernel-review-bindings/scripts/validate_agon_mechanical_trial_sdk_helpers.py",
+        "python mechanics/agon/parts/verdict-retention-rank-review-helpers/scripts/build_agon_vds_sdk_helper_candidates.py --check",
+        "python mechanics/agon/parts/verdict-retention-rank-review-helpers/scripts/validate_agon_vds_sdk_helper_candidates.py",
+        "python mechanics/agon/parts/verdict-retention-rank-review-helpers/scripts/build_agon_retention_rank_sdk_helpers.py --check",
+        "python mechanics/agon/parts/verdict-retention-rank-review-helpers/scripts/validate_agon_retention_rank_sdk_helpers.py",
+        "python mechanics/agon/parts/epistemic-kag-review-helpers/scripts/build_agon_epistemic_sdk_helpers.py --check",
+        "python mechanics/agon/parts/epistemic-kag-review-helpers/scripts/validate_agon_epistemic_sdk_helpers.py",
+        "python mechanics/agon/parts/epistemic-kag-review-helpers/scripts/build_agon_kag_sdk_helpers.py --check",
+        "python mechanics/agon/parts/epistemic-kag-review-helpers/scripts/validate_agon_kag_sdk_helpers.py",
+        "python mechanics/agon/parts/school-lineage-campaign-review-helpers/scripts/build_agon_slc_sdk_helpers.py --check",
+        "python mechanics/agon/parts/school-lineage-campaign-review-helpers/scripts/validate_agon_slc_sdk_helpers.py",
+        "python mechanics/agon/parts/sophian-threshold-review-helpers/scripts/build_agon_sophian_sdk_helpers.py --check",
+        "python mechanics/agon/parts/sophian-threshold-review-helpers/scripts/validate_agon_sophian_sdk_helpers.py",
+        "python -m pytest -q mechanics/agon/parts/center-law-preview-helpers/tests/test_agon_ccs_sdk_helper_candidates.py mechanics/agon/parts/state-packet-review-bindings/tests/test_agon_sdk_state_packet_bindings.py mechanics/agon/parts/recurrence-adapter/tests/test_agon_recurrence_adapter.py mechanics/agon/parts/recurrence-adapter/tests/test_agon_recurrence_prebinding_review_lanes.py mechanics/agon/parts/duel-kernel-review-bindings/tests/test_agon_duel_kernel_sdk_bindings.py mechanics/agon/parts/duel-kernel-review-bindings/tests/test_agon_mechanical_trial_sdk_helpers.py mechanics/agon/parts/verdict-retention-rank-review-helpers/tests/test_agon_vds_sdk_helper_candidates.py mechanics/agon/parts/verdict-retention-rank-review-helpers/tests/test_agon_retention_rank_sdk_helpers.py mechanics/agon/parts/epistemic-kag-review-helpers/tests/test_agon_epistemic_sdk_helpers.py mechanics/agon/parts/epistemic-kag-review-helpers/tests/test_agon_kag_sdk_helpers.py mechanics/agon/parts/school-lineage-campaign-review-helpers/tests/test_agon_slc_sdk_helpers.py mechanics/agon/parts/sophian-threshold-review-helpers/tests/test_agon_sophian_sdk_helpers.py"
       ]
     },
     {
       "slug": "antifragility",
       "name_type": "shared",
-      "operation": "Route SDK stress-context, degraded-mode, via negativa, and closeout stress carry below owner remediation.",
+      "operation": "Route SDK stress-posture dispatch, reviewed stress closeout carry, and via negativa pruning below owner remediation.",
       "source_surfaces": [
-        "docs/antifragility-control-plane.md",
-        "docs/antifragility-closeout-seam.md",
-        "docs/VIA_NEGATIVA_CHECKLIST.md",
-        "tests/fixtures/antifragility",
-        "tests/test_antifragility_public_surface.py"
+        "mechanics/antifragility/parts/stress-posture-dispatch-gate",
+        "mechanics/antifragility/parts/stress-posture-dispatch-gate/docs/stress-posture-dispatch-gate.md",
+        "mechanics/antifragility/parts/stress-posture-dispatch-gate/examples/stress-posture-dispatch-request.example.json",
+        "mechanics/antifragility/parts/stress-posture-dispatch-gate/examples/stress-posture-dispatch-decision.example.json",
+        "mechanics/antifragility/parts/stress-posture-dispatch-gate/tests/test_stress_posture_dispatch_gate.py",
+        "mechanics/antifragility/parts/reviewed-stress-closeout-carry",
+        "mechanics/antifragility/parts/reviewed-stress-closeout-carry/docs/reviewed-stress-closeout-carry.md",
+        "mechanics/antifragility/parts/reviewed-stress-closeout-carry/examples/reviewed-stress-closeout-manifest.example.json",
+        "mechanics/antifragility/parts/reviewed-stress-closeout-carry/tests/test_reviewed_stress_closeout_carry.py",
+        "mechanics/antifragility/parts/via-negativa",
+        "mechanics/antifragility/parts/via-negativa/docs/via-negativa-checklist.md",
+        "mechanics/antifragility/parts/via-negativa/tests/test_via_negativa_checklist.py"
       ],
       "candidate_parts": [
-        "stress-context",
-        "closeout-seam",
+        "stress-posture-dispatch-gate",
+        "reviewed-stress-closeout-carry",
         "via-negativa"
       ],
       "validation": [
-        "python -m pytest -q tests/test_antifragility_public_surface.py"
+        "python -m pytest -q mechanics/antifragility/parts/stress-posture-dispatch-gate/tests/test_stress_posture_dispatch_gate.py mechanics/antifragility/parts/reviewed-stress-closeout-carry/tests/test_reviewed_stress_closeout_carry.py mechanics/antifragility/parts/via-negativa/tests/test_via_negativa_checklist.py"
       ]
     },
     {
       "slug": "boundary-bridge",
       "name_type": "shared",
-      "operation": "Keep SDK typed facades, compatibility checks, skill bridges, and surface handoffs as handles while sibling repositories retain meaning.",
+      "operation": "Keep SDK typed facades, consumed-surface posture gates, skill bridges, and owner-layer signal handoffs as handles while sibling repositories retain meaning.",
       "source_surfaces": [
         "docs/boundaries.md",
         "src/aoa_sdk/AGENTS.md",
@@ -193,8 +307,30 @@
         "src/aoa_sdk/errors.py",
         "src/aoa_sdk/models.py",
         "docs/versioning.md",
-        "docs/skill-runtime-recommendation-gap.md",
-        "docs/aoa-surface-detection-first-wave.md",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_agent_phase_binding_surface_reader.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_posture_cli.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_eval_surface_reader.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_governed_run_surface_reader.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_kag_surface_reader.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_memo_surface_reader.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_playbook_surface_reader.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_surface_actions.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py",
+        "mechanics/boundary-bridge/parts/skill-runtime-bridge",
+        "mechanics/boundary-bridge/parts/skill-runtime-bridge/docs/recommendation-actionability-gap.md",
+        "mechanics/boundary-bridge/parts/skill-runtime-bridge/docs/host-actionability-reporting-design.md",
+        "mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge.py",
+        "mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge_cli.py",
+        "mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_reference_contracts.py",
+        "mechanics/boundary-bridge/parts/technique-promotion-readiness-reader",
+        "mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py",
+        "mechanics/boundary-bridge/parts/owner-layer-signal-handoff",
+        "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/initial-surface-detection-boundary.md",
+        "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md",
+        "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-heuristics.md",
+        "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md",
         "src/aoa_sdk/agents",
         "src/aoa_sdk/cli",
         "src/aoa_sdk/compatibility",
@@ -209,157 +345,197 @@
         "src/aoa_sdk/stats",
         "src/aoa_sdk/surfaces",
         "src/aoa_sdk/techniques",
-        "tests/test_compatibility.py",
-        "tests/test_governed_runs.py",
-        "tests/test_kag.py",
-        "tests/test_playbooks.py",
-        "tests/test_skills.py",
-        "tests/test_surfaces.py",
-        "tests/test_techniques.py"
+        "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py",
+        "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py",
+        "mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py"
       ],
       "candidate_parts": [
-        "typed-facades",
-        "surface-loaders",
-        "truth-labels",
-        "compatibility-policy",
+        "consumed-surface-posture-gate",
         "skill-runtime-bridge",
-        "surface-detection-handoff",
-        "owner-return-routes"
+        "technique-promotion-readiness-reader",
+        "owner-layer-signal-handoff"
       ],
       "validation": [
-        "python -m pytest -q tests/test_compatibility.py tests/test_skills.py tests/test_surfaces.py tests/test_routing.py"
+        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_agent_phase_binding_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_posture_cli.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_eval_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_governed_run_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_kag_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_memo_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_playbook_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_surface_actions.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge_cli.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_reference_contracts.py mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py"
       ]
     },
     {
       "slug": "checkpoint",
       "name_type": "shared",
-      "operation": "Capture session checkpoints, gate review, bridge reviewed closeout, and route return/re-entry packets without owner-truth transfer.",
+      "operation": "Capture session checkpoints, gate review, assemble review-context bundles, run reviewed session closeout handoffs, route child-task re-entry packets, and carry reviewed closeout context without owner-truth transfer.",
       "source_surfaces": [
-        "docs/session-growth-checkpoints.md",
-        "docs/checkpoint-note-promotion.md",
-        "docs/session-closeout.md",
-        "docs/A2A_WAVE5_CODEX_RETURN_CHECKPOINT.md",
-        "docs/RETURN_REENTRY_SEAM.md",
-        "githooks",
-        "schemas/checkpoint_lineage_hint.schema.json",
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle",
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md",
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md",
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates",
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py",
+        "mechanics/checkpoint/parts/reviewed-session-handoff-runner",
+        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md",
+        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/install_closeout_units.py",
+        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/process_closeout_inbox.py",
+        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units",
+        "mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md",
+        "mechanics/checkpoint/parts/child-task-reentry/docs/return-reentry.md",
+        "mechanics/checkpoint/parts/child-task-reentry/examples/summon_return_checkpoint_e2e.fixture.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/candidate-lineage-carry.md",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/owner-followthrough-map.md",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/component-refresh-followthrough.md",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/self-agency-continuity-carry.md",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/next-kernel-followthrough-decision.md",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/checkpoint_lineage_hint.schema.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_candidate_lineage_map.schema.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_owner_followthrough_map.schema.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/component_drift_hint_set.schema.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/component_refresh_followthrough_decision_set.schema.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_continuity_window.schema.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_followthrough_decision.schema.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/checkpoint_lineage_hint.example.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_candidate_lineage_map.example.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_owner_followthrough_map.example.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/component_drift_hints.example.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/component_refresh_followthrough_decision.example.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_continuity_window.example.json",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_followthrough_decision.example.json",
         "src/aoa_sdk/a2a",
         "src/aoa_sdk/checkpoints",
         "src/aoa_sdk/closeout",
-        "systemd",
-        "tests/test_checkpoint_cli.py",
-        "tests/test_checkpoints.py",
-        "tests/test_closeout.py",
-        "tests/test_a2a_wave5_checkpoint_and_return.py"
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py",
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py",
+        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py",
+        "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_sdk_api.py",
+        "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_skill_contract.py",
+        "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_assessment.py",
+        "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_checkpoint_and_return.py",
+        "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_codex_and_closeout.py",
+        "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_e2e_fixture.py",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py"
       ],
       "candidate_parts": [
-        "capture",
-        "git-boundary",
-        "review-note",
-        "closeout-context",
-        "closeout-bridge",
-        "return-reentry"
+        "session-growth-checkpoint-cycle",
+        "reviewed-session-handoff-runner",
+        "child-task-reentry",
+        "reviewed-closeout-context-carry"
       ],
       "validation": [
-        "python -m pytest -q tests/test_checkpoint_cli.py tests/test_checkpoints.py tests/test_closeout.py tests/test_a2a_wave5_checkpoint_and_return.py"
+        "python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_sdk_api.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_skill_contract.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_assessment.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_checkpoint_and_return.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_codex_and_closeout.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_e2e_fixture.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py"
       ]
     },
     {
       "slug": "codex-projection",
       "name_type": "shared",
-      "operation": "Project SDK workspace orientation into Codex-facing MCP, deploy-status, portability, and rollout read surfaces.",
+      "operation": "Project SDK workspace orientation into Codex-facing MCP server, live rollout status readouts, portability boundaries, and owner rollout reference handoffs.",
       "source_surfaces": [
-        "docs/codex-workspace-mcp.md",
-        "docs/CODEX_PLANE_DEPLOY_STATUS.md",
-        "docs/CODEX_PLANE_PORTABILITY.md",
-        "examples/codex_plane_deploy_status_snapshot.example.json",
-        "schemas/codex_plane_deploy_status_snapshot_v1.json",
-        "scripts/aoa_workspace_mcp_server.py",
-        "src/aoa_sdk/codex",
-        "tests/test_codex_workspace_mcp.py",
-        "tests/test_codex_deploy_status.py"
+        "mechanics/codex-projection/parts/workspace-mcp-server",
+        "mechanics/codex-projection/parts/workspace-mcp-server/docs/workspace-mcp-server.md",
+        "mechanics/codex-projection/parts/workspace-mcp-server/scripts/aoa_workspace_mcp_server.py",
+        "mechanics/codex-projection/parts/workspace-mcp-server/tests/test_workspace_mcp_server.py",
+        "mechanics/codex-projection/parts/live-rollout-status-readout",
+        "mechanics/codex-projection/parts/live-rollout-status-readout/docs/live-rollout-status-readout.md",
+        "mechanics/codex-projection/parts/live-rollout-status-readout/examples/live-rollout-status-snapshot.example.json",
+        "mechanics/codex-projection/parts/live-rollout-status-readout/schemas/live-rollout-status-snapshot.schema.json",
+        "mechanics/codex-projection/parts/live-rollout-status-readout/tests/test_live_rollout_status_readout.py",
+        "mechanics/codex-projection/parts/portability-boundary/docs/portability-boundary.md",
+        "mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/deploy-operation-boundary-note.md",
+        "mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/rollout-campaign-refs.md",
+        "src/aoa_sdk/codex"
       ],
       "candidate_parts": [
-        "workspace-mcp",
-        "deploy-status",
-        "portability",
-        "rollout-refs"
+        "workspace-mcp-server",
+        "live-rollout-status-readout",
+        "portability-boundary",
+        "owner-rollout-reference-handoff"
       ],
       "validation": [
-        "python -m pytest -q tests/test_codex_workspace_mcp.py tests/test_codex_deploy_status.py"
+        "python -m pytest -q mechanics/codex-projection/parts/workspace-mcp-server/tests/test_workspace_mcp_server.py mechanics/codex-projection/parts/live-rollout-status-readout/tests/test_live_rollout_status_readout.py"
       ]
     },
     {
       "slug": "experience",
       "name_type": "shared",
-      "operation": "Maintain Experience API helper contracts for adoption, deployment, governance, watchtower, rollback, and release calls.",
+      "operation": "Maintain Experience SDK helper contracts for capture, adoption federation, deployment/watchtower, governance runtime, and office release-train routes.",
       "source_surfaces": [
-        "docs/EXPERIENCE_ADOPTION_API.md",
-        "docs/EXPERIENCE_DEPLOYMENT_API.md",
-        "examples/sdk_adoption_request_call.example.json",
-        "schemas/sdk_adoption_request_call_v1.json",
-        "tests/test_experience_wave2_seed_contracts.py",
-        "tests/test_experience_wave3_seed_contracts.py",
-        "tests/test_experience_wave4_seed_contracts.py",
-        "tests/test_experience_wave5_seed_contracts.py"
+        "mechanics/experience/parts/capture-pipeline-helper",
+        "mechanics/experience/parts/adoption-federation-helper-contracts",
+        "mechanics/experience/parts/deployment-watchtower-helper-contracts",
+        "mechanics/experience/parts/governance-runtime-helper-contracts",
+        "mechanics/experience/parts/office-release-train-helper-contracts"
       ],
       "candidate_parts": [
-        "adoption",
-        "deployment",
-        "governance",
-        "watchtower",
-        "rollback",
-        "release"
+        "capture-pipeline-helper",
+        "adoption-federation-helper-contracts",
+        "deployment-watchtower-helper-contracts",
+        "governance-runtime-helper-contracts",
+        "office-release-train-helper-contracts"
       ],
       "validation": [
-        "python -m pytest -q tests/test_experience_wave2_seed_contracts.py tests/test_experience_wave3_seed_contracts.py tests/test_experience_wave4_seed_contracts.py tests/test_experience_wave5_seed_contracts.py"
+        "python -m pytest -q mechanics/experience/parts/capture-pipeline-helper/tests/test_capture_pipeline_helper.py",
+        "python -m pytest -q mechanics/experience/parts/adoption-federation-helper-contracts/tests/test_adoption_federation_helper_contracts.py mechanics/experience/parts/deployment-watchtower-helper-contracts/tests/test_deployment_watchtower_helper_contracts.py mechanics/experience/parts/governance-runtime-helper-contracts/tests/test_governance_runtime_helper_contracts.py mechanics/experience/parts/office-release-train-helper-contracts/tests/test_office_release_train_helper_contracts.py"
       ]
     },
     {
       "slug": "questbook",
       "name_type": "shared",
-      "operation": "Route SDK quest source records and durable followthrough obligations without owner acceptance claims.",
+      "operation": "Keep SDK source quest records, public obligation index posture, lifecycle vocabulary, and future dispatch-reader posture visible without turning obligations into owner verdicts.",
       "source_surfaces": [
-        "quests",
-        "mechanics/agon/README.md",
-        "mechanics/agon/PARTS.md",
-        "ROADMAP.md"
+        "QUESTBOOK.md",
+        "quests/README.md",
+        "quests/AGENTS.md",
+        "quests/agon/README.md",
+        "quests/agon/ready",
+        "mechanics/questbook/parts/quest-source-store",
+        "mechanics/questbook/parts/public-obligation-index",
+        "mechanics/questbook/parts/lifecycle-dispatch-posture"
       ],
       "candidate_parts": [
         "quest-source-store",
-        "agon-helper-quests",
-        "owner-followthrough"
+        "public-obligation-index",
+        "lifecycle-dispatch-posture"
       ],
       "validation": [
         "python scripts/validate_mechanics_topology.py",
-        "python -m pytest -q tests/test_mechanics_topology.py"
+        "python scripts/validate_nested_agents.py --strict-advisory --fail-on-untracked",
+        "python -m pytest -q tests/test_mechanics_topology.py tests/test_design_surfaces.py"
       ]
     },
     {
       "slug": "recurrence",
       "name_type": "shared",
-      "operation": "Manage recurrence manifests, hooks, graph closure, review decisions, downstream projections, observations, and readiness.",
+      "operation": "Manage SDK recurrence manifest gates, observation producers, technique publication observation boundaries, graph readouts, review surfaces, downstream projection guards, rollout handoffs, and recursor readiness scans.",
       "source_surfaces": [
-        "docs/RECURRENCE_CONTROL_PLANE.md",
-        "docs/RECURRENCE_HARDENING_COMPATIBILITY.md",
-        "examples/recurrence",
-        "manifests/recurrence",
-        "schemas/manifest_scan_report.schema.json",
-        "scripts/validate_recurrence_manifests.py",
         "src/aoa_sdk/recurrence",
-        "tests/test_recurrence_registry.py"
+        "mechanics/recurrence/parts/component-manifest-gate/docs/control-plane.md",
+        "mechanics/recurrence/parts/component-manifest-gate/manifests",
+        "mechanics/recurrence/parts/component-manifest-gate/schemas/change_signal.schema.json",
+        "mechanics/recurrence/parts/hook-observation-pack/docs/technique-publication-observation-boundary.md",
+        "mechanics/recurrence/parts/hook-observation-pack/manifests",
+        "mechanics/recurrence/parts/component-manifest-gate/schemas/manifest_scan_report.schema.json",
+        "mechanics/recurrence/parts/graph-closure-snapshot/schemas/graph_snapshot.schema.json",
+        "mechanics/recurrence/parts/live-observation-producers/schemas/live_observation_run.schema.json",
+        "mechanics/recurrence/parts/beacon-candidate-pressure",
+        "mechanics/recurrence/parts/owner-review-surface",
+        "mechanics/recurrence/parts/review-decision-closure/schemas/owner_review_decision.schema.json",
+        "mechanics/recurrence/parts/downstream-projection-guard/schemas/downstream-projection-bundle.schema.json",
+        "mechanics/recurrence/parts/wiring-rollout-handoff",
+        "mechanics/recurrence/parts/recursor-readiness/scripts/recursor_agent_readiness.py"
       ],
       "candidate_parts": [
-        "manifest-compatibility",
-        "hook-pack",
-        "graph-closure",
-        "review-decision",
-        "downstream-projections",
-        "live-observations",
+        "component-manifest-gate",
+        "hook-observation-pack",
+        "graph-closure-snapshot",
+        "live-observation-producers",
+        "beacon-candidate-pressure",
+        "owner-review-surface",
+        "review-decision-closure",
+        "downstream-projection-guard",
+        "wiring-rollout-handoff",
         "recursor-readiness"
       ],
       "validation": [
-        "python scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS",
-        "python -m pytest -q tests/test_recurrence_registry.py tests/test_recurrence_seed.py"
+        "python mechanics/recurrence/parts/component-manifest-gate/scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS --json",
+        "python -m pytest -q mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_registry.py mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_seed.py",
+        "python -m pytest -q mechanics/recurrence/parts/hook-observation-pack/tests/test_recurrence_hook_pack_seed.py mechanics/recurrence/parts/beacon-candidate-pressure/tests/test_recurrence_beacon_seed.py mechanics/recurrence/parts/downstream-projection-guard/tests/test_recurrence_downstream_projection_seed.py"
       ]
     },
     {
@@ -370,22 +546,29 @@
         "CHANGELOG.md",
         "docs/RELEASING.md",
         "docs/RELEASE_CI_POSTURE.md",
+        "mechanics/release-support/parts/release-audit-publish-helper",
+        "mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md",
+        "mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py",
+        ".github/workflows/release-artifacts.yml",
+        ".github/workflows/release-cadence-audit.yml",
+        "mechanics/release-support/parts/public-support-ci-posture",
+        "mechanics/release-support/parts/public-support-ci-posture/docs/public-support-ci-posture.md",
+        "mechanics/release-support/parts/public-support-ci-posture/config/sibling_canary_matrix.json",
+        "mechanics/release-support/parts/public-support-ci-posture/scripts/run_sibling_canary.py",
+        "mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py",
+        "mechanics/release-support/parts/public-support-ci-posture/tests/test_sibling_canary.py",
         ".github/workflows/repo-validation.yml",
+        ".github/workflows/latest-sibling-canary.yml",
         "scripts/release_check.py",
-        "src/aoa_sdk/release",
-        "tests/test_release.py",
-        "tests/test_roadmap_parity.py"
+        "src/aoa_sdk/release"
       ],
       "candidate_parts": [
-        "changelog",
-        "release-audit",
-        "ci-posture",
-        "package-build",
-        "publication"
+        "release-audit-publish-helper",
+        "public-support-ci-posture"
       ],
       "validation": [
         "python scripts/release_check.py",
-        "python -m pytest -q tests/test_release.py tests/test_roadmap_parity.py"
+        "python -m pytest -q mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py mechanics/release-support/parts/public-support-ci-posture/tests/test_sibling_canary.py"
       ]
     },
     {
@@ -393,18 +576,21 @@
       "name_type": "shared",
       "operation": "Provide the RPG typed consumer slice and surface-path helpers without becoming gameplay runtime.",
       "source_surfaces": [
-        "docs/RPG_SDK_ADDENDUM.md",
-        "docs/RPG_SURFACE_PATHS.md",
+        "mechanics/rpg/parts/typed-consumer-api",
+        "mechanics/rpg/parts/typed-consumer-api/docs/typed-consumer-api-boundary.md",
+        "mechanics/rpg/parts/typed-consumer-api/tests/test_typed_consumer_api.py",
+        "mechanics/rpg/parts/surface-path-transport",
+        "mechanics/rpg/parts/surface-path-transport/docs/surface-path-transport.md",
+        "mechanics/rpg/parts/surface-path-transport/tests/test_surface_path_transport.py",
         "src/aoa_sdk/rpg",
-        "tests/test_rpg_api.py"
+        "src/aoa_sdk/rpg/surfaces.py"
       ],
       "candidate_parts": [
-        "typed-registry",
-        "surface-paths",
-        "consumer-api"
+        "typed-consumer-api",
+        "surface-path-transport"
       ],
       "validation": [
-        "python -m pytest -q tests/test_rpg_api.py"
+        "python -m pytest -q mechanics/rpg/parts/typed-consumer-api/tests/test_typed_consumer_api.py mechanics/rpg/parts/surface-path-transport/tests/test_surface_path_transport.py"
       ]
     },
     {
@@ -415,52 +601,55 @@
         ".aoa/workspace.toml",
         "docs/workspace-layout.md",
         "generated/workspace_control_plane.min.json",
-        "githooks",
         "scripts/build_workspace_control_plane.py",
         "scripts/validate_workspace_control_plane.py",
-        "src/aoa_sdk/workspace",
-        "systemd",
-        "tests/test_workspace.py",
-        "tests/test_workspace_control_plane.py",
-        "tests/test_live_workspace.py"
+        "mechanics/runtime-seam/parts/workspace-root-resolution",
+        "mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py",
+        "mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution_cli.py",
+        "mechanics/runtime-seam/parts/portable-workspace-bootstrap",
+        "mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py",
+        "mechanics/runtime-seam/parts/control-plane-capsule",
+        "mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py",
+        "mechanics/runtime-seam/parts/runtime-mirror-boundary",
+        "mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py",
+        "src/aoa_sdk/workspace"
       ],
       "candidate_parts": [
         "workspace-root-resolution",
         "control-plane-capsule",
-        "portable-bootstrap",
-        "runtime-mirror-boundary",
-        "local-automation-seam"
+        "portable-workspace-bootstrap",
+        "runtime-mirror-boundary"
       ],
       "validation": [
         "python scripts/build_workspace_control_plane.py --check",
         "python scripts/validate_workspace_control_plane.py",
-        "python -m pytest -q tests/test_workspace.py tests/test_workspace_control_plane.py tests/test_live_workspace.py"
+        "python -m pytest -q mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution_cli.py mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py"
       ]
     },
     {
       "slug": "titan",
       "name_type": "shared",
-      "operation": "Expose bounded Titan runtime harness, console, appserver, identity, memory, session, and swarm helpers.",
+      "operation": "Expose bounded Titan SDK helper contracts for incarnation/runtime receipts, operator console, appserver bridge, memory loom and recall, visible session replay, and swarm closeout.",
       "source_surfaces": [
-        "docs/TITAN_RUNTIME_HARNESS.md",
-        "docs/TITAN_OPERATOR_CONSOLE.md",
-        "examples/titan_console_state.example.json",
-        "schemas/titan_console_state.schema.json",
-        "scripts/titanctl.py",
         "src/aoa_sdk/titans",
-        "tests/test_titan_console.py",
-        "tests/test_titanctl_runtime.py"
+        "mechanics/titan/parts/incarnation-identity-runtime-helper-contracts",
+        "mechanics/titan/parts/operator-console-helper-contracts",
+        "mechanics/titan/parts/appserver-bridge-helper-contracts",
+        "mechanics/titan/parts/memory-loom-recall-helper-contracts",
+        "mechanics/titan/parts/session-praxis-replay-helper-contracts",
+        "mechanics/titan/parts/swarm-ledger-closeout-helper-contracts"
       ],
       "candidate_parts": [
-        "runtime-harness",
-        "operator-console",
-        "appserver-bridge",
-        "memory-loom",
-        "session-replay",
-        "swarm-ledger"
+        "incarnation-identity-runtime-helper-contracts",
+        "operator-console-helper-contracts",
+        "appserver-bridge-helper-contracts",
+        "memory-loom-recall-helper-contracts",
+        "session-praxis-replay-helper-contracts",
+        "swarm-ledger-closeout-helper-contracts"
       ],
       "validation": [
-        "python -m pytest -q tests/test_titan_console.py tests/test_titanctl_runtime.py"
+        "python -m pytest -q mechanics/titan/parts/incarnation-identity-runtime-helper-contracts/tests/test_titanctl_runtime.py mechanics/titan/parts/incarnation-identity-runtime-helper-contracts/tests/test_titan_incarnation_spine.py",
+        "python -m pytest -q mechanics/titan/parts/operator-console-helper-contracts/tests/test_titan_console.py mechanics/titan/parts/appserver-bridge-helper-contracts/tests/test_titan_appserver_bridge.py mechanics/titan/parts/memory-loom-recall-helper-contracts/tests/test_titan_memory_loom.py mechanics/titan/parts/session-praxis-replay-helper-contracts/tests/test_titan_session_replay.py mechanics/titan/parts/swarm-ledger-closeout-helper-contracts/tests/test_titan_swarm_ledger.py mechanics/titan/parts/swarm-ledger-closeout-helper-contracts/tests/test_titan_closeout_audit.py"
       ]
     }
   ]

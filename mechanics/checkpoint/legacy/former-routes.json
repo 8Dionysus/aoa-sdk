@@ -1,0 +1,18 @@
+{
+  "schema_version": "aoa_sdk_mechanics_legacy_routes_v1",
+  "parent": "checkpoint",
+  "entries": [
+    {
+      "former_name": "closeout",
+      "active_route": "checkpoint/reviewed-session-handoff-runner",
+      "status": "distilled",
+      "rationale": "Closeout assembly is a reviewed checkpoint bridge part, not an independent SDK parent mechanic."
+    },
+    {
+      "former_name": "a2a-return",
+      "active_route": "checkpoint/child-task-reentry",
+      "status": "distilled",
+      "rationale": "A2A return is a return and re-entry part below checkpoint review, not an independent SDK parent mechanic."
+    }
+  ]
+}

@@ -36,11 +36,12 @@ For a different machine layout, prefer overrides over code changes.
 Repo names in env vars are normalized to uppercase with non-alphanumeric characters replaced by `_`.
 
 Workspace discovery overrides in `aoa-sdk` are not a substitute for
-Codex-plane deployment regeneration. When the live public workspace root
+Codex Projection deployment regeneration. When the live public workspace root
 changes, rerender the source-owned `8Dionysus/.codex/` deployment surfaces
-from the shared Codex-plane manifest/profile pair instead of patching SDK
+from the shared Codex projection manifest/profile pair instead of patching SDK
 discovery code or MCP server names ad hoc. For the owner split, see
-`docs/CODEX_PLANE_PORTABILITY.md` and `8Dionysus/docs/CODEX_PLANE_REGENERATION.md`.
+`mechanics/codex-projection/parts/portability-boundary/docs/portability-boundary.md`
+and `8Dionysus/docs/CODEX_PLANE_REGENERATION.md`.
 
 ## Inspection
 

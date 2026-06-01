@@ -13,6 +13,9 @@ posture, build, publication helper, and Repo Validation support.
 
 - `mechanics/AGENTS.md`
 - `mechanics/release-support/README.md`
+- `mechanics/release-support/parts/AGENTS.md`
+- `mechanics/release-support/parts/release-audit-publish-helper/README.md`
+- `mechanics/release-support/parts/public-support-ci-posture/README.md`
 - `CHANGELOG.md`
 - `docs/RELEASING.md`
 - `docs/RELEASE_CI_POSTURE.md`
@@ -31,7 +34,7 @@ posture, build, publication helper, and Repo Validation support.
 ```bash
 python scripts/validate_mechanics_topology.py
 python scripts/release_check.py
-python -m pytest -q tests/test_release.py tests/test_roadmap_parity.py
+python -m pytest -q mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py
 ```
 
 ## Closeout

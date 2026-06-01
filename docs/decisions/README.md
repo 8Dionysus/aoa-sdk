@@ -74,11 +74,68 @@ python scripts/generate_decision_indexes.py --check
 The corrected parent mechanics topology is recorded in
 `AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`. The source-family
 coverage guard is recorded in
-`AOA-SDK-D-0006-mechanics-source-family-crosswalk.md`.
+`AOA-SDK-D-0006-mechanics-source-family-crosswalk.md`. The first
+mechanic-owned payload localization is recorded in
+`AOA-SDK-D-0007-mechanic-artifact-localization.md`. Codex Projection artifact
+localization is recorded in
+`AOA-SDK-D-0008-codex-projection-artifact-localization.md`. Agon and
+Experience part-local helper localization is recorded in
+`AOA-SDK-D-0009-agon-experience-part-localization.md`. The remaining
+Experience helper contract bundles are localized in
+`AOA-SDK-D-0010-experience-helper-contract-part-localization.md`. Titan helper
+contract bundles are localized in
+`AOA-SDK-D-0011-titan-helper-contract-part-localization.md`. Recurrence
+control-plane payload is localized in
+`AOA-SDK-D-0012-recurrence-control-plane-part-localization.md`. Boundary Bridge
+and Checkpoint active payload is localized in
+`AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md`.
+Antifragility stress-posture dispatch, reviewed stress closeout carry, and via
+negativa pruning payload is localized in
+`AOA-SDK-D-0014-antifragility-active-part-localization.md`. RPG typed consumer
+API and surface-path transport payload is localized in
+`AOA-SDK-D-0015-rpg-typed-consumer-part-localization.md`. Checkpoint reviewed
+closeout context carry payload is localized in
+`AOA-SDK-D-0016-checkpoint-closeout-context-carry-localization.md`. Boundary
+Bridge skill-runtime bridge payload is localized in
+`AOA-SDK-D-0017-skill-runtime-bridge-part-localization.md`. Release Support
+runbook, public support posture, and release helper tests are localized in
+`AOA-SDK-D-0018-release-support-part-localization.md`. Codex Projection
+workspace MCP server docs, runnable script, and tests are localized in
+`AOA-SDK-D-0019-codex-workspace-mcp-server-localization.md`. Technique
+publication hook guidance is localized as a recurrence observation boundary in
+`AOA-SDK-D-0020-technique-publication-observation-boundary-localization.md`.
+The `aoa-techniques` promotion-readiness facade regression is localized in
+`AOA-SDK-D-0021-technique-promotion-readiness-reader-localization.md`.
+Reviewed session handoff runner docs and operator scripts are localized in
+`AOA-SDK-D-0022-reviewed-session-handoff-runner-localization.md`.
+Session-growth checkpoint cycle docs are localized in
+`AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md`. Active
+mechanics topology status naming is recorded in
+`AOA-SDK-D-0034-active-mechanics-topology-status-naming.md`. Diagnostic catalog
+compatibility path canonicalization is recorded in
+`AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md`.
+Root technical district allowlist validation is recorded in
+`AOA-SDK-D-0036-root-technical-district-allowlist-validation.md`. Workspace
+MCP surface-crosswalk naming is recorded in
+`AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md`.
+Skill and surface manual-equivalence naming is recorded in
+`AOA-SDK-D-0038-manual-equivalence-active-lane-naming.md`. A2A quest-passport
+secondary-tier naming is recorded in
+`AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md`. Sibling
+fallback-key input alias normalization is recorded in
+`AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md`.
+External stress fallback-ref accounting is recorded in
+`AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md`. Questbook source
+store restoration is recorded in
+`AOA-SDK-D-0042-questbook-source-store-restoration.md`. The checked SDK
+source-home tree is recorded in
+`AOA-SDK-D-0043-sdk-source-home-tree.md`.
 
 Together they supersede the first inventory-based skeleton's parent package set
-while preserving the same route-only rule: no source payload moved into
-`mechanics/`.
+and replace the old route-only posture with a controlled part-local payload
+rule: single-mechanic artifacts move into functioning parts, while root keeps
+only public, shared, repo-wide, tooling-facing contracts, or the Questbook
+source-record district.
 
 ## Addressing
 

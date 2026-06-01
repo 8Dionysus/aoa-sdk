@@ -35,15 +35,47 @@ def test_mechanics_package_set_is_explicit() -> None:
     )
 
 
-def test_demoted_parent_candidates_are_explicit_parts() -> None:
-    assert mechanics_validator.DEMOTED_PARENT_CANDIDATES == (
-        "workspace-topology",
-        "compatibility",
-        "skill-routing",
-        "surface-detection",
-        "closeout",
-        "a2a-return",
-        "codex-plane",
+def test_former_parent_names_are_legacy_indexed_not_active_topology() -> None:
+    topology = mechanics_validator._read_json(  # noqa: SLF001
+        REPO_ROOT / mechanics_validator.TOPOLOGY_PATH,
+        [],
+    )
+
+    assert "demoted_" + "parent_candidates" not in topology
+    assert topology["legacy_route_indexes"] == [
+        path.as_posix() for path in mechanics_validator.LEGACY_INDEX_FILES
+    ]
+    assert set(topology["active_part_routes"]["boundary-bridge"]) >= {
+        "consumed-surface-posture-gate",
+        "owner-layer-signal-handoff",
+    }
+
+
+def test_active_topology_status_names_current_payload_posture() -> None:
+    topology = mechanics_validator._read_json(  # noqa: SLF001
+        REPO_ROOT / mechanics_validator.TOPOLOGY_PATH,
+        [],
+    )
+
+    assert topology["status"] == mechanics_validator.EXPECTED_TOPOLOGY_STATUS
+    assert topology["payload_movement_status"] == mechanics_validator.EXPECTED_PAYLOAD_MOVEMENT_STATUS
+
+
+def test_active_route_ids_do_not_use_legacy_or_migration_vocabulary() -> None:
+    topology = mechanics_validator._read_json(  # noqa: SLF001
+        REPO_ROOT / mechanics_validator.TOPOLOGY_PATH,
+        [],
+    )
+
+    active_routes = {
+        f"{parent}/{part}"
+        for parent, parts in topology["active_part_routes"].items()
+        for part in parts
+    }
+    assert all(
+        token not in route
+        for route in active_routes
+        for token in mechanics_validator.FORBIDDEN_ACTIVE_ROUTE_TOKENS
     )
 
 
@@ -53,6 +85,27 @@ def test_source_family_routes_cover_current_sdk_source_tree() -> None:
         [],
     )
     assert set(topology["source_family_routes"]) == mechanics_validator._source_families(REPO_ROOT)  # noqa: SLF001
+
+
+def test_root_technical_district_files_are_explicitly_allowlisted() -> None:
+    issues: list[str] = []
+    mechanics_validator._validate_root_technical_districts(REPO_ROOT, issues)  # noqa: SLF001
+
+    assert issues == []
+
+
+def test_questbook_source_store_is_root_routed_not_part_local() -> None:
+    assert (REPO_ROOT / "QUESTBOOK.md").is_file()
+    assert (REPO_ROOT / "quests" / "README.md").is_file()
+    assert (REPO_ROOT / "quests" / "AGENTS.md").is_file()
+    assert (REPO_ROOT / "quests" / "agon" / "ready").is_dir()
+    assert (REPO_ROOT / "mechanics" / "questbook" / "README.md").is_file()
+
+    part_local_quest_dirs = sorted(
+        path.relative_to(REPO_ROOT).as_posix()
+        for path in (REPO_ROOT / "mechanics").glob("*/parts/*/quests")
+    )
+    assert part_local_quest_dirs == []
 
 
 def test_boundary_bridge_covers_sibling_facade_source_families() -> None:

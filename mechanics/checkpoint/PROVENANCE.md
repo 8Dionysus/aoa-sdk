@@ -2,18 +2,23 @@
 
 ## Source Surfaces
 
-- `docs/session-growth-checkpoints.md`
-- `docs/checkpoint-note-promotion.md`
-- `docs/session-closeout.md`
-- `docs/A2A_WAVE5_CODEX_RETURN_CHECKPOINT.md`
-- `docs/RETURN_REENTRY_SEAM.md`
-- `githooks/`
-- `schemas/checkpoint_lineage_hint.schema.json`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/install_closeout_units.py`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/process_closeout_inbox.py`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/`
+- `mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md`
+- `mechanics/checkpoint/parts/child-task-reentry/docs/return-reentry.md`
+- `mechanics/checkpoint/parts/reviewed-closeout-context-carry/`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/`
 - `src/aoa_sdk/checkpoints/`
 - `src/aoa_sdk/closeout/`
 - `src/aoa_sdk/a2a/`
-- `tests/test_checkpoint_cli.py`
-- `tests/test_checkpoints.py`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py`
 
 ## Stronger Owners
 
@@ -26,6 +31,16 @@ mechanic only captures and gates local evidence.
 This shared name matches the recurring AoA checkpoint shape but keeps SDK
 behavior limited to session-local control-plane support.
 
-The first SDK skeleton incorrectly promoted `closeout` and `a2a-return` to
-parent mechanics. They are Checkpoint parts: closeout bridge and return
-re-entry.
+Former parent-name candidates for this package live only in
+`legacy/INDEX.md`. Active Checkpoint routes name the operation: review context
+bundle, reviewed session handoff runner, and child-task re-entry.
+
+Former root closeout-carry docs, schemas, examples, and tests moved into
+`mechanics/checkpoint/parts/reviewed-closeout-context-carry/`. Old root names
+such as `docs/CANDIDATE_LINEAGE_CARRY.md`,
+`docs/closeout-followthrough-map.md`, `docs/COMPONENT_DRIFT_HINTS.md`,
+`docs/SELF_AGENCY_CONTINUITY_CARRY.md`,
+`docs/SESSION_GROWTH_KERNEL_SIGNAL_RULES.md`,
+`schemas/checkpoint_lineage_hint.schema.json`, root closeout-carry schemas,
+root closeout-carry examples, and the candidate/component carry tests are
+provenance only, not active routes.

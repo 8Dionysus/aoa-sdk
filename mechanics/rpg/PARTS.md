@@ -4,6 +4,5 @@
 
 | Part | Current surfaces | Future payload condition |
 | --- | --- | --- |
-| typed-registry | `src/aoa_sdk/rpg/registry.py`, models | only if registry contracts need examples |
-| surface-paths | `docs/RPG_SURFACE_PATHS.md`, `src/aoa_sdk/rpg/surfaces.py` | only if paths become generated surfaces |
-| consumer-api | `docs/RPG_SDK_ADDENDUM.md`, `tests/test_rpg_api.py` | only if API examples become reusable fixtures |
+| [typed-consumer-api](parts/typed-consumer-api/README.md) | typed consumer API boundary doc, source family, and part tests | active part-local SDK consumer API route |
+| [surface-path-transport](parts/surface-path-transport/README.md) | surface path transport doc and route test | active part-local path expectation route |

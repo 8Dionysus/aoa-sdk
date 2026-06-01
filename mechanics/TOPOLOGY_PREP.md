@@ -1,6 +1,6 @@
 # Mechanics Topology Prep
 
-Status: source inventory for the first `aoa-sdk` mechanics skeleton.
+Status: source inventory for the first `aoa-sdk` mechanics topology draft.
 
 This file records the analysis basis for `mechanics/`. It is intentionally a
 topology prep surface, not a payload migration log.
@@ -8,7 +8,7 @@ topology prep surface, not a payload migration log.
 ## Inventory Basis
 
 The first pass used tracked files only, so transient caches and local runtime
-artifacts do not shape the skeleton.
+artifacts do not shape the topology draft.
 
 ```text
 tracked files: 1056
@@ -26,14 +26,12 @@ Top-level tracked distribution:
 | `docs` | 154 | authored boundaries, API contracts, decisions, recurrence, Agon, Titan, closeout, release |
 | `examples` | 112 | public-safe fixtures and schema examples |
 | `generated` | 14 | lower-authority control-plane companions |
-| `githooks` | 4 | optional active-session git boundary integration |
 | `manifests` | 21 | recurrence component and hook manifests |
 | `mechanics` | 52 | operation topology cards, parts, provenance, and validator inputs |
-| `quests` | 12 | Agon helper quest candidates |
+| `quests` | 12 | Agon helper quest source records |
 | `schemas` | 122 | SDK helper contract schemas |
 | `scripts` | 50 | builders, validators, operators, release checks |
 | `src` | 106 | importable typed SDK source |
-| `systemd` | 3 | optional bounded closeout inbox automation |
 | `tests` | 165 | regression, fixture, schema, CLI, and route checks |
 
 Extension distribution:
@@ -45,7 +43,7 @@ Extension distribution:
 | `.py` | 242 | SDK source, tests, builders, validators, operator scripts |
 | `.svg` | 50 | documentation and skill assets |
 | `.yaml` | 44 | skill metadata and workflow support |
-| no extension | 5 | license and hook/runtime command files |
+| no extension | 5 | license and part-local Git hook templates |
 | `.yml` | 5 | GitHub workflow support |
 | `.example` | 5 | hook template examples |
 | `.toml` | 3 | package and workspace metadata |
@@ -62,10 +60,10 @@ Local route cards before this landing:
 - `.github/AGENTS.md`
 - `docs/decisions/AGENTS.md`
 - `generated/AGENTS.md`
-- `githooks/AGENTS.md`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/AGENTS.md`
 - `schemas/AGENTS.md`
 - `src/aoa_sdk/AGENTS.md`
-- `systemd/AGENTS.md`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/AGENTS.md`
 
 `mechanics/AGENTS.md` becomes the local route card for this new topology
 district.
@@ -81,13 +79,13 @@ district.
 | `titans` | 6 | runtime, console, appserver, memory, session, and swarm control-plane helpers |
 | `skills` | 6 | discovery, disclosure, activation, detector, and runtime session support |
 | `workspace` | 5 | root discovery, config, roots, and portable bootstrap |
-| `rpg` | 4 | typed RPG registry, models, and surface-path helpers |
+| `rpg` | 4 | typed RPG consumer API, models, and surface-path transport helpers |
 | root package | 5 | SDK public API, models, errors, package init, source route card |
 | `surfaces` | 3 | additive surface registry and heuristics |
 | `stats` | 3 | source coverage, profile, and regrounding signals |
 | `routing` | 3 | picker and hints over loaded surfaces |
 | `loaders` | 3 | typed JSON/file loading |
-| `codex` | 3 | workspace MCP and Codex deploy-status registry |
+| `codex` | 3 | workspace MCP server source and Codex live rollout status registry |
 | `techniques` | 2 | sibling facade |
 | `release` | 2 | release audit and publish helper API |
 | `playbooks` | 2 | sibling facade |
@@ -115,7 +113,7 @@ because it has files.
 | `checkpoints` | `checkpoint` | checkpoint registry and review gates are the parent operation |
 | `cli` | `boundary-bridge` | cross-mechanic command facade; follow the command's owning mechanic after entry |
 | `closeout` | `checkpoint` | reviewed closeout is a checkpoint bridge part |
-| `codex` | `codex-projection` | workspace MCP and deploy-status readers project Codex-facing state |
+| `codex` | `codex-projection` | workspace MCP server and live rollout status readers project Codex-facing state |
 | `compatibility` | `boundary-bridge` | compatibility policy bridges consumed sibling surfaces |
 | `evals` | `boundary-bridge` | eval readers are typed handles over proof-owner surfaces |
 | `governed_runs` | `boundary-bridge` | governed-run artifacts bridge abyss-stack and playbook review targets |
@@ -130,9 +128,24 @@ because it has files.
 | `skills` | `boundary-bridge` | discovery and dispatch remain below `aoa-skills` ownership |
 | `stats` | `boundary-bridge` | stats readers expose `aoa-stats` surfaces without owning stats truth |
 | `surfaces` | `boundary-bridge` | detection reports are advisory bridge and handoff surfaces |
-| `techniques` | `boundary-bridge` | technique readiness readers expose `aoa-techniques` surfaces |
+| `techniques` | `boundary-bridge` | technique promotion readiness readers expose `aoa-techniques` surfaces |
 | `titans` | `titan` | Titan helper families form the Titan parent operation |
 | `workspace` | `runtime-seam` | root discovery, config, and bootstrap are runtime/source seam surfaces |
+
+Checkpoint reviewed closeout context carry is now a functioning part-local
+payload under `mechanics/checkpoint/parts/reviewed-closeout-context-carry/`.
+The path names the active operation: reviewed closeout context in, advisory
+carry packets out, owner truth routed away.
+
+Boundary Bridge skill runtime bridge is now a functioning part-local payload
+under `mechanics/boundary-bridge/parts/skill-runtime-bridge/`. The path names
+the active operation: skill-router and host inventory signals in, explicit
+actionability reporting out, skill meaning routed back to `aoa-skills`.
+
+Release Support detailed runbook and public support CI posture are now
+functioning part-local payloads under `mechanics/release-support/parts/`.
+Root release docs remain active route doors because federation release
+preflight and public onboarding need stable entry surfaces.
 
 ## Contract Family Inventory
 
@@ -173,7 +186,7 @@ Test families:
 
 ## Derivation Rules
 
-The skeleton uses a package only when the operation has all of these:
+The topology draft uses a package only when the operation has all of these:
 
 - repeated pressure across more than one repository district;
 - a clear trigger;
@@ -197,45 +210,65 @@ handoff but must not claim the meaning.
 | Mechanic | Trigger | SDK owns | Stronger owner split |
 | --- | --- | --- | --- |
 | `agon` | Agon helper candidate, registry, or seed update | candidate-only SDK helper packs and generated registries | Agon doctrine, verdict, duel, KAG, Sophian, and state-packet meaning |
-| `antifragility` | stress-context, degraded-mode, via negativa, or closeout stress carry changes | public-safe fixtures and control-plane stress routes | owner remediation, proof, deletion, runtime response |
+| `antifragility` | stress-posture dispatch, reviewed stress closeout carry, or via negativa pruning changes | public-safe examples and control-plane stress routes | owner remediation, proof, deletion, runtime response |
 | `boundary-bridge` | typed facade, compatibility, skill bridge, or surface handoff changes | SDK handle, typed model, truth label, checks, handoff route | sibling source truth and policy |
 | `checkpoint` | mid-session note capture, hook, review-note, closeout bridge, or return re-entry changes | session-local capture, fail-closed gates, bridge context, return packets | durable memory, proof, progression, and owner verdicts |
-| `codex-projection` | Codex MCP, deploy status, portability, or rollout ref change | typed local Codex-facing read and MCP exposure | Codex runtime, host deployment, and sibling rollout authority |
+| `codex-projection` | Codex MCP, live rollout status, portability boundary, or rollout ref handoff change | typed local Codex-facing read and MCP exposure | Codex runtime, host deployment, and sibling rollout authority |
 | `experience` | SDK API helper contract for adoption, deployment, governance, release | typed call contracts, schemas, examples, validation | Experience owner truth and operational decisions |
-| `questbook` | quest source record or owner-followthrough obligation change | SDK quest source-store route and candidate helper quest routing | owner acceptance, completion, proof, release, memory |
+| `questbook` | source quest records, public obligation index, lifecycle posture, or dispatch-reader posture changes | SDK obligation source placement, human index posture, lifecycle vocabulary, generated-reader posture | helper contracts, proof verdicts, owner acceptance, release truth |
 | `recurrence` | recurrence manifests, hooks, graph, review, projections, observations | SDK recurrence control-plane helpers and validators | owner component truth and eval-suite proof |
 | `release-support` | changelog, release audit, CI, build, or publish helper changes | bounded release audit and support posture | GitHub release truth, package publication, and sibling releases |
-| `rpg` | RPG typed consumer or surface-path change | typed registry and path helper | RPG runtime/gameplay semantics |
+| `rpg` | RPG typed consumer or surface-path transport change | typed consumer API and path helper | RPG runtime/gameplay semantics |
 | `runtime-seam` | workspace root, mirror, bootstrap, capsule, or local automation seam changes | explicit local path resolution, control-plane capsule, and local seam routing | host layout, sibling repo content, runtime mirror deployment |
 | `titan` | Titan harness, console, appserver, memory, session, or swarm helper changes | bounded Titan control-plane API and CLI surfaces | Titan runtime, identity, memory, and role authority |
 
-## Demoted Parent Candidates
+`questbook` remains an active parent because sibling repos treat root
+`quests/` as a source quest record district and `mechanics/questbook/` as the
+operation law for source-store, public-index, lifecycle, and dispatch-reader
+posture. Agon helper contracts stay part-local, but durable SDK obligations
+live in root `quests/<lane>/<state>/`.
 
-The first SDK skeleton promoted several lanes by file-family pressure. The
-source mechanics show these belong as parts:
+## Legacy Name Routing
 
-| Former parent candidate | Correct route |
+The first SDK topology draft promoted several file-family lanes by local pressure.
+Those names are not active route ids. Package-local `legacy/INDEX.md` files
+preserve the former-name lookup, while active topology uses canonical part
+routes:
+
+| Active parent | Active route |
 | --- | --- |
-| `workspace-topology` | `runtime-seam/workspace-root-resolution` |
-| `compatibility` | `boundary-bridge/compatibility-policy` |
-| `skill-routing` | `boundary-bridge/skill-runtime-bridge` |
-| `surface-detection` | `boundary-bridge/surface-detection-handoff` |
-| `closeout` | `checkpoint/closeout-bridge` |
-| `a2a-return` | `checkpoint/return-reentry` |
-| `codex-plane` | `codex-projection/deploy-status` |
+| `runtime-seam` | `runtime-seam/workspace-root-resolution` |
+| `runtime-seam` | `runtime-seam/portable-workspace-bootstrap` |
+| `runtime-seam` | `runtime-seam/control-plane-capsule` |
+| `runtime-seam` | `runtime-seam/runtime-mirror-boundary` |
+| `boundary-bridge` | `boundary-bridge/consumed-surface-posture-gate` |
+| `boundary-bridge` | `boundary-bridge/skill-runtime-bridge` |
+| `boundary-bridge` | `boundary-bridge/owner-layer-signal-handoff` |
+| `checkpoint` | `checkpoint/session-growth-checkpoint-cycle` |
+| `checkpoint` | `checkpoint/reviewed-session-handoff-runner` |
+| `checkpoint` | `checkpoint/child-task-reentry` |
+| `checkpoint` | `checkpoint/reviewed-closeout-context-carry` |
+| `codex-projection` | `codex-projection/workspace-mcp-server` |
+| `codex-projection` | `codex-projection/live-rollout-status-readout` |
+| `codex-projection` | `codex-projection/portability-boundary` |
+| `codex-projection` | `codex-projection/owner-rollout-reference-handoff` |
 
 ## Payload Movement Rule
 
-This first skeleton does not move source files, schemas, examples, generated
+The first topology draft did not move source files, schemas, examples, generated
 files, manifests, quests, scripts, or tests into mechanics packages.
 
-A later payload move needs a separate decision or update, a package-local
-validator, a compatibility note, and source-owner closeout. Until then,
-mechanic `PARTS.md` files are candidate topology only.
+The current artifact-localization phase moves single-mechanic-owned payload
+only after the owning part has `README.md`, `CONTRACT.md`, `VALIDATION.md`, and
+a narrow validator route. Old root paths become migration/provenance evidence,
+not active routes.
+
+The placement law and migration ledger now live in
+[`ARTIFACT_TOPOLOGY.md`](ARTIFACT_TOPOLOGY.md).
 
 ## Validation
 
-The narrow gate for this skeleton is:
+The narrow gate for this topology draft is:
 
 ```bash
 python scripts/validate_mechanics_topology.py

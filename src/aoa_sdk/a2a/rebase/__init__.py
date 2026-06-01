@@ -2,7 +2,7 @@ from .contracts import build_summon_request_payload, build_summon_result_payload
 from .checkpoint import build_checkpoint_bridge_plan, build_checkpoint_context_bundle
 from .closeout import (
     build_reviewed_closeout_request,
-    build_runtime_wave_closeout_receipt,
+    build_runtime_return_closeout_receipt,
     closeout_summary_lines,
     plan_owner_publications,
 )
@@ -63,7 +63,7 @@ __all__ = [
     "build_summon_request_payload",
     "build_summon_result_payload",
     "build_memo_export_plan",
-    "build_runtime_wave_closeout_receipt",
+    "build_runtime_return_closeout_receipt",
     "plan_owner_publications",
     "build_reviewed_closeout_request",
     "closeout_summary_lines",

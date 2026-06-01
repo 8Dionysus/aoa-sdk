@@ -21,6 +21,9 @@ MARKER_FILE = "AOA_WORKSPACE_ROOT"
 CONTROL_PLANE_RELATIVE_PATH = "generated/workspace_control_plane.min.json"
 PROJECT_CODEX_CONFIG_RELATIVE_PATH = ".codex/config.toml"
 PROJECT_HOOKS_RELATIVE_PATH = ".codex/hooks.json"
+WORKSPACE_MCP_SERVER_SCRIPT_RELATIVE_PATH = (
+    "mechanics/codex-projection/parts/workspace-mcp-server/scripts/aoa_workspace_mcp_server.py"
+)
 
 REPO_HINTS: dict[str, dict[str, Any]] = {
     "8Dionysus": {
@@ -113,37 +116,37 @@ SURFACE_CROSSWALK: list[dict[str, str]] = [
     {
         "need": "repo law, conventions, and persistent posture",
         "primary_surface": "AGENTS.md",
-        "fallback": "repo README.md and owner source files",
+        "secondary_surface": "repo README.md and owner source files",
         "notes": "use workspace-root guidance first, then the nearest repo-local guidance",
     },
     {
         "need": "repeatable bounded workflow",
         "primary_surface": "skills",
-        "fallback": "repo-local source files",
+        "secondary_surface": "repo-local source files",
         "notes": "skills carry workflow shape; owner repos keep semantic authority",
     },
     {
         "need": "role specialization or delegation posture",
         "primary_surface": "subagents",
-        "fallback": "skills",
+        "secondary_surface": "skills",
         "notes": "role posture is not the same thing as workflow canon",
     },
     {
         "need": "cross-repo orientation and next-surface choice",
         "primary_surface": "project-level MCP",
-        "fallback": "workspace AGENTS.md",
+        "secondary_surface": "workspace AGENTS.md",
         "notes": "use the workspace MCP to orient, not to replace repo-local truth",
     },
     {
         "need": "derived metrics, receipts overview, or summary views",
         "primary_surface": "repo-local MCP: aoa-stats",
-        "fallback": "owner repo source files",
+        "secondary_surface": "owner repo source files",
         "notes": "aoa-stats remains derived-only when semantics matter",
     },
     {
         "need": "seed staging, route map, and planting follow-through",
         "primary_surface": "repo-local MCP: dionysus",
-        "fallback": "owner repo source files",
+        "secondary_surface": "owner repo source files",
         "notes": "staging and route maps do not outrank planted owner objects",
     },
 ]
@@ -306,7 +309,10 @@ class AoAWorkspaceMCPState:
             {
                 "name": "abyss_stack_diagnostic_catalog",
                 "scope": "abyss-stack",
-                "path": "generated/diagnostic_surface_catalog.min.json",
+                "path": (
+                    "mechanics/diagnostic-spine/parts/diagnostic-surfaces/generated/"
+                    "diagnostic_surface_catalog.min.json"
+                ),
                 "need": "runtime-substrate diagnostic summary",
             },
         ]
@@ -359,6 +365,14 @@ class AoAWorkspaceMCPState:
                 mcp_servers = raw_servers
 
         server_config = mcp_servers.get("aoa_workspace") if isinstance(mcp_servers.get("aoa_workspace"), dict) else None
+        server_args = server_config.get("args") if server_config is not None else None
+        server_cwd = server_config.get("cwd") if server_config is not None else None
+        script_path: Path | None = None
+        uses_part_local_script = False
+        if isinstance(server_args, list):
+            uses_part_local_script = WORKSPACE_MCP_SERVER_SCRIPT_RELATIVE_PATH in server_args
+            if isinstance(server_cwd, str) and WORKSPACE_MCP_SERVER_SCRIPT_RELATIVE_PATH in server_args:
+                script_path = (config_path.parent / server_cwd / WORKSPACE_MCP_SERVER_SCRIPT_RELATIVE_PATH).resolve()
 
         return {
             "config_path": str(config_path),
@@ -370,8 +384,12 @@ class AoAWorkspaceMCPState:
             "aoa_workspace_server": {
                 "configured": server_config is not None,
                 "command": server_config.get("command") if server_config is not None else None,
-                "args": server_config.get("args") if server_config is not None else None,
-                "cwd": server_config.get("cwd") if server_config is not None else None,
+                "args": server_args,
+                "cwd": server_cwd,
+                "expected_script": WORKSPACE_MCP_SERVER_SCRIPT_RELATIVE_PATH,
+                "uses_part_local_script": uses_part_local_script,
+                "script_path": str(script_path) if script_path is not None else None,
+                "script_exists": script_path.exists() if script_path is not None else None,
             },
         }
 
@@ -538,7 +556,7 @@ def build_server(start: str | Path | None = None) -> Any:
         """Prompt recipe for first orientation in the AoA workspace."""
         return (
             "Use workspace_resolution, then workspace_repo_map, then workspace_surface_crosswalk. "
-            "Name the strongest next surface for the task, one fallback surface, and one owner boundary you must not cross."
+            "Name the strongest next surface for the task, one secondary surface, and one owner boundary you must not cross."
         )
 
     @mcp.prompt()
@@ -548,7 +566,7 @@ def build_server(start: str | Path | None = None) -> Any:
             f"Task: {task}\n"
             "Use workspace_surface_crosswalk first. Then say whether the next move belongs in AGENTS.md, "
             "skills, subagents, project-level MCP, repo-local MCP, or repo-local source files. "
-            "Name one primary choice and one fallback."
+            "Name one primary choice and one secondary surface."
         )
 
     LOGGER.info("AoA workspace MCP server ready at federation root: %s", current_state().workspace_root)

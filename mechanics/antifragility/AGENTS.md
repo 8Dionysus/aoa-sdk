@@ -6,17 +6,17 @@
 
 ## Role
 
-Route the shared Antifragility mechanic for SDK stress-context helpers,
-degraded-mode posture, via negativa pruning, and closeout stress carry.
+Route the shared Antifragility mechanic for SDK stress-posture dispatch gates,
+reviewed stress closeout carry, and via negativa pruning.
 
 ## Read before editing
 
 - `mechanics/AGENTS.md`
 - `mechanics/antifragility/README.md`
-- `docs/antifragility-control-plane.md`
-- `docs/antifragility-closeout-seam.md`
-- `docs/VIA_NEGATIVA_CHECKLIST.md`
-- `tests/fixtures/antifragility/`
+- `mechanics/antifragility/parts/README.md`
+- `mechanics/antifragility/parts/stress-posture-dispatch-gate/README.md`
+- `mechanics/antifragility/parts/reviewed-stress-closeout-carry/README.md`
+- `mechanics/antifragility/parts/via-negativa/README.md`
 
 ## Boundaries
 
@@ -28,9 +28,10 @@ degraded-mode posture, via negativa pruning, and closeout stress carry.
 
 ```bash
 python scripts/validate_mechanics_topology.py
-python -m pytest -q tests/test_antifragility_public_surface.py
+python -m pytest -q mechanics/antifragility/parts/stress-posture-dispatch-gate/tests/test_stress_posture_dispatch_gate.py mechanics/antifragility/parts/reviewed-stress-closeout-carry/tests/test_reviewed_stress_closeout_carry.py mechanics/antifragility/parts/via-negativa/tests/test_via_negativa_checklist.py
 ```
 
 ## Closeout
 
-Report stress-context, degraded-mode, via negativa, or closeout-seam changes.
+Report stress-posture dispatch, reviewed stress closeout carry, or via
+negativa pruning changes.

@@ -6,35 +6,37 @@
 
 ## Role
 
-Route the shared recurrence mechanic for manifests, hooks, graph closure,
-review decisions, downstream projections, live observations, and recursor
-readiness.
+Route the SDK recurrence mechanic control plane across manifest gates, observation
+producers, graph readouts, review surfaces, downstream projections, rollout
+handoffs, and recursor readiness scans.
 
 ## Read before editing
 
 - `mechanics/AGENTS.md`
 - `mechanics/recurrence/README.md`
-- `docs/RECURRENCE_CONTROL_PLANE.md`
-- `manifests/recurrence/`
+- `mechanics/recurrence/PARTS.md`
+- `mechanics/recurrence/parts/AGENTS.md`
 - `src/aoa_sdk/recurrence/`
-- `examples/recurrence/`
 
 ## Boundaries
 
 - Stay on the control plane.
 - Keep component truth with owner surfaces.
 - Keep eval-suite proof in `aoa-evals`.
-- Do not make recurrence projections hidden routing or stats authority.
+- Do not make recurrence projections hidden routing, stats, KAG, or owner authority.
+- Use route-role names for active recurrence surfaces; historical chronology
+  belongs only in provenance or migration accounting.
 
 ## Validation
 
 ```bash
 python scripts/validate_mechanics_topology.py
-python scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS
-python -m pytest -q tests/test_recurrence_registry.py tests/test_recurrence_seed.py
+python mechanics/recurrence/parts/component-manifest-gate/scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS --json
+python -m pytest -q mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_registry.py mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_seed.py
 ```
 
 ## Closeout
 
-Report whether manifest compatibility, graph, review, projection, observation,
-or readiness behavior changed.
+Report which part changed and whether manifest compatibility, hooks, graph,
+observations, beacons, review, projections, wiring, or readiness behavior
+changed.

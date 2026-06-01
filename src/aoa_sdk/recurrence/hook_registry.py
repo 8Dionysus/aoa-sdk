@@ -7,6 +7,7 @@ from typing import Iterable
 
 from ..workspace.discovery import Workspace
 from .models import HookBinding, HookBindingSet, HookEvent
+from .registry import iter_recurrence_manifest_roots
 
 
 @dataclass(slots=True)
@@ -50,29 +51,30 @@ class HookRegistry:
 def load_hook_registry(workspace: Workspace) -> HookRegistry:
     loaded: list[LoadedHookBindingSet] = []
     for repo, repo_root in workspace.repo_roots.items():
-        hook_root = repo_root / "manifests" / "recurrence" / "hooks"
-        if not hook_root.is_dir():
-            continue
-        for path in sorted(hook_root.glob("*.json")):
-            payload = json.loads(path.read_text(encoding="utf-8"))
-            binding_set = HookBindingSet.model_validate(payload)
-            if binding_set.owner_repo != repo:
-                binding_set = binding_set.model_copy(update={"owner_repo": repo})
+        for manifest_root in iter_recurrence_manifest_roots(repo_root):
+            hook_root = manifest_root / "hooks"
+            if not hook_root.is_dir():
+                continue
+            for path in sorted(hook_root.glob("*.json")):
+                payload = json.loads(path.read_text(encoding="utf-8"))
+                binding_set = HookBindingSet.model_validate(payload)
+                if binding_set.owner_repo != repo:
+                    binding_set = binding_set.model_copy(update={"owner_repo": repo})
 
-            repaired_bindings: list[HookBinding] = []
-            changed = False
-            for binding in binding_set.bindings:
-                updates = {}
-                if binding.owner_repo != repo:
-                    updates["owner_repo"] = repo
-                if not binding.component_ref:
-                    updates["component_ref"] = binding_set.component_ref
-                if updates:
-                    binding = binding.model_copy(update=updates)
-                    changed = True
-                repaired_bindings.append(binding)
+                repaired_bindings: list[HookBinding] = []
+                changed = False
+                for binding in binding_set.bindings:
+                    updates = {}
+                    if binding.owner_repo != repo:
+                        updates["owner_repo"] = repo
+                    if not binding.component_ref:
+                        updates["component_ref"] = binding_set.component_ref
+                    if updates:
+                        binding = binding.model_copy(update=updates)
+                        changed = True
+                    repaired_bindings.append(binding)
 
-            if changed:
-                binding_set = binding_set.model_copy(update={"bindings": repaired_bindings})
-            loaded.append(LoadedHookBindingSet(manifest_path=path, binding_set=binding_set))
+                if changed:
+                    binding_set = binding_set.model_copy(update={"bindings": repaired_bindings})
+                loaded.append(LoadedHookBindingSet(manifest_path=path, binding_set=binding_set))
     return HookRegistry(workspace, loaded)

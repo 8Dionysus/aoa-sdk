@@ -13,8 +13,9 @@ helper boundary.
 
 - `mechanics/AGENTS.md`
 - `mechanics/rpg/README.md`
-- `docs/RPG_SDK_ADDENDUM.md`
-- `docs/RPG_SURFACE_PATHS.md`
+- `mechanics/rpg/parts/README.md`
+- `mechanics/rpg/parts/typed-consumer-api/README.md`
+- `mechanics/rpg/parts/surface-path-transport/README.md`
 - `src/aoa_sdk/rpg/`
 
 ## Boundaries
@@ -27,7 +28,7 @@ helper boundary.
 
 ```bash
 python scripts/validate_mechanics_topology.py
-python -m pytest -q tests/test_rpg_api.py
+python -m pytest -q mechanics/rpg/parts/typed-consumer-api/tests/test_typed_consumer_api.py mechanics/rpg/parts/surface-path-transport/tests/test_surface_path_transport.py
 ```
 
 ## Closeout

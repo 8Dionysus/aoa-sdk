@@ -454,10 +454,10 @@ def _collect_technique_readiness(
                 "readiness queue surface is visible",
             ),
             (
-                "latest graduation wave",
+                "latest graduation",
                 "evidence_pressure",
                 "canonical_graduation_seen",
-                "graduation wave evidence is visible",
+                "graduation evidence is visible",
             ),
             (
                 "dominant blocker",
@@ -873,10 +873,10 @@ def _collect_playbook_harvest(
             ["real-run-harvests", "composition-gates"],
         ),
         (
-            "fallback",
-            "fallback_pattern_repeated",
+            "alternate path",
+            "alternate_path_pattern_repeated",
             "repeat_pattern",
-            "fallback pattern repeated; scenario may need playbook boundary",
+            "alternate path pattern repeated; scenario may need playbook boundary",
             ["real-run-harvests"],
         ),
         (

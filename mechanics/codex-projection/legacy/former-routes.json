@@ -1,0 +1,12 @@
+{
+  "schema_version": "aoa_sdk_mechanics_legacy_routes_v1",
+  "parent": "codex-projection",
+  "entries": [
+    {
+      "former_name": "codex-plane",
+      "active_route": "codex-projection/live-rollout-status-readout",
+      "status": "distilled",
+      "rationale": "Deploy status is a Codex Projection part, not an independent SDK parent mechanic."
+    }
+  ]
+}

@@ -139,8 +139,8 @@ def _print_skill_items(label: str, items: list[SkillDispatchItem]) -> None:
         typer.echo(f"  - {item.skill_name} [{item.layer} / {family} / {availability}]")
         typer.echo(f"    reason: {item.reason}")
         host_line = f"{item.host_availability.status} via {item.host_availability.source}"
-        if item.host_availability.manual_fallback_allowed:
-            host_line += "; manual fallback allowed"
+        if item.host_availability.manual_equivalence_allowed:
+            host_line += "; manual equivalence allowed"
         typer.echo(f"    host: {host_line}")
 
 

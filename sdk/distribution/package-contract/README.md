@@ -1,0 +1,19 @@
+# Package Contract
+
+Role: route package metadata, build shape, and import distribution promises.
+
+Input: `pyproject.toml`, package name/version posture, build metadata,
+included source files, and import-surface distribution expectations.
+
+Output: package metadata update, build validation, release-support route, or
+decision record.
+
+Owner: `sdk/distribution/AGENTS.md` and
+`sdk/source_home.manifest.json#package_contract`.
+
+Next route: `pyproject.toml`, `src/aoa_sdk/`,
+`mechanics/release-support/parts/release-audit-publish-helper/`, and
+`python -m build`.
+
+Stop line: do not claim package publication before external publication proof
+exists.
