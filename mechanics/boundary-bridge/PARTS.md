@@ -4,10 +4,7 @@
 
 | Part | Current surfaces | Future payload condition |
 | --- | --- | --- |
-| typed-facades | `src/aoa_sdk/*/registry.py`, `src/aoa_sdk/api.py`, `src/aoa_sdk/cli/` | only if facade families need shared owner maps |
-| surface-loaders | `src/aoa_sdk/loaders/`, `src/aoa_sdk/compatibility/policy.py` | only if loader behavior starts carrying reusable crossing contracts |
-| truth-labels | `src/aoa_sdk/models.py`, facade model tests | only if labels become cross-cutting schemas |
-| compatibility-policy | `src/aoa_sdk/compatibility/policy.py`, `docs/versioning.md`, `scripts/sibling_canary_matrix.json` | migrated from the over-specific `compatibility` parent; remains a bridge part |
-| skill-runtime-bridge | `.agents/skills/`, `src/aoa_sdk/skills/`, skill runtime docs | migrated from the over-specific `skill-routing` parent; `aoa-skills` keeps skill meaning |
-| surface-detection-handoff | `docs/aoa-surface-detection-*.md`, `src/aoa_sdk/surfaces/` | migrated from the over-specific `surface-detection` parent; hints stay advisory |
-| owner-return-routes | `docs/boundaries.md`, route tests | only if handoff receipts become package-local artifacts |
+| consumed-surface-posture-gate | `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`, `src/aoa_sdk/compatibility/policy.py`, typed facade readers | active; checks whether consumed sibling surfaces are safe to read before SDK code trusts them |
+| skill-runtime-bridge | `mechanics/boundary-bridge/parts/skill-runtime-bridge/`, `.agents/skills/`, `src/aoa_sdk/skills/` | active; exposes skill runtime handles while `aoa-skills` keeps skill meaning |
+| technique-promotion-readiness-reader | `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/`, `src/aoa_sdk/techniques/` | active; reads `aoa-techniques` promotion readiness without claiming technique authority |
+| owner-layer-signal-handoff | `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/`, `src/aoa_sdk/surfaces/` | turns advisory surface signals into reviewed owner-layer handoff material without making them executable truth |

@@ -24,7 +24,7 @@ DEFAULT_POLICY = {
     "stronger_than_recall": [
         "operator_instruction",
         "owner_repo_source",
-        "wave_manifest_or_source_seed",
+        "source_manifest_or_seed",
         "reviewed_receipt_or_planting_report",
     ],
 }
@@ -74,7 +74,7 @@ def new_index(workspace: str, operator: str) -> Dict[str, Any]:
     return {
         "version": 0,
         "kind": "titan_memory_index",
-        "wave": "fourteenth_wave",
+        "surface_role": "memory_loom_recall_helper_contracts",
         "created_at": now,
         "updated_at": now,
         "workspace": workspace,

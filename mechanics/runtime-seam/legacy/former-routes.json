@@ -1,0 +1,12 @@
+{
+  "schema_version": "aoa_sdk_mechanics_legacy_routes_v1",
+  "parent": "runtime-seam",
+  "entries": [
+    {
+      "former_name": "workspace-topology",
+      "active_route": "runtime-seam/workspace-root-resolution",
+      "status": "distilled",
+      "rationale": "Workspace root discovery is a Runtime Seam part, not an independent SDK parent mechanic."
+    }
+  ]
+}

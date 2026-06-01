@@ -58,7 +58,7 @@ CANONICAL_STATS_EVENT_KINDS = {
     "progression_delta_receipt",
     "quest_promotion_receipt",
     "repair_cycle_receipt",
-    "runtime_wave_closeout_receipt",
+    "runtime_return_closeout_receipt",
     "skill_run_receipt",
     "technique_publication_receipt",
     "technique_promotion_receipt",
@@ -79,7 +79,7 @@ class QuestPassport:
     risk: Risk
     control_mode: ControlMode
     delegate_tier: str
-    fallback_tier: str | None = None
+    secondary_tier: str | None = None
     wrapper_class: str | None = None
     route_anchor: str | None = None
     expected_artifacts: list[str] = field(default_factory=list)
@@ -255,7 +255,7 @@ class CheckpointBridgePlan:
 
 
 MANIFEST_BATCH_PUBLISHERS = {
-    "abyss-stack.runtime-wave-closeouts",
+    "abyss-stack.runtime-return-closeouts",
     "aoa-skills.session-harvest-family",
     "aoa-skills.core-kernel-applications",
     "aoa-evals.eval-result",

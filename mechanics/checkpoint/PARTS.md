@@ -4,9 +4,7 @@
 
 | Part | Current surfaces | Future payload condition |
 | --- | --- | --- |
-| capture | `docs/session-growth-checkpoints.md`, `src/aoa_sdk/checkpoints/` | only if capture schemas become public contracts |
-| git-boundary | `githooks/`, CLI git-boundary checks | only if hook packets need examples |
-| review-note | `docs/checkpoint-note-promotion.md`, checkpoint CLI tests | only if review packets get stable schemas |
-| closeout-context | checkpoint closeout bridge commands | only if context bundles become mechanic-local fixtures |
-| closeout-bridge | `docs/session-closeout.md`, `src/aoa_sdk/closeout/`, `systemd/` | migrated from the over-specific `closeout` parent; closeout is a checkpoint/growth bridge part |
-| return-reentry | `docs/A2A_WAVE5_CODEX_RETURN_CHECKPOINT.md`, `docs/RETURN_REENTRY_SEAM.md`, `src/aoa_sdk/a2a/` | migrated from the over-specific `a2a-return` parent; return packets stay below owner acceptance |
+| session-growth-checkpoint-cycle | `parts/session-growth-checkpoint-cycle/`, `parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/`, `src/aoa_sdk/checkpoints/`, part-local checkpoint API/CLI tests | captures, reviews, gates, promotes session-local checkpoint notes, and carries managed Git boundary hook templates without minting owner truth |
+| reviewed-session-handoff-runner | `parts/reviewed-session-handoff-runner/`, `parts/reviewed-session-handoff-runner/closeout-inbox-user-units/`, `src/aoa_sdk/closeout/`, part-local runner API/CLI tests | packages and runs reviewed session material without turning it into memory, proof, or owner verdict |
+| child-task-reentry | `mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md`, `mechanics/checkpoint/parts/child-task-reentry/docs/return-reentry.md`, `src/aoa_sdk/a2a/` | carries child-task return packets back below owner acceptance |
+| reviewed-closeout-context-carry | `mechanics/checkpoint/parts/reviewed-closeout-context-carry/` | active; carries reviewed maps, component-refresh hints, continuity hints, and next-kernel decisions below owner truth |

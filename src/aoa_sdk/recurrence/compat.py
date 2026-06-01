@@ -43,7 +43,6 @@ AGON_SHAPE_KEYS = {
     "stop_lines",
     "surface_refs",
     "surfaces",
-    "wave",
 }
 
 
@@ -151,7 +150,6 @@ def looks_like_agon_adapter_payload(payload: dict[str, Any]) -> bool:
         payload.get("component_ref"),
         payload.get("component_id"),
         payload.get("status"),
-        payload.get("wave"),
     )
     if any(isinstance(value, str) and "agon" in value.lower() for value in text_fields):
         return True

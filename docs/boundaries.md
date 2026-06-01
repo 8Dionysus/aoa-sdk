@@ -19,6 +19,8 @@ repositories remain authoritative.
 - typed loaders over published surfaces
 - local workspace discovery and sibling-repo resolution
 - shared Python models for stable consumer use
+- SDK source-home posture under `sdk/` for public-interface,
+  facade-boundary, runtime-entry, and distribution route shape
 - root system-design and agent-surface design posture in `DESIGN.md` and
   `DESIGN.AGENTS.md`
 - durable rationale for SDK-owned topology, route-law, compatibility, and
@@ -40,6 +42,8 @@ repositories remain authoritative.
   sibling-owner truth
 - mechanics packages that pretend source payload moved or that SDK owns sibling
   meaning
+- `sdk/` folders that pretend to be a second Python implementation tree or a
+  sibling-source owner
 - hidden ranking, routing, or memory policy
 - daemon or service responsibilities
 - project-specific overlays inside portable-core modules

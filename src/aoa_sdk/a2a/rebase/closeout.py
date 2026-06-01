@@ -18,7 +18,7 @@ from .models import (
 from .utils import slugify, to_jsonable, unique_preserve_order, utc_now_z
 
 
-def build_runtime_wave_closeout_receipt(
+def build_runtime_return_closeout_receipt(
     remote_task: RemoteTaskResult,
     decision: SummonDecision,
     *,
@@ -32,7 +32,7 @@ def build_runtime_wave_closeout_receipt(
     owner_repo: str = "abyss-stack",
     actor_ref: str = "abyss-stack.runtime-a2a",
 ) -> dict:
-    event_kind = "runtime_wave_closeout_receipt"
+    event_kind = "runtime_return_closeout_receipt"
     if event_kind not in CANONICAL_STATS_EVENT_KINDS:
         raise ValueError(f"unsupported event kind: {event_kind}")
 
@@ -91,7 +91,7 @@ def build_runtime_wave_closeout_receipt(
 
     return {
         "event_kind": event_kind,
-        "event_id": f"runtime-wave-closeout::{slugify(remote_task.task_id)}",
+        "event_id": f"runtime-return-closeout::{slugify(remote_task.task_id)}",
         "observed_at": observed_at or utc_now_z(),
         "run_ref": f"run:a2a:{remote_task.task_id}",
         "session_ref": session_ref,
@@ -141,9 +141,9 @@ def plan_owner_publications(
         )
 
     _add(
-        "abyss-stack.runtime-wave-closeouts",
+        "abyss-stack.runtime-return-closeouts",
         "publish canonical runtime closeout receipts under the runtime owner lane",
-        "runtime_wave_closeout_receipt",
+        "runtime_return_closeout_receipt",
         runtime_receipt_paths,
         True,
     )
@@ -254,7 +254,7 @@ def build_reviewed_closeout_request(
 
     request = {
         "schema_version": 1,
-        "request_kind": "a2a_wave5_closeout_request",
+        "request_kind": "a2a_return_closeout_request",
         "closeout_id": f"closeout-{slugify(remote_task.task_id)}",
         "session_ref": session_ref,
         "reviewed": True,

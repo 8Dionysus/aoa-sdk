@@ -72,13 +72,22 @@ Current protected local cards include:
 
 - `.aoa/AGENTS.md`
 - `.github/AGENTS.md`
+- `.agents/skills/AGENTS.md`
+- `docs/AGENTS.md`
 - `docs/decisions/AGENTS.md`
 - `generated/AGENTS.md`
-- `githooks/AGENTS.md`
+- `sdk/AGENTS.md`
+- `sdk/public-interface/AGENTS.md`
+- `sdk/facade-boundary/AGENTS.md`
+- `sdk/runtime-entry/AGENTS.md`
+- `sdk/distribution/AGENTS.md`
 - `mechanics/AGENTS.md`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/AGENTS.md`
+- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/AGENTS.md`
 - `schemas/AGENTS.md`
+- `scripts/AGENTS.md`
 - `src/aoa_sdk/AGENTS.md`
-- `systemd/AGENTS.md`
+- `tests/AGENTS.md`
 
 The `mechanics/` package-local cards listed in `mechanics/topology.json` are
 also protected route surfaces.
@@ -105,11 +114,19 @@ and check command that produced it.
 ### Mechanic Cards
 
 The root `mechanics/AGENTS.md` and package-local cards name operation owner,
-input, output, source surfaces, stronger owners, legacy bridges, validation,
-and closeout.
+input, output, source surfaces, stronger owners, provenance bridges,
+validation, and closeout.
 
 A mechanic card should not claim importable SDK source ownership. That remains
-in `src/aoa_sdk/` unless a later decision creates a different source home.
+in `src/aoa_sdk/`. SDK source-home posture now starts at `sdk/AGENTS.md` and
+routes to implementation, mechanics, docs, release, or stronger-owner
+surfaces.
+
+Functioning mechanic parts add the nearest active work route:
+`parts/<part>/README.md` names role, input, output, owner, and next route;
+`CONTRACT.md` names may/must-not boundaries; `VALIDATION.md` names executable
+proof. Old root paths route through `mechanics/ARTIFACT_TOPOLOGY.md` or
+package `PROVENANCE.md`, while active work starts from the current part route.
 
 ## Reading Order Shape
 
@@ -137,15 +154,20 @@ For repository-shape, source-home, route-law, or mechanics topology changes, rea
 - `DESIGN.md` names the system form. It is not executable route law.
 - `DESIGN.AGENTS.md` names the agent-facing form. It is not a local card.
 - `docs/decisions/` preserves rationale. It is not active source truth.
-- `src/aoa_sdk/` owns importable typed SDK behavior.
+- `sdk/` owns SDK source-home posture and route shape.
+- `src/aoa_sdk/` owns importable typed SDK implementation.
 - `docs/` explains SDK posture and boundaries.
 - `schemas/` owns helper contract shape.
 - `examples/` owns public-safe examples and fixtures.
 - `generated/` remains derived.
 - `scripts/` owns deterministic builders and validators.
 - `tests/` owns regression proof for expected behavior.
-- `mechanics/` owns repeatable operation topology, not SDK source code. Its
-  topology map also owns source-family routing.
+- `mechanics/` owns repeatable operation topology, not SDK source code. It also
+  owns part-local homes for single-mechanic artifacts, and its topology map
+  owns source-family routing.
+- Tool-native template names such as Git hook filenames or user unit filenames
+  stay inside the owning part-local route; they do not define root guidance
+  districts.
 
 ## Canonical Card Shape
 
@@ -183,7 +205,8 @@ Agent guidance must not:
   progression verdicts;
 - convert `aoa skills ...` into a non-skill activation route;
 - make the SDK a runtime service, daemon, or hidden agent runner;
-- introduce top-level `sdk/` or widen `mechanics/` by cosmetic analogy;
+- use `sdk/` as a second implementation tree or as cosmetic symmetry;
+- widen `mechanics/` by cosmetic analogy;
 - bury semantic changes under "docs-only" wording.
 
 ## Decision Review
@@ -201,6 +224,7 @@ Executable commands live in root `AGENTS.md` and nearest local cards. This
 design surface names what validation should prove:
 
 - required local route cards exist and preserve owner boundaries;
+- SDK source-home branches have local route cards and manifest coverage;
 - generated companions are reproducible;
 - decision indexes are current;
 - source-home and mechanics topology changes have rationale;

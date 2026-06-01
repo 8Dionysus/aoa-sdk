@@ -6,7 +6,7 @@ from typing import Any, Literal, cast
 
 from ..errors import RecordNotFound, SurfaceNotFound
 from ..loaders.json_file import load_json
-from ..models import CodexPlaneDeployStatusSnapshot
+from ..models import CodexProjectionLiveRolloutStatusSnapshot
 from ..workspace.discovery import Workspace
 
 
@@ -37,7 +37,7 @@ class CodexAPI:
     def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
 
-    def deploy_status(self) -> CodexPlaneDeployStatusSnapshot:
+    def deploy_status(self) -> CodexProjectionLiveRolloutStatusSnapshot:
         workspace_root = self.workspace.federation_root
         rollout_root = workspace_root / ROLLOUT_DIR_RELATIVE_PATH
         trust = self._load_required(rollout_root / TRUST_STATE_FILENAME)
@@ -72,7 +72,7 @@ class CodexAPI:
             or not stable_names_ok
         )
 
-        return CodexPlaneDeployStatusSnapshot(
+        return CodexProjectionLiveRolloutStatusSnapshot(
             workspace_root=str(workspace_root),
             trust_posture=trust_posture,
             latest_trust_state_ref=trust_state_ref,

@@ -1,12 +1,18 @@
 # Titan Parts
 
+## Active Parts
+
+| Part | Active home | Role | Validation |
+| --- | --- | --- | --- |
+| incarnation-identity-runtime-helper-contracts | `parts/incarnation-identity-runtime-helper-contracts/` | Runtime receipt, incarnation spine, identity ledger, ingress, gate, and titanctl helper contracts | `parts/incarnation-identity-runtime-helper-contracts/VALIDATION.md` |
+| operator-console-helper-contracts | `parts/operator-console-helper-contracts/` | Console state, event, approval, digest, close, validation, and appserver-plan helper contracts | `parts/operator-console-helper-contracts/VALIDATION.md` |
+| appserver-bridge-helper-contracts | `parts/appserver-bridge-helper-contracts/` | App-server bridge session, event replay, launch-plan, approval, and metrics helper contracts | `parts/appserver-bridge-helper-contracts/VALIDATION.md` |
+| memory-loom-recall-helper-contracts | `parts/memory-loom-recall-helper-contracts/` | Memory loom, recall, retention, record, and redaction helper contracts | `parts/memory-loom-recall-helper-contracts/VALIDATION.md` |
+| session-praxis-replay-helper-contracts | `parts/session-praxis-replay-helper-contracts/` | Visible-session replay, phase graph, packets, compaction source, and learning-delta helper contracts | `parts/session-praxis-replay-helper-contracts/VALIDATION.md` |
+| swarm-ledger-closeout-helper-contracts | `parts/swarm-ledger-closeout-helper-contracts/` | Task, report, finding, grade, timeout, ledger, and closeout audit helper contracts | `parts/swarm-ledger-closeout-helper-contracts/VALIDATION.md` |
+
 ## Candidate Parts
 
-| Part | Current surfaces | Future payload condition |
-| --- | --- | --- |
-| runtime-harness | `docs/TITAN_RUNTIME_HARNESS.md`, `scripts/titanctl.py` | only if runtime helper packets become a package |
-| operator-console | `docs/TITAN_OPERATOR_CONSOLE.md`, console schemas | only with console contract fixtures |
-| appserver-bridge | `docs/TITAN_APPSERVER_BRIDGE.md`, bridge scripts | only if bridge sessions need package-local lanes |
-| memory-loom | `docs/TITAN_MEMORY_LOOM.md`, memory schemas | only if memory helper examples become stable packs |
-| session-replay | session replay source and tests | only if replay bundles become public fixtures |
-| swarm-ledger | swarm ledger source and tests | only if swarm ledgers need a mechanic schema set |
+No root-held Titan candidates remain active. A future candidate part must name
+the SDK-owned helper contract route it protects and must not use old root
+script or doc filenames as the active route.

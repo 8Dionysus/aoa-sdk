@@ -1,6 +1,6 @@
 # RPG Mechanic
 
-Status: skeleton.
+Status: active topology with part-local payload.
 
 ## Mechanic Card
 
@@ -18,7 +18,7 @@ tests change.
 
 - typed RPG registry models
 - surface-path helper behavior
-- SDK addendum and path documentation
+- typed consumer API boundary and path documentation
 - regression tests for the consumer slice
 
 ### Stronger owner split
@@ -28,16 +28,14 @@ decisions remain outside SDK ownership.
 
 ### Current source surfaces
 
-- `docs/RPG_SDK_ADDENDUM.md`
-- `docs/RPG_SURFACE_PATHS.md`
+- `mechanics/rpg/parts/typed-consumer-api/`
+- `mechanics/rpg/parts/surface-path-transport/`
 - `src/aoa_sdk/rpg/`
-- `tests/test_rpg_api.py`
 
 ### Candidate parts
 
-- typed-registry
-- surface-paths
-- consumer-api
+- typed-consumer-api
+- surface-path-transport
 
 ### Must not claim
 
@@ -47,7 +45,7 @@ truth.
 ### Validation
 
 ```bash
-python -m pytest -q tests/test_rpg_api.py
+python -m pytest -q mechanics/rpg/parts/typed-consumer-api/tests/test_typed_consumer_api.py mechanics/rpg/parts/surface-path-transport/tests/test_surface_path_transport.py
 ```
 
 ### Next route

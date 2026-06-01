@@ -93,55 +93,74 @@ class RecurrenceRegistry:
         return build_manifest_scan_report(self.workspace, registry=self)
 
 
+def iter_recurrence_manifest_roots(repo_root: Path) -> Iterable[Path]:
+    """Yield recurrence manifest districts understood by the SDK control plane."""
+    candidates = [
+        repo_root / "mechanics" / "recurrence" / "manifests",
+        repo_root / "manifests" / "recurrence",
+    ]
+    parts_root = repo_root / "mechanics" / "recurrence" / "parts"
+    if parts_root.is_dir():
+        candidates.extend(
+            part / "manifests" for part in sorted(parts_root.iterdir()) if part.is_dir()
+        )
+
+    seen: set[Path] = set()
+    for candidate in candidates:
+        resolved = candidate.resolve()
+        if resolved in seen or not candidate.is_dir():
+            continue
+        seen.add(resolved)
+        yield candidate
+
+
 def load_registry(workspace: Workspace) -> RecurrenceRegistry:
     loaded: list[LoadedComponent] = []
     foreign_manifests: list[LoadedForeignManifest] = []
     diagnostics: list[ManifestDiagnostic] = []
     for repo, repo_root in workspace.repo_roots.items():
-        manifest_root = repo_root / "manifests" / "recurrence"
-        if not manifest_root.is_dir():
-            continue
-        for path in sorted(manifest_root.rglob("*.json")):
-            classification = classify_manifest(repo, repo_root, path)
-            diagnostics.extend(classification.diagnostics)
+        for manifest_root in iter_recurrence_manifest_roots(repo_root):
+            for path in sorted(manifest_root.rglob("*.json")):
+                classification = classify_manifest(repo, repo_root, path)
+                diagnostics.extend(classification.diagnostics)
 
-            if classification.payload is None:
-                continue
+                if classification.payload is None:
+                    continue
 
-            if classification.manifest_kind != "recurrence_component":
-                foreign_manifests.append(
-                    LoadedForeignManifest(
-                        manifest_path=path,
-                        repo=repo,
-                        manifest_kind=classification.manifest_kind,
-                        manifest_ref=classification.manifest_ref,
-                    )
-                )
-                continue
-
-            component, component_diagnostics = validate_recurrence_component_payload(
-                repo=repo,
-                repo_root=repo_root,
-                path=path,
-                payload=classification.payload,
-            )
-            diagnostics.extend(component_diagnostics)
-            if component is None:
-                if any(
-                    diagnostic.manifest_kind == "agon_recurrence_adapter"
-                    for diagnostic in component_diagnostics
-                ):
+                if classification.manifest_kind != "recurrence_component":
                     foreign_manifests.append(
                         LoadedForeignManifest(
                             manifest_path=path,
                             repo=repo,
-                            manifest_kind="agon_recurrence_adapter",
+                            manifest_kind=classification.manifest_kind,
                             manifest_ref=classification.manifest_ref,
                         )
                     )
-                continue
+                    continue
 
-            loaded.append(LoadedComponent(manifest_path=path, component=component))
+                component, component_diagnostics = validate_recurrence_component_payload(
+                    repo=repo,
+                    repo_root=repo_root,
+                    path=path,
+                    payload=classification.payload,
+                )
+                diagnostics.extend(component_diagnostics)
+                if component is None:
+                    if any(
+                        diagnostic.manifest_kind == "agon_recurrence_adapter"
+                        for diagnostic in component_diagnostics
+                    ):
+                        foreign_manifests.append(
+                            LoadedForeignManifest(
+                                manifest_path=path,
+                                repo=repo,
+                                manifest_kind="agon_recurrence_adapter",
+                                manifest_ref=classification.manifest_ref,
+                            )
+                        )
+                    continue
+
+                loaded.append(LoadedComponent(manifest_path=path, component=component))
     return RecurrenceRegistry(
         workspace,
         loaded,

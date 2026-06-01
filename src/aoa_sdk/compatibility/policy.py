@@ -88,14 +88,13 @@ SURFACE_COMPATIBILITY_RULES = {
     "abyss-stack.diagnostic_surface_catalog.min": SurfaceCompatibilityRule(
         surface_id="abyss-stack.diagnostic_surface_catalog.min",
         repo="abyss-stack",
-        relative_path="generated/diagnostic_surface_catalog.min.json",
-        preferred_relative_paths=[
+        relative_path=(
             "mechanics/diagnostic-spine/parts/diagnostic-surfaces/generated/"
             "diagnostic_surface_catalog.min.json"
-        ],
+        ),
         version_field="schema_version",
         supported_versions=["abyss_stack_diagnostic_surface_catalog_v1"],
-        notes="Prefer the diagnostic-spine part-local catalog; legacy generated/ remains a migration fallback.",
+        notes="Canonical diagnostic-spine part-local catalog. Root generated copies are not active compatibility inputs.",
     ),
     "aoa-techniques.technique_capsules": SurfaceCompatibilityRule(
         surface_id="aoa-techniques.technique_capsules",

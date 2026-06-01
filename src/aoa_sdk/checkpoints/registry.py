@@ -435,7 +435,7 @@ def _coerce_datetime(value: datetime | str | None) -> datetime | None:
     return datetime.fromisoformat(normalized)
 
 
-def _with_local_timestamp_fallback(
+def _with_local_timestamp_default(
     *,
     utc_value: datetime | str | None,
     local_value: str | None,
@@ -2054,10 +2054,26 @@ def _hook_template_path(
     workspace_candidate: Path | None = None
     sdk_root = _repo_path_if_available(workspace, "aoa-sdk")
     if sdk_root is not None:
-        workspace_candidate = sdk_root / "githooks" / hook_name
+        workspace_candidate = (
+            sdk_root
+            / "mechanics"
+            / "checkpoint"
+            / "parts"
+            / "session-growth-checkpoint-cycle"
+            / "git-boundary-hook-templates"
+            / hook_name
+        )
         if workspace_candidate.exists():
             return workspace_candidate
-    package_candidate = Path(__file__).resolve().parents[3] / "githooks" / hook_name
+    package_candidate = (
+        Path(__file__).resolve().parents[3]
+        / "mechanics"
+        / "checkpoint"
+        / "parts"
+        / "session-growth-checkpoint-cycle"
+        / "git-boundary-hook-templates"
+        / hook_name
+    )
     if package_candidate.exists():
         return package_candidate
     if workspace_candidate is not None:
@@ -3531,7 +3547,7 @@ def _progression_signals_from_reviewed_artifact(
         ),
         (
             "deep_readiness",
-            ("architecture", "wave", "phase", "bridge", "kernel"),
+            ("architecture", "stage", "phase", "bridge", "kernel"),
             "the reviewed artifact shows deeper structural understanding that should be reconsidered during progression lift",
         ),
     ]
@@ -3643,7 +3659,7 @@ def _quest_promotion_fields(
         quest_unit_name = unit_name or f"reviewed closeout candidate {bounded_unit_ref}"
     else:
         owner_repo = "aoa-playbooks"
-        next_surface = f"quests/{_safe_name(context.session_ref)}-followup/QUEST.md"
+        next_surface = f"quests/checkpoint/captured/{_safe_name(context.session_ref)}-followup.md"
         promotion_verdict = "keep_open_quest"
         nearest_wrong_target = "promote_to_skill"
         repeat_shape = "route"
@@ -3781,7 +3797,7 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             runtime_session_created_at = _coerce_datetime(payload.get("runtime_session_created_at"))
         if "agent_review" in payload:
             review = SessionCheckpointAgentReview.model_validate(payload["agent_review"])
-            reviewed_at_local, reviewed_tz = _with_local_timestamp_fallback(
+            reviewed_at_local, reviewed_tz = _with_local_timestamp_default(
                 utc_value=review.reviewed_at,
                 local_value=review.reviewed_at_local,
                 tz_name=review.reviewed_tz,
@@ -3799,7 +3815,7 @@ def _build_checkpoint_note(paths: _CheckpointPaths) -> SessionCheckpointNote:
             agent_review_map[review_key] = review
             continue
         entry = SessionCheckpointHistoryEntry.model_validate(payload["history_entry"])
-        observed_at_local, observed_tz = _with_local_timestamp_fallback(
+        observed_at_local, observed_tz = _with_local_timestamp_default(
             utc_value=entry.observed_at,
             local_value=entry.observed_at_local,
             tz_name=entry.observed_tz,
@@ -4699,7 +4715,7 @@ def _render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label:
     lines.extend(["## Checkpoint History", ""])
     for entry in note.checkpoint_history:
         observed_at = entry.observed_at.isoformat().replace("+00:00", "Z")
-        observed_at_local, observed_tz = _with_local_timestamp_fallback(
+        observed_at_local, observed_tz = _with_local_timestamp_default(
             utc_value=entry.observed_at,
             local_value=entry.observed_at_local,
             tz_name=entry.observed_tz,

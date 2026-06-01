@@ -1,6 +1,6 @@
 # Release Support Mechanic
 
-Status: skeleton.
+Status: active topology with part-local payload.
 
 ## Mechanic Card
 
@@ -32,19 +32,22 @@ outside SDK helper truth until actually performed.
 - `CHANGELOG.md`
 - `docs/RELEASING.md`
 - `docs/RELEASE_CI_POSTURE.md`
+- `mechanics/release-support/parts/release-audit-publish-helper/`
+- `mechanics/release-support/parts/public-support-ci-posture/`
 - `.github/workflows/repo-validation.yml`
+- `.github/workflows/latest-sibling-canary.yml`
+- `.github/workflows/release-artifacts.yml`
+- `.github/workflows/release-cadence-audit.yml`
 - `scripts/release_check.py`
 - `src/aoa_sdk/release/`
-- `tests/test_release.py`
-- `tests/test_roadmap_parity.py`
+- `mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py`
+- `mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py`
+- `mechanics/release-support/parts/public-support-ci-posture/tests/test_sibling_canary.py`
 
 ### Candidate parts
 
-- changelog
-- release-audit
-- ci-posture
-- package-build
-- publication
+- release-audit-publish-helper
+- public-support-ci-posture
 
 ### Must not claim
 
@@ -55,7 +58,7 @@ published GitHub Release or package upload.
 
 ```bash
 python scripts/release_check.py
-python -m pytest -q tests/test_release.py tests/test_roadmap_parity.py
+python -m pytest -q mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py mechanics/release-support/parts/public-support-ci-posture/tests/test_sibling_canary.py
 ```
 
 ### Next route

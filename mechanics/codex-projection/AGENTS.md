@@ -6,18 +6,18 @@
 
 ## Role
 
-Route the shared Codex Projection mechanic for SDK Codex workspace MCP,
-deploy-status snapshots, portability boundaries, rollout references, and
-Codex-facing control-plane reads.
+Route the shared Codex Projection mechanic for SDK workspace MCP server,
+live rollout status snapshots, portability boundaries, rollout reference
+handoffs, and Codex-facing control-plane reads.
 
 ## Read before editing
 
 - `mechanics/AGENTS.md`
 - `mechanics/codex-projection/README.md`
-- `docs/codex-workspace-mcp.md`
-- `docs/CODEX_PLANE_DEPLOY_STATUS.md`
+- `mechanics/codex-projection/parts/workspace-mcp-server/README.md`
+- `mechanics/codex-projection/parts/live-rollout-status-readout/README.md`
 - `src/aoa_sdk/codex/`
-- `scripts/aoa_workspace_mcp_server.py`
+- `mechanics/codex-projection/parts/workspace-mcp-server/scripts/aoa_workspace_mcp_server.py`
 
 ## Boundaries
 
@@ -29,10 +29,10 @@ Codex-facing control-plane reads.
 
 ```bash
 python scripts/validate_mechanics_topology.py
-python -m pytest -q tests/test_codex_workspace_mcp.py tests/test_codex_deploy_status.py
+python -m pytest -q mechanics/codex-projection/parts/workspace-mcp-server/tests/test_workspace_mcp_server.py mechanics/codex-projection/parts/live-rollout-status-readout/tests/test_live_rollout_status_readout.py
 ```
 
 ## Closeout
 
-Report whether MCP, deploy-status, portability, or rollout reference behavior
-changed.
+Report whether workspace MCP server, live rollout status, portability boundary,
+or rollout reference handoff behavior changed.

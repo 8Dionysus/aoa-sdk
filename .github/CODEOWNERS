@@ -2,17 +2,14 @@
 /.agents/ @8Dionysus
 /.aoa/ @8Dionysus
 /.github/ @8Dionysus
-/config/ @8Dionysus
 /docs/ @8Dionysus
-/examples/ @8Dionysus
 /generated/ @8Dionysus
-/githooks/ @8Dionysus
-/manifests/ @8Dionysus
-/quests/ @8Dionysus
+/mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/ @8Dionysus
+/mechanics/release-support/parts/public-support-ci-posture/ @8Dionysus
 /schemas/ @8Dionysus
 /scripts/ @8Dionysus
 /src/ @8Dionysus
-/systemd/ @8Dionysus
+/mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/ @8Dionysus
 /tests/ @8Dionysus
 
 /AGENTS.md @8Dionysus

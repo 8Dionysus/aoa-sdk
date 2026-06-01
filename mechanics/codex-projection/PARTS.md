@@ -4,13 +4,14 @@
 
 | Part | Current surfaces | Future payload condition |
 | --- | --- | --- |
-| workspace-mcp | `docs/codex-workspace-mcp.md`, `scripts/aoa_workspace_mcp_server.py` | only if MCP resources need package-local schemas |
-| deploy-status | deploy-status schema, example, registry | only if snapshots become a generated read lane |
-| portability | `docs/CODEX_PLANE_PORTABILITY.md` | only if portability contracts need examples |
-| rollout-refs | rollout campaign refs and deploy operation note | only if rollout references become package-local manifests |
+| workspace-mcp-server | `parts/workspace-mcp-server/` | owns the runnable MCP server route, docs, and tests; importable source remains in `src/aoa_sdk/codex/` |
+| live-rollout-status-readout | `parts/live-rollout-status-readout/` | reads external rollout evidence and emits a bounded SDK status snapshot |
+| portability-boundary | `parts/portability-boundary/docs/portability-boundary.md` | explains workspace-root portability without making SDK code the deploy owner |
+| owner-rollout-reference-handoff | `parts/owner-rollout-reference-handoff/docs/` | carries source-owned rollout refs without making them SDK truth |
 
 ## Provenance Bridge
 
-This parent replaces the over-specific `codex-plane` parent. The SDK-specific
-plane wording is a part-local concern inside the shared Codex Projection
-mechanic.
+Former parent-name candidates for this package live only in
+`legacy/INDEX.md`. Active Codex Projection routes name the operation:
+workspace MCP server, live rollout status readout, portability boundary, and
+owner rollout reference handoff.

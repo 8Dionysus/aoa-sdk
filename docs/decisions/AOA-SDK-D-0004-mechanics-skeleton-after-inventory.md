@@ -10,7 +10,7 @@ Superseded by `AOA-SDK-D-0005`.
 - Original date: 2026-05-31
 - Surface classes: topology, mechanics, route card, validation guard
 - SDK facets: mechanics topology, control-plane, source inventory, agent surface
-- Mechanic parents: workspace-topology, compatibility, boundary-bridge, skill-routing, surface-detection, checkpoint, closeout, recurrence, agon, titan, experience, a2a-return, rpg, codex-plane, release-support
+- Mechanic parents: agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan
 - Guard families: source topology, mechanics topology, nested agents, release check
 - Posture: superseded
 
@@ -41,23 +41,10 @@ pressure.
 
 Add `mechanics/` now as a route-only operation topology skeleton.
 
-The first skeleton names 15 packages:
-
-- `workspace-topology`
-- `compatibility`
-- `boundary-bridge`
-- `skill-routing`
-- `surface-detection`
-- `checkpoint`
-- `closeout`
-- `recurrence`
-- `agon`
-- `titan`
-- `experience`
-- `a2a-return`
-- `rpg`
-- `codex-plane`
-- `release-support`
+The first skeleton used a larger inventory-driven parent set. Its former
+parent names are now preserved under package-local legacy indexes, while the
+active tree uses the corrected 12-package parent set recorded by
+`AOA-SDK-D-0005`.
 
 Each package gets an `AGENTS.md`, `README.md`, `PARTS.md`, and
 `PROVENANCE.md`. The root gets `mechanics/README.md`,
@@ -76,9 +63,9 @@ Shared names stay shared where the recurring operation is the same AoA shape:
 `boundary-bridge`, `checkpoint`, `recurrence`, `agon`, `titan`,
 `experience`, `rpg`, and `release-support`.
 
-SDK-local names are used where the operation exists because this repo is the
-control-plane SDK: `workspace-topology`, `compatibility`, `skill-routing`,
-`surface-detection`, `a2a-return`, and `codex-plane`.
+SDK-local lanes exist because this repo is the control-plane SDK, but the
+correct active shape is a shared parent plus a topological part route. Former
+parent-name records stay in `mechanics/*/legacy/INDEX.md`.
 
 This keeps the earlier source-home decision intact: `src/aoa_sdk/` remains the
 importable Python source home, and no top-level `sdk/` district is added by

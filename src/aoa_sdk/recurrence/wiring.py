@@ -12,6 +12,13 @@ BEACON_REPORT = ".aoa/recurrence/beacons/session.latest.json"
 USAGE_GAP_REPORT = ".aoa/recurrence/usage-gaps/session.latest.json"
 REVIEW_QUEUE_REPORT = ".aoa/recurrence/review-queues/session.latest.json"
 REVIEW_SUMMARY_REPORT = ".aoa/recurrence/review-summaries/session.latest.json"
+RECURRENCE_CI_TESTS = (
+    "mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_seed.py "
+    "mechanics/recurrence/parts/beacon-candidate-pressure/tests/test_recurrence_beacon_seed.py "
+    "mechanics/recurrence/parts/hook-observation-pack/tests/test_recurrence_hook_pack_seed.py "
+    "mechanics/recurrence/parts/owner-review-surface/tests/test_recurrence_review_pack_seed.py "
+    "mechanics/recurrence/parts/wiring-rollout-handoff/tests/test_recurrence_wiring_pack_seed.py"
+)
 
 
 def build_wiring_plan(workspace: Workspace) -> WiringPlan:
@@ -83,7 +90,7 @@ def build_wiring_plan(workspace: Workspace) -> WiringPlan:
             target_path=".github/workflows/recurrence-control-plane.example.yml",
             commands=[
                 "aoa recur doctor --root . --json",
-                "pytest -q tests/test_recurrence_seed.py tests/test_recurrence_beacon_seed.py tests/test_recurrence_hook_pack_seed.py tests/test_recurrence_review_pack_seed.py tests/test_recurrence_wiring_pack_seed.py",
+                f"pytest -q {RECURRENCE_CI_TESTS}",
             ],
             notes="CI should prove the planted control-plane stays coherent before it widens further.",
         ),

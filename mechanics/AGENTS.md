@@ -7,10 +7,11 @@ Everything under `mechanics/`.
 ## Role
 
 `mechanics/` is the SDK operation topology layer. It names repeatable
-cross-surface SDK operations and points back to the source, docs, schemas,
-examples, generated companions, scripts, and tests that already carry payload.
+cross-surface SDK operations and hosts part-local payload when a single
+mechanic part owns the artifact.
 
-Mechanics are route maps. They are not the importable SDK source home.
+Mechanics are operation homes and route maps. They are not the importable SDK
+source home.
 
 ## Read before editing
 
@@ -19,10 +20,13 @@ Mechanics are route maps. They are not the importable SDK source home.
 3. `DESIGN.AGENTS.md`
 4. `docs/decisions/README.md`
 5. `mechanics/README.md`
-6. `mechanics/TOPOLOGY_PREP.md`
-7. `mechanics/topology.json`
-8. The package-local `AGENTS.md` and README for each touched mechanic
-9. The stronger source surface named by the mechanic card
+6. `mechanics/ARTIFACT_TOPOLOGY.md`
+7. `mechanics/TOPOLOGY_PREP.md`
+8. `mechanics/topology.json`
+9. The package-local `AGENTS.md` and README for each touched mechanic
+10. The nearest part `README.md`, `CONTRACT.md`, and `VALIDATION.md` when a
+    functioning part exists
+11. The stronger source surface named by the mechanic card
 
 ## Boundaries
 
@@ -38,9 +42,13 @@ Mechanics are route maps. They are not the importable SDK source home.
   before claiming a new source family is covered.
 - File-family pressure routes through `PARTS.md`; it does not create a parent
   package by itself.
-- Do not create physical `parts/` payload directories until a later landing
-  moves or adds reviewed payload with a package-local validator.
-- Do not treat topology cards as proof that a source surface has moved.
+- Move single-mechanic-owned payload into the nearest
+  `mechanics/<parent>/parts/<part>/<district>/` home once the part has a local
+  contract and validation route.
+- Preserve old-path accounting in `ARTIFACT_TOPOLOGY.md`, `PROVENANCE.md`, or
+  legacy receipts. Active work starts from the current route.
+- Do not treat topology cards as proof that a source surface has moved; prove
+  the move with current paths and validators.
 
 ## Validation
 

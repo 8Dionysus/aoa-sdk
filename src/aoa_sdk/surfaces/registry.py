@@ -355,8 +355,8 @@ def _derive_skill_surface_items(
                     requires_confirmation=False,
                     existing_command="aoa skills dispatch",
                     existing_surface=f".agents/skills/{item.skill_name}/SKILL.md",
-                    manual_fallback_allowed=False,
-                    manual_fallback_note=None,
+                    manual_equivalence_allowed=False,
+                    manual_equivalence_note=None,
                     host_availability_status=item.host_availability.status,
                 ),
                 related_skill_names=[],
@@ -370,15 +370,15 @@ def _derive_skill_surface_items(
             )
         )
 
-    fallback_items = [*skill_report.must_confirm, *skill_report.suggest_next]
-    for item in fallback_items:
-        if item.host_availability.status != "router-only" or not item.host_availability.manual_fallback_allowed:
+    manual_equivalence_items = [*skill_report.must_confirm, *skill_report.suggest_next]
+    for item in manual_equivalence_items:
+        if item.host_availability.status != "router-only" or not item.host_availability.manual_equivalence_allowed:
             continue
-        fallback_signals: list[SurfaceSignal] = ["router-match"]
+        manual_equivalence_signals: list[SurfaceSignal] = ["router-match"]
         if item in skill_report.must_confirm:
-            fallback_signals.append("risk-gate")
+            manual_equivalence_signals.append("risk-gate")
         if closeout_signal:
-            fallback_signals.append("closeout-chain")
+            manual_equivalence_signals.append("closeout-chain")
         items.append(
             SurfaceOpportunityItem(
                 surface_ref=f"aoa-skills:{item.skill_name}",
@@ -388,10 +388,10 @@ def _derive_skill_surface_items(
                 state="manual-equivalent",
                 phase_detected=surface_phase,
                 reason=item.reason,
-                signals=_ordered_signals(fallback_signals),
+                signals=_ordered_signals(manual_equivalence_signals),
                 confidence="high" if item in skill_report.must_confirm else "medium",
                 execution=SurfaceOpportunityExecutionHint(
-                    lane="manual-fallback",
+                    lane="manual-equivalence",
                     executable_now=False,
                     requires_confirmation=item in skill_report.must_confirm,
                     existing_command=(
@@ -402,8 +402,8 @@ def _derive_skill_surface_items(
                         else "aoa skills detect"
                     ),
                     existing_surface=None,
-                    manual_fallback_allowed=True,
-                    manual_fallback_note="keep the distinction visible: the same discipline was followed manually, not claimed as a real activation",
+                    manual_equivalence_allowed=True,
+                    manual_equivalence_note="keep the distinction visible: the same discipline was followed manually, not claimed as a real activation",
                     host_availability_status=item.host_availability.status,
                 ),
                 related_skill_names=_related_skill_names(skill_report, item.skill_name),
@@ -452,8 +452,8 @@ def _derive_heuristic_items(
                     requires_confirmation=False,
                     existing_command=None,
                     existing_surface=rule.existing_surface,
-                    manual_fallback_allowed=False,
-                    manual_fallback_note=None,
+                    manual_equivalence_allowed=False,
+                    manual_equivalence_note=None,
                     host_availability_status=None,
                 ),
                 related_skill_names=[],
@@ -491,8 +491,8 @@ def _derive_heuristic_items(
                     requires_confirmation=False,
                     existing_command=None,
                     existing_surface=explicit_rule.existing_surface,
-                    manual_fallback_allowed=False,
-                    manual_fallback_note=None,
+                    manual_equivalence_allowed=False,
+                    manual_equivalence_note=None,
                     host_availability_status=None,
                 ),
                 related_skill_names=[],
@@ -915,7 +915,7 @@ def _derive_closeout_followups(
 def _owner_layer_notes(*, items: list[SurfaceOpportunityItem]) -> list[str]:
     notes = [
         "aoa-sdk stays on the control plane; it may detect and hand off but does not become the source of truth for eval, memo, playbook, technique, or agent meaning",
-        "playbook, eval, memo, agent, and technique items remain hints, candidates, or closeout handoffs in wave one; they are not auto-activatable runtime objects here",
+        "playbook, eval, memo, agent, and technique items remain hints, candidates, or closeout handoffs in the initial boundary; they are not auto-activatable runtime objects here",
     ]
     if any(item.shortlist_hints for item in items):
         notes.append("routing shortlist hints stay advisory only; they can sharpen inspection and ambiguity reporting but never overwrite activation truth")

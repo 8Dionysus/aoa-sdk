@@ -15,8 +15,8 @@ SCHEMA_REF = "schemas/workspace-control-plane.schema.json"
 VALIDATION_REFS = (
     "scripts/build_workspace_control_plane.py",
     "scripts/validate_workspace_control_plane.py",
-    "tests/test_workspace_control_plane.py",
-    "tests/test_compatibility.py",
+    "mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py",
+    "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py",
 )
 FORBIDDEN_LOW_CONTEXT_PREFIXES = ("src/", "scripts/")
 
@@ -32,7 +32,7 @@ SURFACE_PAYLOAD = {
 
 ROUTE_SPECS = (
     {
-        "route_id": "workspace-topology",
+        "route_id": "workspace-root-resolution",
         "need": "resolve workspace topology, source checkouts, and override rules without guessing",
         "surface_ref": "docs/workspace-layout.md",
         "verification_refs": [
@@ -50,20 +50,20 @@ ROUTE_SPECS = (
         ],
     },
     {
-        "route_id": "surface-detection",
+        "route_id": "owner-layer-signal-handoff",
         "need": "inspect additive owner-layer surface detection and reviewed handoff posture",
-        "surface_ref": "docs/aoa-surface-detection-second-wave.md",
+        "surface_ref": "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md",
         "verification_refs": [
-            "docs/aoa-surface-detection-first-wave.md",
-            "docs/aoa-surface-detection-closeout-handoff.md",
+            "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/initial-surface-detection-boundary.md",
+            "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md",
         ],
     },
     {
         "route_id": "checkpoint-growth",
         "need": "capture reviewable mid-session checkpoint notes without mistaking them for harvest verdicts",
-        "surface_ref": "docs/session-growth-checkpoints.md",
+        "surface_ref": "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md",
         "verification_refs": [
-            "docs/checkpoint-note-promotion.md",
+            "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md",
             "docs/versioning.md",
         ],
     },

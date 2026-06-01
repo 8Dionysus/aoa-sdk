@@ -1,25 +1,26 @@
 # Codex Projection Mechanic
 
-Status: skeleton.
+Status: active topology with part-local payload.
 
 ## Mechanic Card
 
 ### Operation
 
 Project SDK workspace orientation into Codex-facing read surfaces: workspace
-MCP, deploy-status snapshots, portability boundaries, and rollout references.
+MCP server, live rollout status snapshots, portability boundaries, and owner
+rollout reference handoffs.
 
 ### Trigger
 
-Use this mechanic when Codex workspace MCP behavior, deploy-status schemas,
-portability docs, rollout refs, or Codex registry code changes.
+Use this mechanic when Codex workspace MCP server behavior, live rollout status
+schemas, portability docs, rollout refs, or Codex registry code changes.
 
 ### SDK owns
 
-- local MCP server over SDK workspace orientation
-- typed deploy-status snapshot reads
+- local workspace MCP server over SDK workspace orientation
+- typed live rollout status snapshot reads
 - portability boundary docs
-- rollout reference surfaces
+- owner rollout reference handoff surfaces
 
 ### Stronger owner split
 
@@ -28,31 +29,33 @@ repo authority remain outside SDK ownership.
 
 ### Current source surfaces
 
-- `docs/codex-workspace-mcp.md`
-- `docs/CODEX_PLANE_DEPLOY_STATUS.md`
-- `docs/CODEX_PLANE_PORTABILITY.md`
-- `examples/codex_plane_deploy_status_snapshot.example.json`
-- `schemas/codex_plane_deploy_status_snapshot_v1.json`
-- `scripts/aoa_workspace_mcp_server.py`
+- `mechanics/codex-projection/parts/workspace-mcp-server/docs/workspace-mcp-server.md`
+- `mechanics/codex-projection/parts/workspace-mcp-server/scripts/aoa_workspace_mcp_server.py`
+- `mechanics/codex-projection/parts/workspace-mcp-server/tests/test_workspace_mcp_server.py`
+- `mechanics/codex-projection/parts/live-rollout-status-readout/docs/live-rollout-status-readout.md`
+- `mechanics/codex-projection/parts/live-rollout-status-readout/examples/live-rollout-status-snapshot.example.json`
+- `mechanics/codex-projection/parts/live-rollout-status-readout/schemas/live-rollout-status-snapshot.schema.json`
+- `mechanics/codex-projection/parts/portability-boundary/docs/portability-boundary.md`
+- `mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/deploy-operation-boundary-note.md`
+- `mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/rollout-campaign-refs.md`
 - `src/aoa_sdk/codex/`
-- Codex tests under `tests/`
 
 ### Candidate parts
 
-- workspace-mcp
-- deploy-status
-- portability
-- rollout-refs
+- workspace-mcp-server
+- live-rollout-status-readout
+- portability-boundary
+- owner-rollout-reference-handoff
 
 ### Must not claim
 
-This mechanic must not treat a deploy-status snapshot as live deployment
+This mechanic must not treat a live rollout status snapshot as live deployment
 authority or make the SDK a Codex runtime.
 
 ### Validation
 
 ```bash
-python -m pytest -q tests/test_codex_workspace_mcp.py tests/test_codex_deploy_status.py
+python -m pytest -q mechanics/codex-projection/parts/workspace-mcp-server/tests/test_workspace_mcp_server.py mechanics/codex-projection/parts/live-rollout-status-readout/tests/test_live_rollout_status_readout.py
 ```
 
 ### Next route

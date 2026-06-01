@@ -1,0 +1,36 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "properties": {
+    "count": {
+      "type": "integer"
+    },
+    "digest": {
+      "type": "string"
+    },
+    "helpers": {
+      "type": "array"
+    },
+    "registry_id": {
+      "type": "string"
+    },
+    "stop_lines": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "surface_role": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "registry_id",
+    "surface_role",
+    "count",
+    "helpers",
+    "stop_lines",
+    "digest"
+  ],
+  "title": "Agon Duel Kernel SDK Binding Registry",
+  "type": "object"
+}

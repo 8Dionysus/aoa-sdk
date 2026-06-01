@@ -1,0 +1,25 @@
+{
+  "component_id": "component:agon:kag-review-sdk-helpers",
+  "forbidden_actions": [
+    "open_arena_session",
+    "issue_verdict",
+    "write_scar",
+    "mutate_rank",
+    "promote_to_tree_of_sophia",
+    "canonicalize_kag",
+    "auto_rewrite_owner_repo",
+    "hidden_scheduler_action",
+    "single_event_promotion"
+  ],
+  "observation_only": true,
+  "repo": "aoa-sdk",
+  "surfaces": [
+    "mechanics/agon/parts/epistemic-kag-review-helpers/generated/agon_kag_sdk_helpers.min.json",
+    "mechanics/agon/parts/epistemic-kag-review-helpers/config/agon_kag_sdk_helpers.seed.json",
+    "mechanics/agon/parts/epistemic-kag-review-helpers/docs/kag-review-helpers.md",
+    "mechanics/agon/parts/epistemic-kag-review-helpers/docs/kag-sdk-boundary.md",
+    "mechanics/agon/parts/epistemic-kag-review-helpers/docs/kag-review-landing.md"
+  ],
+  "title": "KAG review aoa-sdk helper surfaces",
+  "historical_wave": "XVII"
+}

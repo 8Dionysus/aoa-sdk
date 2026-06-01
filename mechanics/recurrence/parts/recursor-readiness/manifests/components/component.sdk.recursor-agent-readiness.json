@@ -1,0 +1,55 @@
+{
+  "schema_version": "aoa_recurrence_component_v2",
+  "manifest_kind": "recurrence_component",
+  "component_ref": "component:sdk:recursor-agent-readiness",
+  "owner_repo": "aoa-sdk",
+  "description": "Read-only SDK scanners for recursor readiness, no-spawn boundary, and projection-candidate posture.",
+  "source_inputs": [
+    "src/aoa_sdk/recurrence/agent_readiness.py",
+    "src/aoa_sdk/recurrence/recursor_boundary.py",
+    "mechanics/recurrence/parts/recursor-readiness/scripts/recursor_agent_readiness.py",
+    "mechanics/recurrence/parts/recursor-readiness/docs/recursor-agent-readiness.md",
+    "mechanics/recurrence/parts/recursor-readiness/docs/recursor-no-spawn-law.md"
+  ],
+  "generated_surfaces": [],
+  "test_surfaces": [
+    "mechanics/recurrence/parts/recursor-readiness/tests/test_recursor_agent_readiness_seed.py"
+  ],
+  "proof_surfaces": [
+    "python -m py_compile src/aoa_sdk/recurrence/agent_readiness.py src/aoa_sdk/recurrence/recursor_boundary.py mechanics/recurrence/parts/recursor-readiness/scripts/recursor_agent_readiness.py",
+    "python -m pytest -q mechanics/recurrence/parts/recursor-readiness/tests/test_recursor_agent_readiness_seed.py"
+  ],
+  "refresh_routes": [
+    {
+      "action": "revalidate",
+      "commands": [
+        "python -m py_compile src/aoa_sdk/recurrence/agent_readiness.py src/aoa_sdk/recurrence/recursor_boundary.py mechanics/recurrence/parts/recursor-readiness/scripts/recursor_agent_readiness.py",
+        "python -m pytest -q mechanics/recurrence/parts/recursor-readiness/tests/test_recursor_agent_readiness_seed.py"
+      ],
+      "notes": "Prove the SDK scanners stay readiness-only before any owner handoff."
+    }
+  ],
+  "consumer_edges": [
+    {
+      "kind": "documents",
+      "target_repo": "aoa-agents",
+      "target": "component:agents:recursor-readiness",
+      "required": true,
+      "suggested_action": "handoff",
+      "notes": "SDK scanners read aoa-agents readiness contracts but do not install or spawn agents."
+    },
+    {
+      "kind": "evaluated_by",
+      "target_repo": "aoa-evals",
+      "target": "recursor-readiness-boundary-v1",
+      "required": false,
+      "suggested_action": "revalidate",
+      "notes": "Eval-side proof checks the readiness boundary when the scanner contract changes."
+    }
+  ],
+  "tags": [
+    "readiness-only",
+    "no-spawn",
+    "helper-only"
+  ]
+}

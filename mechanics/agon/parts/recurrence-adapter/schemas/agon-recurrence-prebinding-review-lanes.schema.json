@@ -1,0 +1,52 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": true,
+  "properties": {
+    "lanes": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "live_protocol": {
+      "type": "boolean"
+    },
+    "owner_repo": {
+      "type": "string"
+    },
+    "required_stop_lines": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "runtime_effect": {
+      "type": "string"
+    },
+    "schema_version": {
+      "type": "string"
+    },
+    "status": {
+      "type": "string"
+    },
+    "lane_group_ref": {
+      "type": "string"
+    },
+    "surface_role": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "lane_group_ref",
+    "surface_role",
+    "owner_repo",
+    "status",
+    "live_protocol",
+    "runtime_effect",
+    "lanes",
+    "required_stop_lines"
+  ],
+  "title": "Agon Recurrence Prebinding Review Lanes",
+  "type": "object"
+}

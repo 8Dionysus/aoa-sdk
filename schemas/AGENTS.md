@@ -1,11 +1,12 @@
 # AGENTS.md
 
 Local guidance for `schemas/` in `aoa-sdk`. Read the root `AGENTS.md` first.
-This directory owns SDK helper contract schemas.
+This directory owns root-published SDK helper contract schemas.
 
 ## Scope
 
-Schemas here define helper registries, bindings, packets, adapters, and control-plane contracts consumed by SDK code and generated summaries.
+Schemas here define root-published control-plane contracts consumed by SDK code and generated summaries.
+Single-mechanic schemas live under the owning `mechanics/<parent>/parts/<part>/schemas/` route.
 They are owner-subordinate and must not convert sibling-repo meaning into SDK-owned doctrine.
 
 ## Local contract

@@ -25,7 +25,7 @@ from .rebase import (
     build_codex_local_target,
     build_memo_export_plan,
     build_reviewed_closeout_request,
-    build_runtime_wave_closeout_receipt,
+    build_runtime_return_closeout_receipt,
     build_summon_return_checkpoint_fixture,
     build_summon_request_payload,
     build_summon_result_payload,
@@ -279,7 +279,7 @@ class A2AAPI:
             codex_target=codex_target,
         )
 
-    def build_runtime_wave_closeout_receipt(
+    def build_runtime_return_closeout_receipt(
         self,
         remote_task: RemoteTaskResult,
         decision: SummonDecision,
@@ -294,7 +294,7 @@ class A2AAPI:
         owner_repo: str = "abyss-stack",
         actor_ref: str = "abyss-stack.runtime-a2a",
     ) -> dict[str, Any]:
-        return build_runtime_wave_closeout_receipt(
+        return build_runtime_return_closeout_receipt(
             remote_task,
             decision,
             session_ref=session_ref,

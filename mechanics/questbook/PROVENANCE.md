@@ -2,18 +2,25 @@
 
 ## Source Surfaces
 
-- `quests/`
-- `mechanics/agon/README.md`
-- `mechanics/agon/PARTS.md`
-- `ROADMAP.md`
+- `QUESTBOOK.md`
+- `quests/README.md`
+- `quests/AGENTS.md`
+- `quests/agon/README.md`
+- `quests/agon/ready/*.md`
+- `mechanics/questbook/README.md`
+- `mechanics/questbook/PARTS.md`
+- `mechanics/questbook/parts/*`
 
-## Stronger Owners
+## Correction
 
-Quest records can route pressure, but owner surfaces decide acceptance,
-completion, proof, release, memory, or helper meaning.
+The first artifact-localization pass treated root `quests/` as ordinary
+single-mechanic payload and moved Agon quest notes into Agon helper parts.
 
-## Notes
+The corrected topology follows the sibling pattern: root `quests/` is the
+source quest record district; `mechanics/questbook/` owns quest source-store
+law and validation posture; helper parts own helper contracts.
 
-This parent was missing from the first SDK skeleton. The SDK has a real root
-`quests/` source store, so the shared Questbook parent is the correct route;
-Agon-specific quest records are a part, not the parent.
+## Stronger Owner Notes
+
+Questbook keeps SDK obligations visible. It does not decide Agon, proof,
+memory, release, KAG, Tree of Sophia, or sibling-owner truth.

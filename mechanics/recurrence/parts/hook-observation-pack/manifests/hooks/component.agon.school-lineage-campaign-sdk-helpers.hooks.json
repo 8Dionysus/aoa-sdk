@@ -1,0 +1,27 @@
+{
+  "bindings": [
+    {
+      "does_not_emit": [
+        "verdict",
+        "scar",
+        "rank_mutation",
+        "tos_promotion"
+      ],
+      "emits": [
+        "recurrence_observation",
+        "owner_review_candidate"
+      ],
+      "hook_id": "component.agon.school-lineage-campaign-sdk-helpers.drift_watch",
+      "surface_globs": [
+        "mechanics/agon/parts/school-lineage-campaign-review-helpers/generated/agon_slc_sdk_helpers.min.json",
+        "mechanics/agon/parts/school-lineage-campaign-review-helpers/config/agon_slc_sdk_helpers.seed.json",
+        "mechanics/agon/parts/school-lineage-campaign-review-helpers/docs/school-lineage-campaign-review-helpers.md",
+        "mechanics/agon/parts/school-lineage-campaign-review-helpers/docs/slc-sdk-boundary.md",
+        "mechanics/agon/parts/school-lineage-campaign-review-helpers/docs/school-lineage-campaign-review-landing.md"
+      ]
+    }
+  ],
+  "component_id": "component:agon:school-lineage-campaign-sdk-helpers",
+  "hook_binding_set_id": "component.agon.school-lineage-campaign-sdk-helpers.hooks",
+  "historical_wave": "XVI"
+}

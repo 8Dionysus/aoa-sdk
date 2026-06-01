@@ -18,9 +18,81 @@ Tracking starts with the community-docs baseline for this repository.
   the refactored AoA repositories: decisions explain why, design surfaces
   explain system and agent-facing form, generated indexes stay derived, and
   root documents stay route-focused.
-- `aoa-sdk` now has a corrected mechanics topology skeleton after full
-  tracked-file inventory and sibling-source reread: package cards route 12
-  shared AoA parent mechanics, while SDK-specific lanes stay as parts.
+- `aoa-sdk` now has a corrected mechanics topology after full
+  tracked-file inventory and sibling-source reread: package cards route 11
+  shared AoA parent mechanics, SDK-specific lanes stay as parts, and the first
+  Agon recurrence-adapter payload now lives in its functioning part-local home.
+- `aoa-sdk` now has a checked `sdk/` source-home tree for SDK-owned posture:
+  public interface, facade boundary, runtime entry, and distribution routes.
+  `src/aoa_sdk/` remains the importable Python implementation and
+  `mechanics/` remains the repeatable operation topology.
+- Agon helper payloads and the Experience capture helper seam now live
+  in active part-local homes with role, input, output, owner, next-route, and
+  validation cards instead of root technical districts.
+- Remaining Experience helper contract bundles now live in active
+  `mechanics/experience/parts/` homes named by route role instead of by old
+  chronological tests or root API docs: adoption federation, deployment/watchtower,
+  governance runtime, and office release-train helper contracts.
+- Titan helper contract bundles now live in active `mechanics/titan/parts/`
+  homes with route names for incarnation/runtime, operator console, appserver
+  bridge, memory/recall, visible-session replay, and swarm closeout.
+- Recurrence root payload now lives under active part-local homes: component
+  manifest gate, hook observation pack, graph closure snapshot, live observation
+  producers, beacon candidate pressure, owner review surfaces, review decision
+  closure, downstream projection guards, wiring/rollout handoff, and recursor
+  readiness. Part names describe route role instead of old chronological or insert
+  receipts.
+- Boundary Bridge owner-layer signal handoff and Checkpoint child-task reentry
+  payload now live in part-local homes. Active docs, examples, tests, fixture
+  IDs, and A2A helper names use route-role vocabulary instead of chronological
+  labels.
+- Antifragility root payload now lives in part-local homes for
+  stress-posture dispatch gating, reviewed stress closeout carry, and via
+  negativa pruning. Active paths now name the request, decision, manifest
+  carry, checklist, owner route, and validation instead of root doc titles.
+- RPG root docs and API tests now live in part-local homes for typed consumer
+  API and surface-path transport, while `src/aoa_sdk/rpg/` remains the
+  importable SDK source home.
+- Checkpoint reviewed closeout context carry now lives in the
+  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/` part. Active
+  docs, schemas, examples, and tests name advisory carry routes for owner
+  followthrough, component refresh, continuity, and next-kernel decisions
+  instead of old root filenames.
+- Boundary Bridge skill runtime bridge docs and tests now live in
+  `mechanics/boundary-bridge/parts/skill-runtime-bridge/`, where active names
+  describe recommendation actionability and host reporting instead of old
+  root gap/spec filenames.
+- Release Support detailed runbook, public support/CI posture, and release
+  helper tests now live in part-local homes for release audit/publish helpers
+  and public support CI posture. Root release docs remain thin active route
+  doors for federation preflight and public onboarding.
+- Codex Projection workspace MCP server docs, runnable script, and tests now
+  live in `mechanics/codex-projection/parts/workspace-mcp-server/`. The active
+  route names the MCP server operation, while `src/aoa_sdk/codex/workspace_mcp.py`
+  remains the importable SDK source home.
+- Technique publication hook guidance now lives under the Recurrence
+  `hook-observation-pack` as a technique publication observation boundary. The
+  active route names observation-only behavior instead of implying runtime
+  technique hooks.
+- Boundary Bridge now has a `technique-promotion-readiness-reader` part for the
+  `aoa-techniques` facade regression. The test moved out of root `tests/` while
+  `src/aoa_sdk/techniques/` remains the importable SDK source home.
+- Checkpoint reviewed session handoff runner docs, operator scripts, and
+  closeout inbox user unit templates now live under the
+  `mechanics/checkpoint/parts/reviewed-session-handoff-runner/` route and
+  point at the part-local inbox processor.
+- Checkpoint session-growth capture and reviewed checkpoint-note promotion docs
+  now live in `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/`,
+  with generated workspace control-plane refs pointing at the part-local cycle
+  docs.
+- Checkpoint managed Git hook templates now live under
+  `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/`,
+  so hook filenames stay Git-native while the active route names the owning
+  operation.
+- Root technical districts are now guarded by an explicit mechanics topology
+  allowlist: root remains for public, repo-wide, generated, schema, tooling,
+  and fixture contracts, while new single-mechanic payload must use
+  topologically named part-local mechanics homes.
 - The SDK remains a bounded typed control plane for sibling-owned surfaces. It
   can discover, validate, inspect, and hand off source-owned artifacts, but it
   still does not own routing truth, skill execution meaning, proof verdicts,
@@ -51,12 +123,14 @@ Tracking starts with the community-docs baseline for this repository.
 - Decision records now live under canonical `AOA-SDK-D-####` filenames with
   generated lookup indexes by number, date, surface, SDK facet, mechanic
   parent, and guard family.
-- Mechanics now live under `mechanics/` as route-only operation topology, with
-  source-surface provenance, candidate parts, package-local route cards, and a
-  dedicated topology validator.
-- The first over-specific parent candidates are corrected: `workspace-topology`,
-  `compatibility`, `skill-routing`, `surface-detection`, `closeout`,
-  `a2a-return`, and `codex-plane` route as parts under shared parents.
+- Mechanics now live under `mechanics/` as operation topology with
+  source-surface provenance, candidate parts, functioning part-local artifact
+  homes, package-local route cards, and a dedicated topology validator.
+- Former over-specific parent candidates now live only in package-local
+  legacy indexes. Active mechanics use topological part names such as
+  `workspace-root-resolution`, `consumed-surface-posture-gate`,
+  `owner-layer-signal-handoff`, `reviewed-session-handoff-runner`,
+  `child-task-reentry`, and `live-rollout-status-readout`.
 - Compatibility policy now follows refactored sibling owner paths for
   `aoa-memo` memory, memory-object, checkpoint-to-memory, runtime-writeback,
   and `aoa-evals` runtime-candidate surfaces instead of treating old
@@ -69,9 +143,11 @@ Tracking starts with the community-docs baseline for this repository.
 
 - `src/aoa_sdk/` stays the importable SDK source home; a future top-level
   `sdk/` district is not added merely to mirror the package name.
-- `mechanics/` packages name repeatable SDK operations. The first skeleton
-  does not absorb typed SDK source, generated companions, release tooling, or
-  sibling source truth by theme.
+- `mechanics/` packages name repeatable SDK operations. Functioning parts may
+  own single-mechanic config, docs, schemas, generated companions, scripts,
+  tests, and helper contracts, while root `quests/` owns source quest records,
+  `src/aoa_sdk/` remains the importable SDK source home, and sibling source
+  truth stays outside the SDK.
 - Local compatibility repairs should move the canonical path to the stronger
   owner-local path. Hidden compatibility fallback is not a substitute for
   acknowledging sibling topology drift.
@@ -87,11 +163,23 @@ Tracking starts with the community-docs baseline for this repository.
   local `AGENTS.md`, index contract, generated read models, release-check
   wiring, and initial decisions for decisions-before-mechanics,
   design-before-mechanics, and refactored sibling surface paths.
-- `mechanics/` as the SDK operation-topology skeleton with root and
+- `mechanics/` as the SDK initial operation topology with root and
   package-local `AGENTS.md`, `README.md`, `PARTS.md`, `PROVENANCE.md`,
   `TOPOLOGY_PREP.md`, `topology.json`, a validator, and regression tests.
+- `mechanics/ARTIFACT_TOPOLOGY.md` as the placement law and migration ledger
+  for moving mechanic-owned root artifacts into part-local homes.
+- `mechanics/agon/parts/recurrence-adapter/` as the first functioning
+  part-local payload home, including local config, docs, schemas, generated
+  registries, builders, validators, and tests; Questbook source records route
+  through root `quests/`.
+- Agon functioning helper parts for center-law previews, state-packet review
+  bindings, duel-kernel review bindings, verdict/retention/rank review
+  helpers, epistemic/KAG review helpers, SLC review helpers, and Sophian
+  threshold review helpers.
+- `mechanics/experience/parts/capture-pipeline-helper/` as the active home for
+  the Experience capture/pipeline helper contract.
 - `AOA-SDK-D-0005` as the parent-boundary correction decision, superseding the
-  first skeleton's parent package set.
+  first topology draft's parent package set.
 - `AOA-SDK-D-0006` as the source-family crosswalk decision, making every
   `src/aoa_sdk/*` family route through a parent mechanic without promoting
   module names into parents.
@@ -99,26 +187,172 @@ Tracking starts with the community-docs baseline for this repository.
   canonical sibling compatibility paths, and memo source-file path selection.
 - Mechanics topology validation now checks live `src/aoa_sdk/*` source-family
   coverage in addition to the parent package set and demoted parent candidates.
+- Mechanics topology validation now checks functioning part directories for
+  local `README.md`, `CONTRACT.md`, and `VALIDATION.md` surfaces.
+- `AOA-SDK-D-0008`, `AOA-SDK-D-0009`, `AOA-SDK-D-0010`, and `AOA-SDK-D-0011`
+  record Codex Projection, Agon helper, Experience helper, and Titan helper
+  artifact localization decisions.
+- `AOA-SDK-D-0013` records Boundary Bridge owner-layer signal handoff and
+  Checkpoint child-task reentry localization, including active API naming away
+  from chronological helper names.
+- `AOA-SDK-D-0014` records Antifragility active part localization for
+  stress-posture dispatch gating, reviewed stress closeout carry, and via
+  negativa pruning.
+- `AOA-SDK-D-0015` records RPG typed consumer API and surface-path transport
+  localization.
+- `AOA-SDK-D-0016` through `AOA-SDK-D-0030` record the remaining active
+  mechanics localization landings: Checkpoint closeout carry, skill runtime
+  bridge, Release Support, Codex workspace MCP, technique observation and
+  promotion readers, reviewed-session handoff, session-growth checkpoint
+  cycle, localized tests, recurrence change-signal schema, and Checkpoint
+  local automation templates.
+- `AOA-SDK-D-0031` records sibling-canary localization under the
+  public-support CI posture part.
+- `AOA-SDK-D-0032` records root technical district route-card hardening for
+  docs, scripts, tests, and checked-in skill exports.
+- `AOA-SDK-D-0033` records the now-superseded Questbook parent withdrawal that
+  treated root quest records as Agon part-local payload.
+- `AOA-SDK-D-0034` records active mechanics topology status naming after
+  localization completed and stale partial/topology-draft vocabulary left the active
+  surface.
+- `AOA-SDK-D-0035` records `abyss-stack` diagnostic catalog compatibility
+  canonicalization: the SDK now uses the diagnostic-spine part-local path
+  without an old root generated fallback.
+- `AOA-SDK-D-0036` records root technical district allowlist validation, making
+  root additions fail topology validation unless they are explicit root
+  contracts or moved into topologically named part-local mechanics homes.
+- `AOA-SDK-D-0037` records workspace MCP surface-crosswalk naming: secondary
+  orientation routes now use `secondary_surface` instead of an active
+  `fallback` field.
+- `AOA-SDK-D-0038` records manual-equivalence lane naming for router-only skill
+  recommendations: active outputs now use `manual-equivalence` and
+  `manual_equivalence_*`, with old fallback field names accepted only as input
+  aliases.
+- `AOA-SDK-D-0039` records A2A quest-passport secondary-tier naming, replacing
+  the SDK-owned `fallback_tier` output field with `secondary_tier`.
+- `AOA-SDK-D-0040` records sibling fallback-key input alias normalization:
+  SDK models now expose route-bearing `secondary_actions` and `recovery_mode`
+  fields while accepting old sibling keys only as validation aliases.
+- `AOA-SDK-D-0041` records external stress fallback-ref accounting:
+  fallback-shaped stress refs may remain exact only as source/routing evidence handles,
+  not as SDK-owned active route names.
+- `AOA-SDK-D-0042` supersedes the Questbook parent withdrawal and restores
+  root `quests/` as the lane/state source quest record district with
+  `mechanics/questbook/` as active source-store and lifecycle posture.
 
 ### Changed
 
 - Root `AGENTS.md`, `README.md`, `ROADMAP.md`, and `docs/boundaries.md` now
   route structural, design, and decision questions to their owning surfaces
   instead of carrying the full explanation inline.
+- `DESIGN.md` and `DESIGN.AGENTS.md` now route single-mechanic local
+  automation templates through part-local mechanics homes instead of former
+  root local-automation districts.
+- Mechanics package cards now use a consistent active-topology status instead
+  of stale draft-topology labels after part-local payload localization.
+- `mechanics/topology.json` now names the current state
+  `active-part-localized-topology` with complete payload movement, and the
+  topology validator rejects stale in-progress status names or migration
+  vocabulary inside active route IDs.
+- `ROADMAP.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, root district route cards,
+  and mechanics part cards now describe current routes and alternate-path
+  behavior without stale draft-topology or fallback route wording in active prose.
+- Root `docs/`, `scripts/`, `tests/`, and `.agents/skills/` now have local
+  route cards registered in the nested AGENTS validator so single-mechanic
+  payload has a nearest stop-line before it lands in root.
+- Root `quests/` is restored as a Questbook source-record district, not a
+  generic payload lane; Agon helper notes now live in `quests/agon/ready/`
+  while helper contracts remain in `mechanics/agon/parts/*`.
+- `sdk/` is now a checked source-home tree, with route cards and manifest
+  coverage for public-interface, facade-boundary, runtime-entry, and
+  distribution posture.
+- `scripts/validate_sdk_source_home.py` now validates the SDK source-home
+  manifest, branch cards, family README routes, route targets, and absence of
+  mechanic `PARTS.md` vocabulary under `sdk/`.
 - `scripts/release_check.py` now checks generated decision indexes before the
   rest of the release gate.
-- `scripts/release_check.py` now checks mechanics topology before the rest of
-  the release gate.
+- `scripts/release_check.py` now checks SDK source-home and mechanics topology
+  before the rest of the release gate.
 - `scripts/validate_nested_agents.py` recognizes `DESIGN.AGENTS.md` as an
   active agent-facing guidance surface.
+- `scripts/validate_nested_agents.py` now tracks the Agon parts route card as
+  an active nested guidance surface.
+- `scripts/validate_nested_agents.py` now tracks the part-local Checkpoint
+  `git-boundary-hook-templates/` and `closeout-inbox-user-units/` route cards
+  instead of root local automation districts.
 - `src/aoa_sdk/codex/workspace_mcp.py` and `src/aoa_sdk/routing/picker.py`
   now route memo catalog inspection to the refactored `generated/memory/`
   surface.
 - `src/aoa_sdk/compatibility/policy.py` now uses canonical refactored paths
   for migrated memo and eval surfaces while preserving stable SDK surface IDs.
+- `src/aoa_sdk/compatibility/policy.py` now requires the `abyss-stack`
+  diagnostic-spine part-local catalog and no longer treats the old root
+  generated diagnostic catalog as an active compatibility fallback.
+- `src/aoa_sdk/codex/workspace_mcp.py` reports whether project-level
+  `aoa_workspace` MCP config points at the part-local server script.
+- `src/aoa_sdk/codex/workspace_mcp.py` now reports the `abyss-stack`
+  diagnostic catalog runtime entrypoint through the part-local diagnostic-spine
+  path.
+- `scripts/validate_mechanics_topology.py` now validates root technical
+  districts against an explicit allowlist and rejects re-created root
+  `config/`, `examples/`, `manifests/`, `githooks/`, and `systemd/` districts
+  unless a root contract deliberately reopens them; root `quests/` is
+  allowlisted only as the Questbook source-record district.
+- `src/aoa_sdk/codex/workspace_mcp.py` now exposes
+  `surface-crosswalk.secondary_surface` and asks prompts for a secondary
+  surface rather than a fallback route.
+- `src/aoa_sdk/models.py`, `src/aoa_sdk/skills/detector.py`,
+  `src/aoa_sdk/surfaces/registry.py`, and `src/aoa_sdk/cli/main.py` now name
+  router-only skill preservation as manual equivalence instead of an active
+  manual-fallback lane.
+- `src/aoa_sdk/a2a/rebase/models.py` now emits `QuestPassport.secondary_tier`
+  for optional delegation planning instead of `fallback_tier`.
+- `src/aoa_sdk/models.py` now exposes sibling routing/playbook posture as
+  `secondary_actions` and `recovery_mode` while keeping `fallback_actions` and
+  `fallback_mode` as input-only aliases for current sibling generated JSON.
+- `src/aoa_sdk/checkpoints/registry.py` now names local timestamp synthesis as
+  a defaulting helper instead of a fallback helper.
+- `src/aoa_sdk/recurrence/live_observations.py` now detects repeated
+  alternate-path pressure with active alternate-path vocabulary.
+- Antifragility stress contracts now state that `retrieval-only-fallback`
+  strings in examples are external source/routing evidence handles, while new
+  SDK-owned stress posture names must use degraded, recovery, source-first, or
+  alternate-path vocabulary.
 
 ### Moved Or Retired
 
+- Agon recurrence-adapter and prebinding review-lane config, docs, schemas,
+  generated registries, builders, validators, and tests moved from root
+  technical districts into `mechanics/agon/parts/recurrence-adapter/`; their
+  quest source records are restored in `quests/agon/ready/`.
+- Remaining Agon helper config, docs, schemas, examples, generated registries,
+  builders, validators, and tests moved from root technical districts into
+  their owning `mechanics/agon/parts/*/` routes; their quest source records
+  are restored in `quests/agon/ready/`.
+- Experience capture/pipeline helper docs, schema, example, and test
+  moved from root technical districts into
+  `mechanics/experience/parts/capture-pipeline-helper/`.
+- Remaining Experience adoption/federation, deployment/watchtower, governance
+  runtime, and office release-train docs, schemas, examples, and seed contract
+  tests moved from root technical districts into their owning
+  `mechanics/experience/parts/*/` routes.
+- Titan docs, schemas, examples, scripts, and tests moved from root technical
+  districts into their owning `mechanics/titan/parts/*/` routes while
+  `src/aoa_sdk/titans/` remains the importable SDK source home.
+- Owner-layer surface detection docs and tests moved from root `docs/` and
+  `tests/` into
+  `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/`.
+- A2A summon/return/checkpoint docs, examples, and tests moved from root
+  `docs/`, `examples/a2a/`, and `tests/` into
+  `mechanics/checkpoint/parts/child-task-reentry/`; active runtime closeout
+  helper vocabulary now uses return-checkpoint names instead of chronological
+  names.
+- Antifragility control-plane docs, closeout carry docs, via negativa
+  checklist, stress examples, closeout manifest example, and public-surface
+  regression moved from root `docs/`, `tests/fixtures/antifragility/`, and
+  `tests/` into `mechanics/antifragility/parts/*/` route homes.
+- RPG SDK addendum, surface path docs, and RPG API regression test moved from
+  root `docs/` and `tests/` into `mechanics/rpg/parts/*/` route homes.
 - Test fixtures for `aoa-memo` memory readers moved from root-level
   `generated/` into `generated/memory/` and `generated/memory-objects/`.
 - Test fixtures for `aoa-memo` checkpoint and runtime-writeback surfaces moved
@@ -126,6 +360,25 @@ Tracking starts with the community-docs baseline for this repository.
   and `mechanics/writeback/parts/`.
 - Test fixtures for `aoa-evals` runtime-candidate readers moved into the
   audit mechanic's `candidate-readers` part-local generated lane.
+- Codex workspace MCP docs, server script, and tests moved from root `docs/`,
+  `scripts/`, and `tests/` into
+  `mechanics/codex-projection/parts/workspace-mcp-server/`.
+- Technique publication hook guidance moved from root `docs/` into
+  `mechanics/recurrence/parts/hook-observation-pack/docs/`.
+- Technique promotion-readiness facade regression moved from root `tests/` into
+  `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/`.
+- Reviewed session handoff runner docs and closeout inbox installer/processor
+  scripts moved from root `docs/` and `scripts/` into
+  `mechanics/checkpoint/parts/reviewed-session-handoff-runner/`.
+- Session-growth checkpoint cycle docs moved from root `docs/` into
+  `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/`.
+- Managed Checkpoint Git hook templates moved from root `githooks/` into
+  `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/`.
+- Closeout inbox user unit templates moved from root `systemd/` into
+  `mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/`.
+- Sibling canary script, matrix, and regression moved from root `scripts/` and
+  `tests/` into
+  `mechanics/release-support/parts/public-support-ci-posture/`.
 - Old root-level migrated memo/eval paths are retired from active SDK
   compatibility for these surfaces; workspaces exposing only those paths now
   fail compatibility as topology drift.
@@ -133,6 +386,7 @@ Tracking starts with the community-docs baseline for this repository.
 ### Validation
 
 - `python scripts/generate_decision_indexes.py --check`
+- `python scripts/validate_sdk_source_home.py`
 - `python scripts/validate_mechanics_topology.py`
 - `python scripts/build_workspace_control_plane.py --check`
 - `python scripts/validate_workspace_control_plane.py`
@@ -169,10 +423,10 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Added
 
-- Agon recurrence adapter registry, Wave VII/IX recurrence lanes, state-packet
+- Agon recurrence adapter registry, prebinding review lanes, state-packet
   SDK bridges, verdict-delta and sealed-commit helper candidates, duel-kernel
   SDK bindings, mechanical-trial helpers, retention-rank helpers,
-  KAG/Sophian helpers, and Wave XV epistemic SDK helper surfaces
+  KAG/Sophian helpers, and epistemic review SDK helper surfaces
 - recurrence control-plane seeds, graph/manifest compatibility inserts,
   downstream projections, live-observation producers, recursor readiness
   helpers, stats re-grounding policy, and source-ref-aware routing inspection
@@ -185,8 +439,8 @@ Tracking starts with the community-docs baseline for this repository.
 ### Changed
 
 - SDK review follow-ups, recurrence projection schemas, helper imports,
-  closeout follow-through capture, helper contract inputs, wave3 typed
-  adoption coverage, wave4 API contract coverage, stats re-grounding behavior,
+  closeout follow-through capture, helper contract inputs, adoption typed
+  coverage, API contract coverage, stats re-grounding behavior,
   and Titan CLI gate handling were tightened for the current control-plane
   release line
 
@@ -221,7 +475,7 @@ Tracking starts with the community-docs baseline for this repository.
 
 - checkpoint typing, memo writeback intake, required-check plus Node24
   workflow refs, and release-facing repo posture are tightened for the current
-  control-plane wave
+  control-plane release line
 
 ### Validation
 
@@ -237,7 +491,7 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
-- this patch hardens Codex-plane deploy-state reads, rollout reference
+- this patch hardens Codex Projection live rollout status reads, rollout reference
   boundaries, and continuity carry in the control plane
 - closeout follow-through and release publish failure handling are tightened
   without widening `aoa-sdk` into a runtime owner
@@ -245,7 +499,7 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Added
 
-- Codex deploy-status snapshot surfaces and deploy-operation boundary guidance
+- Codex Projection live rollout status surfaces and deploy-operation boundary guidance
   for the control plane.
 - self-agency continuity carry and closeout follow-through mapping for
   checkpoint-driven rollout sessions.
@@ -254,8 +508,8 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Changed
 
-- release-audit typing and deploy-status reads are hardened across the current
-  Codex-plane rollout path.
+- release-audit typing and live rollout status reads are hardened across the
+  current Codex Projection rollout path.
 
 ### Fixed
 
