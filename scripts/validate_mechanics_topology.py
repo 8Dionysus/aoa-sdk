@@ -35,12 +35,11 @@ ROOT_TECHNICAL_DISTRICT_FILES = {
     "docs": frozenset(
         {
             "docs/AGENTS.md",
-            "docs/AGENTS_ROOT_REFERENCE.md",
+            "docs/README.md",
             "docs/RELEASE_CI_POSTURE.md",
             "docs/RELEASING.md",
             "docs/blueprint.md",
             "docs/boundaries.md",
-            "docs/ecosystem-impact.md",
             "docs/versioning.md",
             "docs/workspace-layout.md",
         }

@@ -10,13 +10,17 @@ Root `docs/` surfaces, excluding stronger nested cards such as
 Root docs are public route, boundary, versioning, workspace, design-reference,
 and historical context surfaces.
 
+`docs/README.md` is the docs entry map. Keep it route-oriented and weaker than
+the source surface it points to.
+
 ## Read Before Editing
 
 1. Root `AGENTS.md`
 2. `DESIGN.md`
 3. `DESIGN.AGENTS.md`
-4. `mechanics/README.md`
-5. The owning mechanic package and part when a doc is part-specific
+4. `docs/README.md`
+5. `mechanics/README.md`
+6. The owning mechanic package and part when a doc is part-specific
 
 ## Boundaries
 
@@ -27,6 +31,8 @@ and historical context surfaces.
 - Keep historical docs explicit as history; do not make seed notes active
   source truth.
 - Route moved mechanic payload through its current part-local owner home.
+- Do not preserve old root guidance or one-off impact prose in flat `docs/`
+  when current owner surfaces already carry the route.
 
 ## Validation
 

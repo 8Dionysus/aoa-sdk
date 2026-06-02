@@ -211,6 +211,7 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0001 - Decision Rationale Lane Before Mechanics](../AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md) | 2026-05-31 | root/topology, docs route, validation guard | none | rationale route, index parity, source topology | accepted |
+| [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs, route-law, topology, validation | all | root-surface hygiene, docs routes, decision drift | accepted |
 
 ## design surface
 
@@ -223,6 +224,12 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
+
+## docs map
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs, route-law, topology, validation | all | root-surface hygiene, docs routes, decision drift | accepted |
 
 ## downstream projections
 
@@ -456,6 +463,7 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | all | root-surface hygiene, docs routes | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | release-support | changelog drift, release readiness, docs routes | accepted |
+| [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs, route-law, topology, validation | all | root-surface hygiene, docs routes, decision drift | accepted |
 
 ## root quests
 

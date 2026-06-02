@@ -21,6 +21,7 @@ follow the linked owner surface instead of expanding this page.
 | System form | [DESIGN](DESIGN.md) |
 | Agent-facing guidance form | [DESIGN.AGENTS](DESIGN.AGENTS.md) |
 | Local route law and executable checks | [AGENTS](AGENTS.md) and nearest nested `AGENTS.md` |
+| Documentation map | [docs](docs/README.md) |
 | Checked SDK source-home posture | [sdk](sdk/README.md), [source home manifest](sdk/source_home.manifest.json) |
 | Importable implementation | [src/aoa_sdk](src/aoa_sdk/AGENTS.md) |
 | Repeatable SDK mechanics | [mechanics](mechanics/README.md), [mechanics topology](mechanics/topology.json) |
@@ -90,7 +91,7 @@ companions. The root README should not become that inventory.
 | District | Use For |
 | --- | --- |
 | [.aoa](.aoa/) | Workspace metadata consumed by SDK discovery. |
-| [docs](docs/) | Boundaries, release route, versioning, seed history, and decision records. |
+| [docs](docs/README.md) | Documentation map, boundaries, release route, versioning, seed history, and decision records. |
 | [generated](generated/) | Derived read models and compact control-plane companions. |
 | [mechanics](mechanics/) | Repeatable SDK operations with package and part ownership. |
 | [sdk](sdk/) | Source-authored SDK posture and manifest-checked route map. |
