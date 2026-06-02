@@ -31,7 +31,7 @@ def test_roadmap_keeps_current_control_plane_surface_explicit() -> None:
     assert "> Current release: `v0.2.3`" in readme
     assert "## [0.2.3] - 2026-04-23" in changelog
     assert "`v0.2.3`" in roadmap
-    assert "Current release contour" in roadmap
+    assert "Current unreleased contour" in roadmap
     assert "Roadmap drift is an SDK-layer risk" in roadmap
     assert "must not turn\n`aoa-sdk` into a source-owning runtime layer" in roadmap
     assert payload["schema_version"] == "aoa_sdk_workspace_control_plane_v2"

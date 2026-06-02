@@ -54,6 +54,12 @@ Grouped by `Guard families` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) | 2026-05-31 | compatibility, sibling topology, generated route | compatibility policy, control-plane, sibling read path | boundary-bridge | accepted |
 
+## changelog drift
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | changelog, release posture, root docs | release-support | accepted |
+
 ## compatibility
 
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
@@ -94,6 +100,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0023 - Session Growth Checkpoint Cycle Localization](../AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, generated companion | mechanics topology, checkpoint, workspace control plane | checkpoint | accepted |
 | [AOA-SDK-D-0027 - Public Support CI Posture Test Localization](../AOA-SDK-D-0027-public-support-ci-posture-test-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | mechanics topology, release support, public support posture | release-support | accepted |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | root docs, control-plane routing, validation authority | all | accepted |
+| [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | changelog, release posture, root docs | release-support | accepted |
 
 ## fallback removal
 
@@ -250,6 +257,12 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | accepted |
 | [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | boundary-bridge, checkpoint, codex-projection, recurrence, release-support, rpg, runtime-seam, titan | accepted |
 | [AOA-SDK-D-0018 - Release Support Part Localization](../AOA-SDK-D-0018-release-support-part-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | mechanics topology, release support, release audit, public support posture | release-support | accepted |
+
+## release readiness
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | changelog, release posture, root docs | release-support | accepted |
 
 ## root route law
 

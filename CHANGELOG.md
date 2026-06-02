@@ -9,19 +9,18 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
-- The May 31 reconciliation point covered the post-`v0.2.3` control-plane refactor span:
-  22 first-parent commits and 382 changed tracked paths from `v0.2.3..main`,
-  including the May 31 decision/design landing and the earlier portable
-  skill, session-growth, memo-compatibility, live-workspace, and route-card
-  hardening work.
+- This Unreleased section records durable post-`v0.2.3` control-plane changes
+  without live reconciliation counters. Exact commit totals, path totals, PR
+  ranges, and remote check handles belong in a dated release section built
+  during release prep.
 - `aoa-sdk` now has the same explicit rationale/design spine expected from
   the refactored AoA repositories: decisions explain why, design surfaces
   explain system and agent-facing form, generated indexes stay derived, and
   root documents stay route-focused.
-- `aoa-sdk` now has a corrected mechanics topology after full
-  tracked-file inventory and sibling-source reread: package cards route 11
-  shared AoA parent mechanics, SDK-specific lanes stay as parts, and the first
-  Agon recurrence-adapter payload now lives in its functioning part-local home.
+- `aoa-sdk` now has a corrected mechanics topology after sibling-source
+  reread: package cards route 12 active mechanics packages, SDK-specific lanes
+  stay as parts, and the first Agon recurrence-adapter payload now lives in
+  its functioning part-local home.
 - `aoa-sdk` now has a checked `sdk/` source-home tree for SDK-owned posture:
   public interface, facade boundary, runtime entry, and distribution routes.
   `src/aoa_sdk/` remains the importable Python implementation and
@@ -101,15 +100,15 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Reconciliation Basis
 
-- Reconciled against `git log --first-parent v0.2.3..HEAD`, the current
-  `CHANGELOG.md`, the landed decision records under `docs/decisions/`, root
-  route cards, compatibility policy, workspace fixtures, and the current
-  release gate instead of trusting PR titles alone.
-- Current post-`v0.2.3` public span includes PR-backed work through #135:
-  portable AoA skill foundation, session-growth and GitHub landing support,
-  dry-run helper guards, refreshed shared skill exports, audit fixes, memo
-  compatibility follow-ups, live workspace missing-surface handling, memory
-  route trigger law, and the decision/design/canonical-surface landing.
+- Unreleased entries record stable route, owner, and validation changes. They
+  deliberately avoid live first-parent commit totals, changed-path totals,
+  merged-PR ranges, and GitHub check handles because those drift after every
+  landing.
+- During release prep, reconstruct the exact span from
+  `git log --first-parent <last-tag>..HEAD`, `git diff --name-status`,
+  merged PR metadata, landed decision records, route cards, compatibility
+  policy, workspace fixtures, and the current release gate. Record that exact
+  reconciliation only in the dated release section.
 - The largest current topology change is not a package version bump. It is the
   shift from implicit root prose and stale sibling paths toward explicit
   owner-surface routing, decision rationale, design law, and canonical sibling
@@ -165,9 +164,7 @@ Tracking starts with the community-docs baseline for this repository.
   design-before-mechanics, and refactored sibling surface paths.
 - `mechanics/` as the SDK initial operation topology with root and
   package-local `AGENTS.md`, `README.md`, `PARTS.md`, `PROVENANCE.md`,
-  `TOPOLOGY_PREP.md`, `topology.json`, a validator, and regression tests.
-- `mechanics/ARTIFACT_TOPOLOGY.md` as the placement law and migration ledger
-  for moving mechanic-owned root artifacts into part-local homes.
+  `topology.json`, a validator, and regression tests.
 - `mechanics/agon/parts/recurrence-adapter/` as the first functioning
   part-local payload home, including local config, docs, schemas, generated
   registries, builders, validators, and tests; Questbook source records route
@@ -239,6 +236,10 @@ Tracking starts with the community-docs baseline for this repository.
 - `AOA-SDK-D-0042` supersedes the Questbook parent withdrawal and restores
   root `quests/` as the lane/state source quest record district with
   `mechanics/questbook/` as active source-store and lifecycle posture.
+- `AOA-SDK-D-0046` records the changelog volatility boundary: live
+  `Unreleased` entries stay free of commit totals, changed-path totals, PR
+  ranges, and remote check handles, while dated release sections own exact
+  reconciliation spans.
 
 ### Changed
 
@@ -385,6 +386,10 @@ Tracking starts with the community-docs baseline for this repository.
 - Sibling canary script, matrix, and regression moved from root `scripts/` and
   `tests/` into
   `mechanics/release-support/parts/public-support-ci-posture/`.
+- `mechanics/TOPOLOGY_PREP.md` and `mechanics/ARTIFACT_TOPOLOGY.md` were
+  retired from the active mechanics root. Current mechanics work routes
+  through `mechanics/README.md`, `mechanics/topology.json`, package
+  `PROVENANCE.md`, and part `VALIDATION.md`.
 - Old root-level migrated memo/eval paths are retired from active SDK
   compatibility for these surfaces; workspaces exposing only those paths now
   fail compatibility as topology drift.
@@ -402,13 +407,16 @@ Tracking starts with the community-docs baseline for this repository.
 - `python -m build`
 - `aoa compatibility check /srv/AbyssOS/aoa-sdk`
 - `python scripts/release_check.py`
-- GitHub `Repo Validation` for PR #135.
 
 ### Notes
 
-- This unreleased section is a release-ready reconciliation surface, not a new
-  tag. The current public release remains `v0.2.3` until version surfaces,
-  tags, and GitHub Release publication are intentionally advanced together.
+- This unreleased section is a durable change contour, not the final release
+  reconciliation. The current public release remains `v0.2.3` until version
+  surfaces, tags, and GitHub Release publication are intentionally advanced
+  together.
+- Exact reconciliation spans and final GitHub validation handles belong in the
+  dated release section created during release prep, not in this moving
+  `Unreleased` section.
 - The May 31 canonical-path landing intentionally rejected hidden fallback for
   migrated `aoa-memo` and `aoa-evals` surfaces.
 
