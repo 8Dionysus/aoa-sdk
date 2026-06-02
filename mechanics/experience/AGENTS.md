@@ -14,6 +14,7 @@ it does not own adoption, governance, deployment, office, or release decisions.
 
 - `mechanics/AGENTS.md`
 - `mechanics/experience/README.md`
+- `mechanics/experience/ROADMAP.md`
 - `mechanics/experience/PARTS.md`
 - `mechanics/experience/PROVENANCE.md`
 - `mechanics/experience/parts/`

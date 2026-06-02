@@ -14,6 +14,7 @@ handoffs, and recursor readiness scans.
 
 - `mechanics/AGENTS.md`
 - `mechanics/recurrence/README.md`
+- `mechanics/recurrence/ROADMAP.md`
 - `mechanics/recurrence/PARTS.md`
 - `mechanics/recurrence/parts/AGENTS.md`
 - `src/aoa_sdk/recurrence/`

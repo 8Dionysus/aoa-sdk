@@ -13,6 +13,7 @@ posture, build, publication helper, and Repo Validation support.
 
 - `mechanics/AGENTS.md`
 - `mechanics/release-support/README.md`
+- `mechanics/release-support/ROADMAP.md`
 - `mechanics/release-support/parts/AGENTS.md`
 - `mechanics/release-support/parts/release-audit-publish-helper/README.md`
 - `mechanics/release-support/parts/public-support-ci-posture/README.md`

@@ -13,6 +13,7 @@ handles separate from sibling-owned meaning.
 
 - `mechanics/AGENTS.md`
 - `mechanics/boundary-bridge/README.md`
+- `mechanics/boundary-bridge/ROADMAP.md`
 - `mechanics/boundary-bridge/parts/AGENTS.md`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/README.md`
 - `mechanics/boundary-bridge/parts/skill-runtime-bridge/README.md`

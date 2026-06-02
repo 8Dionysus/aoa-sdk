@@ -20,12 +20,13 @@ source home.
 3. `DESIGN.AGENTS.md`
 4. `docs/decisions/README.md`
 5. `mechanics/README.md`
-6. `mechanics/topology.json`
-7. The package-local `AGENTS.md`, `README.md`, `PARTS.md`, and `PROVENANCE.md`
-   for each touched mechanic
-8. The nearest part `README.md`, `CONTRACT.md`, and `VALIDATION.md` when a
+6. `mechanics/ROADMAP.md`
+7. `mechanics/topology.json`
+8. The package-local `AGENTS.md`, `README.md`, `ROADMAP.md`, `PARTS.md`, and
+   `PROVENANCE.md` for each touched mechanic
+9. The nearest part `README.md`, `CONTRACT.md`, and `VALIDATION.md` when a
     functioning part exists
-9. The stronger source surface named by the mechanic card
+10. The stronger source surface named by the mechanic card
 
 ## Boundaries
 
@@ -41,6 +42,8 @@ source home.
   before claiming a new source family is covered.
 - File-family pressure routes through `PARTS.md`; it does not create a parent
   package by itself.
+- Future-facing package pressure routes through package `ROADMAP.md`; it does
+  not belong in package `README.md`, `PARTS.md`, or `PROVENANCE.md`.
 - Move single-mechanic-owned payload into the nearest
   `mechanics/<parent>/parts/<part>/<district>/` home once the part has a local
   contract and validation route.
@@ -70,4 +73,5 @@ Release-facing or root-route changes should continue through
 ## Closeout
 
 Report which mechanic package changed, whether any payload moved, which source
-surfaces remain stronger, and which validator proved the topology.
+surfaces remain stronger, whether future pressure moved, and which validator
+proved the topology.

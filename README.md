@@ -24,7 +24,7 @@ follow the linked owner surface instead of expanding this page.
 | Documentation map | [docs](docs/README.md) |
 | Checked SDK source-home posture | [sdk](sdk/README.md), [source home manifest](sdk/source_home.manifest.json) |
 | Importable implementation | [src/aoa_sdk](src/aoa_sdk/AGENTS.md) |
-| Repeatable SDK mechanics | [mechanics](mechanics/README.md), [mechanics topology](mechanics/topology.json) |
+| Repeatable SDK mechanics | [mechanics](mechanics/README.md), [mechanics roadmap](mechanics/ROADMAP.md), [mechanics topology](mechanics/topology.json) |
 | Workspace discovery and control-plane capsule | [workspace layout](docs/workspace-layout.md), [.aoa workspace](.aoa/workspace.toml), [generated capsule](generated/workspace_control_plane.min.json) |
 | Compatibility, release, and public support posture | [versioning](docs/versioning.md), [releasing](docs/RELEASING.md), [release and CI posture](docs/RELEASE_CI_POSTURE.md), [release support mechanic](mechanics/release-support/README.md) |
 | Durable rationale | [decision records](docs/decisions/README.md) |
@@ -39,7 +39,7 @@ follow the linked owner surface instead of expanding this page.
 | Decide whether a change belongs in this repo | Read [docs/boundaries](docs/boundaries.md), [DESIGN](DESIGN.md), and the relevant source-home or mechanic card. |
 | Work on SDK-facing source posture | Start at [sdk](sdk/README.md) and the nearest branch `AGENTS.md`. |
 | Change importable Python behavior | Start at [src/aoa_sdk/AGENTS.md](src/aoa_sdk/AGENTS.md), then route to the owning tests or mechanic. |
-| Change repeatable operations, helpers, schemas, examples, or part tests | Start at [mechanics](mechanics/README.md), then package `AGENTS.md`, package `README.md`, package `PARTS.md`, package `PROVENANCE.md`, and the active part `VALIDATION.md`. |
+| Change repeatable operations, helpers, schemas, examples, or part tests | Start at [mechanics](mechanics/README.md), then package `AGENTS.md`, package `README.md`, package `ROADMAP.md`, package `PARTS.md`, package `PROVENANCE.md`, and the active part `VALIDATION.md`. |
 | Change workspace, compatibility, checkpoint, Codex projection, release, or closeout behavior | Follow the matching mechanic package route before changing root docs. |
 | Change public support, release posture, or CI posture | Start at [docs/RELEASE_CI_POSTURE](docs/RELEASE_CI_POSTURE.md) and [mechanics/release-support](mechanics/release-support/README.md). |
 | Change direction, obligation, or rationale | Use [ROADMAP](ROADMAP.md), [QUESTBOOK](QUESTBOOK.md), [quests](quests/README.md), and [decision records](docs/decisions/README.md). |
@@ -75,7 +75,8 @@ The current landed surface includes:
 - root design surfaces, [DESIGN](DESIGN.md) and [DESIGN.AGENTS](DESIGN.AGENTS.md);
 - canonical decision rationale under [docs/decisions](docs/decisions/README.md);
 - the checked SDK source-home tree under [sdk](sdk/README.md);
-- active mechanics topology under [mechanics](mechanics/README.md);
+- active mechanics topology under [mechanics](mechanics/README.md) with
+  future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;
 - the compact control-plane capsule at
   [generated/workspace_control_plane.min.json](generated/workspace_control_plane.min.json);
@@ -84,7 +85,8 @@ The current landed surface includes:
 
 Detailed shipped-surface maps live in [mechanics](mechanics/README.md),
 [sdk](sdk/README.md), generated companions, decision indexes, and release
-history. [ROADMAP](ROADMAP.md) keeps direction. The root README should not become that inventory.
+history. Package-local future pressure lives in mechanics package roadmaps.
+[ROADMAP](ROADMAP.md) keeps direction at the repo level. The root README should not become that inventory.
 
 ## Core Districts
 

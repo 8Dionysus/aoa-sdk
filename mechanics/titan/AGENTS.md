@@ -14,6 +14,7 @@ session replay, and swarm closeout.
 
 - `mechanics/AGENTS.md`
 - `mechanics/titan/README.md`
+- `mechanics/titan/ROADMAP.md`
 - `mechanics/titan/PARTS.md`
 - `mechanics/titan/PROVENANCE.md`
 - `mechanics/titan/parts/`

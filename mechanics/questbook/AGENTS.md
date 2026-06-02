@@ -16,8 +16,8 @@ runtime action, release readiness, or Agon authority.
 ## Read Before Editing
 
 Read root `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `QUESTBOOK.md`,
-`quests/README.md`, this package `README.md`, `PARTS.md`, and the nearest part
-card.
+`quests/README.md`, this package `README.md`, this package `ROADMAP.md`,
+`PARTS.md`, and the nearest part card.
 
 ## Boundaries
 

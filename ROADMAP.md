@@ -38,8 +38,9 @@ Use the stronger surface when the change is narrower:
 - compatibility posture: [docs/versioning](docs/versioning.md);
 - SDK source-home posture: [sdk](sdk/README.md) and
   `sdk/source_home.manifest.json`;
-- operation topology: [mechanics](mechanics/README.md), parent route cards,
-  parent `PARTS.md`, parent `PROVENANCE.md`, and part `VALIDATION.md`;
+- operation topology: [mechanics](mechanics/README.md), [mechanics roadmap](mechanics/ROADMAP.md),
+  parent route cards, parent `ROADMAP.md`, parent `PARTS.md`, parent
+  `PROVENANCE.md`, and part `VALIDATION.md`;
 - release history: [CHANGELOG](CHANGELOG.md);
 - durable rationale: [docs/decisions](docs/decisions/README.md) and generated
   `docs/decisions/indexes/`;
@@ -67,7 +68,7 @@ land a local surface?
 | input | SDK-layer pressure, direction changes, horizon order, or public-contour changes |
 | output | direction, horizon posture, future trigger, or owner-route pressure |
 | owner | root roadmap for direction; source, mechanics, decisions, generated companions, and release docs for detail |
-| next route | [sdk](sdk/README.md), [mechanics](mechanics/README.md), [docs](docs/README.md), [generated capsule](generated/workspace_control_plane.min.json), then nearest local route card |
+| next route | [sdk](sdk/README.md), [mechanics](mechanics/README.md), [mechanics roadmap](mechanics/ROADMAP.md), [docs](docs/README.md), [generated capsule](generated/workspace_control_plane.min.json), then nearest local route card |
 | validation | [AGENTS.md#verify](AGENTS.md#verify), plus route-specific tests when roadmap contracts move |
 
 ## Current Direction
@@ -127,7 +128,7 @@ Current anchors:
 | Workspace control plane | `.aoa/workspace.toml`, `docs/workspace-layout.md`, `generated/workspace_control_plane.min.json` | Keep source checkouts, runtime mirrors, and generated capsule posture aligned. |
 | Compatibility posture | `docs/versioning.md` and compatibility checks | Keep consumed sibling surfaces explicit, versioned where possible, and fail-closed on drift. |
 | SDK source home | `sdk/README.md`, `sdk/source_home.manifest.json`, `src/aoa_sdk/` | Keep public SDK posture separate from importable implementation. |
-| Mechanics atlas | `mechanics/README.md`, `mechanics/topology.json`, parent cards, part `VALIDATION.md` | Keep operation detail local while root watches repo-wide direction. |
+| Mechanics atlas | `mechanics/README.md`, `mechanics/ROADMAP.md`, `mechanics/topology.json`, parent cards, parent roadmaps, part `VALIDATION.md` | Keep operation detail and package future pressure local while root watches repo-wide direction. |
 | Bounded helpers | skill guards, surface detection, checkpoint and closeout route cards | Keep loaded, suggested, manual-equivalent, and activated states visibly separate. |
 | Release support | `docs/RELEASING.md`, `docs/RELEASE_CI_POSTURE.md`, release-support parts | Keep release preflight, CI posture, sibling canaries, audit, and publish helpers subordinate to owner truth. |
 
@@ -154,7 +155,7 @@ Current anchors:
 | Field | Direction |
 | --- | --- |
 | Current posture | `mechanics/` owns repeatable SDK operations across compatibility, runtime seams, checkpoint, release support, Codex projection, RPG, questbook, recurrence, antifragility, Agon, Experience, and Titan helper boundaries. |
-| Next honest move | Let package route cards, `PARTS.md`, `PROVENANCE.md`, part READMEs, and part `VALIDATION.md` files carry local detail while root watches only repo-wide direction. |
+| Next honest move | Let `mechanics/ROADMAP.md`, package route cards, package `ROADMAP.md`, `PARTS.md`, `PROVENANCE.md`, part READMEs, and part `VALIDATION.md` files carry local detail and package future pressure while root watches only repo-wide direction. |
 | Guardrail | Mechanics route operation pressure; they do not become source-owned sibling truth, proof verdicts, memory objects, playbooks, or runtime workers. |
 
 ### Horizon: Workspace And Compatibility

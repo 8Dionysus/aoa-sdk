@@ -25,6 +25,10 @@ Tracking starts with the community-docs baseline for this repository.
   public interface, facade boundary, runtime entry, and distribution routes.
   `src/aoa_sdk/` remains the importable Python implementation and
   `mechanics/` remains the repeatable operation topology.
+- Mechanics future pressure now has its own roadmap layer:
+  `mechanics/ROADMAP.md` routes mechanics-wide pressure, each active package
+  has a package `ROADMAP.md`, and the mechanics topology validator requires
+  those surfaces.
 - Agon helper payloads and the Experience capture helper seam now live
   in active part-local homes with role, input, output, owner, next-route, and
   validation cards instead of root technical districts.
@@ -165,6 +169,8 @@ Tracking starts with the community-docs baseline for this repository.
 - `mechanics/` as the SDK initial operation topology with root and
   package-local `AGENTS.md`, `README.md`, `PARTS.md`, `PROVENANCE.md`,
   `topology.json`, a validator, and regression tests.
+- `mechanics/ROADMAP.md` plus package `ROADMAP.md` files as the mechanics
+  future-pressure router and package-local future-contour layer.
 - `mechanics/agon/parts/recurrence-adapter/` as the first functioning
   part-local payload home, including local config, docs, schemas, generated
   registries, builders, validators, and tests; Questbook source records route

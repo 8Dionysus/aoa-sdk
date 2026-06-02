@@ -14,6 +14,7 @@ through root `quests/` and Questbook.
 
 - `mechanics/AGENTS.md`
 - `mechanics/agon/README.md`
+- `mechanics/agon/ROADMAP.md`
 - `mechanics/agon/PARTS.md`
 - `mechanics/agon/PROVENANCE.md`
 - the nearest part card under `mechanics/agon/parts/`

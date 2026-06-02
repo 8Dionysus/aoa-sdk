@@ -13,6 +13,7 @@ helper boundary.
 
 - `mechanics/AGENTS.md`
 - `mechanics/rpg/README.md`
+- `mechanics/rpg/ROADMAP.md`
 - `mechanics/rpg/parts/README.md`
 - `mechanics/rpg/parts/typed-consumer-api/README.md`
 - `mechanics/rpg/parts/surface-path-transport/README.md`

@@ -66,7 +66,7 @@ Mechanic-local docs live with their mechanics, not as a flat `docs/` pile.
 | Boundary, workspace, or compatibility meaning | target doc, [DESIGN](../DESIGN.md), owning source/tests, and relevant mechanic |
 | Release-visible public docs | [RELEASING](RELEASING.md), [RELEASE_CI_POSTURE](RELEASE_CI_POSTURE.md), release-support part, and [CHANGELOG](../CHANGELOG.md) when release notes are actually needed |
 | Decision rationale | [decisions AGENTS](decisions/AGENTS.md), then [decisions README](decisions/README.md) |
-| Mechanic-owned payload docs | [mechanics](../mechanics/README.md), then package `AGENTS.md`, `README.md`, `PARTS.md`, and part `VALIDATION.md` |
+| Mechanic-owned payload docs | [mechanics](../mechanics/README.md), then package `AGENTS.md`, `README.md`, `ROADMAP.md`, `PARTS.md`, and part `VALIDATION.md` |
 
 ## Topology Rule
 

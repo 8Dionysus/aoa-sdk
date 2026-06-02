@@ -200,6 +200,7 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | all | root-surface hygiene, docs routes | accepted |
 | [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | docs, route-law, roadmap, validation | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## control-plane stress posture
 
@@ -314,6 +315,7 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | topology, validation guard, mechanics, root technical districts | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
 | [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | topology, mechanics, quest source store, root district | questbook, agon, checkpoint | root source store, parent boundary, lifecycle posture, validation | accepted |
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | all | root-surface hygiene, mechanics topology, nested agents | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## nested agents
 
@@ -457,6 +459,7 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | docs, route-law, roadmap, validation | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## root district hygiene
 

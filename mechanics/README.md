@@ -11,10 +11,13 @@ contract. Use `sdk/` for checked public SDK source-home posture and
 ## Route
 
 1. Choose the package from the map below.
-2. Read package `AGENTS.md`, `README.md`, `PARTS.md`, and `PROVENANCE.md`.
-3. Follow the active part route when one exists.
-4. Use the part `VALIDATION.md` for executable checks.
-5. Update `topology.json` when package, part, source-family, or validation
+2. Read [mechanics roadmap](ROADMAP.md) when future pressure or package
+   direction is involved.
+3. Read package `AGENTS.md`, `README.md`, `ROADMAP.md`, `PARTS.md`, and
+   `PROVENANCE.md`.
+4. Follow the active part route when one exists.
+5. Use the part `VALIDATION.md` for executable checks.
+6. Update `topology.json` when package, part, source-family, or validation
    routing changes.
 
 ## Package Map
@@ -37,17 +40,19 @@ contract. Use `sdk/` for checked public SDK source-home posture and
 ## Root Contract
 
 Root `mechanics/` owns only the atlas, the active machine map, and minimal
-test glue:
+future-pressure router and test glue:
 
 - `README.md` for human route selection.
 - `AGENTS.md` for local edit law.
+- `ROADMAP.md` for mechanics-wide future-pressure routing.
 - `topology.json` for package order, source-family routes, active part routes,
   validation route lists, and legacy index registration.
 - `conftest.py` for shared part-local pytest fixtures.
 
 Do not add root rosters, prep reports, migration ledgers, backlogs, templates,
 or generic holding areas. Active operation detail belongs in the owning
-package or part. Durable rationale belongs in `docs/decisions/`. Former-path
+package or part. Package-local future pressure belongs in package
+`ROADMAP.md`. Durable rationale belongs in `docs/decisions/`. Former-path
 accounting belongs in package `PROVENANCE.md` and package-local `legacy/`
 indexes when needed.
 
@@ -78,6 +83,6 @@ indexes when needed.
 ## Validation
 
 Use the touched part `VALIDATION.md` for focused checks. For package, part,
-source-family, root-district, or route-card changes, run the mechanics
-topology gate from the root route card. Release-facing changes continue
-through the repository release gate.
+source-family, root-district, roadmap, or route-card changes, run the
+mechanics topology gate from the root route card. Release-facing changes
+continue through the repository release gate.
