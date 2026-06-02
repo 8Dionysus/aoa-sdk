@@ -293,6 +293,7 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0034 - Active Mechanics Topology Status Naming](../AOA-SDK-D-0034-active-mechanics-topology-status-naming.md) | 2026-06-01 | topology, mechanics, validation | all | active naming, root-surface hygiene, mechanics topology | accepted |
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | topology, validation guard, mechanics, root technical districts | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
 | [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | topology, mechanics, quest source store, root district | questbook, agon, checkpoint | root source store, parent boundary, lifecycle posture, validation | accepted |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | all | root-surface hygiene, mechanics topology, nested agents | accepted |
 
 ## nested agents
 
@@ -448,6 +449,12 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | titan | mechanics topology, part validation, schema validation, script smoke | accepted |
 | [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) | 2026-06-01 | topology, agent guidance, validation guard | boundary-bridge, release-support, runtime-seam | nested agents, root-surface hygiene, active naming | accepted |
 
+## route cards
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | all | root-surface hygiene, mechanics topology, nested agents | accepted |
+
 ## route selection
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
@@ -570,6 +577,12 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0025 - Consumed Surface Posture Gate Test Localization](../AOA-SDK-D-0025-consumed-surface-posture-gate-test-localization.md) | 2026-06-01 | topology, mechanics, test placement | boundary-bridge | mechanics topology, active naming, source-owner boundary | accepted |
+
+## validation authority
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | all | root-surface hygiene, mechanics topology, nested agents | accepted |
 
 ## workspace
 

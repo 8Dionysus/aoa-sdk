@@ -55,8 +55,8 @@ release contour is:
   `scripts/validate_sdk_source_home.py`, and
   `docs/decisions/AOA-SDK-D-0043-sdk-source-home-tree.md`
 - corrected active mechanics topology after full inventory and sibling-source reread:
-  `mechanics/README.md`, `mechanics/TOPOLOGY_PREP.md`,
-  `mechanics/topology.json`, `scripts/validate_mechanics_topology.py`, and
+  `mechanics/README.md`, `mechanics/topology.json`,
+  `scripts/validate_mechanics_topology.py`, and
   `docs/decisions/AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`
 - source-family crosswalk coverage for every `src/aoa_sdk/*` family:
   `mechanics/topology.json`,

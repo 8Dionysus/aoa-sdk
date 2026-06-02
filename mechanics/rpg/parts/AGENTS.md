@@ -16,8 +16,8 @@ remains the importable source home.
 - Do not turn typed reads into gameplay, frontend, runtime, quest, progression,
   or state authority.
 - Keep canonical owner refs and generated transport paths visible.
-- Keep old root paths in `mechanics/rpg/PROVENANCE.md` or
-  `mechanics/ARTIFACT_TOPOLOGY.md`, not as active routes.
+- Keep old root paths in `mechanics/rpg/PROVENANCE.md` or package-local
+  legacy indexes, not as active routes.
 
 ## Validation
 

@@ -13,9 +13,9 @@ session replay, and swarm closeout.
 ## Read before editing
 
 - `mechanics/AGENTS.md`
-- `mechanics/ARTIFACT_TOPOLOGY.md`
 - `mechanics/titan/README.md`
 - `mechanics/titan/PARTS.md`
+- `mechanics/titan/PROVENANCE.md`
 - `mechanics/titan/parts/`
 - `src/aoa_sdk/titans/`
 

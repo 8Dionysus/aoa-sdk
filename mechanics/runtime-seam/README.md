@@ -56,11 +56,9 @@ This mechanic must not hide path discovery or rewrite sibling source ownership.
 
 ### Validation
 
-```bash
-python scripts/build_workspace_control_plane.py --check
-python scripts/validate_workspace_control_plane.py
-python -m pytest -q mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution_cli.py mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py
-```
+Use the touched part `VALIDATION.md` for executable checks. For package-wide
+route changes, use `mechanics/topology.json` for the active validation list
+and then run the mechanics topology gate from the root route card.
 
 ### Next route
 

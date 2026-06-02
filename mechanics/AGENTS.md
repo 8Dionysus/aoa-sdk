@@ -20,13 +20,12 @@ source home.
 3. `DESIGN.AGENTS.md`
 4. `docs/decisions/README.md`
 5. `mechanics/README.md`
-6. `mechanics/ARTIFACT_TOPOLOGY.md`
-7. `mechanics/TOPOLOGY_PREP.md`
-8. `mechanics/topology.json`
-9. The package-local `AGENTS.md` and README for each touched mechanic
-10. The nearest part `README.md`, `CONTRACT.md`, and `VALIDATION.md` when a
+6. `mechanics/topology.json`
+7. The package-local `AGENTS.md`, `README.md`, `PARTS.md`, and `PROVENANCE.md`
+   for each touched mechanic
+8. The nearest part `README.md`, `CONTRACT.md`, and `VALIDATION.md` when a
     functioning part exists
-11. The stronger source surface named by the mechanic card
+9. The stronger source surface named by the mechanic card
 
 ## Boundaries
 
@@ -45,7 +44,7 @@ source home.
 - Move single-mechanic-owned payload into the nearest
   `mechanics/<parent>/parts/<part>/<district>/` home once the part has a local
   contract and validation route.
-- Preserve old-path accounting in `ARTIFACT_TOPOLOGY.md`, `PROVENANCE.md`, or
+- Preserve old-path accounting in package `PROVENANCE.md` or package-local
   legacy receipts. Active work starts from the current route.
 - Do not treat topology cards as proof that a source surface has moved; prove
   the move with current paths and validators.

@@ -1,119 +1,83 @@
-# aoa-sdk Mechanics
+# SDK Mechanics
 
-Status: active topology with part-local payload.
+`mechanics/` is the dispatcher for repeatable SDK operation pressure.
 
-`mechanics/` names repeatable SDK operations that already span several
-repository districts. It now also hosts functioning part-local payload when a
-single mechanic part owns the artifact.
+Use this atlas when the work is about an operation around the SDK: typed
+facade, consumed sibling surface, checkpoint handoff, recurrence gate,
+release support, control-plane capsule, generated reader, or part-local helper
+contract. Use `sdk/` for checked public SDK source-home posture and
+`src/aoa_sdk/` for the importable Python implementation package.
 
-The topology exists so future work can ask a narrower question: which operation
-is changing, what does the SDK own, what stronger owner remains outside, where
-does the active artifact live, and which validator proves the crossing?
+## Route
 
-## Source Basis
+1. Choose the package from the map below.
+2. Read package `AGENTS.md`, `README.md`, `PARTS.md`, and `PROVENANCE.md`.
+3. Follow the active part route when one exists.
+4. Use the part `VALIDATION.md` for executable checks.
+5. Update `topology.json` when package, part, source-family, or validation
+   routing changes.
 
-This topology was derived from the tracked `aoa-sdk` file inventory and then
-corrected against live mechanics sources in `Agents-of-Abyss`, `aoa-agents`,
-`aoa-memo`, `aoa-evals`, `aoa-skills`, and `aoa-techniques`:
+## Package Map
 
-- 1056 tracked files.
-- 25 top-level districts or singleton root surfaces.
-- 357 JSON files, 339 Markdown files, and 242 Python files.
-- active source clusters under `src/aoa_sdk/` for recurrence, A2A, Titan,
-  skills, workspace, RPG, surfaces, stats, routing, Codex, release,
-  compatibility, checkpoint, closeout, loaders, command facades, and sibling
-  facades.
-- matching schema, example, generated, script, manifest, quest, and test
-  families for recurrence, Agon, Titan, Experience APIs, checkpoint/closeout,
-  A2A return, workspace, and release support.
-- sibling mechanics repeatedly put narrow lanes under parent `PARTS.md` rather
-  than promoting every file family to a parent package.
-- `topology.json` carries a `source_family_routes` crosswalk for every
-  `src/aoa_sdk/*` family, including root-package files, so new source families
-  cannot silently evade a mechanic route.
-
-The detailed inventory and derivation rules live in
-[`TOPOLOGY_PREP.md`](TOPOLOGY_PREP.md). The active placement law and migration
-ledger live in [`ARTIFACT_TOPOLOGY.md`](ARTIFACT_TOPOLOGY.md). The
-machine-readable package map lives in [`topology.json`](topology.json).
-
-## Package Registry
-
-| Mechanic | Name type | Operation |
+| Package | Class | Use for |
 | --- | --- | --- |
-| [`agon`](agon/README.md) | shared | Agon SDK helper candidates, registries, recurrence adapters, and candidate-only helper packs |
-| [`antifragility`](antifragility/README.md) | shared | stress-posture dispatch, reviewed stress closeout carry, and via negativa pruning |
-| [`boundary-bridge`](boundary-bridge/README.md) | shared | typed facades, compatibility policy, skill runtime bridge, surface handoff, and owner split |
-| [`checkpoint`](checkpoint/README.md) | shared | session checkpoint capture, review gates, closeout bridge, return re-entry, and reviewed context carry |
-| [`codex-projection`](codex-projection/README.md) | shared | workspace MCP server, live rollout status readouts, portability boundaries, and rollout reference handoffs |
-| [`experience`](experience/README.md) | shared | Experience API helper contracts and adoption/deployment/governance calls |
-| [`questbook`](questbook/README.md) | shared | source quest records, public obligation index posture, lifecycle vocabulary, and future dispatch-reader posture |
-| [`recurrence`](recurrence/README.md) | shared | recurrence manifests, hooks, graph, review, projections, and live observations |
-| [`release-support`](release-support/README.md) | shared | changelog, release audit/publish helpers, public support CI posture, build, and publication gates |
-| [`rpg`](rpg/README.md) | shared | RPG typed consumer slice and surface path helper boundary |
-| [`runtime-seam`](runtime-seam/README.md) | shared | workspace root, source/runtime mirror boundary, capsule, bootstrap, and local automation seams |
-| [`titan`](titan/README.md) | shared | Titan runtime harness, console, appserver, memory, session, and swarm helpers |
+| [`agon`](agon/README.md) | shared | Agon helper candidates, recurrence adapters, state-packet bindings, and generated candidate registries |
+| [`antifragility`](antifragility/README.md) | shared | stress dispatch, reviewed stress carry, and via negativa posture |
+| [`boundary-bridge`](boundary-bridge/README.md) | shared | typed facades, consumed-surface gates, skill bridges, technique readers, and owner-layer handoff |
+| [`checkpoint`](checkpoint/README.md) | shared | checkpoint capture, review gates, closeout handoff, child-task re-entry, and reviewed context carry |
+| [`codex-projection`](codex-projection/README.md) | shared | workspace MCP, rollout status readouts, portability boundaries, and rollout reference handoff |
+| [`experience`](experience/README.md) | shared | Experience helper contracts for capture, adoption, deployment, governance, and office release trains |
+| [`questbook`](questbook/README.md) | shared | SDK obligation source records, public obligation posture, lifecycle vocabulary, and dispatch-reader posture |
+| [`recurrence`](recurrence/README.md) | shared | manifests, hooks, graph closure, observations, review, projection, rollout, and recursor readiness |
+| [`release-support`](release-support/README.md) | shared | changelog, release audit, CI posture, build, publication helper, and sibling canary support |
+| [`rpg`](rpg/README.md) | shared | RPG typed consumer API and surface path transport without gameplay authority |
+| [`runtime-seam`](runtime-seam/README.md) | shared | workspace roots, source/runtime mirror boundary, control-plane capsule, bootstrap, and local seam routing |
+| [`titan`](titan/README.md) | shared | Titan helper contracts for runtime receipts, console, appserver, memory, session replay, and swarm closeout |
 
-## Package Contract
+## Root Contract
 
-Every package has:
+Root `mechanics/` owns only the atlas, the active machine map, and minimal
+test glue:
 
-- `AGENTS.md` for local route law.
-- `README.md` for the operation card.
-- `PARTS.md` for candidate sub-operations.
-- `PROVENANCE.md` for current source surfaces and stronger-owner notes.
+- `README.md` for human route selection.
+- `AGENTS.md` for local edit law.
+- `topology.json` for package order, source-family routes, active part routes,
+  validation route lists, and legacy index registration.
+- `conftest.py` for shared part-local pytest fixtures.
 
-Functioning part-local payload also has:
+Do not add root rosters, prep reports, migration ledgers, backlogs, templates,
+or generic holding areas. Active operation detail belongs in the owning
+package or part. Durable rationale belongs in `docs/decisions/`. Former-path
+accounting belongs in package `PROVENANCE.md` and package-local `legacy/`
+indexes when needed.
 
-- `parts/AGENTS.md` for part district route law.
-- `parts/README.md` for the active/candidate part index.
-- `parts/<part>/README.md` for role, input, output, owner, and next route.
-- `parts/<part>/CONTRACT.md` for may/must-not boundaries.
-- `parts/<part>/VALIDATION.md` for executable proof.
+## Placement
 
-The package cards use a common shape:
+- SDK implementation stays under `src/aoa_sdk/`.
+- Checked public SDK posture stays under `sdk/`.
+- Mechanics-owned docs, schemas, examples, config, manifests, builders,
+  generated companions, and focused tests live under
+  `mechanics/<package>/parts/<part>/`.
+- Root generated read models stay root-published only when they are consumed
+  outside one mechanic.
+- Root command wrappers stay in `scripts/` only as repo-wide validators,
+  release gates, shared builders, or public compatibility entrypoints.
+- Source quest records stay in root `quests/<lane>/<state>/`; helper contracts
+  stay part-local.
 
-- Operation
-- Trigger
-- SDK owns
-- Stronger owner split
-- Current source surfaces
-- Candidate parts
-- Must not claim
-- Validation
-- Next route
+## Stop Lines
 
-## Parent Versus Part Rule
-
-Top-level package names follow the shared AoA mechanics vocabulary unless a
-repo-local mechanic has a genuinely independent operation, owner split,
-stop-line, and validator.
-
-Former parent-name candidates are not active route ids. Their lookup record
-lives only in package-local `legacy/INDEX.md` files. Active routes use
-topological part names such as `runtime-seam/workspace-root-resolution`,
-`boundary-bridge/consumed-surface-posture-gate`,
-`boundary-bridge/skill-runtime-bridge`,
-`boundary-bridge/owner-layer-signal-handoff`,
-`checkpoint/reviewed-session-handoff-runner`,
-`checkpoint/reviewed-closeout-context-carry`,
-`release-support/release-audit-publish-helper`,
-`release-support/public-support-ci-posture`, and
-`codex-projection/live-rollout-status-readout`.
+- A mechanic is not sibling source truth.
+- A mechanic is not a proof verdict.
+- A mechanic is not durable memory.
+- A mechanic is not runtime activation.
+- A mechanic is not a generated-reader source.
+- A dry-run helper is not a release.
+- Legacy accounting is not the active route for current behavior.
 
 ## Validation
 
-```bash
-python scripts/validate_mechanics_topology.py
-python -m pytest -q tests/test_mechanics_topology.py
-```
-
-The validator checks the package registry, package files, required card
-sections, root topology map, part-local contracts when present,
-source-surface references, nested route-card registration, and the root
-technical-district allowlist. New single-mechanic payload must land under a
-topologically named `mechanics/<parent>/parts/<part>/` owner route instead of
-quietly re-opening root `docs/`, `scripts/`, `tests/`, `config/`, `examples/`,
-`manifests/`, `githooks/`, or `systemd/` lanes. Root `quests/` is open only
-as the Questbook source-record district; helper payload still belongs in
-part-local mechanics homes.
+Use the touched part `VALIDATION.md` for focused checks. For package, part,
+source-family, root-district, or route-card changes, run the mechanics
+topology gate from the root route card. Release-facing changes continue
+through the repository release gate.

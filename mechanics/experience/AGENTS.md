@@ -13,9 +13,9 @@ it does not own adoption, governance, deployment, office, or release decisions.
 ## Read before editing
 
 - `mechanics/AGENTS.md`
-- `mechanics/ARTIFACT_TOPOLOGY.md`
 - `mechanics/experience/README.md`
 - `mechanics/experience/PARTS.md`
+- `mechanics/experience/PROVENANCE.md`
 - `mechanics/experience/parts/`
 
 ## Boundaries

@@ -45,9 +45,9 @@ approval, runtime activation, or owner-local remediation.
 
 ### Validation
 
-```bash
-python -m pytest -q mechanics/antifragility/parts/stress-posture-dispatch-gate/tests/test_stress_posture_dispatch_gate.py mechanics/antifragility/parts/reviewed-stress-closeout-carry/tests/test_reviewed_stress_closeout_carry.py mechanics/antifragility/parts/via-negativa/tests/test_via_negativa_checklist.py
-```
+Use the touched part `VALIDATION.md` for executable checks. For package-wide
+route changes, use `mechanics/topology.json` for the active validation list
+and then run the mechanics topology gate from the root route card.
 
 ### Next route
 

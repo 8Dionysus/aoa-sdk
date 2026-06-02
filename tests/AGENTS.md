@@ -13,7 +13,7 @@ validators, smoke import, and cross-mechanic docs contracts.
 
 1. Root `AGENTS.md`
 2. `DESIGN.AGENTS.md`
-3. `mechanics/ARTIFACT_TOPOLOGY.md`
+3. `mechanics/README.md`
 4. The owning part `VALIDATION.md` when a regression belongs to one mechanic
 
 ## Boundaries
@@ -34,4 +34,5 @@ python scripts/validate_mechanics_topology.py
 ## Closeout
 
 Name whether the test is root-wide or part-local. If part-local, move it and
-update the part `VALIDATION.md` plus `mechanics/ARTIFACT_TOPOLOGY.md`.
+update the part `VALIDATION.md`, package `PROVENANCE.md`, and
+`mechanics/topology.json`.

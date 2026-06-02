@@ -67,9 +67,9 @@ allow promotion while semantic checkpoint review is still pending.
 
 ### Validation
 
-```bash
-python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_sdk_api.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_skill_contract.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_assessment.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_checkpoint_and_return.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_codex_and_closeout.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_e2e_fixture.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py
-```
+Use the touched part `VALIDATION.md` for executable checks. For package-wide
+route changes, use `mechanics/topology.json` for the active validation list
+and then run the mechanics topology gate from the root route card.
 
 ### Next route
 

@@ -43,4 +43,4 @@ rank, scar, retention, arena, and runtime authority.
 ## Next Route
 
 Use `../../PROVENANCE.md` for old root path accounting and
-`../../../ARTIFACT_TOPOLOGY.md` for repo-wide placement law.
+`../../../topology.json` for repo-wide route law.

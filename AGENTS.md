@@ -19,7 +19,7 @@ This repository owns:
 - the compact control-plane capsule at `generated/workspace_control_plane.min.json`
 - the mechanics topology under `mechanics/`, including package route cards,
   source-family routes, part-local artifact homes, `mechanics/topology.json`,
-  and `mechanics/ARTIFACT_TOPOLOGY.md`
+  package provenance cards, and part-local validation homes
 - additive surface detection and reviewed closeout handoff helpers that remain owner-subordinate
 
 It does not own:

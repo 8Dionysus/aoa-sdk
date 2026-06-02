@@ -17,7 +17,7 @@ or runtime authority.
 - Keep active paths action-bearing: the part name should expose the input,
   output, owner, next route, and validation home.
 - Keep old root paths in `mechanics/antifragility/PROVENANCE.md` or
-  `mechanics/ARTIFACT_TOPOLOGY.md`, not as active routes.
+  package-local legacy indexes, not as active routes.
 - Do not make stress examples proof verdicts, cleanup approval, runtime
   repair, or memo promotion.
 

@@ -22,8 +22,8 @@ Use the shortest route by need:
   `docs/decisions/indexes/by-number.md`, and
   `python scripts/generate_decision_indexes.py --check`
 - mechanics topology and artifact placement: `mechanics/README.md`,
-  `mechanics/ARTIFACT_TOPOLOGY.md`, `mechanics/TOPOLOGY_PREP.md`,
-  `mechanics/topology.json`, and
+  `mechanics/topology.json`, package `PROVENANCE.md`, part
+  `VALIDATION.md`, and
   `python scripts/validate_mechanics_topology.py`
 - compact control-plane capsule: `generated/workspace_control_plane.min.json`
 - workspace topology and override rules: `docs/workspace-layout.md` and `.aoa/workspace.toml`
@@ -66,8 +66,8 @@ Use the shortest route by need:
   mechanics choices: `docs/decisions/README.md`,
   `docs/decisions/AGENTS.md`, and `docs/decisions/indexes/`
 - mechanics operation topology and artifact placement: `mechanics/README.md`,
-  `mechanics/ARTIFACT_TOPOLOGY.md`, `mechanics/TOPOLOGY_PREP.md`,
-  `mechanics/topology.json`, and
+  `mechanics/topology.json`, package `PROVENANCE.md`, part
+  `VALIDATION.md`, and
   `python scripts/validate_mechanics_topology.py`
 - machine-readable workspace and discovery alignment: `.aoa/workspace.toml`, `src/aoa_sdk/workspace/discovery.py`, and `docs/workspace-layout.md`
 - project-level Codex workspace orientation via MCP: `mechanics/codex-projection/parts/workspace-mcp-server/docs/workspace-mcp-server.md`, `src/aoa_sdk/codex/workspace_mcp.py`, and `mechanics/codex-projection/parts/workspace-mcp-server/scripts/aoa_workspace_mcp_server.py`

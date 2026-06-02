@@ -61,10 +61,9 @@ accepted operator decisions, accepted memory, role truth, or proof verdicts.
 
 ### Validation
 
-```bash
-python -m pytest -q mechanics/titan/parts/incarnation-identity-runtime-helper-contracts/tests/test_titanctl_runtime.py mechanics/titan/parts/incarnation-identity-runtime-helper-contracts/tests/test_titan_incarnation_spine.py
-python -m pytest -q mechanics/titan/parts/operator-console-helper-contracts/tests/test_titan_console.py mechanics/titan/parts/appserver-bridge-helper-contracts/tests/test_titan_appserver_bridge.py mechanics/titan/parts/memory-loom-recall-helper-contracts/tests/test_titan_memory_loom.py mechanics/titan/parts/session-praxis-replay-helper-contracts/tests/test_titan_session_replay.py mechanics/titan/parts/swarm-ledger-closeout-helper-contracts/tests/test_titan_swarm_ledger.py mechanics/titan/parts/swarm-ledger-closeout-helper-contracts/tests/test_titan_closeout_audit.py
-```
+Use the touched part `VALIDATION.md` for executable checks. For package-wide
+route changes, use `mechanics/topology.json` for the active validation list
+and then run the mechanics topology gate from the root route card.
 
 ### Next route
 

@@ -56,10 +56,10 @@ published GitHub Release or package upload.
 
 ### Validation
 
-```bash
-python scripts/release_check.py
-python -m pytest -q mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py mechanics/release-support/parts/public-support-ci-posture/tests/test_sibling_canary.py
-```
+Use the touched part `VALIDATION.md` for executable checks. For package-wide
+route changes, use `mechanics/topology.json` for the active validation list
+and then run the mechanics topology gate from the root route card. Release
+publication still follows the repository release route.
 
 ### Next route
 

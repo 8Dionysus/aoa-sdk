@@ -15,8 +15,8 @@ and historical context surfaces.
 1. Root `AGENTS.md`
 2. `DESIGN.md`
 3. `DESIGN.AGENTS.md`
-4. `mechanics/ARTIFACT_TOPOLOGY.md`
-5. The owning mechanic part when a doc is part-specific
+4. `mechanics/README.md`
+5. The owning mechanic package and part when a doc is part-specific
 
 ## Boundaries
 

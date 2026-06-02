@@ -30,8 +30,8 @@ pattern while keeping publication truth external until verified.
 Detailed release runbook and support/CI posture moved into release-support
 parts. Root `docs/RELEASING.md` and `docs/RELEASE_CI_POSTURE.md` remain
 repo-level public route doors, not compatibility fallbacks. Former root payload
-and `tests/test_release.py` are accounted for in
-`mechanics/ARTIFACT_TOPOLOGY.md`.
+and `tests/test_release.py` are accounted for in this package provenance,
+active part route cards, and `mechanics/topology.json`.
 
 Former root roadmap parity regression `tests/test_roadmap_parity.py` moved
 into `mechanics/release-support/parts/public-support-ci-posture/`; the old root
