@@ -85,6 +85,12 @@ Grouped by `Guard families` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, ci | mechanics topology, release support, compatibility, public support | release-support | accepted |
 
+## decision drift
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs, route-law, topology, validation | docs map, root docs, decision lane | all | accepted |
+
 ## docs routes
 
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
@@ -101,6 +107,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0027 - Public Support CI Posture Test Localization](../AOA-SDK-D-0027-public-support-ci-posture-test-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | mechanics topology, release support, public support posture | release-support | accepted |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | root docs, control-plane routing, validation authority | all | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | changelog, release posture, root docs | release-support | accepted |
+| [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs, route-law, topology, validation | docs map, root docs, decision lane | all | accepted |
 
 ## fallback removal
 
@@ -292,6 +299,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | topology, validation guard, mechanics, root technical districts | mechanics topology, root district hygiene, active naming, artifact placement | all | accepted |
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | mechanics topology, route cards, validation authority | all | accepted |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | root docs, control-plane routing, validation authority | all | accepted |
+| [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs, route-law, topology, validation | docs map, root docs, decision lane | all | accepted |
 
 ## route clarity
 

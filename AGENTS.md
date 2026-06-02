@@ -46,7 +46,6 @@ It does not own:
    routing changes
 11. `.aoa/workspace.toml`
 12. source files and tests you plan to touch
-13. `docs/AGENTS_ROOT_REFERENCE.md` for preserved full root guidance, especially checkpoint-hook and closeout-loop details
 
 
 ## AGENTS stack law
@@ -165,6 +164,10 @@ State which typed facade, discovery rule, compatibility surface, CLI behavior, c
 For `sdk/` changes, also state which source-home branch changed and whether
 implementation or mechanic payload moved.
 
-## Full reference
+## Retired root reference
 
-`docs/AGENTS_ROOT_REFERENCE.md` preserves the former detailed root guidance, including the long surface-detection, checkpoint, hook, and closeout truth rules. Read it before editing those seams.
+The former preserved root-guidance dump is retired from active docs. Use this
+root route card plus the nearest mechanic-owned docs for checkpoint, hook,
+surface-detection, closeout, release, and compatibility work. If a rule from
+the old dump still matters, restate it at the smallest active owner surface
+instead of reintroducing a competing root reference.

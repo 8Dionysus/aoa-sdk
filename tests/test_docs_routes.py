@@ -52,6 +52,42 @@ def test_readme_license_matches_project_license() -> None:
     assert "[MIT]" not in readme
 
 
+def test_docs_map_is_entrypoint_not_flat_archive() -> None:
+    readme = read_text("README.md")
+    agents = read_text("AGENTS.md")
+    docs_agents = read_text("docs/AGENTS.md")
+    docs_map = read_text("docs/README.md")
+    decision = read_text("docs/decisions/AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md")
+
+    assert "Documentation map" in readme
+    assert "docs/README.md" in readme
+    assert "This is the entrypoint for the `docs/` surface of `aoa-sdk`." in docs_map
+    assert "`docs/` is not a flat shelf" in docs_map
+    assert "Current operational" in docs_map
+    assert "docs entry map" in docs_agents
+    assert "Retired root reference" in agents
+    assert "former preserved root-guidance dump is retired from active docs" in agents
+    assert "Retire `docs/AGENTS_ROOT_REFERENCE.md` and `docs/ecosystem-impact.md`" in decision
+
+    assert not (REPO_ROOT / "docs" / "AGENTS_ROOT_REFERENCE.md").exists()
+    assert not (REPO_ROOT / "docs" / "ecosystem-impact.md").exists()
+
+
+def test_decision_readme_routes_lookup_through_generated_indexes() -> None:
+    decisions = read_text("docs/decisions/README.md")
+
+    assert "## Lookup Route" in decisions
+    assert "Do not hand-maintain a \"latest decision\" roster" in decisions
+    assert "indexes/by-number.md" in decisions
+    assert "indexes/by-date.md" in decisions
+    assert "indexes/by-surface.md" in decisions
+    assert "indexes/by-sdk-facet.md" in decisions
+    assert "indexes/by-mechanic.md" in decisions
+    assert "indexes/by-guard.md" in decisions
+    assert "## Active Mechanics Decision" not in decisions
+    assert "The corrected parent mechanics topology is recorded in" not in decisions
+
+
 def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
     agents = read_text("AGENTS.md")
 
@@ -112,6 +148,7 @@ def test_changelog_records_current_unreleased_contour() -> None:
         assert section in unreleased
     assert "without live reconciliation counters" in unreleased
     assert "AOA-SDK-D-0046" in unreleased
+    assert "AOA-SDK-D-0047" in unreleased
     assert "DESIGN.md" in changelog
     assert "DESIGN.AGENTS.md" in changelog
     assert "docs/decisions/" in changelog

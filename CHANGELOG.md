@@ -240,6 +240,9 @@ Tracking starts with the community-docs baseline for this repository.
   `Unreleased` entries stay free of commit totals, changed-path totals, PR
   ranges, and remote check handles, while dated release sections own exact
   reconciliation spans.
+- `AOA-SDK-D-0047` records the docs-map cleanup: `docs/README.md` is now the
+  docs entry map, stale flat docs are retired, and decision lookup routes
+  through generated indexes instead of a manual latest-decision roster.
 
 ### Changed
 
@@ -252,6 +255,10 @@ Tracking starts with the community-docs baseline for this repository.
   the route-law decision.
 - Root `README.md` now matches the repository `LICENSE` and package metadata
   by naming Apache License 2.0 instead of MIT.
+- Root docs now route through `docs/README.md` as a documentation map instead
+  of relying on a flat `docs/` shelf.
+- `docs/decisions/README.md` now points to generated lookup indexes instead of
+  hand-maintaining the active mechanics decision roster.
 - `DESIGN.md` and `DESIGN.AGENTS.md` now route single-mechanic local
   automation templates through part-local mechanics homes instead of former
   root local-automation districts.
@@ -390,6 +397,9 @@ Tracking starts with the community-docs baseline for this repository.
   retired from the active mechanics root. Current mechanics work routes
   through `mechanics/README.md`, `mechanics/topology.json`, package
   `PROVENANCE.md`, and part `VALIDATION.md`.
+- `docs/AGENTS_ROOT_REFERENCE.md` and `docs/ecosystem-impact.md` were retired
+  from active `docs/`; current root guidance and ecosystem posture now route
+  through active owner surfaces.
 - Old root-level migrated memo/eval paths are retired from active SDK
   compatibility for these surfaces; workspaces exposing only those paths now
   fail compatibility as topology drift.

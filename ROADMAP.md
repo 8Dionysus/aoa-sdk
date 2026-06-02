@@ -20,6 +20,9 @@ The current landed surface already includes:
   system form and agent-facing guidance form for mechanics work
 - canonical decision rationale lane under `docs/decisions/` with generated
   lookup indexes
+- docs entry map under `docs/README.md`, with root docs kept to route,
+  boundary, workspace, versioning, release-door, seed-history, and decision
+  surfaces
 - checked SDK source-home tree under `sdk/`, validated by
   `scripts/validate_sdk_source_home.py`
 - active mechanics topology under `mechanics/`, grounded in
@@ -106,6 +109,8 @@ Goals:
 
 - keep `ROADMAP.md` as the root-level current-direction door
 - keep `README.md` and `AGENTS.md` short and route-first
+- keep `docs/README.md` as the docs entry map instead of letting `docs/`
+  become a flat shelf
 - keep `DESIGN.md` and `DESIGN.AGENTS.md` as the root design route for
   SDK source-home and mechanics topology
 - keep `sdk/` as the checked SDK source-home tree, not an implementation or

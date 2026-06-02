@@ -115,6 +115,7 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | root docs, control-plane routing, validation authority | all | root-surface hygiene, docs routes | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | changelog, release posture, root docs | release-support | changelog drift, release readiness, docs routes | accepted |
+| [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs map, root docs, decision lane | all | root-surface hygiene, docs routes, decision drift | accepted |
 
 ## docs route
 
@@ -249,6 +250,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | mechanics topology, route cards, validation authority | all | root-surface hygiene, mechanics topology, nested agents | accepted |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | root docs, control-plane routing, validation authority | all | root-surface hygiene, docs routes | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | changelog, release posture, root docs | release-support | changelog drift, release readiness, docs routes | accepted |
+| [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs map, root docs, decision lane | all | root-surface hygiene, docs routes, decision drift | accepted |
 
 ## runtime entrypoint
 
@@ -353,6 +355,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | mechanics topology, questbook, root quests, active naming | questbook, agon, checkpoint | root source store, parent boundary, lifecycle posture, validation | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | mechanics topology, route cards, validation authority | all | root-surface hygiene, mechanics topology, nested agents | accepted |
+| [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs map, root docs, decision lane | all | root-surface hygiene, docs routes, decision drift | accepted |
 
 ## typed model
 
@@ -371,6 +374,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | mechanics topology, route cards, validation authority | all | root-surface hygiene, mechanics topology, nested agents | accepted |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | root docs, control-plane routing, validation authority | all | root-surface hygiene, docs routes | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | changelog, release posture, root docs | release-support | changelog drift, release readiness, docs routes | accepted |
+| [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs map, root docs, decision lane | all | root-surface hygiene, docs routes, decision drift | accepted |
 
 ## validation guard
 
