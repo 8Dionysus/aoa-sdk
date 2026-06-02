@@ -130,7 +130,9 @@ store restoration is recorded in
 `AOA-SDK-D-0042-questbook-source-store-restoration.md`. The checked SDK
 source-home tree is recorded in
 `AOA-SDK-D-0043-sdk-source-home-tree.md`. Mechanics root doc slimming is
-recorded in `AOA-SDK-D-0044-mechanics-root-doc-slimming.md`.
+recorded in `AOA-SDK-D-0044-mechanics-root-doc-slimming.md`. Root README
+front-door routing is recorded in
+`AOA-SDK-D-0045-root-readme-front-door.md`.
 
 Together they supersede the first inventory-based skeleton's parent package set
 and replace the old route-only posture with a controlled part-local payload

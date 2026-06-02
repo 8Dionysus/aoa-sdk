@@ -93,6 +93,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0020 - Technique Publication Observation Boundary Localization](../AOA-SDK-D-0020-technique-publication-observation-boundary-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, active naming | mechanics topology, recurrence, hook observation | recurrence | accepted |
 | [AOA-SDK-D-0023 - Session Growth Checkpoint Cycle Localization](../AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, generated companion | mechanics topology, checkpoint, workspace control plane | checkpoint | accepted |
 | [AOA-SDK-D-0027 - Public Support CI Posture Test Localization](../AOA-SDK-D-0027-public-support-ci-posture-test-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | mechanics topology, release support, public support posture | release-support | accepted |
+| [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | root docs, control-plane routing, validation authority | all | accepted |
 
 ## fallback removal
 
@@ -277,6 +278,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) | 2026-06-01 | compatibility, topology, mechanics, runtime entrypoint | compatibility posture, workspace MCP, active naming, sibling path routing | boundary-bridge, codex-projection | accepted |
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | topology, validation guard, mechanics, root technical districts | mechanics topology, root district hygiene, active naming, artifact placement | all | accepted |
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | mechanics topology, route cards, validation authority | all | accepted |
+| [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | root docs, control-plane routing, validation authority | all | accepted |
 
 ## route clarity
 

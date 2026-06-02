@@ -9,9 +9,12 @@ REPO_ROOT = Path(__file__).resolve().parents[5]
 
 def test_surface_path_transport_doc_is_routed_from_readme() -> None:
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
-    surface_path_ref = "mechanics/rpg/parts/surface-path-transport/docs/surface-path-transport.md"
+    package_readme = (REPO_ROOT / "mechanics" / "rpg" / "README.md").read_text(encoding="utf-8")
+    part_readme = (PART_ROOT / "README.md").read_text(encoding="utf-8")
 
-    assert surface_path_ref in readme
+    assert "mechanics/rpg/README.md" in readme
+    assert "mechanics/rpg/parts/surface-path-transport/" in package_readme
+    assert "docs/surface-path-transport.md" in part_readme
 
 
 def test_surface_path_transport_keeps_consumer_expectations_bounded() -> None:

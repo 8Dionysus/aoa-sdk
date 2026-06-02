@@ -188,6 +188,12 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) | 2026-05-31 | compatibility, sibling topology, generated route | boundary-bridge | source topology, compatibility check, canonical path | accepted |
 | [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | superseded |
 
+## control-plane routing
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | all | root-surface hygiene, docs routes | accepted |
+
 ## control-plane stress posture
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
@@ -432,6 +438,12 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | topology, validation guard, mechanics, root technical districts | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
 
+## root docs
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | all | root-surface hygiene, docs routes | accepted |
+
 ## root quests
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
@@ -583,6 +595,7 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | all | root-surface hygiene, mechanics topology, nested agents | accepted |
+| [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | all | root-surface hygiene, docs routes | accepted |
 
 ## workspace
 

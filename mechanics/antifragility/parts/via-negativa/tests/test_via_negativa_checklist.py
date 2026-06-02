@@ -9,9 +9,12 @@ REPO_ROOT = Path(__file__).resolve().parents[5]
 
 def test_via_negativa_checklist_is_routed_from_readme() -> None:
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
-    checklist_ref = "mechanics/antifragility/parts/via-negativa/docs/via-negativa-checklist.md"
+    package_readme = (REPO_ROOT / "mechanics" / "antifragility" / "README.md").read_text(encoding="utf-8")
+    part_readme = (PART_ROOT / "README.md").read_text(encoding="utf-8")
 
-    assert checklist_ref in readme
+    assert "mechanics/antifragility/README.md" in readme
+    assert "mechanics/antifragility/parts/via-negativa/" in package_readme
+    assert "docs/via-negativa-checklist.md" in part_readme
 
 
 def test_via_negativa_checklist_names_subtraction_before_addition() -> None:
