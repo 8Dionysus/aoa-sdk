@@ -116,6 +116,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | root docs, control-plane routing, validation authority | all | root-surface hygiene, docs routes | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | changelog, release posture, root docs | release-support | changelog drift, release readiness, docs routes | accepted |
 | [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs map, root docs, decision lane | all | root-surface hygiene, docs routes, decision drift | accepted |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | root docs, roadmap, control-plane routing | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
 
 ## docs route
 
@@ -217,6 +218,12 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | changelog, release posture, root docs | release-support | changelog drift, release readiness, docs routes | accepted |
 
+## roadmap
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | root docs, roadmap, control-plane routing | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
+
 ## root district
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
@@ -251,6 +258,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | root docs, control-plane routing, validation authority | all | root-surface hygiene, docs routes | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | changelog, release posture, root docs | release-support | changelog drift, release readiness, docs routes | accepted |
 | [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs map, root docs, decision lane | all | root-surface hygiene, docs routes, decision drift | accepted |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | root docs, roadmap, control-plane routing | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
 
 ## runtime entrypoint
 
@@ -375,6 +383,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | root docs, control-plane routing, validation authority | all | root-surface hygiene, docs routes | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | changelog, release posture, root docs | release-support | changelog drift, release readiness, docs routes | accepted |
 | [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs map, root docs, decision lane | all | root-surface hygiene, docs routes, decision drift | accepted |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | root docs, roadmap, control-plane routing | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
 
 ## validation guard
 

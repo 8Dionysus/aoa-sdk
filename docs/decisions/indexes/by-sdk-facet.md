@@ -199,6 +199,7 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | all | root-surface hygiene, docs routes | accepted |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | docs, route-law, roadmap, validation | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
 
 ## control-plane stress posture
 
@@ -451,6 +452,12 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) | 2026-06-01 | active naming, external source ref, compatibility accounting, stress evidence | antifragility | active naming, source ref preservation, owner boundary, part validation | accepted |
 
+## roadmap
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | docs, route-law, roadmap, validation | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
+
 ## root district hygiene
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
@@ -464,6 +471,7 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | all | root-surface hygiene, docs routes | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | release-support | changelog drift, release readiness, docs routes | accepted |
 | [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs, route-law, topology, validation | all | root-surface hygiene, docs routes, decision drift | accepted |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | docs, route-law, roadmap, validation | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
 
 ## root quests
 
