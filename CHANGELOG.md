@@ -249,6 +249,8 @@ Tracking starts with the community-docs baseline for this repository.
   validation routes stay in `AGENTS.md`, nearest nested route cards, part
   `VALIDATION.md`, release docs, and owning tests; `AOA-SDK-D-0045` records
   the route-law decision.
+- Root `README.md` now matches the repository `LICENSE` and package metadata
+  by naming Apache License 2.0 instead of MIT.
 - `DESIGN.md` and `DESIGN.AGENTS.md` now route single-mechanic local
   automation templates through part-local mechanics homes instead of former
   root local-automation districts.
