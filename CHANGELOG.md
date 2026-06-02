@@ -243,6 +243,9 @@ Tracking starts with the community-docs baseline for this repository.
 - `AOA-SDK-D-0047` records the docs-map cleanup: `docs/README.md` is now the
   docs entry map, stale flat docs are retired, and decision lookup routes
   through generated indexes instead of a manual latest-decision roster.
+- `AOA-SDK-D-0048` records the root roadmap direction-surface split: roadmap
+  owns direction, horizons, and future triggers while changelog, mechanics,
+  generated companions, and decision indexes own detailed inventories.
 
 ### Changed
 
@@ -259,6 +262,8 @@ Tracking starts with the community-docs baseline for this repository.
   of relying on a flat `docs/` shelf.
 - `docs/decisions/README.md` now points to generated lookup indexes instead of
   hand-maintaining the active mechanics decision roster.
+- Root `ROADMAP.md` now follows an authority/update-rule/horizon shape and no
+  longer hand-maintains a part-local shipped-surface inventory.
 - `DESIGN.md` and `DESIGN.AGENTS.md` now route single-mechanic local
   automation templates through part-local mechanics homes instead of former
   root local-automation districts.

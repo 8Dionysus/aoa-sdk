@@ -82,9 +82,9 @@ The current landed surface includes:
 - bounded skill, surface-detection, checkpoint, closeout, Codex projection,
   release, and public support helpers.
 
-The detailed shipped surface map lives in [ROADMAP](ROADMAP.md),
-[mechanics](mechanics/README.md), [sdk](sdk/README.md), and generated
-companions. The root README should not become that inventory.
+Detailed shipped-surface maps live in [mechanics](mechanics/README.md),
+[sdk](sdk/README.md), generated companions, decision indexes, and release
+history. [ROADMAP](ROADMAP.md) keeps direction. The root README should not become that inventory.
 
 ## Core Districts
 

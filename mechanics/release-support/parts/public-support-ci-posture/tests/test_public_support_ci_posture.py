@@ -33,6 +33,11 @@ def test_roadmap_keeps_current_control_plane_surface_explicit() -> None:
     assert "`v0.2.3`" in roadmap
     assert "Current unreleased contour" in roadmap
     assert "Roadmap drift is an SDK-layer risk" in roadmap
+    assert "## Authority" in roadmap
+    assert "## Update Rule" in roadmap
+    assert "## Operating Card" in roadmap
+    assert "## Horizons" in roadmap
+    assert "## When The Time Comes" in roadmap
     assert "must not turn\n`aoa-sdk` into a source-owning runtime layer" in roadmap
     assert payload["schema_version"] == "aoa_sdk_workspace_control_plane_v2"
     assert [route["route_id"] for route in payload["routes"]] == [
@@ -48,11 +53,24 @@ def test_roadmap_keeps_current_control_plane_surface_explicit() -> None:
     assert "`aoa surfaces detect`" in roadmap
     assert "checkpoint capture, review-note, and explicit reviewed-session handoff runner" in roadmap
     assert "release audit and publish" in roadmap
+    assert "Detailed shipped-surface maps live in" in readme
+    assert "ROADMAP](ROADMAP.md) keeps direction" in readme
 
-    current_release_surfaces = [
+    owner_surfaces = [
         ".aoa/workspace.toml",
         "docs/workspace-layout.md",
         "generated/workspace_control_plane.min.json",
+        "mechanics/README.md",
+        "docs/decisions/indexes/",
+        "docs/RELEASING.md",
+        "docs/RELEASE_CI_POSTURE.md",
+    ]
+    for surface in owner_surfaces:
+        assert (REPO_ROOT / surface).exists(), surface
+        assert surface in roadmap
+    assert "release-support parts" in roadmap
+
+    part_local_surfaces = [
         "mechanics/codex-projection/parts/live-rollout-status-readout/docs/live-rollout-status-readout.md",
         "mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/deploy-operation-boundary-note.md",
         "mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/rollout-campaign-refs.md",
@@ -73,9 +91,7 @@ def test_roadmap_keeps_current_control_plane_surface_explicit() -> None:
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md",
         "mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md",
         "mechanics/release-support/parts/public-support-ci-posture/docs/public-support-ci-posture.md",
-        "docs/RELEASING.md",
-        "docs/RELEASE_CI_POSTURE.md",
     ]
-    for surface in current_release_surfaces:
+    for surface in part_local_surfaces:
         assert (REPO_ROOT / surface).exists(), surface
-        assert surface in roadmap
+        assert surface not in roadmap

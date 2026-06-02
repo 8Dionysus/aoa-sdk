@@ -132,6 +132,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) | 2026-06-01 | topology, agent guidance, validation guard | nested agents, root technical districts, mechanics topology | nested agents, root-surface hygiene, active naming | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | source topology, nested agents, manifest validation, root route law | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | changelog, release posture, root docs | changelog drift, release readiness, docs routes | accepted |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | docs, route-law, roadmap, validation | root docs, roadmap, control-plane routing | roadmap drift, root-surface hygiene, docs routes | accepted |
 
 ## rpg
 

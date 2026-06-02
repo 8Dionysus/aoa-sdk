@@ -108,6 +108,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | root docs, control-plane routing, validation authority | all | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | changelog, release posture, root docs | release-support | accepted |
 | [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs, route-law, topology, validation | docs map, root docs, decision lane | all | accepted |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | docs, route-law, roadmap, validation | root docs, roadmap, control-plane routing | release-support | accepted |
 
 ## fallback removal
 
@@ -271,6 +272,12 @@ Grouped by `Guard families` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | changelog, release posture, root docs | release-support | accepted |
 
+## roadmap drift
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | docs, route-law, roadmap, validation | root docs, roadmap, control-plane routing | release-support | accepted |
+
 ## root route law
 
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
@@ -300,6 +307,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | mechanics topology, route cards, validation authority | all | accepted |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | root docs, control-plane routing, validation authority | all | accepted |
 | [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs, route-law, topology, validation | docs map, root docs, decision lane | all | accepted |
+| [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | docs, route-law, roadmap, validation | root docs, roadmap, control-plane routing | release-support | accepted |
 
 ## route clarity
 

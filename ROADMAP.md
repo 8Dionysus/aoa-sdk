@@ -1,97 +1,106 @@
 # AoA SDK Roadmap
 
-This roadmap is the current repo-owned direction surface for `aoa-sdk`.
+This roadmap tracks repo-level direction for `aoa-sdk` as the typed control
+plane for the AoA federation.
 
-Use it when the question is "what is the SDK's current control-plane phase and
-what should harden next?"
+Use it when the question is "what direction should shape the next SDK-layer
+change?", not "which shipped surface should I open?"
+
 Use `docs/blueprint.md` only as the original seed blueprint and historical
 design context.
 
-## Current phase
+## Authority
 
-`aoa-sdk` has moved beyond seed bootstrap into control-plane contract
-hardening.
+Root `ROADMAP.md` owns:
 
-The current landed surface already includes:
+- repo-level SDK direction;
+- current control-plane contract hardening posture;
+- source-home, mechanics, compatibility, workspace, release-support, and
+  generated-capsule pressure when that pressure changes the whole repo contour;
+- concrete future triggers that belong to `aoa-sdk`.
 
-- workspace discovery and topology resolution grounded in
-  `.aoa/workspace.toml`
-- root design surfaces, `DESIGN.md` and `DESIGN.AGENTS.md`, that name SDK
-  system form and agent-facing guidance form for mechanics work
-- canonical decision rationale lane under `docs/decisions/` with generated
-  lookup indexes
-- docs entry map under `docs/README.md`, with root docs kept to route,
-  boundary, workspace, versioning, release-door, seed-history, and decision
-  surfaces
-- checked SDK source-home tree under `sdk/`, validated by
-  `scripts/validate_sdk_source_home.py`
-- active mechanics topology under `mechanics/`, grounded in
-  `mechanics/topology.json`, package provenance, part validation routes, and
-  `scripts/validate_mechanics_topology.py`
-- typed compatibility checks and workspace inspection
-- the compact control-plane capsule at
-  `generated/workspace_control_plane.min.json`
-- bounded `aoa skills enter` / `aoa skills guard` wrappers
-- additive `aoa surfaces detect` and reviewed closeout handoff helpers that
-  stay weaker than owner truth
-- checkpoint capture, review-note, and explicit reviewed-session handoff runner surfaces
-- typed Codex Projection live rollout status reads plus bounded release audit and publish
-  helpers
+It does not own release history, mechanic-local roadmaps, checked mechanic
+landings, decision rationale, generated truth, sibling meaning, quest state,
+proof verdicts, memory objects, routing policy, role policy, playbook law, or
+runtime implementation.
 
-### Current unreleased contour
+Use the stronger surface when the change is narrower:
 
-The live post-`v0.2.3` direction is control-plane hardening. Its current
-unreleased contour is:
+- public entry and route choice: [README](README.md);
+- route law and executable checks: [AGENTS](AGENTS.md), then the nearest
+  nested `AGENTS.md`;
+- system form: [DESIGN](DESIGN.md);
+- agent-facing guidance form: [DESIGN.AGENTS](DESIGN.AGENTS.md);
+- docs entry and placement: [docs README](docs/README.md);
+- boundaries: [docs/boundaries](docs/boundaries.md);
+- workspace topology: [docs/workspace-layout](docs/workspace-layout.md) and
+  [.aoa/workspace](.aoa/workspace.toml);
+- compatibility posture: [docs/versioning](docs/versioning.md);
+- SDK source-home posture: [sdk](sdk/README.md) and
+  `sdk/source_home.manifest.json`;
+- operation topology: [mechanics](mechanics/README.md), parent route cards,
+  parent `PARTS.md`, parent `PROVENANCE.md`, and part `VALIDATION.md`;
+- release history: [CHANGELOG](CHANGELOG.md);
+- durable rationale: [docs/decisions](docs/decisions/README.md) and generated
+  `docs/decisions/indexes/`;
+- durable obligations: [QUESTBOOK](QUESTBOOK.md) and [quests](quests/README.md).
 
-- workspace topology and the compact control-plane capsule:
-  `.aoa/workspace.toml`, `docs/workspace-layout.md`, and
-  `generated/workspace_control_plane.min.json`
-- decision rationale lane that enabled mechanics:
-  `docs/decisions/README.md`,
-  `docs/decisions/AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md`,
-  `docs/decisions/AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md`,
-  `docs/decisions/indexes/`, and
-  `scripts/generate_decision_indexes.py`
-- root design surfaces that enabled mechanics:
-  `DESIGN.md` and `DESIGN.AGENTS.md`
-- SDK source-home posture:
-  `sdk/README.md`, `sdk/SDK_SHAPE.md`, `sdk/source_home.manifest.json`,
-  `scripts/validate_sdk_source_home.py`, and
-  `docs/decisions/AOA-SDK-D-0043-sdk-source-home-tree.md`
-- corrected active mechanics topology after sibling-source reread:
-  `mechanics/README.md`, `mechanics/topology.json`,
-  `scripts/validate_mechanics_topology.py`, and
-  `docs/decisions/AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`
-- source-family crosswalk coverage for every `src/aoa_sdk/*` family:
-  `mechanics/topology.json`,
-  `docs/decisions/AOA-SDK-D-0006-mechanics-source-family-crosswalk.md`, and
-  `tests/test_mechanics_topology.py`
-- Codex Projection live rollout status and rollout reference boundaries:
-  `mechanics/codex-projection/parts/live-rollout-status-readout/docs/live-rollout-status-readout.md`,
-  `mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/deploy-operation-boundary-note.md`,
-  `mechanics/codex-projection/parts/owner-rollout-reference-handoff/docs/rollout-campaign-refs.md`,
-  `mechanics/codex-projection/parts/live-rollout-status-readout/schemas/live-rollout-status-snapshot.schema.json`,
-  `mechanics/codex-projection/parts/live-rollout-status-readout/examples/live-rollout-status-snapshot.example.json`, and
-  `src/aoa_sdk/codex/registry.py`
-- reviewed closeout context carry, component-refresh followthrough,
-  self-agency continuity carry, and next-kernel followthrough decision:
-  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/README.md`,
-  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/owner-followthrough-map.md`,
-  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/component-refresh-followthrough.md`,
-  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/self-agency-continuity-carry.md`,
-  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/next-kernel-followthrough-decision.md`,
-  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_owner_followthrough_map.schema.json`,
-  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_continuity_window.schema.json`, and
-  `mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_followthrough_decision.schema.json`
-- checkpoint, surface-detection, and reviewed handoff guidance:
-  `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`,
-  `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md`,
-  `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`, and
-  `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md`
-- bounded release and CI posture:
-  `mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md`,
-  `mechanics/release-support/parts/public-support-ci-posture/docs/public-support-ci-posture.md`,
-  `docs/RELEASING.md`, and `docs/RELEASE_CI_POSTURE.md`
+## Update Rule
+
+Update this roadmap only when a change moves repo-level SDK direction,
+control-plane posture, source-home topology, mechanics-to-source interface,
+workspace or compatibility posture, release-support direction, generated
+capsule posture, or a concrete future trigger.
+
+Do not update it for local mechanic landings, generated refreshes, release
+notes, decision records, quest lifecycle moves, package-local artifact
+relocation, or validator maintenance unless that local change alters
+repo-level direction.
+
+Before closeout, ask: did this change move the SDK's direction, or did it only
+land a local surface?
+
+## Operating Card
+
+| Field | Route |
+| --- | --- |
+| input | SDK-layer pressure, direction changes, horizon order, or public-contour changes |
+| output | direction, horizon posture, future trigger, or owner-route pressure |
+| owner | root roadmap for direction; source, mechanics, decisions, generated companions, and release docs for detail |
+| next route | [sdk](sdk/README.md), [mechanics](mechanics/README.md), [docs](docs/README.md), [generated capsule](generated/workspace_control_plane.min.json), then nearest local route card |
+| validation | [AGENTS.md#verify](AGENTS.md#verify), plus route-specific tests when roadmap contracts move |
+
+## Current Direction
+
+`aoa-sdk` is past seed bootstrap. The current post-`v0.2.3` direction is
+control-plane contract hardening.
+
+The repo should now:
+
+- keep root entry surfaces compact enough to trust;
+- keep `README.md` as the public front door and `ROADMAP.md` as direction, not
+  shipped-surface inventory;
+- keep `docs/README.md` as the docs entry map and `docs/blueprint.md` as seed
+  history;
+- keep source-authored SDK posture in `sdk/` while `src/aoa_sdk/` remains the
+  importable implementation;
+- keep repeatable SDK operations in `mechanics/`;
+- keep generated companions subordinate to source docs, builders, validators,
+  and local route cards;
+- keep workspace discovery explicit through `.aoa/workspace.toml`,
+  `docs/workspace-layout.md`, and `generated/workspace_control_plane.min.json`;
+- keep compatibility checks explicit and source-subordinate;
+- keep `aoa skills enter` / `aoa skills guard`, `aoa surfaces detect`,
+  checkpoint capture, review-note, and explicit reviewed-session handoff runner
+  surfaces bounded and weaker than owner truth;
+- keep typed Codex Projection reads and release audit and publish helpers below
+  rollout, release, and sibling-owner authority.
+
+The main near-term risk is roadmap drift: shipped workspace, compatibility,
+Codex, checkpoint, closeout, release, and mechanics surfaces must stay
+discoverable, but their full inventories belong in `docs/README.md`,
+`CHANGELOG.md`, `mechanics/`, generated companions, part route cards, and
+decision indexes rather than in this roadmap.
 
 Roadmap drift is an SDK-layer risk because downstream agents use this file to
 choose whether a change belongs on the control plane. It still must not turn
@@ -101,74 +110,106 @@ The next honest move is not to widen the SDK into a second owner layer.
 It is to keep the control plane small, explicit, testable, and source-
 subordinate while cross-repo growth becomes denser.
 
-## Current cycle
+## Current Public Contour
 
-### Stage 1: current-direction consolidation
+Current release marker: `v0.2.3`.
 
-Goals:
+Current unreleased contour: control-plane contract hardening after `v0.2.3`.
+This is a directional contour, not a changelog replacement.
 
-- keep `ROADMAP.md` as the root-level current-direction door
-- keep `README.md` and `AGENTS.md` short and route-first
-- keep `docs/README.md` as the docs entry map instead of letting `docs/`
-  become a flat shelf
-- keep `DESIGN.md` and `DESIGN.AGENTS.md` as the root design route for
-  SDK source-home and mechanics topology
-- keep `sdk/` as the checked SDK source-home tree, not an implementation or
-  mechanics payload lane
-- keep `docs/blueprint.md` explicit as seed history rather than current-state
-  authority
-- keep structural rationale in `docs/decisions/` and keep mechanics payload
-  moves tied to package-local reason and validator surfaces
+Current anchors:
 
-### Stage 2: control-plane contract hardening
+| Anchor | Surface | Directional use |
+| --- | --- | --- |
+| Root entry and route law | `README.md`, `AGENTS.md`, `docs/README.md` | Keep entry, commands, and docs wayfinding separate. |
+| System and agent-facing form | `DESIGN.md`, `DESIGN.AGENTS.md` | Keep SDK shape, source-home posture, and guidance mesh explicit. |
+| Decision rationale | `docs/decisions/README.md`, `docs/decisions/indexes/` | Keep route-law and topology rationale findable without manual rosters. |
+| Workspace control plane | `.aoa/workspace.toml`, `docs/workspace-layout.md`, `generated/workspace_control_plane.min.json` | Keep source checkouts, runtime mirrors, and generated capsule posture aligned. |
+| Compatibility posture | `docs/versioning.md` and compatibility checks | Keep consumed sibling surfaces explicit, versioned where possible, and fail-closed on drift. |
+| SDK source home | `sdk/README.md`, `sdk/source_home.manifest.json`, `src/aoa_sdk/` | Keep public SDK posture separate from importable implementation. |
+| Mechanics atlas | `mechanics/README.md`, `mechanics/topology.json`, parent cards, part `VALIDATION.md` | Keep operation detail local while root watches repo-wide direction. |
+| Bounded helpers | skill guards, surface detection, checkpoint and closeout route cards | Keep loaded, suggested, manual-equivalent, and activated states visibly separate. |
+| Release support | `docs/RELEASING.md`, `docs/RELEASE_CI_POSTURE.md`, release-support parts | Keep release preflight, CI posture, sibling canaries, audit, and publish helpers subordinate to owner truth. |
 
-Goals:
+## Horizons
 
-- harden topology, compatibility, and generated-capsule stability
-- keep workspace discovery explicit and test-backed
-- fail closed on silent generated-surface or route drift
-- preserve the distinction between source checkouts and deployed runtime
-  mirrors
+### Horizon: Root Clarity
 
-Exit signals:
+| Field | Direction |
+| --- | --- |
+| Current posture | `README.md`, `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `ROADMAP.md`, `docs/README.md`, and `docs/boundaries.md` now have separate jobs. |
+| Next honest move | Keep root surfaces as entry, route law, shape, agent-facing shape, direction, docs map, and boundaries. Move inventories to changelog, docs maps, generated readers, mechanics, or decisions. |
+| Guardrail | Root docs must not become archives of every part, validator, release note, or session. |
 
-- the current-state verification battery stays green
-- docs, tests, and the control-plane capsule stay aligned
-- current repo direction no longer depends on reading the seed blueprint first
+### Horizon: Source Home And Implementation
 
-### Stage 3: closeout and owner-followthrough discipline
+| Field | Direction |
+| --- | --- |
+| Current posture | `sdk/` is the checked source-authored SDK posture tree; `src/aoa_sdk/` is the importable Python implementation. |
+| Next honest move | Keep public-interface, facade-boundary, runtime-entry, and distribution posture tied to `sdk/source_home.manifest.json`, source tests, and decision rationale. |
+| Guardrail | `sdk/` must not become a second implementation tree, and `src/aoa_sdk/` must not absorb sibling meaning. |
 
-Goals:
+### Horizon: Mechanics Atlas
 
-- keep checkpoint capture, review-note, and explicit reviewed session handoff bounded
-- keep owner followthrough, continuity carry, and component-refresh hints
-  reviewed and source-subordinate
-- preserve explicit truth labels across loaded, suggested, manual-equivalent,
-  and activated surfaces
+| Field | Direction |
+| --- | --- |
+| Current posture | `mechanics/` owns repeatable SDK operations across compatibility, runtime seams, checkpoint, release support, Codex projection, RPG, questbook, recurrence, antifragility, Agon, Experience, and Titan helper boundaries. |
+| Next honest move | Let package route cards, `PARTS.md`, `PROVENANCE.md`, part READMEs, and part `VALIDATION.md` files carry local detail while root watches only repo-wide direction. |
+| Guardrail | Mechanics route operation pressure; they do not become source-owned sibling truth, proof verdicts, memory objects, playbooks, or runtime workers. |
 
-Exit signals:
+### Horizon: Workspace And Compatibility
 
-- reviewed closeout routes stay inspectable and weaker than owner meaning
-- persistent handoff bundles remain advisory
-- no closeout helper silently becomes policy, activation, or progression
-  authority
+| Field | Direction |
+| --- | --- |
+| Current posture | Workspace discovery, runtime mirror separation, canonical sibling paths, and compatibility posture are explicit and test-backed. |
+| Next honest move | Keep canonical owner paths current, remove hidden fallback behavior, and make any new consumed surface enter through the compatibility map. |
+| Guardrail | Local convenience must not turn stale sibling paths or runtime mirrors into source truth. |
 
-### Stage 4: portability and rollout posture
+### Horizon: Bounded Handoff Helpers
 
-Goals:
+| Field | Direction |
+| --- | --- |
+| Current posture | Skill guards, surface detection, checkpoint notes, reviewed closeout carry, owner followthrough hints, and reviewed-session handoff runner surfaces are available as bounded helper routes. |
+| Next honest move | Preserve truth labels and owner-subordination while making handoff evidence easier to inspect and validate. |
+| Guardrail | No helper silently becomes activation, progression, proof, durable memory, routing, or runtime authority. |
 
-- keep sibling-workspace bootstrap and discovery overrides legible
-- keep Codex Projection portability and live rollout status reads typed and bounded
-- keep release audit and publish helpers subordinate to owner-repo truth
+### Horizon: Release And Support
 
-## Standing discipline
+| Field | Direction |
+| --- | --- |
+| Current posture | Root release docs are thin route doors; detailed runbook, public support posture, sibling canaries, release audit, and publish helpers live in release-support parts. |
+| Next honest move | Keep public claims aligned across README, changelog, release docs, release-support parts, generated companions, and GitHub validation. |
+| Guardrail | No roadmap history as changelog truth, no support claim without release-support route, and no publish claim before actual publication. |
 
-Across all waves:
+## When The Time Comes
 
-- stay on the control plane
-- keep source-owned meaning in sibling repositories
-- prefer manifest-driven, test-backed behavior over hidden heuristics
+These are repo-level triggers that should wait for real evidence:
+
+- Add a new consumed sibling surface only after the owner path, compatibility
+  mode, validator, and typed read posture are clear.
+- Widen CLI or orchestration breadth only after existing workspace,
+  compatibility, and truth-label helpers stay green under sibling drift.
+- Promote a helper closer to activation only after the source owner has named
+  the meaning and rollback/approval posture.
+- Add a new mechanic parent only when an existing parent would become less
+  clear by owning the pressure.
+- Add broader remote adapter or MCP/A2A behavior only after local-first
+  contracts remain stable.
+
+An item belongs here only when its trigger is concrete and repo-wide. If the
+future pressure is mechanic-local, use the owning mechanic package. If it is a
+durable obligation, use `QUESTBOOK.md` and `quests/`.
+
+## Standing Direction
+
+Across all horizons:
+
+- stay on the control plane;
+- keep source-owned meaning in sibling repositories;
+- keep root documents compact and route-bound;
+- keep source, generated, runtime, and compatibility surfaces distinct;
+- prefer manifest-driven, test-backed behavior over hidden heuristics;
 - keep rollout, checkpoint, and closeout helpers explicit about what they can
-  read, suggest, or execute
+  read, suggest, or execute;
 - do not let convenience helpers impersonate routing, memory, playbook, eval,
-  or role authority
+  role, stats, KAG, or runtime authority.
