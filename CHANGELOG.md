@@ -245,6 +245,10 @@ Tracking starts with the community-docs baseline for this repository.
 - Root `AGENTS.md`, `README.md`, `ROADMAP.md`, and `docs/boundaries.md` now
   route structural, design, and decision questions to their owning surfaces
   instead of carrying the full explanation inline.
+- Root `README.md` is now a command-free public front door. Executable
+  validation routes stay in `AGENTS.md`, nearest nested route cards, part
+  `VALIDATION.md`, release docs, and owning tests; `AOA-SDK-D-0045` records
+  the route-law decision.
 - `DESIGN.md` and `DESIGN.AGENTS.md` now route single-mechanic local
   automation templates through part-local mechanics homes instead of former
   root local-automation districts.

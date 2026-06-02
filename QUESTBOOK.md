@@ -38,8 +38,6 @@ in `mechanics/questbook/`.
 
 ## Validation
 
-```bash
-python scripts/validate_mechanics_topology.py
-python scripts/validate_nested_agents.py --strict-advisory --fail-on-untracked
-python -m pytest -q tests/test_mechanics_topology.py tests/test_design_surfaces.py
-```
+Executable validation routes live in `AGENTS.md`, `mechanics/AGENTS.md`, and
+the touched part `VALIDATION.md`. For Questbook source-store changes, start at
+`mechanics/questbook/README.md` and the relevant part route.

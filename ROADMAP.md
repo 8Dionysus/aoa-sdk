@@ -22,8 +22,9 @@ The current landed surface already includes:
   lookup indexes
 - checked SDK source-home tree under `sdk/`, validated by
   `scripts/validate_sdk_source_home.py`
-- active mechanics topology under `mechanics/`, grounded in full tracked-file
-  inventory and validated by `scripts/validate_mechanics_topology.py`
+- active mechanics topology under `mechanics/`, grounded in
+  `mechanics/topology.json`, package provenance, part validation routes, and
+  `scripts/validate_mechanics_topology.py`
 - typed compatibility checks and workspace inspection
 - the compact control-plane capsule at
   `generated/workspace_control_plane.min.json`
@@ -54,7 +55,7 @@ release contour is:
   `sdk/README.md`, `sdk/SDK_SHAPE.md`, `sdk/source_home.manifest.json`,
   `scripts/validate_sdk_source_home.py`, and
   `docs/decisions/AOA-SDK-D-0043-sdk-source-home-tree.md`
-- corrected active mechanics topology after full inventory and sibling-source reread:
+- corrected active mechanics topology after sibling-source reread:
   `mechanics/README.md`, `mechanics/topology.json`,
   `scripts/validate_mechanics_topology.py`, and
   `docs/decisions/AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`

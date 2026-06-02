@@ -109,6 +109,12 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0002 - Root Design Surfaces Before Mechanics](../AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md) | 2026-05-31 | design surface, agent surface, mechanics prep, source home | none | source topology, route law, agent mesh | accepted |
 
+## docs
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | root docs, control-plane routing, validation authority | all | root-surface hygiene, docs routes | accepted |
+
 ## docs route
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
@@ -234,6 +240,7 @@ Grouped by `Surface classes` metadata.
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | mechanics topology, route cards, validation authority | all | root-surface hygiene, mechanics topology, nested agents | accepted |
+| [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | root docs, control-plane routing, validation authority | all | root-surface hygiene, docs routes | accepted |
 
 ## runtime entrypoint
 
@@ -354,6 +361,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0034 - Active Mechanics Topology Status Naming](../AOA-SDK-D-0034-active-mechanics-topology-status-naming.md) | 2026-06-01 | mechanics topology, active naming, route validation | all | active naming, root-surface hygiene, mechanics topology | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | mechanics topology, route cards, validation authority | all | root-surface hygiene, mechanics topology, nested agents | accepted |
+| [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | root docs, control-plane routing, validation authority | all | root-surface hygiene, docs routes | accepted |
 
 ## validation guard
 

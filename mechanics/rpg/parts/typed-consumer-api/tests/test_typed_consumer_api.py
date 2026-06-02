@@ -12,13 +12,14 @@ PART_ROOT = Path(__file__).resolve().parents[1]
 
 def test_typed_consumer_api_docs_are_routed_from_readme() -> None:
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    package_readme = (REPO_ROOT / "mechanics" / "rpg" / "README.md").read_text(encoding="utf-8")
+    part_readme = (PART_ROOT / "README.md").read_text(encoding="utf-8")
 
-    for fragment in [
-        "mechanics/rpg/parts/typed-consumer-api/docs/typed-consumer-api-boundary.md",
-        "mechanics/rpg/parts/surface-path-transport/docs/surface-path-transport.md",
-        "src/aoa_sdk/rpg/",
-    ]:
-        assert fragment in readme
+    assert "mechanics/rpg/README.md" in readme
+    assert "mechanics/rpg/parts/typed-consumer-api/" in package_readme
+    assert "mechanics/rpg/parts/surface-path-transport/" in package_readme
+    assert "docs/typed-consumer-api-boundary.md" in part_readme
+    assert "src/aoa_sdk/rpg/" in part_readme
 
     boundary = (PART_ROOT / "docs" / "typed-consumer-api-boundary.md").read_text(encoding="utf-8")
     assert "It must not start secretly authoring it." in boundary

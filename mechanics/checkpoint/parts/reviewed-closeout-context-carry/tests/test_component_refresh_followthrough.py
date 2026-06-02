@@ -33,13 +33,14 @@ def test_component_drift_hint_example_validates_against_schema() -> None:
 
 def test_component_refresh_followthrough_routes_from_readme() -> None:
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    package_readme = (REPO_ROOT / "mechanics" / "checkpoint" / "README.md").read_text(encoding="utf-8")
+    part_readme = (PART_ROOT / "README.md").read_text(encoding="utf-8")
 
-    for fragment in [
-        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/component-refresh-followthrough.md",
-        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/component_drift_hint_set.schema.json",
-        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/component_refresh_followthrough_decision.example.json",
-    ]:
-        assert fragment in readme
+    assert "mechanics/checkpoint/README.md" in readme
+    assert "mechanics/checkpoint/parts/reviewed-closeout-context-carry/" in package_readme
+    assert "docs/component-refresh-followthrough.md" in part_readme
+    assert "schemas/" in part_readme
+    assert "examples/" in part_readme
 
 
 def test_component_refresh_followthrough_example_validates_against_schema() -> None:

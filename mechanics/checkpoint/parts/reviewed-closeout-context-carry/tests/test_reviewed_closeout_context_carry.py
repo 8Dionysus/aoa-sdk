@@ -31,14 +31,15 @@ def test_checkpoint_lineage_hint_example_validates_against_schema() -> None:
 
 def test_reviewed_closeout_context_carry_routes_from_readme() -> None:
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    package_readme = (REPO_ROOT / "mechanics" / "checkpoint" / "README.md").read_text(encoding="utf-8")
+    part_readme = (PART_ROOT / "README.md").read_text(encoding="utf-8")
 
-    for fragment in [
-        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/candidate-lineage-carry.md",
-        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_owner_followthrough_map.schema.json",
-        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_owner_followthrough_map.example.json",
-        "mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/next-kernel-followthrough-decision.md",
-    ]:
-        assert fragment in readme
+    assert "mechanics/checkpoint/README.md" in readme
+    assert "mechanics/checkpoint/parts/reviewed-closeout-context-carry/" in package_readme
+    assert "docs/candidate-lineage-carry.md" in part_readme
+    assert "docs/next-kernel-followthrough-decision.md" in part_readme
+    assert "schemas/" in part_readme
+    assert "examples/" in part_readme
 
 
 def test_closeout_candidate_lineage_map_example_validates_against_schema() -> None:

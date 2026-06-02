@@ -199,7 +199,7 @@ sibling change behind permissive alternate path behavior, it weakens the SDK.
 Mechanics packages land after the decision and design surfaces can name why the
 package exists, what it owns, which stronger owners remain outside, and how the
 move is validated. Payload moves need a package-local part, active contract,
-artifact-topology receipt, and validator.
+package provenance route, topology-map update, and validator.
 
 Single-mechanic artifacts should move from root technical districts into
 `mechanics/<parent>/parts/<part>/<district>/...` once the part owns their

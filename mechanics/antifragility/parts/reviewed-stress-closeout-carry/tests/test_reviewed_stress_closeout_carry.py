@@ -22,14 +22,15 @@ def test_reviewed_stress_closeout_manifest_is_json_valid() -> None:
 
 def test_reviewed_stress_closeout_carry_stays_below_owner_authority() -> None:
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+    package_readme = (REPO_ROOT / "mechanics" / "antifragility" / "README.md").read_text(encoding="utf-8")
+    part_readme = (PART_ROOT / "README.md").read_text(encoding="utf-8")
     contract = (PART_ROOT / "CONTRACT.md").read_text(encoding="utf-8")
     doc = (PART_ROOT / "docs" / "reviewed-stress-closeout-carry.md").read_text(encoding="utf-8")
 
-    for fragment in [
-        "mechanics/antifragility/parts/reviewed-stress-closeout-carry/docs/reviewed-stress-closeout-carry.md",
-        "mechanics/antifragility/parts/reviewed-stress-closeout-carry/examples/reviewed-stress-closeout-manifest.example.json",
-    ]:
-        assert fragment in readme
+    assert "mechanics/antifragility/README.md" in readme
+    assert "mechanics/antifragility/parts/reviewed-stress-closeout-carry/" in package_readme
+    assert "docs/reviewed-stress-closeout-carry.md" in part_readme
+    assert "examples/reviewed-stress-closeout-manifest.example.json" in part_readme
 
     assert "auto-trigger runtime repair" in doc
     assert "treat routing hints as source truth" in doc
