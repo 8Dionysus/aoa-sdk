@@ -35,6 +35,17 @@ def test_readme_is_public_front_door_not_command_authority() -> None:
         assert text not in readme
 
 
+def test_readme_license_matches_project_license() -> None:
+    readme = read_text("README.md")
+    license_text = read_text("LICENSE")
+    pyproject = read_text("pyproject.toml")
+
+    assert license_text.startswith("Apache License\nVersion 2.0")
+    assert 'license = {text = "Apache-2.0"}' in pyproject
+    assert "Licensed under the [Apache License 2.0](LICENSE)." in readme
+    assert "[MIT]" not in readme
+
+
 def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
     agents = read_text("AGENTS.md")
 
