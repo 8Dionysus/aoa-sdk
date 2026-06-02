@@ -18,8 +18,9 @@ This repository owns:
 - workspace discovery, topology resolution, compatibility checks, versioning posture, and CLI inspection surfaces
 - the compact control-plane capsule at `generated/workspace_control_plane.min.json`
 - the mechanics topology under `mechanics/`, including package route cards,
-  source-family routes, part-local artifact homes, `mechanics/topology.json`,
-  package provenance cards, and part-local validation homes
+  source-family routes, future-pressure roadmaps, part-local artifact homes,
+  `mechanics/topology.json`, package provenance cards, and part-local
+  validation homes
 - additive surface detection and reviewed closeout handoff helpers that remain owner-subordinate
 
 It does not own:
@@ -42,8 +43,8 @@ It does not own:
 9. `sdk/README.md` and `sdk/source_home.manifest.json` when SDK source-home
    posture, public-interface, facade-boundary, runtime-entry, or distribution
    topology changes
-10. `mechanics/README.md` when repeatable SDK operation topology or package
-   routing changes
+10. `mechanics/README.md` and `mechanics/ROADMAP.md` when repeatable SDK
+   operation topology, package routing, or mechanics future pressure changes
 11. `.aoa/workspace.toml`
 12. source files and tests you plan to touch
 

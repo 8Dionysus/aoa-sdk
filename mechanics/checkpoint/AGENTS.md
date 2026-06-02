@@ -15,6 +15,7 @@ closeout context carry below owner truth.
 
 - `mechanics/AGENTS.md`
 - `mechanics/checkpoint/README.md`
+- `mechanics/checkpoint/ROADMAP.md`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/README.md`
 - `mechanics/checkpoint/parts/AGENTS.md`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`

@@ -14,6 +14,7 @@ and local automation seams.
 
 - `mechanics/AGENTS.md`
 - `mechanics/runtime-seam/README.md`
+- `mechanics/runtime-seam/ROADMAP.md`
 - `.aoa/workspace.toml`
 - `docs/workspace-layout.md`
 - `generated/workspace_control_plane.min.json`

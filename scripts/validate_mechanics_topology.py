@@ -100,10 +100,11 @@ ROOT_TECHNICAL_DISTRICT_PREFIXES = {
 REQUIRED_ROOT_FILES = (
     MECHANICS_DIR / "AGENTS.md",
     MECHANICS_DIR / "README.md",
+    MECHANICS_DIR / "ROADMAP.md",
     TOPOLOGY_PATH,
 )
 
-REQUIRED_PACKAGE_FILES = ("AGENTS.md", "README.md", "PARTS.md", "PROVENANCE.md")
+REQUIRED_PACKAGE_FILES = ("AGENTS.md", "README.md", "ROADMAP.md", "PARTS.md", "PROVENANCE.md")
 LEGACY_ROUTE_FILES = (
     MECHANICS_DIR / "runtime-seam" / "legacy" / "former-routes.json",
     MECHANICS_DIR / "boundary-bridge" / "legacy" / "former-routes.json",
@@ -376,6 +377,19 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
         parts_path = package_dir / "PARTS.md"
         if parts_path.is_file() and "## Candidate Parts" not in parts_path.read_text(encoding="utf-8"):
             issues.append(f"mechanics/{slug}/PARTS.md: missing candidate parts section")
+
+        roadmap_path = package_dir / "ROADMAP.md"
+        if roadmap_path.is_file():
+            roadmap = roadmap_path.read_text(encoding="utf-8")
+            for snippet in (
+                "## Current Contour",
+                "## Next Work",
+                "## When Time Comes",
+                "## Out Of Scope",
+                "## Update Trigger",
+            ):
+                if snippet not in roadmap:
+                    issues.append(f"mechanics/{slug}/ROADMAP.md: missing {snippet!r}")
 
         provenance_path = package_dir / "PROVENANCE.md"
         if provenance_path.is_file():

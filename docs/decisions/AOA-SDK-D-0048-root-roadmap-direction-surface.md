@@ -67,7 +67,8 @@ roadmap a second inventory.
   part cards, and release-support docs.
 - Release-support tests assert directional anchors rather than requiring the
   roadmap to list every active part-local surface.
-- Future mechanics-roadmap work can start from a cleaner root contract.
+- Mechanics-roadmap work can start from a cleaner root contract and should
+  keep package-local future pressure out of root roadmap inventory.
 
 ## Source Surfaces
 
@@ -79,7 +80,8 @@ roadmap a second inventory.
 
 ## Follow-Up Route
 
-Audit mechanics roadmap shape next. Mechanic-local roadmaps should carry
+The follow-up route is `mechanics/ROADMAP.md` plus package
+`mechanics/<package>/ROADMAP.md` files. They should carry mechanics-wide and
 package-local future pressure without forcing root `ROADMAP.md` to become a
 mechanics inventory.
 

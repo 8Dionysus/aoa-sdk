@@ -212,6 +212,7 @@
   "required_package_files": [
     "AGENTS.md",
     "README.md",
+    "ROADMAP.md",
     "PARTS.md",
     "PROVENANCE.md"
   ],

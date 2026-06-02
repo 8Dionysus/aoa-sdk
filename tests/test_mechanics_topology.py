@@ -35,6 +35,29 @@ def test_mechanics_package_set_is_explicit() -> None:
     )
 
 
+def test_mechanics_roadmaps_are_required_route_surfaces() -> None:
+    assert mechanics_validator.REQUIRED_ROOT_FILES == (
+        mechanics_validator.MECHANICS_DIR / "AGENTS.md",
+        mechanics_validator.MECHANICS_DIR / "README.md",
+        mechanics_validator.MECHANICS_DIR / "ROADMAP.md",
+        mechanics_validator.TOPOLOGY_PATH,
+    )
+    assert mechanics_validator.REQUIRED_PACKAGE_FILES == (
+        "AGENTS.md",
+        "README.md",
+        "ROADMAP.md",
+        "PARTS.md",
+        "PROVENANCE.md",
+    )
+
+    root_roadmap = (REPO_ROOT / "mechanics" / "ROADMAP.md").read_text(encoding="utf-8")
+    for slug in mechanics_validator.EXPECTED_PACKAGES:
+        assert f"[`{slug}`]({slug}/ROADMAP.md)" in root_roadmap
+        package_roadmap = (REPO_ROOT / "mechanics" / slug / "ROADMAP.md").read_text(encoding="utf-8")
+        assert "## Current Contour" in package_roadmap
+        assert "## Update Trigger" in package_roadmap
+
+
 def test_former_parent_names_are_legacy_indexed_not_active_topology() -> None:
     topology = mechanics_validator._read_json(  # noqa: SLF001
         REPO_ROOT / mechanics_validator.TOPOLOGY_PATH,

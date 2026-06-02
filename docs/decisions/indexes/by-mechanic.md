@@ -14,6 +14,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0009 - Agon and Experience Part Localization](../AOA-SDK-D-0009-agon-experience-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | mechanics topology, artifact localization, Agon helpers, Experience helpers, root technical districts | mechanics topology, part validation, schema validation, generated registry parity | accepted |
 | [AOA-SDK-D-0033 - Questbook Parent Withdrawal After Quest Localization](../AOA-SDK-D-0033-questbook-parent-withdrawal-after-quest-localization.md) | 2026-06-01 | topology, mechanics, parent boundary | mechanics topology, parent set, quest routing, active naming | parent boundary, root-surface hygiene, active naming | superseded |
 | [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | topology, mechanics, quest source store, root district | mechanics topology, questbook, root quests, active naming | root source store, parent boundary, lifecycle posture, validation | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## all
 
@@ -33,6 +34,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 | [AOA-SDK-D-0014 - Antifragility Active Part Localization](../AOA-SDK-D-0014-antifragility-active-part-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | mechanics topology, antifragility, control-plane stress posture, closeout carry | mechanics topology, part validation, docs routes, active naming | accepted |
 | [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) | 2026-06-01 | active naming, external source ref, compatibility accounting, stress evidence | antifragility stress posture, reviewed stress carry, active naming, owner boundary | active naming, source ref preservation, owner boundary, part validation | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## boundary-bridge
 
@@ -52,6 +54,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0038 - Manual Equivalence Active Lane Naming](../AOA-SDK-D-0038-manual-equivalence-active-lane-naming.md) | 2026-06-01 | active naming, typed model, skill runtime bridge, surface detection | skill runtime bridge, owner-layer signal handoff, active naming, compatibility input | active naming, compatibility alias, route clarity, part validation | accepted |
 | [AOA-SDK-D-0040 - Sibling Fallback Field Input Alias Normalization](../AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md) | 2026-06-01 | active naming, typed model, sibling surface, compatibility input | routing stats reader, playbook reader, active naming, compatibility posture | active naming, compatibility alias, sibling owner boundary, part validation | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | source topology, nested agents, manifest validation, root route law | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## checkpoint
 
@@ -69,6 +72,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0039 - A2A Quest Passport Secondary Tier Naming](../AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md) | 2026-06-01 | active naming, typed model, checkpoint, A2A contract | A2A rebase, child-task reentry, active naming, request payload | active naming, route clarity, part validation | accepted |
 | [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | topology, mechanics, quest source store, root district | mechanics topology, questbook, root quests, active naming | root source store, parent boundary, lifecycle posture, validation | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | source topology, nested agents, manifest validation, root route law | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## codex-projection
 
@@ -82,6 +86,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) | 2026-06-01 | compatibility, topology, mechanics, runtime entrypoint | compatibility posture, workspace MCP, active naming, sibling path routing | compatibility, active naming, root-surface hygiene, part validation | accepted |
 | [AOA-SDK-D-0037 - Workspace MCP Surface Crosswalk Secondary Route Naming](../AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md) | 2026-06-01 | MCP readout, active naming, Codex projection | workspace MCP, active naming, route selection, agent guidance | active naming, fallback removal, route clarity, part validation | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | source topology, nested agents, manifest validation, root route law | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## experience
 
@@ -91,6 +96,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 | [AOA-SDK-D-0009 - Agon and Experience Part Localization](../AOA-SDK-D-0009-agon-experience-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | mechanics topology, artifact localization, Agon helpers, Experience helpers, root technical districts | mechanics topology, part validation, schema validation, generated registry parity | accepted |
 | [AOA-SDK-D-0010 - Experience Helper Contract Part Localization](../AOA-SDK-D-0010-experience-helper-contract-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | mechanics topology, artifact localization, Experience helpers, root technical districts, schema validation | mechanics topology, part validation, schema validation | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## none
 
@@ -107,6 +113,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 | [AOA-SDK-D-0009 - Agon and Experience Part Localization](../AOA-SDK-D-0009-agon-experience-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | mechanics topology, artifact localization, Agon helpers, Experience helpers, root technical districts | mechanics topology, part validation, schema validation, generated registry parity | accepted |
 | [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | topology, mechanics, quest source store, root district | mechanics topology, questbook, root quests, active naming | root source store, parent boundary, lifecycle posture, validation | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## recurrence
 
@@ -118,6 +125,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0012 - Recurrence Control Plane Part Localization](../AOA-SDK-D-0012-recurrence-control-plane-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | mechanics topology, artifact localization, recurrence control plane, manifest gate, downstream projections, recursor readiness | mechanics topology, manifest compatibility, part validation, schema validation, script smoke | accepted |
 | [AOA-SDK-D-0020 - Technique Publication Observation Boundary Localization](../AOA-SDK-D-0020-technique-publication-observation-boundary-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, active naming | mechanics topology, recurrence, hook observation | mechanics topology, docs routes, active naming, owner boundary | accepted |
 | [AOA-SDK-D-0029 - Recurrence Change Signal Schema Localization](../AOA-SDK-D-0029-recurrence-change-signal-schema-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, schema | mechanics topology, recurrence, component manifest gate | mechanics topology, schema placement, active naming | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## release-support
 
@@ -133,6 +141,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | source topology, nested agents, manifest validation, root route law | accepted |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | changelog, release posture, root docs | changelog drift, release readiness, docs routes | accepted |
 | [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | docs, route-law, roadmap, validation | root docs, roadmap, control-plane routing | roadmap drift, root-surface hygiene, docs routes | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## rpg
 
@@ -142,6 +151,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 | [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | source topology, mechanics topology, release check | accepted |
 | [AOA-SDK-D-0015 - RPG Typed Consumer Part Localization](../AOA-SDK-D-0015-rpg-typed-consumer-part-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | mechanics topology, RPG, typed consumer API, surface path transport | mechanics topology, part validation, docs routes, active naming | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## runtime-seam
 
@@ -154,6 +164,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0028 - CLI Surface Test Localization](../AOA-SDK-D-0028-cli-surface-test-localization.md) | 2026-06-01 | topology, mechanics, test placement, CLI | mechanics topology, runtime seam, boundary bridge | mechanics topology, part validation, active naming, root-surface hygiene | accepted |
 | [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) | 2026-06-01 | topology, agent guidance, validation guard | nested agents, root technical districts, mechanics topology | nested agents, root-surface hygiene, active naming | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | source topology, nested agents, manifest validation, root route law | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## titan
 
@@ -163,3 +174,4 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | source topology, mechanics topology, nested agents, release check | accepted |
 | [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | source topology, mechanics topology, release check | accepted |
 | [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | mechanics topology, artifact localization, Titan helpers, root technical districts, CLI helper scripts | mechanics topology, part validation, schema validation, script smoke | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |

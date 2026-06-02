@@ -13,6 +13,7 @@ reviewed stress closeout carry, and via negativa pruning.
 
 - `mechanics/AGENTS.md`
 - `mechanics/antifragility/README.md`
+- `mechanics/antifragility/ROADMAP.md`
 - `mechanics/antifragility/parts/README.md`
 - `mechanics/antifragility/parts/stress-posture-dispatch-gate/README.md`
 - `mechanics/antifragility/parts/reviewed-stress-closeout-carry/README.md`

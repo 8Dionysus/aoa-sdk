@@ -14,6 +14,7 @@ handoffs, and Codex-facing control-plane reads.
 
 - `mechanics/AGENTS.md`
 - `mechanics/codex-projection/README.md`
+- `mechanics/codex-projection/ROADMAP.md`
 - `mechanics/codex-projection/parts/workspace-mcp-server/README.md`
 - `mechanics/codex-projection/parts/live-rollout-status-readout/README.md`
 - `src/aoa_sdk/codex/`

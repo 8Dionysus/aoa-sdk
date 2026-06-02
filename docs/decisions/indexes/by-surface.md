@@ -193,6 +193,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | mechanics topology, root district hygiene, active naming, artifact placement | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
 | [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | mechanics topology, questbook, root quests, active naming | questbook, agon, checkpoint | root source store, parent boundary, lifecycle posture, validation | accepted |
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | mechanics topology, route cards, validation authority | all | root-surface hygiene, mechanics topology, nested agents | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics topology, roadmap, control-plane routing | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## parent boundary
 
@@ -223,6 +224,7 @@ Grouped by `Surface classes` metadata.
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | root docs, roadmap, control-plane routing | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics topology, roadmap, control-plane routing | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## root district
 
@@ -259,6 +261,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | changelog, release posture, root docs | release-support | changelog drift, release readiness, docs routes | accepted |
 | [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs map, root docs, decision lane | all | root-surface hygiene, docs routes, decision drift | accepted |
 | [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | root docs, roadmap, control-plane routing | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics topology, roadmap, control-plane routing | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## runtime entrypoint
 
@@ -384,6 +387,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | changelog, release posture, root docs | release-support | changelog drift, release readiness, docs routes | accepted |
 | [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) | 2026-06-02 | docs map, root docs, decision lane | all | root-surface hygiene, docs routes, decision drift | accepted |
 | [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) | 2026-06-02 | root docs, roadmap, control-plane routing | release-support | roadmap drift, root-surface hygiene, docs routes | accepted |
+| [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics topology, roadmap, control-plane routing | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | roadmap drift, mechanics topology, root-surface hygiene | accepted |
 
 ## validation guard
 
