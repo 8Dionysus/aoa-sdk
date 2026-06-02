@@ -13,9 +13,9 @@ through root `quests/` and Questbook.
 ## Read before editing
 
 - `mechanics/AGENTS.md`
-- `mechanics/ARTIFACT_TOPOLOGY.md`
 - `mechanics/agon/README.md`
 - `mechanics/agon/PARTS.md`
+- `mechanics/agon/PROVENANCE.md`
 - the nearest part card under `mechanics/agon/parts/`
 
 ## Boundaries

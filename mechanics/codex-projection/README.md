@@ -54,9 +54,9 @@ authority or make the SDK a Codex runtime.
 
 ### Validation
 
-```bash
-python -m pytest -q mechanics/codex-projection/parts/workspace-mcp-server/tests/test_workspace_mcp_server.py mechanics/codex-projection/parts/live-rollout-status-readout/tests/test_live_rollout_status_readout.py
-```
+Use the touched part `VALIDATION.md` for executable checks. For package-wide
+route changes, use `mechanics/topology.json` for the active validation list
+and then run the mechanics topology gate from the root route card.
 
 ### Next route
 

@@ -17,7 +17,7 @@
 
 Active part names describe the operation route rather than the old root file
 district. Historical chronological names and former root paths live in `PROVENANCE.md`
-and `mechanics/ARTIFACT_TOPOLOGY.md`.
+and package-local legacy indexes.
 
 ## Candidate Parts
 

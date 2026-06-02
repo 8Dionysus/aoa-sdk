@@ -183,6 +183,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) | 2026-06-01 | compatibility posture, workspace MCP, active naming, sibling path routing | boundary-bridge, codex-projection | compatibility, active naming, root-surface hygiene, part validation | accepted |
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | mechanics topology, root district hygiene, active naming, artifact placement | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
 | [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | mechanics topology, questbook, root quests, active naming | questbook, agon, checkpoint | root source store, parent boundary, lifecycle posture, validation | accepted |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | mechanics topology, route cards, validation authority | all | root-surface hygiene, mechanics topology, nested agents | accepted |
 
 ## parent boundary
 
@@ -227,6 +228,12 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | mechanics topology, control-plane, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | accepted |
+
+## route-law
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | mechanics topology, route cards, validation authority | all | root-surface hygiene, mechanics topology, nested agents | accepted |
 
 ## runtime entrypoint
 
@@ -330,6 +337,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | mechanics topology, root district hygiene, active naming, artifact placement | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
 | [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | mechanics topology, questbook, root quests, active naming | questbook, agon, checkpoint | root source store, parent boundary, lifecycle posture, validation | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | mechanics topology, route cards, validation authority | all | root-surface hygiene, mechanics topology, nested agents | accepted |
 
 ## typed model
 
@@ -345,6 +353,7 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0034 - Active Mechanics Topology Status Naming](../AOA-SDK-D-0034-active-mechanics-topology-status-naming.md) | 2026-06-01 | mechanics topology, active naming, route validation | all | active naming, root-surface hygiene, mechanics topology | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | mechanics topology, route cards, validation authority | all | root-surface hygiene, mechanics topology, nested agents | accepted |
 
 ## validation guard
 

@@ -57,13 +57,9 @@ Experience operation.
 
 ### Validation
 
-```bash
-python -m pytest -q mechanics/experience/parts/capture-pipeline-helper/tests/test_capture_pipeline_helper.py
-python -m pytest -q mechanics/experience/parts/adoption-federation-helper-contracts/tests/test_adoption_federation_helper_contracts.py
-python -m pytest -q mechanics/experience/parts/deployment-watchtower-helper-contracts/tests/test_deployment_watchtower_helper_contracts.py
-python -m pytest -q mechanics/experience/parts/governance-runtime-helper-contracts/tests/test_governance_runtime_helper_contracts.py
-python -m pytest -q mechanics/experience/parts/office-release-train-helper-contracts/tests/test_office_release_train_helper_contracts.py
-```
+Use the touched part `VALIDATION.md` for executable checks. For package-wide
+route changes, use `mechanics/topology.json` for the active validation list
+and then run the mechanics topology gate from the root route card.
 
 ### Next route
 

@@ -177,6 +177,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0030 - Checkpoint Local Automation Template Localization](../AOA-SDK-D-0030-checkpoint-local-automation-template-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, local automation | mechanics topology, checkpoint, managed hooks, closeout runner | checkpoint | accepted |
 | [AOA-SDK-D-0034 - Active Mechanics Topology Status Naming](../AOA-SDK-D-0034-active-mechanics-topology-status-naming.md) | 2026-06-01 | topology, mechanics, validation | mechanics topology, active naming, route validation | all | accepted |
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | topology, validation guard, mechanics, root technical districts | mechanics topology, root district hygiene, active naming, artifact placement | all | accepted |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | mechanics topology, route cards, validation authority | all | accepted |
 
 ## nested agents
 
@@ -188,6 +189,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0008 - Codex Projection Artifact Localization](../AOA-SDK-D-0008-codex-projection-artifact-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | mechanics topology, artifact localization, codex projection, root technical districts | codex-projection | accepted |
 | [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) | 2026-06-01 | topology, agent guidance, validation guard | nested agents, root technical districts, mechanics topology | boundary-bridge, release-support, runtime-seam | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | accepted |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | mechanics topology, route cards, validation authority | all | accepted |
 
 ## owner boundary
 
@@ -274,6 +276,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0034 - Active Mechanics Topology Status Naming](../AOA-SDK-D-0034-active-mechanics-topology-status-naming.md) | 2026-06-01 | topology, mechanics, validation | mechanics topology, active naming, route validation | all | accepted |
 | [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) | 2026-06-01 | compatibility, topology, mechanics, runtime entrypoint | compatibility posture, workspace MCP, active naming, sibling path routing | boundary-bridge, codex-projection | accepted |
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | topology, validation guard, mechanics, root technical districts | mechanics topology, root district hygiene, active naming, artifact placement | all | accepted |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | mechanics topology, route cards, validation authority | all | accepted |
 
 ## route clarity
 

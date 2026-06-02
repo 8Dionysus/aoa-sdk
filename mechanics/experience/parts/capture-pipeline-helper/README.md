@@ -38,4 +38,4 @@ activation, certification, deployment, and governance.
 ## Next Route
 
 Use `../../PROVENANCE.md` for former root-path accounting and
-`../../../ARTIFACT_TOPOLOGY.md` for repo-wide placement law.
+`../../../topology.json` for repo-wide route law.

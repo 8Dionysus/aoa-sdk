@@ -21,6 +21,7 @@ Grouped by `Mechanic parents` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0034 - Active Mechanics Topology Status Naming](../AOA-SDK-D-0034-active-mechanics-topology-status-naming.md) | 2026-06-01 | topology, mechanics, validation | mechanics topology, active naming, route validation | active naming, root-surface hygiene, mechanics topology | accepted |
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | topology, validation guard, mechanics, root technical districts | mechanics topology, root district hygiene, active naming, artifact placement | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
+| [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | mechanics topology, route cards, validation authority | root-surface hygiene, mechanics topology, nested agents | accepted |
 
 ## antifragility
 

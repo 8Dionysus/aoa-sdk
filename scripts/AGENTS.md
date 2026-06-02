@@ -13,7 +13,7 @@ control-plane utilities.
 
 1. Root `AGENTS.md`
 2. `DESIGN.md`
-3. `mechanics/ARTIFACT_TOPOLOGY.md`
+3. `mechanics/README.md`
 4. The owning mechanic `VALIDATION.md` if a script serves one mechanic part
 
 ## Boundaries
@@ -38,4 +38,5 @@ python scripts/release_check.py
 ## Closeout
 
 State whether the script is repo-wide or part-owned. If part-owned, move it
-under the part and update the artifact ledger in the same change.
+under the part and update package `PROVENANCE.md`, part `VALIDATION.md`, and
+`mechanics/topology.json` in the same change.

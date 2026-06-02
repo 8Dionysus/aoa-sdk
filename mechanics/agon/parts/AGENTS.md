@@ -18,9 +18,9 @@ old-path route homes.
 
 1. Root `AGENTS.md`
 2. `mechanics/AGENTS.md`
-3. `mechanics/ARTIFACT_TOPOLOGY.md`
-4. `mechanics/agon/AGENTS.md`
-5. `mechanics/agon/PARTS.md`
+3. `mechanics/agon/AGENTS.md`
+4. `mechanics/agon/PARTS.md`
+5. `mechanics/agon/PROVENANCE.md`
 6. The nearest part `README.md`, `CONTRACT.md`, and `VALIDATION.md`
 
 ## Boundaries
@@ -28,8 +28,8 @@ old-path route homes.
 - Stay on the control plane.
 - Keep each active part tied to one row in `mechanics/agon/PARTS.md`.
 - Keep stronger Agon meaning in the owner repositories.
-- Keep old root paths in `mechanics/ARTIFACT_TOPOLOGY.md` or
-  `mechanics/agon/PROVENANCE.md`, not as active routes.
+- Keep old root paths in `mechanics/agon/PROVENANCE.md` or package-local
+  legacy indexes, not as active routes.
 - Keep `src/aoa_sdk/` as the importable SDK source home.
 
 ## Validation

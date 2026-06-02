@@ -100,9 +100,7 @@ ROOT_TECHNICAL_DISTRICT_PREFIXES = {
 
 REQUIRED_ROOT_FILES = (
     MECHANICS_DIR / "AGENTS.md",
-    MECHANICS_DIR / "ARTIFACT_TOPOLOGY.md",
     MECHANICS_DIR / "README.md",
-    MECHANICS_DIR / "TOPOLOGY_PREP.md",
     TOPOLOGY_PATH,
 )
 
@@ -448,19 +446,6 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
         for slug in EXPECTED_PACKAGES:
             if f"[`{slug}`]" not in text:
                 issues.append(f"mechanics/README.md: missing registry link for {slug}")
-
-    topology_prep = repo_root / MECHANICS_DIR / "TOPOLOGY_PREP.md"
-    if topology_prep.is_file():
-        text = topology_prep.read_text(encoding="utf-8")
-        if "tracked files: 1056" not in text:
-            issues.append("mechanics/TOPOLOGY_PREP.md: missing tracked-file inventory")
-        for slug in EXPECTED_PACKAGES:
-            if f"`{slug}`" not in text:
-                issues.append(f"mechanics/TOPOLOGY_PREP.md: missing package {slug}")
-        for family in _source_families(repo_root):
-            label = "root package" if family == "root-package" else f"`{family}`"
-            if label not in text:
-                issues.append(f"mechanics/TOPOLOGY_PREP.md: missing source family {family}")
 
     return issues
 
