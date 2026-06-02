@@ -35,10 +35,10 @@ The current landed surface already includes:
 - typed Codex Projection live rollout status reads plus bounded release audit and publish
   helpers
 
-### Current release contour
+### Current unreleased contour
 
-The live direction for `v0.2.3` is control-plane hardening. Its current
-release contour is:
+The live post-`v0.2.3` direction is control-plane hardening. Its current
+unreleased contour is:
 
 - workspace topology and the compact control-plane capsule:
   `.aoa/workspace.toml`, `docs/workspace-layout.md`, and

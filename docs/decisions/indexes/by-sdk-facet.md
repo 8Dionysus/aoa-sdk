@@ -95,6 +95,12 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0021 - Technique Promotion Readiness Reader Localization](../AOA-SDK-D-0021-technique-promotion-readiness-reader-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | boundary-bridge | mechanics topology, part validation, active naming, owner boundary | accepted |
 
+## changelog
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | release-support | changelog drift, release readiness, docs routes | accepted |
+
 ## checkpoint
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
@@ -400,6 +406,12 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0018 - Release Support Part Localization](../AOA-SDK-D-0018-release-support-part-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | release-support | mechanics topology, part validation, docs routes, active naming, release check | accepted |
 
+## release posture
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | release-support | changelog drift, release readiness, docs routes | accepted |
+
 ## release support
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
@@ -443,6 +455,7 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0045 - Root README Front Door](../AOA-SDK-D-0045-root-readme-front-door.md) | 2026-06-02 | docs, route-law, validation | all | root-surface hygiene, docs routes | accepted |
+| [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | release-support | changelog drift, release readiness, docs routes | accepted |
 
 ## root quests
 

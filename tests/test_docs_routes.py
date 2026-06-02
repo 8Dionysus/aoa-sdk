@@ -11,6 +11,12 @@ def read_text(relative_path: str) -> str:
     return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
 
 
+def changelog_unreleased_section(changelog: str) -> str:
+    start = changelog.index("## [Unreleased]")
+    next_release = changelog.index("\n## [", start + len("## [Unreleased]"))
+    return changelog[start:next_release]
+
+
 def test_readme_is_public_front_door_not_command_authority() -> None:
     readme = read_text("README.md")
 
@@ -89,6 +95,7 @@ def test_design_lane_is_routed_before_mechanics() -> None:
 
 def test_changelog_records_current_unreleased_contour() -> None:
     changelog = read_text("CHANGELOG.md")
+    unreleased = changelog_unreleased_section(changelog)
 
     required_sections = [
         "### Summary",
@@ -102,17 +109,37 @@ def test_changelog_records_current_unreleased_contour() -> None:
         "### Notes",
     ]
     for section in required_sections:
-        assert section in changelog
-    assert "22 first-parent commits and 382 changed tracked paths" in changelog
+        assert section in unreleased
+    assert "without live reconciliation counters" in unreleased
+    assert "AOA-SDK-D-0046" in unreleased
     assert "DESIGN.md" in changelog
     assert "DESIGN.AGENTS.md" in changelog
     assert "docs/decisions/" in changelog
     assert "root-level generated paths" in changelog
     assert "active routes" in changelog
-    assert "This unreleased section is a release-ready reconciliation surface" in changelog
+    assert "This unreleased section is a durable change contour" in changelog
     assert "mechanics topology" in changelog
-    assert "mechanics/ARTIFACT_TOPOLOGY.md" in changelog
+    assert "retired from the active mechanics root" in changelog
     assert "python scripts/validate_mechanics_topology.py" in changelog
+
+
+def test_changelog_unreleased_avoids_live_reconciliation_counters() -> None:
+    changelog = read_text("CHANGELOG.md")
+    unreleased = changelog_unreleased_section(changelog)
+
+    forbidden_live_fragments = [
+        "first-parent commits",
+        "changed tracked paths",
+        "merged PRs #",
+        "through #",
+        "PR #",
+        "Repo Validation for PR",
+    ]
+    for fragment in forbidden_live_fragments:
+        assert fragment not in unreleased
+
+    assert "dated release section" in unreleased
+    assert "git log --first-parent <last-tag>..HEAD" in unreleased
 
 
 def test_readme_routes_sibling_canary_surfaces_without_roster() -> None:
