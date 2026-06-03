@@ -122,6 +122,10 @@ from .runtime.sessions import (
     probe_checkpoint_runtime_session,
     probe_existing_checkpoint_runtime_session,
 )
+from .session_memory import (
+    resolve_checkpoint_session_memory as _resolve_checkpoint_session_memory,
+    session_memory_evidence_from_ref as _session_memory_evidence_from_ref,
+)
 from .timestamps import (
     local_timestamp_parts as _local_timestamp_parts,
 )
@@ -1288,6 +1292,11 @@ class CheckpointsAPI:
         )
         session_trace_ref = cast(str | None, runtime_session_metadata["session_trace_ref"])
         session_trace_thread_id = cast(str | None, runtime_session_metadata["session_trace_thread_id"])
+        session_memory_ref, session_memory_freshness = _resolve_checkpoint_session_memory(
+            workspace=self.workspace,
+            session_trace_thread_id=session_trace_thread_id,
+            session_trace_ref=session_trace_ref,
+        )
 
         notes: list[str] = []
         note_ref: str | None = None
@@ -1368,6 +1377,14 @@ class CheckpointsAPI:
             notes.append("no live Codex rollout trace was available from the active runtime session; closeout will rely on the reviewed artifact plus checkpoint evidence only")
         else:
             notes.append("bound closeout evidence to the live Codex rollout trace referenced by the active runtime session")
+        if session_memory_ref is None:
+            notes.append("no aoa-session-memory archive ref was available for the active Codex thread; closeout will keep using reviewed artifact and checkpoint-local evidence")
+        else:
+            notes.append(
+                "bound closeout evidence to the aoa-session-memory archive as route evidence, not reviewed truth"
+            )
+        for caution in session_memory_freshness.cautions:
+            notes.append(f"session-memory freshness caution: {caution}")
         if not collected_receipt_paths:
             notes.append("no prior receipt refs were supplied; closeout execution will rely on the reviewed artifact and any local checkpoint evidence only")
         if checkpoint_review_carry.review_refs:
@@ -1389,6 +1406,8 @@ class CheckpointsAPI:
             runtime_session_id=runtime_session_id,
             session_trace_ref=session_trace_ref,
             session_trace_thread_id=session_trace_thread_id,
+            session_memory_ref=session_memory_ref,
+            session_memory_freshness=session_memory_freshness,
             checkpoint_note_ref=note_ref,
             checkpoint_note_refs=aggregated_note_refs,
             surface_handoff_ref=handoff_ref,
@@ -1443,12 +1462,15 @@ class CheckpointsAPI:
 
         reviewed_artifact_path_obj = Path(context.reviewed_artifact_ref)
         reviewed_artifact_evidence = _merge_closeout_evidence(
-            primary=_read_reviewed_artifact(reviewed_artifact_path_obj),
-            secondary=(
-                _read_session_trace(Path(context.session_trace_ref).expanduser().resolve())
-                if context.session_trace_ref is not None
-                else None
+            primary=_merge_closeout_evidence(
+                primary=_read_reviewed_artifact(reviewed_artifact_path_obj),
+                secondary=(
+                    _read_session_trace(Path(context.session_trace_ref).expanduser().resolve())
+                    if context.session_trace_ref is not None
+                    else None
+                ),
             ),
+            secondary=_session_memory_evidence_from_ref(context.session_memory_ref),
         )
         notes = _load_context_checkpoint_notes(context)
         handoff = _load_context_surface_handoff(context)
@@ -1545,6 +1567,8 @@ class CheckpointsAPI:
             runtime_session_id=context.runtime_session_id,
             session_trace_ref=context.session_trace_ref,
             session_trace_thread_id=context.session_trace_thread_id,
+            session_memory_ref=context.session_memory_ref,
+            session_memory_freshness=context.session_memory_freshness,
             checkpoint_note_ref=context.checkpoint_note_ref,
             checkpoint_note_refs=list(context.checkpoint_note_refs),
             surface_handoff_ref=context.surface_handoff_ref,

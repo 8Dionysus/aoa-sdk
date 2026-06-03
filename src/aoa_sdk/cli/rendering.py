@@ -524,6 +524,15 @@ def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
     typer.echo(f"runtime_session_id: {context.runtime_session_id or 'none'}")
     typer.echo(f"session_trace_ref: {context.session_trace_ref or 'none'}")
     typer.echo(f"session_trace_thread_id: {context.session_trace_thread_id or 'none'}")
+    if context.session_memory_ref is None:
+        typer.echo(f"session_memory_ref: none [{context.session_memory_freshness.status}]")
+    else:
+        typer.echo(
+            "session_memory_ref: "
+            f"{context.session_memory_ref.session_id} "
+            f"[{context.session_memory_freshness.status}] "
+            f"{context.session_memory_ref.archive_path}"
+        )
     typer.echo(f"checkpoint_note_ref: {context.checkpoint_note_ref or 'none'}")
     typer.echo(
         "checkpoint_note_refs: "
@@ -580,6 +589,15 @@ def _print_closeout_execution_report(report: CheckpointCloseoutExecutionReport) 
     typer.echo(f"runtime_session_id: {report.runtime_session_id or 'none'}")
     typer.echo(f"session_trace_ref: {report.session_trace_ref or 'none'}")
     typer.echo(f"session_trace_thread_id: {report.session_trace_thread_id or 'none'}")
+    if report.session_memory_ref is None:
+        typer.echo(f"session_memory_ref: none [{report.session_memory_freshness.status}]")
+    else:
+        typer.echo(
+            "session_memory_ref: "
+            f"{report.session_memory_ref.session_id} "
+            f"[{report.session_memory_freshness.status}] "
+            f"{report.session_memory_ref.archive_path}"
+        )
     typer.echo(f"checkpoint_note_ref: {report.checkpoint_note_ref or 'none'}")
     typer.echo(
         "checkpoint_note_refs: "
