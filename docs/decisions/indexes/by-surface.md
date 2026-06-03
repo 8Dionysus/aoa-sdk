@@ -66,6 +66,12 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0030 - Checkpoint Local Automation Template Localization](../AOA-SDK-D-0030-checkpoint-local-automation-template-localization.md) | 2026-06-01 | mechanics topology, checkpoint, managed hooks, closeout runner | checkpoint | mechanics topology, active naming, root-surface hygiene | accepted |
 | [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) | 2026-06-01 | mechanics topology, release support, compatibility, public support | release-support | root-surface hygiene, compatibility drift, active naming | accepted |
 
+## boundary-bridge
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0054 - Surface Registry Route-Role Branches](../AOA-SDK-D-0054-surface-registry-route-role-branches.md) | 2026-06-03 | importable implementation, surface detection, owner-layer handoff | boundary-bridge, checkpoint | source topology, owner-layer signal handoff, checkpoint session-growth | accepted |
+
 ## checkpoint
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
@@ -164,6 +170,7 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
 | [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, closeout bridge | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
+| [AOA-SDK-D-0054 - Surface Registry Route-Role Branches](../AOA-SDK-D-0054-surface-registry-route-role-branches.md) | 2026-06-03 | importable implementation, surface detection, owner-layer handoff | boundary-bridge, checkpoint | source topology, owner-layer signal handoff, checkpoint session-growth | accepted |
 
 ## local automation
 
@@ -336,6 +343,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | importable implementation, generated read model, source topology | checkpoint, runtime-seam | source topology, generated freshness, agent routing | accepted |
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
 | [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, closeout bridge | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
+| [AOA-SDK-D-0054 - Surface Registry Route-Role Branches](../AOA-SDK-D-0054-surface-registry-route-role-branches.md) | 2026-06-03 | importable implementation, surface detection, owner-layer handoff | boundary-bridge, checkpoint | source topology, owner-layer signal handoff, checkpoint session-growth | accepted |
 
 ## stress evidence
 
@@ -424,6 +432,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | importable implementation, generated read model, source topology | checkpoint, runtime-seam | source topology, generated freshness, agent routing | accepted |
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
 | [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, closeout bridge | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
+| [AOA-SDK-D-0054 - Surface Registry Route-Role Branches](../AOA-SDK-D-0054-surface-registry-route-role-branches.md) | 2026-06-03 | importable implementation, surface detection, owner-layer handoff | boundary-bridge, checkpoint | source topology, owner-layer signal handoff, checkpoint session-growth | accepted |
 
 ## validation guard
 

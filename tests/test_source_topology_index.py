@@ -87,6 +87,29 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
     assert "runtime note loading" in modules["src/aoa_sdk/checkpoints/ledger/notes.py"]["role"]
 
 
+def test_source_topology_index_names_surface_route_role_branches() -> None:
+    payload = source_topology.build_payload()
+    packages = {package["path"]: package for package in _walk_packages(payload["tree"])}
+    modules = {module["path"]: module for module in _walk_modules(payload["tree"])}
+
+    assert "owner-layer signal handoff" in packages["src/aoa_sdk/surfaces"]["role"]
+    assert "named surface branch" in packages["src/aoa_sdk/surfaces"]["next_route"]
+    assert modules["src/aoa_sdk/surfaces/registry.py"]["split_pressure"] == "low"
+    assert "public API facade" in modules["src/aoa_sdk/surfaces/registry.py"]["role"]
+    assert "named surface branch" in modules["src/aoa_sdk/surfaces/registry.py"]["next_route"]
+    surface_module_roles = {
+        "src/aoa_sdk/surfaces/items.py": "opportunity item derivation",
+        "src/aoa_sdk/surfaces/context.py": "receipt context owner",
+        "src/aoa_sdk/surfaces/checkpoint_candidates.py": "checkpoint candidate cluster",
+        "src/aoa_sdk/surfaces/progression.py": "progression-axis signal owner",
+        "src/aoa_sdk/surfaces/closeout_handoff.py": "reviewed closeout handoff assembly",
+        "src/aoa_sdk/surfaces/common.py": "small pure helper owner",
+        "src/aoa_sdk/surfaces/heuristics.py": "heuristic rule owner",
+    }
+    for path, role_fragment in surface_module_roles.items():
+        assert role_fragment in modules[path]["role"]
+
+
 def test_source_topology_index_keeps_large_modules_as_split_pressure() -> None:
     payload = source_topology.build_payload()
     largest_paths = {entry["path"]: entry for entry in payload["largest_modules"]}

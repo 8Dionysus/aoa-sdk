@@ -47,6 +47,11 @@ Tracking starts with the community-docs baseline for this repository.
   artifact execution, and owner handoff. `closeout/bridge.py` is a thin
   compatibility facade, and checkpoint closeout remains below durable memory,
   proof, progression, quest, and owner-approval truth.
+- Surface detection now has route-role implementation branches for opportunity
+  item derivation, context and receipt enrichment, checkpoint candidate
+  clusters, progression-axis signals, and reviewed closeout handoff assembly.
+  `surfaces/registry.py` remains the public `SurfacesAPI` facade and
+  owner-layer signal hints stay advisory.
 - Agon helper payloads and the Experience capture helper seam now live
   in active part-local homes with role, input, output, owner, next-route, and
   validation cards instead of root technical districts.

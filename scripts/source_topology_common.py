@@ -23,6 +23,7 @@ SOURCE_INPUT_REFS = (
     "docs/decisions/AOA-SDK-D-0051-implementation-source-topology-index.md",
     "docs/decisions/AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md",
     "docs/decisions/AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md",
+    "docs/decisions/AOA-SDK-D-0054-surface-registry-route-role-branches.md",
 )
 VALIDATION_REFS = (
     "scripts/build_source_topology_index.py",
@@ -51,7 +52,7 @@ TOP_LEVEL_ROLES = {
     "rpg": "RPG typed consumer API helpers",
     "skills": "skill discovery and runtime-session helpers",
     "stats": "stats-surface readers",
-    "surfaces": "surface discovery and manifest helpers",
+    "surfaces": "owner-layer signal detection and reviewed surface handoff helpers",
     "techniques": "technique-surface readers",
     "titans": "Titan-facing helper surface",
     "workspace": "workspace discovery and root resolution helpers",
@@ -68,6 +69,7 @@ PACKAGE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/review": "checkpoint after-commit and agent-review branch",
     "src/aoa_sdk/checkpoints/runtime": "checkpoint runtime-session lookup branch",
     "src/aoa_sdk/checkpoints/topology": "checkpoint topology branch for path naming and static routing helpers",
+    "src/aoa_sdk/surfaces": "surface detection owner-layer signal handoff route-role branches",
 }
 
 MODULE_ROLE_OVERRIDES = {
@@ -95,6 +97,14 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/timestamps.py": "checkpoint timestamp normalization helper owner",
     "src/aoa_sdk/checkpoints/topology/paths.py": "checkpoint filesystem path topology owner",
     "src/aoa_sdk/cli/main.py": "CLI command assembly surface",
+    "src/aoa_sdk/surfaces/checkpoint_candidates.py": "surface checkpoint candidate cluster, lineage, promotion, and note-ref owner",
+    "src/aoa_sdk/surfaces/closeout_handoff.py": "surface reviewed closeout handoff assembly owner",
+    "src/aoa_sdk/surfaces/common.py": "surface shared type aliases and small pure helper owner",
+    "src/aoa_sdk/surfaces/context.py": "surface session, shortlist, stats, and receipt context owner",
+    "src/aoa_sdk/surfaces/heuristics.py": "surface deterministic heuristic rule owner",
+    "src/aoa_sdk/surfaces/items.py": "surface opportunity item derivation and merge owner",
+    "src/aoa_sdk/surfaces/progression.py": "surface progression-axis signal owner",
+    "src/aoa_sdk/surfaces/registry.py": "surface public API facade and owner-layer signal orchestrator",
 }
 
 
@@ -210,6 +220,8 @@ def _module_next_route(path: Path, line_count: int) -> str:
         return "keep public CheckpointsAPI orchestration here; add behavior in the named checkpoint branch that owns it"
     if rel == "src/aoa_sdk/checkpoints/closeout/bridge.py":
         return "keep this facade thin; add behavior in the owning closeout context, evidence, execution, followthrough, or owner-handoff branch"
+    if rel == "src/aoa_sdk/surfaces/registry.py":
+        return "keep public SurfacesAPI orchestration here; add behavior in the named surface branch that owns it"
     if rel == "src/aoa_sdk/checkpoints/topology/paths.py":
         return "keep static checkpoint path naming here; route behavior back to checkpoint registry or a route-role branch"
     if line_count >= 1000:
@@ -241,6 +253,9 @@ def _package_payload(path: Path) -> dict[str, Any]:
 
 
 def _package_next_route(path: Path, line_count: int, module_count: int) -> str:
+    rel = _rel(path)
+    if rel == "src/aoa_sdk/surfaces":
+        return "route behavior to the named surface branch that owns it; add a new branch only when a new owner role appears"
     if path.name == "topology":
         return "keep topology branches static and behavior-free unless a new route role is named"
     if line_count >= 2000 or module_count >= 10:
