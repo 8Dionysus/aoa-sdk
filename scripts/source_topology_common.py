@@ -24,6 +24,12 @@ SOURCE_INPUT_REFS = (
     "docs/decisions/AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md",
     "docs/decisions/AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md",
     "docs/decisions/AOA-SDK-D-0054-surface-registry-route-role-branches.md",
+    "docs/decisions/AOA-SDK-D-0055-checkpoint-skipped-session-recovery-branch.md",
+    "docs/decisions/AOA-SDK-D-0056-cli-command-family-route-modules.md",
+    "docs/decisions/AOA-SDK-D-0057-closeout-api-route-role-branches.md",
+    "docs/decisions/AOA-SDK-D-0058-recurrence-route-role-branches.md",
+    "docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md",
+    "docs/decisions/AOA-SDK-D-0060-low-pressure-route-stop-lines.md",
 )
 VALIDATION_REFS = (
     "scripts/build_source_topology_index.py",
@@ -36,17 +42,18 @@ TOP_LEVEL_ROLES = {
     "a2a": "child-task handoff and rebase control-plane helpers",
     "agents": "agent projection and role-surface readers",
     "checkpoints": "checkpoint capture, review, closeout, and handoff control-plane behavior",
-    "cli": "Typer CLI command surface",
-    "closeout": "reviewed closeout helper API",
+    "cli": "Typer CLI app assembly, command-family modules, shared CLI rendering, and CLI plumbing",
+    "closeout": "reviewed closeout runner facade and route-role branches",
     "codex": "Codex workspace and rollout-facing helpers",
     "compatibility": "consumed-surface compatibility checks",
+    "contracts": "shared SDK typed contract route-role branches",
     "evals": "eval-surface readers and bounded helper posture",
     "governed_runs": "governed run metadata and helper surface",
     "kag": "KAG bridge reader helpers",
     "loaders": "shared JSON and file loading utilities",
     "memo": "memo-surface readers and bounded memory helper posture",
     "playbooks": "playbook-surface readers",
-    "recurrence": "recurrence planning, observation, and reentry control-plane helpers",
+    "recurrence": "recurrence planning, observation, CLI, typed contracts, projection, and reentry control-plane helpers",
     "release": "release audit and publish helper surface",
     "routing": "routing-surface readers and picker helpers",
     "rpg": "RPG typed consumer API helpers",
@@ -66,16 +73,21 @@ PACKAGE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/ledger": "checkpoint note ledger assembly and runtime note loading branch",
     "src/aoa_sdk/checkpoints/promotion": "checkpoint reviewed promotion target writer branch",
     "src/aoa_sdk/checkpoints/render": "checkpoint note presentation render branch",
-    "src/aoa_sdk/checkpoints/review": "checkpoint after-commit and agent-review branch",
+    "src/aoa_sdk/checkpoints/review": "checkpoint after-commit, agent-review, and skipped-session recovery branch",
     "src/aoa_sdk/checkpoints/runtime": "checkpoint runtime-session lookup branch",
     "src/aoa_sdk/checkpoints/topology": "checkpoint topology branch for path naming and static routing helpers",
+    "src/aoa_sdk/cli": "CLI app assembly and command-family route modules",
+    "src/aoa_sdk/closeout": "reviewed closeout runner facade and route-role branches for manifest, queue, publisher, followthrough, receipt, and filesystem behavior",
+    "src/aoa_sdk/contracts": "shared SDK typed contract route-role branches with models.py compatibility re-export",
+    "src/aoa_sdk/recurrence/contracts": "recurrence typed contract route-role branches",
+    "src/aoa_sdk/recurrence/live": "recurrence live observation producer route-role branches",
     "src/aoa_sdk/surfaces": "surface detection owner-layer signal handoff route-role branches",
 }
 
 MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/__init__.py": "public import package marker",
     "src/aoa_sdk/api.py": "AoASDK aggregate API constructor and facet attachment point",
-    "src/aoa_sdk/models.py": "shared typed SDK model contracts",
+    "src/aoa_sdk/models.py": "shared typed SDK model compatibility re-export surface",
     "src/aoa_sdk/checkpoints/closeout/bridge.py": "checkpoint closeout compatibility facade over pipeline branches",
     "src/aoa_sdk/checkpoints/closeout/common.py": "checkpoint closeout shared small helper owner",
     "src/aoa_sdk/checkpoints/closeout/context.py": "checkpoint closeout context scope, handoff, receipt, and candidate-map owner",
@@ -93,10 +105,68 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/render/markdown.py": "checkpoint note markdown render owner",
     "src/aoa_sdk/checkpoints/review/after_commit.py": "checkpoint after-commit report and auto-observation owner",
     "src/aoa_sdk/checkpoints/review/agent_review.py": "checkpoint agent-review autofill and review-carry owner",
+    "src/aoa_sdk/checkpoints/review/skipped_recovery.py": "checkpoint skipped-session recovery, reachability, and blocking required-action owner",
     "src/aoa_sdk/checkpoints/runtime/sessions.py": "checkpoint runtime-session lookup and probe owner",
     "src/aoa_sdk/checkpoints/timestamps.py": "checkpoint timestamp normalization helper owner",
     "src/aoa_sdk/checkpoints/topology/paths.py": "checkpoint filesystem path topology owner",
-    "src/aoa_sdk/cli/main.py": "CLI command assembly surface",
+    "src/aoa_sdk/cli/checkpoint.py": "CLI checkpoint capture, review, hook, boundary, promotion, and checkpoint-closeout command family owner",
+    "src/aoa_sdk/cli/closeout.py": "CLI reviewed closeout run, manifest, queue, inbox, and status command family owner",
+    "src/aoa_sdk/cli/common.py": "CLI shared path resolution, persistence, host-skill, and checkpoint hook argument owner",
+    "src/aoa_sdk/cli/compatibility.py": "CLI consumed-surface compatibility check command family owner",
+    "src/aoa_sdk/cli/main.py": "CLI root Typer app assembly and legacy test re-export surface",
+    "src/aoa_sdk/cli/release.py": "CLI release audit and publish command family owner",
+    "src/aoa_sdk/cli/rendering.py": "CLI human-readable report rendering owner",
+    "src/aoa_sdk/cli/skills.py": "CLI skill detect, dispatch, enter, and guard command family owner",
+    "src/aoa_sdk/cli/surfaces.py": "CLI surface detect and reviewed handoff command family owner",
+    "src/aoa_sdk/cli/workspace.py": "CLI workspace inspect and bootstrap command family owner",
+    "src/aoa_sdk/closeout/api.py": "CloseoutAPI public facade and route-role method binding surface",
+    "src/aoa_sdk/closeout/filesystem.py": "closeout queue path, safe filename, archival, and uniqueness helper owner",
+    "src/aoa_sdk/closeout/followthrough.py": "closeout kernel next-step, owner follow-through, workflow follow-through, and owner handoff owner",
+    "src/aoa_sdk/closeout/manifests.py": "closeout build-request loading, submit-reviewed request writing, validation, and manifest assembly owner",
+    "src/aoa_sdk/closeout/publishers.py": "closeout publisher specs, receipt-kind routing, subprocess execution, stats refresh, and stdout parsing owner",
+    "src/aoa_sdk/closeout/queue.py": "closeout enqueue, inbox processing, queue status, and manifest archival orchestration owner",
+    "src/aoa_sdk/closeout/receipts.py": "closeout receipt collection, receipt-file loading, publisher detection, and evidence-ref resolution owner",
+    "src/aoa_sdk/closeout/runner.py": "closeout reviewed manifest run and report emission owner",
+    "src/aoa_sdk/contracts/agents.py": "shared agent phase binding and artifact envelope contract owner",
+    "src/aoa_sdk/contracts/checkpoints.py": "shared checkpoint lineage, note, capture, review, hook, boundary, and checkpoint-closeout bridge contract owner",
+    "src/aoa_sdk/contracts/closeout.py": "shared reviewed closeout runner, publisher, stats refresh, owner follow-through, inbox, and status contract owner",
+    "src/aoa_sdk/contracts/codex.py": "shared Codex projection live rollout status contract owner",
+    "src/aoa_sdk/contracts/evals.py": "shared eval card, capsule, section, comparison, and runtime candidate intake contract owner",
+    "src/aoa_sdk/contracts/governed_runs.py": "shared governed run review packet, audit, and handoff contract owner",
+    "src/aoa_sdk/contracts/kag.py": "shared KAG registry, federation, tiny bundle, regrounding, inspect, and query-mode contract owner",
+    "src/aoa_sdk/contracts/memo.py": "shared memo surface, capsule, section, object, and writeback contract owner",
+    "src/aoa_sdk/contracts/playbooks.py": "shared playbook registry, activation, composition, review, and landing-governance contract owner",
+    "src/aoa_sdk/contracts/project_core.py": "shared project-core kernel, outer ring, risk ring, and foundation profile contract owner",
+    "src/aoa_sdk/contracts/routing.py": "shared routing hint, registry entry, stats regrounding hint, and surface compatibility contract owner",
+    "src/aoa_sdk/contracts/skills.py": "shared skill card, disclosure, activation, session, dispatch, and detection contract owner",
+    "src/aoa_sdk/contracts/stats.py": "shared stats summary, source coverage, route progression, automation pipeline, and regrounding signal contract owner",
+    "src/aoa_sdk/contracts/surfaces.py": "shared surface opportunity, surface detection, and surface closeout handoff contract owner",
+    "src/aoa_sdk/contracts/techniques.py": "shared technique promotion readiness contract owner",
+    "src/aoa_sdk/contracts/workspace.py": "shared workspace bootstrap report contract owner",
+    "src/aoa_sdk/recurrence/cli.py": "recurrence CLI exported app assembly facade",
+    "src/aoa_sdk/recurrence/cli_core.py": "recurrence root command family owner",
+    "src/aoa_sdk/recurrence/cli_graph.py": "recurrence graph CLI command family owner",
+    "src/aoa_sdk/recurrence/cli_hooks.py": "recurrence hooks CLI command family owner",
+    "src/aoa_sdk/recurrence/cli_live.py": "recurrence live producers CLI command family owner",
+    "src/aoa_sdk/recurrence/cli_project.py": "recurrence downstream projection CLI command family owner",
+    "src/aoa_sdk/recurrence/cli_review.py": "recurrence owner review CLI command family owner",
+    "src/aoa_sdk/recurrence/contracts/base.py": "recurrence base literal aliases and strict model owner",
+    "src/aoa_sdk/recurrence/contracts/beacons.py": "recurrence beacon, candidate ledger, and usage-gap contract owner",
+    "src/aoa_sdk/recurrence/contracts/manifest.py": "recurrence manifest, component, edge, freshness, input, and beacon-rule contract owner",
+    "src/aoa_sdk/recurrence/contracts/observations.py": "recurrence observation and hook-run contract owner",
+    "src/aoa_sdk/recurrence/contracts/propagation.py": "recurrence change signal, propagation plan, return handoff, and connectivity-gap contract owner",
+    "src/aoa_sdk/recurrence/contracts/projections.py": "recurrence downstream routing, stats, KAG, projection guard, and bundle contract owner",
+    "src/aoa_sdk/recurrence/contracts/review.py": "recurrence review queue, dossier, owner decision, ledger, suppression, and close-report contract owner",
+    "src/aoa_sdk/recurrence/contracts/rollout.py": "recurrence wiring plan and rollout window contract owner",
+    "src/aoa_sdk/recurrence/live/common.py": "recurrence live observation shared helper owner",
+    "src/aoa_sdk/recurrence/live/events.py": "recurrence event repetition live observation producer owner",
+    "src/aoa_sdk/recurrence/live/generated.py": "recurrence generated staleness live observation producer owner",
+    "src/aoa_sdk/recurrence/live/playbooks.py": "recurrence playbook harvest live observation producer owner",
+    "src/aoa_sdk/recurrence/live/runtime.py": "recurrence runtime evidence selection live observation producer owner",
+    "src/aoa_sdk/recurrence/live/skills.py": "recurrence skill trigger and usage-gap live observation producer owner",
+    "src/aoa_sdk/recurrence/live/techniques.py": "recurrence technique intake and readiness live observation producer owner",
+    "src/aoa_sdk/recurrence/live_observations.py": "recurrence live observation producer registry facade",
+    "src/aoa_sdk/recurrence/models.py": "recurrence typed contract compatibility re-export surface",
     "src/aoa_sdk/surfaces/checkpoint_candidates.py": "surface checkpoint candidate cluster, lineage, promotion, and note-ref owner",
     "src/aoa_sdk/surfaces/closeout_handoff.py": "surface reviewed closeout handoff assembly owner",
     "src/aoa_sdk/surfaces/common.py": "surface shared type aliases and small pure helper owner",
@@ -222,6 +292,32 @@ def _module_next_route(path: Path, line_count: int) -> str:
         return "keep this facade thin; add behavior in the owning closeout context, evidence, execution, followthrough, or owner-handoff branch"
     if rel == "src/aoa_sdk/surfaces/registry.py":
         return "keep public SurfacesAPI orchestration here; add behavior in the named surface branch that owns it"
+    if rel == "src/aoa_sdk/cli/main.py":
+        return "keep root app assembly here; add command behavior in the owning CLI command-family module"
+    if rel == "src/aoa_sdk/cli/common.py":
+        return "keep shared CLI plumbing here; route command behavior to a command-family module and domain behavior to SDK owners"
+    if rel == "src/aoa_sdk/cli/rendering.py":
+        return "keep human-readable output formatting here; route command behavior to a command-family module"
+    if rel == "src/aoa_sdk/closeout/api.py":
+        return "keep CloseoutAPI facade bindings here; add behavior in the owning closeout route branch"
+    if rel == "src/aoa_sdk/recurrence/cli.py":
+        return "keep exported recur_app assembly here; add command behavior in the owning recurrence cli_* module"
+    if rel == "src/aoa_sdk/recurrence/live_observations.py":
+        return "keep live producer registry facade here; add producer behavior in recurrence/live branches"
+    if rel == "src/aoa_sdk/recurrence/models.py":
+        return "keep compatibility re-exports here; add typed contracts in recurrence/contracts branches"
+    if rel == "src/aoa_sdk/models.py":
+        return "keep compatibility re-exports here; add shared typed contracts in aoa_sdk/contracts branches"
+    if rel == "src/aoa_sdk/checkpoints/ledger/notes.py":
+        return "keep checkpoint ledger assembly here; split only when a new ledger owner route is named"
+    if rel == "src/aoa_sdk/release/api.py":
+        return "keep bounded release audit/publish helpers here; split only when a release-support route owner diverges"
+    if rel == "src/aoa_sdk/skills/detector.py":
+        return "keep skill detection and checkpoint bridge detection here; split only when a new skill-detection owner route appears"
+    if rel == "src/aoa_sdk/compatibility/policy.py":
+        return "keep consumed-surface compatibility policy here; split only when a new compatibility owner route appears"
+    if rel == "src/aoa_sdk/recurrence/hooks.py":
+        return "keep recurrence hook binding and run behavior here; split only when hook owner routes diverge"
     if rel == "src/aoa_sdk/checkpoints/topology/paths.py":
         return "keep static checkpoint path naming here; route behavior back to checkpoint registry or a route-role branch"
     if line_count >= 1000:
@@ -254,6 +350,16 @@ def _package_payload(path: Path) -> dict[str, Any]:
 
 def _package_next_route(path: Path, line_count: int, module_count: int) -> str:
     rel = _rel(path)
+    if rel == "src/aoa_sdk/cli":
+        return "route CLI behavior to command-family modules; keep main.py as root app assembly only"
+    if rel == "src/aoa_sdk/closeout":
+        return "route closeout behavior to manifest, queue, runner, publisher, followthrough, receipt, or filesystem branches"
+    if rel == "src/aoa_sdk/contracts":
+        return "route shared typed contracts to the contract branch that owns the SDK family"
+    if rel == "src/aoa_sdk/recurrence/contracts":
+        return "route typed recurrence contracts to the contract branch that owns the packet family"
+    if rel == "src/aoa_sdk/recurrence/live":
+        return "route live observation behavior to the producer branch that owns the source family"
     if rel == "src/aoa_sdk/surfaces":
         return "route behavior to the named surface branch that owns it; add a new branch only when a new owner role appears"
     if path.name == "topology":
