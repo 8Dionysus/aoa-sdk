@@ -25,7 +25,7 @@ follow the linked owner surface instead of expanding this page.
 | Checked SDK source-home posture | [sdk](sdk/README.md), [source home manifest](sdk/source_home.manifest.json) |
 | Importable implementation | [src/aoa_sdk](src/aoa_sdk/AGENTS.md) |
 | Repeatable SDK mechanics | [mechanics](mechanics/README.md), [mechanics roadmap](mechanics/ROADMAP.md), [mechanics topology](mechanics/topology.json) |
-| Workspace discovery and control-plane capsule | [workspace layout](docs/workspace-layout.md), [.aoa workspace](.aoa/workspace.toml), [generated capsule](generated/workspace_control_plane.min.json) |
+| Workspace discovery, source topology, and control-plane capsule | [workspace layout](docs/workspace-layout.md), [.aoa workspace](.aoa/workspace.toml), [generated source topology](generated/source_topology.min.json), [generated capsule](generated/workspace_control_plane.min.json) |
 | Compatibility, release, and public support posture | [versioning](docs/versioning.md), [releasing](docs/RELEASING.md), [release and CI posture](docs/RELEASE_CI_POSTURE.md), [release support mechanic](mechanics/release-support/README.md) |
 | Durable rationale | [decision records](docs/decisions/README.md) |
 | Current direction and durable obligations | [ROADMAP](ROADMAP.md), [QUESTBOOK](QUESTBOOK.md), [quests](quests/README.md) |
@@ -80,6 +80,8 @@ The current landed surface includes:
 - typed compatibility and workspace inspection helpers;
 - the compact control-plane capsule at
   [generated/workspace_control_plane.min.json](generated/workspace_control_plane.min.json);
+- the generated implementation tree index at
+  [generated/source_topology.min.json](generated/source_topology.min.json);
 - bounded skill, surface-detection, checkpoint, closeout, Codex projection,
   release, and public support helpers.
 

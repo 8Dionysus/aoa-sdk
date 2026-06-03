@@ -47,6 +47,7 @@ ROOT_TECHNICAL_DISTRICT_FILES = {
     "generated": frozenset(
         {
             "generated/AGENTS.md",
+            "generated/source_topology.min.json",
             "generated/workspace_control_plane.min.json",
         }
     ),
@@ -59,12 +60,15 @@ ROOT_TECHNICAL_DISTRICT_FILES = {
     "scripts": frozenset(
         {
             "scripts/AGENTS.md",
+            "scripts/build_source_topology_index.py",
             "scripts/build_workspace_control_plane.py",
             "scripts/generate_decision_indexes.py",
             "scripts/release_check.py",
+            "scripts/source_topology_common.py",
             "scripts/validate_mechanics_topology.py",
             "scripts/validate_nested_agents.py",
             "scripts/validate_sdk_source_home.py",
+            "scripts/validate_source_topology_index.py",
             "scripts/validate_workspace_control_plane.py",
             "scripts/workspace_control_plane_common.py",
         }
@@ -79,6 +83,7 @@ ROOT_TECHNICAL_DISTRICT_FILES = {
             "tests/test_mechanics_topology.py",
             "tests/test_sdk_source_home.py",
             "tests/test_smoke.py",
+            "tests/test_source_topology_index.py",
             "tests/test_validate_nested_agents.py",
         }
     ),
@@ -386,7 +391,6 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
                 "## Next Work",
                 "## When Time Comes",
                 "## Out Of Scope",
-                "## Update Trigger",
             ):
                 if snippet not in roadmap:
                     issues.append(f"mechanics/{slug}/ROADMAP.md: missing {snippet!r}")

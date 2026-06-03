@@ -94,6 +94,8 @@ def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
     assert "python scripts/generate_decision_indexes.py --check" in agents
     assert "python scripts/validate_sdk_source_home.py" in agents
     assert "python scripts/validate_mechanics_topology.py" in agents
+    assert "python scripts/build_source_topology_index.py --check" in agents
+    assert "python scripts/validate_source_topology_index.py" in agents
     assert "python scripts/build_workspace_control_plane.py --check" in agents
     assert "python scripts/validate_workspace_control_plane.py" in agents
     assert "aoa compatibility check /srv/AbyssOS/aoa-sdk" in agents

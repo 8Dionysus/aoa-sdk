@@ -1,37 +1,40 @@
 # Antifragility Roadmap
 
-This roadmap owns future pressure for the SDK Antifragility mechanic.
+Antifragility is the SDK control-plane route for making stress, pruning, and
+repair pressure reviewable without turning SDK helpers into cleanup authority
+or proof verdicts.
 
 ## Current Contour
 
-Antifragility owns stress-posture dispatch gates, reviewed stress closeout
-carry, and via negativa pruning helpers. These surfaces keep failure pressure
-reviewable and owner-routed.
+- Keep stress-posture dispatch, reviewed stress closeout carry, and via
+  negativa pruning routed through active `parts/`.
+- Keep dispatch decisions advisory until the stronger owner accepts the
+  remediation or follow-through route.
+- Keep reviewed stress carry as evidence for return and handoff, not as proof
+  that a fix landed.
+- Keep pruning helpers bounded to explicit stop lines, owner routes, and
+  validation surfaces.
 
 ## Next Work
 
-- Keep stress dispatch requests and decisions advisory until the stronger owner
-  accepts remediation.
-- Keep reviewed stress carry as evidence for followthrough, not as proof that a
-  fix landed.
-- Add machine checks only after repeated stress work proves a stable field or
-  stop-line contract.
+- Tighten stress packet fields only where repeated runs prove a stable contract.
+- Keep generated summaries derived from local stress source records and tests.
+- Route cleanup, repair proof, playbook choreography, memory, and stats claims
+  back to the owners that can accept them.
 
 ## When Time Comes
 
-- Add a new part when a recurring stress route cannot be represented by
-  dispatch, carry, or via negativa without blurring the operation.
-- Add generated summaries only when they remain derived from the local stress
-  source records and tests.
+- Add a new part when a recurring stress route no longer fits dispatch, carry,
+  or via negativa without blurring the operation.
+- Add stronger machine checks when stress patterns begin to drive CI or release
+  decisions.
+- Add generated posture views only after they stay visibly weaker than source
+  records, owner receipts, and proof routes.
 
 ## Out Of Scope
 
-- proof verdicts;
-- cleanup approval;
-- automatic remediation;
-- hidden degraded-mode behavior.
-
-## Update Trigger
-
-Update this roadmap when stress posture, carry semantics, pruning route, or
-future antifragility depth changes.
+- Proof verdicts.
+- Cleanup approval.
+- Automatic remediation.
+- Hidden degraded-mode behavior.
+- Runtime self-healing without runtime-owner gates.

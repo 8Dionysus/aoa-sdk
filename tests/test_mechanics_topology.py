@@ -55,7 +55,9 @@ def test_mechanics_roadmaps_are_required_route_surfaces() -> None:
         assert f"[`{slug}`]({slug}/ROADMAP.md)" in root_roadmap
         package_roadmap = (REPO_ROOT / "mechanics" / slug / "ROADMAP.md").read_text(encoding="utf-8")
         assert "## Current Contour" in package_roadmap
-        assert "## Update Trigger" in package_roadmap
+        assert "## When Time Comes" in package_roadmap
+        assert "## Out Of Scope" in package_roadmap
+        assert "## Update Trigger" not in package_roadmap
 
 
 def test_former_parent_names_are_legacy_indexed_not_active_topology() -> None:

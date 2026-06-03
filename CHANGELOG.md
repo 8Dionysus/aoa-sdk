@@ -28,7 +28,20 @@ Tracking starts with the community-docs baseline for this repository.
 - Mechanics future pressure now has its own roadmap layer:
   `mechanics/ROADMAP.md` routes mechanics-wide pressure, each active package
   has a package `ROADMAP.md`, and the mechanics topology validator requires
-  those surfaces.
+  those surfaces. Package roadmaps now follow the center mechanic form:
+  current contour, next work, condition-based future movement, and stop lines
+  instead of repeated update-trigger tails.
+- Checkpoint implementation topology now has its first tree-shaped cut:
+  checkpoint filesystem path naming lives in
+  `src/aoa_sdk/checkpoints/topology/paths.py`, while `registry.py` remains the
+  behavioral `CheckpointsAPI` facade.
+- `src/aoa_sdk` now has a generated source-topology index at
+  `generated/source_topology.min.json` so agents can inspect implementation
+  route keys, split pressure, and next-route hints before loading large modules.
+- Checkpoint implementation helpers now live in route-role branches for
+  runtime sessions, hook/git boundaries, reviewed promotion targets, rendering,
+  after-commit review, agent-review carry, note ledger assembly, and reviewed
+  closeout bridge support. `CheckpointsAPI` remains the public facade.
 - Agon helper payloads and the Experience capture helper seam now live
   in active part-local homes with role, input, output, owner, next-route, and
   validation cards instead of root technical districts.

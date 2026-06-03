@@ -1,12 +1,15 @@
 # AGENTS.md
 
 Local guidance for `generated/` in `aoa-sdk`. Read the root `AGENTS.md` first.
-This directory carries generated control-plane summaries.
+This directory carries generated control-plane summaries and source topology
+read models.
 Generated artifacts are lower authority than their sources.
 
 ## Scope
 
-Generated files such as `workspace_control_plane.min.json` and helper registries make the SDK's consumed surfaces quick to inspect.
+Generated files such as `workspace_control_plane.min.json`,
+`source_topology.min.json`, and helper registries make the SDK's consumed
+surfaces and implementation tree quick to inspect.
 They do not own skill, eval, memo, playbook, routing, role, or runtime meaning.
 
 ## Local contract
@@ -23,5 +26,7 @@ Common gates:
 ```bash
 python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
+python scripts/build_source_topology_index.py --check
+python scripts/validate_source_topology_index.py
 python -m pytest -q
 ```
