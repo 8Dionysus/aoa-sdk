@@ -855,6 +855,61 @@ def test_checkpoint_after_commit_cli_reports_skip_without_active_session(workspa
     assert payload["changed_paths"] == ["README.md"]
 
 
+def test_checkpoint_git_boundary_cli_blocks_unresolved_skipped_thread_checkpoint(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    runner = CliRunner()
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    _git_commit(repo_root, subject="plan verify a bounded change")
+    commit_sha = subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-cli-unresolved-skip")
+
+    skipped = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "after-commit",
+            str(repo_root),
+            "--commit-ref",
+            "HEAD",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert skipped.exit_code == 0
+    assert json.loads(skipped.stdout)["status"] == "skipped_no_active_session"
+
+    boundary = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "git-boundary-check",
+            str(repo_root),
+            "--boundary",
+            "push",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    payload = json.loads(boundary.stdout)
+    assert boundary.exit_code == 1
+    assert payload["status"] == "blocked_unresolved_checkpoint"
+    assert payload["pending_refs"] == [commit_sha]
+    assert "aoa checkpoint review-note" in payload["required_action"]
+    assert "--session-file" in payload["required_action"]
+
+
 def test_checkpoint_after_commit_cli_accepts_owner_followthrough_kind(workspace_root: Path) -> None:
     runner = CliRunner()
     repo_root = workspace_root / "aoa-sdk"

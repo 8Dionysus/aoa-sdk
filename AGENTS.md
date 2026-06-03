@@ -116,7 +116,7 @@ aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json
 aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
 ```
 
-`aoa skills ...` remains skill-only. checkpoint notes stay lower-authority than harvest verdicts; `skipped_no_active_session` and `agent_review=pending` are session-local signals, not final review. A checkpoint note is a session-local ledger for harvest, progression, and quest hints through `checkpoint_capture.session_end_skill_targets`, `checkpoint_capture.progression_axis_signals`, and `checkpoint_capture.session_end_next_honest_move`. Keep `aoa-session-progression-lift` and `aoa-checkpoint-closeout-bridge` as reviewed-closeout helpers, remember that `manual-equivalent` never becomes `activated`, and routing shortlist hints stay advisory only.
+`aoa skills ...` remains skill-only. checkpoint notes stay lower-authority than harvest verdicts; `skipped_no_active_session` and `agent_review=pending` are session-local signals, not final review. A reviewable `skipped_no_active_session` tied to the current Codex thread must be recovered with `aoa checkpoint review-note --auto`, not treated as a clean boundary. A checkpoint note is a session-local ledger for harvest, progression, and quest hints through `checkpoint_capture.session_end_skill_targets`, `checkpoint_capture.progression_axis_signals`, and `checkpoint_capture.session_end_next_honest_move`. Keep `aoa-session-progression-lift` and `aoa-checkpoint-closeout-bridge` as reviewed-closeout helpers, remember that `manual-equivalent` never becomes `activated`, and routing shortlist hints stay advisory only.
 
 ## GitHub landing workflow
 

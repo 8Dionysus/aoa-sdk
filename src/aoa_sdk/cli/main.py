@@ -544,6 +544,22 @@ def _print_checkpoint_git_boundary(report: CheckpointGitBoundaryCheck) -> None:
         if report.required_action is not None:
             typer.echo(report.required_action, err=True)
         return
+    if report.status == "blocked_unresolved_checkpoint":
+        pending_preview = ", ".join(report.pending_refs[:5]) or "none"
+        report_suffix = (
+            f" report={report.post_commit_status_ref}"
+            if report.post_commit_status_ref is not None
+            else ""
+        )
+        typer.echo(
+            "checkpoint_git_boundary: "
+            f"blocked_unresolved_checkpoint boundary={report.boundary} "
+            f"repo={report.repo_label} pending={pending_preview}{report_suffix}",
+            err=True,
+        )
+        if report.required_action is not None:
+            typer.echo(report.required_action, err=True)
+        return
     typer.echo(
         "checkpoint_git_boundary: "
         f"{report.status} boundary={report.boundary} repo={report.repo_label} "
@@ -1827,7 +1843,7 @@ def checkpoint_git_boundary_check(
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
     else:
         _print_checkpoint_git_boundary(report)
-    if report.status == "blocked_pending_review":
+    if report.status in {"blocked_pending_review", "blocked_unresolved_checkpoint"}:
         raise typer.Exit(1)
 
 
