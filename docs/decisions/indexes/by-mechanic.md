@@ -73,6 +73,9 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0042 - Questbook Source Store Restoration](../AOA-SDK-D-0042-questbook-source-store-restoration.md) | 2026-06-01 | topology, mechanics, quest source store, root district | mechanics topology, questbook, root quests, active naming | root source store, parent boundary, lifecycle posture, validation | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | source topology, nested agents, manifest validation, root route law | accepted |
 | [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
+| [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | source-topology, mechanics, checkpoint, validation | importable implementation, checkpoint control-plane, path topology | source topology, checkpoint path routing, session-growth state | accepted |
+| [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | importable implementation, generated read model, source topology | source topology, generated freshness, agent routing | accepted |
+| [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | importable implementation, checkpoint control-plane, route-role branches | source topology, checkpoint route roles, session-growth state | accepted |
 
 ## codex-projection
 
@@ -165,6 +168,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) | 2026-06-01 | topology, agent guidance, validation guard | nested agents, root technical districts, mechanics topology | nested agents, root-surface hygiene, active naming | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | source topology, nested agents, manifest validation, root route law | accepted |
 | [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) | 2026-06-02 | mechanics, route-law, roadmap, validation | mechanics topology, roadmap, control-plane routing | roadmap drift, mechanics topology, root-surface hygiene | accepted |
+| [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | importable implementation, generated read model, source topology | source topology, generated freshness, agent routing | accepted |
 
 ## titan
 

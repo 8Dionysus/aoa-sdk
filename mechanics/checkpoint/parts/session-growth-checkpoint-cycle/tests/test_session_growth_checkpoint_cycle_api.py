@@ -9,6 +9,7 @@ import pytest
 
 from aoa_sdk import AoASDK
 from aoa_sdk.checkpoints import registry as checkpoint_registry
+from aoa_sdk.checkpoints.runtime import sessions as checkpoint_runtime_sessions
 from aoa_sdk.errors import InvalidSurface, SurfaceNotFound
 from aoa_sdk.skills.session import probe_session
 
@@ -438,7 +439,7 @@ def test_after_commit_retries_transient_runtime_session_read_error(
         codex_thread_id="thread-transient-retry",
     )
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    original_load_session = checkpoint_registry.load_session
+    original_load_session = checkpoint_runtime_sessions.load_session
     call_count = {"count": 0}
 
     def flaky_load_session(workspace, session_file_arg):
@@ -448,8 +449,8 @@ def test_after_commit_retries_transient_runtime_session_read_error(
         call_count["count"] += 1
         return original_load_session(workspace, session_file_arg)
 
-    monkeypatch.setattr(checkpoint_registry, "load_session", flaky_load_session)
-    monkeypatch.setattr(checkpoint_registry, "AFTER_COMMIT_SESSION_PROBE_DELAY_SECONDS", 0.0)
+    monkeypatch.setattr(checkpoint_runtime_sessions, "load_session", flaky_load_session)
+    monkeypatch.setattr(checkpoint_runtime_sessions, "AFTER_COMMIT_SESSION_PROBE_DELAY_SECONDS", 0.0)
 
     report = sdk.checkpoints.after_commit(repo_root=str(repo_root), commit_ref="HEAD")
 
@@ -472,7 +473,7 @@ def test_after_commit_fails_when_existing_runtime_session_file_is_invalid(
     session_file.parent.mkdir(parents=True, exist_ok=True)
     session_file.write_text("{", encoding="utf-8")
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    monkeypatch.setattr(checkpoint_registry, "AFTER_COMMIT_SESSION_PROBE_DELAY_SECONDS", 0.0)
+    monkeypatch.setattr(checkpoint_runtime_sessions, "AFTER_COMMIT_SESSION_PROBE_DELAY_SECONDS", 0.0)
 
     report = sdk.checkpoints.after_commit(repo_root=str(repo_root), commit_ref="HEAD")
 

@@ -46,10 +46,12 @@ add package `ROADMAP.md` files for every active mechanics package.
 
 The mechanics router owns package future-pressure routing and mechanics-wide
 stop lines. Package roadmaps own package-local current contour, next work,
-future triggers, out-of-scope lines, and update triggers.
+condition-based future contours, and stop lines.
 
 Update route cards, root entry surfaces, and the mechanics topology validator
-so these roadmaps are required route surfaces rather than decorative files.
+so these roadmaps are required route surfaces rather than decorative files. The
+package update rule belongs in route law and validators; it should not be
+repeated as an identical tail inside every package roadmap.
 
 ## Rationale
 
@@ -71,6 +73,8 @@ operation while keeping validation commands in `AGENTS.md` and part
 - Package `README.md` files remain entry cards instead of future backlogs.
 - Package `PARTS.md` files remain active part maps instead of roadmap ledgers.
 - Package `PROVENANCE.md` files remain source accounting.
+- Package `ROADMAP.md` files stay symmetrical with the center mechanic role:
+  current contour, next work, condition-based future movement, and stop lines.
 - `scripts/validate_mechanics_topology.py` and route tests now require the new
   roadmap layer.
 

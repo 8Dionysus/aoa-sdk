@@ -73,7 +73,9 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'generated control-plane summaries',
         'Generated artifacts are lower authority than their sources',
         'workspace_control_plane.min.json',
+        'source_topology.min.json',
         'python scripts/build_workspace_control_plane.py --check',
+        'python scripts/build_source_topology_index.py --check',
     ),
     'schemas/AGENTS.md': (
         'root-published SDK helper contract schemas',

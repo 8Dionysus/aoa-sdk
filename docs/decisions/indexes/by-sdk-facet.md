@@ -112,6 +112,13 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0024 - Checkpoint Test Surface Localization](../AOA-SDK-D-0024-checkpoint-test-surface-localization.md) | 2026-06-01 | topology, mechanics, test placement | checkpoint | mechanics topology, active naming, root-surface hygiene | accepted |
 | [AOA-SDK-D-0030 - Checkpoint Local Automation Template Localization](../AOA-SDK-D-0030-checkpoint-local-automation-template-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, local automation | checkpoint | mechanics topology, active naming, root-surface hygiene | accepted |
 
+## checkpoint control-plane
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | source-topology, mechanics, checkpoint, validation | checkpoint | source topology, checkpoint path routing, session-growth state | accepted |
+| [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
+
 ## child-task reentry
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
@@ -252,11 +259,25 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
 
+## generated read model
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | checkpoint, runtime-seam | source topology, generated freshness, agent routing | accepted |
+
 ## hook observation
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0020 - Technique Publication Observation Boundary Localization](../AOA-SDK-D-0020-technique-publication-observation-boundary-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, active naming | recurrence | mechanics topology, docs routes, active naming, owner boundary | accepted |
+
+## importable implementation
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | source-topology, mechanics, checkpoint, validation | checkpoint | source topology, checkpoint path routing, session-growth state | accepted |
+| [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | checkpoint, runtime-seam | source topology, generated freshness, agent routing | accepted |
+| [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
 
 ## managed hooks
 
@@ -353,6 +374,12 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0007 - Mechanic Artifact Localization](../AOA-SDK-D-0007-mechanic-artifact-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | agon | mechanics topology, nested agents, generated parity, part validation | accepted |
+
+## path topology
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | source-topology, mechanics, checkpoint, validation | checkpoint | source topology, checkpoint path routing, session-growth state | accepted |
 
 ## playbook reader
 
@@ -511,6 +538,12 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0034 - Active Mechanics Topology Status Naming](../AOA-SDK-D-0034-active-mechanics-topology-status-naming.md) | 2026-06-01 | topology, mechanics, validation | all | active naming, root-surface hygiene, mechanics topology | accepted |
 
+## route-role branches
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
+
 ## routing stats reader
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
@@ -585,6 +618,12 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) | 2026-05-31 | topology, mechanics, route card, validation guard | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | superseded |
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | source topology, mechanics topology, nested agents, release check | accepted |
+
+## source topology
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | checkpoint, runtime-seam | source topology, generated freshness, agent routing | accepted |
 
 ## surface detection
 

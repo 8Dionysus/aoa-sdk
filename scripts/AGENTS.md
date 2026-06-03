@@ -32,6 +32,8 @@ control-plane utilities.
 python -m ruff check scripts
 python scripts/validate_sdk_source_home.py
 python scripts/validate_mechanics_topology.py
+python scripts/build_source_topology_index.py --check
+python scripts/validate_source_topology_index.py
 python scripts/release_check.py
 ```
 

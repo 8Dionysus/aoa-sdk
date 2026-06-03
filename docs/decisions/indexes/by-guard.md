@@ -42,6 +42,12 @@ Grouped by `Guard families` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0002 - Root Design Surfaces Before Mechanics](../AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md) | 2026-05-31 | root/topology, design route, agent guidance | design surface, agent surface, mechanics prep, source home | none | accepted |
 
+## agent routing
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | importable implementation, generated read model, source topology | checkpoint, runtime-seam | accepted |
+
 ## API naming
 
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
@@ -59,6 +65,18 @@ Grouped by `Guard families` metadata.
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | changelog, release posture, root docs | release-support | accepted |
+
+## checkpoint path routing
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | source-topology, mechanics, checkpoint, validation | importable implementation, checkpoint control-plane, path topology | checkpoint | accepted |
+
+## checkpoint route roles
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | importable implementation, checkpoint control-plane, route-role branches | checkpoint | accepted |
 
 ## compatibility
 
@@ -115,6 +133,12 @@ Grouped by `Guard families` metadata.
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0037 - Workspace MCP Surface Crosswalk Secondary Route Naming](../AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md) | 2026-06-01 | MCP readout, active naming, Codex projection | workspace MCP, active naming, route selection, agent guidance | codex-projection | accepted |
+
+## generated freshness
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | importable implementation, generated read model, source topology | checkpoint, runtime-seam | accepted |
 
 ## generated parity
 
@@ -349,6 +373,13 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | mechanics topology, artifact localization, Titan helpers, root technical districts, CLI helper scripts | titan | accepted |
 | [AOA-SDK-D-0012 - Recurrence Control Plane Part Localization](../AOA-SDK-D-0012-recurrence-control-plane-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | mechanics topology, artifact localization, recurrence control plane, manifest gate, downstream projections, recursor readiness | recurrence | accepted |
 
+## session-growth state
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | source-topology, mechanics, checkpoint, validation | importable implementation, checkpoint control-plane, path topology | checkpoint | accepted |
+| [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | importable implementation, checkpoint control-plane, route-role branches | checkpoint | accepted |
+
 ## sibling owner boundary
 
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
@@ -372,6 +403,9 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) | 2026-05-31 | topology, mechanics, route card, validation guard | mechanics topology, parent boundary, source inventory, agent surface | agon, antifragility, boundary-bridge, checkpoint, codex-projection, experience, questbook, recurrence, release-support, rpg, runtime-seam, titan | accepted |
 | [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) | 2026-05-31 | topology, mechanics, validation guard, source inventory | mechanics topology, source family routing, parent boundary, boundary bridge | boundary-bridge, checkpoint, codex-projection, recurrence, release-support, rpg, runtime-seam, titan | accepted |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | accepted |
+| [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | source-topology, mechanics, checkpoint, validation | importable implementation, checkpoint control-plane, path topology | checkpoint | accepted |
+| [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | importable implementation, generated read model, source topology | checkpoint, runtime-seam | accepted |
+| [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | importable implementation, checkpoint control-plane, route-role branches | checkpoint | accepted |
 
 ## source-owner boundary
 

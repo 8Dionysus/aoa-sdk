@@ -142,6 +142,8 @@ Minimum validation for code, topology, or reviewed-handoff changes:
 python scripts/generate_decision_indexes.py --check
 python scripts/validate_sdk_source_home.py
 python scripts/validate_mechanics_topology.py
+python scripts/build_source_topology_index.py --check
+python scripts/validate_source_topology_index.py
 python scripts/build_workspace_control_plane.py --check
 python scripts/validate_workspace_control_plane.py
 python -m pytest -q
