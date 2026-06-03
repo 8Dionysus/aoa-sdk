@@ -120,6 +120,7 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
 | [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 | [AOA-SDK-D-0055 - Checkpoint Skipped Session Recovery Branch](../AOA-SDK-D-0055-checkpoint-skipped-session-recovery-branch.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, skipped-session recovery | accepted |
+| [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 
 ## child-task reentry
 
@@ -307,6 +308,7 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0058 - Recurrence Route-Role Branches](../AOA-SDK-D-0058-recurrence-route-role-branches.md) | 2026-06-03 | source-topology, recurrence, implementation, validation | recurrence | source topology, recurrence control-plane, downstream projection guard | accepted |
 | [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) | 2026-06-03 | source-topology, models, implementation, validation | boundary-bridge, checkpoint, recurrence, runtime-seam | source topology, public import compatibility, typed contract routing | accepted |
 | [AOA-SDK-D-0060 - Low-Pressure Route Stop-Lines](../AOA-SDK-D-0060-low-pressure-route-stop-lines.md) | 2026-06-03 | source-topology, implementation, validation, stop-line | checkpoint, recurrence, release-support, boundary-bridge | source topology, route-role pressure, stop-line discipline | accepted |
+| [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 
 ## managed hooks
 
@@ -632,6 +634,12 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | source topology, nested agents, manifest validation, root route law | accepted |
+
+## session-memory attachment
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 
 ## sibling path routing
 

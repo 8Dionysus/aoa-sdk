@@ -15,6 +15,8 @@ from .rendering import (
     _print_checkpoint_git_boundary,
     _print_checkpoint_hook_install,
     _print_checkpoint_hook_status,
+    _print_checkpoint_lifecycle_archive_result,
+    _print_checkpoint_lifecycle_audit,
     _print_checkpoint_note,
     _print_checkpoint_promotion,
     _print_closeout_context,
@@ -373,6 +375,74 @@ def checkpoint_status(
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     _print_checkpoint_note(note)
+
+
+@checkpoint_app.command("lifecycle-audit")
+def checkpoint_lifecycle_audit(
+    repo_root: str | None = typer.Argument(
+        None,
+        help="Optional repository root or repo name used to filter checkpoint lifecycle entries.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    report = AoASDK.from_workspace(root).checkpoints.lifecycle_audit(
+        repo_root=repo_root,
+        session_file=session_file,
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_lifecycle_audit(report)
+
+
+@checkpoint_app.command("close-archive")
+def checkpoint_close_archive(
+    repo_root: str | None = typer.Argument(
+        None,
+        help="Optional repository root or repo name used to filter checkpoint lifecycle entries.",
+    ),
+    runtime_session_id: str | None = typer.Option(
+        None,
+        "--runtime-session-id",
+        help="Optional runtime session id or scope key to close/archive.",
+    ),
+    include_stale: bool = typer.Option(
+        False,
+        "--include-stale",
+        help="Also archive nonpending stale current scopes without marking them closed.",
+    ),
+    dry_run: bool = typer.Option(
+        True,
+        "--dry-run/--apply",
+        help="Preview by default; use --apply to move checkpoint evidence from current to archive.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    report = AoASDK.from_workspace(root).checkpoints.close_archive(
+        repo_root=repo_root,
+        session_file=session_file,
+        runtime_session_id=runtime_session_id,
+        dry_run=dry_run,
+        include_stale=include_stale,
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_lifecycle_archive_result(report)
 
 
 @checkpoint_app.command("promote")

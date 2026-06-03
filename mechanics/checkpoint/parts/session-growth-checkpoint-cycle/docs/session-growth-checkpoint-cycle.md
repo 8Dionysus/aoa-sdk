@@ -20,6 +20,18 @@ existing session-harvest family into an automatic runtime authority.
 - while any checkpoint commit still has `agent_review=pending`, next-step guidance must point to the missing `review-note --auto` rather than directly to reviewed closeout
 - installed `pre-push` and `pre-merge-commit` hooks now fail closed through `aoa checkpoint git-boundary-check` when any aggregated runtime-session checkpoint note still carries pending checkpoint reviews; they stay non-minting at git-boundary time, and with no current session file they also fail closed on a reachable unresolved `skipped_no_active_session` post-commit status that requested checkpoint review
 - while any aggregated runtime-session checkpoint note still has `agent_review=pending`, `aoa checkpoint build-closeout-context` and `aoa checkpoint execute-closeout-chain` fail closed instead of building reviewed-closeout artifacts too early
+- `aoa checkpoint lifecycle-audit` reads every checkpoint note under
+  `.aoa/session-growth/current/` and classifies it as active current,
+  pending review, reviewed awaiting closeout, closeout built, closeout
+  executed, closed, or stale current scope
+- `aoa checkpoint close-archive` previews by default and only moves files with
+  `--apply`; it closes reviewed closeout-executed scopes by appending a
+  lifecycle event before archival, while `--include-stale` only moves
+  nonpending stale current scopes as archive evidence without marking them
+  closed
+- lifecycle audit may report aoa-session-memory archive refs from closeout
+  context or execution reports, but those refs stay read-only route evidence
+  and the checkpoint mechanic must not mutate aoa-session-memory
 - once reviewed closeout is allowed, `closeout-context.json` carries one aggregated checkpoint-review bundle with review refs, inherited auto-observation refs, findings, candidate notes, stats hints, mechanic hints, closeout questions, evidence refs, and deferred next-owner moves
 - the mechanical donor, progression, and quest artifacts emitted by `aoa-checkpoint-closeout-bridge` now carry the same checkpoint-review bundle forward so reviewed closeout does not drop the semantic checkpoint layer immediately after context build
 - when that bridge also reaches owner follow-through, it now writes one persistent `.aoa/closeout/handoffs/*.owner-handoff.json` bundle rooted in the reviewed `closeout-context.json`; this stays a follow-through queue, not final owner truth, and it must not mint canonical owner landing state by itself
@@ -108,9 +120,19 @@ The repo-root checkpoint note must still agree with the resolved reviewed
 session for the closeout to proceed. This keeps one narrow repo-scoped note
 from silently standing in for the whole session and blocks cross-session
 mismatch when parallel work is in flight.
+Lifecycle audit treats `current/<runtime-session-id>/<repo-label>/` as a
+runtime-scope claim, not as a durable archive. An active runtime match is
+active current; pending semantic review stays blocked; reviewed notes without
+closeout execution remain awaiting closeout; reviewed closeout-executed notes
+can be closed and archived; and nonpending stale scopes can be moved out of
+`current/` without being marked closed. This keeps `current/` active-now or
+still-actionable while preserving evidence under
+`aoa-sdk/.aoa/session-growth/archive/`.
 
 The JSONL file is append-only checkpoint history.
 The JSON and Markdown files are rebuilt snapshots for current review.
+Lifecycle close writes an append-only `checkpoint_lifecycle_closed_v1` event
+to the JSONL before rebuilding snapshots and moving the scope to archive.
 `post-commit-report.json` is the trigger/audit artifact for one plain-commit
 capture pass; it is not the authoritative checkpoint ledger.
 It records whether the agent-authored review is still `pending` or already
@@ -197,6 +219,9 @@ aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
 aoa checkpoint git-boundary-check /srv/AbyssOS/aoa-sdk --boundary merge --root /srv/AbyssOS --json
 aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/AbyssOS/aoa-sdk --json
 aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/AbyssOS/aoa-sdk --json
+aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
+aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
+aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --include-stale --apply --json
 aoa checkpoint status /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS/aoa-sdk --json
 ```
 

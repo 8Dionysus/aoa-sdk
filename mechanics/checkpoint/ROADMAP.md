@@ -15,6 +15,10 @@ owner acceptance.
 - Keep reviewed handoff runner output operator-visible and evidence-linked, not
   an automatic closeout result.
 - Keep reviewed closeout carry fields advisory and owner-routed.
+- Keep `current/` lifecycle-visible: active runtime scopes stay current,
+  pending-review scopes remain blocked, reviewed closeout execution can be
+  closed and archived, and nonpending stale scopes can move to archive evidence
+  without being marked as reviewed closeout.
 
 ## Next Work
 
@@ -24,6 +28,8 @@ owner acceptance.
   owner, and progression owner without claiming their verdicts.
 - Preserve hook and handoff visibility without making the SDK a hidden workflow
   runner.
+- Use lifecycle audit before close/archive cleanup so `current/` pressure is
+  measured rather than guessed.
 
 ## When Time Comes
 
@@ -33,6 +39,8 @@ owner acceptance.
   and reviewed intake route.
 - Add stronger closeout helpers only after checkpoint, questbook, release
   support, and owner handoff evidence repeat cleanly.
+- Add stronger lifecycle transitions only when a repeated route proves the new
+  state and its owner boundary; do not add states to explain a one-session tail.
 
 ## Out Of Scope
 
@@ -41,3 +49,4 @@ owner acceptance.
 - Progression or quest acceptance.
 - Automatic closeout, harvest, push, merge, or release logic.
 - Hidden workflow execution.
+- Mutating aoa-session-memory from checkpoint lifecycle routes.

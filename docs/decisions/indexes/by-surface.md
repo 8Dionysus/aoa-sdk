@@ -81,6 +81,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
 | [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, closeout bridge | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 | [AOA-SDK-D-0055 - Checkpoint Skipped Session Recovery Branch](../AOA-SDK-D-0055-checkpoint-skipped-session-recovery-branch.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, skipped-session recovery | accepted |
+| [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 
 ## ci
 
@@ -190,6 +191,13 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0058 - Recurrence Route-Role Branches](../AOA-SDK-D-0058-recurrence-route-role-branches.md) | 2026-06-03 | importable implementation, recurrence control-plane, route-role branches | recurrence | source topology, recurrence control-plane, downstream projection guard | accepted |
 | [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) | 2026-06-03 | importable implementation, typed contracts, compatibility re-export | boundary-bridge, checkpoint, recurrence, runtime-seam | source topology, public import compatibility, typed contract routing | accepted |
 | [AOA-SDK-D-0060 - Low-Pressure Route Stop-Lines](../AOA-SDK-D-0060-low-pressure-route-stop-lines.md) | 2026-06-03 | importable implementation, route-role branches, compatibility re-export | checkpoint, recurrence, release-support, boundary-bridge | source topology, route-role pressure, stop-line discipline | accepted |
+| [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
+
+## lifecycle
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 
 ## local automation
 
@@ -329,6 +337,12 @@ Grouped by `Surface classes` metadata.
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) | 2026-06-01 | compatibility posture, workspace MCP, active naming, sibling path routing | boundary-bridge, codex-projection | compatibility, active naming, root-surface hygiene, part validation | accepted |
+
+## runtime-evidence
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 
 ## schema
 
@@ -482,6 +496,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0058 - Recurrence Route-Role Branches](../AOA-SDK-D-0058-recurrence-route-role-branches.md) | 2026-06-03 | importable implementation, recurrence control-plane, route-role branches | recurrence | source topology, recurrence control-plane, downstream projection guard | accepted |
 | [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) | 2026-06-03 | importable implementation, typed contracts, compatibility re-export | boundary-bridge, checkpoint, recurrence, runtime-seam | source topology, public import compatibility, typed contract routing | accepted |
 | [AOA-SDK-D-0060 - Low-Pressure Route Stop-Lines](../AOA-SDK-D-0060-low-pressure-route-stop-lines.md) | 2026-06-03 | importable implementation, route-role branches, compatibility re-export | checkpoint, recurrence, release-support, boundary-bridge | source topology, route-role pressure, stop-line discipline | accepted |
+| [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 
 ## validation guard
 

@@ -228,6 +228,26 @@ class SessionCheckpointAgentReview(BaseModel):
     defer_until_closeout: bool = True
 
 
+class SessionCheckpointLifecycleEvent(BaseModel):
+    schema_version: int = 1
+    event_type: Literal["checkpoint_lifecycle_closed_v1"] = (
+        "checkpoint_lifecycle_closed_v1"
+    )
+    event_id: str
+    observed_at: datetime
+    observed_at_local: str | None = None
+    observed_tz: str | None = None
+    repo_root: str
+    repo_label: str
+    session_ref: str
+    runtime_session_id: str | None = None
+    lifecycle_state: Literal["closed"] = "closed"
+    closeout_context_ref: str | None = None
+    closeout_execution_report_ref: str | None = None
+    archive_reason: str
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
 class SessionCheckpointHistoryEntry(BaseModel):
     checkpoint_kind: Literal[
         "manual",
@@ -329,6 +349,7 @@ class SessionCheckpointNote(BaseModel):
     mechanic_hints: list[str] = Field(default_factory=list)
     closeout_questions: list[str] = Field(default_factory=list)
     agent_reviews: list[SessionCheckpointAgentReview] = Field(default_factory=list)
+    lifecycle_events: list[SessionCheckpointLifecycleEvent] = Field(default_factory=list)
     blocked_by: list[str] = Field(default_factory=list)
     review_status: Literal["unreviewed", "reviewed"] = "unreviewed"
     evidence_refs: list[str] = Field(default_factory=list)
@@ -453,6 +474,84 @@ class CheckpointGitBoundaryCheck(BaseModel):
     pending_refs: list[str] = Field(default_factory=list)
     blocking_repo_labels: list[str] = Field(default_factory=list)
     required_action: str | None = None
+
+
+class CheckpointLifecycleEntry(BaseModel):
+    repo_label: str
+    runtime_session_id: str | None = None
+    runtime_scope_key: str | None = None
+    session_ref: str | None = None
+    current_dir: str
+    note_ref: str | None = None
+    post_commit_report_ref: str | None = None
+    closeout_context_ref: str | None = None
+    closeout_execution_report_ref: str | None = None
+    session_memory_archive_ref: str | None = None
+    state: Literal["collecting", "reviewable", "promoted", "closed"] | None = None
+    review_status: Literal["unreviewed", "reviewed"] | None = None
+    agent_review_status: Literal["none", "pending", "reviewed"] | None = None
+    lifecycle_state: Literal[
+        "active_current",
+        "pending_review",
+        "reviewed_awaiting_closeout",
+        "closeout_built",
+        "closeout_executed",
+        "closed",
+        "stale_current_scope",
+    ]
+    active_runtime_scope: bool = False
+    closable: bool = False
+    archiveable: bool = False
+    pending_refs: list[str] = Field(default_factory=list)
+    blocked_by: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    reason: str
+
+
+class CheckpointLifecycleAuditReport(BaseModel):
+    schema_version: int = 1
+    report_type: Literal["checkpoint_lifecycle_audit_v1"] = (
+        "checkpoint_lifecycle_audit_v1"
+    )
+    checked_at: datetime
+    checked_at_local: str | None = None
+    checked_tz: str | None = None
+    repo_root: str | None = None
+    repo_label: str | None = None
+    session_file: str | None = None
+    active_runtime_session_id: str | None = None
+    current_scope_count: int = 0
+    note_count: int = 0
+    archive_scope_count: int = 0
+    closeout_context_count: int = 0
+    closeout_execution_count: int = 0
+    pending_review_count: int = 0
+    reviewed_not_closed_count: int = 0
+    closable_count: int = 0
+    archiveable_count: int = 0
+    lifecycle_counts: dict[str, int] = Field(default_factory=dict)
+    entries: list[CheckpointLifecycleEntry] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+
+class CheckpointLifecycleArchiveResult(BaseModel):
+    schema_version: int = 1
+    report_type: Literal["checkpoint_lifecycle_archive_result_v1"] = (
+        "checkpoint_lifecycle_archive_result_v1"
+    )
+    executed_at: datetime
+    executed_at_local: str | None = None
+    executed_tz: str | None = None
+    dry_run: bool = True
+    repo_root: str | None = None
+    repo_label: str | None = None
+    runtime_session_id: str | None = None
+    archived_count: int = 0
+    skipped_count: int = 0
+    archived_entries: list[CheckpointLifecycleEntry] = Field(default_factory=list)
+    skipped_entries: list[CheckpointLifecycleEntry] = Field(default_factory=list)
+    archive_refs: list[str] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
 
 
 class SessionEndSkillTarget(BaseModel):

@@ -9,7 +9,9 @@ Status: active topology with part-local payload.
 Capture session-growth checkpoint notes, guard git boundaries, require semantic
 review, build explicit review-context bundles, route child-task re-entry
 packets, attach session-memory archive refs, and carry reviewed closeout
-context without minting owner truth.
+context without minting owner truth. Audit checkpoint lifecycle state so
+`current/` means active-now or still-blocked review work, while reviewed
+closeout scopes can be closed and archived without deleting evidence.
 
 ### Trigger
 
@@ -24,6 +26,8 @@ context carry changes.
 - active-session git boundary checks
 - review-note and promotion fail-closed gates
 - mechanical review-context bundle assembly
+- checkpoint lifecycle audit and close/archive routing for nonpending reviewed
+  closeout scopes
 - read-only session-memory archive attachment for checkpoint closeout
 - reviewed session handoff request/inbox/manifest assembly
 - child-task checkpoint and re-entry packet assembly
@@ -47,6 +51,7 @@ status remain outside SDK checkpoint authority.
 - `mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/`
 - `mechanics/checkpoint/parts/reviewed-closeout-context-carry/`
 - `src/aoa_sdk/checkpoints/`
+- `src/aoa_sdk/checkpoints/lifecycle.py`
 - `src/aoa_sdk/closeout/`
 - `src/aoa_sdk/a2a/`
 - `mechanics/checkpoint/parts/child-task-reentry/`
@@ -67,6 +72,8 @@ status remain outside SDK checkpoint authority.
 
 This mechanic must not treat `agent_review=pending` as reviewed closeout or
 allow promotion while semantic checkpoint review is still pending.
+It must not close or archive a pending-review checkpoint scope even when a
+closeout artifact exists nearby.
 
 ### Validation
 
@@ -79,3 +86,7 @@ and then run the mechanics topology gate from the root route card.
 If checkpoint evidence survives review, route it through closeout, memory,
 proof, progression, or owner surfaces rather than strengthening the checkpoint
 ledger or reviewed carry packet itself.
+Use lifecycle audit when `current/` no longer looks like active work; use
+close/archive only after pending review is clear and reviewed closeout execution
+exists, or when moving nonpending stale scopes as archive evidence without
+marking them closed.

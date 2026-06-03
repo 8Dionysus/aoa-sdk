@@ -9,7 +9,9 @@
 Route the shared checkpoint mechanic for session-local note capture, git
 boundary checks, review-note gates, promotion stop-lines, and review-context
 bundle assembly, reviewed session handoff runner behavior, and reviewed
-closeout context carry below owner truth. It may attach read-only
+closeout context carry below owner truth. It also owns checkpoint lifecycle
+audit and close/archive routing so stale `current/` scopes are visible and
+movable without deleting evidence. It may attach read-only
 aoa-session-memory archive refs to checkpoint closeout context, but it does not
 promote memory claims.
 
@@ -34,6 +36,9 @@ promote memory claims.
 - Do not make checkpoint hints memory, proof, progression, or owner verdicts.
 - Do not make reviewed closeout carry mint candidate, seed, object,
   continuity, component-refresh, or owner-acceptance truth.
+- Do not close or archive checkpoint scopes with pending semantic review.
+- Do not mutate aoa-session-memory when reading session-memory refs for
+  checkpoint lifecycle or closeout evidence.
 - Do not let hooks run closeout, harvest, push, merge, or release logic.
 
 ## Validation
@@ -41,10 +46,12 @@ promote memory claims.
 ```bash
 python scripts/validate_mechanics_topology.py
 python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_session_memory.py mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py
+aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
+aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
 ```
 
 ## Closeout
 
 Report whether capture, hook guard, review-note, promotion, review-context,
 session-memory attachment, reviewed session handoff runner, or reviewed
-closeout context carry behavior changed.
+closeout context carry, lifecycle audit, or close/archive behavior changed.

@@ -72,6 +72,8 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
     assert modules["src/aoa_sdk/checkpoints/registry.py"]["split_pressure"] == "medium"
     assert "route-role orchestrator" in modules["src/aoa_sdk/checkpoints/registry.py"]["role"]
     assert "named checkpoint branch" in modules["src/aoa_sdk/checkpoints/registry.py"]["next_route"]
+    assert "checkpoint lifecycle audit" in modules["src/aoa_sdk/checkpoints/lifecycle.py"]["role"]
+    assert "close/archive orchestration" in modules["src/aoa_sdk/checkpoints/lifecycle.py"]["role"]
     assert modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["split_pressure"] == "low"
     assert "compatibility facade" in modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["role"]
     assert "facade thin" in modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["next_route"]
@@ -86,6 +88,9 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
         assert role_fragment in modules[path]["role"]
     assert modules["src/aoa_sdk/checkpoints/ledger/notes.py"]["split_pressure"] == "low"
     assert "runtime note loading" in modules["src/aoa_sdk/checkpoints/ledger/notes.py"]["role"]
+    assert "lifecycle ledger event normalization" in modules[
+        "src/aoa_sdk/checkpoints/ledger/lifecycle_events.py"
+    ]["role"]
     assert "skipped-session recovery" in modules[
         "src/aoa_sdk/checkpoints/review/skipped_recovery.py"
     ]["role"]

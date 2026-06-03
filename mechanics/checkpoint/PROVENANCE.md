@@ -13,6 +13,7 @@
 - `mechanics/checkpoint/parts/reviewed-closeout-context-carry/`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/`
 - `src/aoa_sdk/checkpoints/`
+- `src/aoa_sdk/checkpoints/lifecycle.py`
 - `src/aoa_sdk/closeout/`
 - `src/aoa_sdk/a2a/`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py`
@@ -33,6 +34,9 @@ This shared name matches the recurring AoA checkpoint shape but keeps SDK
 behavior limited to session-local control-plane support.
 Session-memory archive refs are consumed as route evidence for reviewed
 closeout context, not as reviewed memory truth.
+Checkpoint lifecycle audit consumes those refs read-only. Close/archive may
+move checkpoint files from `current/` to `archive/`, but it does not mutate
+aoa-session-memory or turn archive indexes into reviewed truth.
 
 Former parent-name candidates for this package live only in
 `legacy/INDEX.md`. Active Checkpoint routes name the operation: review context

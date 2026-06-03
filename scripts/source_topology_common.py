@@ -30,6 +30,7 @@ SOURCE_INPUT_REFS = (
     "docs/decisions/AOA-SDK-D-0058-recurrence-route-role-branches.md",
     "docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md",
     "docs/decisions/AOA-SDK-D-0060-low-pressure-route-stop-lines.md",
+    "docs/decisions/AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md",
 )
 VALIDATION_REFS = (
     "scripts/build_source_topology_index.py",
@@ -98,7 +99,9 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/closeout/owner_handoff.py": "checkpoint closeout owner follow-through handoff owner",
     "src/aoa_sdk/checkpoints/hooks/git_boundary.py": "checkpoint Git hook template, git metadata, and dirty-boundary helper owner",
     "src/aoa_sdk/checkpoints/kinds.py": "checkpoint kind inference helper owner",
+    "src/aoa_sdk/checkpoints/ledger/lifecycle_events.py": "checkpoint lifecycle ledger event normalization helper owner",
     "src/aoa_sdk/checkpoints/ledger/notes.py": "checkpoint note ledger assembly, rotation, and runtime note loading owner",
+    "src/aoa_sdk/checkpoints/lifecycle.py": "checkpoint lifecycle audit, pending-review stop-line, and close/archive orchestration owner",
     "src/aoa_sdk/checkpoints/naming.py": "checkpoint slug naming helper owner",
     "src/aoa_sdk/checkpoints/promotion/targets.py": "checkpoint reviewed promotion target writer owner",
     "src/aoa_sdk/checkpoints/registry.py": "checkpoint public API facade and route-role orchestrator",
@@ -288,7 +291,7 @@ def _module_payload(path: Path) -> dict[str, Any]:
 def _module_next_route(path: Path, line_count: int) -> str:
     rel = _rel(path)
     if rel == "src/aoa_sdk/checkpoints/registry.py":
-        return "keep public CheckpointsAPI orchestration here; add behavior in the named checkpoint branch that owns it"
+        return "keep public CheckpointsAPI orchestration here; add behavior in lifecycle, closeout, review, ledger, or the named checkpoint branch that owns it"
     if rel == "src/aoa_sdk/checkpoints/closeout/bridge.py":
         return "keep this facade thin; add behavior in the owning closeout context, evidence, execution, followthrough, or owner-handoff branch"
     if rel == "src/aoa_sdk/surfaces/registry.py":

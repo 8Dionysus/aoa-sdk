@@ -15,6 +15,8 @@ from ..models import (
     CheckpointGitBoundaryCheck,
     CheckpointHookInstallResult,
     CheckpointHookStatus,
+    CheckpointLifecycleArchiveResult,
+    CheckpointLifecycleAuditReport,
     CloseoutContextCandidateMap,
     CloseoutExecutionStep,
     SessionCheckpointAutoObservation,
@@ -66,6 +68,10 @@ from .hooks.git_boundary import (
     render_checkpoint_hook,
 )
 from .kinds import infer_auto_checkpoint_kind as _infer_auto_checkpoint_kind
+from .lifecycle import (
+    audit_checkpoint_lifecycle as _audit_checkpoint_lifecycle,
+    close_archive_checkpoint_lifecycle as _close_archive_checkpoint_lifecycle,
+)
 from .ledger.notes import (
     archive_current_checkpoint as _archive_current_checkpoint,
     build_checkpoint_note as _build_checkpoint_note,
@@ -1103,6 +1109,36 @@ class CheckpointsAPI:
             status="clear",
             runtime_session_id=runtime_session_id,
             note_ref=preferred_note_ref,
+        )
+
+    def lifecycle_audit(
+        self,
+        *,
+        repo_root: str | None = None,
+        session_file: str | None = None,
+    ) -> CheckpointLifecycleAuditReport:
+        return _audit_checkpoint_lifecycle(
+            workspace=self.workspace,
+            repo_root=repo_root,
+            session_file=session_file,
+        )
+
+    def close_archive(
+        self,
+        *,
+        repo_root: str | None = None,
+        session_file: str | None = None,
+        runtime_session_id: str | None = None,
+        dry_run: bool = True,
+        include_stale: bool = False,
+    ) -> CheckpointLifecycleArchiveResult:
+        return _close_archive_checkpoint_lifecycle(
+            workspace=self.workspace,
+            repo_root=repo_root,
+            session_file=session_file,
+            runtime_session_id=runtime_session_id,
+            dry_run=dry_run,
+            include_stale=include_stale,
         )
 
     def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:

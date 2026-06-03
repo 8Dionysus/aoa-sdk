@@ -205,6 +205,46 @@ def _write_checkpoint_history_entry(
     )
 
 
+def _mark_checkpoint_note_reviewed(note_dir: Path) -> None:
+    payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
+    payload["review_status"] = "reviewed"
+    payload["agent_review_status"] = "reviewed"
+    payload["agent_review_required"] = False
+    payload["agent_review_pending_refs"] = []
+    (note_dir / "checkpoint-note.json").write_text(
+        json.dumps(payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _write_closeout_execution_report(
+    note_dir: Path,
+    *,
+    session_ref: str,
+    runtime_session_id: str,
+    session_memory_archive_ref: str | None = None,
+) -> Path:
+    payload: dict[str, object] = {
+        "session_ref": session_ref,
+        "runtime_session_id": runtime_session_id,
+        "session_memory_ref": (
+            {
+                "source": "aoa-session-memory",
+                "authority_contract": "archive_indexes_are_route_evidence_not_reviewed_truth",
+                "aoa_root": "/srv/AbyssOS/.aoa",
+                "session_id": "thread-test",
+                "archive_path": session_memory_archive_ref,
+                "manifest_ref": f"{session_memory_archive_ref}/session.manifest.json",
+            }
+            if session_memory_archive_ref is not None
+            else None
+        ),
+    }
+    path = note_dir / "closeout-execution-report.json"
+    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
+    return path
+
+
 def _write_owner_handoff(
     workspace_root: Path,
     *,
@@ -1865,6 +1905,182 @@ def test_checkpoint_parallel_runtime_sessions_keep_independent_current_ledgers(
         repo_root=str(workspace_root / "aoa-sdk"),
         session_file=str(session_file_two),
     ).runtime_session_id == "runtime-session-two"
+
+
+def test_checkpoint_lifecycle_audit_classifies_active_stale_and_closeout_executed(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    active_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
+        session_id="runtime-session-live",
+    )
+    stale_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "stale-session.json",
+        session_id="runtime-session-stale",
+    )
+
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="manual",
+        intent_text="active checkpoint work remains in progress",
+        session_file=str(active_session),
+    )
+    stale_note = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="reviewed closeout candidate survived this runtime session",
+        mutation_surface="code",
+        session_file=str(stale_session),
+    )
+    stale_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-stale",
+    )
+    session_memory_archive = workspace_root / ".aoa" / "sessions" / "2026-04-10__001__test"
+    session_memory_archive.mkdir(parents=True)
+    (session_memory_archive / "session.manifest.json").write_text("{}\n", encoding="utf-8")
+    _mark_checkpoint_note_reviewed(stale_note_dir)
+    _write_closeout_execution_report(
+        stale_note_dir,
+        session_ref=stale_note.session_ref,
+        runtime_session_id="runtime-session-stale",
+        session_memory_archive_ref=str(session_memory_archive),
+    )
+
+    report = sdk.checkpoints.lifecycle_audit(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(active_session),
+    )
+
+    states = {entry.runtime_session_id: entry for entry in report.entries}
+    assert report.note_count == 2
+    assert report.active_runtime_session_id == "runtime-session-live"
+    assert states["runtime-session-live"].lifecycle_state == "active_current"
+    assert states["runtime-session-live"].active_runtime_scope is True
+    assert states["runtime-session-stale"].lifecycle_state == "closeout_executed"
+    assert states["runtime-session-stale"].closable is True
+    assert states["runtime-session-stale"].archiveable is True
+    assert states["runtime-session-stale"].session_memory_archive_ref == str(session_memory_archive)
+    assert (session_memory_archive / "session.manifest.json").exists()
+
+
+def test_checkpoint_close_archive_dry_run_and_apply_closes_reviewed_closeout_scope(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    active_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
+        session_id="runtime-session-live",
+    )
+    closeout_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "closeout-session.json",
+        session_id="runtime-session-closeout",
+    )
+    note = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="reviewed closeout candidate survived this runtime session",
+        mutation_surface="code",
+        session_file=str(closeout_session),
+    )
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-closeout",
+    )
+    _mark_checkpoint_note_reviewed(note_dir)
+    _write_closeout_execution_report(
+        note_dir,
+        session_ref=note.session_ref,
+        runtime_session_id="runtime-session-closeout",
+    )
+
+    dry_run = sdk.checkpoints.close_archive(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(active_session),
+        runtime_session_id="runtime-session-closeout",
+        dry_run=True,
+    )
+
+    assert dry_run.dry_run is True
+    assert dry_run.archived_count == 1
+    assert note_dir.exists()
+
+    applied = sdk.checkpoints.close_archive(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(active_session),
+        runtime_session_id="runtime-session-closeout",
+        dry_run=False,
+    )
+
+    assert applied.dry_run is False
+    assert applied.archived_count == 1
+    assert applied.archive_refs
+    assert not note_dir.exists()
+    archive_note = Path(applied.archive_refs[0]) / "checkpoint-note.json"
+    archive_jsonl = Path(applied.archive_refs[0]) / "checkpoint-note.jsonl"
+    archived_payload = json.loads(archive_note.read_text(encoding="utf-8"))
+    jsonl_payloads = [
+        json.loads(line)
+        for line in archive_jsonl.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert archived_payload["state"] == "closed"
+    assert archived_payload["review_status"] == "reviewed"
+    assert archived_payload["carry_until_session_closeout"] is False
+    assert any("lifecycle_event" in payload for payload in jsonl_payloads)
+
+
+def test_checkpoint_close_archive_skips_pending_review_even_with_closeout_execution(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    active_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
+        session_id="runtime-session-live",
+    )
+    pending_note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-pending",
+    )
+    _write_checkpoint_history_entry(
+        note_dir=pending_note_dir,
+        session_ref="session:pending-review-closeout",
+        runtime_session_id="runtime-session-pending",
+        repo_root=workspace_root / "aoa-sdk",
+        repo_label="aoa-sdk",
+        candidate_id="candidate:growth:pending",
+        candidate_kind="growth",
+        owner_hint="aoa-sdk",
+        display_name="Pending checkpoint candidate",
+        source_surface_ref="aoa-sdk:checkpoint",
+        evidence_refs=["path:README.md"],
+        progression_axis_signals=[],
+        intent_text="",
+        agent_review_status="pending",
+    )
+    _write_closeout_execution_report(
+        pending_note_dir,
+        session_ref="session:pending-review-closeout",
+        runtime_session_id="runtime-session-pending",
+    )
+
+    result = sdk.checkpoints.close_archive(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(active_session),
+        runtime_session_id="runtime-session-pending",
+        include_stale=True,
+        dry_run=False,
+    )
+
+    assert result.archived_count == 0
+    assert result.skipped_count == 1
+    assert result.skipped_entries[0].lifecycle_state == "pending_review"
+    assert result.skipped_entries[0].pending_refs == []
+    assert pending_note_dir.exists()
 
 
 def test_checkpoint_status_backfills_local_timestamp_for_legacy_history_entry(workspace_root: Path) -> None:
