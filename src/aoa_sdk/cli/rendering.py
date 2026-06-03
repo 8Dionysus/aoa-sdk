@@ -14,6 +14,7 @@ from ..models import (
     CheckpointHookStatus,
     CheckpointLifecycleArchiveResult,
     CheckpointLifecycleAuditReport,
+    CheckpointSessionReconcileResult,
     KernelNextStepBrief,
     OwnerFollowThroughBrief,
     SessionCheckpointNote,
@@ -522,8 +523,13 @@ def _print_checkpoint_lifecycle_audit(report: CheckpointLifecycleAuditReport) ->
     typer.echo(f"  pending_review_count: {report.pending_review_count}")
     typer.echo(f"  reviewed_not_closed_count: {report.reviewed_not_closed_count}")
     typer.echo(f"  closeout_execution_count: {report.closeout_execution_count}")
+    typer.echo(f"  session_memory_ref_count: {report.session_memory_ref_count}")
+    typer.echo(
+        f"  session_closed_without_closeout_count: {report.session_closed_without_closeout_count}"
+    )
     typer.echo(f"  closable_count: {report.closable_count}")
     typer.echo(f"  archiveable_count: {report.archiveable_count}")
+    typer.echo(f"  generated_index_ref: {report.generated_index_ref or 'none'}")
     typer.echo("  lifecycle_counts:")
     if not report.lifecycle_counts:
         typer.echo("    - none")
@@ -544,8 +550,56 @@ def _print_checkpoint_lifecycle_audit(report: CheckpointLifecycleAuditReport) ->
                 f"{active} closable={'yes' if entry.closable else 'no'} "
                 f"archiveable={'yes' if entry.archiveable else 'no'}{pending}"
             )
+            if entry.session_memory_archive_ref:
+                typer.echo(f"      session_memory: {entry.session_memory_archive_ref}")
+            if entry.required_action:
+                typer.echo(f"      required_action: {entry.required_action}")
         if len(report.entries) > 20:
             typer.echo(f"    - ... {len(report.entries) - 20} more")
+    typer.echo(f"  notes: {', '.join(report.notes) if report.notes else 'none'}")
+
+
+def _print_checkpoint_session_reconcile_result(report: CheckpointSessionReconcileResult) -> None:
+    typer.echo("checkpoint_session_reconcile:")
+    typer.echo(
+        "  executed_at_canonical_utc: "
+        + _format_dual_timestamp(
+            utc_value=report.executed_at,
+            local_value=report.executed_at_local,
+            tz_name=report.executed_tz,
+        )
+    )
+    typer.echo(f"  dry_run: {'yes' if report.dry_run else 'no'}")
+    typer.echo(f"  repo_label: {report.repo_label or 'all'}")
+    typer.echo(f"  runtime_session_id: {report.runtime_session_id or 'all'}")
+    typer.echo(f"  session_filter: {report.session_filter or 'none'}")
+    typer.echo(f"  selected_count: {report.selected_count}")
+    typer.echo(f"  archived_count: {report.archived_count}")
+    typer.echo(f"  skipped_count: {report.skipped_count}")
+    typer.echo(f"  required_action_count: {report.required_action_count}")
+    typer.echo(f"  generated_index_ref: {report.generated_index_ref or 'none'}")
+    typer.echo(f"  archive_refs: {', '.join(report.archive_refs) if report.archive_refs else 'none'}")
+    typer.echo("  archived_entries:")
+    if not report.archived_entries:
+        typer.echo("    - none")
+    else:
+        for entry in report.archived_entries[:20]:
+            typer.echo(
+                "    - "
+                f"{entry.repo_label} session={entry.runtime_session_id or 'none'} "
+                f"state={entry.lifecycle_state} "
+                f"session_memory={entry.session_memory_archive_ref or 'none'}"
+            )
+        if len(report.archived_entries) > 20:
+            typer.echo(f"    - ... {len(report.archived_entries) - 20} more")
+    typer.echo("  required_actions:")
+    if not report.required_actions:
+        typer.echo("    - none")
+    else:
+        for action in report.required_actions[:20]:
+            typer.echo(f"    - {action}")
+        if len(report.required_actions) > 20:
+            typer.echo(f"    - ... {len(report.required_actions) - 20} more")
     typer.echo(f"  notes: {', '.join(report.notes) if report.notes else 'none'}")
 
 

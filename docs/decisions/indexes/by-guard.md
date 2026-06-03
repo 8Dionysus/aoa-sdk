@@ -71,6 +71,7 @@ Grouped by `Guard families` metadata.
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | accepted |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | accepted |
 
 ## checkpoint path routing
 
@@ -177,6 +178,12 @@ Grouped by `Guard families` metadata.
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | importable implementation, generated read model, source topology | checkpoint, runtime-seam | accepted |
+
+## generated navigation
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | accepted |
 
 ## generated parity
 
@@ -331,6 +338,7 @@ Grouped by `Guard families` metadata.
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | accepted |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | accepted |
 
 ## public import compatibility
 
@@ -465,6 +473,7 @@ Grouped by `Guard families` metadata.
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | accepted |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | accepted |
 
 ## sibling owner boundary
 

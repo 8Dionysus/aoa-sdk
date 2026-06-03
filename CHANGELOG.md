@@ -46,6 +46,11 @@ Tracking starts with the community-docs baseline for this repository.
   `current/` is measured as active-now or still-blocked review work, reviewed
   closeout execution can be closed append-only and archived, stale scopes can
   move as archive evidence, and aoa-session-memory stays read-only evidence.
+- Checkpoint session reconciliation now covers Codex sessions closed without
+  reviewed closeout: `reconcile-sessions` / `sweep-closed-sessions` dry-run by
+  default, read aoa-session-memory refs without mutating them, archive
+  nonpending no-closeout scopes with `archived_without_closeout`, and write a
+  generated lifecycle navigation index with graph-ready anchors.
 - Checkpoint reviewed closeout support now has pipeline branches for
   followthrough decisions, context/session scope, evidence reading, mechanical
   artifact execution, and owner handoff. `closeout/bridge.py` is a thin

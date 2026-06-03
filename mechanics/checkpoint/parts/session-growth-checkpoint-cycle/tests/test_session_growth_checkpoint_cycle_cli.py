@@ -81,6 +81,78 @@ def _write_closeout_execution_report(note_dir: Path, *, session_ref: str, runtim
     return path
 
 
+def _write_session_memory_archive(
+    workspace_root: Path,
+    *,
+    thread_id: str,
+    rollout_path: str,
+    label: str,
+) -> Path:
+    session_dir = workspace_root / ".aoa" / "sessions" / label
+    raw_dir = session_dir / "raw"
+    raw_dir.mkdir(parents=True, exist_ok=True)
+    raw_path = raw_dir / "session.raw.jsonl"
+    raw_path.write_text('{"type":"session_meta"}\n', encoding="utf-8")
+    blocks_index = raw_dir / "blocks.index.json"
+    blocks_index.write_text("[]\n", encoding="utf-8")
+    (session_dir / "session.manifest.json").write_text(
+        json.dumps(
+            {
+                "session_id": thread_id,
+                "session_label": label,
+                "session_title": "Checkpoint CLI no-closeout",
+                "updated_at": "2026-04-10T15:00:00Z",
+                "archive_status": "indexed",
+                "distillation_status": "raw_archived",
+                "review_status": "provisional",
+                "source": {"transcript_path": rollout_path},
+                "raw": {
+                    "path": str(raw_path),
+                    "line_count": 1,
+                    "indexing_status": "indexed",
+                    "blocks_index": str(blocks_index),
+                },
+                "raw_blocks": {"index": str(blocks_index), "blocks": []},
+                "segments": [],
+            }
+        ),
+        encoding="utf-8",
+    )
+    (session_dir / "session.index.json").write_text(
+        json.dumps(
+            {
+                "session_id": thread_id,
+                "updated_at": "2026-04-10T15:00:00Z",
+                "event_count": 1,
+                "work_context": {"status": "resolved", "work_name": "aoa-sdk"},
+                "conversation_act_counts": {"operator_prompt": 1},
+                "session_act_counts": {"operator_prompt": 1},
+                "route_signal_counts": {"authority_surface": {"checkpoint": 1}},
+            }
+        ),
+        encoding="utf-8",
+    )
+    registry = {
+        "schema_version": 1,
+        "updated_at": "2026-04-10T15:00:00Z",
+        "sessions": [
+            {
+                "session_id": thread_id,
+                "session_label": label,
+                "path": str(session_dir),
+                "transcript_path": rollout_path,
+                "archive_status": "indexed",
+                "distillation_status": "raw_archived",
+                "event_count": 1,
+                "segment_count": 0,
+                "updated_at": "2026-04-10T15:00:00Z",
+            }
+        ],
+    }
+    (workspace_root / ".aoa" / "session-registry.json").write_text(json.dumps(registry), encoding="utf-8")
+    return session_dir
+
+
 def _init_git_repo(repo_root: Path) -> None:
     subprocess.run(["git", "init"], cwd=repo_root, check=True, capture_output=True, text=True)
     subprocess.run(["git", "config", "user.name", "AoA Test"], cwd=repo_root, check=True, capture_output=True, text=True)
@@ -360,6 +432,76 @@ def test_checkpoint_lifecycle_audit_and_close_archive_cli_json_dry_run(workspace
     assert close_payload["dry_run"] is True
     assert close_payload["archived_count"] == 1
     assert note_dir.exists()
+
+
+def test_checkpoint_reconcile_sessions_cli_json_dry_run_writes_index(workspace_root: Path) -> None:
+    runner = CliRunner()
+    active_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
+        session_id="runtime-cli-active",
+    )
+    closed_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "closed-session.json",
+        session_id="runtime-cli-no-closeout",
+    )
+    closed_payload = json.loads(closed_session.read_text(encoding="utf-8"))
+    _write_session_memory_archive(
+        workspace_root,
+        thread_id=closed_payload["codex_thread_id"],
+        rollout_path=closed_payload["codex_rollout_path"],
+        label="2026-04-10__006__cli-no-closeout",
+    )
+
+    append = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "append",
+            str(workspace_root / "aoa-sdk"),
+            "--kind",
+            "verify_green",
+            "--intent-text",
+            "reviewed checkpoint exists but closeout was skipped",
+            "--mutation-surface",
+            "code",
+            "--session-file",
+            str(closed_session),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+    assert append.exit_code == 0
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-cli-no-closeout",
+    )
+    _mark_checkpoint_note_reviewed(note_dir)
+
+    result = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "reconcile-sessions",
+            str(workspace_root / "aoa-sdk"),
+            "--runtime-session-id",
+            "runtime-cli-no-closeout",
+            "--session-file",
+            str(active_session),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["dry_run"] is True
+    assert payload["archived_count"] == 1
+    assert payload["archived_entries"][0]["lifecycle_state"] == "session_closed_reviewed_no_closeout"
+    assert payload["generated_index_ref"]
+    assert Path(payload["generated_index_ref"]).exists()
 
 
 def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path) -> None:

@@ -121,6 +121,7 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 | [AOA-SDK-D-0055 - Checkpoint Skipped Session Recovery Branch](../AOA-SDK-D-0055-checkpoint-skipped-session-recovery-branch.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, skipped-session recovery | accepted |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 
 ## child-task reentry
 
@@ -139,6 +140,12 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0056 - CLI Command Family Route Modules](../AOA-SDK-D-0056-cli-command-family-route-modules.md) | 2026-06-03 | source-topology, cli, implementation, validation | boundary-bridge, checkpoint, release-support, runtime-seam | source topology, CLI compatibility, command-family routing | accepted |
+
+## CLI facade
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 
 ## CLI helper scripts
 
@@ -640,6 +647,7 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 
 ## sibling path routing
 

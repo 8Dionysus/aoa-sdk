@@ -19,6 +19,10 @@ owner acceptance.
   pending-review scopes remain blocked, reviewed closeout execution can be
   closed and archived, and nonpending stale scopes can move to archive evidence
   without being marked as reviewed closeout.
+- Keep no-closeout session endings visible: when aoa-session-memory has
+  preserved the closed Codex session, checkpoint reconcile/sweep can archive
+  nonpending checkpoint evidence with `archived_without_closeout` instead of
+  pretending reviewed closeout occurred.
 
 ## Next Work
 
@@ -30,6 +34,10 @@ owner acceptance.
   runner.
 - Use lifecycle audit before close/archive cleanup so `current/` pressure is
   measured rather than guessed.
+- Use reconcile/sweep dry-runs before applying no-closeout archive movement;
+  generated checkpoint lifecycle indexes should route review, session-memory
+  refs, candidates, commits, and graph-ready anchors without becoming memory
+  or GraphRAG authority.
 
 ## When Time Comes
 
@@ -41,6 +49,9 @@ owner acceptance.
   support, and owner handoff evidence repeat cleanly.
 - Add stronger lifecycle transitions only when a repeated route proves the new
   state and its owner boundary; do not add states to explain a one-session tail.
+- Add optional timers only as bounded wrappers around explicit sweep commands;
+  do not add a hidden daemon that runs closeout, review, harvest, owner moves,
+  or memory mutation.
 
 ## Out Of Scope
 

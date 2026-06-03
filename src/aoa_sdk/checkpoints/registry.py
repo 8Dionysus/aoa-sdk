@@ -17,6 +17,7 @@ from ..models import (
     CheckpointHookStatus,
     CheckpointLifecycleArchiveResult,
     CheckpointLifecycleAuditReport,
+    CheckpointSessionReconcileResult,
     CloseoutContextCandidateMap,
     CloseoutExecutionStep,
     SessionCheckpointAutoObservation,
@@ -89,6 +90,7 @@ from .ledger.notes import (
 )
 from .naming import safe_checkpoint_name as _safe_name
 from .promotion.targets import promote_to_dionysus, write_harvest_handoff
+from .reconcile import reconcile_closed_checkpoint_sessions as _reconcile_closed_checkpoint_sessions
 from .render.markdown import render_checkpoint_note_markdown as _render_checkpoint_note_markdown
 from .review.after_commit import (
     after_commit_intent as _after_commit_intent,
@@ -1116,11 +1118,13 @@ class CheckpointsAPI:
         *,
         repo_root: str | None = None,
         session_file: str | None = None,
+        write_index: bool = False,
     ) -> CheckpointLifecycleAuditReport:
         return _audit_checkpoint_lifecycle(
             workspace=self.workspace,
             repo_root=repo_root,
             session_file=session_file,
+            write_index=write_index,
         )
 
     def close_archive(
@@ -1139,6 +1143,30 @@ class CheckpointsAPI:
             runtime_session_id=runtime_session_id,
             dry_run=dry_run,
             include_stale=include_stale,
+        )
+
+    def reconcile_sessions(
+        self,
+        *,
+        repo_root: str | None = None,
+        session_file: str | None = None,
+        runtime_session_id: str | None = None,
+        session_filter: str | None = None,
+        since: str | None = None,
+        until: str | None = None,
+        dry_run: bool = True,
+        write_index: bool = True,
+    ) -> CheckpointSessionReconcileResult:
+        return _reconcile_closed_checkpoint_sessions(
+            workspace=self.workspace,
+            repo_root=repo_root,
+            session_file=session_file,
+            runtime_session_id=runtime_session_id,
+            session_filter=session_filter,
+            since=since,
+            until=until,
+            dry_run=dry_run,
+            write_index=write_index,
         )
 
     def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:

@@ -11,7 +11,10 @@ review, build explicit review-context bundles, route child-task re-entry
 packets, attach session-memory archive refs, and carry reviewed closeout
 context without minting owner truth. Audit checkpoint lifecycle state so
 `current/` means active-now or still-blocked review work, while reviewed
-closeout scopes can be closed and archived without deleting evidence.
+closeout scopes can be closed and archived without deleting evidence. Reconcile
+runtime sessions that ended without reviewed closeout by reading
+aoa-session-memory archive refs and archiving checkpoint evidence with an
+explicit no-closeout lifecycle event.
 
 ### Trigger
 
@@ -28,6 +31,8 @@ context carry changes.
 - mechanical review-context bundle assembly
 - checkpoint lifecycle audit and close/archive routing for nonpending reviewed
   closeout scopes
+- checkpoint session reconciliation for session-memory-backed no-closeout
+  endings
 - read-only session-memory archive attachment for checkpoint closeout
 - reviewed session handoff request/inbox/manifest assembly
 - child-task checkpoint and re-entry packet assembly
@@ -52,6 +57,8 @@ status remain outside SDK checkpoint authority.
 - `mechanics/checkpoint/parts/reviewed-closeout-context-carry/`
 - `src/aoa_sdk/checkpoints/`
 - `src/aoa_sdk/checkpoints/lifecycle.py`
+- `src/aoa_sdk/checkpoints/reconcile.py`
+- `src/aoa_sdk/checkpoints/indexes.py`
 - `src/aoa_sdk/closeout/`
 - `src/aoa_sdk/a2a/`
 - `mechanics/checkpoint/parts/child-task-reentry/`
@@ -74,6 +81,8 @@ This mechanic must not treat `agent_review=pending` as reviewed closeout or
 allow promotion while semantic checkpoint review is still pending.
 It must not close or archive a pending-review checkpoint scope even when a
 closeout artifact exists nearby.
+It must not treat `archived_without_closeout` as reviewed closeout or mutate
+aoa-session-memory while resolving archive refs.
 
 ### Validation
 
@@ -89,4 +98,6 @@ ledger or reviewed carry packet itself.
 Use lifecycle audit when `current/` no longer looks like active work; use
 close/archive only after pending review is clear and reviewed closeout execution
 exists, or when moving nonpending stale scopes as archive evidence without
-marking them closed.
+marking them closed. Use reconcile/sweep only when aoa-session-memory proves
+the runtime session ended without closeout; that route preserves evidence and
+does not claim reviewed closeout happened.

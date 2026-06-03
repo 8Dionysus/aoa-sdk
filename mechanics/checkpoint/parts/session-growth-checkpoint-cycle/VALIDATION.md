@@ -12,6 +12,8 @@ For lifecycle audit and close/archive compatibility, also run:
 ```bash
 aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
 aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
+aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
+aoa checkpoint sweep-closed-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
 ```
 
 For route docs and generated control-plane refs, also run:

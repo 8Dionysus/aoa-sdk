@@ -8,7 +8,10 @@ attaches read-only session-memory archive refs, and carries reviewed
 checkpoint evidence toward final session handoff. It also exposes lifecycle
 audit and close/archive routing so old `current/` checkpoint scopes stop
 pretending to be active work once review and closeout evidence prove their
-next state.
+next state. When an operator closes a Codex session without running the
+reviewed closeout cycle, it can reconcile the checkpoint scope against
+read-only aoa-session-memory archive refs and move the scope to archive
+evidence without claiming reviewed closeout happened.
 
 ## Input
 
@@ -18,11 +21,16 @@ next state.
 - active runtime-session checkpoint ledgers
 - aoa-session-memory session registry, manifest, index, and raw-block refs
 - reviewed closeout context and execution artifacts for lifecycle closure
+- session-memory-backed evidence that a runtime session ended without reviewed
+  checkpoint closeout
 
 ## Output
 
 - session-local checkpoint note ledger and snapshots
 - lifecycle audit and dry-run/apply close/archive reports
+- dry-run/apply session reconciliation reports for no-closeout session ends
+- generated checkpoint lifecycle navigation indexes under
+  `.aoa/session-growth/indexes/`
 - session-memory attachment refs for closeout context
 - reviewed checkpoint note promotion targets
 - review-context inputs for final reviewed session handoff
@@ -39,6 +47,11 @@ After review, route surviving evidence to the reviewed session handoff runner,
 owner follow-through, memory, proof, progression, quest, or stats surfaces.
 After reviewed closeout execution, route the checkpoint scope to lifecycle
 close/archive so `current/` remains active-now or still-blocked review work.
+After session-memory proves that a runtime session ended without reviewed
+closeout, use `aoa checkpoint reconcile-sessions` or
+`aoa checkpoint sweep-closed-sessions`; these commands preserve and archive the
+checkpoint evidence, but never run closeout or mint memory/proof/progression
+truth.
 
 ## Validation
 
