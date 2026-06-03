@@ -57,6 +57,16 @@
       "primary_mechanic": "boundary-bridge",
       "reason": "consumed-surface posture gates bridge sibling surfaces"
     },
+    "contracts": {
+      "primary_mechanic": "boundary-bridge",
+      "secondary_mechanics": [
+        "checkpoint",
+        "codex-projection",
+        "recurrence",
+        "runtime-seam"
+      ],
+      "reason": "shared typed contract branches are SDK facade handles while route-specific owners retain operation meaning"
+    },
     "evals": {
       "primary_mechanic": "boundary-bridge",
       "reason": "eval readers are typed handles over aoa-evals owned proof surfaces"
@@ -335,6 +345,7 @@
         "src/aoa_sdk/agents",
         "src/aoa_sdk/cli",
         "src/aoa_sdk/compatibility",
+        "src/aoa_sdk/contracts",
         "src/aoa_sdk/evals",
         "src/aoa_sdk/governed_runs",
         "src/aoa_sdk/kag",

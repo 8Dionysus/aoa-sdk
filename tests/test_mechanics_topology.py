@@ -142,6 +142,7 @@ def test_boundary_bridge_covers_sibling_facade_source_families() -> None:
     source_surfaces = set(boundary_bridge["source_surfaces"])
 
     assert {
+        "src/aoa_sdk/contracts",
         "src/aoa_sdk/governed_runs",
         "src/aoa_sdk/kag",
         "src/aoa_sdk/loaders",

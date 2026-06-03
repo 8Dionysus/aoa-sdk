@@ -1,0 +1,507 @@
+from __future__ import annotations
+
+import json
+
+import typer
+
+from ..api import AoASDK
+from .common import (
+    _resolve_checkpoint_git_boundary,
+    _resolve_checkpoint_hook_repos,
+    _resolve_checkpoint_managed_hooks,
+)
+from .rendering import (
+    _print_checkpoint_after_commit_report,
+    _print_checkpoint_git_boundary,
+    _print_checkpoint_hook_install,
+    _print_checkpoint_hook_status,
+    _print_checkpoint_note,
+    _print_checkpoint_promotion,
+    _print_closeout_context,
+    _print_closeout_execution_report,
+)
+
+
+checkpoint_app = typer.Typer(help="Capture checkpoint-aware session-growth notes and reviewed promotions")
+
+
+@checkpoint_app.command("append")
+def checkpoint_append(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    kind: str = typer.Option(
+        ...,
+        "--kind",
+        help="Checkpoint kind: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
+    ),
+    intent_text: str = typer.Option("", "--intent-text", help="Intent text used for checkpoint-aware surface detection."),
+    mutation_surface: str = typer.Option(
+        "none",
+        "--mutation-surface",
+        help="Mutation class: none, code, repo-config, infra, runtime, or public-share.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to read active skill names.",
+    ),
+    skill_report_path: str | None = typer.Option(
+        None,
+        "--skill-report-path",
+        help="Optional reference to an existing persisted skill report used as prelude context.",
+    ),
+    mark_reviewable: bool = typer.Option(
+        False,
+        "--mark-reviewable",
+        help="Mark this checkpoint as manually reviewable even if repeat density is still low.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    note = AoASDK.from_workspace(root).checkpoints.append(
+        repo_root=repo_root,
+        checkpoint_kind=kind,  # type: ignore[arg-type]
+        intent_text=intent_text,
+        mutation_surface=mutation_surface,  # type: ignore[arg-type]
+        session_file=session_file,
+        skill_report_path=skill_report_path,
+        manual_review_requested=mark_reviewable,
+    )
+    payload = note.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_note(note)
+
+
+@checkpoint_app.command("mark")
+def checkpoint_mark(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    kind: str = typer.Option(
+        ...,
+        "--kind",
+        help="Checkpoint kind: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
+    ),
+    intent_text: str = typer.Option(
+        ...,
+        "--intent-text",
+        help="Concrete milestone summary to record in the session checkpoint ledger.",
+    ),
+    mutation_surface: str = typer.Option(
+        "none",
+        "--mutation-surface",
+        help="Mutation class: none, code, repo-config, infra, runtime, or public-share.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to read active skill names.",
+    ),
+    skill_report_path: str | None = typer.Option(
+        None,
+        "--skill-report-path",
+        help="Optional reference to an existing persisted skill report used as prelude context.",
+    ),
+    mark_reviewable: bool = typer.Option(
+        True,
+        "--mark-reviewable/--no-mark-reviewable",
+        help="Mark this explicit milestone as manually reviewable by default.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    note = AoASDK.from_workspace(root).checkpoints.append(
+        repo_root=repo_root,
+        checkpoint_kind=kind,  # type: ignore[arg-type]
+        intent_text=intent_text,
+        mutation_surface=mutation_surface,  # type: ignore[arg-type]
+        session_file=session_file,
+        skill_report_path=skill_report_path,
+        manual_review_requested=mark_reviewable,
+    )
+    payload = note.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_note(note)
+
+
+@checkpoint_app.command("after-commit")
+def checkpoint_after_commit(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    commit_ref: str = typer.Option("HEAD", "--commit-ref", help="Committed git ref to capture, usually HEAD."),
+    checkpoint_kind: str = typer.Option(
+        "auto",
+        "--kind",
+        "--checkpoint-kind",
+        help="Post-commit checkpoint kind: auto, commit, or owner_followthrough.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    report = AoASDK.from_workspace(root).checkpoints.after_commit(
+        repo_root=repo_root,
+        commit_ref=commit_ref,
+        session_file=session_file,
+        checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_after_commit_report(report)
+
+
+@checkpoint_app.command("review-note")
+def checkpoint_review_note(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    commit_ref: str = typer.Option("HEAD", "--commit-ref", help="Committed git ref being reviewed."),
+    auto: bool = typer.Option(
+        False,
+        "--auto",
+        help="Auto-fill the checkpoint review from the matching auto observation when summary or note lists are omitted.",
+    ),
+    summary: str | None = typer.Option(
+        None,
+        "--summary",
+        help="Agent-authored summary for this checkpoint review. Required unless --auto is used.",
+    ),
+    finding: list[str] = typer.Option(
+        None,
+        "--finding",
+        help="Agent-authored finding to carry into the session checkpoint note. Repeat for multiple findings.",
+    ),
+    candidate_note: list[str] = typer.Option(
+        None,
+        "--candidate-note",
+        help="Agent-authored candidate note naming what/why/owner/where. Repeat for multiple notes.",
+    ),
+    stats_hint: list[str] = typer.Option(
+        None,
+        "--stats-hint",
+        help="Agent-authored stats hint to verify at reviewed closeout. Repeat for multiple hints.",
+    ),
+    mechanic_hint: list[str] = typer.Option(
+        None,
+        "--mechanic-hint",
+        help="Agent-authored mechanism or workflow hint to revisit at closeout. Repeat for multiple hints.",
+    ),
+    closeout_question: list[str] = typer.Option(
+        None,
+        "--closeout-question",
+        help="Question the agent should answer when rereading the full session at closeout. Repeat for multiple questions.",
+    ),
+    evidence_ref: list[str] = typer.Option(
+        None,
+        "--evidence-ref",
+        help="Evidence reference the agent used while reviewing this checkpoint. Repeat for multiple refs.",
+    ),
+    next_owner_move: list[str] = typer.Option(
+        None,
+        "--next-owner-move",
+        help="Deferred owner move to consider only at reviewed closeout. Repeat for multiple moves.",
+    ),
+    applied_skill: list[str] = typer.Option(
+        None,
+        "--applied-skill",
+        help="Skill the agent actually used while writing this review note. Repeat for multiple skills.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    note = AoASDK.from_workspace(root).checkpoints.review_note(
+        repo_root=repo_root,
+        commit_ref=commit_ref,
+        summary=summary,
+        auto_fill=auto,
+        findings=finding or [],
+        candidate_notes=candidate_note or [],
+        stats_hints=stats_hint or [],
+        mechanic_hints=mechanic_hint or [],
+        closeout_questions=closeout_question or [],
+        evidence_refs=evidence_ref or [],
+        next_owner_moves=next_owner_move or [],
+        applied_skill_names=applied_skill or [],
+        session_file=session_file,
+    )
+    payload = note.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_note(note)
+
+
+@checkpoint_app.command("install-hook")
+def checkpoint_install_hook(
+    repo: str | None = typer.Option(None, "--repo", help="Repository name that should receive the managed checkpoint hooks."),
+    all_owner: bool = typer.Option(
+        False,
+        "--all-owner",
+        help="Install hooks for every mutable owner repo discovered in the workspace.",
+    ),
+    hook: str = typer.Option(
+        "all",
+        "--hook",
+        help="Managed checkpoint hook to install: post-commit, pre-push, pre-merge-commit, or all.",
+    ),
+    overwrite: bool = typer.Option(
+        False,
+        "--overwrite",
+        help="Replace stale existing hook files with the current managed checkpoint hook template.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    sdk = AoASDK.from_workspace(root)
+    repo_names = _resolve_checkpoint_hook_repos(
+        workspace=sdk.workspace,
+        repo=repo,
+        all_owner=all_owner,
+        allow_readonly=True,
+    )
+    hook_names = _resolve_checkpoint_managed_hooks(hook)
+    results = [
+        sdk.checkpoints.install_hook(repo_name=repo_name, hook_name=hook_name, overwrite=overwrite)
+        for repo_name in repo_names
+        for hook_name in hook_names
+    ]
+    payload = {
+        "workspace_root": str(sdk.workspace.root),
+        "results": [result.model_dump(mode="json") for result in results],
+    }
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    for result in results:
+        _print_checkpoint_hook_install(result)
+
+
+@checkpoint_app.command("hook-status")
+def checkpoint_hook_status(
+    repo: str | None = typer.Option(None, "--repo", help="Repository name whose managed checkpoint hooks should be inspected."),
+    all_owner: bool = typer.Option(
+        False,
+        "--all-owner",
+        help="Inspect hook status for every mutable owner repo discovered in the workspace.",
+    ),
+    hook: str = typer.Option(
+        "all",
+        "--hook",
+        help="Managed checkpoint hook to inspect: post-commit, pre-push, pre-merge-commit, or all.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    sdk = AoASDK.from_workspace(root)
+    repo_names = _resolve_checkpoint_hook_repos(
+        workspace=sdk.workspace,
+        repo=repo,
+        all_owner=all_owner,
+        allow_readonly=True,
+    )
+    hook_names = _resolve_checkpoint_managed_hooks(hook)
+    statuses = [
+        sdk.checkpoints.hook_status(repo_name=repo_name, hook_name=hook_name)
+        for repo_name in repo_names
+        for hook_name in hook_names
+    ]
+    payload = {
+        "workspace_root": str(sdk.workspace.root),
+        "results": [status.model_dump(mode="json") for status in statuses],
+    }
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    for status in statuses:
+        _print_checkpoint_hook_status(status)
+
+
+@checkpoint_app.command("git-boundary-check")
+def checkpoint_git_boundary_check(
+    repo_root: str = typer.Argument(..., help="Repository root or repo name whose current checkpoint note should gate the git boundary."),
+    boundary: str = typer.Option(
+        ...,
+        "--boundary",
+        help="Git boundary to check: push or merge.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    resolved_boundary = _resolve_checkpoint_git_boundary(boundary)
+    report = AoASDK.from_workspace(root).checkpoints.git_boundary_check(
+        repo_root=repo_root,
+        boundary=resolved_boundary,
+        session_file=session_file,
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+    else:
+        _print_checkpoint_git_boundary(report)
+    if report.status in {"blocked_pending_review", "blocked_unresolved_checkpoint"}:
+        raise typer.Exit(1)
+
+
+@checkpoint_app.command("status")
+def checkpoint_status(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    note = AoASDK.from_workspace(root).checkpoints.status(repo_root=repo_root, session_file=session_file)
+    payload = note.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_note(note)
+
+
+@checkpoint_app.command("promote")
+def checkpoint_promote(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
+    target: str = typer.Option(
+        ...,
+        "--target",
+        help="Promotion target: dionysus-note or harvest-handoff.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    promotion = AoASDK.from_workspace(root).checkpoints.promote(
+        repo_root=repo_root,
+        target=target,  # type: ignore[arg-type]
+        session_file=session_file,
+    )
+    payload = promotion.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_promotion(promotion)
+
+
+@checkpoint_app.command("build-closeout-context")
+def checkpoint_build_closeout_context(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the closeout context."),
+    reviewed_artifact: str = typer.Option(
+        ...,
+        "--reviewed-artifact",
+        help="Reviewed session artifact that the explicit closeout chain must reread.",
+    ),
+    session_ref: str | None = typer.Option(
+        None,
+        "--session-ref",
+        help="Optional explicit session_ref override when it cannot be derived from the reviewed artifact, receipts, or local note.",
+    ),
+    receipt_path: list[str] = typer.Option(
+        None,
+        "--receipt-path",
+        help="Receipt JSON or JSONL file that should be included in the closeout evidence bundle. Repeat for multiple files.",
+    ),
+    receipt_dir: list[str] = typer.Option(
+        None,
+        "--receipt-dir",
+        help="Directory whose JSON or JSONL receipts should be included in the closeout evidence bundle. Repeat for multiple directories.",
+    ),
+    surface_handoff_path: str | None = typer.Option(
+        None,
+        "--surface-handoff-path",
+        help="Optional reviewed surface handoff path. Defaults to the latest local reviewed handoff for the repo label.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    context = AoASDK.from_workspace(root).checkpoints.build_closeout_context(
+        repo_root=repo_root,
+        reviewed_artifact_path=reviewed_artifact,
+        session_ref=session_ref,
+        receipt_paths=receipt_path or [],
+        receipt_dirs=receipt_dir or [],
+        surface_handoff_path=surface_handoff_path,
+        session_file=session_file,
+    )
+    payload = context.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_closeout_context(context)
+
+
+@checkpoint_app.command("execute-closeout-chain")
+def checkpoint_execute_closeout_chain(
+    repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the closeout context."),
+    reviewed_artifact: str = typer.Option(
+        ...,
+        "--reviewed-artifact",
+        help="Reviewed session artifact that the explicit closeout chain must reread.",
+    ),
+    session_ref: str | None = typer.Option(
+        None,
+        "--session-ref",
+        help="Optional explicit session_ref override when it cannot be derived from the reviewed artifact, receipts, or local note.",
+    ),
+    receipt_path: list[str] = typer.Option(
+        None,
+        "--receipt-path",
+        help="Receipt JSON or JSONL file that should be included in the closeout evidence bundle. Repeat for multiple files.",
+    ),
+    receipt_dir: list[str] = typer.Option(
+        None,
+        "--receipt-dir",
+        help="Directory whose JSON or JSONL receipts should be included in the closeout evidence bundle. Repeat for multiple directories.",
+    ),
+    surface_handoff_path: str | None = typer.Option(
+        None,
+        "--surface-handoff-path",
+        help="Optional reviewed surface handoff path. Defaults to the latest local reviewed handoff for the repo label.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    report = AoASDK.from_workspace(root).checkpoints.execute_closeout_chain(
+        repo_root=repo_root,
+        reviewed_artifact_path=reviewed_artifact,
+        session_ref=session_ref,
+        receipt_paths=receipt_path or [],
+        receipt_dirs=receipt_dir or [],
+        surface_handoff_path=surface_handoff_path,
+        session_file=session_file,
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_closeout_execution_report(report)

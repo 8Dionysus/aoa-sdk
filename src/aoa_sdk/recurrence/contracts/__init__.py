@@ -1,0 +1,1 @@
+"""Typed recurrence contract branches."""
