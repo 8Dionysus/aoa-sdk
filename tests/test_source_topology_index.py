@@ -57,7 +57,7 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
     modules = {module["path"]: module for module in _walk_modules(payload["tree"])}
 
     expected_packages = {
-        "src/aoa_sdk/checkpoints/closeout": "closeout context",
+        "src/aoa_sdk/checkpoints/closeout": "closeout pipeline",
         "src/aoa_sdk/checkpoints/hooks": "Git hook",
         "src/aoa_sdk/checkpoints/ledger": "note ledger",
         "src/aoa_sdk/checkpoints/promotion": "promotion target",
@@ -71,9 +71,18 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
     assert modules["src/aoa_sdk/checkpoints/registry.py"]["split_pressure"] == "medium"
     assert "route-role orchestrator" in modules["src/aoa_sdk/checkpoints/registry.py"]["role"]
     assert "named checkpoint branch" in modules["src/aoa_sdk/checkpoints/registry.py"]["next_route"]
-    assert modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["split_pressure"] == "medium"
-    assert "owner handoff" in modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["role"]
-    assert "split context, evidence, execution" in modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["next_route"]
+    assert modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["split_pressure"] == "low"
+    assert "compatibility facade" in modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["role"]
+    assert "facade thin" in modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["next_route"]
+    closeout_module_roles = {
+        "src/aoa_sdk/checkpoints/closeout/context.py": "candidate-map owner",
+        "src/aoa_sdk/checkpoints/closeout/evidence.py": "Codex trace evidence reader owner",
+        "src/aoa_sdk/checkpoints/closeout/execution.py": "mechanical packet and receipt builder owner",
+        "src/aoa_sdk/checkpoints/closeout/followthrough.py": "next-skill posture owner",
+        "src/aoa_sdk/checkpoints/closeout/owner_handoff.py": "owner follow-through handoff owner",
+    }
+    for path, role_fragment in closeout_module_roles.items():
+        assert role_fragment in modules[path]["role"]
     assert modules["src/aoa_sdk/checkpoints/ledger/notes.py"]["split_pressure"] == "low"
     assert "runtime note loading" in modules["src/aoa_sdk/checkpoints/ledger/notes.py"]["role"]
 

@@ -118,6 +118,7 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | source-topology, mechanics, checkpoint, validation | checkpoint | source topology, checkpoint path routing, session-growth state | accepted |
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
+| [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 
 ## child-task reentry
 
@@ -136,6 +137,12 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, validation guard | titan | mechanics topology, part validation, schema validation, script smoke | accepted |
+
+## closeout bridge
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 
 ## closeout carry
 
@@ -278,6 +285,7 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | source-topology, mechanics, checkpoint, validation | checkpoint | source topology, checkpoint path routing, session-growth state | accepted |
 | [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | checkpoint, runtime-seam | source topology, generated freshness, agent routing | accepted |
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
+| [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 
 ## managed hooks
 

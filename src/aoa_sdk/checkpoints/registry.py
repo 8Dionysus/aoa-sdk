@@ -28,27 +28,35 @@ from ..skills.discovery import SkillsAPI
 from ..surfaces import SurfacesAPI
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
-from .closeout.bridge import (
-    _build_closeout_followthrough_decision,
-    _build_donor_harvest_outputs,
-    _build_owner_followthrough_map,
-    _build_progression_lift_outputs,
-    _build_quest_harvest_outputs,
+from .closeout.context import (
     _closeout_candidate_clusters,
     _collect_candidate_lineage_hints,
     _collect_receipt_paths,
     _derive_closeout_skill_plan,
-    _has_reviewed_closeout_owner_handoff_for_repo,
     _load_context_checkpoint_notes,
     _load_context_surface_handoff,
     _load_receipt_payloads,
     _load_reviewed_surface_handoff,
-    _merge_closeout_evidence,
-    _read_reviewed_artifact,
-    _read_session_trace,
     _resolve_closeout_session_ref,
     _surface_handoff_path,
     _validate_repo_root_closeout_scope,
+)
+from .closeout.evidence import (
+    _merge_closeout_evidence,
+    _read_reviewed_artifact,
+    _read_session_trace,
+)
+from .closeout.execution import (
+    _build_donor_harvest_outputs,
+    _build_progression_lift_outputs,
+    _build_quest_harvest_outputs,
+)
+from .closeout.followthrough import (
+    _build_closeout_followthrough_decision,
+    _build_owner_followthrough_map,
+)
+from .closeout.owner_handoff import (
+    _has_reviewed_closeout_owner_handoff_for_repo,
     _write_checkpoint_owner_handoff,
 )
 from .hooks.git_boundary import (

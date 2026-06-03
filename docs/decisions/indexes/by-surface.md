@@ -73,6 +73,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0039 - A2A Quest Passport Secondary Tier Naming](../AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md) | 2026-06-01 | A2A rebase, child-task reentry, active naming, request payload | checkpoint | active naming, route clarity, part validation | accepted |
 | [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | importable implementation, checkpoint control-plane, path topology | checkpoint | source topology, checkpoint path routing, session-growth state | accepted |
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
+| [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, closeout bridge | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 
 ## ci
 
@@ -162,6 +163,7 @@ Grouped by `Surface classes` metadata.
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
+| [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, closeout bridge | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 
 ## local automation
 
@@ -333,6 +335,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | importable implementation, checkpoint control-plane, path topology | checkpoint | source topology, checkpoint path routing, session-growth state | accepted |
 | [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | importable implementation, generated read model, source topology | checkpoint, runtime-seam | source topology, generated freshness, agent routing | accepted |
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
+| [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, closeout bridge | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 
 ## stress evidence
 
@@ -420,6 +423,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) | 2026-06-03 | importable implementation, checkpoint control-plane, path topology | checkpoint | source topology, checkpoint path routing, session-growth state | accepted |
 | [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | importable implementation, generated read model, source topology | checkpoint, runtime-seam | source topology, generated freshness, agent routing | accepted |
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
+| [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, closeout bridge | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 
 ## validation guard
 

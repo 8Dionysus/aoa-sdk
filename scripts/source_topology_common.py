@@ -22,6 +22,7 @@ SOURCE_INPUT_REFS = (
     "docs/decisions/AOA-SDK-D-0050-checkpoint-path-topology-tree.md",
     "docs/decisions/AOA-SDK-D-0051-implementation-source-topology-index.md",
     "docs/decisions/AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md",
+    "docs/decisions/AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md",
 )
 VALIDATION_REFS = (
     "scripts/build_source_topology_index.py",
@@ -59,7 +60,7 @@ TOP_LEVEL_ROLES = {
 PACKAGE_ROLE_OVERRIDES = {
     "src/aoa_sdk": "importable Python implementation root and AoASDK aggregate entrypoint",
     "src/aoa_sdk/a2a/rebase": "A2A rebase route helpers",
-    "src/aoa_sdk/checkpoints/closeout": "checkpoint reviewed closeout context, evidence, execution, and owner-handoff branch",
+    "src/aoa_sdk/checkpoints/closeout": "checkpoint reviewed closeout pipeline branches for context, evidence, execution, followthrough, and owner-handoff",
     "src/aoa_sdk/checkpoints/hooks": "checkpoint managed Git hook and dirty-boundary branch",
     "src/aoa_sdk/checkpoints/ledger": "checkpoint note ledger assembly and runtime note loading branch",
     "src/aoa_sdk/checkpoints/promotion": "checkpoint reviewed promotion target writer branch",
@@ -73,7 +74,14 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/__init__.py": "public import package marker",
     "src/aoa_sdk/api.py": "AoASDK aggregate API constructor and facet attachment point",
     "src/aoa_sdk/models.py": "shared typed SDK model contracts",
-    "src/aoa_sdk/checkpoints/closeout/bridge.py": "checkpoint closeout bridge helper owner for context, evidence, receipts, and owner handoff",
+    "src/aoa_sdk/checkpoints/closeout/bridge.py": "checkpoint closeout compatibility facade over pipeline branches",
+    "src/aoa_sdk/checkpoints/closeout/common.py": "checkpoint closeout shared small helper owner",
+    "src/aoa_sdk/checkpoints/closeout/context.py": "checkpoint closeout context scope, handoff, receipt, and candidate-map owner",
+    "src/aoa_sdk/checkpoints/closeout/contracts.py": "checkpoint closeout mechanical artifact contract owner",
+    "src/aoa_sdk/checkpoints/closeout/evidence.py": "checkpoint closeout reviewed artifact and Codex trace evidence reader owner",
+    "src/aoa_sdk/checkpoints/closeout/execution.py": "checkpoint closeout mechanical packet and receipt builder owner",
+    "src/aoa_sdk/checkpoints/closeout/followthrough.py": "checkpoint closeout followthrough decision and next-skill posture owner",
+    "src/aoa_sdk/checkpoints/closeout/owner_handoff.py": "checkpoint closeout owner follow-through handoff owner",
     "src/aoa_sdk/checkpoints/hooks/git_boundary.py": "checkpoint Git hook template, git metadata, and dirty-boundary helper owner",
     "src/aoa_sdk/checkpoints/kinds.py": "checkpoint kind inference helper owner",
     "src/aoa_sdk/checkpoints/ledger/notes.py": "checkpoint note ledger assembly, rotation, and runtime note loading owner",
@@ -201,7 +209,7 @@ def _module_next_route(path: Path, line_count: int) -> str:
     if rel == "src/aoa_sdk/checkpoints/registry.py":
         return "keep public CheckpointsAPI orchestration here; add behavior in the named checkpoint branch that owns it"
     if rel == "src/aoa_sdk/checkpoints/closeout/bridge.py":
-        return "if closeout grows again, split context, evidence, execution, and owner-handoff routes from this bridge"
+        return "keep this facade thin; add behavior in the owning closeout context, evidence, execution, followthrough, or owner-handoff branch"
     if rel == "src/aoa_sdk/checkpoints/topology/paths.py":
         return "keep static checkpoint path naming here; route behavior back to checkpoint registry or a route-role branch"
     if line_count >= 1000:
