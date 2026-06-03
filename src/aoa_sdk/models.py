@@ -1728,9 +1728,11 @@ class CheckpointGitBoundaryCheck(BaseModel):
         "clear_no_active_session",
         "clear_no_note",
         "blocked_pending_review",
+        "blocked_unresolved_checkpoint",
     ]
     runtime_session_id: str | None = None
     note_ref: str | None = None
+    post_commit_status_ref: str | None = None
     pending_refs: list[str] = Field(default_factory=list)
     blocking_repo_labels: list[str] = Field(default_factory=list)
     required_action: str | None = None

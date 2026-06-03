@@ -64,6 +64,7 @@ from .hooks.git_boundary import (
     checkpoint_hook_status_parts,
     read_git_commit_metadata,
     render_checkpoint_hook,
+    run_git,
 )
 from .kinds import infer_auto_checkpoint_kind as _infer_auto_checkpoint_kind
 from .ledger.notes import (
@@ -138,6 +139,95 @@ CHECKPOINT_KINDS = (
 POST_COMMIT_CHECKPOINT_KINDS = ("auto", "commit", "owner_followthrough")
 OWNER_MUTABLE_REPOS = tuple(repo for repo in KNOWN_REPOS if repo != "8Dionysus")
 PROMOTION_TARGETS = ("dionysus-note", "harvest-handoff")
+
+
+def _load_latest_post_commit_status(
+    workspace: Workspace,
+    repo_label: str,
+) -> tuple[Path, CheckpointAfterCommitReport] | None:
+    status_path = post_commit_status_path(workspace, repo_label)
+    if not status_path.exists():
+        return None
+    try:
+        return status_path, CheckpointAfterCommitReport.model_validate_json(
+            status_path.read_text(encoding="utf-8")
+        )
+    except Exception:
+        return None
+
+
+def _is_unresolved_skipped_after_commit_report(report: CheckpointAfterCommitReport) -> bool:
+    return (
+        report.status == "skipped_no_active_session"
+        and report.manual_review_requested
+        and report.agent_review_status != "reviewed"
+    )
+
+
+def _after_commit_report_matches_commit(
+    report: CheckpointAfterCommitReport,
+    *,
+    commit_metadata: dict[str, Any],
+    commit_ref: str,
+) -> bool:
+    commit_sha = cast(str | None, commit_metadata.get("commit_sha"))
+    commit_short_sha = cast(str | None, commit_metadata.get("commit_short_sha"))
+    if report.commit_sha is not None and commit_sha is not None:
+        return report.commit_sha == commit_sha
+    if report.commit_short_sha is not None and commit_short_sha is not None:
+        return report.commit_short_sha == commit_short_sha
+    return report.commit_ref == commit_ref
+
+
+def _after_commit_report_matches_session_path(
+    report: CheckpointAfterCommitReport,
+    session_path: Path,
+) -> bool:
+    if report.session_file is None:
+        return False
+    return Path(report.session_file).expanduser().resolve() == session_path.expanduser().resolve()
+
+
+def _after_commit_report_has_thread_scoped_session_file(report: CheckpointAfterCommitReport) -> bool:
+    if report.session_file is None:
+        return False
+    return "skill-runtime-sessions" in Path(report.session_file).parts
+
+
+def _after_commit_report_is_reachable_head(
+    repo_root_path: Path,
+    report: CheckpointAfterCommitReport,
+) -> bool:
+    if report.commit_sha is None:
+        return False
+    result = run_git(
+        repo_root_path,
+        "merge-base",
+        "--is-ancestor",
+        report.commit_sha,
+        "HEAD",
+        check=False,
+    )
+    return result.returncode == 0
+
+
+def _unresolved_skipped_post_commit_status_for_boundary(
+    workspace: Workspace,
+    *,
+    repo_root_path: Path,
+    repo_label: str,
+) -> tuple[Path, CheckpointAfterCommitReport] | None:
+    loaded = _load_latest_post_commit_status(workspace, repo_label)
+    if loaded is None:
+        return None
+    status_path, report = loaded
+    if not _is_unresolved_skipped_after_commit_report(report):
+        return None
+    if not _after_commit_report_has_thread_scoped_session_file(report):
+        return None
+    if not _after_commit_report_is_reachable_head(repo_root_path, report):
+        return None
+    return status_path, report
 
 
 class CheckpointsAPI:
@@ -731,6 +821,62 @@ class CheckpointsAPI:
                 _write_after_commit_report(post_commit_status_path(self.workspace, repo_label), report)
             return report
 
+    def _recover_skipped_after_commit_for_review(
+        self,
+        *,
+        repo_root: str,
+        repo_label: str,
+        commit_ref: str,
+        commit_metadata: dict[str, Any],
+        session_path: Path,
+    ) -> tuple[Path, Any] | None:
+        loaded = _load_latest_post_commit_status(self.workspace, repo_label)
+        if loaded is None:
+            return None
+        status_path, skipped_report = loaded
+        if not _is_unresolved_skipped_after_commit_report(skipped_report):
+            return None
+        if not _after_commit_report_matches_commit(
+            skipped_report,
+            commit_metadata=commit_metadata,
+            commit_ref=commit_ref,
+        ):
+            return None
+        if not _after_commit_report_matches_session_path(skipped_report, session_path):
+            return None
+
+        runtime_session_id, _ = ensure_checkpoint_runtime_session(
+            workspace=self.workspace,
+            session_file=str(session_path),
+        )
+        if runtime_session_id is None:
+            raise SurfaceNotFound(
+                "checkpoint review recovery could not create an active runtime session"
+            )
+
+        recovered_report = self.after_commit(
+            repo_root=repo_root,
+            commit_ref=commit_ref,
+            session_file=str(session_path),
+            checkpoint_kind=skipped_report.checkpoint_kind,
+        )
+        if recovered_report.status != "captured":
+            detail = recovered_report.error_text or recovered_report.status
+            raise SurfaceNotFound(
+                "checkpoint review recovery could not capture skipped post-commit "
+                f"checkpoint from {status_path}: {detail}"
+            )
+
+        recovered_session_path, runtime_session = probe_existing_checkpoint_runtime_session(
+            workspace=self.workspace,
+            session_file=str(session_path),
+        )
+        if runtime_session is None:
+            raise SurfaceNotFound(
+                "checkpoint review recovery created a runtime session path but could not reload it"
+            )
+        return recovered_session_path, runtime_session
+
     def review_note(
         self,
         *,
@@ -748,15 +894,26 @@ class CheckpointsAPI:
         applied_skill_names: list[str] | None = None,
         session_file: str | None = None,
     ) -> SessionCheckpointNote:
+        repo_root_path = _resolve_context_root(self.workspace, repo_root)
+        repo_label = _resolve_context_label(self.workspace, repo_root)
+        commit_metadata = read_git_commit_metadata(repo_root_path, commit_ref)
         session_path, runtime_session = probe_existing_checkpoint_runtime_session(
             workspace=self.workspace,
             session_file=session_file,
         )
+        if runtime_session is None and auto_fill:
+            recovered_session = self._recover_skipped_after_commit_for_review(
+                repo_root=repo_root,
+                repo_label=repo_label,
+                commit_ref=commit_ref,
+                commit_metadata=commit_metadata,
+                session_path=session_path,
+            )
+            if recovered_session is not None:
+                session_path, runtime_session = recovered_session
         if runtime_session is None:
             raise SurfaceNotFound("checkpoint agent review requires an existing active runtime session")
 
-        repo_root_path = _resolve_context_root(self.workspace, repo_root)
-        repo_label = _resolve_context_label(self.workspace, repo_root)
         paths = _resolve_runtime_checkpoint_paths(
             self.workspace,
             repo_root=repo_root,
@@ -766,7 +923,6 @@ class CheckpointsAPI:
         if not paths.jsonl.exists():
             raise SurfaceNotFound(f"no checkpoint note exists yet for {paths.repo_label}")
 
-        commit_metadata = read_git_commit_metadata(repo_root_path, commit_ref)
         current_note = self.status(repo_root=repo_root, session_file=str(session_path))
         auto_observation = _matching_auto_observation(
             note=current_note,
@@ -908,6 +1064,7 @@ class CheckpointsAPI:
 
         note = self.status(repo_root=repo_root, session_file=str(session_path))
         _mark_after_commit_report_reviewed(paths.post_commit_report, review=review)
+        _mark_after_commit_report_reviewed(post_commit_status_path(self.workspace, repo_label), review=review)
         return note
 
     def hook_status(
@@ -978,6 +1135,35 @@ class CheckpointsAPI:
         )
         runtime_session_id = cast(str | None, runtime_metadata["runtime_session_id"])
         if runtime_session_id is None:
+            unresolved_skipped_status = _unresolved_skipped_post_commit_status_for_boundary(
+                self.workspace,
+                repo_root_path=repo_root_path,
+                repo_label=repo_label,
+            )
+            if unresolved_skipped_status is not None:
+                status_path, skipped_report = unresolved_skipped_status
+                pending_ref = (
+                    skipped_report.commit_sha
+                    or skipped_report.commit_short_sha
+                    or skipped_report.commit_ref
+                )
+                return CheckpointGitBoundaryCheck(
+                    repo_root=str(repo_root_path),
+                    repo_label=repo_label,
+                    boundary=boundary,
+                    status="blocked_unresolved_checkpoint",
+                    post_commit_status_ref=str(status_path),
+                    pending_refs=[pending_ref],
+                    blocking_repo_labels=[repo_label],
+                    required_action=(
+                        "unresolved skipped checkpoint blocks "
+                        f"{boundary}; post-commit requested review for {pending_ref} "
+                        "but no active runtime session existed; run "
+                        f"`aoa checkpoint review-note {repo_root_path} --commit-ref {pending_ref} "
+                        f"--auto --session-file {skipped_report.session_file} "
+                        f"--root {self.workspace.federation_root}`"
+                    ),
+                )
             return CheckpointGitBoundaryCheck(
                 repo_root=str(repo_root_path),
                 repo_label=repo_label,
