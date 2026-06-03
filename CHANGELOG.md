@@ -42,6 +42,11 @@ Tracking starts with the community-docs baseline for this repository.
   runtime sessions, hook/git boundaries, reviewed promotion targets, rendering,
   after-commit review, agent-review carry, note ledger assembly, and reviewed
   closeout bridge support. `CheckpointsAPI` remains the public facade.
+- Checkpoint reviewed closeout support now has pipeline branches for
+  followthrough decisions, context/session scope, evidence reading, mechanical
+  artifact execution, and owner handoff. `closeout/bridge.py` is a thin
+  compatibility facade, and checkpoint closeout remains below durable memory,
+  proof, progression, quest, and owner-approval truth.
 - Agon helper payloads and the Experience capture helper seam now live
   in active part-local homes with role, input, output, owner, next-route, and
   validation cards instead of root technical districts.
