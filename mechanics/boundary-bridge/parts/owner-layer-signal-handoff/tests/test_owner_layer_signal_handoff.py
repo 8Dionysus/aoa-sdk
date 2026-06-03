@@ -661,7 +661,10 @@ def test_surface_detect_enriches_skill_items_from_core_receipt_context(
         encoding="utf-8",
     )
 
-    from aoa_sdk.surfaces import registry as surfaces_registry
+    from aoa_sdk.surfaces.context import (
+        enrich_item_with_skill_receipt_context,
+        load_core_skill_receipt_contexts,
+    )
 
     item = SurfaceOpportunityItem(
         surface_ref="aoa-skills:aoa-automation-opportunity-scan",
@@ -687,8 +690,8 @@ def test_surface_detect_enriches_skill_items_from_core_receipt_context(
         closeout_family_candidates=["aoa-session-donor-harvest"],
         promotion_hint=None,
     )
-    contexts = surfaces_registry._load_core_skill_receipt_contexts(sdk.workspace)
-    item = surfaces_registry._enrich_item_with_skill_receipt_context(
+    contexts = load_core_skill_receipt_contexts(sdk.workspace)
+    item = enrich_item_with_skill_receipt_context(
         item,
         skill_receipt_contexts=contexts,
     )

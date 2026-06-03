@@ -286,6 +286,7 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | checkpoint, runtime-seam | source topology, generated freshness, agent routing | accepted |
 | [AOA-SDK-D-0052 - Checkpoint Route-Role Implementation Branches](../AOA-SDK-D-0052-checkpoint-route-role-implementation-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, session-growth state | accepted |
 | [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
+| [AOA-SDK-D-0054 - Surface Registry Route-Role Branches](../AOA-SDK-D-0054-surface-registry-route-role-branches.md) | 2026-06-03 | source-topology, boundary-bridge, implementation, validation | boundary-bridge, checkpoint | source topology, owner-layer signal handoff, checkpoint session-growth | accepted |
 
 ## managed hooks
 
@@ -357,6 +358,12 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) | 2026-06-01 | active naming, external source ref, compatibility accounting, stress evidence | antifragility | active naming, source ref preservation, owner boundary, part validation | accepted |
+
+## owner-layer handoff
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0054 - Surface Registry Route-Role Branches](../AOA-SDK-D-0054-surface-registry-route-role-branches.md) | 2026-06-03 | source-topology, boundary-bridge, implementation, validation | boundary-bridge, checkpoint | source topology, owner-layer signal handoff, checkpoint session-growth | accepted |
 
 ## owner-layer signal handoff
 
@@ -638,6 +645,7 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0013 - Boundary Bridge And Checkpoint Active Part Localization](../AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, public API naming | boundary-bridge, checkpoint | mechanics topology, workspace control plane, part validation, docs routes, API naming | accepted |
+| [AOA-SDK-D-0054 - Surface Registry Route-Role Branches](../AOA-SDK-D-0054-surface-registry-route-role-branches.md) | 2026-06-03 | source-topology, boundary-bridge, implementation, validation | boundary-bridge, checkpoint | source topology, owner-layer signal handoff, checkpoint session-growth | accepted |
 
 ## surface path transport
 
