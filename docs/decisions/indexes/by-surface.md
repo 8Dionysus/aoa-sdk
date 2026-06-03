@@ -82,6 +82,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0053 - Checkpoint Closeout Pipeline Branches](../AOA-SDK-D-0053-checkpoint-closeout-pipeline-branches.md) | 2026-06-03 | importable implementation, checkpoint control-plane, closeout bridge | checkpoint | source topology, checkpoint route roles, closeout boundary | accepted |
 | [AOA-SDK-D-0055 - Checkpoint Skipped Session Recovery Branch](../AOA-SDK-D-0055-checkpoint-skipped-session-recovery-branch.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, skipped-session recovery | accepted |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 
 ## ci
 
@@ -178,6 +179,12 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) | 2026-05-31 | compatibility policy, control-plane, sibling read path | boundary-bridge | source topology, compatibility check, canonical path | accepted |
 
+## generated-index
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
+
 ## implementation
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
@@ -198,6 +205,7 @@ Grouped by `Surface classes` metadata.
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 
 ## local automation
 
@@ -343,6 +351,7 @@ Grouped by `Surface classes` metadata.
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 
 ## schema
 
@@ -497,6 +506,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) | 2026-06-03 | importable implementation, typed contracts, compatibility re-export | boundary-bridge, checkpoint, recurrence, runtime-seam | source topology, public import compatibility, typed contract routing | accepted |
 | [AOA-SDK-D-0060 - Low-Pressure Route Stop-Lines](../AOA-SDK-D-0060-low-pressure-route-stop-lines.md) | 2026-06-03 | importable implementation, route-role branches, compatibility re-export | checkpoint, recurrence, release-support, boundary-bridge | source topology, route-role pressure, stop-line discipline | accepted |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
+| [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 
 ## validation guard
 

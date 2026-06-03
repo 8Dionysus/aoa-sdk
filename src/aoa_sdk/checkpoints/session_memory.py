@@ -137,6 +137,48 @@ def resolve_checkpoint_session_memory(
     return ref, freshness
 
 
+def resolve_checkpoint_session_memory_for_runtime_session(
+    *,
+    workspace: Workspace,
+    runtime_session_id: str | None,
+) -> tuple[CheckpointSessionMemoryRef | None, CheckpointSessionMemoryFreshness]:
+    checked_at = datetime.now(UTC)
+    if not isinstance(runtime_session_id, str) or not runtime_session_id.strip():
+        return None, CheckpointSessionMemoryFreshness(
+            status="missing",
+            checked_at=checked_at,
+            cautions=["checkpoint runtime session id is missing"],
+        )
+
+    runtime_session_ref = _runtime_session_ref_for_id(
+        workspace=workspace,
+        runtime_session_id=runtime_session_id,
+    )
+    if runtime_session_ref is None:
+        return None, CheckpointSessionMemoryFreshness(
+            status="missing",
+            checked_at=checked_at,
+            cautions=[
+                "no aoa-sdk skill runtime session file matched this checkpoint runtime session"
+            ],
+        )
+
+    ref, freshness = resolve_checkpoint_session_memory(
+        workspace=workspace,
+        session_trace_thread_id=_string_value(runtime_session_ref.payload, "codex_thread_id"),
+        session_trace_ref=_string_value(runtime_session_ref.payload, "codex_rollout_path"),
+    )
+    if ref is not None:
+        ref = ref.model_copy(
+            update={
+                "evidence_refs": _dedupe_strings(
+                    [*ref.evidence_refs, str(runtime_session_ref.path)]
+                )
+            }
+        )
+    return ref, freshness
+
+
 def session_memory_evidence_from_ref(
     ref: CheckpointSessionMemoryRef | None,
 ) -> dict[str, object] | None:
@@ -197,6 +239,35 @@ def _candidate_aoa_roots(workspace: Workspace) -> list[Path]:
         seen.add(candidate)
         unique.append(candidate)
     return unique
+
+
+class _RuntimeSessionRef:
+    def __init__(self, *, path: Path, payload: dict[str, Any]) -> None:
+        self.path = path
+        self.payload = payload
+
+
+def _runtime_session_ref_for_id(
+    *,
+    workspace: Workspace,
+    runtime_session_id: str,
+) -> _RuntimeSessionRef | None:
+    if not workspace.has_repo("aoa-sdk"):
+        return None
+    aoa_root = workspace.repo_path("aoa-sdk") / ".aoa"
+    candidate_paths: list[Path] = []
+    session_root = aoa_root / "skill-runtime-sessions"
+    if session_root.is_dir():
+        candidate_paths.extend(sorted(session_root.glob("*.json")))
+    if aoa_root.is_dir():
+        candidate_paths.extend(sorted(aoa_root.glob("*.json")))
+    for path in candidate_paths:
+        payload = _load_json_object(path)
+        if payload is None:
+            continue
+        if _string_value(payload, "session_id") == runtime_session_id:
+            return _RuntimeSessionRef(path=path, payload=payload)
+    return None
 
 
 def _looks_like_session_memory_root(path: Path) -> bool:

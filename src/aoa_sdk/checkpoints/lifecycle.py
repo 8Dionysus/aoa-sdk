@@ -15,8 +15,10 @@ from ..models import (
 )
 from ..workspace.discovery import Workspace
 from .ledger.notes import archive_current_checkpoint, build_checkpoint_note
+from .indexes import write_checkpoint_lifecycle_index
 from .render.markdown import render_checkpoint_note_markdown
 from .runtime.sessions import probe_checkpoint_runtime_session
+from .session_memory import resolve_checkpoint_session_memory_for_runtime_session
 from .timestamps import local_timestamp_parts
 from .topology.paths import (
     CheckpointPaths,
@@ -28,6 +30,9 @@ from .topology.paths import (
 LifecycleState = Literal[
     "active_current",
     "pending_review",
+    "session_closed_pending_review",
+    "session_closed_reviewed_no_closeout",
+    "session_closed_collecting_no_closeout",
     "reviewed_awaiting_closeout",
     "closeout_built",
     "closeout_executed",
@@ -41,6 +46,7 @@ def audit_checkpoint_lifecycle(
     workspace: Workspace,
     repo_root: str | None = None,
     session_file: str | None = None,
+    write_index: bool = False,
 ) -> CheckpointLifecycleAuditReport:
     checked_at, checked_at_local, checked_tz = local_timestamp_parts()
     session_path, runtime_metadata = probe_checkpoint_runtime_session(
@@ -54,6 +60,13 @@ def audit_checkpoint_lifecycle(
     )
     current_root = checkpoint_current_root(workspace)
     archive_root = workspace.repo_path("aoa-sdk") / ".aoa" / "session-growth" / "archive"
+    current_dirs = _iter_checkpoint_current_dirs(current_root)
+    if repo_label is not None:
+        current_dirs = [
+            current_dir
+            for current_dir in current_dirs
+            if _repo_label_from_current_dir(workspace, current_dir) == repo_label
+        ]
     entries = [
         entry
         for entry in (
@@ -64,12 +77,27 @@ def audit_checkpoint_lifecycle(
                     active_runtime_session_id if isinstance(active_runtime_session_id, str) else None
                 ),
             )
-            for current_dir in _iter_checkpoint_current_dirs(current_root)
+            for current_dir in current_dirs
         )
-        if entry is not None and (repo_label is None or entry.repo_label == repo_label)
+        if entry is not None
     ]
     lifecycle_counts = Counter(entry.lifecycle_state for entry in entries)
-    pending_review_count = sum(1 for entry in entries if entry.lifecycle_state == "pending_review")
+    pending_review_count = sum(
+        1
+        for entry in entries
+        if entry.lifecycle_state in {"pending_review", "session_closed_pending_review"}
+    )
+    session_memory_ref_count = sum(1 for entry in entries if entry.session_memory_archive_ref)
+    session_closed_without_closeout_count = sum(
+        1
+        for entry in entries
+        if entry.lifecycle_state
+        in {
+            "session_closed_pending_review",
+            "session_closed_reviewed_no_closeout",
+            "session_closed_collecting_no_closeout",
+        }
+    )
     reviewed_not_closed_count = sum(
         1
         for entry in entries
@@ -89,7 +117,7 @@ def audit_checkpoint_lifecycle(
         notes.append(
             "session-memory refs are reported as route evidence only; lifecycle audit does not mutate .aoa"
         )
-    return CheckpointLifecycleAuditReport(
+    report = CheckpointLifecycleAuditReport(
         checked_at=checked_at,
         checked_at_local=checked_at_local,
         checked_tz=checked_tz,
@@ -104,6 +132,8 @@ def audit_checkpoint_lifecycle(
         archive_scope_count=_archive_scope_count(archive_root),
         closeout_context_count=sum(1 for entry in entries if entry.closeout_context_ref),
         closeout_execution_count=sum(1 for entry in entries if entry.closeout_execution_report_ref),
+        session_memory_ref_count=session_memory_ref_count,
+        session_closed_without_closeout_count=session_closed_without_closeout_count,
         pending_review_count=pending_review_count,
         reviewed_not_closed_count=reviewed_not_closed_count,
         closable_count=sum(1 for entry in entries if entry.closable),
@@ -112,6 +142,10 @@ def audit_checkpoint_lifecycle(
         entries=entries,
         notes=notes,
     )
+    if write_index:
+        index_ref = write_checkpoint_lifecycle_index(workspace=workspace, report=report)
+        report.generated_index_ref = str(index_ref)
+    return report
 
 
 def close_archive_checkpoint_lifecycle(
@@ -200,12 +234,30 @@ def _entry_from_current_dir(
         active_runtime_session_id is not None
         and note.runtime_session_id == active_runtime_session_id
     )
+    session_memory_ref, session_memory_freshness = (
+        resolve_checkpoint_session_memory_for_runtime_session(
+            workspace=workspace,
+            runtime_session_id=note.runtime_session_id,
+        )
+        if not active_runtime_scope
+        else (None, None)
+    )
+    session_memory_archive_ref = _dedupe_strings(
+        [
+            _session_memory_archive_ref(
+                paths.closeout_execution_report,
+                paths.closeout_context,
+            ),
+            session_memory_ref.archive_path if session_memory_ref is not None else None,
+        ]
+    )
     lifecycle_state, reason = _lifecycle_state(
         note_state=note.state,
         review_status=note.review_status,
         agent_review_status=note.agent_review_status,
         pending_refs=note.agent_review_pending_refs,
         active_runtime_scope=active_runtime_scope,
+        has_session_memory_archive=bool(session_memory_archive_ref),
         has_closeout_context=closeout_context_ref is not None,
         has_closeout_execution=closeout_execution_ref is not None,
     )
@@ -216,7 +268,14 @@ def _entry_from_current_dir(
         and not pending_refs
     ) or note.state in {"closed", "promoted"}
     archiveable = closable or (
-        not active_runtime_scope and lifecycle_state != "pending_review"
+        not active_runtime_scope
+        and lifecycle_state not in {"pending_review", "session_closed_pending_review"}
+    )
+    required_action = _required_action(
+        lifecycle_state=lifecycle_state,
+        repo_label=paths.repo_label,
+        pending_refs=pending_refs,
+        runtime_session_id=note.runtime_session_id,
     )
     evidence_refs = _dedupe_strings(
         [
@@ -225,6 +284,7 @@ def _entry_from_current_dir(
             *(post_commit_ref,),
             *(closeout_context_ref,),
             *(closeout_execution_ref,),
+            *(session_memory_ref.evidence_refs if session_memory_ref is not None else []),
             *note.evidence_refs,
         ]
     )
@@ -238,9 +298,12 @@ def _entry_from_current_dir(
         post_commit_report_ref=post_commit_ref,
         closeout_context_ref=closeout_context_ref,
         closeout_execution_report_ref=closeout_execution_ref,
-        session_memory_archive_ref=_session_memory_archive_ref(
-            paths.closeout_execution_report,
-            paths.closeout_context,
+        session_memory_archive_ref=session_memory_archive_ref[0] if session_memory_archive_ref else None,
+        session_memory_session_id=(
+            session_memory_ref.session_id if session_memory_ref is not None else None
+        ),
+        session_memory_status=(
+            session_memory_freshness.status if session_memory_freshness is not None else None
         ),
         state=note.state,
         review_status=note.review_status,
@@ -252,6 +315,7 @@ def _entry_from_current_dir(
         pending_refs=pending_refs,
         blocked_by=list(note.blocked_by),
         evidence_refs=evidence_refs,
+        required_action=required_action,
         reason=reason,
     )
 
@@ -263,15 +327,32 @@ def _lifecycle_state(
     agent_review_status: str,
     pending_refs: list[str],
     active_runtime_scope: bool,
+    has_session_memory_archive: bool,
     has_closeout_context: bool,
     has_closeout_execution: bool,
 ) -> tuple[LifecycleState, str]:
     if note_state in {"closed", "promoted"}:
         return "closed", "checkpoint note is already closed or promoted"
-    if pending_refs or agent_review_status == "pending":
+    pending_review = bool(pending_refs) or agent_review_status == "pending"
+    if pending_review and has_session_memory_archive and not active_runtime_scope:
+        return (
+            "session_closed_pending_review",
+            "aoa-session-memory archive exists, but pending agent review blocks reconcile/archive",
+        )
+    if pending_review:
         return "pending_review", "pending agent review blocks close/archive"
     if has_closeout_execution:
         return "closeout_executed", "reviewed closeout execution report exists"
+    if has_session_memory_archive and not active_runtime_scope and review_status == "reviewed":
+        return (
+            "session_closed_reviewed_no_closeout",
+            "aoa-session-memory archive exists, but reviewed closeout execution is missing",
+        )
+    if has_session_memory_archive and not active_runtime_scope:
+        return (
+            "session_closed_collecting_no_closeout",
+            "aoa-session-memory archive exists, but checkpoint review or closeout did not complete",
+        )
     if has_closeout_context:
         return "closeout_built", "reviewed closeout context exists but execution report is missing"
     if review_status == "reviewed":
@@ -279,6 +360,25 @@ def _lifecycle_state(
     if active_runtime_scope:
         return "active_current", "checkpoint note belongs to the active runtime session"
     return "stale_current_scope", "checkpoint note is outside the active runtime session"
+
+
+def _required_action(
+    *,
+    lifecycle_state: LifecycleState,
+    repo_label: str,
+    pending_refs: list[str],
+    runtime_session_id: str | None,
+) -> str | None:
+    if lifecycle_state not in {"pending_review", "session_closed_pending_review"}:
+        return None
+    refs_preview = ", ".join(pending_refs[:5]) if pending_refs else "pending checkpoint entry"
+    if len(pending_refs) > 5:
+        refs_preview += f" (+{len(pending_refs) - 5} more)"
+    session_part = f" --runtime-session-id {runtime_session_id}" if runtime_session_id else ""
+    return (
+        f"review checkpoint note for {repo_label}{session_part} before reconcile/archive; "
+        f"pending refs: {refs_preview}"
+    )
 
 
 def _close_and_archive_entry(*, workspace: Workspace, entry: CheckpointLifecycleEntry) -> Path:
@@ -349,6 +449,14 @@ def _close_and_archive_entry(*, workspace: Workspace, entry: CheckpointLifecycle
     return archive_dir
 
 
+def close_and_archive_checkpoint_entry(
+    *,
+    workspace: Workspace,
+    entry: CheckpointLifecycleEntry,
+) -> Path:
+    return _close_and_archive_entry(workspace=workspace, entry=entry)
+
+
 def _archive_entry_without_closing(*, workspace: Workspace, entry: CheckpointLifecycleEntry) -> Path:
     paths = _checkpoint_paths_from_entry(workspace, entry)
     note = build_checkpoint_note(paths)
@@ -357,6 +465,85 @@ def _archive_entry_without_closing(*, workspace: Workspace, entry: CheckpointLif
     paths.note_json.write_text(note.model_dump_json(indent=2) + "\n", encoding="utf-8")
     paths.note_md.write_text(
         render_checkpoint_note_markdown(note, repo_label=paths.repo_label),
+        encoding="utf-8",
+    )
+    archive_dir = archive_current_checkpoint(paths)
+    _remove_empty_current_dirs(paths)
+    return archive_dir
+
+
+def archive_checkpoint_entry_without_closeout(
+    *,
+    workspace: Workspace,
+    entry: CheckpointLifecycleEntry,
+) -> Path:
+    paths = _checkpoint_paths_from_entry(workspace, entry)
+    note = build_checkpoint_note(paths)
+    if note.agent_review_status == "pending" or note.agent_review_pending_refs:
+        raise ValueError("pending checkpoint agent review blocks no-closeout reconcile/archive")
+    if not entry.session_memory_archive_ref:
+        raise ValueError("no-closeout reconcile/archive requires aoa-session-memory archive evidence")
+
+    observed_at, observed_at_local, observed_tz = local_timestamp_parts()
+    event = SessionCheckpointLifecycleEvent(
+        event_type="checkpoint_session_archived_without_closeout_v1",
+        event_id=(
+            "session-archive-without-closeout:"
+            f"{_safe_event_fragment(note.session_ref)}:"
+            f"{observed_at.strftime('%Y%m%dT%H%M%SZ')}"
+        ),
+        observed_at=observed_at,
+        observed_at_local=observed_at_local,
+        observed_tz=observed_tz,
+        repo_root=str(_repo_root_for_label(workspace, paths.repo_label)),
+        repo_label=paths.repo_label,
+        session_ref=note.session_ref,
+        runtime_session_id=note.runtime_session_id,
+        lifecycle_state="archived_without_closeout",
+        closeout_context_ref=str(paths.closeout_context) if paths.closeout_context.exists() else None,
+        closeout_execution_report_ref=None,
+        session_memory_archive_ref=entry.session_memory_archive_ref,
+        archive_reason=(
+            "aoa-session-memory archive exists for a checkpoint runtime session "
+            "that ended without reviewed checkpoint closeout execution"
+        ),
+        evidence_refs=_dedupe_strings(
+            [
+                str(paths.jsonl),
+                *(str(paths.note_json) if paths.note_json.exists() else None,),
+                *(str(paths.closeout_context) if paths.closeout_context.exists() else None,),
+                entry.session_memory_archive_ref,
+                *entry.evidence_refs,
+            ]
+        ),
+    )
+    if not any(existing.event_type == event.event_type for existing in note.lifecycle_events):
+        with paths.jsonl.open("a", encoding="utf-8") as handle:
+            handle.write(
+                json.dumps(
+                    {
+                        "session_ref": note.session_ref,
+                        "runtime_session_id": note.runtime_session_id,
+                        "runtime_session_created_at": (
+                            note.runtime_session_created_at.isoformat().replace("+00:00", "Z")
+                            if note.runtime_session_created_at is not None
+                            else None
+                        ),
+                        "repo_root": str(_repo_root_for_label(workspace, paths.repo_label)),
+                        "repo_label": paths.repo_label,
+                        "lifecycle_event": event.model_dump(mode="json"),
+                    },
+                    ensure_ascii=True,
+                )
+                + "\n"
+            )
+    reconciled_note = build_checkpoint_note(paths)
+    paths.note_json.write_text(
+        reconciled_note.model_dump_json(indent=2) + "\n",
+        encoding="utf-8",
+    )
+    paths.note_md.write_text(
+        render_checkpoint_note_markdown(reconciled_note, repo_label=paths.repo_label),
         encoding="utf-8",
     )
     archive_dir = archive_current_checkpoint(paths)
@@ -390,6 +577,19 @@ def _checkpoint_paths_from_current_dir(workspace: Workspace, current_dir: Path) 
         runtime_session_id=runtime_session_id,
         runtime_scope_key=runtime_scope_key,
     )
+
+
+def _repo_label_from_current_dir(workspace: Workspace, current_dir: Path) -> str | None:
+    current_root = checkpoint_current_root(workspace)
+    try:
+        rel_parts = current_dir.relative_to(current_root).parts
+    except ValueError:
+        return None
+    if len(rel_parts) == 1:
+        return rel_parts[0]
+    if len(rel_parts) >= 2:
+        return rel_parts[1]
+    return None
 
 
 def _checkpoint_paths_from_entry(workspace: Workspace, entry: CheckpointLifecycleEntry) -> CheckpointPaths:

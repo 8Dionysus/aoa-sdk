@@ -19,6 +19,7 @@ from .rendering import (
     _print_checkpoint_lifecycle_audit,
     _print_checkpoint_note,
     _print_checkpoint_promotion,
+    _print_checkpoint_session_reconcile_result,
     _print_closeout_context,
     _print_closeout_execution_report,
 )
@@ -389,11 +390,17 @@ def checkpoint_lifecycle_audit(
         help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    write_index: bool = typer.Option(
+        False,
+        "--write-index/--no-write-index",
+        help="Write the generated checkpoint lifecycle navigation index.",
+    ),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     report = AoASDK.from_workspace(root).checkpoints.lifecycle_audit(
         repo_root=repo_root,
         session_file=session_file,
+        write_index=write_index,
     )
     payload = report.model_dump(mode="json")
     if json_output:
@@ -443,6 +450,124 @@ def checkpoint_close_archive(
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     _print_checkpoint_lifecycle_archive_result(report)
+
+
+def _checkpoint_reconcile_sessions_impl(
+    *,
+    repo_root: str | None,
+    runtime_session_id: str | None,
+    session_filter: str | None,
+    since: str | None,
+    until: str | None,
+    dry_run: bool,
+    write_index: bool,
+    session_file: str | None,
+    root: str,
+    json_output: bool,
+) -> None:
+    report = AoASDK.from_workspace(root).checkpoints.reconcile_sessions(
+        repo_root=repo_root,
+        session_file=session_file,
+        runtime_session_id=runtime_session_id,
+        session_filter=session_filter,
+        since=since,
+        until=until,
+        dry_run=dry_run,
+        write_index=write_index,
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_session_reconcile_result(report)
+
+
+@checkpoint_app.command("reconcile-sessions")
+def checkpoint_reconcile_sessions(
+    repo_root: str | None = typer.Argument(
+        None,
+        help="Optional repository root or repo name used to filter checkpoint lifecycle entries.",
+    ),
+    runtime_session_id: str | None = typer.Option(
+        None,
+        "--runtime-session-id",
+        help="Optional runtime session id or scope key to reconcile.",
+    ),
+    session_filter: str | None = typer.Option(
+        None,
+        "--session",
+        help="Optional session id, session ref, note path, or session-memory archive fragment.",
+    ),
+    since: str | None = typer.Option(
+        None,
+        "--since",
+        help="Only reconcile checkpoint sessions observed on or after this date/time.",
+    ),
+    until: str | None = typer.Option(
+        None,
+        "--until",
+        help="Only reconcile checkpoint sessions observed on or before this date/time.",
+    ),
+    dry_run: bool = typer.Option(
+        True,
+        "--dry-run/--apply",
+        help="Preview by default; use --apply to move checkpoint evidence from current to archive.",
+    ),
+    write_index: bool = typer.Option(
+        True,
+        "--write-index/--no-write-index",
+        help="Write the generated checkpoint lifecycle navigation index.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    _checkpoint_reconcile_sessions_impl(
+        repo_root=repo_root,
+        runtime_session_id=runtime_session_id,
+        session_filter=session_filter,
+        since=since,
+        until=until,
+        dry_run=dry_run,
+        write_index=write_index,
+        session_file=session_file,
+        root=root,
+        json_output=json_output,
+    )
+
+
+@checkpoint_app.command("sweep-closed-sessions")
+def checkpoint_sweep_closed_sessions(
+    repo_root: str | None = typer.Argument(
+        None,
+        help="Optional repository root or repo name used to filter checkpoint lifecycle entries.",
+    ),
+    runtime_session_id: str | None = typer.Option(None, "--runtime-session-id"),
+    session_filter: str | None = typer.Option(None, "--session"),
+    since: str | None = typer.Option(None, "--since"),
+    until: str | None = typer.Option(None, "--until"),
+    dry_run: bool = typer.Option(True, "--dry-run/--apply"),
+    write_index: bool = typer.Option(True, "--write-index/--no-write-index"),
+    session_file: str | None = typer.Option(None, "--session-file"),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    _checkpoint_reconcile_sessions_impl(
+        repo_root=repo_root,
+        runtime_session_id=runtime_session_id,
+        session_filter=session_filter,
+        since=since,
+        until=until,
+        dry_run=dry_run,
+        write_index=write_index,
+        session_file=session_file,
+        root=root,
+        json_output=json_output,
+    )
 
 
 @checkpoint_app.command("promote")

@@ -32,6 +32,16 @@ existing session-harvest family into an automatic runtime authority.
 - lifecycle audit may report aoa-session-memory archive refs from closeout
   context or execution reports, but those refs stay read-only route evidence
   and the checkpoint mechanic must not mutate aoa-session-memory
+- lifecycle audit may also resolve aoa-session-memory archive refs from the
+  checkpoint runtime-session trace when the operator closed the Codex session
+  without reviewed closeout; those refs produce `session_closed_*` lifecycle
+  states, not reviewed closeout claims
+- `aoa checkpoint reconcile-sessions` and its
+  `aoa checkpoint sweep-closed-sessions` alias preview by default, write a
+  generated navigation index when requested, and with `--apply` archive only
+  session-memory-backed no-closeout scopes or existing closeout-executed
+  scopes; pending-review scopes return required actions instead of moving
+  evidence
 - once reviewed closeout is allowed, `closeout-context.json` carries one aggregated checkpoint-review bundle with review refs, inherited auto-observation refs, findings, candidate notes, stats hints, mechanic hints, closeout questions, evidence refs, and deferred next-owner moves
 - the mechanical donor, progression, and quest artifacts emitted by `aoa-checkpoint-closeout-bridge` now carry the same checkpoint-review bundle forward so reviewed closeout does not drop the semantic checkpoint layer immediately after context build
 - when that bridge also reaches owner follow-through, it now writes one persistent `.aoa/closeout/handoffs/*.owner-handoff.json` bundle rooted in the reviewed `closeout-context.json`; this stays a follow-through queue, not final owner truth, and it must not mint canonical owner landing state by itself
@@ -222,6 +232,9 @@ aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk --reviewed-artifact /
 aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
 aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
 aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --include-stale --apply --json
+aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
+aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --runtime-session-id <runtime-session-id> --apply --json
+aoa checkpoint sweep-closed-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --session <session-or-archive-fragment> --dry-run --json
 aoa checkpoint status /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS/aoa-sdk --json
 ```
 

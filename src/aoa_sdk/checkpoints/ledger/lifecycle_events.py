@@ -31,6 +31,8 @@ def lifecycle_evidence_refs(events: list[SessionCheckpointLifecycleEvent]) -> se
             refs.add(event.closeout_context_ref)
         if event.closeout_execution_report_ref:
             refs.add(event.closeout_execution_report_ref)
+        if event.session_memory_archive_ref:
+            refs.add(event.session_memory_archive_ref)
     return refs
 
 

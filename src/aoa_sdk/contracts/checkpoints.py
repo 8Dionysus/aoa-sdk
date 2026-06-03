@@ -230,9 +230,10 @@ class SessionCheckpointAgentReview(BaseModel):
 
 class SessionCheckpointLifecycleEvent(BaseModel):
     schema_version: int = 1
-    event_type: Literal["checkpoint_lifecycle_closed_v1"] = (
-        "checkpoint_lifecycle_closed_v1"
-    )
+    event_type: Literal[
+        "checkpoint_lifecycle_closed_v1",
+        "checkpoint_session_archived_without_closeout_v1",
+    ] = "checkpoint_lifecycle_closed_v1"
     event_id: str
     observed_at: datetime
     observed_at_local: str | None = None
@@ -241,9 +242,10 @@ class SessionCheckpointLifecycleEvent(BaseModel):
     repo_label: str
     session_ref: str
     runtime_session_id: str | None = None
-    lifecycle_state: Literal["closed"] = "closed"
+    lifecycle_state: Literal["closed", "archived_without_closeout"] = "closed"
     closeout_context_ref: str | None = None
     closeout_execution_report_ref: str | None = None
+    session_memory_archive_ref: str | None = None
     archive_reason: str
     evidence_refs: list[str] = Field(default_factory=list)
 
@@ -487,12 +489,17 @@ class CheckpointLifecycleEntry(BaseModel):
     closeout_context_ref: str | None = None
     closeout_execution_report_ref: str | None = None
     session_memory_archive_ref: str | None = None
+    session_memory_session_id: str | None = None
+    session_memory_status: Literal["current", "partial", "missing", "unavailable"] | None = None
     state: Literal["collecting", "reviewable", "promoted", "closed"] | None = None
     review_status: Literal["unreviewed", "reviewed"] | None = None
     agent_review_status: Literal["none", "pending", "reviewed"] | None = None
     lifecycle_state: Literal[
         "active_current",
         "pending_review",
+        "session_closed_pending_review",
+        "session_closed_reviewed_no_closeout",
+        "session_closed_collecting_no_closeout",
         "reviewed_awaiting_closeout",
         "closeout_built",
         "closeout_executed",
@@ -505,6 +512,7 @@ class CheckpointLifecycleEntry(BaseModel):
     pending_refs: list[str] = Field(default_factory=list)
     blocked_by: list[str] = Field(default_factory=list)
     evidence_refs: list[str] = Field(default_factory=list)
+    required_action: str | None = None
     reason: str
 
 
@@ -525,12 +533,15 @@ class CheckpointLifecycleAuditReport(BaseModel):
     archive_scope_count: int = 0
     closeout_context_count: int = 0
     closeout_execution_count: int = 0
+    session_memory_ref_count: int = 0
+    session_closed_without_closeout_count: int = 0
     pending_review_count: int = 0
     reviewed_not_closed_count: int = 0
     closable_count: int = 0
     archiveable_count: int = 0
     lifecycle_counts: dict[str, int] = Field(default_factory=dict)
     entries: list[CheckpointLifecycleEntry] = Field(default_factory=list)
+    generated_index_ref: str | None = None
     notes: list[str] = Field(default_factory=list)
 
 
@@ -551,6 +562,33 @@ class CheckpointLifecycleArchiveResult(BaseModel):
     archived_entries: list[CheckpointLifecycleEntry] = Field(default_factory=list)
     skipped_entries: list[CheckpointLifecycleEntry] = Field(default_factory=list)
     archive_refs: list[str] = Field(default_factory=list)
+    notes: list[str] = Field(default_factory=list)
+
+
+class CheckpointSessionReconcileResult(BaseModel):
+    schema_version: int = 1
+    report_type: Literal["checkpoint_session_reconcile_result_v1"] = (
+        "checkpoint_session_reconcile_result_v1"
+    )
+    executed_at: datetime
+    executed_at_local: str | None = None
+    executed_tz: str | None = None
+    dry_run: bool = True
+    repo_root: str | None = None
+    repo_label: str | None = None
+    runtime_session_id: str | None = None
+    session_filter: str | None = None
+    since: str | None = None
+    until: str | None = None
+    selected_count: int = 0
+    archived_count: int = 0
+    skipped_count: int = 0
+    required_action_count: int = 0
+    archived_entries: list[CheckpointLifecycleEntry] = Field(default_factory=list)
+    skipped_entries: list[CheckpointLifecycleEntry] = Field(default_factory=list)
+    required_actions: list[str] = Field(default_factory=list)
+    archive_refs: list[str] = Field(default_factory=list)
+    generated_index_ref: str | None = None
     notes: list[str] = Field(default_factory=list)
 
 

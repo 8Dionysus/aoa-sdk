@@ -31,6 +31,7 @@ SOURCE_INPUT_REFS = (
     "docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md",
     "docs/decisions/AOA-SDK-D-0060-low-pressure-route-stop-lines.md",
     "docs/decisions/AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md",
+    "docs/decisions/AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md",
 )
 VALIDATION_REFS = (
     "scripts/build_source_topology_index.py",
@@ -102,8 +103,10 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/ledger/lifecycle_events.py": "checkpoint lifecycle ledger event normalization helper owner",
     "src/aoa_sdk/checkpoints/ledger/notes.py": "checkpoint note ledger assembly, rotation, and runtime note loading owner",
     "src/aoa_sdk/checkpoints/lifecycle.py": "checkpoint lifecycle audit, pending-review stop-line, and close/archive orchestration owner",
+    "src/aoa_sdk/checkpoints/indexes.py": "checkpoint generated lifecycle navigation index owner",
     "src/aoa_sdk/checkpoints/naming.py": "checkpoint slug naming helper owner",
     "src/aoa_sdk/checkpoints/promotion/targets.py": "checkpoint reviewed promotion target writer owner",
+    "src/aoa_sdk/checkpoints/reconcile.py": "checkpoint no-closeout session reconciliation owner",
     "src/aoa_sdk/checkpoints/registry.py": "checkpoint public API facade and route-role orchestrator",
     "src/aoa_sdk/checkpoints/render/markdown.py": "checkpoint note markdown render owner",
     "src/aoa_sdk/checkpoints/review/after_commit.py": "checkpoint after-commit report and auto-observation owner",
