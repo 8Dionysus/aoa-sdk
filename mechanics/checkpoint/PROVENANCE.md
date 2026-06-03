@@ -18,6 +18,7 @@
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_session_memory.py`
 - `mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py`
 
 ## Stronger Owners
@@ -30,6 +31,8 @@ mechanic only captures and gates local evidence.
 
 This shared name matches the recurring AoA checkpoint shape but keeps SDK
 behavior limited to session-local control-plane support.
+Session-memory archive refs are consumed as route evidence for reviewed
+closeout context, not as reviewed memory truth.
 
 Former parent-name candidates for this package live only in
 `legacy/INDEX.md`. Active Checkpoint routes name the operation: review context

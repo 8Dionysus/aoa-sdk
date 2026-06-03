@@ -24,6 +24,44 @@ from .contracts import (
 )
 from .owner_handoff import _build_accepted_candidate, _quest_promotion_fields
 
+
+def _session_memory_ref_payload(context: CheckpointCloseoutContext) -> dict[str, object] | None:
+    if context.session_memory_ref is None:
+        return None
+    return context.session_memory_ref.model_dump(mode="json")
+
+
+def _session_memory_freshness_payload(context: CheckpointCloseoutContext) -> dict[str, object]:
+    return context.session_memory_freshness.model_dump(mode="json")
+
+
+def _session_memory_evidence_refs(context: CheckpointCloseoutContext) -> list[dict[str, str]]:
+    ref = context.session_memory_ref
+    if ref is None:
+        return []
+    evidence_refs = [
+        {"kind": "session_memory_archive", "ref": ref.archive_path, "role": "archive-root"},
+        {"kind": "session_memory_manifest", "ref": ref.manifest_ref, "role": "manifest"},
+    ]
+    if ref.session_index_ref is not None:
+        evidence_refs.append(
+            {"kind": "session_memory_index", "ref": ref.session_index_ref, "role": "route-index"}
+        )
+    if ref.raw_ref is not None:
+        evidence_refs.append(
+            {"kind": "session_memory_raw", "ref": ref.raw_ref, "role": "raw-evidence"}
+        )
+    if ref.raw_blocks_index_ref is not None:
+        evidence_refs.append(
+            {
+                "kind": "session_memory_raw_blocks_index",
+                "ref": ref.raw_blocks_index_ref,
+                "role": "raw-block-ledger",
+            }
+        )
+    return evidence_refs
+
+
 def _build_donor_harvest_outputs(
     *,
     context: CheckpointCloseoutContext,
@@ -74,6 +112,8 @@ def _build_donor_harvest_outputs(
         "reviewed_artifact_ref": str(reviewed_artifact),
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
+        "session_memory_ref": _session_memory_ref_payload(context),
+        "session_memory_freshness": _session_memory_freshness_payload(context),
         "checkpoint_note_ref": context.checkpoint_note_ref,
         "surface_handoff_ref": context.surface_handoff_ref,
         "checkpoint_review_carry": context.checkpoint_review_carry.model_dump(mode="json"),
@@ -105,6 +145,7 @@ def _build_donor_harvest_outputs(
                 if context.session_trace_ref is not None
                 else []
             ),
+            *_session_memory_evidence_refs(context),
             {
                 "kind": "skill_contract",
                 "ref": "repo:aoa-skills/skills/aoa-session-donor-harvest/SKILL.md",
@@ -211,6 +252,8 @@ def _build_progression_lift_outputs(
         "reviewed_artifact_ref": str(reviewed_artifact),
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
+        "session_memory_ref": _session_memory_ref_payload(context),
+        "session_memory_freshness": _session_memory_freshness_payload(context),
         "checkpoint_review_carry": context.checkpoint_review_carry.model_dump(mode="json"),
         "candidate_ids": _dedupe_strings(
             [
@@ -239,6 +282,7 @@ def _build_progression_lift_outputs(
                 if context.session_trace_ref is not None
                 else []
             ),
+            *_session_memory_evidence_refs(context),
             {
                 "kind": "skill_contract",
                 "ref": "repo:aoa-skills/skills/aoa-session-progression-lift/SKILL.md",
@@ -347,6 +391,8 @@ def _build_quest_harvest_outputs(
         "reviewed_artifact_ref": str(reviewed_artifact),
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
+        "session_memory_ref": _session_memory_ref_payload(context),
+        "session_memory_freshness": _session_memory_freshness_payload(context),
         "checkpoint_review_carry": context.checkpoint_review_carry.model_dump(mode="json"),
         "candidate_ref": bounded_unit_ref,
         "candidate_refs": candidate_refs,
@@ -381,6 +427,8 @@ def _build_quest_harvest_outputs(
         "multi_candidate_followup_required": multi_candidate_followup_required,
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
+        "session_memory_ref": _session_memory_ref_payload(context),
+        "session_memory_freshness": _session_memory_freshness_payload(context),
         "checkpoint_review_carry": context.checkpoint_review_carry.model_dump(mode="json"),
     }
     packet_path = output_dir / "QUEST_PROMOTION.json"
@@ -396,6 +444,8 @@ def _build_quest_harvest_outputs(
         "promotions": promotion_entries,
         "session_trace_ref": context.session_trace_ref,
         "session_trace_thread_id": context.session_trace_thread_id,
+        "session_memory_ref": _session_memory_ref_payload(context),
+        "session_memory_freshness": _session_memory_freshness_payload(context),
         "checkpoint_review_carry": context.checkpoint_review_carry.model_dump(mode="json"),
     }
     promotion_bundle_path = output_dir / "QUEST_PROMOTIONS.json"
@@ -420,6 +470,7 @@ def _build_quest_harvest_outputs(
                 if context.session_trace_ref is not None
                 else []
             ),
+            *_session_memory_evidence_refs(context),
             {
                 "kind": "skill_contract",
                 "ref": "repo:aoa-skills/skills/aoa-quest-harvest/SKILL.md",

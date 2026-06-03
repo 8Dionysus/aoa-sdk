@@ -4,7 +4,8 @@
 
 `session-growth-checkpoint-cycle` is the Checkpoint part that captures
 session-local checkpoint notes, gates review, preserves promotion stop-lines,
-and carries reviewed checkpoint evidence toward final session handoff.
+attaches read-only session-memory archive refs, and carries reviewed
+checkpoint evidence toward final session handoff.
 
 ## Input
 
@@ -12,10 +13,12 @@ and carries reviewed checkpoint evidence toward final session handoff.
 - explicit `aoa checkpoint mark`, `append`, `after-commit`, and `review-note`
   calls
 - active runtime-session checkpoint ledgers
+- aoa-session-memory session registry, manifest, index, and raw-block refs
 
 ## Output
 
 - session-local checkpoint note ledger and snapshots
+- session-memory attachment refs for closeout context
 - reviewed checkpoint note promotion targets
 - review-context inputs for final reviewed session handoff
 

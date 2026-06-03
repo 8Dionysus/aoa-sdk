@@ -9,7 +9,9 @@
 Route the shared checkpoint mechanic for session-local note capture, git
 boundary checks, review-note gates, promotion stop-lines, and review-context
 bundle assembly, reviewed session handoff runner behavior, and reviewed
-closeout context carry below owner truth.
+closeout context carry below owner truth. It may attach read-only
+aoa-session-memory archive refs to checkpoint closeout context, but it does not
+promote memory claims.
 
 ## Read before editing
 
@@ -38,11 +40,11 @@ closeout context carry below owner truth.
 
 ```bash
 python scripts/validate_mechanics_topology.py
-python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py
+python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_session_memory.py mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py
 ```
 
 ## Closeout
 
 Report whether capture, hook guard, review-note, promotion, review-context,
-reviewed session handoff runner, or reviewed closeout context carry behavior
-changed.
+session-memory attachment, reviewed session handoff runner, or reviewed
+closeout context carry behavior changed.

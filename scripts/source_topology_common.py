@@ -107,6 +107,7 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/review/agent_review.py": "checkpoint agent-review autofill and review-carry owner",
     "src/aoa_sdk/checkpoints/review/skipped_recovery.py": "checkpoint skipped-session recovery, reachability, and blocking required-action owner",
     "src/aoa_sdk/checkpoints/runtime/sessions.py": "checkpoint runtime-session lookup and probe owner",
+    "src/aoa_sdk/checkpoints/session_memory.py": "checkpoint read-only aoa-session-memory archive attachment owner",
     "src/aoa_sdk/checkpoints/timestamps.py": "checkpoint timestamp normalization helper owner",
     "src/aoa_sdk/checkpoints/topology/paths.py": "checkpoint filesystem path topology owner",
     "src/aoa_sdk/cli/checkpoint.py": "CLI checkpoint capture, review, hook, boundary, promotion, and checkpoint-closeout command family owner",

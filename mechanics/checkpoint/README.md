@@ -8,7 +8,8 @@ Status: active topology with part-local payload.
 
 Capture session-growth checkpoint notes, guard git boundaries, require semantic
 review, build explicit review-context bundles, route child-task re-entry
-packets, and carry reviewed closeout context without minting owner truth.
+packets, attach session-memory archive refs, and carry reviewed closeout
+context without minting owner truth.
 
 ### Trigger
 
@@ -23,6 +24,7 @@ context carry changes.
 - active-session git boundary checks
 - review-note and promotion fail-closed gates
 - mechanical review-context bundle assembly
+- read-only session-memory archive attachment for checkpoint closeout
 - reviewed session handoff request/inbox/manifest assembly
 - child-task checkpoint and re-entry packet assembly
 - reviewed closeout context carry schemas, examples, and advisory maps
@@ -51,6 +53,7 @@ status remain outside SDK checkpoint authority.
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py`
+- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_session_memory.py`
 - `mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py`
 
 ### Candidate parts

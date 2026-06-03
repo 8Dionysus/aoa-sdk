@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 from datetime import datetime
-from typing import Literal
+from typing import Any, Literal
 
 from pydantic import BaseModel, Field, model_validator
 
@@ -99,6 +99,63 @@ class CloseoutFollowthroughDecision(BaseModel):
         if self.recommended_next_skill in self.also_considered:
             raise ValueError("also_considered must not repeat recommended_next_skill")
         return self
+
+
+class CheckpointSessionMemoryRouteSignalSummary(BaseModel):
+    layer: str
+    signal_count: int
+    top_keys: dict[str, int] = Field(default_factory=dict)
+
+
+class CheckpointSessionMemoryRef(BaseModel):
+    schema_version: Literal["aoa_checkpoint_session_memory_ref_v1"] = (
+        "aoa_checkpoint_session_memory_ref_v1"
+    )
+    source: Literal["aoa-session-memory"] = "aoa-session-memory"
+    authority_contract: Literal["archive_indexes_are_route_evidence_not_reviewed_truth"] = (
+        "archive_indexes_are_route_evidence_not_reviewed_truth"
+    )
+    aoa_root: str
+    session_id: str
+    session_label: str | None = None
+    session_title: str | None = None
+    archive_path: str
+    manifest_ref: str
+    session_index_ref: str | None = None
+    raw_ref: str | None = None
+    raw_blocks_index_ref: str | None = None
+    source_trace_ref: str | None = None
+    archive_status: str | None = None
+    distillation_status: str | None = None
+    review_status: str | None = None
+    event_count: int | None = None
+    segment_count: int | None = None
+    updated_at: str | None = None
+    work_context: dict[str, Any] = Field(default_factory=dict)
+    conversation_act_counts: dict[str, int] = Field(default_factory=dict)
+    session_act_counts: dict[str, int] = Field(default_factory=dict)
+    route_signal_layers: list[str] = Field(default_factory=list)
+    route_signal_summary: list[CheckpointSessionMemoryRouteSignalSummary] = Field(
+        default_factory=list
+    )
+    evidence_refs: list[str] = Field(default_factory=list)
+    cautions: list[str] = Field(default_factory=list)
+
+
+class CheckpointSessionMemoryFreshness(BaseModel):
+    schema_version: Literal["aoa_checkpoint_session_memory_freshness_v1"] = (
+        "aoa_checkpoint_session_memory_freshness_v1"
+    )
+    status: Literal["current", "partial", "missing", "unavailable"] = "unavailable"
+    local_manifest_status: Literal["current", "missing", "not_checked"] = "not_checked"
+    local_session_index_status: Literal["current", "missing", "not_checked"] = "not_checked"
+    local_raw_status: Literal["current", "missing", "not_checked"] = "not_checked"
+    global_search_status: Literal["not_checked"] = "not_checked"
+    global_atlas_status: Literal["not_checked"] = "not_checked"
+    global_graph_status: Literal["not_checked"] = "not_checked"
+    checked_at: datetime | None = None
+    cautions: list[str] = Field(default_factory=list)
+
 
 class CheckpointCandidateCluster(BaseModel):
     candidate_id: str
@@ -450,6 +507,10 @@ class CheckpointCloseoutContext(BaseModel):
     runtime_session_id: str | None = None
     session_trace_ref: str | None = None
     session_trace_thread_id: str | None = None
+    session_memory_ref: CheckpointSessionMemoryRef | None = None
+    session_memory_freshness: CheckpointSessionMemoryFreshness = Field(
+        default_factory=CheckpointSessionMemoryFreshness
+    )
     checkpoint_note_ref: str | None = None
     checkpoint_note_refs: list[str] = Field(default_factory=list)
     surface_handoff_ref: str | None = None
@@ -503,6 +564,10 @@ class CheckpointCloseoutExecutionReport(BaseModel):
     runtime_session_id: str | None = None
     session_trace_ref: str | None = None
     session_trace_thread_id: str | None = None
+    session_memory_ref: CheckpointSessionMemoryRef | None = None
+    session_memory_freshness: CheckpointSessionMemoryFreshness = Field(
+        default_factory=CheckpointSessionMemoryFreshness
+    )
     checkpoint_note_ref: str | None = None
     checkpoint_note_refs: list[str] = Field(default_factory=list)
     surface_handoff_ref: str | None = None
