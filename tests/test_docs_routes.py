@@ -228,6 +228,9 @@ def test_readme_routes_surface_detection_to_owner_surfaces() -> None:
     assert "checkpoint notes carry harvest, progression, and upgrade candidates through the end of the session" in checkpoint
     assert "agent_review=pending" in checkpoint
     assert "checkpoint_capture.session_end_skill_targets" in checkpoint
+    assert "aoa checkpoint lifecycle-audit" in checkpoint
+    assert "checkpoint_lifecycle_closed_v1" in checkpoint
+    assert "must not mutate aoa-session-memory" in checkpoint
 
 
 def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:

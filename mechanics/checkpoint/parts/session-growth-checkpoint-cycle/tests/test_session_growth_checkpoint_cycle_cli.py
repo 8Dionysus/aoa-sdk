@@ -52,6 +52,35 @@ def _write_runtime_session_file(path: Path, *, session_id: str) -> Path:
     return path
 
 
+def _mark_checkpoint_note_reviewed(note_dir: Path) -> None:
+    payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
+    payload["review_status"] = "reviewed"
+    payload["agent_review_status"] = "reviewed"
+    payload["agent_review_required"] = False
+    payload["agent_review_pending_refs"] = []
+    (note_dir / "checkpoint-note.json").write_text(
+        json.dumps(payload, indent=2) + "\n",
+        encoding="utf-8",
+    )
+
+
+def _write_closeout_execution_report(note_dir: Path, *, session_ref: str, runtime_session_id: str) -> Path:
+    path = note_dir / "closeout-execution-report.json"
+    path.write_text(
+        json.dumps(
+            {
+                "session_ref": session_ref,
+                "runtime_session_id": runtime_session_id,
+                "session_memory_ref": None,
+            },
+            indent=2,
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    return path
+
+
 def _init_git_repo(repo_root: Path) -> None:
     subprocess.run(["git", "init"], cwd=repo_root, check=True, capture_output=True, text=True)
     subprocess.run(["git", "config", "user.name", "AoA Test"], cwd=repo_root, check=True, capture_output=True, text=True)
@@ -250,6 +279,87 @@ def test_checkpoint_cli_append_status_and_promote_handoff(workspace_root: Path) 
     assert promote_payload["promoted_at_local"]
     assert promote_payload["promoted_tz"]
     assert handoff_path.exists()
+
+
+def test_checkpoint_lifecycle_audit_and_close_archive_cli_json_dry_run(workspace_root: Path) -> None:
+    runner = CliRunner()
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-lifecycle-session.json",
+        session_id="runtime-cli-lifecycle",
+    )
+
+    append = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "append",
+            str(workspace_root / "aoa-sdk"),
+            "--kind",
+            "verify_green",
+            "--intent-text",
+            "reviewed closeout candidate survived this runtime session",
+            "--mutation-surface",
+            "code",
+            "--session-file",
+            str(session_file),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+
+    assert append.exit_code == 0
+    append_payload = json.loads(append.stdout)
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-cli-lifecycle",
+    )
+    _mark_checkpoint_note_reviewed(note_dir)
+    _write_closeout_execution_report(
+        note_dir,
+        session_ref=append_payload["session_ref"],
+        runtime_session_id="runtime-cli-lifecycle",
+    )
+
+    audit = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "lifecycle-audit",
+            str(workspace_root / "aoa-sdk"),
+            "--session-file",
+            str(session_file),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+    close_archive = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "close-archive",
+            str(workspace_root / "aoa-sdk"),
+            "--runtime-session-id",
+            "runtime-cli-lifecycle",
+            "--session-file",
+            str(session_file),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+
+    assert audit.exit_code == 0
+    audit_payload = json.loads(audit.stdout)
+    assert audit_payload["closable_count"] == 1
+    assert audit_payload["entries"][0]["lifecycle_state"] == "closeout_executed"
+    assert close_archive.exit_code == 0
+    close_payload = json.loads(close_archive.stdout)
+    assert close_payload["dry_run"] is True
+    assert close_payload["archived_count"] == 1
+    assert note_dir.exists()
 
 
 def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path) -> None:

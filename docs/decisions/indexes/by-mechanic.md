@@ -87,6 +87,7 @@ Grouped by `Mechanic parents` metadata.
 | [AOA-SDK-D-0057 - Closeout API Route-Role Branches](../AOA-SDK-D-0057-closeout-api-route-role-branches.md) | 2026-06-03 | source-topology, closeout, implementation, validation | importable implementation, reviewed closeout runner, route-role branches | source topology, reviewed closeout runner, owner follow-through | accepted |
 | [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) | 2026-06-03 | source-topology, models, implementation, validation | importable implementation, typed contracts, compatibility re-export | source topology, public import compatibility, typed contract routing | accepted |
 | [AOA-SDK-D-0060 - Low-Pressure Route Stop-Lines](../AOA-SDK-D-0060-low-pressure-route-stop-lines.md) | 2026-06-03 | source-topology, implementation, validation, stop-line | importable implementation, route-role branches, compatibility re-export | source topology, route-role pressure, stop-line discipline | accepted |
+| [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 
 ## codex-projection
 

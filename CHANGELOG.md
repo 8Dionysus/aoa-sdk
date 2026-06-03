@@ -42,6 +42,10 @@ Tracking starts with the community-docs baseline for this repository.
   runtime sessions, hook/git boundaries, reviewed promotion targets, rendering,
   after-commit review, agent-review carry, note ledger assembly, and reviewed
   closeout bridge support. `CheckpointsAPI` remains the public facade.
+- Checkpoint lifecycle now has an explicit audit and close/archive route:
+  `current/` is measured as active-now or still-blocked review work, reviewed
+  closeout execution can be closed append-only and archived, stale scopes can
+  move as archive evidence, and aoa-session-memory stays read-only evidence.
 - Checkpoint reviewed closeout support now has pipeline branches for
   followthrough decisions, context/session scope, evidence reading, mechanical
   artifact execution, and owner handoff. `closeout/bridge.py` is a thin
@@ -275,6 +279,9 @@ Tracking starts with the community-docs baseline for this repository.
 - `AOA-SDK-D-0048` records the root roadmap direction-surface split: roadmap
   owns direction, horizons, and future triggers while changelog, mechanics,
   generated companions, and decision indexes own detailed inventories.
+- `AOA-SDK-D-0061` records the checkpoint lifecycle close/archive route,
+  including pending-review blocking, append-only lifecycle closure, stale
+  archive evidence, and the read-only aoa-session-memory boundary.
 
 ### Changed
 
@@ -360,6 +367,12 @@ Tracking starts with the community-docs baseline for this repository.
   `fallback_mode` as input-only aliases for current sibling generated JSON.
 - `src/aoa_sdk/checkpoints/registry.py` now names local timestamp synthesis as
   a defaulting helper instead of a fallback helper.
+- `src/aoa_sdk/checkpoints/lifecycle.py` now owns checkpoint lifecycle audit
+  and close/archive orchestration, while `registry.py` remains the
+  `CheckpointsAPI` facade.
+- Checkpoint part docs now define `current/` as active runtime or still
+  actionable checkpoint state, not as a long-lived archive of old runtime
+  scopes.
 - `src/aoa_sdk/recurrence/live_observations.py` now detects repeated
   alternate-path pressure with active alternate-path vocabulary.
 - Antifragility stress contracts now state that `retrieval-only-fallback`
@@ -450,6 +463,8 @@ Tracking starts with the community-docs baseline for this repository.
 - `python -m mypy src`
 - `python -m build`
 - `aoa compatibility check /srv/AbyssOS/aoa-sdk`
+- `aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json`
+- `aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json`
 - `python scripts/release_check.py`
 
 ### Notes

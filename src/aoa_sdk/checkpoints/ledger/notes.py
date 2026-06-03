@@ -14,10 +14,12 @@ from ...models import (
     SessionCheckpointAgentReview,
     SessionCheckpointCluster,
     SessionCheckpointHistoryEntry,
+    SessionCheckpointLifecycleEvent,
     SessionCheckpointNote,
     SessionEndSkillTarget,
 )
 from ...workspace.discovery import Workspace
+from .lifecycle_events import lifecycle_closed, lifecycle_evidence_refs, normalize_lifecycle_event
 from ..naming import safe_checkpoint_name
 from ..render.markdown import render_checkpoint_note_markdown
 from ..review.agent_review import (
@@ -37,12 +39,10 @@ from ..topology.paths import (
 
 SESSION_REF_TIMESTAMP_FORMAT = "%Y-%m-%dT%H-%M-%S-%fZ"
 
-
 class CheckpointStatusAPI(Protocol):
     workspace: Workspace
 
     def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote: ...
-
     def peek_status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote: ...
 
 
@@ -94,7 +94,7 @@ def default_session_ref(
     return f"session:{timestamp}-{paths.repo_label}-checkpoint-growth{runtime_suffix}"
 
 
-def archive_current_checkpoint(paths: CheckpointPaths) -> None:
+def archive_current_checkpoint(paths: CheckpointPaths) -> Path:
     archive_root = paths.root / ".aoa" / "session-growth" / "archive"
     timestamp = datetime.now(UTC).strftime("%Y%m%dT%H%M%SZ")
     archive_stem = (
@@ -117,6 +117,7 @@ def archive_current_checkpoint(paths: CheckpointPaths) -> None:
             source.rename(archive_dir / source.name)
     if paths.closeout_artifacts.exists():
         paths.closeout_artifacts.rename(archive_dir / paths.closeout_artifacts.name)
+    return archive_dir
 
 
 def move_current_checkpoint(*, source_paths: CheckpointPaths, target_paths: CheckpointPaths) -> None:
@@ -171,6 +172,7 @@ def merge_checkpoint_lineage_hint(
 def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
     entries: list[SessionCheckpointHistoryEntry] = []
     agent_review_map: dict[str, SessionCheckpointAgentReview] = {}
+    lifecycle_events: list[SessionCheckpointLifecycleEvent] = []
     session_ref: str | None = None
     runtime_session_id: str | None = None
     runtime_session_created_at: datetime | None = None
@@ -204,6 +206,9 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
             if review_key in agent_review_map:
                 del agent_review_map[review_key]
             agent_review_map[review_key] = review
+            continue
+        if "lifecycle_event" in payload:
+            lifecycle_events.append(normalize_lifecycle_event(payload["lifecycle_event"]))
             continue
         entry = SessionCheckpointHistoryEntry.model_validate(payload["history_entry"])
         observed_at_local, observed_tz = with_local_timestamp_default(
@@ -329,6 +334,8 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
         all_evidence.update(review.evidence_refs)
         next_owner_moves.update(review.next_owner_moves)
     note_review_carry = collect_review_carry(agent_reviews)
+    all_evidence.update(lifecycle_evidence_refs(lifecycle_events))
+    is_lifecycle_closed = lifecycle_closed(lifecycle_events)
 
     candidate_clusters: list[SessionCheckpointCluster] = []
     for checkpoint_cluster in cluster_map.values():
@@ -377,6 +384,8 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
         candidate_clusters=candidate_clusters,
         recommendation=recommendation,
     )
+    if is_lifecycle_closed:
+        state = "closed"
 
     note = SessionCheckpointNote(
         session_ref=session_ref,
@@ -411,11 +420,15 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
         mechanic_hints=note_review_carry.mechanic_hints,
         closeout_questions=note_review_carry.closeout_questions,
         agent_reviews=agent_reviews,
+        lifecycle_events=lifecycle_events,
         blocked_by=sorted(all_blocked),
         review_status=(
             "reviewed"
-            if not pending_agent_review_refs
-            and (existing_review_status == "reviewed" or agent_review_status == "reviewed")
+            if is_lifecycle_closed
+            or (
+                not pending_agent_review_refs
+                and (existing_review_status == "reviewed" or agent_review_status == "reviewed")
+            )
             else "unreviewed"
         ),
         evidence_refs=sorted(all_evidence),
