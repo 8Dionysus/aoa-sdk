@@ -14,10 +14,12 @@ context without minting owner truth. Audit checkpoint lifecycle state so
 closeout scopes can be closed and archived without deleting evidence. Reconcile
 runtime sessions that ended without reviewed closeout by reading
 aoa-session-memory archive refs and archiving checkpoint evidence with an
-explicit no-closeout lifecycle event. Derive candidate-intelligence route
-evidence from checkpoint action facets so repeated actions, wrapper gaps, and
-owner pressure can be reviewed without making the SDK an accepted wrapper
-owner.
+explicit no-closeout lifecycle event. Audit the remaining checkpoint backlog as
+read-only navigation so pending review, stale scopes, runtime trace gaps,
+session-memory refs, and next routes are visible before archive movement.
+Derive candidate-intelligence route evidence from checkpoint action facets so
+repeated actions, wrapper gaps, and owner pressure can be reviewed without
+making the SDK an accepted wrapper owner.
 
 ### Trigger
 
@@ -34,6 +36,8 @@ context carry changes.
 - mechanical review-context bundle assembly
 - checkpoint lifecycle audit and close/archive routing for nonpending reviewed
   closeout scopes
+- checkpoint backlog audit and generated navigation for open current/no-closeout
+  pressure
 - checkpoint session reconciliation for session-memory-backed no-closeout
   endings
 - candidate-intelligence action signatures, repetition clusters, wrapper-gap
@@ -62,6 +66,8 @@ status remain outside SDK checkpoint authority.
 - `mechanics/checkpoint/parts/reviewed-closeout-context-carry/`
 - `src/aoa_sdk/checkpoints/`
 - `src/aoa_sdk/checkpoints/lifecycle.py`
+- `src/aoa_sdk/checkpoints/backlog.py`
+- `src/aoa_sdk/checkpoints/backlog_indexes.py`
 - `src/aoa_sdk/checkpoints/reconcile.py`
 - `src/aoa_sdk/checkpoints/indexes.py`
 - `src/aoa_sdk/checkpoints/candidate_intelligence.py`
@@ -114,10 +120,12 @@ close/archive only after pending review is clear and reviewed closeout execution
 exists, or when moving nonpending stale scopes as archive evidence without
 marking them closed. Use reconcile/sweep only when aoa-session-memory proves
 the runtime session ended without closeout; that route preserves evidence and
-does not claim reviewed closeout happened. Use candidate intelligence when the
-question is whether repeated checkpoint actions suggest a wrapper gap or owner
-review lane; treat its generated index as navigation only. Use carrier
-intelligence when the question is whether repeated action pressure suggests a
-mechanic, tool, MCP, hook, script, daemon, service, or index carrier; keep
-install, registration, execution, memory, proof, RAG/GraphRAG, and owner
-acceptance with the owning route.
+does not claim reviewed closeout happened. Use backlog audit before reconcile
+when the question is what remains open, which runtime traces are resolved, and
+which scopes need session-memory freshness/import/recovery before movement.
+Use candidate intelligence when the question is whether repeated checkpoint
+actions suggest a wrapper gap or owner review lane; treat its generated index
+as navigation only. Use carrier intelligence when the question is whether
+repeated action pressure suggests a mechanic, tool, MCP, hook, script, daemon,
+service, or index carrier; keep install, registration, execution, memory,
+proof, RAG/GraphRAG, and owner acceptance with the owning route.

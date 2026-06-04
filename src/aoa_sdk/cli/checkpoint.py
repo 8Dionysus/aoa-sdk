@@ -12,6 +12,7 @@ from .common import (
 )
 from .rendering import (
     _print_checkpoint_after_commit_report,
+    _print_checkpoint_backlog_audit,
     _print_candidate_intelligence_report,
     _print_carrier_intelligence_report,
     _print_checkpoint_git_boundary,
@@ -485,6 +486,37 @@ def checkpoint_lifecycle_audit(
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     _print_checkpoint_lifecycle_audit(report)
+
+
+@checkpoint_app.command("backlog-audit")
+def checkpoint_backlog_audit(
+    repo_root: str | None = typer.Argument(
+        None,
+        help="Optional repository root or repo name used to filter checkpoint backlog entries.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    write_index: bool = typer.Option(
+        False,
+        "--write-index/--no-write-index",
+        help="Write the generated checkpoint backlog navigation index.",
+    ),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    report = AoASDK.from_workspace(root).checkpoints.backlog_audit(
+        repo_root=repo_root,
+        session_file=session_file,
+        write_index=write_index,
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_checkpoint_backlog_audit(report)
 
 
 @checkpoint_app.command("close-archive")

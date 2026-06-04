@@ -85,6 +85,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 | [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 | [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, carrier intelligence, CLI facade, source topology | checkpoint | owner boundary, no hidden automation, generated navigation, review gate | accepted |
+| [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) | 2026-06-04 | checkpoint control-plane, session-memory attachment, CLI facade, source topology | checkpoint | checkpoint lifecycle, session-memory boundary, generated navigation, no hidden automation | accepted |
 
 ## ci
 
@@ -201,6 +202,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 | [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 | [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, carrier intelligence, CLI facade, source topology | checkpoint | owner boundary, no hidden automation, generated navigation, review gate | accepted |
+| [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) | 2026-06-04 | checkpoint control-plane, session-memory attachment, CLI facade, source topology | checkpoint | checkpoint lifecycle, session-memory boundary, generated navigation, no hidden automation | accepted |
 
 ## implementation
 
@@ -223,6 +225,7 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
+| [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) | 2026-06-04 | checkpoint control-plane, session-memory attachment, CLI facade, source topology | checkpoint | checkpoint lifecycle, session-memory boundary, generated navigation, no hidden automation | accepted |
 
 ## local automation
 
@@ -376,6 +379,12 @@ Grouped by `Surface classes` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0029 - Recurrence Change Signal Schema Localization](../AOA-SDK-D-0029-recurrence-change-signal-schema-localization.md) | 2026-06-01 | mechanics topology, recurrence, component manifest gate | recurrence | mechanics topology, schema placement, active naming | accepted |
 
+## session-memory
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) | 2026-06-04 | checkpoint control-plane, session-memory attachment, CLI facade, source topology | checkpoint | checkpoint lifecycle, session-memory boundary, generated navigation, no hidden automation | accepted |
+
 ## sibling surface
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
@@ -526,6 +535,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 | [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 | [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, carrier intelligence, CLI facade, source topology | checkpoint | owner boundary, no hidden automation, generated navigation, review gate | accepted |
+| [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) | 2026-06-04 | checkpoint control-plane, session-memory attachment, CLI facade, source topology | checkpoint | checkpoint lifecycle, session-memory boundary, generated navigation, no hidden automation | accepted |
 
 ## validation guard
 

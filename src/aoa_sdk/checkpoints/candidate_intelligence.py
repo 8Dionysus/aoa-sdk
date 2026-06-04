@@ -223,7 +223,7 @@ def build_candidate_intelligence_from_surface(
         actionability_gaps=actionability_gaps,
     )
     occurrence_counts = _signature_occurrence_counts(events)
-    signatures = _signatures_for_events(events)
+    signatures = _signatures_for_events(events, occurrence_counts=occurrence_counts)
     gaps = _wrapper_gaps_for_signatures(
         signatures=signatures,
         events=events,
@@ -275,7 +275,6 @@ def build_candidate_intelligence_from_note(
             repo_label=repo_label,
             candidate_clusters=candidate_clusters,
         )
-        raw_signatures = _signatures_for_events(raw_events)
     occurrence_counts = _signature_occurrence_counts(raw_events)
     occurrence_counts = _merge_occurrence_counts(
         occurrence_counts,
@@ -284,6 +283,8 @@ def build_candidate_intelligence_from_note(
             candidate_clusters=candidate_clusters or [],
         ),
     )
+    if not raw_signatures and raw_events:
+        raw_signatures = _signatures_for_events(raw_events, occurrence_counts=occurrence_counts)
     signatures = _merge_signatures(raw_signatures)
     events = _merge_events(raw_events)
     gaps = _wrapper_gaps_for_signatures(
@@ -548,7 +549,11 @@ def _event_from_profile(
     )
 
 
-def _signatures_for_events(events: list[CheckpointActionEvent]) -> list[ActionSignature]:
+def _signatures_for_events(
+    events: list[CheckpointActionEvent],
+    *,
+    occurrence_counts: Counter[str] | None = None,
+) -> list[ActionSignature]:
     grouped: dict[str, list[CheckpointActionEvent]] = defaultdict(list)
     for event in events:
         if event.action_signature_ref is None:
@@ -560,6 +565,8 @@ def _signatures_for_events(events: list[CheckpointActionEvent]) -> list[ActionSi
         profile = _profile_from_event(first)
         evidence_refs = _dedupe(ref for event in group for ref in event.evidence_refs)
         surface_refs = _dedupe(ref for event in group for ref in event.surface_refs)
+        route_signals = _dedupe(signal for event in group for signal in event.facets.route_signals)
+        repeat_count = occurrence_counts.get(signature_id, len(group)) if occurrence_counts else len(group)
         signatures.append(
             ActionSignature(
                 signature_id=signature_id,
@@ -574,6 +581,17 @@ def _signatures_for_events(events: list[CheckpointActionEvent]) -> list[ActionSi
                 failure_modes=list(profile.failure_modes),
                 stop_lines=list(profile.stop_lines),
                 owner_pressure=_owner_pressure(surface_refs=surface_refs, evidence_refs=evidence_refs),
+                event_types=_dedupe(event.facets.event_type for event in group),
+                route_signals=route_signals,
+                mutation_surfaces=_mutation_surfaces(evidence_refs=evidence_refs, route_signals=route_signals),
+                authority_surfaces=_authority_surfaces(evidence_refs=evidence_refs, route_signals=route_signals),
+                memory_provenance_refs=_memory_provenance_refs(evidence_refs=evidence_refs, route_signals=route_signals),
+                negative_evidence=_negative_evidence(
+                    signature_id=signature_id,
+                    profile=profile,
+                    events=group,
+                    repeat_count=repeat_count,
+                ),
                 evidence_refs=evidence_refs,
                 action_event_ids=[event.event_id for event in group],
                 wrapper_family_hint=profile.wrapper_family,
@@ -952,6 +970,61 @@ def _owner_pressure(*, surface_refs: list[str], evidence_refs: list[str]) -> lis
         elif ref.startswith("context:"):
             owners.append(ref.removeprefix("context:"))
     return _dedupe(owners)
+
+
+def _mutation_surfaces(*, evidence_refs: list[str], route_signals: list[str]) -> list[str]:
+    return _prefixed_values([*evidence_refs, *route_signals], "mutation_surface:")
+
+
+def _authority_surfaces(*, evidence_refs: list[str], route_signals: list[str]) -> list[str]:
+    authority_refs = []
+    for value in [*evidence_refs, *route_signals]:
+        if value.startswith("authority_surface:"):
+            authority_refs.append(value.removeprefix("authority_surface:"))
+        elif value.startswith("context:"):
+            authority_refs.append(value.removeprefix("context:"))
+        elif value.startswith("aoa-") and ":" in value:
+            authority_refs.append(value.split(":", 1)[0])
+    return _dedupe(authority_refs)
+
+
+def _memory_provenance_refs(*, evidence_refs: list[str], route_signals: list[str]) -> list[str]:
+    refs = []
+    for value in [*evidence_refs, *route_signals]:
+        lowered = value.lower()
+        if (
+            value.startswith(("session_memory:", "raw:", "memory:", "memo:"))
+            or "session-memory" in lowered
+            or "raw_ref" in lowered
+            or "provenance" in lowered
+        ):
+            refs.append(value)
+    return _dedupe(refs)
+
+
+def _negative_evidence(
+    *,
+    signature_id: str,
+    profile: ActionProfile,
+    events: list[CheckpointActionEvent],
+    repeat_count: int,
+) -> list[str]:
+    negatives = list(profile.failure_modes)
+    if repeat_count <= 1:
+        negatives.append("single_event_cannot_promote")
+    if profile.wrapper_family == "unknown":
+        negatives.append("wrapper_family_unknown")
+    if "risk" in signature_id or any("risk" in signal for event in events for signal in event.facets.route_signals):
+        negatives.append("risk_signal_requires_review")
+    return _dedupe(negatives)
+
+
+def _prefixed_values(values: list[str], prefix: str) -> list[str]:
+    return _dedupe(
+        value.removeprefix(prefix)
+        for value in values
+        if isinstance(value, str) and value.startswith(prefix)
+    )
 
 
 def _novelty_markers(intent_text: str) -> bool:

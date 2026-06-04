@@ -72,6 +72,7 @@ Grouped by `Guard families` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | accepted |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | accepted |
+| [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) | 2026-06-04 | checkpoint, lifecycle, session-memory, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade, source topology | checkpoint | accepted |
 
 ## checkpoint path routing
 
@@ -186,6 +187,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | accepted |
 | [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | accepted |
 | [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, ecosystem-carrier, validation | checkpoint control-plane, carrier intelligence, CLI facade, source topology | checkpoint | accepted |
+| [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) | 2026-06-04 | checkpoint, lifecycle, session-memory, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade, source topology | checkpoint | accepted |
 
 ## generated parity
 
@@ -284,6 +286,7 @@ Grouped by `Guard families` metadata.
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, ecosystem-carrier, validation | checkpoint control-plane, carrier intelligence, CLI facade, source topology | checkpoint | accepted |
+| [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) | 2026-06-04 | checkpoint, lifecycle, session-memory, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade, source topology | checkpoint | accepted |
 
 ## no single-event promotion
 
@@ -497,6 +500,7 @@ Grouped by `Guard families` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | accepted |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | accepted |
+| [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) | 2026-06-04 | checkpoint, lifecycle, session-memory, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade, source topology | checkpoint | accepted |
 
 ## sibling owner boundary
 

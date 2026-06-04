@@ -147,6 +147,9 @@ def test_checkpoint_candidate_intelligence_backfills_legacy_candidate_clusters(
     signature = _signature_by_action(report, "repeat_manual_workflow")
     cluster = next(item for item in report.repetition_clusters if item.signature_id == signature.signature_id)
     assert signature.wrapper_family_hint == "playbook"
+    assert signature.event_types == ["repeated_manual_workflow_candidate"]
+    assert "route_signal:legacy_backfill" in signature.route_signals
+    assert "single_event_cannot_promote" not in signature.negative_evidence
     assert cluster.repeat_count == 2
     assert cluster.wrapper_readiness.draftability == "reviewable"
     assert report.sample_audit[0].verdict == "unreviewed"
@@ -192,8 +195,10 @@ def test_checkpoint_candidate_intelligence_classifies_wrapper_lanes_and_gap_pres
     assert _signature_by_action(owner_report, "clarify_owner_or_agent_role").wrapper_family_hint == "owner_local"
     assert risk_note.repetition_clusters[0].wrapper_readiness.draftability == "blocked"
     assert "automation_risk_requires_review" in risk_note.repetition_clusters[0].wrapper_readiness.blockers
+    assert "risk_signal_requires_review" in risk_note.action_signatures[0].negative_evidence
     assert gap_report.action_signatures[0].family == "wrapper_gap"
     assert gap_report.action_signatures[0].wrapper_family_hint == "unknown"
+    assert "wrapper_family_unknown" in gap_report.action_signatures[0].negative_evidence
     assert gap_report.wrapper_gap_candidates[0].nearest_existing_wrapper is None
     assert gap_report.wrapper_gap_candidates[0].draftability == "reviewable"
 
@@ -244,3 +249,5 @@ def test_checkpoint_candidate_intelligence_cli_writes_generated_navigation_index
     assert index["counts"]["graph_anchors"] > 0
     assert index["counts"]["graph_edges"] > 0
     assert set(index["by_wrapper_family"]) >= {"eval", "memo", "owner_local", "playbook", "technique"}
+    assert "repeated_manual_workflow_candidate" in index["by_event_type"]
+    assert "route copied without owner review" in index["by_negative_evidence"]

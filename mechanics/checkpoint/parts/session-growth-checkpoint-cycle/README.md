@@ -12,6 +12,9 @@ next state. When an operator closes a Codex session without running the
 reviewed closeout cycle, it can reconcile the checkpoint scope against
 read-only aoa-session-memory archive refs and move the scope to archive
 evidence without claiming reviewed closeout happened.
+It also audits the open checkpoint backlog as a read-only navigation layer,
+including runtime trace gaps where the SDK-local runtime-session trace exists
+but aoa-session-memory has not yet exposed a matching archive ref.
 
 ## Input
 
@@ -31,6 +34,8 @@ evidence without claiming reviewed closeout happened.
 - dry-run/apply session reconciliation reports for no-closeout session ends
 - generated checkpoint lifecycle navigation indexes under
   `.aoa/session-growth/indexes/`
+- read-only checkpoint backlog audit reports and generated backlog navigation
+  indexes under `.aoa/session-growth/indexes/`
 - session-memory attachment refs for closeout context
 - reviewed checkpoint note promotion targets
 - review-context inputs for final reviewed session handoff
@@ -52,6 +57,10 @@ closeout, use `aoa checkpoint reconcile-sessions` or
 `aoa checkpoint sweep-closed-sessions`; these commands preserve and archive the
 checkpoint evidence, but never run closeout or mint memory/proof/progression
 truth.
+When runtime-session traces exist but no session-memory archive ref is present
+yet, use `aoa checkpoint backlog-audit` first. It names the next route, such as
+reviewing a pending note, recovering a session-memory archive, reconciling a
+no-closeout scope, or inspecting a missing runtime trace.
 
 ## Validation
 

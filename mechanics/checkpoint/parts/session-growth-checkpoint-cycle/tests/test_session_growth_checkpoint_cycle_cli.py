@@ -504,6 +504,78 @@ def test_checkpoint_reconcile_sessions_cli_json_dry_run_writes_index(workspace_r
     assert Path(payload["generated_index_ref"]).exists()
 
 
+def test_checkpoint_backlog_audit_cli_json_writes_trace_gap_index(workspace_root: Path) -> None:
+    runner = CliRunner()
+    (workspace_root / ".aoa" / "sessions").mkdir(parents=True, exist_ok=True)
+    (workspace_root / ".aoa" / "session-registry.json").write_text(
+        json.dumps({"schema_version": 1, "updated_at": "2026-06-03T00:00:00Z", "sessions": []}),
+        encoding="utf-8",
+    )
+    active_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
+        session_id="runtime-cli-active",
+    )
+    gap_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-cli-gap.json",
+        session_id="runtime-cli-trace-gap",
+    )
+    append = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "append",
+            str(workspace_root / "aoa-sdk"),
+            "--kind",
+            "verify_green",
+            "--intent-text",
+            "reviewed checkpoint exists but session memory archive is missing",
+            "--mutation-surface",
+            "code",
+            "--session-file",
+            str(gap_session),
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+    assert append.exit_code == 0
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-cli-trace-gap",
+    )
+    _mark_checkpoint_note_reviewed(note_dir)
+
+    result = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "backlog-audit",
+            str(workspace_root / "aoa-sdk"),
+            "--session-file",
+            str(active_session),
+            "--write-index",
+            "--root",
+            str(workspace_root / "aoa-sdk"),
+            "--json",
+        ],
+    )
+
+    assert result.exit_code == 0
+    payload = json.loads(result.stdout)
+    assert payload["report_type"] == "checkpoint_backlog_audit_v1"
+    assert payload["counts"]["runtime_trace_gaps"] == 1
+    assert payload["entries"][0]["next_route"] == "recover_session_memory_archive"
+    assert payload["entries"][0]["runtime_trace_status"] == "resolved"
+    assert payload["entries"][0]["session_memory_status"] == "missing"
+    index_ref = Path(payload["generated_index_ref"])
+    assert index_ref.exists()
+    index = json.loads(index_ref.read_text(encoding="utf-8"))
+    assert index["by_next_route"]["recover_session_memory_archive"] == [
+        "runtime-cli-trace-gap"
+    ]
+
+
 def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path) -> None:
     runner = CliRunner()
 

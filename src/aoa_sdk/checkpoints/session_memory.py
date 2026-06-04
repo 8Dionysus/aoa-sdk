@@ -9,6 +9,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 from ..contracts.checkpoints import (
+    CheckpointRuntimeTraceRef,
     CheckpointSessionMemoryFreshness,
     CheckpointSessionMemoryRef,
     CheckpointSessionMemoryRouteSignalSummary,
@@ -177,6 +178,36 @@ def resolve_checkpoint_session_memory_for_runtime_session(
             }
         )
     return ref, freshness
+
+
+def resolve_checkpoint_runtime_trace_ref(
+    *,
+    workspace: Workspace,
+    runtime_session_id: str | None,
+) -> CheckpointRuntimeTraceRef | None:
+    if not isinstance(runtime_session_id, str) or not runtime_session_id.strip():
+        return None
+    runtime_session_ref = _runtime_session_ref_for_id(
+        workspace=workspace,
+        runtime_session_id=runtime_session_id,
+    )
+    if runtime_session_ref is None:
+        return None
+    codex_thread_id = _string_value(runtime_session_ref.payload, "codex_thread_id")
+    codex_rollout_path = _string_value(runtime_session_ref.payload, "codex_rollout_path")
+    return CheckpointRuntimeTraceRef(
+        runtime_session_id=runtime_session_id,
+        runtime_session_file_ref=str(runtime_session_ref.path),
+        codex_thread_id=codex_thread_id,
+        codex_rollout_path=codex_rollout_path,
+        evidence_refs=_dedupe_strings(
+            [
+                str(runtime_session_ref.path),
+                codex_rollout_path,
+                *(f"codex_thread:{codex_thread_id}" if codex_thread_id else None,),
+            ]
+        ),
+    )
 
 
 def session_memory_evidence_from_ref(

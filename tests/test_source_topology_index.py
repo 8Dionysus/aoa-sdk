@@ -78,6 +78,14 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
     assert "candidate navigation" in modules[
         "src/aoa_sdk/checkpoints/candidate_indexes.py"
     ]["next_route"]
+    assert "backlog audit" in modules["src/aoa_sdk/checkpoints/backlog.py"]["role"]
+    assert "runtime trace gap navigation" in modules["src/aoa_sdk/checkpoints/backlog.py"]["role"]
+    assert "backlog inspection read-only" in modules[
+        "src/aoa_sdk/checkpoints/backlog.py"
+    ]["next_route"]
+    assert "backlog navigation index" in modules[
+        "src/aoa_sdk/checkpoints/backlog_indexes.py"
+    ]["role"]
     assert "action-signature" in modules[
         "src/aoa_sdk/checkpoints/candidate_intelligence.py"
     ]["role"]

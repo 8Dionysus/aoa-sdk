@@ -43,6 +43,8 @@ def build_checkpoint_lifecycle_index(
         {
             "runtime_session_id": entry.runtime_session_id,
             "repo_label": entry.repo_label,
+            "runtime_trace_thread_id": entry.runtime_trace_thread_id,
+            "source_trace_ref": entry.source_trace_ref,
             "session_memory_session_id": entry.session_memory_session_id,
             "session_memory_archive_ref": entry.session_memory_archive_ref,
             "session_memory_status": entry.session_memory_status,
@@ -50,6 +52,11 @@ def build_checkpoint_lifecycle_index(
         }
         for entry in entries
         if entry.session_memory_archive_ref
+    ]
+    runtime_trace_gaps = [
+        _entry_summary(entry)
+        for entry in entries
+        if _is_runtime_trace_gap(entry)
     ]
     anchors, edges = _graph_ready(entries)
     return {
@@ -66,6 +73,7 @@ def build_checkpoint_lifecycle_index(
             "lifecycle": dict(sorted(Counter(entry.lifecycle_state for entry in entries).items())),
             "unresolved_review": len(unresolved_review),
             "session_memory_refs": len(session_memory_refs),
+            "runtime_trace_gaps": len(runtime_trace_gaps),
             "graph_anchors": len(anchors),
             "graph_edges": len(edges),
         },
@@ -79,7 +87,9 @@ def build_checkpoint_lifecycle_index(
                 str(item["session_memory_archive_ref"]),
             ),
         ),
+        "runtime_trace_gaps": runtime_trace_gaps,
         "by_repo": _group_entries(entries, "repo_label"),
+        "by_next_route": _group_entries(entries, "next_route"),
         "by_owner_hint": _owner_hint_index(entries),
         "by_candidate": _candidate_index(entries),
         "by_commit": _commit_index(entries),
@@ -118,13 +128,27 @@ def _entry_summary(entry: CheckpointLifecycleEntry) -> dict[str, Any]:
         "closable": entry.closable,
         "archiveable": entry.archiveable,
         "required_action": entry.required_action,
+        "next_route": entry.next_route,
         "note_ref": entry.note_ref,
+        "runtime_trace_status": entry.runtime_trace_status,
+        "runtime_trace_thread_id": entry.runtime_trace_thread_id,
+        "runtime_trace_ref": entry.runtime_trace_ref,
+        "source_trace_ref": entry.source_trace_ref,
         "session_memory_archive_ref": entry.session_memory_archive_ref,
         "session_memory_session_id": entry.session_memory_session_id,
         "session_memory_status": entry.session_memory_status,
+        "raw_refs": entry.raw_refs,
         "current_dir": entry.current_dir,
         "reason": entry.reason,
     }
+
+
+def _is_runtime_trace_gap(entry: CheckpointLifecycleEntry) -> bool:
+    return (
+        not entry.active_runtime_scope
+        and entry.runtime_trace_status == "resolved"
+        and not entry.session_memory_archive_ref
+    )
 
 
 def _group_entries(entries: list[CheckpointLifecycleEntry], key: str) -> dict[str, list[str]]:
@@ -183,9 +207,13 @@ def _graph_ready(
         for kind, value in (
             ("repo", entry.repo_label),
             ("runtime_session", entry.runtime_session_id),
+            ("runtime_trace", entry.runtime_trace_ref),
+            ("codex_thread", entry.runtime_trace_thread_id),
+            ("source_trace", entry.source_trace_ref),
             ("session_ref", entry.session_ref),
             ("session_memory_archive", entry.session_memory_archive_ref),
             ("lifecycle_event", entry.lifecycle_state),
+            ("next_route", entry.next_route),
             ("closeout_artifact", entry.closeout_context_ref),
             ("closeout_artifact", entry.closeout_execution_report_ref),
         ):
