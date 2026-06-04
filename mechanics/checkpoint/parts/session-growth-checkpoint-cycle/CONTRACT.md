@@ -13,6 +13,11 @@ that checkpoint scope as `session_closed_reviewed_no_closeout` or
 `session_closed_collecting_no_closeout` and archive it with a
 `checkpoint_session_archived_without_closeout_v1` event. This event preserves
 evidence; it does not close the note, run closeout, or promote the contents.
+The part also derives candidate-intelligence route evidence from checkpoint
+action facets: action signatures, repetition clusters, existing-wrapper fit,
+wrapper readiness, wrapper gaps, and bounded sample-audit targets. These
+classifier outputs are generated navigation only; they do not accept a
+wrapper, assign owner truth, or promote a single event.
 
 ## SDK-Owned Active Names
 
@@ -22,8 +27,12 @@ evidence; it does not close the note, run closeout, or promote the contents.
 - source module: `src/aoa_sdk/checkpoints/`
 - lifecycle module: `src/aoa_sdk/checkpoints/lifecycle.py`
 - reconcile module: `src/aoa_sdk/checkpoints/reconcile.py`
+- candidate-intelligence module:
+  `src/aoa_sdk/checkpoints/candidate_intelligence.py`
 - generated lifecycle index:
   `.aoa/session-growth/indexes/checkpoint-lifecycle-navigation.min.json`
+- generated candidate-intelligence index:
+  `.aoa/session-growth/indexes/checkpoint-candidate-intelligence.min.json`
 
 ## Stop-Lines
 
@@ -35,5 +44,9 @@ evidence; it does not close the note, run closeout, or promote the contents.
 - Do not mutate aoa-session-memory when attaching or reporting session-memory
   archive refs.
 - Do not treat `archived_without_closeout` as `closed`.
+- Do not treat action signatures, repetition clusters, or wrapper gaps as
+  reviewed memory, proof, owner verdict, accepted wrapper, or promotion
+  authority.
+- Do not let a single weak event become draftable or promoted.
 - Do not mint memory, proof, progression, quest, stats, or owner verdicts from
   checkpoint notes.

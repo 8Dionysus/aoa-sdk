@@ -51,6 +51,12 @@ Tracking starts with the community-docs baseline for this repository.
   default, read aoa-session-memory refs without mutating them, archive
   nonpending no-closeout scopes with `archived_without_closeout`, and write a
   generated lifecycle navigation index with graph-ready anchors.
+- Checkpoint candidate intelligence now derives action facets, action
+  signatures, repetition clusters, wrapper-gap candidates, existing-wrapper
+  fit, wrapper readiness, bounded sample-audit targets, and a generated
+  navigation index. It can surface skill, playbook, technique, eval, memo, SDK
+  mechanic, owner-local, and unknown wrapper pressure without promoting a
+  single event or accepting wrapper truth.
 - Checkpoint reviewed closeout support now has pipeline branches for
   followthrough decisions, context/session scope, evidence reading, mechanical
   artifact execution, and owner handoff. `closeout/bridge.py` is a thin

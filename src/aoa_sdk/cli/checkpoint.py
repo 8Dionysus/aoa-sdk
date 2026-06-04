@@ -12,6 +12,7 @@ from .common import (
 )
 from .rendering import (
     _print_checkpoint_after_commit_report,
+    _print_candidate_intelligence_report,
     _print_checkpoint_git_boundary,
     _print_checkpoint_hook_install,
     _print_checkpoint_hook_status,
@@ -376,6 +377,44 @@ def checkpoint_status(
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
     _print_checkpoint_note(note)
+
+
+@checkpoint_app.command("candidate-intelligence")
+def checkpoint_candidate_intelligence(
+    repo_root: str = typer.Argument(
+        ...,
+        help="Repository root or repo-relative path used as the checkpoint context.",
+    ),
+    sample_limit: int = typer.Option(
+        0,
+        "--sample-limit",
+        min=0,
+        help="Bounded number of unreviewed classifier samples to include.",
+    ),
+    write_index: bool = typer.Option(
+        False,
+        "--write-index/--no-write-index",
+        help="Write the generated checkpoint candidate-intelligence navigation index.",
+    ),
+    session_file: str | None = typer.Option(
+        None,
+        "--session-file",
+        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+    ),
+    root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
+    json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
+) -> None:
+    report = AoASDK.from_workspace(root).checkpoints.candidate_intelligence(
+        repo_root=repo_root,
+        session_file=session_file,
+        sample_limit=sample_limit,
+        write_index=write_index,
+    )
+    payload = report.model_dump(mode="json")
+    if json_output:
+        typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
+        return
+    _print_candidate_intelligence_report(report)
 
 
 @checkpoint_app.command("lifecycle-audit")

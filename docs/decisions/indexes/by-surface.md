@@ -83,12 +83,19 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0055 - Checkpoint Skipped Session Recovery Branch](../AOA-SDK-D-0055-checkpoint-skipped-session-recovery-branch.md) | 2026-06-03 | importable implementation, checkpoint control-plane, route-role branches | checkpoint | source topology, checkpoint route roles, skipped-session recovery | accepted |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 
 ## ci
 
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) | 2026-06-01 | mechanics topology, release support, compatibility, public support | release-support | root-surface hygiene, compatibility drift, active naming | accepted |
+
+## classifier
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 
 ## CLI
 
@@ -184,6 +191,7 @@ Grouped by `Surface classes` metadata.
 | Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 
 ## implementation
 
@@ -507,6 +515,7 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0060 - Low-Pressure Route Stop-Lines](../AOA-SDK-D-0060-low-pressure-route-stop-lines.md) | 2026-06-03 | importable implementation, route-role branches, compatibility re-export | checkpoint, recurrence, release-support, boundary-bridge | source topology, route-role pressure, stop-line discipline | accepted |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint control-plane, importable implementation, session-memory attachment | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 
 ## validation guard
 
@@ -533,3 +542,9 @@ Grouped by `Surface classes` metadata.
 | [AOA-SDK-D-0027 - Public Support CI Posture Test Localization](../AOA-SDK-D-0027-public-support-ci-posture-test-localization.md) | 2026-06-01 | mechanics topology, release support, public support posture | release-support | mechanics topology, part validation, docs routes, active naming | accepted |
 | [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) | 2026-06-01 | nested agents, root technical districts, mechanics topology | boundary-bridge, release-support, runtime-seam | nested agents, root-surface hygiene, active naming | accepted |
 | [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) | 2026-06-01 | mechanics topology, root district hygiene, active naming, artifact placement | all | root-surface hygiene, mechanics topology, active naming, validator authority | accepted |
+
+## wrapper-gap
+
+| Decision | Date | SDK facets | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |

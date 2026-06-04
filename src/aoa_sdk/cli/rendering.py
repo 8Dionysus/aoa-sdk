@@ -12,6 +12,7 @@ from ..models import (
     CheckpointGitBoundaryCheck,
     CheckpointHookInstallResult,
     CheckpointHookStatus,
+    CandidateIntelligenceReport,
     CheckpointLifecycleArchiveResult,
     CheckpointLifecycleAuditReport,
     CheckpointSessionReconcileResult,
@@ -299,6 +300,12 @@ def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
     typer.echo(f"stats_refresh_recommended: {'yes' if note.stats_refresh_recommended else 'no'}")
     typer.echo(f"repo_scope: {', '.join(note.repo_scope) if note.repo_scope else 'none'}")
     typer.echo(f"blocked_by: {', '.join(note.blocked_by) if note.blocked_by else 'none'}")
+    typer.echo(
+        "action_signatures: "
+        f"{len(note.action_signatures)} signature(s), "
+        f"{len(note.repetition_clusters)} repetition cluster(s), "
+        f"{len(note.wrapper_gap_candidates)} wrapper gap(s)"
+    )
     typer.echo("candidate_clusters:")
     if not note.candidate_clusters:
         typer.echo("  - none")
@@ -331,6 +338,63 @@ def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
                     "    auto_skills: "
                     + ", ".join(entry.auto_observation.applied_skill_names)
                 )
+
+
+def _print_candidate_intelligence_report(report: CandidateIntelligenceReport) -> None:
+    typer.echo(f"repo_label: {report.repo_label}")
+    typer.echo(f"source: {report.source}")
+    typer.echo(f"boundary: {report.boundary_note}")
+    if report.generated_index_ref:
+        typer.echo(f"generated_index_ref: {report.generated_index_ref}")
+    typer.echo(f"action_events: {len(report.action_events)}")
+    typer.echo(f"action_signatures: {len(report.action_signatures)}")
+    typer.echo(f"repetition_clusters: {len(report.repetition_clusters)}")
+    typer.echo(f"wrapper_gap_candidates: {len(report.wrapper_gap_candidates)}")
+    typer.echo("signatures:")
+    if not report.action_signatures:
+        typer.echo("  - none")
+    else:
+        for signature in report.action_signatures:
+            typer.echo(
+                f"  - {signature.signature_id} [{signature.wrapper_family_hint} / {signature.confidence}]"
+            )
+            typer.echo(f"    action: {signature.family}.{signature.action} -> {signature.object}")
+            typer.echo(
+                "    owner_pressure: "
+                f"{', '.join(signature.owner_pressure) if signature.owner_pressure else 'none'}"
+            )
+    typer.echo("repetition_clusters:")
+    if not report.repetition_clusters:
+        typer.echo("  - none")
+    else:
+        for cluster in report.repetition_clusters:
+            typer.echo(
+                f"  - {cluster.cluster_id} repeat={cluster.repeat_count} "
+                f"draftability={cluster.wrapper_readiness.draftability} "
+                f"fit={cluster.existing_wrapper_fit.fit_status}"
+            )
+            typer.echo(
+                f"    wrapper: {cluster.wrapper_readiness.proposed_wrapper_family}; "
+                f"automation_risk={cluster.automation_risk}; owner_clarity={cluster.owner_clarity}"
+            )
+            if cluster.wrapper_gap is not None:
+                typer.echo(f"    wrapper_gap: {cluster.wrapper_gap.candidate_id}")
+    typer.echo("wrapper_gap_candidates:")
+    if not report.wrapper_gap_candidates:
+        typer.echo("  - none")
+    else:
+        for gap in report.wrapper_gap_candidates:
+            typer.echo(
+                f"  - {gap.candidate_id} [{gap.proposed_wrapper_family} / {gap.draftability}]"
+            )
+            typer.echo(f"    novelty_reason: {gap.novelty_reason}")
+    typer.echo("sample_audit:")
+    if not report.sample_audit:
+        typer.echo("  - none")
+    else:
+        for sample in report.sample_audit:
+            typer.echo(f"  - {sample.sample_id} -> {sample.target_ref} [{sample.verdict}]")
+            typer.echo(f"    reason: {sample.reason}")
 
 def _format_dual_timestamp(
     *,

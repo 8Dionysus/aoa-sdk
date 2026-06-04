@@ -4,7 +4,14 @@ from typing import Literal
 
 from pydantic import AliasChoices, BaseModel, Field
 
-from .checkpoints import CheckpointCandidateCluster, ProgressionAxisSignal, SessionCheckpointCluster
+from .checkpoints import (
+    ActionSignature,
+    CheckpointActionEvent,
+    CheckpointCandidateCluster,
+    ProgressionAxisSignal,
+    SessionCheckpointCluster,
+    WrapperGapCandidate,
+)
 from .routing import RoutingOwnerLayerShortlistHint
 from .stats import StatsRegroundingSignal
 
@@ -113,6 +120,9 @@ class SurfaceDetectionReport(BaseModel):
     regrounding_reason_codes: list[str] = Field(default_factory=list)
     checkpoint_should_capture: bool = False
     candidate_clusters: list["CheckpointCandidateCluster"] = Field(default_factory=list)
+    action_events: list[CheckpointActionEvent] = Field(default_factory=list)
+    action_signatures: list[ActionSignature] = Field(default_factory=list)
+    wrapper_gap_candidates: list[WrapperGapCandidate] = Field(default_factory=list)
     promotion_recommendation: Literal["none", "local_note", "dionysus_note", "harvest_handoff"] = "none"
     blocked_by: list[str] = Field(default_factory=list)
     closeout_followups: list[str] = Field(default_factory=list)

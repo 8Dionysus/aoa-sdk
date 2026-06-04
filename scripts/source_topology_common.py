@@ -32,6 +32,7 @@ SOURCE_INPUT_REFS = (
     "docs/decisions/AOA-SDK-D-0060-low-pressure-route-stop-lines.md",
     "docs/decisions/AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md",
     "docs/decisions/AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md",
+    "docs/decisions/AOA-SDK-D-0063-checkpoint-candidate-intelligence.md",
 )
 VALIDATION_REFS = (
     "scripts/build_source_topology_index.py",
@@ -98,6 +99,8 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/closeout/execution.py": "checkpoint closeout mechanical packet and receipt builder owner",
     "src/aoa_sdk/checkpoints/closeout/followthrough.py": "checkpoint closeout followthrough decision and next-skill posture owner",
     "src/aoa_sdk/checkpoints/closeout/owner_handoff.py": "checkpoint closeout owner follow-through handoff owner",
+    "src/aoa_sdk/checkpoints/candidate_indexes.py": "checkpoint generated candidate-intelligence navigation index owner",
+    "src/aoa_sdk/checkpoints/candidate_intelligence.py": "checkpoint action-signature, repetition-cluster, and wrapper-gap classifier owner",
     "src/aoa_sdk/checkpoints/hooks/git_boundary.py": "checkpoint Git hook template, git metadata, and dirty-boundary helper owner",
     "src/aoa_sdk/checkpoints/kinds.py": "checkpoint kind inference helper owner",
     "src/aoa_sdk/checkpoints/ledger/lifecycle_events.py": "checkpoint lifecycle ledger event normalization helper owner",
@@ -295,6 +298,10 @@ def _module_next_route(path: Path, line_count: int) -> str:
     rel = _rel(path)
     if rel == "src/aoa_sdk/checkpoints/registry.py":
         return "keep public CheckpointsAPI orchestration here; add behavior in lifecycle, closeout, review, ledger, or the named checkpoint branch that owns it"
+    if rel == "src/aoa_sdk/checkpoints/candidate_intelligence.py":
+        return "keep classifier route evidence here; route accepted wrappers, memory, proof, and owner verdicts to their owner repos"
+    if rel == "src/aoa_sdk/checkpoints/candidate_indexes.py":
+        return "keep generated candidate navigation here; route reviewed classifier changes back to candidate_intelligence or owner surfaces"
     if rel == "src/aoa_sdk/checkpoints/closeout/bridge.py":
         return "keep this facade thin; add behavior in the owning closeout context, evidence, execution, followthrough, or owner-handoff branch"
     if rel == "src/aoa_sdk/surfaces/registry.py":

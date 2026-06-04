@@ -23,6 +23,10 @@ owner acceptance.
   preserved the closed Codex session, checkpoint reconcile/sweep can archive
   nonpending checkpoint evidence with `archived_without_closeout` instead of
   pretending reviewed closeout occurred.
+- Keep candidate intelligence below owner truth: checkpoint action facets,
+  signatures, repetition clusters, and wrapper gaps may route review, but they
+  do not accept skills, playbooks, techniques, evals, memo entries, SDK
+  mechanics, or owner-local wrappers.
 
 ## Next Work
 
@@ -38,6 +42,10 @@ owner acceptance.
   generated checkpoint lifecycle indexes should route review, session-memory
   refs, candidates, commits, and graph-ready anchors without becoming memory
   or GraphRAG authority.
+- Use `candidate-intelligence` dry-runs before changing classifier rules;
+  generated candidate indexes should route signatures, wrapper gaps, owner
+  pressure, existing-fit status, and sample-audit targets without becoming
+  memory, proof, or wrapper acceptance.
 
 ## When Time Comes
 
@@ -49,6 +57,9 @@ owner acceptance.
   support, and owner handoff evidence repeat cleanly.
 - Add stronger lifecycle transitions only when a repeated route proves the new
   state and its owner boundary; do not add states to explain a one-session tail.
+- Add wrapper-specific automation only after repeated classifier samples have
+  reviewed verdicts; do not convert a single action signature into an accepted
+  aoa-* wrapper.
 - Add optional timers only as bounded wrappers around explicit sweep commands;
   do not add a hidden daemon that runs closeout, review, harvest, owner moves,
   or memory mutation.
@@ -61,3 +72,5 @@ owner acceptance.
 - Automatic closeout, harvest, push, merge, or release logic.
 - Hidden workflow execution.
 - Mutating aoa-session-memory from checkpoint lifecycle routes.
+- Promoting classifier output or generated candidate indexes into accepted
+  wrappers without owner review.
