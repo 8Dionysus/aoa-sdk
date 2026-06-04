@@ -221,6 +221,11 @@ def checkpoint_review_note(
         "--session-file",
         help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
     ),
+    runtime_session_id: str | None = typer.Option(
+        None,
+        "--runtime-session-id",
+        help="Explicit checkpoint runtime session id for reviewing a stale scoped checkpoint note.",
+    ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
@@ -238,6 +243,7 @@ def checkpoint_review_note(
         next_owner_moves=next_owner_move or [],
         applied_skill_names=applied_skill or [],
         session_file=session_file,
+        runtime_session_id=runtime_session_id,
     )
     payload = note.model_dump(mode="json")
     if json_output:

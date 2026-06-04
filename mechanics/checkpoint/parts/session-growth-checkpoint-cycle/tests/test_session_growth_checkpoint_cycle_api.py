@@ -1065,6 +1065,38 @@ def test_checkpoint_review_note_auto_fills_from_observation(workspace_root: Path
     assert report_payload["agent_review_ref"] == note.agent_reviews[-1].review_id
 
 
+def test_checkpoint_review_note_auto_fills_stale_scope_by_runtime_session_id(
+    workspace_root: Path,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(repo_root, subject="review stale checkpoint scope")
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-stale-review.json",
+        session_id="runtime-stale-review",
+    )
+    sdk = AoASDK.from_workspace(repo_root)
+    sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref=commit_sha,
+        session_file=str(session_file),
+    )
+    session_file.unlink()
+
+    note = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref=commit_sha,
+        auto_fill=True,
+        runtime_session_id="runtime-stale-review",
+    )
+
+    assert note.runtime_session_id == "runtime-stale-review"
+    assert note.review_status == "reviewed"
+    assert note.agent_review_status == "reviewed"
+    assert note.agent_review_pending_refs == []
+    assert any(review.auto_observation_ref for review in note.agent_reviews)
+
+
 def test_checkpoint_review_note_auto_dedupes_repeated_review_for_same_commit(
     workspace_root: Path,
 ) -> None:
@@ -2296,6 +2328,83 @@ def test_checkpoint_lifecycle_audit_routes_runtime_trace_gap_without_reconcile(
     assert index_payload["runtime_trace_gaps"][0]["runtime_trace_thread_id"] == "thread-trace-gap"
     assert any(
         anchor["kind"] == "runtime_trace"
+        for anchor in index_payload["graph_ready"]["anchors"]
+    )
+
+
+def test_checkpoint_backlog_audit_routes_legacy_post_commit_raw_trace_recovery(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    (workspace_root / ".aoa" / "sessions").mkdir(parents=True, exist_ok=True)
+    (workspace_root / ".aoa" / "session-registry.json").write_text(
+        json.dumps({"schema_version": 1, "updated_at": "2026-06-03T00:00:00Z", "sessions": []}),
+        encoding="utf-8",
+    )
+    codex_thread_id = "019dlegacy-aaaa-bbbb-cccc-000000000001"
+    raw_root = workspace_root / ".codex" / "sessions"
+    raw_transcript = _write_rollout_trace(
+        raw_root
+        / "2026"
+        / "04"
+        / "10"
+        / f"rollout-2026-04-10T00-00-00-{codex_thread_id}.jsonl"
+    )
+    monkeypatch.setenv("AOA_CODEX_SESSIONS_ROOT", str(raw_root))
+    active_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
+        session_id="runtime-active-after-legacy",
+    )
+    legacy_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / f"{codex_thread_id}.json",
+        session_id="runtime-legacy-raw-recovery",
+        codex_thread_id=codex_thread_id,
+    )
+    commit_sha = _git_commit(repo_root, subject="recover legacy raw checkpoint trace")
+    sdk.checkpoints.after_commit(
+        repo_root=str(repo_root),
+        commit_ref=commit_sha,
+        session_file=str(legacy_session),
+    )
+    reviewed = sdk.checkpoints.review_note(
+        repo_root=str(repo_root),
+        commit_ref=commit_sha,
+        auto_fill=True,
+        session_file=str(legacy_session),
+    )
+    legacy_session.unlink()
+
+    backlog = sdk.checkpoints.backlog_audit(
+        repo_root=str(repo_root),
+        session_file=str(active_session),
+        write_index=True,
+    )
+
+    entry = next(item for item in backlog.entries if item.runtime_session_id == reviewed.runtime_session_id)
+    assert entry.runtime_trace_status == "recoverable"
+    assert entry.runtime_trace_thread_id == codex_thread_id
+    assert entry.source_trace_ref == str(raw_transcript)
+    assert str(raw_transcript) in entry.raw_refs
+    assert entry.session_memory_status == "missing"
+    assert entry.next_route == "recover_session_memory_archive"
+    assert entry.required_action is not None
+    assert str(raw_transcript) in entry.required_action
+    assert backlog.counts["runtime_trace_recoverable"] == 1
+    assert backlog.counts["runtime_trace_gaps"] == 1
+    assert backlog.generated_index_ref is not None
+    index_payload = json.loads(Path(backlog.generated_index_ref).read_text(encoding="utf-8"))
+    index_entry = next(
+        item
+        for item in index_payload["runtime_trace_gaps"]
+        if item["runtime_session_id"] == reviewed.runtime_session_id
+    )
+    assert index_entry["runtime_trace_status"] == "recoverable"
+    assert index_entry["source_trace_ref"] == str(raw_transcript)
+    assert any(
+        anchor["kind"] == "raw_ref" and anchor["ref"] == str(raw_transcript)
         for anchor in index_payload["graph_ready"]["anchors"]
     )
 

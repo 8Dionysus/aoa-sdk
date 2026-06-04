@@ -784,39 +784,56 @@ class CheckpointsAPI:
         next_owner_moves: list[str] | None = None,
         applied_skill_names: list[str] | None = None,
         session_file: str | None = None,
+        runtime_session_id: str | None = None,
     ) -> SessionCheckpointNote:
         repo_root_path = _resolve_context_root(self.workspace, repo_root)
         repo_label = _resolve_context_label(self.workspace, repo_root)
         commit_metadata = read_git_commit_metadata(repo_root_path, commit_ref)
-        session_path, runtime_session = probe_existing_checkpoint_runtime_session(
-            workspace=self.workspace,
-            session_file=session_file,
+        if runtime_session_id is not None and session_file is not None:
+            raise ValueError("checkpoint review-note accepts either session_file or runtime_session_id, not both")
+        explicit_runtime_session_id = (
+            runtime_session_id.strip() if isinstance(runtime_session_id, str) else None
         )
-        if runtime_session is None and auto_fill:
-            recovered_session = _recover_skipped_after_commit_for_review(
-                workspace=self.workspace,
+        session_path: Path | None = None
+        runtime_session = None
+        if explicit_runtime_session_id:
+            paths = _resolve_runtime_checkpoint_paths(
+                self.workspace,
                 repo_root=repo_root,
-                repo_label=repo_label,
-                commit_ref=commit_ref,
-                commit_metadata=commit_metadata,
-                session_path=session_path,
-                capture_after_commit=self.after_commit,
+                runtime_session_id=explicit_runtime_session_id,
+                migrate_legacy=True,
             )
-            if recovered_session is not None:
-                session_path, runtime_session = recovered_session
-        if runtime_session is None:
-            raise SurfaceNotFound("checkpoint agent review requires an existing active runtime session")
-
-        paths = _resolve_runtime_checkpoint_paths(
-            self.workspace,
-            repo_root=repo_root,
-            runtime_session_id=runtime_session.session_id,
-            migrate_legacy=True,
-        )
+            if not paths.jsonl.exists():
+                raise SurfaceNotFound(f"no checkpoint note exists yet for {paths.repo_label}")
+            current_note = _build_checkpoint_note(paths)
+        else:
+            session_path, runtime_session = probe_existing_checkpoint_runtime_session(
+                workspace=self.workspace,
+                session_file=session_file,
+            )
+            if runtime_session is None and auto_fill:
+                recovered_session = _recover_skipped_after_commit_for_review(
+                    workspace=self.workspace,
+                    repo_root=repo_root,
+                    repo_label=repo_label,
+                    commit_ref=commit_ref,
+                    commit_metadata=commit_metadata,
+                    session_path=session_path,
+                    capture_after_commit=self.after_commit,
+                )
+                if recovered_session is not None:
+                    session_path, runtime_session = recovered_session
+            if runtime_session is None:
+                raise SurfaceNotFound("checkpoint agent review requires an existing active runtime session")
+            paths = _resolve_runtime_checkpoint_paths(
+                self.workspace,
+                repo_root=repo_root,
+                runtime_session_id=runtime_session.session_id,
+                migrate_legacy=True,
+            )
+            current_note = self.status(repo_root=repo_root, session_file=str(session_path))
         if not paths.jsonl.exists():
             raise SurfaceNotFound(f"no checkpoint note exists yet for {paths.repo_label}")
-
-        current_note = self.status(repo_root=repo_root, session_file=str(session_path))
         auto_observation = _matching_auto_observation(
             note=current_note,
             commit_ref=commit_ref,
@@ -943,10 +960,26 @@ class CheckpointsAPI:
                 ),
             ),
         )
+        runtime_created_at = (
+            runtime_session.created_at.astimezone(UTC)
+            if runtime_session is not None
+            else current_note.runtime_session_created_at
+        )
+        payload_runtime_session_id = (
+            explicit_runtime_session_id
+            if explicit_runtime_session_id is not None
+            else runtime_session.session_id
+            if runtime_session is not None
+            else None
+        )
         payload = {
-            "session_ref": self.peek_status(repo_root=repo_root, session_file=str(session_path)).session_ref,
-            "runtime_session_id": runtime_session.session_id,
-            "runtime_session_created_at": runtime_session.created_at.astimezone(UTC).isoformat().replace("+00:00", "Z"),
+            "session_ref": current_note.session_ref,
+            "runtime_session_id": payload_runtime_session_id,
+            "runtime_session_created_at": (
+                runtime_created_at.isoformat().replace("+00:00", "Z")
+                if runtime_created_at is not None
+                else None
+            ),
             "repo_root": str(repo_root_path),
             "repo_label": repo_label,
             "agent_review": review.model_dump(mode="json"),
@@ -955,7 +988,15 @@ class CheckpointsAPI:
         with paths.jsonl.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(payload, ensure_ascii=True) + "\n")
 
-        note = self.status(repo_root=repo_root, session_file=str(session_path))
+        if runtime_session is None:
+            note = _build_checkpoint_note(paths)
+            paths.note_json.write_text(note.model_dump_json(indent=2) + "\n", encoding="utf-8")
+            paths.note_md.write_text(
+                _render_checkpoint_note_markdown(note, repo_label=paths.repo_label),
+                encoding="utf-8",
+            )
+        else:
+            note = self.status(repo_root=repo_root, session_file=str(session_path))
         _mark_after_commit_report_reviewed(paths.post_commit_report, review=review)
         _mark_after_commit_report_reviewed(post_commit_status_path(self.workspace, repo_label), review=review)
         return note

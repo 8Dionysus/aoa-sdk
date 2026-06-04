@@ -58,6 +58,10 @@ def audit_checkpoint_backlog(
         notes.append(
             "runtime trace gaps should route to aoa-session-memory freshness/sweep/import checks before reconcile"
         )
+    if counts.get("runtime_trace_recoverable", 0):
+        notes.append(
+            "recoverable runtime traces come from legacy post-commit report/raw transcript coordinates, not live SDK runtime session files"
+        )
     report = CheckpointBacklogAuditReport(
         checked_at=checked_at,
         checked_at_local=checked_at_local,
@@ -127,6 +131,9 @@ def _counts(entries: list[CheckpointBacklogEntry]) -> dict[str, int]:
         "runtime_trace_resolved": sum(
             1 for entry in entries if entry.runtime_trace_status == "resolved"
         ),
+        "runtime_trace_recoverable": sum(
+            1 for entry in entries if entry.runtime_trace_status == "recoverable"
+        ),
         "runtime_trace_missing": sum(1 for entry in entries if entry.runtime_trace_status == "missing"),
         "runtime_trace_gaps": sum(
             1
@@ -151,7 +158,7 @@ def _counts(entries: list[CheckpointBacklogEntry]) -> dict[str, int]:
 def _is_runtime_trace_gap(entry: CheckpointBacklogEntry) -> bool:
     return (
         not entry.active_runtime_scope
-        and entry.runtime_trace_status == "resolved"
+        and entry.runtime_trace_status in {"resolved", "recoverable"}
         and not entry.session_memory_archive_ref
     )
 

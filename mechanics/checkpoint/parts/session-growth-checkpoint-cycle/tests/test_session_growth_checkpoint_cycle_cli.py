@@ -1379,6 +1379,60 @@ def test_checkpoint_review_note_cli_auto_fills_from_observation(workspace_root: 
     assert payload["agent_reviews"][-1]["findings"]
 
 
+def test_checkpoint_review_note_cli_auto_fills_stale_scope_by_runtime_session_id(
+    workspace_root: Path,
+) -> None:
+    runner = CliRunner()
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    session_file = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-cli-stale-review.json",
+        session_id="runtime-cli-stale-review",
+    )
+    _git_commit(repo_root, subject="review stale checkpoint scope from cli")
+
+    captured = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "after-commit",
+            str(repo_root),
+            "--commit-ref",
+            "HEAD",
+            "--session-file",
+            str(session_file),
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+    assert captured.exit_code == 0
+    session_file.unlink()
+
+    reviewed = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "review-note",
+            str(repo_root),
+            "--commit-ref",
+            "HEAD",
+            "--runtime-session-id",
+            "runtime-cli-stale-review",
+            "--auto",
+            "--root",
+            str(workspace_root),
+            "--json",
+        ],
+    )
+
+    assert reviewed.exit_code == 0
+    payload = json.loads(reviewed.stdout)
+    assert payload["runtime_session_id"] == "runtime-cli-stale-review"
+    assert payload["agent_review_status"] == "reviewed"
+    assert payload["review_status"] == "reviewed"
+
+
 def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(workspace_root: Path) -> None:
     runner = CliRunner()
     repo_root = workspace_root / "aoa-sdk"

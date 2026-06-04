@@ -161,7 +161,10 @@ class CheckpointRuntimeTraceRef(BaseModel):
     schema_version: Literal["aoa_checkpoint_runtime_trace_ref_v1"] = (
         "aoa_checkpoint_runtime_trace_ref_v1"
     )
-    source: Literal["aoa-sdk-skill-runtime-session"] = "aoa-sdk-skill-runtime-session"
+    source: Literal[
+        "aoa-sdk-skill-runtime-session",
+        "checkpoint-post-commit-report",
+    ] = "aoa-sdk-skill-runtime-session"
     runtime_session_id: str
     runtime_session_file_ref: str
     codex_thread_id: str | None = None
@@ -913,7 +916,7 @@ class CheckpointLifecycleEntry(BaseModel):
     closeout_execution_report_ref: str | None = None
     runtime_trace_ref: str | None = None
     runtime_trace_thread_id: str | None = None
-    runtime_trace_status: Literal["resolved", "missing", "not_checked"] | None = None
+    runtime_trace_status: Literal["resolved", "recoverable", "missing", "not_checked"] | None = None
     source_trace_ref: str | None = None
     session_memory_archive_ref: str | None = None
     session_memory_session_id: str | None = None
@@ -1035,7 +1038,7 @@ class CheckpointBacklogEntry(BaseModel):
     note_ref: str | None = None
     current_dir: str
     post_commit_report_ref: str | None = None
-    runtime_trace_status: Literal["resolved", "missing", "not_checked"] | None = None
+    runtime_trace_status: Literal["resolved", "recoverable", "missing", "not_checked"] | None = None
     runtime_trace_thread_id: str | None = None
     runtime_trace_ref: str | None = None
     source_trace_ref: str | None = None
