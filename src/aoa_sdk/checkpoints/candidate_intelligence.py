@@ -283,9 +283,16 @@ def build_candidate_intelligence_from_note(
             candidate_clusters=candidate_clusters or [],
         ),
     )
-    if not raw_signatures and raw_events:
-        raw_signatures = _signatures_for_events(raw_events, occurrence_counts=occurrence_counts)
-    signatures = _merge_signatures(raw_signatures)
+    occurrence_counts = _merge_occurrence_counts(
+        occurrence_counts,
+        _signature_saved_event_counts(raw_signatures),
+    )
+    if raw_events:
+        raw_signatures = [
+            *raw_signatures,
+            *_signatures_for_events(raw_events, occurrence_counts=occurrence_counts),
+        ]
+    signatures = _merge_signatures(raw_signatures, occurrence_counts=occurrence_counts)
     events = _merge_events(raw_events)
     gaps = _wrapper_gaps_for_signatures(
         signatures=signatures,
@@ -890,6 +897,16 @@ def _candidate_cluster_occurrence_counts(
     return counts
 
 
+def _signature_saved_event_counts(signatures: list[ActionSignature]) -> Counter[str]:
+    counts: Counter[str] = Counter()
+    for signature in signatures:
+        counts[signature.signature_id] = max(
+            counts.get(signature.signature_id, 0),
+            len(signature.action_event_ids),
+        )
+    return counts
+
+
 def _merge_occurrence_counts(left: Counter[str], right: Counter[str]) -> Counter[str]:
     merged: Counter[str] = Counter(left)
     for key, value in right.items():
@@ -897,7 +914,11 @@ def _merge_occurrence_counts(left: Counter[str], right: Counter[str]) -> Counter
     return merged
 
 
-def _merge_signatures(signatures: list[ActionSignature]) -> list[ActionSignature]:
+def _merge_signatures(
+    signatures: list[ActionSignature],
+    *,
+    occurrence_counts: Counter[str] | None = None,
+) -> list[ActionSignature]:
     merged: dict[str, ActionSignature] = {}
     for signature in signatures:
         existing = merged.get(signature.signature_id)
@@ -909,11 +930,59 @@ def _merge_signatures(signatures: list[ActionSignature]) -> list[ActionSignature
                 "evidence_refs": _dedupe([*existing.evidence_refs, *signature.evidence_refs]),
                 "action_event_ids": _dedupe([*existing.action_event_ids, *signature.action_event_ids]),
                 "inputs": _dedupe([*existing.inputs, *signature.inputs]),
+                "steps": _dedupe([*existing.steps, *signature.steps]),
+                "outputs": _dedupe([*existing.outputs, *signature.outputs]),
+                "verification": _dedupe([*existing.verification, *signature.verification]),
+                "failure_modes": _dedupe([*existing.failure_modes, *signature.failure_modes]),
+                "stop_lines": _dedupe([*existing.stop_lines, *signature.stop_lines]),
                 "owner_pressure": _dedupe([*existing.owner_pressure, *signature.owner_pressure]),
+                "event_types": _dedupe([*existing.event_types, *signature.event_types]),
+                "route_signals": _dedupe([*existing.route_signals, *signature.route_signals]),
+                "mutation_surfaces": _dedupe(
+                    [*existing.mutation_surfaces, *signature.mutation_surfaces]
+                ),
+                "authority_surfaces": _dedupe(
+                    [*existing.authority_surfaces, *signature.authority_surfaces]
+                ),
+                "memory_provenance_refs": _dedupe(
+                    [*existing.memory_provenance_refs, *signature.memory_provenance_refs]
+                ),
+                "negative_evidence": _dedupe(
+                    [*existing.negative_evidence, *signature.negative_evidence]
+                ),
                 "confidence": _max_confidence([existing.confidence, signature.confidence]),
             }
         )
-    return sorted(merged.values(), key=lambda item: item.signature_id)
+    normalized = [
+        _normalize_signature_negative_evidence(
+            signature,
+            repeat_count=(
+                occurrence_counts.get(signature.signature_id, len(signature.action_event_ids))
+                if occurrence_counts
+                else len(signature.action_event_ids)
+            ),
+        )
+        for signature in merged.values()
+    ]
+    return sorted(normalized, key=lambda item: item.signature_id)
+
+
+def _normalize_signature_negative_evidence(
+    signature: ActionSignature,
+    *,
+    repeat_count: int,
+) -> ActionSignature:
+    if repeat_count > 1 and "single_event_cannot_promote" in signature.negative_evidence:
+        return signature.model_copy(
+            update={
+                "negative_evidence": [
+                    item
+                    for item in signature.negative_evidence
+                    if item != "single_event_cannot_promote"
+                ]
+            }
+        )
+    return signature
 
 
 def _merge_events(events: list[CheckpointActionEvent]) -> list[CheckpointActionEvent]:

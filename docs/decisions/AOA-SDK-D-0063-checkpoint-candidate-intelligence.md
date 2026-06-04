@@ -52,6 +52,11 @@ corrective carrier axis is handled by AOA-SDK-D-0064.
 `candidate_clusters` remain the compatibility surface. Their
 `action_signature_refs` point into the richer classifier evidence, but the
 old fields stay readable for existing checkpoint closeout and promotion gates.
+Legacy saved `ActionSignature` records may lack the newer classifier axes. The
+report route re-enriches those signatures from action events and saved event
+refs, then normalizes single-event negative evidence against the recovered
+repeat count. This is generated navigation; it does not rewrite the checkpoint
+note or promote the signature.
 
 `aoa checkpoint candidate-intelligence` can report the current note and, with
 `--write-index`, writes

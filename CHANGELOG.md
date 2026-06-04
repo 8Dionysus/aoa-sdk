@@ -62,6 +62,10 @@ Tracking starts with the community-docs baseline for this repository.
   navigation index. It can surface skill, playbook, technique, eval, memo,
   SDK-local checkpoint mechanic, owner-local, and unknown wrapper pressure
   without promoting a single event or accepting wrapper truth.
+- Checkpoint candidate intelligence also re-enriches legacy saved action
+  signatures from their action events and saved event refs, so old checkpoint
+  notes gain event-type, route-signal, mutation, authority, provenance, and
+  repeat-count-aware negative-evidence axes without rewriting the note.
 - Checkpoint carrier intelligence now separates ecosystem carrier candidates
   from wrapper-family hints. It can surface mechanic, tool, MCP, hook, script,
   daemon, service, index, and unknown carrier pressure with owner scope,
