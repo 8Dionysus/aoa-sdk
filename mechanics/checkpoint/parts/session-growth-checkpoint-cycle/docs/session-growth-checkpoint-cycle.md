@@ -47,6 +47,12 @@ existing session-harvest family into an automatic runtime authority.
   candidates, existing-wrapper fit, wrapper readiness, and bounded sample-audit
   targets; with `--write-index` it writes a generated navigation index only,
   not accepted memory, proof, owner truth, GraphRAG truth, or wrapper authority
+- `aoa checkpoint carrier-intelligence` reads the current checkpoint note via
+  candidate-intelligence evidence and derives carrier candidates for mechanic,
+  tool, MCP, hook, script, daemon, service, index, or unknown pressure; with
+  `--write-index` it writes a generated navigation index only, not accepted
+  mechanics, installed tools, registered MCP services, installed hooks,
+  runtime automation, memory, proof, RAG/GraphRAG truth, or owner authority
 - once reviewed closeout is allowed, `closeout-context.json` carries one aggregated checkpoint-review bundle with review refs, inherited auto-observation refs, findings, candidate notes, stats hints, mechanic hints, closeout questions, evidence refs, and deferred next-owner moves
 - the mechanical donor, progression, and quest artifacts emitted by `aoa-checkpoint-closeout-bridge` now carry the same checkpoint-review bundle forward so reviewed closeout does not drop the semantic checkpoint layer immediately after context build
 - when that bridge also reaches owner follow-through, it now writes one persistent `.aoa/closeout/handoffs/*.owner-handoff.json` bundle rooted in the reviewed `closeout-context.json`; this stays a follow-through queue, not final owner truth, and it must not mint canonical owner landing state by itself
@@ -66,8 +72,15 @@ existing session-harvest family into an automatic runtime authority.
 - checkpoint notes may also carry candidate-intelligence refs rooted in action
   signatures; that carry may name repeated action shape, wrapper-family hint,
   owner pressure, existing-wrapper fit, wrapper gaps, and sample-audit targets,
-  but it must not accept a skill, playbook, technique, eval, memo entry, SDK
-  mechanic, owner-local wrapper, or promotion from one event
+  but it must not accept a skill, playbook, technique, eval, memo entry,
+  SDK-local checkpoint mechanic, owner-local wrapper, or promotion from one
+  event
+- checkpoint carrier intelligence may derive carrier candidates rooted in
+  action signatures; that carry may name carrier kind, owner scope,
+  installability, execution posture, execution risk, existing-carrier fit, and
+  sample-audit targets, but it must not install, register, execute, start
+  runtime automation, claim owner acceptance, or turn generated graph-ready
+  anchors into RAG/GraphRAG authority
 - reviewed closeout may also carry one separate self-agency continuity hint
   surface rooted in
   `continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref`; it
@@ -100,6 +113,7 @@ aoa-sdk/.aoa/session-growth/current/<runtime-session-id>/<repo-label>/
   closeout-context.json
   closeout-execution-report.json
 aoa-sdk/.aoa/session-growth/indexes/
+  checkpoint-carrier-candidate-intelligence.min.json
   checkpoint-candidate-intelligence.min.json
   checkpoint-lifecycle-navigation.min.json
 ```
@@ -251,6 +265,7 @@ aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry
 aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --runtime-session-id <runtime-session-id> --apply --json
 aoa checkpoint sweep-closed-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --session <session-or-archive-fragment> --dry-run --json
 aoa checkpoint candidate-intelligence /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --sample-limit 3 --write-index --json
+aoa checkpoint carrier-intelligence /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --sample-limit 3 --write-index --json
 aoa checkpoint status /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS/aoa-sdk --json
 ```
 

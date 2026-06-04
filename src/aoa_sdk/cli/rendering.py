@@ -13,6 +13,7 @@ from ..models import (
     CheckpointHookInstallResult,
     CheckpointHookStatus,
     CandidateIntelligenceReport,
+    CarrierIntelligenceReport,
     CheckpointLifecycleArchiveResult,
     CheckpointLifecycleAuditReport,
     CheckpointSessionReconcileResult,
@@ -395,6 +396,46 @@ def _print_candidate_intelligence_report(report: CandidateIntelligenceReport) ->
         for sample in report.sample_audit:
             typer.echo(f"  - {sample.sample_id} -> {sample.target_ref} [{sample.verdict}]")
             typer.echo(f"    reason: {sample.reason}")
+
+
+def _print_carrier_intelligence_report(report: CarrierIntelligenceReport) -> None:
+    typer.echo(f"repo_label: {report.repo_label}")
+    typer.echo(f"source: {report.source}")
+    typer.echo(f"boundary: {report.boundary_note}")
+    if report.generated_index_ref:
+        typer.echo(f"generated_index_ref: {report.generated_index_ref}")
+    typer.echo(f"carrier_candidates: {len(report.carrier_candidates)}")
+    typer.echo("carriers:")
+    if not report.carrier_candidates:
+        typer.echo("  - none")
+    else:
+        for candidate in report.carrier_candidates:
+            typer.echo(
+                f"  - {candidate.candidate_id} "
+                f"[{candidate.carrier_kind} / {candidate.owner_scope}]"
+            )
+            typer.echo(
+                f"    source: {candidate.source_wrapper_family}; "
+                f"risk={candidate.execution_risk}; posture={candidate.execution_posture}; "
+                f"installability={candidate.installability}"
+            )
+            typer.echo(
+                f"    readiness: {candidate.carrier_readiness.draftability}; "
+                f"fit={candidate.existing_carrier_fit.fit_status}"
+            )
+            if candidate.carrier_readiness.blockers:
+                typer.echo(
+                    "    blockers: "
+                    + ", ".join(candidate.carrier_readiness.blockers)
+                )
+    typer.echo("sample_audit:")
+    if not report.sample_audit:
+        typer.echo("  - none")
+    else:
+        for sample in report.sample_audit:
+            typer.echo(f"  - {sample.sample_id} -> {sample.target_ref} [{sample.verdict}]")
+            typer.echo(f"    reason: {sample.reason}")
+
 
 def _format_dual_timestamp(
     *,

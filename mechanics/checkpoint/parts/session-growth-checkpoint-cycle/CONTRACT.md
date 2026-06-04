@@ -18,6 +18,12 @@ action facets: action signatures, repetition clusters, existing-wrapper fit,
 wrapper readiness, wrapper gaps, and bounded sample-audit targets. These
 classifier outputs are generated navigation only; they do not accept a
 wrapper, assign owner truth, or promote a single event.
+The part also derives carrier-intelligence route evidence from those action
+signatures: carrier kind, owner scope, existing-carrier fit, execution risk,
+installability, execution posture, and sample-audit targets. These outputs are
+generated ecosystem route evidence only; they do not create accepted mechanics,
+install tools, register MCP services, install hooks, start scripts, daemons, or
+services, mint memory/proof, or grant RAG/GraphRAG authority.
 
 ## SDK-Owned Active Names
 
@@ -29,10 +35,14 @@ wrapper, assign owner truth, or promote a single event.
 - reconcile module: `src/aoa_sdk/checkpoints/reconcile.py`
 - candidate-intelligence module:
   `src/aoa_sdk/checkpoints/candidate_intelligence.py`
+- carrier-intelligence module:
+  `src/aoa_sdk/checkpoints/carrier_intelligence.py`
 - generated lifecycle index:
   `.aoa/session-growth/indexes/checkpoint-lifecycle-navigation.min.json`
 - generated candidate-intelligence index:
   `.aoa/session-growth/indexes/checkpoint-candidate-intelligence.min.json`
+- generated carrier-intelligence index:
+  `.aoa/session-growth/indexes/checkpoint-carrier-candidate-intelligence.min.json`
 
 ## Stop-Lines
 
@@ -47,6 +57,9 @@ wrapper, assign owner truth, or promote a single event.
 - Do not treat action signatures, repetition clusters, or wrapper gaps as
   reviewed memory, proof, owner verdict, accepted wrapper, or promotion
   authority.
+- Do not treat carrier candidates as accepted mechanics, installed tools,
+  registered MCP services, installed hooks, scripts, daemons, services, index
+  authority, RAG/GraphRAG authority, or owner verdicts.
 - Do not let a single weak event become draftable or promoted.
 - Do not mint memory, proof, progression, quest, stats, or owner verdicts from
   checkpoint notes.

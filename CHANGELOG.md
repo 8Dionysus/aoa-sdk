@@ -54,9 +54,16 @@ Tracking starts with the community-docs baseline for this repository.
 - Checkpoint candidate intelligence now derives action facets, action
   signatures, repetition clusters, wrapper-gap candidates, existing-wrapper
   fit, wrapper readiness, bounded sample-audit targets, and a generated
-  navigation index. It can surface skill, playbook, technique, eval, memo, SDK
-  mechanic, owner-local, and unknown wrapper pressure without promoting a
-  single event or accepting wrapper truth.
+  navigation index. It can surface skill, playbook, technique, eval, memo,
+  SDK-local checkpoint mechanic, owner-local, and unknown wrapper pressure
+  without promoting a single event or accepting wrapper truth.
+- Checkpoint carrier intelligence now separates ecosystem carrier candidates
+  from wrapper-family hints. It can surface mechanic, tool, MCP, hook, script,
+  daemon, service, index, and unknown carrier pressure with owner scope,
+  execution risk, installability, generated navigation, and sample-audit lanes,
+  while keeping `sdk_local` private to SDK checkpoint scope and blocking hidden
+  install, registration, execution, RAG/GraphRAG, memory, proof, or owner
+  authority.
 - Checkpoint reviewed closeout support now has pipeline branches for
   followthrough decisions, context/session scope, evidence reading, mechanical
   artifact execution, and owner handoff. `closeout/bridge.py` is a thin

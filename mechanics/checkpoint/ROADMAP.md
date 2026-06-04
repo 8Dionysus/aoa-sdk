@@ -26,7 +26,11 @@ owner acceptance.
 - Keep candidate intelligence below owner truth: checkpoint action facets,
   signatures, repetition clusters, and wrapper gaps may route review, but they
   do not accept skills, playbooks, techniques, evals, memo entries, SDK
-  mechanics, or owner-local wrappers.
+  local checkpoint mechanics, or owner-local wrappers.
+- Keep carrier intelligence as a separate ecosystem route layer: carrier
+  candidates may name mechanic, tool, MCP, hook, script, daemon, service, or
+  index pressure with owner scope and execution gates, but they do not install,
+  register, execute, or accept those carriers.
 
 ## Next Work
 
@@ -46,6 +50,10 @@ owner acceptance.
   generated candidate indexes should route signatures, wrapper gaps, owner
   pressure, existing-fit status, and sample-audit targets without becoming
   memory, proof, or wrapper acceptance.
+- Use `carrier-intelligence` dry-runs when the question is whether repeated
+  action pressure suggests an ecosystem carrier such as a mechanic, tool, MCP
+  access plane, hook, script, daemon, service, or generated index. Treat
+  `sdk_local` as a private SDK scope, not the head pattern.
 
 ## When Time Comes
 
@@ -60,6 +68,9 @@ owner acceptance.
 - Add wrapper-specific automation only after repeated classifier samples have
   reviewed verdicts; do not convert a single action signature into an accepted
   aoa-* wrapper.
+- Add carrier-specific implementation only after owner-scoped carrier samples
+  have reviewed verdicts and the owning repo accepts install, registration, or
+  execution posture.
 - Add optional timers only as bounded wrappers around explicit sweep commands;
   do not add a hidden daemon that runs closeout, review, harvest, owner moves,
   or memory mutation.
@@ -74,3 +85,5 @@ owner acceptance.
 - Mutating aoa-session-memory from checkpoint lifecycle routes.
 - Promoting classifier output or generated candidate indexes into accepted
   wrappers without owner review.
+- Treating generated carrier indexes as RAG, GraphRAG, install, registration,
+  hook activation, tool execution, or owner-verdict authority.
