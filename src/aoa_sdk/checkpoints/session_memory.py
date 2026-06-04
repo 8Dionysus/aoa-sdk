@@ -18,6 +18,7 @@ from ..loaders import load_json
 from ..workspace.discovery import Workspace
 
 SESSION_MEMORY_ROOT_ENV = "AOA_SESSION_MEMORY_ROOT"
+CODEX_SESSIONS_ROOT_ENV = "AOA_CODEX_SESSIONS_ROOT"
 ROUTE_SIGNAL_TOP_KEY_LIMIT = 8
 
 
@@ -142,6 +143,7 @@ def resolve_checkpoint_session_memory_for_runtime_session(
     *,
     workspace: Workspace,
     runtime_session_id: str | None,
+    post_commit_report_ref: str | None = None,
 ) -> tuple[CheckpointSessionMemoryRef | None, CheckpointSessionMemoryFreshness]:
     checked_at = datetime.now(UTC)
     if not isinstance(runtime_session_id, str) or not runtime_session_id.strip():
@@ -151,29 +153,30 @@ def resolve_checkpoint_session_memory_for_runtime_session(
             cautions=["checkpoint runtime session id is missing"],
         )
 
-    runtime_session_ref = _runtime_session_ref_for_id(
+    runtime_trace_ref = resolve_checkpoint_runtime_trace_ref(
         workspace=workspace,
         runtime_session_id=runtime_session_id,
+        post_commit_report_ref=post_commit_report_ref,
     )
-    if runtime_session_ref is None:
+    if runtime_trace_ref is None:
         return None, CheckpointSessionMemoryFreshness(
             status="missing",
             checked_at=checked_at,
             cautions=[
-                "no aoa-sdk skill runtime session file matched this checkpoint runtime session"
+                "no aoa-sdk skill runtime session file or recoverable raw transcript matched this checkpoint runtime session"
             ],
         )
 
     ref, freshness = resolve_checkpoint_session_memory(
         workspace=workspace,
-        session_trace_thread_id=_string_value(runtime_session_ref.payload, "codex_thread_id"),
-        session_trace_ref=_string_value(runtime_session_ref.payload, "codex_rollout_path"),
+        session_trace_thread_id=runtime_trace_ref.codex_thread_id,
+        session_trace_ref=runtime_trace_ref.codex_rollout_path,
     )
     if ref is not None:
         ref = ref.model_copy(
             update={
                 "evidence_refs": _dedupe_strings(
-                    [*ref.evidence_refs, str(runtime_session_ref.path)]
+                    [*ref.evidence_refs, *runtime_trace_ref.evidence_refs]
                 )
             }
         )
@@ -184,6 +187,7 @@ def resolve_checkpoint_runtime_trace_ref(
     *,
     workspace: Workspace,
     runtime_session_id: str | None,
+    post_commit_report_ref: str | None = None,
 ) -> CheckpointRuntimeTraceRef | None:
     if not isinstance(runtime_session_id, str) or not runtime_session_id.strip():
         return None
@@ -192,7 +196,11 @@ def resolve_checkpoint_runtime_trace_ref(
         runtime_session_id=runtime_session_id,
     )
     if runtime_session_ref is None:
-        return None
+        return _runtime_trace_ref_from_post_commit_report(
+            workspace=workspace,
+            runtime_session_id=runtime_session_id,
+            post_commit_report_ref=post_commit_report_ref,
+        )
     codex_thread_id = _string_value(runtime_session_ref.payload, "codex_thread_id")
     codex_rollout_path = _string_value(runtime_session_ref.payload, "codex_rollout_path")
     return CheckpointRuntimeTraceRef(
@@ -299,6 +307,99 @@ def _runtime_session_ref_for_id(
         if _string_value(payload, "session_id") == runtime_session_id:
             return _RuntimeSessionRef(path=path, payload=payload)
     return None
+
+
+def _runtime_trace_ref_from_post_commit_report(
+    *,
+    workspace: Workspace,
+    runtime_session_id: str,
+    post_commit_report_ref: str | None,
+) -> CheckpointRuntimeTraceRef | None:
+    if not isinstance(post_commit_report_ref, str) or not post_commit_report_ref.strip():
+        return None
+    report_path = Path(post_commit_report_ref).expanduser().resolve(strict=False)
+    report = _load_json_object(report_path)
+    if report is None:
+        return None
+    report_runtime_session_id = _string_value(report, "runtime_session_id")
+    if report_runtime_session_id and report_runtime_session_id != runtime_session_id:
+        return None
+    session_file = _string_value(report, "session_file")
+    if session_file is None:
+        return None
+    session_path = Path(session_file).expanduser().resolve(strict=False)
+    session_payload = _load_json_object(session_path)
+    codex_thread_id = _string_value(session_payload, "codex_thread_id")
+    codex_rollout_path = _string_value(session_payload, "codex_rollout_path")
+    if codex_thread_id is None:
+        codex_thread_id = _thread_id_from_session_file(session_path)
+    if codex_rollout_path is None and codex_thread_id is not None:
+        raw_path = _find_codex_raw_transcript(
+            workspace=workspace,
+            codex_thread_id=codex_thread_id,
+        )
+        if raw_path is not None:
+            codex_rollout_path = str(raw_path)
+    if codex_thread_id is None and codex_rollout_path is None:
+        return None
+    return CheckpointRuntimeTraceRef(
+        source="checkpoint-post-commit-report",
+        runtime_session_id=runtime_session_id,
+        runtime_session_file_ref=str(session_path),
+        codex_thread_id=codex_thread_id,
+        codex_rollout_path=codex_rollout_path,
+        evidence_refs=_dedupe_strings(
+            [
+                str(report_path),
+                str(session_path),
+                codex_rollout_path,
+                *(f"codex_thread:{codex_thread_id}" if codex_thread_id else None,),
+            ]
+        ),
+    )
+
+
+def _thread_id_from_session_file(path: Path) -> str | None:
+    stem = path.stem.strip()
+    if not stem:
+        return None
+    # Codex rollout thread ids are UUID-like or long sortable ids embedded in
+    # legacy SDK runtime session filenames.
+    if "-" in stem and len(stem) >= 16:
+        return stem
+    return None
+
+
+def _find_codex_raw_transcript(
+    *,
+    workspace: Workspace,
+    codex_thread_id: str,
+) -> Path | None:
+    for root in _candidate_codex_session_roots(workspace):
+        if not root.is_dir():
+            continue
+        matches = sorted(root.rglob(f"*{codex_thread_id}*.jsonl"))
+        if matches:
+            return matches[0].resolve(strict=False)
+    return None
+
+
+def _candidate_codex_session_roots(workspace: Workspace) -> list[Path]:
+    candidates: list[Path] = []
+    env_root = os.environ.get(CODEX_SESSIONS_ROOT_ENV)
+    if isinstance(env_root, str) and env_root.strip():
+        candidates.append(Path(env_root).expanduser().resolve(strict=False))
+    candidates.append((Path.home() / ".codex" / "sessions").resolve(strict=False))
+    candidates.append((workspace.root / ".codex" / "sessions").resolve(strict=False))
+    candidates.append((workspace.federation_root / ".codex" / "sessions").resolve(strict=False))
+    unique: list[Path] = []
+    seen: set[Path] = set()
+    for candidate in candidates:
+        if candidate in seen:
+            continue
+        seen.add(candidate)
+        unique.append(candidate)
+    return unique
 
 
 def _looks_like_session_memory_root(path: Path) -> bool:

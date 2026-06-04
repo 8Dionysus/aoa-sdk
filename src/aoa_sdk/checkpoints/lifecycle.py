@@ -120,6 +120,13 @@ def audit_checkpoint_lifecycle(
         notes.append(
             "session-memory refs are reported as route evidence only; lifecycle audit does not mutate .aoa"
         )
+    recoverable_trace_count = sum(
+        1 for entry in entries if entry.runtime_trace_status == "recoverable"
+    )
+    if recoverable_trace_count:
+        notes.append(
+            f"{recoverable_trace_count} checkpoint entrie(s) have recoverable raw trace refs from legacy post-commit reports"
+        )
     report = CheckpointLifecycleAuditReport(
         checked_at=checked_at,
         checked_at_local=checked_at_local,
@@ -237,17 +244,27 @@ def _entry_from_current_dir(
         active_runtime_session_id is not None
         and note.runtime_session_id == active_runtime_session_id
     )
+    runtime_trace_ref = resolve_checkpoint_runtime_trace_ref(
+        workspace=workspace,
+        runtime_session_id=note.runtime_session_id,
+        post_commit_report_ref=post_commit_ref,
+    )
+    runtime_trace_status: Literal["resolved", "recoverable", "missing"] = (
+        "resolved"
+        if runtime_trace_ref is not None
+        and runtime_trace_ref.source == "aoa-sdk-skill-runtime-session"
+        else "recoverable"
+        if runtime_trace_ref is not None
+        else "missing"
+    )
     session_memory_ref, session_memory_freshness = (
         resolve_checkpoint_session_memory_for_runtime_session(
             workspace=workspace,
             runtime_session_id=note.runtime_session_id,
+            post_commit_report_ref=post_commit_ref,
         )
         if not active_runtime_scope
         else (None, None)
-    )
-    runtime_trace_ref = resolve_checkpoint_runtime_trace_ref(
-        workspace=workspace,
-        runtime_session_id=note.runtime_session_id,
     )
     session_memory_archive_ref = _dedupe_strings(
         [
@@ -278,12 +295,6 @@ def _entry_from_current_dir(
         not active_runtime_scope
         and lifecycle_state not in {"pending_review", "session_closed_pending_review"}
     )
-    required_action = _required_action(
-        lifecycle_state=lifecycle_state,
-        repo_label=paths.repo_label,
-        pending_refs=pending_refs,
-        runtime_session_id=note.runtime_session_id,
-    )
     evidence_refs = _dedupe_strings(
         [
             str(paths.jsonl),
@@ -311,6 +322,19 @@ def _entry_from_current_dir(
         has_session_memory_archive=bool(session_memory_archive_ref),
         review_status=note.review_status,
     )
+    required_action = _required_action(
+        lifecycle_state=lifecycle_state,
+        next_route=next_route,
+        repo_label=paths.repo_label,
+        pending_refs=pending_refs,
+        runtime_session_id=note.runtime_session_id,
+        runtime_trace_thread_id=(
+            runtime_trace_ref.codex_thread_id if runtime_trace_ref is not None else None
+        ),
+        source_trace_ref=(
+            runtime_trace_ref.codex_rollout_path if runtime_trace_ref is not None else None
+        ),
+    )
     return CheckpointLifecycleEntry(
         repo_label=paths.repo_label,
         runtime_session_id=note.runtime_session_id,
@@ -327,7 +351,7 @@ def _entry_from_current_dir(
         runtime_trace_thread_id=(
             runtime_trace_ref.codex_thread_id if runtime_trace_ref is not None else None
         ),
-        runtime_trace_status="resolved" if runtime_trace_ref is not None else "missing",
+        runtime_trace_status=runtime_trace_status,
         source_trace_ref=(
             runtime_trace_ref.codex_rollout_path if runtime_trace_ref is not None else None
         ),
@@ -400,19 +424,39 @@ def _lifecycle_state(
 def _required_action(
     *,
     lifecycle_state: LifecycleState,
+    next_route: str,
     repo_label: str,
     pending_refs: list[str],
     runtime_session_id: str | None,
+    runtime_trace_thread_id: str | None,
+    source_trace_ref: str | None,
 ) -> str | None:
-    if lifecycle_state not in {"pending_review", "session_closed_pending_review"}:
+    if lifecycle_state in {"pending_review", "session_closed_pending_review"}:
+        refs_preview = ", ".join(pending_refs[:5]) if pending_refs else "pending checkpoint entry"
+        if len(pending_refs) > 5:
+            refs_preview += f" (+{len(pending_refs) - 5} more)"
+        session_part = f" --runtime-session-id {runtime_session_id}" if runtime_session_id else ""
+        return (
+            f"review checkpoint note for {repo_label}{session_part} before reconcile/archive; "
+            f"pending refs: {refs_preview}"
+        )
+    if next_route != "recover_session_memory_archive":
         return None
-    refs_preview = ", ".join(pending_refs[:5]) if pending_refs else "pending checkpoint entry"
-    if len(pending_refs) > 5:
-        refs_preview += f" (+{len(pending_refs) - 5} more)"
-    session_part = f" --runtime-session-id {runtime_session_id}" if runtime_session_id else ""
+    if runtime_trace_thread_id and source_trace_ref:
+        return (
+            "recover aoa-session-memory archive for "
+            f"{repo_label} from raw transcript {source_trace_ref} "
+            f"with session id {runtime_trace_thread_id}; then rerun checkpoint backlog-audit"
+        )
+    if runtime_trace_thread_id:
+        return (
+            "recover aoa-session-memory archive for "
+            f"{repo_label} by sweeping/importing Codex thread {runtime_trace_thread_id}; "
+            "then rerun checkpoint backlog-audit"
+        )
     return (
-        f"review checkpoint note for {repo_label}{session_part} before reconcile/archive; "
-        f"pending refs: {refs_preview}"
+        f"recover aoa-session-memory archive for {repo_label}; "
+        "then rerun checkpoint backlog-audit"
     )
 
 
