@@ -18,6 +18,7 @@ from ..models import (
     CheckpointLifecycleArchiveResult,
     CheckpointLifecycleAuditReport,
     CheckpointSessionReconcileResult,
+    CandidateIntelligenceReport,
     CloseoutContextCandidateMap,
     CloseoutExecutionStep,
     SessionCheckpointAutoObservation,
@@ -69,6 +70,12 @@ from .hooks.git_boundary import (
     render_checkpoint_hook,
 )
 from .kinds import infer_auto_checkpoint_kind as _infer_auto_checkpoint_kind
+from .candidate_indexes import (
+    write_checkpoint_candidate_intelligence_index as _write_checkpoint_candidate_intelligence_index,
+)
+from .candidate_intelligence import (
+    build_candidate_intelligence_from_note as _build_candidate_intelligence_from_note,
+)
 from .lifecycle import (
     audit_checkpoint_lifecycle as _audit_checkpoint_lifecycle,
     close_archive_checkpoint_lifecycle as _close_archive_checkpoint_lifecycle,
@@ -270,6 +277,9 @@ class CheckpointsAPI:
                 checkpoint_should_capture=report.checkpoint_should_capture,
                 blocked_by=list(report.blocked_by),
                 candidate_clusters=list(report.candidate_clusters),
+                action_events=list(report.action_events),
+                action_signatures=list(report.action_signatures),
+                wrapper_gap_candidates=list(report.wrapper_gap_candidates),
                 manual_review_requested=manual_review_requested,
                 commit_sha=commit_sha,
                 commit_short_sha=commit_short_sha,
@@ -1168,6 +1178,32 @@ class CheckpointsAPI:
             dry_run=dry_run,
             write_index=write_index,
         )
+
+    def candidate_intelligence(
+        self,
+        *,
+        repo_root: str,
+        session_file: str | None = None,
+        sample_limit: int = 0,
+        write_index: bool = False,
+    ) -> CandidateIntelligenceReport:
+        note = self.status(repo_root=repo_root, session_file=session_file)
+        report = _build_candidate_intelligence_from_note(
+            workspace=self.workspace,
+            repo_root=repo_root,
+            action_events=list(note.action_events),
+            action_signatures=list(note.action_signatures),
+            candidate_clusters=list(note.candidate_clusters),
+            runtime_session_ids=[note.runtime_session_id] if note.runtime_session_id else [],
+            sample_limit=sample_limit,
+        )
+        if write_index:
+            index_path = _write_checkpoint_candidate_intelligence_index(
+                workspace=self.workspace,
+                report=report,
+            )
+            report = report.model_copy(update={"generated_index_ref": str(index_path)})
+        return report
 
     def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:
         runtime_session_metadata = peek_checkpoint_runtime_session(

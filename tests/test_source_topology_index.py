@@ -72,6 +72,18 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
     assert modules["src/aoa_sdk/checkpoints/registry.py"]["split_pressure"] == "medium"
     assert "route-role orchestrator" in modules["src/aoa_sdk/checkpoints/registry.py"]["role"]
     assert "named checkpoint branch" in modules["src/aoa_sdk/checkpoints/registry.py"]["next_route"]
+    assert "candidate-intelligence navigation index" in modules[
+        "src/aoa_sdk/checkpoints/candidate_indexes.py"
+    ]["role"]
+    assert "candidate navigation" in modules[
+        "src/aoa_sdk/checkpoints/candidate_indexes.py"
+    ]["next_route"]
+    assert "action-signature" in modules[
+        "src/aoa_sdk/checkpoints/candidate_intelligence.py"
+    ]["role"]
+    assert "classifier route evidence" in modules[
+        "src/aoa_sdk/checkpoints/candidate_intelligence.py"
+    ]["next_route"]
     assert "checkpoint lifecycle audit" in modules["src/aoa_sdk/checkpoints/lifecycle.py"]["role"]
     assert "close/archive orchestration" in modules["src/aoa_sdk/checkpoints/lifecycle.py"]["role"]
     assert modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["split_pressure"] == "low"
@@ -86,7 +98,7 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
     }
     for path, role_fragment in closeout_module_roles.items():
         assert role_fragment in modules[path]["role"]
-    assert modules["src/aoa_sdk/checkpoints/ledger/notes.py"]["split_pressure"] == "low"
+    assert modules["src/aoa_sdk/checkpoints/ledger/notes.py"]["split_pressure"] == "medium"
     assert "runtime note loading" in modules["src/aoa_sdk/checkpoints/ledger/notes.py"]["role"]
     assert "lifecycle ledger event normalization" in modules[
         "src/aoa_sdk/checkpoints/ledger/lifecycle_events.py"
@@ -237,12 +249,15 @@ def test_source_topology_index_records_low_pressure_stop_lines() -> None:
     modules = {module["path"]: module for module in _walk_modules(payload["tree"])}
 
     stop_lines = {
-        "src/aoa_sdk/checkpoints/ledger/notes.py": "new ledger owner route",
         "src/aoa_sdk/release/api.py": "release-support route owner",
         "src/aoa_sdk/skills/detector.py": "new skill-detection owner route",
         "src/aoa_sdk/compatibility/policy.py": "new compatibility owner route",
         "src/aoa_sdk/recurrence/hooks.py": "hook owner routes diverge",
     }
+    assert modules["src/aoa_sdk/checkpoints/ledger/notes.py"]["split_pressure"] == "medium"
+    assert "new ledger owner route" in modules[
+        "src/aoa_sdk/checkpoints/ledger/notes.py"
+    ]["next_route"]
     for path, route_fragment in stop_lines.items():
         assert modules[path]["split_pressure"] == "low"
         assert route_fragment in modules[path]["next_route"]

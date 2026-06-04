@@ -95,6 +95,39 @@ def render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label: 
                 lines.append("- evidence refs:")
                 lines.extend(f"  - `{ref}`" for ref in review.evidence_refs)
             lines.append("")
+    lines.extend(["", "## Candidate Intelligence", ""])
+    lines.append(
+        "Generated route evidence only; not reviewed memory, proof, owner verdict, "
+        "accepted wrapper, automation, or promotion."
+    )
+    if note.action_signatures:
+        lines.append("- action signatures:")
+        lines.extend(
+            f"  - `{signature.signature_id}` -> `{signature.wrapper_family_hint}` "
+            f"({signature.confidence})"
+            for signature in note.action_signatures
+        )
+    else:
+        lines.append("- action signatures: `none`")
+    if note.repetition_clusters:
+        lines.append("- repetition clusters:")
+        lines.extend(
+            f"  - `{cluster.cluster_id}` repeat `{cluster.repeat_count}`; "
+            f"draftability `{cluster.wrapper_readiness.draftability}`; "
+            f"fit `{cluster.existing_wrapper_fit.fit_status}`"
+            for cluster in note.repetition_clusters
+        )
+    else:
+        lines.append("- repetition clusters: `none`")
+    if note.wrapper_gap_candidates:
+        lines.append("- wrapper gaps:")
+        lines.extend(
+            f"  - `{gap.candidate_id}` -> `{gap.proposed_wrapper_family}` "
+            f"({gap.draftability})"
+            for gap in note.wrapper_gap_candidates
+        )
+    else:
+        lines.append("- wrapper gaps: `none`")
     lines.extend(["", "## Candidate Clusters", ""])
     if not note.candidate_clusters:
         lines.append("- none")

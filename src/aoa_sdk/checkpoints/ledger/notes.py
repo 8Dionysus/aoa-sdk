@@ -19,6 +19,7 @@ from ...models import (
     SessionEndSkillTarget,
 )
 from ...workspace.discovery import Workspace
+from ..candidate_intelligence import build_candidate_intelligence_from_note
 from .lifecycle_events import lifecycle_closed, lifecycle_evidence_refs, normalize_lifecycle_event
 from ..naming import safe_checkpoint_name
 from ..render.markdown import render_checkpoint_note_markdown
@@ -173,6 +174,9 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
     entries: list[SessionCheckpointHistoryEntry] = []
     agent_review_map: dict[str, SessionCheckpointAgentReview] = {}
     lifecycle_events: list[SessionCheckpointLifecycleEvent] = []
+    history_action_events = []
+    history_action_signatures = []
+    history_wrapper_gap_candidates = []
     session_ref: str | None = None
     runtime_session_id: str | None = None
     runtime_session_created_at: datetime | None = None
@@ -223,6 +227,9 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
                     "observed_tz": observed_tz,
                 }
             )
+        history_action_events.extend(entry.action_events)
+        history_action_signatures.extend(entry.action_signatures)
+        history_wrapper_gap_candidates.extend(entry.wrapper_gap_candidates)
         entries.append(entry)
     if runtime_session_id is None:
         runtime_session_id = paths.runtime_session_id
@@ -299,6 +306,12 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
             merged_moves = _dedupe_strings([*(existing.next_owner_moves if existing else []), *cluster.next_owner_moves])
             merged_promote_if = _dedupe_strings([*(existing.promote_if if existing else []), *cluster.promote_if])
             merged_blocked = _dedupe_strings([*(existing.blocked_by if existing else []), *cluster.blocked_by])
+            merged_action_signature_refs = _dedupe_strings(
+                [
+                    *(existing.action_signature_refs if existing else []),
+                    *cluster.action_signature_refs,
+                ]
+            )
             merged_session_end_targets = _dedupe_session_end_targets(
                 [*(existing.session_end_targets if existing else []), *cluster_session_end_targets]
             )
@@ -326,6 +339,7 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
                     existing.lineage_hint if existing is not None else None,
                     cluster.lineage_hint,
                 ),
+                action_signature_refs=merged_action_signature_refs,
             )
             all_evidence.update(merged_evidence)
             next_owner_moves.update(merged_moves)
@@ -363,6 +377,21 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
         cluster.candidate_id for cluster in candidate_clusters if "upgrade" in cluster.session_end_targets
     ]
     progression_axis_signals = _aggregate_progression_axis_signals(candidate_clusters)
+    candidate_intelligence_report = build_candidate_intelligence_from_note(
+        workspace=Workspace.discover(paths.root),
+        repo_root=paths.repo_label,
+        action_events=history_action_events,
+        action_signatures=history_action_signatures,
+        candidate_clusters=candidate_clusters,
+        runtime_session_ids=[runtime_session_id] if runtime_session_id is not None else [],
+    )
+    wrapper_gap_map = {
+        gap.candidate_id: gap
+        for gap in [
+            *candidate_intelligence_report.wrapper_gap_candidates,
+            *history_wrapper_gap_candidates,
+        ]
+    }
     stats_refresh_recommended = bool(candidate_clusters)
     pending_agent_review_refs = [
         entry.commit_sha or entry.commit_short_sha or entry.intent_text
@@ -395,6 +424,13 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
         repo_scope=sorted(repo_scope),
         checkpoint_history=entries,
         candidate_clusters=candidate_clusters,
+        action_events=list(candidate_intelligence_report.action_events),
+        action_signatures=list(candidate_intelligence_report.action_signatures),
+        repetition_clusters=list(candidate_intelligence_report.repetition_clusters),
+        wrapper_gap_candidates=sorted(
+            wrapper_gap_map.values(),
+            key=lambda item: (item.signature_id, item.candidate_id),
+        ),
         promotion_recommendation=recommendation,
         carry_until_session_closeout=state not in {"promoted", "closed"},
         session_end_recommendation=_derive_session_end_recommendation(

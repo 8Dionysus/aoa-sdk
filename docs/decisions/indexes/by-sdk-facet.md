@@ -95,6 +95,12 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0021 - Technique Promotion Readiness Reader Localization](../AOA-SDK-D-0021-technique-promotion-readiness-reader-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | boundary-bridge | mechanics topology, part validation, active naming, owner boundary | accepted |
 
+## candidate intelligence
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
+
 ## changelog
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
@@ -122,6 +128,7 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0055 - Checkpoint Skipped Session Recovery Branch](../AOA-SDK-D-0055-checkpoint-skipped-session-recovery-branch.md) | 2026-06-03 | source-topology, checkpoint, implementation, validation | checkpoint | source topology, checkpoint route roles, skipped-session recovery | accepted |
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 
 ## child-task reentry
 
@@ -146,6 +153,7 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 
 ## CLI helper scripts
 
@@ -699,6 +707,7 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0013 - Boundary Bridge And Checkpoint Active Part Localization](../AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md) | 2026-05-31 | topology, mechanics, artifact placement, public API naming | boundary-bridge, checkpoint | mechanics topology, workspace control plane, part validation, docs routes, API naming | accepted |
 | [AOA-SDK-D-0054 - Surface Registry Route-Role Branches](../AOA-SDK-D-0054-surface-registry-route-role-branches.md) | 2026-06-03 | source-topology, boundary-bridge, implementation, validation | boundary-bridge, checkpoint | source topology, owner-layer signal handoff, checkpoint session-growth | accepted |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 
 ## surface path transport
 

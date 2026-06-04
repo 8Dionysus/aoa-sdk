@@ -184,6 +184,7 @@ Grouped by `Guard families` metadata.
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint control-plane, session-memory attachment, CLI facade | checkpoint | accepted |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | accepted |
 
 ## generated parity
 
@@ -277,6 +278,12 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) | 2026-06-01 | topology, source home, agent route cards, validation | sdk source home, public interface, facade boundary, runtime entry, distribution | boundary-bridge, checkpoint, codex-projection, release-support, runtime-seam | accepted |
 | [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) | 2026-06-02 | topology, mechanics, validation, route-law | mechanics topology, route cards, validation authority | all | accepted |
 
+## no single-event promotion
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | accepted |
+
 ## owner boundary
 
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
@@ -285,6 +292,7 @@ Grouped by `Guard families` metadata.
 | [AOA-SDK-D-0021 - Technique Promotion Readiness Reader Localization](../AOA-SDK-D-0021-technique-promotion-readiness-reader-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | mechanics topology, Boundary Bridge, techniques facade | boundary-bridge | accepted |
 | [AOA-SDK-D-0022 - Reviewed Session Handoff Runner Localization](../AOA-SDK-D-0022-reviewed-session-handoff-runner-localization.md) | 2026-06-01 | topology, mechanics, artifact placement, validation guard | mechanics topology, checkpoint, reviewed session handoff runner | checkpoint | accepted |
 | [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) | 2026-06-01 | active naming, external source ref, compatibility accounting, stress evidence | antifragility stress posture, reviewed stress carry, active naming, owner boundary | antifragility | accepted |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | accepted |
 
 ## owner follow-through
 
@@ -372,6 +380,12 @@ Grouped by `Guard families` metadata.
 | Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) | 2026-06-02 | docs, release, route-law, validation | changelog, release posture, root docs | release-support | accepted |
+
+## review gate
+
+| Decision | Date | Surface classes | SDK facets | Mechanic parents | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint control-plane, candidate intelligence, CLI facade, surface detection | checkpoint | accepted |
 
 ## reviewed closeout runner
 

@@ -42,6 +42,11 @@ existing session-harvest family into an automatic runtime authority.
   session-memory-backed no-closeout scopes or existing closeout-executed
   scopes; pending-review scopes return required actions instead of moving
   evidence
+- `aoa checkpoint candidate-intelligence` reads the current checkpoint note and
+  derives action facets, action signatures, repetition clusters, wrapper-gap
+  candidates, existing-wrapper fit, wrapper readiness, and bounded sample-audit
+  targets; with `--write-index` it writes a generated navigation index only,
+  not accepted memory, proof, owner truth, GraphRAG truth, or wrapper authority
 - once reviewed closeout is allowed, `closeout-context.json` carries one aggregated checkpoint-review bundle with review refs, inherited auto-observation refs, findings, candidate notes, stats hints, mechanic hints, closeout questions, evidence refs, and deferred next-owner moves
 - the mechanical donor, progression, and quest artifacts emitted by `aoa-checkpoint-closeout-bridge` now carry the same checkpoint-review bundle forward so reviewed closeout does not drop the semantic checkpoint layer immediately after context build
 - when that bridge also reaches owner follow-through, it now writes one persistent `.aoa/closeout/handoffs/*.owner-handoff.json` bundle rooted in the reviewed `closeout-context.json`; this stays a follow-through queue, not final owner truth, and it must not mint canonical owner landing state by itself
@@ -58,6 +63,11 @@ existing session-harvest family into an automatic runtime authority.
   wrong target, evidence refs, axis pressure, supersession metadata, and
   status posture, but it must not mint `candidate_ref`, `seed_ref`, or
   `object_ref`
+- checkpoint notes may also carry candidate-intelligence refs rooted in action
+  signatures; that carry may name repeated action shape, wrapper-family hint,
+  owner pressure, existing-wrapper fit, wrapper gaps, and sample-audit targets,
+  but it must not accept a skill, playbook, technique, eval, memo entry, SDK
+  mechanic, owner-local wrapper, or promotion from one event
 - reviewed closeout may also carry one separate self-agency continuity hint
   surface rooted in
   `continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref`; it
@@ -89,6 +99,9 @@ aoa-sdk/.aoa/session-growth/current/<runtime-session-id>/<repo-label>/
   harvest-handoff.json
   closeout-context.json
   closeout-execution-report.json
+aoa-sdk/.aoa/session-growth/indexes/
+  checkpoint-candidate-intelligence.min.json
+  checkpoint-lifecycle-navigation.min.json
 ```
 
 When no runtime session is available yet, the legacy unscoped ledger remains
@@ -159,6 +172,8 @@ Those rebuilt snapshots now act as the session-local ledger for:
 - harvest candidates that should be bundled at reviewed closeout
 - progression candidates and provisional axis movement that should feed `aoa-session-progression-lift` only at reviewed closeout
 - upgrade candidates that should be reviewed once at closeout before any owner-layer promotion
+- action signatures and wrapper gaps that should be sampled, reviewed, and
+  routed to the correct owner before any wrapper is drafted or accepted
 - the final stats-refresh hint that belongs to the same reviewed closeout moment
 - agent-authored intermediate review notes for each commit checkpoint, including what changed, why it matters, where it belongs, and which questions the final closeout must reread against the full session
 
@@ -235,6 +250,7 @@ aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --include-
 aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
 aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --runtime-session-id <runtime-session-id> --apply --json
 aoa checkpoint sweep-closed-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --session <session-or-archive-fragment> --dry-run --json
+aoa checkpoint candidate-intelligence /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --sample-limit 3 --write-index --json
 aoa checkpoint status /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS/aoa-sdk --json
 ```
 

@@ -6,6 +6,7 @@ from ..models import (
     SurfaceCloseoutHandoff,
     SurfaceDetectionReport,
 )
+from ..checkpoints.candidate_intelligence import build_candidate_intelligence_from_surface
 from ..skills.detector import detect_skills
 from ..workspace.discovery import Workspace
 from .checkpoint_candidates import (
@@ -111,6 +112,37 @@ class SurfacesAPI:
                     ),
                 ]
             )
+        candidate_intelligence = (
+            build_candidate_intelligence_from_surface(
+                workspace=self.workspace,
+                repo_root=repo_root,
+                intent_text=intent_text,
+                checkpoint_kind=checkpoint_kind,
+                mutation_surface=mutation_surface,
+                items=items,
+                candidate_clusters=candidate_clusters,
+                actionability_gaps=list(skill_report.actionability_gaps),
+            )
+            if phase == "checkpoint"
+            else None
+        )
+        if candidate_intelligence is not None:
+            refs_by_candidate: dict[str, list[str]] = {}
+            for event in candidate_intelligence.action_events:
+                if event.action_signature_ref is None:
+                    continue
+                for candidate_id in event.candidate_ids:
+                    refs_by_candidate.setdefault(candidate_id, []).append(event.action_signature_ref)
+            candidate_clusters = [
+                cluster.model_copy(
+                    update={
+                        "action_signature_refs": sorted(
+                            set(refs_by_candidate.get(cluster.candidate_id, []))
+                        )
+                    }
+                )
+                for cluster in candidate_clusters
+            ]
         blocked_by = checkpoint_blocked_by(candidate_clusters) if phase == "checkpoint" else []
         checkpoint_should_capture = bool(candidate_clusters) or (
             phase == "checkpoint" and checkpoint_kind in {"manual", "pause"} and bool(items)
@@ -135,6 +167,21 @@ class SurfacesAPI:
             regrounding_reason_codes=regrounding_reason_codes(regrounding_hints),
             checkpoint_should_capture=checkpoint_should_capture,
             candidate_clusters=candidate_clusters,
+            action_events=(
+                list(candidate_intelligence.action_events)
+                if candidate_intelligence is not None
+                else []
+            ),
+            action_signatures=(
+                list(candidate_intelligence.action_signatures)
+                if candidate_intelligence is not None
+                else []
+            ),
+            wrapper_gap_candidates=(
+                list(candidate_intelligence.wrapper_gap_candidates)
+                if candidate_intelligence is not None
+                else []
+            ),
             promotion_recommendation=(
                 checkpoint_promotion_recommendation(
                     candidate_clusters=candidate_clusters,

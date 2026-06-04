@@ -172,6 +172,229 @@ class CheckpointCandidateCluster(BaseModel):
     blocked_by: list[str] = Field(default_factory=list)
     next_owner_moves: list[str] = Field(default_factory=list)
     lineage_hint: CheckpointLineageHint | None = None
+    action_signature_refs: list[str] = Field(default_factory=list)
+
+
+class ActionFacetSet(BaseModel):
+    schema_version: Literal["aoa_checkpoint_action_facets_v1"] = (
+        "aoa_checkpoint_action_facets_v1"
+    )
+    event_type: str
+    family: Literal[
+        "communication",
+        "command_execution",
+        "workspace_mutation",
+        "context_memory",
+        "verification",
+        "owner_routing",
+        "risk",
+        "wrapper_gap",
+        "unknown",
+    ]
+    phase: Literal[
+        "ingress",
+        "in_flight",
+        "pre_mutation",
+        "checkpoint",
+        "closeout",
+        "review",
+        "unknown",
+    ] = "checkpoint"
+    actor: Literal["user", "assistant", "tool", "codex_runtime", "unknown"] = "assistant"
+    action: str
+    object: str
+    outcome: str
+    session_act: str | None = None
+    route_signals: list[str] = Field(default_factory=list)
+    relationships: list[str] = Field(default_factory=list)
+    confidence: Literal["low", "medium", "high"] = "medium"
+
+
+class CheckpointActionEvent(BaseModel):
+    schema_version: Literal["aoa_checkpoint_action_event_v1"] = (
+        "aoa_checkpoint_action_event_v1"
+    )
+    event_id: str
+    source_ref: str
+    facets: ActionFacetSet
+    trigger_text: str = ""
+    evidence_refs: list[str] = Field(default_factory=list)
+    candidate_ids: list[str] = Field(default_factory=list)
+    surface_refs: list[str] = Field(default_factory=list)
+    action_signature_ref: str | None = None
+
+
+class ActionSignature(BaseModel):
+    schema_version: Literal["aoa_checkpoint_action_signature_v1"] = (
+        "aoa_checkpoint_action_signature_v1"
+    )
+    signature_id: str
+    family: str
+    action: str
+    object: str
+    trigger: str
+    inputs: list[str] = Field(default_factory=list)
+    steps: list[str] = Field(default_factory=list)
+    outputs: list[str] = Field(default_factory=list)
+    verification: list[str] = Field(default_factory=list)
+    failure_modes: list[str] = Field(default_factory=list)
+    stop_lines: list[str] = Field(default_factory=list)
+    owner_pressure: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    action_event_ids: list[str] = Field(default_factory=list)
+    wrapper_family_hint: Literal[
+        "skill",
+        "playbook",
+        "technique",
+        "eval",
+        "memo",
+        "sdk_mechanic",
+        "owner_local",
+        "unknown",
+    ] = "unknown"
+    confidence: Literal["low", "medium", "high"] = "medium"
+
+
+class ExistingWrapperFit(BaseModel):
+    schema_version: Literal["aoa_checkpoint_existing_wrapper_fit_v1"] = (
+        "aoa_checkpoint_existing_wrapper_fit_v1"
+    )
+    wrapper_family: Literal[
+        "skill",
+        "playbook",
+        "technique",
+        "eval",
+        "memo",
+        "sdk_mechanic",
+        "owner_local",
+        "unknown",
+    ]
+    fit_status: Literal["strong", "weak", "none"] = "none"
+    existing_surface_ref: str | None = None
+    nearest_existing_wrapper: str | None = None
+    fit_reason: str
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
+class WrapperReadiness(BaseModel):
+    schema_version: Literal["aoa_checkpoint_wrapper_readiness_v1"] = (
+        "aoa_checkpoint_wrapper_readiness_v1"
+    )
+    proposed_wrapper_family: Literal[
+        "skill",
+        "playbook",
+        "technique",
+        "eval",
+        "memo",
+        "sdk_mechanic",
+        "owner_local",
+        "unknown",
+    ]
+    draftability: Literal["observe", "reviewable", "draftable", "blocked"] = "observe"
+    review_status: Literal["unreviewed", "reviewed", "rejected"] = "unreviewed"
+    score: int = 0
+    reasons: list[str] = Field(default_factory=list)
+    blockers: list[str] = Field(default_factory=list)
+    stop_lines: list[str] = Field(default_factory=list)
+
+
+class WrapperGapCandidate(BaseModel):
+    schema_version: Literal["aoa_checkpoint_wrapper_gap_candidate_v1"] = (
+        "aoa_checkpoint_wrapper_gap_candidate_v1"
+    )
+    candidate_id: str
+    signature_id: str
+    proposed_wrapper_family: Literal[
+        "skill",
+        "playbook",
+        "technique",
+        "eval",
+        "memo",
+        "sdk_mechanic",
+        "owner_local",
+        "unknown",
+    ]
+    nearest_existing_wrapper: str | None = None
+    novelty_reason: str
+    draftability: Literal["observe", "reviewable", "draftable", "blocked"] = "observe"
+    review_status: Literal["unreviewed", "reviewed", "rejected"] = "unreviewed"
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
+class RepetitionCluster(BaseModel):
+    schema_version: Literal["aoa_checkpoint_repetition_cluster_v1"] = (
+        "aoa_checkpoint_repetition_cluster_v1"
+    )
+    cluster_id: str
+    signature_id: str
+    repeat_count: int = 0
+    cross_session_count: int = 0
+    trigger_stability: Literal["low", "medium", "high"] = "low"
+    step_stability: Literal["low", "medium", "high"] = "low"
+    verification_stability: Literal["low", "medium", "high"] = "low"
+    failure_recurrence: Literal["none", "low", "medium", "high"] = "none"
+    owner_clarity: Literal["low", "medium", "high"] = "low"
+    novelty_pressure: Literal["low", "medium", "high"] = "low"
+    automation_risk: Literal["low", "medium", "high"] = "medium"
+    review_debt: Literal["low", "medium", "high"] = "medium"
+    action_event_ids: list[str] = Field(default_factory=list)
+    runtime_session_ids: list[str] = Field(default_factory=list)
+    evidence_refs: list[str] = Field(default_factory=list)
+    existing_wrapper_fit: ExistingWrapperFit
+    wrapper_readiness: WrapperReadiness
+    wrapper_gap: WrapperGapCandidate | None = None
+
+
+class CandidateClassifierFeedback(BaseModel):
+    schema_version: Literal["aoa_checkpoint_candidate_classifier_feedback_v1"] = (
+        "aoa_checkpoint_candidate_classifier_feedback_v1"
+    )
+    target_ref: str
+    verdict: Literal["accept", "reject", "weaken", "split", "add_rule"]
+    reason: str
+    reviewer: str = "agent"
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
+class CandidateIntelligenceSample(BaseModel):
+    schema_version: Literal["aoa_checkpoint_candidate_intelligence_sample_v1"] = (
+        "aoa_checkpoint_candidate_intelligence_sample_v1"
+    )
+    sample_id: str
+    target_ref: str
+    sample_kind: Literal["signature", "wrapper_gap", "repetition_cluster"]
+    verdict: Literal["unreviewed", "accept", "reject", "weaken", "split", "add_rule"] = (
+        "unreviewed"
+    )
+    reason: str
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
+class CandidateIntelligenceReport(BaseModel):
+    schema_version: int = 1
+    report_type: Literal["checkpoint_candidate_intelligence_report_v1"] = (
+        "checkpoint_candidate_intelligence_report_v1"
+    )
+    repo_root: str
+    repo_label: str
+    generated_at: datetime
+    generated_at_local: str | None = None
+    generated_tz: str | None = None
+    source: Literal["surface_detection", "checkpoint_note", "lifecycle_audit"] = (
+        "surface_detection"
+    )
+    boundary_note: str = (
+        "Candidate intelligence is generated route evidence, not reviewed truth "
+        "or promotion authority."
+    )
+    action_events: list[CheckpointActionEvent] = Field(default_factory=list)
+    action_signatures: list[ActionSignature] = Field(default_factory=list)
+    repetition_clusters: list[RepetitionCluster] = Field(default_factory=list)
+    wrapper_gap_candidates: list[WrapperGapCandidate] = Field(default_factory=list)
+    existing_wrapper_fits: list[ExistingWrapperFit] = Field(default_factory=list)
+    feedback_items: list[CandidateClassifierFeedback] = Field(default_factory=list)
+    sample_audit: list[CandidateIntelligenceSample] = Field(default_factory=list)
+    generated_index_ref: str | None = None
 
 
 class SessionCheckpointAutoObservation(BaseModel):
@@ -268,6 +491,9 @@ class SessionCheckpointHistoryEntry(BaseModel):
     checkpoint_should_capture: bool = False
     blocked_by: list[str] = Field(default_factory=list)
     candidate_clusters: list[CheckpointCandidateCluster] = Field(default_factory=list)
+    action_events: list[CheckpointActionEvent] = Field(default_factory=list)
+    action_signatures: list[ActionSignature] = Field(default_factory=list)
+    wrapper_gap_candidates: list[WrapperGapCandidate] = Field(default_factory=list)
     manual_review_requested: bool = False
     commit_sha: str | None = None
     commit_short_sha: str | None = None
@@ -293,6 +519,7 @@ class SessionCheckpointCluster(BaseModel):
     blocked_by: list[str] = Field(default_factory=list)
     next_owner_moves: list[str] = Field(default_factory=list)
     lineage_hint: CheckpointLineageHint | None = None
+    action_signature_refs: list[str] = Field(default_factory=list)
 
 
 class ProgressionAxisSignal(BaseModel):
@@ -321,6 +548,10 @@ class SessionCheckpointNote(BaseModel):
     repo_scope: list[str] = Field(default_factory=list)
     checkpoint_history: list[SessionCheckpointHistoryEntry] = Field(default_factory=list)
     candidate_clusters: list[SessionCheckpointCluster] = Field(default_factory=list)
+    action_events: list[CheckpointActionEvent] = Field(default_factory=list)
+    action_signatures: list[ActionSignature] = Field(default_factory=list)
+    repetition_clusters: list[RepetitionCluster] = Field(default_factory=list)
+    wrapper_gap_candidates: list[WrapperGapCandidate] = Field(default_factory=list)
     promotion_recommendation: Literal["none", "local_note", "dionysus_note", "harvest_handoff"] = "none"
     carry_until_session_closeout: bool = True
     session_end_recommendation: Literal[

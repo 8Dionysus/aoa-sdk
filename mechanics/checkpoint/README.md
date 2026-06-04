@@ -14,7 +14,10 @@ context without minting owner truth. Audit checkpoint lifecycle state so
 closeout scopes can be closed and archived without deleting evidence. Reconcile
 runtime sessions that ended without reviewed closeout by reading
 aoa-session-memory archive refs and archiving checkpoint evidence with an
-explicit no-closeout lifecycle event.
+explicit no-closeout lifecycle event. Derive candidate-intelligence route
+evidence from checkpoint action facets so repeated actions, wrapper gaps, and
+owner pressure can be reviewed without making the SDK an accepted wrapper
+owner.
 
 ### Trigger
 
@@ -33,6 +36,8 @@ context carry changes.
   closeout scopes
 - checkpoint session reconciliation for session-memory-backed no-closeout
   endings
+- candidate-intelligence action signatures, repetition clusters, wrapper-gap
+  navigation, and generated candidate index writing
 - read-only session-memory archive attachment for checkpoint closeout
 - reviewed session handoff request/inbox/manifest assembly
 - child-task checkpoint and re-entry packet assembly
@@ -59,6 +64,8 @@ status remain outside SDK checkpoint authority.
 - `src/aoa_sdk/checkpoints/lifecycle.py`
 - `src/aoa_sdk/checkpoints/reconcile.py`
 - `src/aoa_sdk/checkpoints/indexes.py`
+- `src/aoa_sdk/checkpoints/candidate_intelligence.py`
+- `src/aoa_sdk/checkpoints/candidate_indexes.py`
 - `src/aoa_sdk/closeout/`
 - `src/aoa_sdk/a2a/`
 - `mechanics/checkpoint/parts/child-task-reentry/`
@@ -83,6 +90,9 @@ It must not close or archive a pending-review checkpoint scope even when a
 closeout artifact exists nearby.
 It must not treat `archived_without_closeout` as reviewed closeout or mutate
 aoa-session-memory while resolving archive refs.
+It must not treat candidate-intelligence output as an accepted skill,
+playbook, technique, eval, memo entry, SDK mechanic, owner-local wrapper, or
+promotion authority.
 
 ### Validation
 
@@ -100,4 +110,6 @@ close/archive only after pending review is clear and reviewed closeout execution
 exists, or when moving nonpending stale scopes as archive evidence without
 marking them closed. Use reconcile/sweep only when aoa-session-memory proves
 the runtime session ended without closeout; that route preserves evidence and
-does not claim reviewed closeout happened.
+does not claim reviewed closeout happened. Use candidate intelligence when the
+question is whether repeated checkpoint actions suggest a wrapper gap or owner
+review lane; treat its generated index as navigation only.
