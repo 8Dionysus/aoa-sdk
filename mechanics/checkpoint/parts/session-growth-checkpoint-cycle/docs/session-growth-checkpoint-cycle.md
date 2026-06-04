@@ -36,6 +36,12 @@ existing session-harvest family into an automatic runtime authority.
   checkpoint runtime-session trace when the operator closed the Codex session
   without reviewed closeout; those refs produce `session_closed_*` lifecycle
   states, not reviewed closeout claims
+- `aoa checkpoint backlog-audit` reads lifecycle state and SDK-local
+  runtime-session traces without moving files; it reports pending reviews,
+  reviewed-not-closed scopes, runtime trace gaps, session-memory archive refs,
+  required actions, raw refs, and next routes so an operator can decide whether
+  to review, recover session-memory archive evidence, reconcile, or inspect a
+  missing trace
 - `aoa checkpoint reconcile-sessions` and its
   `aoa checkpoint sweep-closed-sessions` alias preview by default, write a
   generated navigation index when requested, and with `--apply` archive only
@@ -81,6 +87,10 @@ existing session-harvest family into an automatic runtime authority.
   sample-audit targets, but it must not install, register, execute, start
   runtime automation, claim owner acceptance, or turn generated graph-ready
   anchors into RAG/GraphRAG authority
+- runtime trace refs from SDK-local skill session files are evidence
+  coordinates only; they may route aoa-session-memory freshness/import/recovery
+  checks, but they do not prove a session-memory archive exists and do not make
+  a scope reconcile-ready by themselves
 - reviewed closeout may also carry one separate self-agency continuity hint
   surface rooted in
   `continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref`; it
@@ -113,6 +123,7 @@ aoa-sdk/.aoa/session-growth/current/<runtime-session-id>/<repo-label>/
   closeout-context.json
   closeout-execution-report.json
 aoa-sdk/.aoa/session-growth/indexes/
+  checkpoint-backlog-navigation.min.json
   checkpoint-carrier-candidate-intelligence.min.json
   checkpoint-candidate-intelligence.min.json
   checkpoint-lifecycle-navigation.min.json
@@ -259,6 +270,7 @@ aoa checkpoint git-boundary-check /srv/AbyssOS/aoa-sdk --boundary merge --root /
 aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/AbyssOS/aoa-sdk --json
 aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/AbyssOS/aoa-sdk --json
 aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
+aoa checkpoint backlog-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --write-index --json
 aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
 aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --include-stale --apply --json
 aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json

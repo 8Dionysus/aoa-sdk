@@ -51,6 +51,11 @@ Tracking starts with the community-docs baseline for this repository.
   default, read aoa-session-memory refs without mutating them, archive
   nonpending no-closeout scopes with `archived_without_closeout`, and write a
   generated lifecycle navigation index with graph-ready anchors.
+- Checkpoint backlog audit now exposes the open no-closeout and stale-current
+  pressure before movement: runtime trace refs, session-memory archive status,
+  raw refs, required actions, next routes, and a generated backlog navigation
+  index stay read-only and below memory, proof, closeout, owner, RAG, and
+  GraphRAG authority.
 - Checkpoint candidate intelligence now derives action facets, action
   signatures, repetition clusters, wrapper-gap candidates, existing-wrapper
   fit, wrapper readiness, bounded sample-audit targets, and a generated

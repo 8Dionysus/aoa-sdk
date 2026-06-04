@@ -2219,6 +2219,129 @@ def test_checkpoint_lifecycle_audit_detects_session_closed_reviewed_no_closeout(
     )
 
 
+def test_checkpoint_lifecycle_audit_routes_runtime_trace_gap_without_reconcile(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    (workspace_root / ".aoa" / "sessions").mkdir(parents=True, exist_ok=True)
+    (workspace_root / ".aoa" / "session-registry.json").write_text(
+        json.dumps({"schema_version": 1, "updated_at": "2026-06-03T00:00:00Z", "sessions": []}),
+        encoding="utf-8",
+    )
+    active_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
+        session_id="runtime-session-live",
+    )
+    stale_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-gap.json",
+        session_id="runtime-session-trace-gap",
+        codex_thread_id="thread-trace-gap",
+    )
+    stale_payload = json.loads(stale_session.read_text(encoding="utf-8"))
+    note = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="reviewed checkpoint exists but session memory archive is not present yet",
+        mutation_surface="code",
+        session_file=str(stale_session),
+    )
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-trace-gap",
+    )
+    _mark_checkpoint_note_reviewed(note_dir)
+
+    report = sdk.checkpoints.lifecycle_audit(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(active_session),
+        write_index=True,
+    )
+
+    entry = next(item for item in report.entries if item.runtime_session_id == note.runtime_session_id)
+    assert entry.lifecycle_state == "reviewed_awaiting_closeout"
+    assert entry.runtime_trace_status == "resolved"
+    assert entry.runtime_trace_thread_id == "thread-trace-gap"
+    assert entry.source_trace_ref == stale_payload["codex_rollout_path"]
+    assert entry.session_memory_status == "missing"
+    assert entry.session_memory_archive_ref is None
+    assert entry.next_route == "recover_session_memory_archive"
+    assert stale_payload["codex_rollout_path"] in entry.raw_refs
+
+    reconcile = sdk.checkpoints.reconcile_sessions(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(active_session),
+        runtime_session_id=note.runtime_session_id,
+        dry_run=True,
+    )
+    assert reconcile.archived_count == 0
+    assert reconcile.skipped_count == 1
+    assert reconcile.skipped_entries[0].next_route == "recover_session_memory_archive"
+
+    backlog = sdk.checkpoints.backlog_audit(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(active_session),
+        write_index=True,
+    )
+    backlog_entry = next(
+        item for item in backlog.entries if item.runtime_session_id == note.runtime_session_id
+    )
+    assert backlog_entry.next_route == "recover_session_memory_archive"
+    assert backlog.counts["runtime_trace_gaps"] == 1
+    assert backlog.counts["next_route:recover_session_memory_archive"] == 1
+    assert backlog.generated_index_ref is not None
+    index_payload = json.loads(Path(backlog.generated_index_ref).read_text(encoding="utf-8"))
+    assert index_payload["artifact_type"] == "checkpoint_backlog_navigation_index_v1"
+    assert index_payload["counts"]["runtime_trace_gaps"] == 1
+    assert index_payload["runtime_trace_gaps"][0]["runtime_trace_thread_id"] == "thread-trace-gap"
+    assert any(
+        anchor["kind"] == "runtime_trace"
+        for anchor in index_payload["graph_ready"]["anchors"]
+    )
+
+
+def test_checkpoint_backlog_audit_does_not_count_active_runtime_trace_as_gap(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    active_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
+        session_id="runtime-active-trace",
+        codex_thread_id="thread-active-trace",
+    )
+    note = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="active checkpoint has runtime trace but no session-memory archive yet",
+        mutation_surface="code",
+        session_file=str(active_session),
+    )
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-active-trace",
+    )
+    _mark_checkpoint_note_reviewed(note_dir)
+
+    backlog = sdk.checkpoints.backlog_audit(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(active_session),
+        write_index=True,
+    )
+
+    entry = next(item for item in backlog.entries if item.runtime_session_id == note.runtime_session_id)
+    assert entry.active_runtime_scope is True
+    assert entry.runtime_trace_status == "resolved"
+    assert entry.session_memory_archive_ref is None
+    assert entry.next_route == "run_reviewed_closeout"
+    assert backlog.counts["runtime_trace_resolved"] == 1
+    assert backlog.counts["runtime_trace_gaps"] == 0
+    assert backlog.generated_index_ref is not None
+    index_payload = json.loads(Path(backlog.generated_index_ref).read_text(encoding="utf-8"))
+    assert index_payload["counts"]["runtime_trace_gaps"] == 0
+    assert index_payload["runtime_trace_gaps"] == []
+
+
 def test_checkpoint_reconcile_sessions_archives_reviewed_no_closeout_scope(
     workspace_root: Path,
 ) -> None:

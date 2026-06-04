@@ -15,6 +15,7 @@ from ..models import (
     CheckpointGitBoundaryCheck,
     CheckpointHookInstallResult,
     CheckpointHookStatus,
+    CheckpointBacklogAuditReport,
     CheckpointLifecycleArchiveResult,
     CheckpointLifecycleAuditReport,
     CheckpointSessionReconcileResult,
@@ -83,6 +84,7 @@ from .carrier_indexes import (
 from .carrier_intelligence import (
     build_carrier_intelligence_from_candidate_report as _build_carrier_intelligence_from_candidate_report,
 )
+from .backlog import audit_checkpoint_backlog as _audit_checkpoint_backlog
 from .lifecycle import (
     audit_checkpoint_lifecycle as _audit_checkpoint_lifecycle,
     close_archive_checkpoint_lifecycle as _close_archive_checkpoint_lifecycle,
@@ -1183,6 +1185,20 @@ class CheckpointsAPI:
             since=since,
             until=until,
             dry_run=dry_run,
+            write_index=write_index,
+        )
+
+    def backlog_audit(
+        self,
+        *,
+        repo_root: str | None = None,
+        session_file: str | None = None,
+        write_index: bool = False,
+    ) -> CheckpointBacklogAuditReport:
+        return _audit_checkpoint_backlog(
+            workspace=self.workspace,
+            repo_root=repo_root,
+            session_file=session_file,
             write_index=write_index,
         )
 

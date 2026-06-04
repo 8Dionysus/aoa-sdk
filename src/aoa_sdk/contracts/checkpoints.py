@@ -157,6 +157,18 @@ class CheckpointSessionMemoryFreshness(BaseModel):
     cautions: list[str] = Field(default_factory=list)
 
 
+class CheckpointRuntimeTraceRef(BaseModel):
+    schema_version: Literal["aoa_checkpoint_runtime_trace_ref_v1"] = (
+        "aoa_checkpoint_runtime_trace_ref_v1"
+    )
+    source: Literal["aoa-sdk-skill-runtime-session"] = "aoa-sdk-skill-runtime-session"
+    runtime_session_id: str
+    runtime_session_file_ref: str
+    codex_thread_id: str | None = None
+    codex_rollout_path: str | None = None
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
 class CheckpointCandidateCluster(BaseModel):
     candidate_id: str
     candidate_kind: str
@@ -240,6 +252,12 @@ class ActionSignature(BaseModel):
     failure_modes: list[str] = Field(default_factory=list)
     stop_lines: list[str] = Field(default_factory=list)
     owner_pressure: list[str] = Field(default_factory=list)
+    event_types: list[str] = Field(default_factory=list)
+    route_signals: list[str] = Field(default_factory=list)
+    mutation_surfaces: list[str] = Field(default_factory=list)
+    authority_surfaces: list[str] = Field(default_factory=list)
+    memory_provenance_refs: list[str] = Field(default_factory=list)
+    negative_evidence: list[str] = Field(default_factory=list)
     evidence_refs: list[str] = Field(default_factory=list)
     action_event_ids: list[str] = Field(default_factory=list)
     wrapper_family_hint: Literal[
@@ -893,9 +911,14 @@ class CheckpointLifecycleEntry(BaseModel):
     post_commit_report_ref: str | None = None
     closeout_context_ref: str | None = None
     closeout_execution_report_ref: str | None = None
+    runtime_trace_ref: str | None = None
+    runtime_trace_thread_id: str | None = None
+    runtime_trace_status: Literal["resolved", "missing", "not_checked"] | None = None
+    source_trace_ref: str | None = None
     session_memory_archive_ref: str | None = None
     session_memory_session_id: str | None = None
     session_memory_status: Literal["current", "partial", "missing", "unavailable"] | None = None
+    raw_refs: list[str] = Field(default_factory=list)
     state: Literal["collecting", "reviewable", "promoted", "closed"] | None = None
     review_status: Literal["unreviewed", "reviewed"] | None = None
     agent_review_status: Literal["none", "pending", "reviewed"] | None = None
@@ -918,6 +941,7 @@ class CheckpointLifecycleEntry(BaseModel):
     blocked_by: list[str] = Field(default_factory=list)
     evidence_refs: list[str] = Field(default_factory=list)
     required_action: str | None = None
+    next_route: str | None = None
     reason: str
 
 
@@ -994,6 +1018,54 @@ class CheckpointSessionReconcileResult(BaseModel):
     required_actions: list[str] = Field(default_factory=list)
     archive_refs: list[str] = Field(default_factory=list)
     generated_index_ref: str | None = None
+    notes: list[str] = Field(default_factory=list)
+
+
+class CheckpointBacklogEntry(BaseModel):
+    schema_version: Literal["aoa_checkpoint_backlog_entry_v1"] = (
+        "aoa_checkpoint_backlog_entry_v1"
+    )
+    repo_label: str
+    runtime_session_id: str | None = None
+    lifecycle_state: str
+    review_status: str | None = None
+    agent_review_status: str | None = None
+    active_runtime_scope: bool = False
+    age_days: int | None = None
+    note_ref: str | None = None
+    current_dir: str
+    post_commit_report_ref: str | None = None
+    runtime_trace_status: Literal["resolved", "missing", "not_checked"] | None = None
+    runtime_trace_thread_id: str | None = None
+    runtime_trace_ref: str | None = None
+    source_trace_ref: str | None = None
+    session_memory_status: Literal["current", "partial", "missing", "unavailable"] | None = None
+    session_memory_session_id: str | None = None
+    session_memory_archive_ref: str | None = None
+    raw_refs: list[str] = Field(default_factory=list)
+    why_open: str
+    next_route: str
+    required_action: str | None = None
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
+class CheckpointBacklogAuditReport(BaseModel):
+    schema_version: int = 1
+    report_type: Literal["checkpoint_backlog_audit_v1"] = "checkpoint_backlog_audit_v1"
+    boundary_note: str = (
+        "Backlog audit is generated navigation evidence. It does not mutate "
+        ".aoa, run closeout, archive notes, promote candidates, or assign owner truth."
+    )
+    checked_at: datetime
+    checked_at_local: str | None = None
+    checked_tz: str | None = None
+    repo_root: str | None = None
+    repo_label: str | None = None
+    active_runtime_session_id: str | None = None
+    counts: dict[str, int] = Field(default_factory=dict)
+    entries: list[CheckpointBacklogEntry] = Field(default_factory=list)
+    generated_index_ref: str | None = None
+    stop_lines: list[str] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
 
 

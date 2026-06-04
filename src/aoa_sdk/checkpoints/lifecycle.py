@@ -18,7 +18,10 @@ from .ledger.notes import archive_current_checkpoint, build_checkpoint_note
 from .indexes import write_checkpoint_lifecycle_index
 from .render.markdown import render_checkpoint_note_markdown
 from .runtime.sessions import probe_checkpoint_runtime_session
-from .session_memory import resolve_checkpoint_session_memory_for_runtime_session
+from .session_memory import (
+    resolve_checkpoint_runtime_trace_ref,
+    resolve_checkpoint_session_memory_for_runtime_session,
+)
 from .timestamps import local_timestamp_parts
 from .topology.paths import (
     CheckpointPaths,
@@ -242,6 +245,10 @@ def _entry_from_current_dir(
         if not active_runtime_scope
         else (None, None)
     )
+    runtime_trace_ref = resolve_checkpoint_runtime_trace_ref(
+        workspace=workspace,
+        runtime_session_id=note.runtime_session_id,
+    )
     session_memory_archive_ref = _dedupe_strings(
         [
             _session_memory_archive_ref(
@@ -284,9 +291,25 @@ def _entry_from_current_dir(
             *(post_commit_ref,),
             *(closeout_context_ref,),
             *(closeout_execution_ref,),
+            *(runtime_trace_ref.evidence_refs if runtime_trace_ref is not None else []),
             *(session_memory_ref.evidence_refs if session_memory_ref is not None else []),
             *note.evidence_refs,
         ]
+    )
+    raw_refs = _dedupe_strings(
+        [
+            runtime_trace_ref.codex_rollout_path if runtime_trace_ref is not None else None,
+            session_memory_ref.raw_ref if session_memory_ref is not None else None,
+            session_memory_ref.raw_blocks_index_ref if session_memory_ref is not None else None,
+            session_memory_ref.source_trace_ref if session_memory_ref is not None else None,
+        ]
+    )
+    next_route = _next_route(
+        lifecycle_state=lifecycle_state,
+        active_runtime_scope=active_runtime_scope,
+        has_runtime_trace=runtime_trace_ref is not None,
+        has_session_memory_archive=bool(session_memory_archive_ref),
+        review_status=note.review_status,
     )
     return CheckpointLifecycleEntry(
         repo_label=paths.repo_label,
@@ -298,6 +321,16 @@ def _entry_from_current_dir(
         post_commit_report_ref=post_commit_ref,
         closeout_context_ref=closeout_context_ref,
         closeout_execution_report_ref=closeout_execution_ref,
+        runtime_trace_ref=(
+            runtime_trace_ref.runtime_session_file_ref if runtime_trace_ref is not None else None
+        ),
+        runtime_trace_thread_id=(
+            runtime_trace_ref.codex_thread_id if runtime_trace_ref is not None else None
+        ),
+        runtime_trace_status="resolved" if runtime_trace_ref is not None else "missing",
+        source_trace_ref=(
+            runtime_trace_ref.codex_rollout_path if runtime_trace_ref is not None else None
+        ),
         session_memory_archive_ref=session_memory_archive_ref[0] if session_memory_archive_ref else None,
         session_memory_session_id=(
             session_memory_ref.session_id if session_memory_ref is not None else None
@@ -305,6 +338,7 @@ def _entry_from_current_dir(
         session_memory_status=(
             session_memory_freshness.status if session_memory_freshness is not None else None
         ),
+        raw_refs=raw_refs,
         state=note.state,
         review_status=note.review_status,
         agent_review_status=note.agent_review_status,
@@ -316,6 +350,7 @@ def _entry_from_current_dir(
         blocked_by=list(note.blocked_by),
         evidence_refs=evidence_refs,
         required_action=required_action,
+        next_route=next_route,
         reason=reason,
     )
 
@@ -646,6 +681,48 @@ def _session_memory_archive_ref(*paths: Path) -> str | None:
         if isinstance(archive_path, str) and archive_path.strip():
             return archive_path
     return None
+
+
+def _next_route(
+    *,
+    lifecycle_state: LifecycleState,
+    active_runtime_scope: bool,
+    has_runtime_trace: bool,
+    has_session_memory_archive: bool,
+    review_status: str,
+) -> str:
+    if lifecycle_state in {"pending_review", "session_closed_pending_review"}:
+        return "review_checkpoint_note"
+    if lifecycle_state == "active_current":
+        return "continue_active_session"
+    if lifecycle_state == "closeout_executed":
+        return "close_archive"
+    if lifecycle_state in {
+        "session_closed_reviewed_no_closeout",
+        "session_closed_collecting_no_closeout",
+    }:
+        return "reconcile_without_closeout"
+    if lifecycle_state == "closeout_built":
+        return "execute_reviewed_closeout_or_inspect"
+    if lifecycle_state == "reviewed_awaiting_closeout":
+        if active_runtime_scope:
+            return "run_reviewed_closeout"
+        if has_session_memory_archive:
+            return "reconcile_without_closeout"
+        if has_runtime_trace:
+            return "recover_session_memory_archive"
+        return "inspect_runtime_trace"
+    if lifecycle_state == "stale_current_scope":
+        if has_session_memory_archive:
+            return "reconcile_without_closeout"
+        if has_runtime_trace:
+            return "recover_session_memory_archive"
+        if review_status == "reviewed":
+            return "inspect_runtime_trace"
+        return "stale_archive_dry_run"
+    if lifecycle_state == "closed":
+        return "archive_closed_scope"
+    return "inspect_checkpoint_scope"
 
 
 def _remove_empty_current_dirs(paths: CheckpointPaths) -> None:

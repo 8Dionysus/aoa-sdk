@@ -18,6 +18,10 @@ action facets: action signatures, repetition clusters, existing-wrapper fit,
 wrapper readiness, wrapper gaps, and bounded sample-audit targets. These
 classifier outputs are generated navigation only; they do not accept a
 wrapper, assign owner truth, or promote a single event.
+The part also exposes a read-only checkpoint backlog audit for no-closeout and
+stale `current/` pressure. It names runtime trace gaps, session-memory archive
+presence, required actions, and next routes without moving checkpoint files,
+running closeout, mutating aoa-session-memory, or making RAG/GraphRAG truth.
 The part also derives carrier-intelligence route evidence from those action
 signatures: carrier kind, owner scope, existing-carrier fit, execution risk,
 installability, execution posture, and sample-audit targets. These outputs are
@@ -33,12 +37,15 @@ services, mint memory/proof, or grant RAG/GraphRAG authority.
 - source module: `src/aoa_sdk/checkpoints/`
 - lifecycle module: `src/aoa_sdk/checkpoints/lifecycle.py`
 - reconcile module: `src/aoa_sdk/checkpoints/reconcile.py`
+- backlog module: `src/aoa_sdk/checkpoints/backlog.py`
 - candidate-intelligence module:
   `src/aoa_sdk/checkpoints/candidate_intelligence.py`
 - carrier-intelligence module:
   `src/aoa_sdk/checkpoints/carrier_intelligence.py`
 - generated lifecycle index:
   `.aoa/session-growth/indexes/checkpoint-lifecycle-navigation.min.json`
+- generated backlog index:
+  `.aoa/session-growth/indexes/checkpoint-backlog-navigation.min.json`
 - generated candidate-intelligence index:
   `.aoa/session-growth/indexes/checkpoint-candidate-intelligence.min.json`
 - generated carrier-intelligence index:
@@ -54,6 +61,8 @@ services, mint memory/proof, or grant RAG/GraphRAG authority.
 - Do not mutate aoa-session-memory when attaching or reporting session-memory
   archive refs.
 - Do not treat `archived_without_closeout` as `closed`.
+- Do not treat runtime trace refs as proof that aoa-session-memory archived a
+  session.
 - Do not treat action signatures, repetition clusters, or wrapper gaps as
   reviewed memory, proof, owner verdict, accepted wrapper, or promotion
   authority.

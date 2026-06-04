@@ -47,6 +47,18 @@ def build_checkpoint_candidate_intelligence_index(
             "by_wrapper_family": dict(
                 sorted(Counter(item.wrapper_family_hint for item in signatures).items())
             ),
+            "by_event_type": dict(
+                sorted(Counter(event_type for item in signatures for event_type in item.event_types).items())
+            ),
+            "by_mutation_surface": dict(
+                sorted(
+                    Counter(
+                        mutation_surface
+                        for item in signatures
+                        for mutation_surface in item.mutation_surfaces
+                    ).items()
+                )
+            ),
             "by_draftability": dict(
                 sorted(Counter(item.wrapper_readiness.draftability for item in clusters).items())
             ),
@@ -61,6 +73,12 @@ def build_checkpoint_candidate_intelligence_index(
                 "object": signature.object,
                 "wrapper_family_hint": signature.wrapper_family_hint,
                 "confidence": signature.confidence,
+                "event_types": signature.event_types,
+                "route_signals": signature.route_signals,
+                "mutation_surfaces": signature.mutation_surfaces,
+                "authority_surfaces": signature.authority_surfaces,
+                "memory_provenance_refs": signature.memory_provenance_refs,
+                "negative_evidence": signature.negative_evidence,
                 "owner_pressure": signature.owner_pressure,
                 "evidence_refs": signature.evidence_refs,
             }
@@ -100,6 +118,11 @@ def build_checkpoint_candidate_intelligence_index(
         ],
         "by_signature": _by_signature(report),
         "by_wrapper_family": _group_signatures(signatures, "wrapper_family_hint"),
+        "by_event_type": _by_list_field(signatures, "event_types"),
+        "by_mutation_surface": _by_list_field(signatures, "mutation_surfaces"),
+        "by_authority_surface": _by_list_field(signatures, "authority_surfaces"),
+        "by_memory_provenance": _by_list_field(signatures, "memory_provenance_refs"),
+        "by_negative_evidence": _by_list_field(signatures, "negative_evidence"),
         "by_owner_pressure": _by_owner_pressure(signatures),
         "by_existing_fit": _by_existing_fit(clusters),
         "sample_audit": [sample.model_dump(mode="json") for sample in report.sample_audit],
@@ -166,6 +189,18 @@ def _by_owner_pressure(signatures) -> dict[str, list[str]]:  # type: ignore[no-u
     return {key: sorted(values) for key, values in sorted(grouped.items())}
 
 
+def _by_list_field(signatures, attr: str) -> dict[str, list[str]]:  # type: ignore[no-untyped-def]
+    grouped: dict[str, list[str]] = defaultdict(list)
+    for signature in signatures:
+        values = getattr(signature, attr)
+        if not isinstance(values, list):
+            continue
+        for value in values:
+            if isinstance(value, str) and value:
+                grouped[value].append(signature.signature_id)
+    return {key: sorted(values) for key, values in sorted(grouped.items())}
+
+
 def _by_existing_fit(clusters) -> dict[str, list[str]]:  # type: ignore[no-untyped-def]
     grouped: dict[str, list[str]] = defaultdict(list)
     for cluster in clusters:
@@ -200,6 +235,30 @@ def _graph_ready(report: CandidateIntelligenceReport) -> tuple[list[dict[str, st
             value=signature.wrapper_family_hint,
             relation="has_wrapper_family",
         )
+        for event_type in signature.event_types:
+            _add_edge(
+                anchors_by_id,
+                edges,
+                source=signature_anchor,
+                kind="event_type",
+                value=event_type,
+                relation="has_event_type",
+            )
+        for next_axis, values in (
+            ("mutation_surface", signature.mutation_surfaces),
+            ("authority_surface", signature.authority_surfaces),
+            ("memory_provenance", signature.memory_provenance_refs),
+            ("negative_evidence", signature.negative_evidence),
+        ):
+            for value in values:
+                _add_edge(
+                    anchors_by_id,
+                    edges,
+                    source=signature_anchor,
+                    kind=next_axis,
+                    value=value,
+                    relation=f"has_{next_axis}",
+                )
     for event in report.action_events:
         event_anchor = _anchor_id("action_event", event.event_id)
         anchors_by_id[event_anchor] = {"id": event_anchor, "kind": "action_event", "ref": event.event_id}

@@ -9,6 +9,7 @@ from ..models import (
     CheckpointCloseoutContext,
     CheckpointCloseoutExecutionReport,
     CheckpointCaptureResult,
+    CheckpointBacklogAuditReport,
     CheckpointGitBoundaryCheck,
     CheckpointHookInstallResult,
     CheckpointHookStatus,
@@ -653,14 +654,66 @@ def _print_checkpoint_lifecycle_audit(report: CheckpointLifecycleAuditReport) ->
                 f"{entry.repo_label} session={entry.runtime_session_id or 'none'} "
                 f"state={entry.lifecycle_state}/{entry.state or 'unknown'} "
                 f"{active} closable={'yes' if entry.closable else 'no'} "
-                f"archiveable={'yes' if entry.archiveable else 'no'}{pending}"
+                f"archiveable={'yes' if entry.archiveable else 'no'} "
+                f"next={entry.next_route or 'inspect'}{pending}"
             )
+            if entry.runtime_trace_ref:
+                typer.echo(f"      runtime_trace: {entry.runtime_trace_ref}")
             if entry.session_memory_archive_ref:
                 typer.echo(f"      session_memory: {entry.session_memory_archive_ref}")
             if entry.required_action:
                 typer.echo(f"      required_action: {entry.required_action}")
         if len(report.entries) > 20:
             typer.echo(f"    - ... {len(report.entries) - 20} more")
+    typer.echo(f"  notes: {', '.join(report.notes) if report.notes else 'none'}")
+
+
+def _print_checkpoint_backlog_audit(report: CheckpointBacklogAuditReport) -> None:
+    typer.echo("checkpoint_backlog_audit:")
+    typer.echo(
+        "  checked_at_canonical_utc: "
+        + _format_dual_timestamp(
+            utc_value=report.checked_at,
+            local_value=report.checked_at_local,
+            tz_name=report.checked_tz,
+        )
+    )
+    typer.echo(f"  repo_label: {report.repo_label or 'all'}")
+    typer.echo(f"  active_runtime_session_id: {report.active_runtime_session_id or 'none'}")
+    typer.echo(f"  generated_index_ref: {report.generated_index_ref or 'none'}")
+    typer.echo("  counts:")
+    if not report.counts:
+        typer.echo("    - none")
+    else:
+        for key, value in sorted(report.counts.items()):
+            typer.echo(f"    - {key}: {value}")
+    typer.echo("  evidence_table:")
+    if not report.entries:
+        typer.echo("    - none")
+    else:
+        for entry in report.entries[:30]:
+            typer.echo(
+                "    - "
+                f"id={(entry.runtime_session_id or 'none')[:12]} "
+                f"state={entry.lifecycle_state} "
+                f"age_days={entry.age_days if entry.age_days is not None else 'unknown'} "
+                f"trace={entry.runtime_trace_status or 'not_checked'} "
+                f"session_memory={entry.session_memory_status or 'not_checked'} "
+                f"next={entry.next_route}"
+            )
+            typer.echo(f"      path: {entry.note_ref or entry.current_dir}")
+            typer.echo(f"      why: {entry.why_open}")
+            if entry.runtime_trace_ref:
+                typer.echo(f"      runtime_trace: {entry.runtime_trace_ref}")
+            if entry.session_memory_archive_ref:
+                typer.echo(f"      session_memory_archive: {entry.session_memory_archive_ref}")
+            if entry.raw_refs:
+                typer.echo(f"      raw_refs: {', '.join(entry.raw_refs[:4])}")
+            if entry.required_action:
+                typer.echo(f"      required_action: {entry.required_action}")
+        if len(report.entries) > 30:
+            typer.echo(f"    - ... {len(report.entries) - 30} more")
+    typer.echo(f"  stop_lines: {', '.join(report.stop_lines) if report.stop_lines else 'none'}")
     typer.echo(f"  notes: {', '.join(report.notes) if report.notes else 'none'}")
 
 
