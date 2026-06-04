@@ -91,8 +91,12 @@ closeout artifact exists nearby.
 It must not treat `archived_without_closeout` as reviewed closeout or mutate
 aoa-session-memory while resolving archive refs.
 It must not treat candidate-intelligence output as an accepted skill,
-playbook, technique, eval, memo entry, SDK mechanic, owner-local wrapper, or
-promotion authority.
+playbook, technique, eval, memo entry, SDK-local checkpoint mechanic,
+owner-local wrapper, or promotion authority.
+It must not treat carrier-intelligence output as an accepted ecosystem
+mechanic, installed tool, registered MCP service, installed hook, script,
+daemon, service, generated-index authority, RAG/GraphRAG authority, or owner
+verdict.
 
 ### Validation
 
@@ -112,4 +116,8 @@ marking them closed. Use reconcile/sweep only when aoa-session-memory proves
 the runtime session ended without closeout; that route preserves evidence and
 does not claim reviewed closeout happened. Use candidate intelligence when the
 question is whether repeated checkpoint actions suggest a wrapper gap or owner
-review lane; treat its generated index as navigation only.
+review lane; treat its generated index as navigation only. Use carrier
+intelligence when the question is whether repeated action pressure suggests a
+mechanic, tool, MCP, hook, script, daemon, service, or index carrier; keep
+install, registration, execution, memory, proof, RAG/GraphRAG, and owner
+acceptance with the owning route.

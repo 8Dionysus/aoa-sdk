@@ -397,6 +397,180 @@ class CandidateIntelligenceReport(BaseModel):
     generated_index_ref: str | None = None
 
 
+class ExistingCarrierFit(BaseModel):
+    schema_version: Literal["aoa_checkpoint_existing_carrier_fit_v1"] = (
+        "aoa_checkpoint_existing_carrier_fit_v1"
+    )
+    carrier_kind: Literal[
+        "mechanic",
+        "tool",
+        "mcp",
+        "hook",
+        "script",
+        "daemon",
+        "service",
+        "index",
+        "unknown",
+    ]
+    fit_status: Literal["strong", "weak", "none"] = "none"
+    existing_surface_ref: str | None = None
+    nearest_existing_carrier: str | None = None
+    fit_reason: str
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
+class CarrierReadiness(BaseModel):
+    schema_version: Literal["aoa_checkpoint_carrier_readiness_v1"] = (
+        "aoa_checkpoint_carrier_readiness_v1"
+    )
+    proposed_carrier_kind: Literal[
+        "mechanic",
+        "tool",
+        "mcp",
+        "hook",
+        "script",
+        "daemon",
+        "service",
+        "index",
+        "unknown",
+    ]
+    owner_scope: Literal["center", "owner_repo", "cross_repo", "sdk_local", "unknown"] = (
+        "unknown"
+    )
+    draftability: Literal["observe", "reviewable", "draftable", "blocked"] = "observe"
+    review_status: Literal["unreviewed", "reviewed", "rejected"] = "unreviewed"
+    execution_posture: Literal[
+        "descriptive_only",
+        "manual_only",
+        "review_required",
+        "install_blocked",
+        "callable_blocked",
+    ] = "descriptive_only"
+    installability: Literal[
+        "not_installable",
+        "candidate_only",
+        "review_required",
+        "owner_required",
+        "install_blocked",
+    ] = "not_installable"
+    score: int = 0
+    reasons: list[str] = Field(default_factory=list)
+    blockers: list[str] = Field(default_factory=list)
+    stop_lines: list[str] = Field(default_factory=list)
+
+
+class CarrierCandidate(BaseModel):
+    schema_version: Literal["aoa_checkpoint_carrier_candidate_v1"] = (
+        "aoa_checkpoint_carrier_candidate_v1"
+    )
+    candidate_id: str
+    signature_id: str
+    carrier_kind: Literal[
+        "mechanic",
+        "tool",
+        "mcp",
+        "hook",
+        "script",
+        "daemon",
+        "service",
+        "index",
+        "unknown",
+    ]
+    owner_scope: Literal["center", "owner_repo", "cross_repo", "sdk_local", "unknown"] = (
+        "unknown"
+    )
+    source_wrapper_family: Literal[
+        "skill",
+        "playbook",
+        "technique",
+        "eval",
+        "memo",
+        "sdk_mechanic",
+        "owner_local",
+        "unknown",
+    ] = "unknown"
+    action_family: str
+    action: str
+    object: str
+    trigger: str
+    route_signals: list[str] = Field(default_factory=list)
+    owner_pressure: list[str] = Field(default_factory=list)
+    cross_repo_pressure: bool = False
+    execution_risk: Literal["low", "medium", "high", "critical"] = "medium"
+    execution_posture: Literal[
+        "descriptive_only",
+        "manual_only",
+        "review_required",
+        "install_blocked",
+        "callable_blocked",
+    ] = "descriptive_only"
+    installability: Literal[
+        "not_installable",
+        "candidate_only",
+        "review_required",
+        "owner_required",
+        "install_blocked",
+    ] = "not_installable"
+    existing_carrier_fit: ExistingCarrierFit
+    carrier_readiness: CarrierReadiness
+    evidence_refs: list[str] = Field(default_factory=list)
+    stop_lines: list[str] = Field(default_factory=list)
+
+
+class CarrierClassifierFeedback(BaseModel):
+    schema_version: Literal["aoa_checkpoint_carrier_classifier_feedback_v1"] = (
+        "aoa_checkpoint_carrier_classifier_feedback_v1"
+    )
+    target_ref: str
+    verdict: Literal["accept", "reject", "weaken", "split", "add_rule"]
+    reason: str
+    reviewer: str = "agent"
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
+class CarrierIntelligenceSample(BaseModel):
+    schema_version: Literal["aoa_checkpoint_carrier_intelligence_sample_v1"] = (
+        "aoa_checkpoint_carrier_intelligence_sample_v1"
+    )
+    sample_id: str
+    target_ref: str
+    sample_kind: Literal["carrier_candidate", "existing_fit", "readiness"]
+    verdict: Literal["unreviewed", "accept", "reject", "weaken", "split", "add_rule"] = (
+        "unreviewed"
+    )
+    reason: str
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
+class CarrierIntelligenceReport(BaseModel):
+    schema_version: int = 1
+    report_type: Literal["checkpoint_carrier_candidate_intelligence_report_v1"] = (
+        "checkpoint_carrier_candidate_intelligence_report_v1"
+    )
+    repo_root: str
+    repo_label: str
+    generated_at: datetime
+    generated_at_local: str | None = None
+    generated_tz: str | None = None
+    source: Literal[
+        "candidate_intelligence_report",
+        "checkpoint_note",
+        "surface_detection",
+        "lifecycle_audit",
+    ] = "candidate_intelligence_report"
+    boundary_note: str = (
+        "Carrier intelligence is generated ecosystem route evidence, not "
+        "accepted mechanics, installed tools, registered MCP services, hooks, "
+        "automation, owner verdicts, memory, proof, RAG, or GraphRAG authority."
+    )
+    carrier_candidates: list[CarrierCandidate] = Field(default_factory=list)
+    existing_carrier_fits: list[ExistingCarrierFit] = Field(default_factory=list)
+    feedback_items: list[CarrierClassifierFeedback] = Field(default_factory=list)
+    sample_audit: list[CarrierIntelligenceSample] = Field(default_factory=list)
+    source_candidate_intelligence_ref: str | None = None
+    generated_index_ref: str | None = None
+
+
 class SessionCheckpointAutoObservation(BaseModel):
     schema_version: int = 1
     observation_type: Literal["auto_post_commit_checkpoint_observation_v1"] = (

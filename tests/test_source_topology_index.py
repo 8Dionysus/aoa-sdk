@@ -84,6 +84,12 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
     assert "classifier route evidence" in modules[
         "src/aoa_sdk/checkpoints/candidate_intelligence.py"
     ]["next_route"]
+    assert "carrier-candidate navigation index" in modules[
+        "src/aoa_sdk/checkpoints/carrier_indexes.py"
+    ]["role"]
+    assert "carrier-candidate classifier" in modules[
+        "src/aoa_sdk/checkpoints/carrier_intelligence.py"
+    ]["role"]
     assert "checkpoint lifecycle audit" in modules["src/aoa_sdk/checkpoints/lifecycle.py"]["role"]
     assert "close/archive orchestration" in modules["src/aoa_sdk/checkpoints/lifecycle.py"]["role"]
     assert modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["split_pressure"] == "low"

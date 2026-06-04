@@ -101,6 +101,12 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
 
+## carrier intelligence
+
+| Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
+| --- | --- | --- | --- | --- | --- |
+| [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, ecosystem-carrier, validation | checkpoint | owner boundary, no hidden automation, generated navigation, review gate | accepted |
+
 ## changelog
 
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
@@ -129,6 +135,7 @@ Grouped by `SDK facets` metadata.
 | [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) | 2026-06-03 | checkpoint, implementation, lifecycle, runtime-evidence, validation | checkpoint | checkpoint lifecycle, pending review, source topology, session-memory boundary | accepted |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 | [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
+| [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, ecosystem-carrier, validation | checkpoint | owner boundary, no hidden automation, generated navigation, review gate | accepted |
 
 ## child-task reentry
 
@@ -154,6 +161,7 @@ Grouped by `SDK facets` metadata.
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) | 2026-06-03 | checkpoint, lifecycle, runtime-evidence, generated-index, validation | checkpoint | checkpoint lifecycle, pending review, session-memory boundary, generated navigation | accepted |
 | [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, wrapper-gap, validation | checkpoint | no single-event promotion, generated navigation, review gate, owner boundary | accepted |
+| [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, ecosystem-carrier, validation | checkpoint | owner boundary, no hidden automation, generated navigation, review gate | accepted |
 
 ## CLI helper scripts
 
@@ -700,6 +708,7 @@ Grouped by `SDK facets` metadata.
 | Decision | Date | Surface classes | Mechanic parents | Guard families | Posture |
 | --- | --- | --- | --- | --- | --- |
 | [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) | 2026-06-03 | source-topology, generated, validation, agent-route | checkpoint, runtime-seam | source topology, generated freshness, agent routing | accepted |
+| [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) | 2026-06-04 | checkpoint, classifier, generated-index, ecosystem-carrier, validation | checkpoint | owner boundary, no hidden automation, generated navigation, review gate | accepted |
 
 ## surface detection
 

@@ -33,6 +33,7 @@ SOURCE_INPUT_REFS = (
     "docs/decisions/AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md",
     "docs/decisions/AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md",
     "docs/decisions/AOA-SDK-D-0063-checkpoint-candidate-intelligence.md",
+    "docs/decisions/AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md",
 )
 VALIDATION_REFS = (
     "scripts/build_source_topology_index.py",
@@ -101,6 +102,8 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/closeout/owner_handoff.py": "checkpoint closeout owner follow-through handoff owner",
     "src/aoa_sdk/checkpoints/candidate_indexes.py": "checkpoint generated candidate-intelligence navigation index owner",
     "src/aoa_sdk/checkpoints/candidate_intelligence.py": "checkpoint action-signature, repetition-cluster, and wrapper-gap classifier owner",
+    "src/aoa_sdk/checkpoints/carrier_indexes.py": "checkpoint generated carrier-candidate navigation index owner",
+    "src/aoa_sdk/checkpoints/carrier_intelligence.py": "checkpoint ecosystem carrier-candidate classifier owner",
     "src/aoa_sdk/checkpoints/hooks/git_boundary.py": "checkpoint Git hook template, git metadata, and dirty-boundary helper owner",
     "src/aoa_sdk/checkpoints/kinds.py": "checkpoint kind inference helper owner",
     "src/aoa_sdk/checkpoints/ledger/lifecycle_events.py": "checkpoint lifecycle ledger event normalization helper owner",

@@ -20,7 +20,8 @@ Checkpoint candidate capture already preserved `candidate_kind`, `owner_hint`,
 `source_surface_ref`, lineage hints, and progression-axis pressure. That was
 useful as a compatibility layer, but too flat for the next question: when does
 a repeated action deserve a candidate wrapper such as a skill, playbook,
-technique, eval, memo route, SDK mechanic, or owner-local wrapper?
+technique, eval, memo route, SDK-local checkpoint mechanic, or owner-local
+wrapper?
 
 The flat route also biased classification toward existing aoa-* surfaces. A
 missing wrapper or unfamiliar repeated action could be forced into the nearest
@@ -28,8 +29,8 @@ known surface instead of being preserved as a wrapper gap.
 
 ## Decision
 
-Add checkpoint candidate intelligence as a deterministic navigation layer
-below legacy `candidate_kind`.
+Add checkpoint candidate intelligence as a deterministic wrapper-navigation
+layer below legacy `candidate_kind`.
 
 The chain is:
 
@@ -41,8 +42,12 @@ candidate -> owner/review lane
 The SDK records `CheckpointActionEvent`, `ActionSignature`,
 `RepetitionCluster`, `ExistingWrapperFit`, `WrapperReadiness`,
 `WrapperGapCandidate`, and bounded sample-audit contracts. The classifier
-distinguishes wrapper lanes for skill, playbook, technique, eval, memo, SDK
-mechanic, owner-local, and unknown/gap pressure.
+distinguishes wrapper lanes for skill, playbook, technique, eval, memo,
+SDK-local checkpoint mechanic, owner-local, and unknown/gap pressure.
+
+This decision does not define the ecosystem carrier ontology for mechanics,
+tools, MCP services, hooks, scripts, daemons, services, or indexes. That
+corrective carrier axis is handled by AOA-SDK-D-0064.
 
 `candidate_clusters` remain the compatibility surface. Their
 `action_signature_refs` point into the richer classifier evidence, but the
@@ -93,7 +98,8 @@ an invariant, assign owner truth, or promote a candidate from one event.
 
 Use sample-audit verdicts to accept, reject, weaken, split, or add classifier
 rules. Do not auto-draft skills, playbooks, techniques, evals, memo entries,
-or owner-local wrappers from the generated index.
+SDK-local checkpoint mechanics, or owner-local wrappers from the generated
+index.
 
 ## Verification
 

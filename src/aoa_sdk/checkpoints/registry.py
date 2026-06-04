@@ -18,6 +18,7 @@ from ..models import (
     CheckpointLifecycleArchiveResult,
     CheckpointLifecycleAuditReport,
     CheckpointSessionReconcileResult,
+    CarrierIntelligenceReport,
     CandidateIntelligenceReport,
     CloseoutContextCandidateMap,
     CloseoutExecutionStep,
@@ -75,6 +76,12 @@ from .candidate_indexes import (
 )
 from .candidate_intelligence import (
     build_candidate_intelligence_from_note as _build_candidate_intelligence_from_note,
+)
+from .carrier_indexes import (
+    write_checkpoint_carrier_candidate_intelligence_index as _write_checkpoint_carrier_candidate_intelligence_index,
+)
+from .carrier_intelligence import (
+    build_carrier_intelligence_from_candidate_report as _build_carrier_intelligence_from_candidate_report,
 )
 from .lifecycle import (
     audit_checkpoint_lifecycle as _audit_checkpoint_lifecycle,
@@ -1199,6 +1206,32 @@ class CheckpointsAPI:
         )
         if write_index:
             index_path = _write_checkpoint_candidate_intelligence_index(
+                workspace=self.workspace,
+                report=report,
+            )
+            report = report.model_copy(update={"generated_index_ref": str(index_path)})
+        return report
+
+    def carrier_intelligence(
+        self,
+        *,
+        repo_root: str,
+        session_file: str | None = None,
+        sample_limit: int = 0,
+        write_index: bool = False,
+    ) -> CarrierIntelligenceReport:
+        candidate_report = self.candidate_intelligence(
+            repo_root=repo_root,
+            session_file=session_file,
+            sample_limit=0,
+            write_index=False,
+        )
+        report = _build_carrier_intelligence_from_candidate_report(
+            candidate_report=candidate_report,
+            sample_limit=sample_limit,
+        )
+        if write_index:
+            index_path = _write_checkpoint_carrier_candidate_intelligence_index(
                 workspace=self.workspace,
                 report=report,
             )
