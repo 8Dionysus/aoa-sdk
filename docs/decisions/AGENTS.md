@@ -23,6 +23,9 @@ sibling-owner truth.
 - Generated indexes are lookup read models only. They are weaker than the
   source decision note and weaker than the active surface the decision
   describes.
+- Keep `modeled_surfaces` in `docs/decisions/indexes/index_contract.yaml` as a
+  top-level list of normalized repo-relative paths under `docs/decisions/`; do
+  not use it for root non-record Markdown.
 - When a decision changes active behavior, update the source surface and its
   validator in the same slice.
 - When a decision routes to a sibling owner, name the stop-line without
