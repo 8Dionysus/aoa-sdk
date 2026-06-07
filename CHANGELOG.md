@@ -9,10 +9,24 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
-- This Unreleased section records durable post-`v0.2.3` control-plane changes
-  without live reconciliation counters. Exact commit totals, path totals, PR
-  ranges, and remote check handles belong in a dated release section built
-  during release prep.
+- No unreleased changes after `v0.4.0` yet.
+
+### Notes
+
+- Add future changes here after the release tag lands. Dated release sections
+  own exact reconciliation spans and validation evidence.
+
+## [0.4.0] - 2026-06-06
+
+### Summary
+
+- `v0.4.0` closes the measured `v0.2.3..origin/main` release-prep span:
+  52 first-parent commits before the version commit, 1398 changed paths,
+  landed PRs through `#165`, 66 decision records, and 12 active mechanics
+  packages. The largest changed surfaces were `mechanics/` (824 paths),
+  `.agents/` portable skill exports (235), `src/` (133), `docs/` (90),
+  `tests/` (35), `sdk/` (24), `quests/` (19), `scripts/` (11), and
+  `generated/` (8).
 - `aoa-sdk` now has the same explicit rationale/design spine expected from
   the refactored AoA repositories: decisions explain why, design surfaces
   explain system and agent-facing form, generated indexes stay derived, and
@@ -158,15 +172,15 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Reconciliation Basis
 
-- Unreleased entries record stable route, owner, and validation changes. They
-  deliberately avoid live first-parent commit totals, changed-path totals,
-  merged-PR ranges, and GitHub check handles because those drift after every
-  landing.
-- During release prep, reconstruct the exact span from
-  `git log --first-parent <last-tag>..HEAD`, `git diff --name-status`,
+- This release section was reconstructed from
+  `git log --first-parent v0.2.3..origin/main`, `git diff --name-status`,
   merged PR metadata, landed decision records, route cards, compatibility
-  policy, workspace fixtures, and the current release gate. Record that exact
-  reconciliation only in the dated release section.
+  policy, workspace fixtures, mechanics topology, source topology, and the
+  current release gate rather than from the moving changelog contour alone.
+- Future `Unreleased` entries should record stable route, owner, and
+  validation changes without live first-parent commit totals, changed-path
+  totals, PR ranges, or remote check handles; dated release sections own exact
+  reconciliation.
 - The largest current topology change is not a package version bump. It is the
   shift from implicit root prose and stale sibling paths toward explicit
   owner-surface routing, decision rationale, design law, and canonical sibling
@@ -397,6 +411,15 @@ Tracking starts with the community-docs baseline for this repository.
 - `src/aoa_sdk/checkpoints/lifecycle.py` now owns checkpoint lifecycle audit
   and close/archive orchestration, while `registry.py` remains the
   `CheckpointsAPI` facade.
+- Live workspace runtime-mirror tests now validate `aoa-skills` outer-ring
+  count and readiness consistency from the owner surface instead of pinning the
+  older 10-skill contour; the live preflight check observed the owner surface
+  expanded to 14 skills.
+- Release-support runbook and public CI posture commands now use the live
+  workspace root `/srv/AbyssOS` for release audit and publish commands.
+- Routing owner-layer shortlist parsing now accepts `source_route` hints from
+  `aoa-routing`, preserving them as advisory owner-layer routing evidence
+  without turning them into SDK-owned executable surfaces.
 - Checkpoint part docs now define `current/` as active runtime or still
   actionable checkpoint state, not as a long-lived archive of old runtime
   scopes.
@@ -493,16 +516,16 @@ Tracking starts with the community-docs baseline for this repository.
 - `aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json`
 - `aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json`
 - `python scripts/release_check.py`
+- `aoa release audit /srv/AbyssOS --phase preflight --repo aoa-sdk --strict --json`
 
 ### Notes
 
-- This unreleased section is a durable change contour, not the final release
-  reconciliation. The current public release remains `v0.2.3` until version
-  surfaces, tags, and GitHub Release publication are intentionally advanced
-  together.
-- Exact reconciliation spans and final GitHub validation handles belong in the
-  dated release section created during release prep, not in this moving
-  `Unreleased` section.
+- This dated section is the canonical `v0.4.0` reconciliation contour. It was
+  built from changelog history plus git, PR, decision, topology, live
+  workspace, and release-audit evidence.
+- GitHub publication remains authoritative only after the annotated `v0.4.0`
+  tag and GitHub Release are created from this section and postpublish audit
+  passes.
 - The May 31 canonical-path landing intentionally rejected hidden fallback for
   migrated `aoa-memo` and `aoa-evals` surfaces.
 

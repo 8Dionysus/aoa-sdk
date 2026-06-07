@@ -99,8 +99,9 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert "aoa-change-protocol" in foundation.skills
     assert "aoa-sanitized-share" in foundation.skills
     assert outer_ring.ring_id == "project-core-engineering-ring-v1"
-    assert len(outer_ring.skills) == 10
-    assert len(outer_ring_readiness) == 10
+    assert outer_ring.skill_count == len(outer_ring.skills)
+    assert len(outer_ring.skills) >= 10
+    assert [entry.skill_name for entry in outer_ring_readiness] == outer_ring.skills
     assert all(item.readiness_passed for item in outer_ring_readiness)
     assert risk_ring.ring_id == "project-risk-guard-ring-v1"
     assert len(risk_ring.skills) == 5

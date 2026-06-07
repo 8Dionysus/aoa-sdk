@@ -17,6 +17,14 @@ def changelog_unreleased_section(changelog: str) -> str:
     return changelog[start:next_release]
 
 
+def changelog_release_section(changelog: str, version: str) -> str:
+    heading = f"## [{version}]"
+    start = changelog.index(heading)
+    next_release = changelog.find("\n## [", start + len(heading))
+    end = next_release if next_release != -1 else len(changelog)
+    return changelog[start:end]
+
+
 def test_readme_is_public_front_door_not_command_authority() -> None:
     readme = read_text("README.md")
 
@@ -131,9 +139,9 @@ def test_design_lane_is_routed_before_mechanics() -> None:
     assert "Create root `DESIGN.md` and `DESIGN.AGENTS.md` before introducing" in decision
 
 
-def test_changelog_records_current_unreleased_contour() -> None:
+def test_changelog_records_current_release_contour() -> None:
     changelog = read_text("CHANGELOG.md")
-    unreleased = changelog_unreleased_section(changelog)
+    release = changelog_release_section(changelog, "0.4.0")
 
     required_sections = [
         "### Summary",
@@ -147,16 +155,17 @@ def test_changelog_records_current_unreleased_contour() -> None:
         "### Notes",
     ]
     for section in required_sections:
-        assert section in unreleased
-    assert "without live reconciliation counters" in unreleased
-    assert "AOA-SDK-D-0046" in unreleased
-    assert "AOA-SDK-D-0047" in unreleased
+        assert section in release
+    assert "52 first-parent commits before the version commit" in release
+    assert "1398 changed paths" in release
+    assert "AOA-SDK-D-0046" in release
+    assert "AOA-SDK-D-0047" in release
     assert "DESIGN.md" in changelog
     assert "DESIGN.AGENTS.md" in changelog
     assert "docs/decisions/" in changelog
     assert "root-level generated paths" in changelog
     assert "active routes" in changelog
-    assert "This unreleased section is a durable change contour" in changelog
+    assert "This dated section is the canonical `v0.4.0` reconciliation contour" in changelog
     assert "mechanics topology" in changelog
     assert "retired from the active mechanics root" in changelog
     assert "python scripts/validate_mechanics_topology.py" in changelog
@@ -177,8 +186,8 @@ def test_changelog_unreleased_avoids_live_reconciliation_counters() -> None:
     for fragment in forbidden_live_fragments:
         assert fragment not in unreleased
 
-    assert "dated release section" in unreleased
-    assert "git log --first-parent <last-tag>..HEAD" in unreleased
+    assert "No unreleased changes after `v0.4.0` yet." in unreleased
+    assert "Dated release sections\n  own exact reconciliation spans" in unreleased
 
 
 def test_readme_routes_sibling_canary_surfaces_without_roster() -> None:

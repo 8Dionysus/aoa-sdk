@@ -584,6 +584,17 @@ def test_surface_detect_accepts_runtime_seed_and_profile_shortlist_hints(
                         "confidence": "high",
                         "ambiguity": "clear",
                     },
+                    {
+                        "shortlist_id": "explicit-request.source_route.primary",
+                        "signal": "explicit-request",
+                        "owner_repo": "Dionysus",
+                        "object_kind": "source_route",
+                        "target_surface": "Dionysus.source_route_anchor",
+                        "inspect_surface": "Dionysus.source_route_anchor",
+                        "hint_reason": "source-route requests should inspect the Dionysus route anchor first",
+                        "confidence": "high",
+                        "ambiguity": "clear",
+                    },
                 ],
             },
             indent=2,
@@ -610,6 +621,17 @@ def test_surface_detect_accepts_runtime_seed_and_profile_shortlist_hints(
         "Dionysus",
         "abyss-stack",
         "8Dionysus",
+    }
+    object_kinds = {
+        hint.object_kind
+        for item in report.items
+        for hint in item.shortlist_hints
+    }
+    assert object_kinds >= {
+        "runtime_surface",
+        "seed",
+        "source_route",
+        "orientation_surface",
     }
 
 

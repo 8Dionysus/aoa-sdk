@@ -58,8 +58,8 @@ For a repo-scoped compatibility view, use `aoa compatibility check /srv/AbyssOS/
 
 The SDK also owns the bounded federation release control plane:
 
-- `aoa release audit /srv --phase preflight|postpublish|cadence --all --json`
-- `aoa release publish /srv --repo <repo>|--all-due --dry-run|--confirm --json`
+- `aoa release audit /srv/AbyssOS --phase preflight|postpublish|cadence --all --json`
+- `aoa release publish /srv/AbyssOS --repo <repo>|--all-due --dry-run|--confirm --json`
 - `python scripts/release_check.py`
 
 Those helpers verify or publish release surfaces.
