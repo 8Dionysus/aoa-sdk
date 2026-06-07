@@ -31,13 +31,13 @@ A release should make it easy to answer:
 3. Run the bounded repo release battery:
    - `python scripts/release_check.py`
 4. Run the federation preflight audit from the workspace root:
-   - `aoa release audit /srv --phase preflight --repo aoa-sdk --strict --json`
+   - `aoa release audit /srv/AbyssOS --phase preflight --repo aoa-sdk --strict --json`
 5. Merge the release-prep PR to `main`.
 6. Publish through the bounded helper rather than ad-hoc shell steps:
-   - dry run: `aoa release publish /srv --repo aoa-sdk --dry-run --json`
-   - real publish: `aoa release publish /srv --repo aoa-sdk --confirm --json`
+   - dry run: `aoa release publish /srv/AbyssOS --repo aoa-sdk --dry-run --json`
+   - real publish: `aoa release publish /srv/AbyssOS --repo aoa-sdk --confirm --json`
 7. Re-run the postpublish audit:
-   - `aoa release audit /srv --phase postpublish --repo aoa-sdk --strict --json`
+   - `aoa release audit /srv/AbyssOS --phase postpublish --repo aoa-sdk --strict --json`
 
 ## Release contract
 
@@ -67,4 +67,4 @@ Postpublish is red if any of these are false:
 
 - `aoa release publish` may create or update the annotated tag and the GitHub Release, but it must not invent versions or prose.
 - The GitHub Release highlights come only from `### Summary` bullets in the latest tagged changelog section.
-- Cadence debt is surfaced separately through `aoa release audit /srv --phase cadence --all --json`.
+- Cadence debt is surfaced separately through `aoa release audit /srv/AbyssOS --phase cadence --all --json`.

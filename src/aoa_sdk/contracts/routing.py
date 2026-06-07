@@ -61,6 +61,7 @@ class RoutingOwnerLayerShortlistHint(BaseModel):
         "playbook",
         "agent",
         "seed",
+        "source_route",
         "runtime_surface",
         "orientation_surface",
     ]
