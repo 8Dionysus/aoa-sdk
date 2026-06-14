@@ -153,7 +153,17 @@ def _rel(path: Path) -> str:
 
 
 def _path_exists(repo_root: Path, rel_path: str) -> bool:
-    return (repo_root / rel_path).exists()
+    path = Path(rel_path)
+    if path.is_absolute():
+        return False
+
+    repo_root = repo_root.resolve()
+    resolved_path = (repo_root / path).resolve()
+    try:
+        resolved_path.relative_to(repo_root)
+    except ValueError:
+        return False
+    return resolved_path.exists()
 
 
 def _tracked_source_paths(repo_root: Path) -> list[Path] | None:
