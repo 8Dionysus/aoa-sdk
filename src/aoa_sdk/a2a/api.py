@@ -26,6 +26,7 @@ from .rebase import (
     build_memo_export_plan,
     build_reviewed_closeout_request,
     build_runtime_return_closeout_receipt,
+    build_runtime_wave_closeout_receipt,
     build_summon_return_checkpoint_fixture,
     build_summon_request_payload,
     build_summon_result_payload,
@@ -295,6 +296,35 @@ class A2AAPI:
         actor_ref: str = "abyss-stack.runtime-a2a",
     ) -> dict[str, Any]:
         return build_runtime_return_closeout_receipt(
+            remote_task,
+            decision,
+            session_ref=session_ref,
+            reviewed_artifact_path=reviewed_artifact_path,
+            stress_bundle=stress_bundle,
+            return_plan=return_plan,
+            checkpoint_bridge_plan=checkpoint_bridge_plan,
+            codex_target=codex_target,
+            observed_at=observed_at,
+            owner_repo=owner_repo,
+            actor_ref=actor_ref,
+        )
+
+    def build_runtime_wave_closeout_receipt(
+        self,
+        remote_task: RemoteTaskResult,
+        decision: SummonDecision,
+        *,
+        session_ref: str,
+        reviewed_artifact_path: str | None = None,
+        stress_bundle: StressBundle | None = None,
+        return_plan: ReturnPlan | None = None,
+        checkpoint_bridge_plan: CheckpointBridgePlan | None = None,
+        codex_target: CodexLocalAgentTarget | None = None,
+        observed_at: str | None = None,
+        owner_repo: str = "abyss-stack",
+        actor_ref: str = "abyss-stack.runtime-a2a",
+    ) -> dict[str, Any]:
+        return build_runtime_wave_closeout_receipt(
             remote_task,
             decision,
             session_ref=session_ref,
