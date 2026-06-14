@@ -222,6 +222,64 @@ def test_checkpoint_candidate_intelligence_enriches_legacy_flat_signatures(
     assert "single_event_cannot_promote" not in signature.negative_evidence
 
 
+def test_checkpoint_candidate_intelligence_counts_duplicate_saved_signature_refs(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir.mkdir(parents=True, exist_ok=True)
+    surface = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="checkpoint",
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+    )
+    saved_signature = _signature_by_action(surface, "record_commit_mutation")
+    event_refs = [
+        saved_signature.action_event_ids[0],
+        "action-event:legacy-second-commit-mutation",
+    ]
+    duplicate_signatures = []
+    for event_ref in event_refs:
+        payload = saved_signature.model_dump(mode="json")
+        payload["action_event_ids"] = [event_ref]
+        payload["negative_evidence"] = ["single_event_cannot_promote"]
+        duplicate_signatures.append(payload)
+    payload = {
+        "session_ref": "session:legacy-duplicate-saved-signatures",
+        "runtime_session_id": "runtime-legacy-duplicate-saved-signatures",
+        "runtime_session_created_at": "2026-04-10T13:55:00Z",
+        "repo_root": str((workspace_root / "aoa-sdk").resolve()),
+        "repo_label": "aoa-sdk",
+        "history_entry": {
+            "checkpoint_kind": "commit",
+            "observed_at": "2026-04-10T14:00:00Z",
+            "report_ref": str(note_dir / "legacy-duplicate-saved-signatures-report.json"),
+            "intent_text": "legacy duplicate signatures still carry distinct saved event refs",
+            "checkpoint_should_capture": True,
+            "blocked_by": [],
+            "candidate_clusters": [cluster.model_dump(mode="json") for cluster in surface.candidate_clusters],
+            "action_events": [],
+            "action_signatures": duplicate_signatures,
+            "manual_review_requested": False,
+        },
+    }
+    with (note_dir / "checkpoint-note.jsonl").open("a", encoding="utf-8") as handle:
+        handle.write(json.dumps(payload, ensure_ascii=True) + "\n")
+
+    report = sdk.checkpoints.candidate_intelligence(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        sample_limit=1,
+    )
+
+    signature = _signature_by_action(report, "record_commit_mutation")
+    cluster = next(item for item in report.repetition_clusters if item.signature_id == signature.signature_id)
+    assert signature.action_event_ids == event_refs
+    assert "single_event_cannot_promote" not in signature.negative_evidence
+    assert cluster.repeat_count == 2
+
+
 def test_checkpoint_candidate_intelligence_classifies_wrapper_lanes_and_gap_pressure(
     workspace_root: Path,
 ) -> None:
