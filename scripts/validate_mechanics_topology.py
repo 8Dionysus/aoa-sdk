@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import json
 from pathlib import Path
+import subprocess
 from typing import Any
 
 
@@ -155,10 +156,42 @@ def _path_exists(repo_root: Path, rel_path: str) -> bool:
     return (repo_root / rel_path).exists()
 
 
+def _tracked_source_paths(repo_root: Path) -> list[Path] | None:
+    result = subprocess.run(
+        ["git", "-C", str(repo_root), "ls-files", "--", "src/aoa_sdk"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode != 0:
+        return None
+    return [Path(line) for line in result.stdout.splitlines() if line]
+
+
 def _source_families(repo_root: Path) -> set[str]:
     source_root = repo_root / "src" / "aoa_sdk"
     families: set[str] = set()
     root_files = False
+
+    tracked_paths = _tracked_source_paths(repo_root)
+    if tracked_paths is not None:
+        for rel_path in tracked_paths:
+            parts = rel_path.parts
+            if len(parts) < 3:
+                continue
+            if len(parts) == 3:
+                name = parts[2]
+                if name != "__pycache__" and not name.endswith(".pyc"):
+                    root_files = True
+                continue
+            family = parts[2]
+            if family != "__pycache__" and not family.endswith(".pyc"):
+                families.add(family)
+
+        if root_files:
+            families.add("root-package")
+        return families
+
     if not source_root.is_dir():
         return families
 

@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import importlib.util
 from pathlib import Path
+import subprocess
 import sys
 
 
@@ -110,6 +111,32 @@ def test_source_family_routes_cover_current_sdk_source_tree() -> None:
         [],
     )
     assert set(topology["source_family_routes"]) == mechanics_validator._source_families(REPO_ROOT)  # noqa: SLF001
+
+
+def test_source_family_routes_ignore_untracked_source_dirs(tmp_path: Path) -> None:
+    repo_root = tmp_path / "repo"
+    source_root = repo_root / "src" / "aoa_sdk"
+    tracked_family = source_root / "tracked_family"
+    untracked_family = source_root / "untracked_scratch"
+    tracked_family.mkdir(parents=True)
+    untracked_family.mkdir()
+    (source_root / "api.py").write_text("", encoding="utf-8")
+    (tracked_family / "__init__.py").write_text("", encoding="utf-8")
+    (untracked_family / "__init__.py").write_text("", encoding="utf-8")
+
+    subprocess.run(["git", "init"], cwd=repo_root, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "add", "src/aoa_sdk/api.py", "src/aoa_sdk/tracked_family/__init__.py"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    assert mechanics_validator._source_families(repo_root) == {  # noqa: SLF001
+        "root-package",
+        "tracked_family",
+    }
 
 
 def test_root_technical_district_files_are_explicitly_allowlisted() -> None:
