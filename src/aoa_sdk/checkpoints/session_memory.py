@@ -3,7 +3,6 @@
 from __future__ import annotations
 
 import os
-import re
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Any, Literal
@@ -222,42 +221,6 @@ def resolve_checkpoint_runtime_trace_ref(
             ]
         ),
     )
-
-
-def session_memory_evidence_from_ref(
-    ref: CheckpointSessionMemoryRef | None,
-) -> dict[str, object] | None:
-    if ref is None:
-        return None
-    route_parts = []
-    for summary in ref.route_signal_summary:
-        top_keys = " ".join(
-            f"{key}:{count}" for key, count in summary.top_keys.items()
-        )
-        route_parts.append(f"{summary.layer}:{summary.signal_count} {top_keys}".strip())
-    text = "\n".join(
-        [
-            "session_memory_ref",
-            f"session_id: {ref.session_id}",
-            f"session_label: {ref.session_label or ''}",
-            f"archive_status: {ref.archive_status or ''}",
-            f"distillation_status: {ref.distillation_status or ''}",
-            f"review_status: {ref.review_status or ''}",
-            f"work_context: {_compact_mapping_text(ref.work_context)}",
-            f"conversation_acts: {_compact_mapping_text(ref.conversation_act_counts)}",
-            f"session_acts: {_compact_mapping_text(ref.session_act_counts)}",
-            "route_signals: " + " | ".join(route_parts),
-            "authority_contract: archive indexes are route evidence, not reviewed truth",
-        ]
-    )
-    tokens = set(re.findall(r"[a-z0-9_:-]+", text.lower()))
-    return {
-        "text": text,
-        "payload": ref.model_dump(mode="json"),
-        "ref": ref.archive_path,
-        "refs": list(ref.evidence_refs),
-        "tokens": tokens,
-    }
 
 
 def _first_existing_aoa_root(workspace: Workspace) -> Path | None:
@@ -651,15 +614,3 @@ def _dedupe_strings(values: list[str | None]) -> list[str]:
 
 def _safe_unknown_session_id(session_path: Path) -> str:
     return f"unknown:{session_path.name}"
-
-
-def _compact_mapping_text(mapping: dict[str, Any]) -> str:
-    parts: list[str] = []
-    for key, value in sorted(mapping.items())[:ROUTE_SIGNAL_TOP_KEY_LIMIT]:
-        if isinstance(value, dict):
-            parts.append(f"{key}=dict")
-        elif isinstance(value, list):
-            parts.append(f"{key}=list:{len(value)}")
-        else:
-            parts.append(f"{key}={value}")
-    return " ".join(parts)

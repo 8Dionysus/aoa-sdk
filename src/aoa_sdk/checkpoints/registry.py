@@ -148,7 +148,6 @@ from .runtime.sessions import (
 )
 from .session_memory import (
     resolve_checkpoint_session_memory as _resolve_checkpoint_session_memory,
-    session_memory_evidence_from_ref as _session_memory_evidence_from_ref,
 )
 from .timestamps import (
     local_timestamp_parts as _local_timestamp_parts,
@@ -1652,15 +1651,12 @@ class CheckpointsAPI:
 
         reviewed_artifact_path_obj = Path(context.reviewed_artifact_ref)
         reviewed_artifact_evidence = _merge_closeout_evidence(
-            primary=_merge_closeout_evidence(
-                primary=_read_reviewed_artifact(reviewed_artifact_path_obj),
-                secondary=(
-                    _read_session_trace(Path(context.session_trace_ref).expanduser().resolve())
-                    if context.session_trace_ref is not None
-                    else None
-                ),
+            primary=_read_reviewed_artifact(reviewed_artifact_path_obj),
+            secondary=(
+                _read_session_trace(Path(context.session_trace_ref).expanduser().resolve())
+                if context.session_trace_ref is not None
+                else None
             ),
-            secondary=_session_memory_evidence_from_ref(context.session_memory_ref),
         )
         notes = _load_context_checkpoint_notes(context)
         handoff = _load_context_surface_handoff(context)
