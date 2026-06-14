@@ -43,6 +43,13 @@ LifecycleState = Literal[
     "stale_current_scope",
 ]
 
+GENERIC_ARCHIVE_BLOCKED_STATES = {
+    "pending_review",
+    "session_closed_pending_review",
+    "session_closed_reviewed_no_closeout",
+    "session_closed_collecting_no_closeout",
+}
+
 
 def audit_checkpoint_lifecycle(
     *,
@@ -297,7 +304,7 @@ def _entry_from_current_dir(
     ) or note.state in {"closed", "promoted"}
     archiveable = closable or (
         not active_runtime_scope
-        and lifecycle_state not in {"pending_review", "session_closed_pending_review"}
+        and lifecycle_state not in GENERIC_ARCHIVE_BLOCKED_STATES
     )
     evidence_refs = _dedupe_strings(
         [
