@@ -146,6 +146,19 @@ def test_root_technical_district_files_are_explicitly_allowlisted() -> None:
     assert issues == []
 
 
+def test_source_surface_paths_must_stay_within_repo_root(tmp_path: Path) -> None:
+    repo_root = tmp_path / "repo"
+    repo_root.mkdir()
+    inside_path = repo_root / "inside.md"
+    outside_path = tmp_path / "outside.md"
+    inside_path.write_text("", encoding="utf-8")
+    outside_path.write_text("", encoding="utf-8")
+
+    assert mechanics_validator._path_exists(repo_root, "inside.md") is True  # noqa: SLF001
+    assert mechanics_validator._path_exists(repo_root, outside_path.as_posix()) is False  # noqa: SLF001
+    assert mechanics_validator._path_exists(repo_root, "../outside.md") is False  # noqa: SLF001
+
+
 def test_questbook_source_store_is_root_routed_not_part_local() -> None:
     assert (REPO_ROOT / "QUESTBOOK.md").is_file()
     assert (REPO_ROOT / "quests" / "README.md").is_file()
