@@ -76,6 +76,7 @@ def audit_checkpoint_lifecycle(
             _entry_from_current_dir(
                 workspace=workspace,
                 current_dir=current_dir,
+                active_runtime_session_file_ref=str(session_path),
                 active_runtime_session_id=(
                     active_runtime_session_id if isinstance(active_runtime_session_id, str) else None
                 ),
@@ -226,6 +227,7 @@ def _entry_from_current_dir(
     *,
     workspace: Workspace,
     current_dir: Path,
+    active_runtime_session_file_ref: str | None,
     active_runtime_session_id: str | None,
 ) -> CheckpointLifecycleEntry | None:
     paths = _checkpoint_paths_from_current_dir(workspace, current_dir)
@@ -248,6 +250,7 @@ def _entry_from_current_dir(
         workspace=workspace,
         runtime_session_id=note.runtime_session_id,
         post_commit_report_ref=post_commit_ref,
+        runtime_session_file_ref=active_runtime_session_file_ref,
     )
     runtime_trace_status: Literal["resolved", "recoverable", "missing"] = (
         "resolved"
@@ -262,6 +265,7 @@ def _entry_from_current_dir(
             workspace=workspace,
             runtime_session_id=note.runtime_session_id,
             post_commit_report_ref=post_commit_ref,
+            runtime_session_file_ref=active_runtime_session_file_ref,
         )
         if not active_runtime_scope
         else (None, None)

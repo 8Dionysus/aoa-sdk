@@ -2451,6 +2451,45 @@ def test_checkpoint_backlog_audit_does_not_count_active_runtime_trace_as_gap(
     assert index_payload["runtime_trace_gaps"] == []
 
 
+def test_checkpoint_backlog_audit_honors_explicit_active_session_trace(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    explicit_session = _write_runtime_session_file(
+        workspace_root / "external-runtime" / "runtime-explicit-trace.json",
+        session_id="runtime-explicit-trace",
+        codex_thread_id="thread-explicit-trace",
+    )
+    note = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="explicit runtime session file should keep trace coordinates",
+        mutation_surface="code",
+        session_file=str(explicit_session),
+    )
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-explicit-trace",
+    )
+    _mark_checkpoint_note_reviewed(note_dir)
+
+    backlog = sdk.checkpoints.backlog_audit(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(explicit_session),
+        write_index=True,
+    )
+
+    entry = next(item for item in backlog.entries if item.runtime_session_id == note.runtime_session_id)
+    assert entry.active_runtime_scope is True
+    assert entry.runtime_trace_status == "resolved"
+    assert entry.runtime_trace_ref == str(explicit_session.resolve())
+    assert entry.runtime_trace_thread_id == "thread-explicit-trace"
+    assert entry.source_trace_ref == str((explicit_session.parent / "runtime-trace.jsonl").resolve())
+    assert backlog.counts["runtime_trace_resolved"] == 1
+    assert backlog.counts["runtime_trace_gaps"] == 0
+
+
 def test_checkpoint_reconcile_sessions_archives_reviewed_no_closeout_scope(
     workspace_root: Path,
 ) -> None:

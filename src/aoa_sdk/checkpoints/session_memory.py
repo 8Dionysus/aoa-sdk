@@ -144,6 +144,7 @@ def resolve_checkpoint_session_memory_for_runtime_session(
     workspace: Workspace,
     runtime_session_id: str | None,
     post_commit_report_ref: str | None = None,
+    runtime_session_file_ref: str | None = None,
 ) -> tuple[CheckpointSessionMemoryRef | None, CheckpointSessionMemoryFreshness]:
     checked_at = datetime.now(UTC)
     if not isinstance(runtime_session_id, str) or not runtime_session_id.strip():
@@ -157,6 +158,7 @@ def resolve_checkpoint_session_memory_for_runtime_session(
         workspace=workspace,
         runtime_session_id=runtime_session_id,
         post_commit_report_ref=post_commit_report_ref,
+        runtime_session_file_ref=runtime_session_file_ref,
     )
     if runtime_trace_ref is None:
         return None, CheckpointSessionMemoryFreshness(
@@ -188,10 +190,14 @@ def resolve_checkpoint_runtime_trace_ref(
     workspace: Workspace,
     runtime_session_id: str | None,
     post_commit_report_ref: str | None = None,
+    runtime_session_file_ref: str | None = None,
 ) -> CheckpointRuntimeTraceRef | None:
     if not isinstance(runtime_session_id, str) or not runtime_session_id.strip():
         return None
-    runtime_session_ref = _runtime_session_ref_for_id(
+    runtime_session_ref = _runtime_session_ref_from_path(
+        runtime_session_id=runtime_session_id,
+        runtime_session_file_ref=runtime_session_file_ref,
+    ) or _runtime_session_ref_for_id(
         workspace=workspace,
         runtime_session_id=runtime_session_id,
     )
@@ -307,6 +313,22 @@ def _runtime_session_ref_for_id(
         if _string_value(payload, "session_id") == runtime_session_id:
             return _RuntimeSessionRef(path=path, payload=payload)
     return None
+
+
+def _runtime_session_ref_from_path(
+    *,
+    runtime_session_id: str,
+    runtime_session_file_ref: str | None,
+) -> _RuntimeSessionRef | None:
+    if not isinstance(runtime_session_file_ref, str) or not runtime_session_file_ref.strip():
+        return None
+    path = Path(runtime_session_file_ref).expanduser().resolve(strict=False)
+    payload = _load_json_object(path)
+    if payload is None:
+        return None
+    if _string_value(payload, "session_id") != runtime_session_id:
+        return None
+    return _RuntimeSessionRef(path=path, payload=payload)
 
 
 def _runtime_trace_ref_from_post_commit_report(
