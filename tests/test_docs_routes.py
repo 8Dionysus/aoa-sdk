@@ -186,7 +186,8 @@ def test_changelog_unreleased_avoids_live_reconciliation_counters() -> None:
     for fragment in forbidden_live_fragments:
         assert fragment not in unreleased
 
-    assert "No unreleased changes after `v0.4.0` yet." in unreleased
+    assert "root README and design anatomy maps" in unreleased
+    assert "`aoa-evals`" in unreleased
     assert "Dated release sections\n  own exact reconciliation spans" in unreleased
 
 

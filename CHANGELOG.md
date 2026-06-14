@@ -9,7 +9,9 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
-- No unreleased changes after `v0.4.0` yet.
+- Align the local `evals/` port with the root README and design anatomy maps
+  so SDK-local eval pressure is discoverable while proof authority remains in
+  `aoa-evals`.
 
 ### Notes
 

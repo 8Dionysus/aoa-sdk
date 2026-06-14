@@ -96,6 +96,7 @@ history. Package-local future pressure lives in mechanics package roadmaps.
 | --- | --- |
 | [.aoa](.aoa/) | Workspace metadata consumed by SDK discovery. |
 | [docs](docs/README.md) | Documentation map, boundaries, release route, versioning, seed history, and decision records. |
+| [evals](evals/) | SDK-local eval pressure intake, suites, and reports before adoption by `aoa-evals`. |
 | [generated](generated/) | Derived read models and compact control-plane companions. |
 | [mechanics](mechanics/) | Repeatable SDK operations with package and part ownership. |
 | [sdk](sdk/) | Source-authored SDK posture and manifest-checked route map. |
