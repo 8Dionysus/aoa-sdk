@@ -2239,7 +2239,7 @@ def test_checkpoint_lifecycle_audit_detects_session_closed_reviewed_no_closeout(
     assert entry.lifecycle_state == "session_closed_reviewed_no_closeout"
     assert entry.session_memory_archive_ref == str(session_memory_archive)
     assert entry.session_memory_status == "current"
-    assert entry.archiveable is True
+    assert entry.archiveable is False
     assert report.session_memory_ref_count == 1
     assert report.session_closed_without_closeout_count == 1
     assert report.generated_index_ref is not None
@@ -2249,6 +2249,55 @@ def test_checkpoint_lifecycle_audit_detects_session_closed_reviewed_no_closeout(
         anchor["kind"] == "session_memory_archive"
         for anchor in index_payload["graph_ready"]["anchors"]
     )
+
+
+def test_checkpoint_close_archive_include_stale_skips_no_closeout_scope(
+    workspace_root: Path,
+) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    active_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
+        session_id="runtime-session-live",
+    )
+    closed_session = _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "closed-session.json",
+        session_id="runtime-session-no-closeout",
+        codex_thread_id="thread-no-closeout",
+    )
+    closed_payload = json.loads(closed_session.read_text(encoding="utf-8"))
+    _write_session_memory_archive(
+        workspace_root,
+        thread_id="thread-no-closeout",
+        rollout_path=closed_payload["codex_rollout_path"],
+        label="2026-04-10__002__checkpoint-no-closeout",
+    )
+    note = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="reviewed checkpoint survived but the operator closed the session",
+        mutation_surface="code",
+        session_file=str(closed_session),
+    )
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id="runtime-session-no-closeout",
+    )
+    _mark_checkpoint_note_reviewed(note_dir)
+
+    result = sdk.checkpoints.close_archive(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(active_session),
+        runtime_session_id=note.runtime_session_id,
+        dry_run=False,
+        include_stale=True,
+    )
+
+    assert result.archived_count == 0
+    assert result.skipped_count == 1
+    assert result.skipped_entries[0].lifecycle_state == "session_closed_reviewed_no_closeout"
+    assert result.skipped_entries[0].next_route == "reconcile_without_closeout"
+    assert note_dir.exists()
 
 
 def test_checkpoint_lifecycle_audit_routes_runtime_trace_gap_without_reconcile(
