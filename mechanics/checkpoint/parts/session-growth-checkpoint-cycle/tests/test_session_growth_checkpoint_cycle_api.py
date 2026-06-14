@@ -520,6 +520,34 @@ def test_git_boundary_check_blocks_unresolved_skipped_thread_checkpoint(
     assert not Path(report.session_file).exists()
 
 
+def test_git_boundary_check_blocks_unresolved_skipped_thread_checkpoint_with_unrelated_active_session(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _git_commit(repo_root, subject="plan verify a bounded change", body="checkpoint skip path")
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-unresolved-skip")
+    sdk = AoASDK.from_workspace(repo_root)
+
+    report = sdk.checkpoints.after_commit(repo_root=str(repo_root), commit_ref="HEAD")
+    monkeypatch.delenv("CODEX_THREAD_ID", raising=False)
+    _write_runtime_session_file(
+        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
+        session_id="runtime-other-thread",
+        codex_thread_id="other-thread",
+    )
+    boundary = sdk.checkpoints.git_boundary_check(repo_root=str(repo_root), boundary="push")
+
+    assert report.status == "skipped_no_active_session"
+    assert boundary.status == "blocked_unresolved_checkpoint"
+    assert boundary.pending_refs == [commit_sha]
+    assert boundary.blocking_repo_labels == ["aoa-sdk"]
+    assert boundary.post_commit_status_ref == str(
+        workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "post-commit-status" / "aoa-sdk.latest.json"
+    )
+
+
 def test_review_note_auto_recovers_skipped_thread_checkpoint(
     workspace_root: Path,
     monkeypatch,

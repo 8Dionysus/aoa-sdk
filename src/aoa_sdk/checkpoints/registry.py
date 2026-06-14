@@ -1067,30 +1067,30 @@ class CheckpointsAPI:
             session_file=session_file,
         )
         runtime_session_id = cast(str | None, runtime_metadata["runtime_session_id"])
-        if runtime_session_id is None:
-            unresolved_skipped_status = _unresolved_skipped_post_commit_status_for_boundary(
-                self.workspace,
-                repo_root_path=repo_root_path,
+        unresolved_skipped_status = _unresolved_skipped_post_commit_status_for_boundary(
+            self.workspace,
+            repo_root_path=repo_root_path,
+            repo_label=repo_label,
+        )
+        if unresolved_skipped_status is not None:
+            status_path, skipped_report = unresolved_skipped_status
+            pending_ref = _skipped_after_commit_pending_ref(skipped_report)
+            return CheckpointGitBoundaryCheck(
+                repo_root=str(repo_root_path),
                 repo_label=repo_label,
-            )
-            if unresolved_skipped_status is not None:
-                status_path, skipped_report = unresolved_skipped_status
-                pending_ref = _skipped_after_commit_pending_ref(skipped_report)
-                return CheckpointGitBoundaryCheck(
-                    repo_root=str(repo_root_path),
-                    repo_label=repo_label,
+                boundary=boundary,
+                status="blocked_unresolved_checkpoint",
+                post_commit_status_ref=str(status_path),
+                pending_refs=[pending_ref],
+                blocking_repo_labels=[repo_label],
+                required_action=_skipped_after_commit_required_action(
+                    repo_root_path=repo_root_path,
+                    workspace_root=self.workspace.federation_root,
                     boundary=boundary,
-                    status="blocked_unresolved_checkpoint",
-                    post_commit_status_ref=str(status_path),
-                    pending_refs=[pending_ref],
-                    blocking_repo_labels=[repo_label],
-                    required_action=_skipped_after_commit_required_action(
-                        repo_root_path=repo_root_path,
-                        workspace_root=self.workspace.federation_root,
-                        boundary=boundary,
-                        report=skipped_report,
-                    ),
-                )
+                    report=skipped_report,
+                ),
+            )
+        if runtime_session_id is None:
             return CheckpointGitBoundaryCheck(
                 repo_root=str(repo_root_path),
                 repo_label=repo_label,
