@@ -73,6 +73,7 @@ and where does the next stronger claim return?
 | `src/aoa_sdk/` | importable typed SDK implementation and CLI behavior |
 | `docs/` | authored root explanation for boundaries, workspace layout, compatibility, release route doors, decisions, and control-plane posture |
 | `docs/decisions/` | durable rationale for topology, route-law, source-home, validation, and mechanics choices |
+| `evals/` | SDK-local eval pressure port for intake, suites, and reports before proof adoption by `aoa-evals` |
 | `mechanics/` | repeatable SDK operation topology, part-local artifact homes, source maps, and package route law |
 | `.aoa/` | workspace metadata and local control-plane runtime artifacts, not hidden source truth |
 | `schemas/` | shared SDK helper contract schemas and root-published generated contracts |
