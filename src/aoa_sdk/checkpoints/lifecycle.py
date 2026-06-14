@@ -198,6 +198,12 @@ def close_archive_checkpoint_lifecycle(
                 archive_ref = _close_and_archive_entry(workspace=workspace, entry=entry)
                 archive_refs.append(str(archive_ref))
             continue
+        if entry.state in {"closed", "promoted"}:
+            archived_entries.append(entry)
+            if not dry_run:
+                archive_ref = _archive_entry_without_closing(workspace=workspace, entry=entry)
+                archive_refs.append(str(archive_ref))
+            continue
         if include_stale and entry.archiveable:
             archived_entries.append(entry)
             if not dry_run:
@@ -301,8 +307,10 @@ def _entry_from_current_dir(
         lifecycle_state == "closeout_executed"
         and note.review_status == "reviewed"
         and not pending_refs
-    ) or note.state in {"closed", "promoted"}
+    )
     archiveable = closable or (
+        note.state in {"closed", "promoted"}
+    ) or (
         not active_runtime_scope
         and lifecycle_state not in GENERIC_ARCHIVE_BLOCKED_STATES
     )

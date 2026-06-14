@@ -2145,6 +2145,68 @@ def test_checkpoint_close_archive_dry_run_and_apply_closes_reviewed_closeout_sco
     assert any("lifecycle_event" in payload for payload in jsonl_payloads)
 
 
+def test_checkpoint_close_archive_archives_promoted_scope_without_closing(
+    workspace_root: Path,
+) -> None:
+    dionysus_root = workspace_root / "Dionysus"
+    (dionysus_root / "reports" / "ecosystem-audits").mkdir(parents=True, exist_ok=True)
+    (dionysus_root / "README.md").write_text("# Dionysus\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
+
+    note = sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="commit",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
+    )
+    sdk.checkpoints.append(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        checkpoint_kind="verify_green",
+        intent_text="recurring workflow needs better handoff proof and recall",
+        mutation_surface="code",
+        session_file=str(session_file),
+    )
+    promotion = sdk.checkpoints.promote(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        target="dionysus-note",
+        session_file=str(session_file),
+    )
+    note_dir = _checkpoint_note_dir(
+        workspace_root,
+        repo_label="aoa-sdk",
+        runtime_session_id=note.runtime_session_id,
+    )
+
+    result = sdk.checkpoints.close_archive(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        session_file=str(session_file),
+        runtime_session_id=note.runtime_session_id,
+        dry_run=False,
+    )
+
+    assert promotion.resulting_state == "promoted"
+    assert result.archived_count == 1
+    assert result.archive_refs
+    assert not note_dir.exists()
+    archive_note = Path(result.archive_refs[0]) / "checkpoint-note.json"
+    archive_jsonl = Path(result.archive_refs[0]) / "checkpoint-note.jsonl"
+    archived_payload = json.loads(archive_note.read_text(encoding="utf-8"))
+    jsonl_payloads = [
+        json.loads(line)
+        for line in archive_jsonl.read_text(encoding="utf-8").splitlines()
+        if line.strip()
+    ]
+    assert archived_payload["state"] == "promoted"
+    assert archived_payload["session_ref"] == note.session_ref
+    assert not any(
+        payload.get("lifecycle_event", {}).get("event_type") == "checkpoint_lifecycle_closed_v1"
+        for payload in jsonl_payloads
+    )
+
+
 def test_checkpoint_close_archive_skips_pending_review_even_with_closeout_execution(
     workspace_root: Path,
 ) -> None:
