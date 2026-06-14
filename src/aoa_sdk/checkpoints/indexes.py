@@ -146,7 +146,7 @@ def _entry_summary(entry: CheckpointLifecycleEntry) -> dict[str, Any]:
 def _is_runtime_trace_gap(entry: CheckpointLifecycleEntry) -> bool:
     return (
         not entry.active_runtime_scope
-        and entry.runtime_trace_status == "resolved"
+        and entry.runtime_trace_status in {"resolved", "recoverable"}
         and not entry.session_memory_archive_ref
     )
 
