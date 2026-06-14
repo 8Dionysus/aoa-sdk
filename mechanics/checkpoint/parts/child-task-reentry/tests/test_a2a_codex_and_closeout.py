@@ -9,8 +9,10 @@ from aoa_sdk.a2a.rebase import (
     build_reviewed_closeout_request,
     build_return_plan,
     build_runtime_return_closeout_receipt,
+    build_runtime_wave_closeout_receipt,
     plan_owner_publications,
 )
+from aoa_sdk.a2a.api import A2AAPI
 
 
 def test_codex_local_target_uses_project_level_paths() -> None:
@@ -88,6 +90,45 @@ def test_closeout_request_and_runtime_receipt_keep_canonical_mapping() -> None:
     assert receipt["payload"]["return_reentry_mode"] == "checkpoint_relaunch"
     assert receipt["payload"]["codex_config_path"] == "/srv/AbyssOS/.codex/agents/reviewer.toml"
     assert request["memo_export_plan"]["contains_raw_trace"] is False
+
+
+def test_runtime_wave_closeout_receipt_alias_preserves_public_compatibility() -> None:
+    passport = QuestPassport(
+        difficulty="d1_patch",
+        risk="r1_repo_local",
+        control_mode="codex_supervised",
+        delegate_tier="executor",
+        route_anchor="bounded_plan",
+        expected_artifacts=["verification_result"],
+    )
+    intent = SummonIntent(desired_role="reviewer", expected_outputs=["verification_result"])
+    decision = assess_summon(passport, intent)
+    result = RemoteTaskResult(
+        task_id="task-child-1",
+        state="completed",
+        agent_id="reviewer",
+        endpoint="codex://local/reviewer",
+        returned_artifacts=["verification_result"],
+    )
+
+    alias_receipt = build_runtime_wave_closeout_receipt(
+        result,
+        decision,
+        session_ref="session:example",
+    )
+    canonical_receipt = build_runtime_return_closeout_receipt(
+        result,
+        decision,
+        session_ref="session:example",
+    )
+    facade_receipt = A2AAPI(workspace=object()).build_runtime_wave_closeout_receipt(
+        result,
+        decision,
+        session_ref="session:example",
+    )
+
+    assert alias_receipt == canonical_receipt
+    assert facade_receipt == canonical_receipt
 
 
 def test_runtime_receipt_keeps_return_refs_when_bridge_refs_are_unset() -> None:
