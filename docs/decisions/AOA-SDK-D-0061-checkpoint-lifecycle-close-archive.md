@@ -52,9 +52,11 @@ The branch classifies current checkpoint scopes as:
 
 `aoa checkpoint lifecycle-audit` reports that state without moving files.
 `aoa checkpoint close-archive` previews by default. With `--apply`, it closes
-only reviewed, nonpending, closeout-executed scopes by appending a
+reviewed, nonpending, closeout-executed scopes by appending a
 `checkpoint_lifecycle_closed_v1` event to the JSONL ledger, rebuilding
-snapshots, and moving the scope under `.aoa/session-growth/archive/`.
+snapshots, and moving the scope under `.aoa/session-growth/archive/`. Already
+`closed` or `promoted` runtime-scoped ledgers are archiveable by `--apply`
+without appending another close event.
 
 With `--include-stale`, the command may move nonpending stale current scopes as
 archive evidence without marking them closed. Pending-review scopes remain
