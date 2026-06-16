@@ -6,10 +6,12 @@ The part captures and reviews local checkpoint evidence during a session. It
 keeps checkpoint notes below harvest verdicts and fails closed when semantic
 review is still pending. It audits lifecycle state for checkpoint scopes under
 `current/` and can close/archive only reviewed, nonpending scopes with reviewed
-closeout execution evidence. Nonpending stale scopes may be archived as stale
-evidence without being marked closed. When aoa-session-memory has preserved a
-runtime session that ended without reviewed closeout, the part can reconcile
-that checkpoint scope as `session_closed_reviewed_no_closeout` or
+closeout execution evidence, or archive already `closed` or `promoted`
+runtime-scoped ledgers without appending another close event. Nonpending stale
+scopes may be archived as stale evidence without being marked closed. When
+aoa-session-memory has preserved a runtime session that ended without reviewed
+closeout, the part can reconcile that checkpoint scope as
+`session_closed_reviewed_no_closeout` or
 `session_closed_collecting_no_closeout` and archive it with a
 `checkpoint_session_archived_without_closeout_v1` event. This event preserves
 evidence; it does not close the note, run closeout, or promote the contents.

@@ -26,9 +26,10 @@ existing session-harvest family into an automatic runtime authority.
   executed, closed, or stale current scope
 - `aoa checkpoint close-archive` previews by default and only moves files with
   `--apply`; it closes reviewed closeout-executed scopes by appending a
-  lifecycle event before archival, while `--include-stale` only moves
-  nonpending stale current scopes as archive evidence without marking them
-  closed
+  lifecycle event before archival, archives already `closed` or `promoted`
+  runtime-scoped ledgers without appending another close event, and uses
+  `--include-stale` only to move nonpending stale current scopes as archive
+  evidence without marking them closed
 - lifecycle audit may report aoa-session-memory archive refs from closeout
   context or execution reports, but those refs stay read-only route evidence
   and the checkpoint mechanic must not mutate aoa-session-memory
