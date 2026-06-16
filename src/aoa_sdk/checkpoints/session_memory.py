@@ -208,6 +208,12 @@ def resolve_checkpoint_runtime_trace_ref(
         )
     codex_thread_id = _string_value(runtime_session_ref.payload, "codex_thread_id")
     codex_rollout_path = _string_value(runtime_session_ref.payload, "codex_rollout_path")
+    if codex_thread_id is None and codex_rollout_path is None:
+        return _runtime_trace_ref_from_post_commit_report(
+            workspace=workspace,
+            runtime_session_id=runtime_session_id,
+            post_commit_report_ref=post_commit_report_ref,
+        )
     return CheckpointRuntimeTraceRef(
         runtime_session_id=runtime_session_id,
         runtime_session_file_ref=str(runtime_session_ref.path),

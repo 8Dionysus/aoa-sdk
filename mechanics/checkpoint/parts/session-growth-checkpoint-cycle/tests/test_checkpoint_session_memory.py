@@ -6,7 +6,10 @@ from pathlib import Path
 import pytest
 
 from aoa_sdk import AoASDK
-from aoa_sdk.checkpoints.session_memory import resolve_checkpoint_session_memory
+from aoa_sdk.checkpoints.session_memory import (
+    resolve_checkpoint_runtime_trace_ref,
+    resolve_checkpoint_session_memory,
+)
 from aoa_sdk.workspace.discovery import Workspace
 
 
@@ -30,6 +33,60 @@ def test_checkpoint_session_memory_resolves_existing_archive(workspace_root: Pat
     assert ref.authority_contract == "archive_indexes_are_route_evidence_not_reviewed_truth"
     assert ref.route_signal_layers == ["authority_surface", "verification_state"]
     assert ref.route_signal_summary[0].top_keys == {"source": 3, "runtime": 1}
+
+
+def test_runtime_trace_uses_report_fallback_for_traceless_explicit_session_file(
+    workspace_root: Path,
+) -> None:
+    runtime_session_id = "runtime-session-traceless"
+    codex_thread_id = "019f0000-0000-7000-8000-traceless"
+    repo_root = workspace_root / "aoa-sdk"
+    session_file = (
+        repo_root / ".aoa" / "skill-runtime-sessions" / f"{codex_thread_id}.json"
+    )
+    session_file.parent.mkdir(parents=True, exist_ok=True)
+    session_file.write_text(
+        json.dumps(
+            {
+                "schema_version": 1,
+                "profile": "aoa-sdk",
+                "session_id": runtime_session_id,
+                "created_at": "2026-06-03T00:00:00Z",
+                "updated_at": "2026-06-03T00:00:00Z",
+                "active_skills": [],
+                "activation_log": [],
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+    raw_trace = workspace_root / ".codex" / "sessions" / f"rollout-{codex_thread_id}.jsonl"
+    raw_trace.parent.mkdir(parents=True, exist_ok=True)
+    raw_trace.write_text("{}\n", encoding="utf-8")
+    report = repo_root / ".aoa" / "post-commit-report.json"
+    report.parent.mkdir(parents=True, exist_ok=True)
+    report.write_text(
+        json.dumps(
+            {
+                "runtime_session_id": runtime_session_id,
+                "session_file": str(session_file),
+            }
+        )
+        + "\n",
+        encoding="utf-8",
+    )
+
+    trace_ref = resolve_checkpoint_runtime_trace_ref(
+        workspace=Workspace.discover(workspace_root),
+        runtime_session_id=runtime_session_id,
+        post_commit_report_ref=str(report),
+        runtime_session_file_ref=str(session_file),
+    )
+
+    assert trace_ref is not None
+    assert trace_ref.source == "checkpoint-post-commit-report"
+    assert trace_ref.codex_thread_id == codex_thread_id
+    assert trace_ref.codex_rollout_path == str(raw_trace.resolve())
 
 
 def test_build_closeout_context_attaches_session_memory_ref(
