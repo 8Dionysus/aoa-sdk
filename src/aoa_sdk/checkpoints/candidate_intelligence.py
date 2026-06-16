@@ -898,12 +898,14 @@ def _candidate_cluster_occurrence_counts(
 
 
 def _signature_saved_event_counts(signatures: list[ActionSignature]) -> Counter[str]:
-    refs_by_signature: dict[str, set[str]] = defaultdict(set)
+    refs_by_signature: dict[str, Counter[str]] = defaultdict(Counter)
     for signature in signatures:
-        refs_by_signature[signature.signature_id].update(signature.action_event_ids)
+        current_counts = refs_by_signature[signature.signature_id]
+        for event_ref, count in Counter(signature.action_event_ids).items():
+            current_counts[event_ref] = max(current_counts[event_ref], count)
     counts: Counter[str] = Counter()
     for signature_id, refs in refs_by_signature.items():
-        counts[signature_id] = len(refs)
+        counts[signature_id] = sum(refs.values())
     return counts
 
 
