@@ -110,21 +110,25 @@ def test_runtime_wave_closeout_receipt_alias_preserves_public_compatibility() ->
         endpoint="codex://local/reviewer",
         returned_artifacts=["verification_result"],
     )
+    observed_at = "2026-06-14T14:40:00Z"
 
     alias_receipt = build_runtime_wave_closeout_receipt(
         result,
         decision,
         session_ref="session:example",
+        observed_at=observed_at,
     )
     canonical_receipt = build_runtime_return_closeout_receipt(
         result,
         decision,
         session_ref="session:example",
+        observed_at=observed_at,
     )
     facade_receipt = A2AAPI(workspace=object()).build_runtime_wave_closeout_receipt(
         result,
         decision,
         session_ref="session:example",
+        observed_at=observed_at,
     )
 
     assert alias_receipt == canonical_receipt
