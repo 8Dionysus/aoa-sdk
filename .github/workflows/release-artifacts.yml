@@ -13,6 +13,12 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
+      - name: Checkout abyss-machine verifier
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/abyss-machine
+          path: .abyss-machine-verifier
+
       - name: Setup Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:
@@ -32,6 +38,11 @@ jobs:
 
       - name: Build package
         run: python -m build
+
+      - name: Validate OS Abyss artifact bundle
+        env:
+          ABYSS_MACHINE_REPO_ROOT: .abyss-machine-verifier
+        run: python mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py
 
       - name: Upload distribution artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02

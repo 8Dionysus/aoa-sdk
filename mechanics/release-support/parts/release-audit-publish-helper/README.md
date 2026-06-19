@@ -19,6 +19,8 @@ state.
 
 - [Release Runbook](docs/release-runbook.md)
 - [Release Audit Publish Helper Tests](tests/test_release_audit_publish_helper.py)
+- `scripts/validate_abyss_machine_package_artifact_bundle.py`
+- `sdk/distribution/manifests/python_distribution.bundle.json`
 - `src/aoa_sdk/release/`
 - `scripts/release_check.py`
 - `docs/RELEASING.md`
