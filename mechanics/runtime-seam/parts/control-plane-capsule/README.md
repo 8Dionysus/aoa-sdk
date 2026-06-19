@@ -11,11 +11,14 @@
 - `scripts/build_workspace_control_plane.py`
 - `scripts/validate_workspace_control_plane.py`
 - `schemas/workspace-control-plane.schema.json`
+- `mechanics/runtime-seam/parts/control-plane-capsule/CONTRACT.md`
 - route docs and part-local verification refs
 
 ## Output
 
 - deterministic generated control-plane JSON
+- `artifact_identity` that tells consumers the capsule's ABI epoch, producer,
+  privacy boundary, trust layer, and required verification
 - validation failures for stale refs, low-context implementation refs, or schema
   drift
 

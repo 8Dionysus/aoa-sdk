@@ -6,6 +6,7 @@ from __future__ import annotations
 import json
 
 from workspace_control_plane_common import (
+    ARTIFACT_IDENTITY,
     ROUTE_SPECS,
     SURFACE_PAYLOAD,
     WORKSPACE_CONTROL_PLANE_PATH,
@@ -31,6 +32,23 @@ def main() -> int:
         if key == "validation_refs":
             for ref in expected:
                 resolve_ref(ref)
+
+    artifact_identity = current_payload.get("artifact_identity")
+    if artifact_identity != ARTIFACT_IDENTITY:
+        raise SystemExit("generated/workspace_control_plane.min.json must keep canonical artifact_identity")
+    if isinstance(artifact_identity, dict):
+        for ref_key in ("authority_ref", "contract_version"):
+            ref = artifact_identity.get(ref_key)
+            if not isinstance(ref, str):
+                raise SystemExit(f"generated/workspace_control_plane.min.json artifact_identity.{ref_key} must be a string")
+            resolve_ref(ref.split("@", 1)[0])
+        for command in artifact_identity.get("verification", []):
+            if not isinstance(command, str) or not command.strip():
+                raise SystemExit("generated/workspace_control_plane.min.json artifact_identity.verification must contain strings")
+            if command.startswith("python "):
+                command_ref = command.removeprefix("python ").split(" ", 1)[0]
+                if command_ref.endswith(".py"):
+                    resolve_ref(command_ref)
 
     routes = current_payload.get("routes")
     if not isinstance(routes, list) or len(routes) != len(ROUTE_SPECS):

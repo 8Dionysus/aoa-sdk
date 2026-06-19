@@ -56,6 +56,16 @@ SURFACE_COMPATIBILITY_RULES = {
         relative_path="generated/workspace_control_plane.min.json",
         version_field="schema_version",
         supported_versions=["aoa_sdk_workspace_control_plane_v2"],
+        required_top_level_keys=[
+            "schema_ref",
+            "owner_repo",
+            "surface_kind",
+            "authority_ref",
+            "workspace_manifest_ref",
+            "validation_refs",
+            "artifact_identity",
+            "routes",
+        ],
     ),
     "Dionysus.seed_route_map.min": SurfaceCompatibilityRule(
         surface_id="Dionysus.seed_route_map.min",
@@ -81,7 +91,7 @@ SURFACE_COMPATIBILITY_RULES = {
     "Tree-of-Sophia.root_entry_map.min": SurfaceCompatibilityRule(
         surface_id="Tree-of-Sophia.root_entry_map.min",
         repo="Tree-of-Sophia",
-        relative_path="generated/root_entry_map.min.json",
+        relative_path="ToS/derived-exports/root_entry_map.min.json",
         version_field="schema_version",
         supported_versions=["tos_root_entry_map_v1"],
     ),
