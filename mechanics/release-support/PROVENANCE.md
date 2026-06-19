@@ -12,6 +12,8 @@
 - `.github/workflows/release-artifacts.yml`
 - `.github/workflows/release-cadence-audit.yml`
 - `scripts/release_check.py`
+- `sdk/distribution/manifests/python_distribution.bundle.json`
+- `mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py`
 - `src/aoa_sdk/release/`
 - `mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py`
 - `mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py`
@@ -40,3 +42,7 @@ name is provenance only, not an active route.
 Former root sibling-canary script, matrix, and regression moved into
 `mechanics/release-support/parts/public-support-ci-posture/`; the old
 `scripts/` and root `tests/` paths are provenance only.
+
+OS Abyss package artifact bundle validation is part-local to
+`release-audit-publish-helper`; root `scripts/release_check.py` only
+orchestrates it after `python -m build`.

@@ -1,0 +1,33 @@
+{
+  "schema": "abyss_machine_artifact_bundle_manifest_v1",
+  "id": "aoa-sdk-python-distribution",
+  "artifact_class": "aoa_sdk_python_distribution",
+  "owner_repo": "aoa-sdk",
+  "policy_ref": "manifests/artifact_signature_policy.manifest.json",
+  "mode": "github_release",
+  "subject_repo_root": "../../..",
+  "artifact_identity": {
+    "artifact_class": "aoa_sdk_python_distribution",
+    "abi_epoch": "aoa_sdk_python_distribution_v1"
+  },
+  "abi_subject": {
+    "path": "sdk/distribution/manifests/python_distribution.bundle.json",
+    "artifact_identity_pointer": "/artifact_identity"
+  },
+  "artifact_subjects": [
+    {
+      "glob": "dist/aoa_sdk-*.whl",
+      "role": "wheel"
+    },
+    {
+      "glob": "dist/aoa_sdk-*.tar.gz",
+      "role": "sdist"
+    }
+  ],
+  "package": {
+    "ecosystem": "python",
+    "pyproject": "pyproject.toml",
+    "name": "aoa-sdk"
+  },
+  "consumer_command": "python mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py"
+}

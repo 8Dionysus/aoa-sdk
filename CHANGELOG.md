@@ -12,6 +12,9 @@ Tracking starts with the community-docs baseline for this repository.
 - Align the local `evals/` port with the root README and design anatomy maps
   so SDK-local eval pressure is discoverable while proof authority remains in
   `aoa-evals`.
+- Add an OS Abyss artifact bundle gate for built `aoa-sdk` wheel/sdist outputs,
+  producing ABI, SBOM, SLSA/in-toto, signature-decision, and verify sidecars
+  under ignored `dist/abyss-artifact-bundle/` before release artifacts upload.
 
 ### Notes
 

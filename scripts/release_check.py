@@ -17,9 +17,16 @@ COMMANDS = [
     ("build workspace control plane", [sys.executable, "scripts/build_workspace_control_plane.py", "--check"]),
     ("validate workspace control plane", [sys.executable, "scripts/validate_workspace_control_plane.py"]),
     ("run tests", [sys.executable, "-m", "pytest", "-q"]),
-    ("run Ruff", [sys.executable, "-m", "ruff", "check", "."]),
+    ("run Ruff", [sys.executable, "-m", "ruff", "check", ".", "--extend-exclude", ".abyss-machine-verifier"]),
     ("run mypy", [sys.executable, "-m", "mypy", "src"]),
     ("build package", [sys.executable, "-m", "build"]),
+    (
+        "validate OS Abyss package artifact bundle",
+        [
+            sys.executable,
+            "mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py",
+        ],
+    ),
 ]
 
 
