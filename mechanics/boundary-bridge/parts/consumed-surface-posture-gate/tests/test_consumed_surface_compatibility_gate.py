@@ -217,6 +217,21 @@ def test_workspace_control_plane_requires_artifact_identity(workspace_root: Path
     assert "artifact_identity" in report.reason
 
 
+def test_workspace_control_plane_rejects_malformed_artifact_identity(workspace_root: Path) -> None:
+    target = workspace_root / "aoa-sdk" / "generated" / "workspace_control_plane.min.json"
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    payload["artifact_identity"] = None
+    target.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.compatibility.check("aoa-sdk.workspace_control_plane.min")
+
+    assert report.compatible is False
+    assert "artifact_identity" in report.reason
+    assert "JSON objects" in report.reason
+
+
 def test_diagnostic_surface_catalog_does_not_fallback_to_old_root_path(
     workspace_root: Path,
 ) -> None:

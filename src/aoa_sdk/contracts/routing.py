@@ -129,6 +129,7 @@ class SurfaceCompatibilityRule(BaseModel):
     supported_versions: list[int | str] = Field(default_factory=list)
     expected_json_kind: Literal["object", "array", "any"] = "object"
     required_top_level_keys: list[str] = Field(default_factory=list)
+    required_top_level_object_keys: list[str] = Field(default_factory=list)
     notes: str = ""
 
 

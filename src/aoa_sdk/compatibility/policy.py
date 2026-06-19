@@ -66,6 +66,7 @@ SURFACE_COMPATIBILITY_RULES = {
             "artifact_identity",
             "routes",
         ],
+        required_top_level_object_keys=["artifact_identity"],
     ),
     "Dionysus.seed_route_map.min": SurfaceCompatibilityRule(
         surface_id="Dionysus.seed_route_map.min",
@@ -738,6 +739,16 @@ def _surface_shape_error(rule: SurfaceCompatibilityRule, data) -> str | None:
         missing = [key for key in rule.required_top_level_keys if key not in data]
         if missing:
             return f"Missing required top-level keys: {missing!r}."
+    if rule.required_top_level_object_keys:
+        if not isinstance(data, dict):
+            return "Surface must load as a JSON object with required object keys."
+        malformed = [
+            key
+            for key in rule.required_top_level_object_keys
+            if key in data and not isinstance(data[key], dict)
+        ]
+        if malformed:
+            return f"Required top-level keys must be JSON objects: {malformed!r}."
 
     return None
 
