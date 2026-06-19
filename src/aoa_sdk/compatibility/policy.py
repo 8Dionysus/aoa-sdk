@@ -56,6 +56,17 @@ SURFACE_COMPATIBILITY_RULES = {
         relative_path="generated/workspace_control_plane.min.json",
         version_field="schema_version",
         supported_versions=["aoa_sdk_workspace_control_plane_v2"],
+        required_top_level_keys=[
+            "schema_ref",
+            "owner_repo",
+            "surface_kind",
+            "authority_ref",
+            "workspace_manifest_ref",
+            "validation_refs",
+            "artifact_identity",
+            "routes",
+        ],
+        required_top_level_object_keys=["artifact_identity"],
     ),
     "Dionysus.seed_route_map.min": SurfaceCompatibilityRule(
         surface_id="Dionysus.seed_route_map.min",
@@ -81,7 +92,7 @@ SURFACE_COMPATIBILITY_RULES = {
     "Tree-of-Sophia.root_entry_map.min": SurfaceCompatibilityRule(
         surface_id="Tree-of-Sophia.root_entry_map.min",
         repo="Tree-of-Sophia",
-        relative_path="generated/root_entry_map.min.json",
+        relative_path="ToS/derived-exports/root_entry_map.min.json",
         version_field="schema_version",
         supported_versions=["tos_root_entry_map_v1"],
     ),
@@ -728,6 +739,16 @@ def _surface_shape_error(rule: SurfaceCompatibilityRule, data) -> str | None:
         missing = [key for key in rule.required_top_level_keys if key not in data]
         if missing:
             return f"Missing required top-level keys: {missing!r}."
+    if rule.required_top_level_object_keys:
+        if not isinstance(data, dict):
+            return "Surface must load as a JSON object with required object keys."
+        malformed = [
+            key
+            for key in rule.required_top_level_object_keys
+            if key in data and not isinstance(data[key], dict)
+        ]
+        if malformed:
+            return f"Required top-level keys must be JSON objects: {malformed!r}."
 
     return None
 

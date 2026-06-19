@@ -19,6 +19,25 @@ VALIDATION_REFS = (
     "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py",
 )
 FORBIDDEN_LOW_CONTEXT_PREFIXES = ("src/", "scripts/")
+ARTIFACT_IDENTITY = {
+    "artifact_class": "control_plane_capsule",
+    "surface_state": "public_generated_control_plane_surface",
+    "owner_repo": "aoa-sdk",
+    "authority_ref": "mechanics/runtime-seam/parts/control-plane-capsule/CONTRACT.md",
+    "producer": "scripts/build_workspace_control_plane.py from scripts/workspace_control_plane_common.py",
+    "consumer_expectation": "consumers verify schema_version, schema_ref, owner_repo, authority_ref, workspace_manifest_ref, validation_refs, routes, and build_workspace_control_plane --check plus validate_workspace_control_plane before treating the capsule as usable control-plane orientation",
+    "privacy_boundary": "public route and validation references only; no secrets, private host evidence, live service facts, or sibling-owned source payloads",
+    "content_identity": "generated/workspace_control_plane.min.json rebuilt from scripts/workspace_control_plane_common.py and compared by build_workspace_control_plane --check",
+    "abi_epoch": "aoa_sdk_workspace_control_plane_v2",
+    "contract_version": "schemas/workspace-control-plane.schema.json@aoa_sdk_workspace_control_plane_v2#artifact_identity",
+    "trust_layer": ["abi_contract_signature"],
+    "verification": [
+        "python scripts/build_workspace_control_plane.py --check",
+        "python scripts/validate_workspace_control_plane.py",
+        "python -m pytest -q mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py",
+    ],
+    "action": "ADD_CONSUMER_EXPECTATION",
+}
 
 SURFACE_PAYLOAD = {
     "schema_version": "aoa_sdk_workspace_control_plane_v2",
@@ -126,6 +145,7 @@ def build_payload() -> dict[str, object]:
 
     payload = {
         **SURFACE_PAYLOAD,
+        "artifact_identity": dict(ARTIFACT_IDENTITY),
         "routes": routes,
     }
     validate_payload_schema(payload)

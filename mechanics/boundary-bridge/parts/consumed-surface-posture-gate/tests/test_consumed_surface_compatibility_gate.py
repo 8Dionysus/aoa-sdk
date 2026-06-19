@@ -44,7 +44,9 @@ def seed_center_capsule_fixtures(workspace_root: Path) -> None:
     )
 
     tos_root = workspace_root / "Tree-of-Sophia"
-    tos_map = tos_root / "generated" / "root_entry_map.min.json"
+    (tos_root / "README.md").parent.mkdir(parents=True, exist_ok=True)
+    (tos_root / "README.md").write_text("# Tree-of-Sophia\n", encoding="utf-8")
+    tos_map = tos_root / "ToS" / "derived-exports" / "root_entry_map.min.json"
     tos_map.parent.mkdir(parents=True, exist_ok=True)
     tos_map.write_text(
         json.dumps(
@@ -100,6 +102,10 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["8Dionysus.public_route_map.min"].compatible is True
     assert report["Agents-of-Abyss.center_entry_map.min"].compatible is True
     assert report["Tree-of-Sophia.root_entry_map.min"].compatible is True
+    assert (
+        report["Tree-of-Sophia.root_entry_map.min"].resolved_relative_path
+        == "ToS/derived-exports/root_entry_map.min.json"
+    )
     assert report["abyss-stack.diagnostic_surface_catalog.min"].compatible is True
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatibility_mode == "unversioned"
     assert report["aoa-playbooks.playbook_activation_surfaces.min"].compatible is True
@@ -195,6 +201,35 @@ def test_diagnostic_surface_catalog_uses_part_local_path_not_old_root_path(
         "mechanics/diagnostic-spine/parts/diagnostic-surfaces/generated/"
         "diagnostic_surface_catalog.min.json"
     )
+
+
+def test_workspace_control_plane_requires_artifact_identity(workspace_root: Path) -> None:
+    target = workspace_root / "aoa-sdk" / "generated" / "workspace_control_plane.min.json"
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    payload.pop("artifact_identity", None)
+    target.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.compatibility.check("aoa-sdk.workspace_control_plane.min")
+
+    assert report.compatible is False
+    assert "artifact_identity" in report.reason
+
+
+def test_workspace_control_plane_rejects_malformed_artifact_identity(workspace_root: Path) -> None:
+    target = workspace_root / "aoa-sdk" / "generated" / "workspace_control_plane.min.json"
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    payload["artifact_identity"] = None
+    target.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.compatibility.check("aoa-sdk.workspace_control_plane.min")
+
+    assert report.compatible is False
+    assert "artifact_identity" in report.reason
+    assert "JSON objects" in report.reason
 
 
 def test_diagnostic_surface_catalog_does_not_fallback_to_old_root_path(

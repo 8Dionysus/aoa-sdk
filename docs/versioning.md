@@ -68,6 +68,12 @@ diagnostic-spine part-local generated catalog:
 The old root `generated/diagnostic_surface_catalog.min.json` path is external
 history, not an active compatibility input.
 
+For `Tree-of-Sophia.root_entry_map.min`, the canonical path is the ToS
+source-home derived export:
+`ToS/derived-exports/root_entry_map.min.json`. The old root
+`generated/root_entry_map.min.json` path is external history, not an active
+compatibility input.
+
 ## Operational Expectation
 
 - Loader functions for supported surfaces should go through the compatibility
