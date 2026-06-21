@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import importlib.util
+import json
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
+from typing import Any
 
 import pytest
 
@@ -18,6 +21,84 @@ from aoa_sdk.release.api import (
     validate_release_body,
 )
 from aoa_sdk.workspace.discovery import Workspace
+
+
+def _repo_root() -> Path:
+    for parent in Path(__file__).resolve().parents:
+        if (parent / "pyproject.toml").is_file() and (parent / "AGENTS.md").is_file():
+            return parent
+    raise RuntimeError("could not find aoa-sdk repository root")
+
+
+def _artifact_bundle_validator_module():
+    script = (
+        _repo_root()
+        / "mechanics"
+        / "release-support"
+        / "parts"
+        / "release-audit-publish-helper"
+        / "scripts"
+        / "validate_abyss_machine_package_artifact_bundle.py"
+    )
+    spec = importlib.util.spec_from_file_location("aoa_sdk_artifact_bundle_validator", script)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+class FakeArtifactBundles:
+    def __init__(self, trust_gate_response: dict[str, Any]) -> None:
+        self.trust_gate_response = trust_gate_response
+        self.trust_gate_calls: list[dict[str, Any]] = []
+        self.records: list[dict[str, Any]] = []
+
+    def trust_gate(self, registry_dir: Path, **kwargs: Any) -> dict[str, Any]:
+        self.trust_gate_calls.append({"registry_dir": registry_dir, **kwargs})
+        return self.trust_gate_response
+
+    def write_bundle_registry_record(self, bundle_dir: Path, registry_dir: Path, **kwargs: Any) -> dict[str, Any]:
+        state = str(kwargs.get("lifecycle_state") or "")
+        record = {
+            "record_id": f"record-{len(self.records) + 1}",
+            "subject_digest": "sha256:" + "1" * 64,
+            "lifecycle_state": state,
+        }
+        self.records.append(record)
+        return {"ok": True, "record": record}
+
+    def read_bundle_registry(self, registry_dir: Path, *, artifact_class: str) -> dict[str, Any]:
+        latest = {
+            record["record_id"]: record
+            for record in self.records
+            if record.get("lifecycle_state") == "release-ready"
+        }
+        if self.records and self.records[-1].get("lifecycle_state") == "revoked":
+            latest = {}
+        return {"latest_by_artifact_class": {artifact_class: next(iter(latest.values()))} if latest else {}}
+
+
+def allow_gate_response() -> dict[str, Any]:
+    return {
+        "ok": True,
+        "verdict": "allow",
+        "decision": {"model": "fail_closed_consumer_admission", "allow": True},
+        "inspected_claims": {
+            "registry_latest": {"selected_record_is_latest": True},
+            "controls": {"required_controls_missing": []},
+            "source": {"source_repo_matched": True},
+        },
+    }
+
+
+def deny_terminal_gate_response() -> dict[str, Any]:
+    return {
+        "ok": True,
+        "verdict": "deny",
+        "decision": {"model": "fail_closed_consumer_admission", "allow": False},
+        "inspected_claims": {"lifecycle": {"terminal_state": True}},
+    }
 
 
 def _init_repo(repo_root: Path, remote_root: Path) -> None:
@@ -128,6 +209,85 @@ def _fresh_release_payload(repo_name: str, version: str, body: str) -> dict[str,
         "url": f"https://github.com/8Dionysus/{repo_name}/releases/tag/v{version}",
         "publishedAt": published_at,
     }
+
+
+def test_package_artifact_manifest_keeps_consumer_trust_gate_contract() -> None:
+    repo_root = _repo_root()
+    manifest = json.loads(
+        (repo_root / "sdk" / "distribution" / "manifests" / "python_distribution.bundle.json").read_text(encoding="utf-8")
+    )
+    helper_readme = (
+        repo_root / "mechanics" / "release-support" / "parts" / "release-audit-publish-helper" / "README.md"
+    ).read_text(encoding="utf-8")
+
+    consumer_contract = manifest["consumer_contract"]
+    consumer_commands = "\n".join(manifest["consumer_command"])
+
+    assert "trust-gate" in consumer_contract["stable_interface"]
+    assert "trust-gate allow/warn" in consumer_contract["consumer_expectation"]
+    assert "abyss-machine artifacts trust-gate" in consumer_commands
+    assert "revoked-record" in helper_readme
+    assert "unverified latest" in helper_readme
+
+
+def test_package_artifact_bundle_validator_reports_external_paths(tmp_path: Path) -> None:
+    validator = _artifact_bundle_validator_module()
+
+    assert validator._path_ref(_repo_root() / "dist" / "bundle") == "dist/bundle"
+    assert validator._path_ref(tmp_path / "bundle") == str((tmp_path / "bundle").resolve())
+
+
+def test_package_artifact_trust_gate_requires_fail_closed_latest_controls_and_source(tmp_path: Path) -> None:
+    validator = _artifact_bundle_validator_module()
+    fake = FakeArtifactBundles(allow_gate_response())
+    registry_roundtrip = {"registered": {"record": {"subject_digest": "sha256:" + "2" * 64}}}
+
+    result = validator._trust_gate_allow_latest(fake, tmp_path, registry_roundtrip)
+
+    assert result["ok"] is True
+    assert fake.trust_gate_calls == [
+        {
+            "registry_dir": tmp_path,
+            "artifact_class": "aoa_sdk_python_distribution",
+            "subject_digest": "sha256:" + "2" * 64,
+            "consumer_intent": "agent",
+            "expected_source_repo": "aoa-sdk",
+        }
+    ]
+
+    for mutated_claim in (
+        {"decision": {"model": "shape_only", "allow": True}},
+        {"inspected_claims": {"registry_latest": {"selected_record_is_latest": False}}},
+        {"inspected_claims": {"controls": {"required_controls_missing": ["sbom"]}}},
+        {"inspected_claims": {"source": {"source_repo_matched": False}}},
+    ):
+        response = allow_gate_response()
+        for key, value in mutated_claim.items():
+            if key == "inspected_claims":
+                response[key].update(value)
+            else:
+                response[key] = value
+        assert validator._trust_gate_allow_latest(FakeArtifactBundles(response), tmp_path, registry_roundtrip)["ok"] is False
+
+
+def test_package_artifact_terminal_registry_state_requires_revoked_gate_deny(tmp_path: Path) -> None:
+    validator = _artifact_bundle_validator_module()
+
+    denied = validator._verify_terminal_registry_state(
+        FakeArtifactBundles(deny_terminal_gate_response()),
+        tmp_path,
+        tmp_path,
+    )
+    assert denied["ok"] is True
+    assert denied["revoked_trust_gate"]["verdict"] == "deny"
+
+    allowed = validator._verify_terminal_registry_state(
+        FakeArtifactBundles(allow_gate_response()),
+        tmp_path,
+        tmp_path,
+    )
+    assert allowed["ok"] is False
+    assert allowed["revoked_trust_gate"]["verdict"] == "allow"
 
 
 def test_parse_latest_release_extracts_summary_validation_and_notes() -> None:

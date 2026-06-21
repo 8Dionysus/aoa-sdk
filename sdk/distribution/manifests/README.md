@@ -14,5 +14,7 @@ python -m build
 python mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py
 ```
 
-Generated sidecars are written under `dist/abyss-artifact-bundle/` and remain
-ignored build output, not source truth.
+Generated sidecars are written under `dist/abyss-artifact-bundle/`; the local
+registry read-model is written under `dist/abyss-artifact-registry/`. Both are
+ignored build output, not source truth, and the helper checks the consumer
+`trust-gate` before treating the bundle as release-ready.
