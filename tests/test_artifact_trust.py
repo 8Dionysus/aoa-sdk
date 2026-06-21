@@ -11,6 +11,7 @@ from aoa_sdk.models import (
     ArtifactBundleRegistry,
     ArtifactClassificationReport,
     ArtifactRequirementsReport,
+    ArtifactSourceRefStatus,
     ArtifactTrustCoverageReport,
     ArtifactTrustGateReport,
     ArtifactUpdateLaneStatus,
@@ -93,12 +94,17 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
                 "subject_digest": "sha256:subject",
                 "source_repo": "aoa-sdk",
                 "source_ref": "dist/aoa_sdk-0.4.0-py3-none-any.whl",
+                "source_refs": ["sdk/distribution/manifests/python_distribution.bundle.json"],
+                "bundle_manifest_ref": "sdk/distribution/manifests/python_distribution.bundle.json",
                 "producer": "aoa-sdk build backend",
+                "producer_command": "python -m build",
+                "evidence_refs": ["commit:e89d46184339adc67418025f06b83b002b6d5038"],
                 "trust_root_mode": "host_managed",
                 "lifecycle_state": "release-ready",
                 "latest_eligible": True,
                 "terminal_state": False,
                 "verifier_versions": {"artifact_bundle_verifier": {"schema": "abyss_machine_artifact_bundle_verify_v1"}},
+                "created_at": "2026-06-21T19:36:40Z",
             }
         ],
         "latest_by_artifact_class": {},
@@ -116,6 +122,10 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
                 "producer_profile": {"producer": "aoa-sdk Python build backend"},
                 "source_route": {"contract_surface_status": "external_subject_or_owner_bundle_required"},
                 "trust_roots": {"github_oidc": {"adapter_only": True}},
+                "registry_status": {"has_latest": True, "latest_record_id": "sha256:record"},
+                "trust_gate_status": {"checked": True, "verdict": "allow"},
+                "consumer": {"intent": "agent", "requires_trust_gate": True},
+                "release_rules": {"release_ready_required": True},
                 "agent_loop": {
                     "requirements": "abyss-machine artifacts requirements --artifact-class aoa_sdk_python_distribution --json",
                     "build_sidecars": "abyss-machine artifacts build-sidecars --artifact-class aoa_sdk_python_distribution --bundle-dir BUNDLE_DIR --json",
@@ -169,6 +179,8 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
         "artifact_class_filter": None,
         "changed_paths": ["src/aoa_sdk/artifacts/api.py"],
         "changed_source_repo": None,
+        "changed_source_ref": "commit:e89d46184339adc67418025f06b83b002b6d5038",
+        "changed_path_source": {"mode": "explicit"},
         "accept_sibling_lag": False,
         "known_verdicts": [
             "fresh",
@@ -192,10 +204,25 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
                 "matches": [],
                 "changed_source_repo": None,
                 "contract_surface_status": "external_subject_or_owner_bundle_required",
-                "registry": {"checked": True, "has_latest": True},
+                "registry": {
+                    "checked": True,
+                    "has_latest": True,
+                    "latest_source_ref": "sdk/distribution/manifests/python_distribution.bundle.json",
+                    "latest_evidence_refs": ["commit:e89d46184339adc67418025f06b83b002b6d5038"],
+                },
                 "trust_gate": {"checked": True, "verdict": "allow"},
+                "source_ref_status": {
+                    "required": True,
+                    "expected": "commit:e89d46184339adc67418025f06b83b002b6d5038",
+                    "matched": True,
+                    "matched_ref": "commit:e89d46184339adc67418025f06b83b002b6d5038",
+                    "known_refs": [
+                        "commit:e89d46184339adc67418025f06b83b002b6d5038",
+                        "github:8Dionysus/aoa-sdk/pull/189",
+                    ],
+                },
                 "next_actions": ["abyss-machine artifacts requirements --artifact-class aoa_sdk_python_distribution --json"],
-                "claim_limit": "Affected detects declared source/profile drift; it does not rebuild or consume artifacts by itself.",
+                "claim_limit": "Affected detects declared source/profile drift and closes source-ref drift only when latest durable evidence proves the ref; it does not rebuild or consume artifacts by itself.",
             }
         ],
         "errors": [],
@@ -253,14 +280,22 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
     assert classification.identity["owner_repo"] == "aoa-sdk"
     assert isinstance(registry, ArtifactBundleRegistry)
     assert registry.records[0].trust_root_mode == "host_managed"
+    assert registry.records[0].source_refs == ["sdk/distribution/manifests/python_distribution.bundle.json"]
+    assert registry.records[0].evidence_refs == ["commit:e89d46184339adc67418025f06b83b002b6d5038"]
     assert isinstance(requirements, ArtifactRequirementsReport)
     assert requirements.rows[0].controls["required"] == ["abi_signature", "sbom", "slsa_in_toto"]
+    assert requirements.rows[0].registry_status["latest_record_id"] == "sha256:record"
+    assert requirements.rows[0].trust_gate_status["verdict"] == "allow"
     assert requirements.rows[0].agent_loop["trust_gate"].startswith("abyss-machine artifacts trust-gate")
     assert isinstance(update_lane, ArtifactUpdateLaneStatus)
     assert update_lane.rows[0].metadata_sidecar == "artifact.update.tuf.json"
     assert isinstance(update_verify, ArtifactUpdateMetadataVerification)
     assert update_verify.update_consideration_allowed is True
     assert isinstance(affected, ArtifactAffectedReport)
+    assert affected.changed_source_ref == "commit:e89d46184339adc67418025f06b83b002b6d5038"
     assert affected.rows[0].verdict == "fresh"
+    assert isinstance(affected.rows[0].source_ref_status, ArtifactSourceRefStatus)
+    assert affected.rows[0].source_ref_status.proven is True
+    assert affected.rows[0].source_ref_proven is True
     assert isinstance(trust_coverage, ArtifactTrustCoverageReport)
     assert trust_coverage.rows[0].status == "FULLY_COVERED"
