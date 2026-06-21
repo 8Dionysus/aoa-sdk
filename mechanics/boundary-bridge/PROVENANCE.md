@@ -9,6 +9,7 @@
 - `src/aoa_sdk/errors.py`
 - `src/aoa_sdk/models.py`
 - `src/aoa_sdk/agents/`
+- `src/aoa_sdk/artifacts/`
 - `src/aoa_sdk/cli/`
 - `src/aoa_sdk/evals/`
 - `src/aoa_sdk/governed_runs/`

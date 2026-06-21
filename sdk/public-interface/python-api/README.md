@@ -16,3 +16,10 @@ and `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`.
 
 Stop line: do not document an API promise here unless implementation and tests
 carry it.
+
+Artifact trust access is a typed consumer facade only. `AoASDK.artifacts` may
+load and validate abyss-machine JSON surfaces such as trust-gate verdicts,
+artifact classification, bundle registries, artifact requirements, affected
+drift read-models, trust coverage, update-lane status, and update metadata
+verification reports. Host enforcement, policy authority, evidence promotion,
+and update client blocking decisions remain in `abyss-machine`.
