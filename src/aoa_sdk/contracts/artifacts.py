@@ -72,13 +72,24 @@ class ArtifactBundleRegistryRecord(ArtifactHostSurface):
     subject_digest: str
     source_repo: str
     source_ref: str
+    source_refs: list[str] = Field(default_factory=list)
+    bundle_manifest_ref: str | None = None
     producer: str
+    producer_command: str | None = None
+    evidence_refs: list[str] = Field(default_factory=list)
     trust_root_mode: str
     lifecycle_state: str
     latest_eligible: bool
     terminal_state: bool
     verifier_versions: dict[str, Any] = Field(default_factory=dict)
     controls: dict[str, Any] = Field(default_factory=dict)
+    created_at: str | None = None
+    updated_at: str | None = None
+    supersedes: str | None = None
+    superseded_by: str | None = None
+    revoked_at: str | None = None
+    revoked_by: str | None = None
+    revocation_reason: str | None = None
 
 
 class ArtifactBundleRegistry(ArtifactHostSurface):
@@ -97,6 +108,10 @@ class ArtifactRequirementRow(ArtifactHostSurface):
     producer_profile: dict[str, Any] = Field(default_factory=dict)
     source_route: dict[str, Any] = Field(default_factory=dict)
     trust_roots: dict[str, Any] = Field(default_factory=dict)
+    registry_status: dict[str, Any] = Field(default_factory=dict)
+    trust_gate_status: dict[str, Any] = Field(default_factory=dict)
+    consumer: dict[str, Any] = Field(default_factory=dict)
+    release_rules: dict[str, Any] = Field(default_factory=dict)
     agent_loop: dict[str, str] = Field(default_factory=dict)
     claim_limits: list[str] = Field(default_factory=list)
 
@@ -144,6 +159,18 @@ class ArtifactUpdateMetadataVerification(ArtifactHostSurface):
         return self.ok and self.verdict == "allow"
 
 
+class ArtifactSourceRefStatus(ArtifactHostSurface):
+    required: bool = False
+    expected: str | None = None
+    matched: bool = False
+    matched_ref: str | None = None
+    known_refs: list[str] = Field(default_factory=list)
+
+    @property
+    def proven(self) -> bool:
+        return self.required and self.matched and bool(self.matched_ref)
+
+
 class ArtifactAffectedRow(ArtifactHostSurface):
     schema_: str = Field(alias="schema")
     artifact_class: str
@@ -157,8 +184,13 @@ class ArtifactAffectedRow(ArtifactHostSurface):
     contract_surface_status: str | None = None
     registry: dict[str, Any] = Field(default_factory=dict)
     trust_gate: dict[str, Any] = Field(default_factory=dict)
+    source_ref_status: ArtifactSourceRefStatus | None = None
     next_actions: list[str] = Field(default_factory=list)
     claim_limit: str | None = None
+
+    @property
+    def source_ref_proven(self) -> bool:
+        return bool(self.source_ref_status and self.source_ref_status.proven)
 
 
 class ArtifactAffectedReport(ArtifactHostSurface):
@@ -169,6 +201,8 @@ class ArtifactAffectedReport(ArtifactHostSurface):
     artifact_class_filter: str | None = None
     changed_paths: list[str] = Field(default_factory=list)
     changed_source_repo: str | None = None
+    changed_source_ref: str | None = None
+    changed_path_source: dict[str, Any] = Field(default_factory=dict)
     accept_sibling_lag: bool = False
     known_verdicts: list[ArtifactAffectedVerdict] = Field(default_factory=list)
     summary: dict[str, Any] = Field(default_factory=dict)
