@@ -3,12 +3,20 @@
   "id": "aoa-sdk-python-distribution",
   "artifact_class": "aoa_sdk_python_distribution",
   "owner_repo": "aoa-sdk",
-  "policy_ref": "manifests/artifact_signature_policy.manifest.json",
+  "policy_ref": "repo:abyss-machine/manifests/artifact_signature_policy.manifest.json",
   "mode": "github_release",
+  "public_safe": true,
   "subject_repo_root": "../../..",
+  "build_type": "https://abyssos.local/buildtypes/python-distribution/v1",
   "artifact_identity": {
     "artifact_class": "aoa_sdk_python_distribution",
     "abi_epoch": "aoa_sdk_python_distribution_v1"
+  },
+  "artifact_source": {
+    "kind": "python_distribution_build_outputs",
+    "content_identity_ref": "artifact.subjects.json",
+    "source_paths_ref": "pyproject.toml",
+    "private_payload_included": false
   },
   "abi_subject": {
     "path": "sdk/distribution/manifests/python_distribution.bundle.json",
@@ -29,5 +37,32 @@
     "pyproject": "pyproject.toml",
     "name": "aoa-sdk"
   },
-  "consumer_command": "python mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py"
+  "lifecycle": {
+    "initial_state": "candidate",
+    "promotion_path": [
+      "candidate",
+      "built-local",
+      "manually-verified",
+      "release-ready",
+      "published",
+      "superseded",
+      "revoked"
+    ],
+    "latest_eligible_states": [
+      "manually-verified",
+      "release-ready",
+      "published"
+    ]
+  },
+  "consumer_contract": {
+    "stable_interface": "python mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py --json and abyss-machine artifacts trust-gate --artifact-class aoa_sdk_python_distribution --consumer-intent agent --json",
+    "consumer_expectation": "Package consumers select an aoa_sdk_python_distribution bundle from the registry latest read-model only after ABI, SBOM, SLSA/in-toto verification, and consumer trust-gate allow/warn succeeds.",
+    "registry_required": true
+  },
+  "consumer_command": [
+    "python -m build",
+    "python mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py --json",
+    "abyss-machine artifacts bundle-registry --registry-dir dist/abyss-artifact-registry --artifact-class aoa_sdk_python_distribution --json",
+    "abyss-machine artifacts trust-gate --registry-dir dist/abyss-artifact-registry --artifact-class aoa_sdk_python_distribution --consumer-intent agent --json"
+  ]
 }
