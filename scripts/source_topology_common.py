@@ -73,6 +73,7 @@ TOP_LEVEL_ROLES = {
 PACKAGE_ROLE_OVERRIDES = {
     "src/aoa_sdk": "importable Python implementation root and AoASDK aggregate entrypoint",
     "src/aoa_sdk/a2a/rebase": "A2A rebase route helpers",
+    "src/aoa_sdk/artifacts": "artifact trust typed consumer facade over abyss-machine host surfaces",
     "src/aoa_sdk/checkpoints/closeout": "checkpoint reviewed closeout pipeline branches for context, evidence, execution, followthrough, and owner-handoff",
     "src/aoa_sdk/checkpoints/hooks": "checkpoint managed Git hook and dirty-boundary branch",
     "src/aoa_sdk/checkpoints/ledger": "checkpoint note ledger assembly and runtime note loading branch",
@@ -143,7 +144,9 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/closeout/queue.py": "closeout enqueue, inbox processing, queue status, and manifest archival orchestration owner",
     "src/aoa_sdk/closeout/receipts.py": "closeout receipt collection, receipt-file loading, publisher detection, and evidence-ref resolution owner",
     "src/aoa_sdk/closeout/runner.py": "closeout reviewed manifest run and report emission owner",
+    "src/aoa_sdk/artifacts/api.py": "artifact trust JSON surface parser and fail-closed consumer helper owner",
     "src/aoa_sdk/contracts/agents.py": "shared agent phase binding and artifact envelope contract owner",
+    "src/aoa_sdk/contracts/artifacts.py": "shared artifact trust, registry, drift, coverage, and update-lane contract owner",
     "src/aoa_sdk/contracts/checkpoints.py": "shared checkpoint lineage, note, capture, review, hook, boundary, and checkpoint-closeout bridge contract owner",
     "src/aoa_sdk/contracts/closeout.py": "shared reviewed closeout runner, publisher, stats refresh, owner follow-through, inbox, and status contract owner",
     "src/aoa_sdk/contracts/codex.py": "shared Codex projection live rollout status contract owner",

@@ -31,6 +31,10 @@
       "primary_mechanic": "boundary-bridge",
       "reason": "agent phase bindings read sibling-owned surfaces without taking owner meaning"
     },
+    "artifacts": {
+      "primary_mechanic": "boundary-bridge",
+      "reason": "artifact trust readers expose abyss-machine host trust surfaces without taking enforcement or policy authority"
+    },
     "checkpoints": {
       "primary_mechanic": "checkpoint",
       "reason": "checkpoint registry and review gates are the checkpoint parent operation"
@@ -343,6 +347,7 @@
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-heuristics.md",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md",
         "src/aoa_sdk/agents",
+        "src/aoa_sdk/artifacts",
         "src/aoa_sdk/cli",
         "src/aoa_sdk/compatibility",
         "src/aoa_sdk/contracts",

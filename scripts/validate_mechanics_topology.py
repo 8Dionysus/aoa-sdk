@@ -78,6 +78,7 @@ ROOT_TECHNICAL_DISTRICT_FILES = {
         {
             "tests/AGENTS.md",
             "tests/conftest.py",
+            "tests/test_artifact_trust.py",
             "tests/test_decision_indexes.py",
             "tests/test_design_surfaces.py",
             "tests/test_docs_routes.py",
