@@ -13,9 +13,10 @@ which writes OS
 Abyss ABI, SBOM, SLSA/in-toto, signature-decision, and verify sidecars under
 ignored `dist/abyss-artifact-bundle/`.
 The same helper writes the local bundle registry under
-`dist/abyss-artifact-registry/`, checks consumer `trust-gate` admission, and
-rehearses adversarial failures for missing SBOM, wrong SLSA subject binding,
-private path leakage, unverified latest registration, and revoked records.
+`dist/abyss-artifact-registry/`, materializes the package subject store, checks
+consumer `trust-gate` admission, and rehearses adversarial failures for missing
+SBOM, wrong SLSA subject binding, private path leakage, unverified latest
+registration, and revoked records.
 
 Use that part when changing release audit, publish helper behavior, changelog
 publication shape, or release validation.
