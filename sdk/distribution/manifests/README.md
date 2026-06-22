@@ -17,4 +17,5 @@ python mechanics/release-support/parts/release-audit-publish-helper/scripts/vali
 Generated sidecars are written under `dist/abyss-artifact-bundle/`; the local
 registry read-model is written under `dist/abyss-artifact-registry/`. Both are
 ignored build output, not source truth, and the helper checks the consumer
-`trust-gate` before treating the bundle as release-ready.
+`trust-gate` and materialized package subject store before treating the bundle
+as release-ready.
