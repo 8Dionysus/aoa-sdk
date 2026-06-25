@@ -56,15 +56,18 @@
   },
   "consumer_contract": {
     "stable_interface": "python mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py --json and abyss-machine artifacts trust-gate --artifact-class aoa_sdk_python_distribution --consumer-intent agent --json",
-    "consumer_expectation": "Package consumers select an aoa_sdk_python_distribution bundle from the registry latest read-model only after ABI, SBOM, SLSA/in-toto verification, and consumer trust-gate allow/warn succeeds.",
-    "registry_required": true
+    "consumer_expectation": "Package consumers select an aoa_sdk_python_distribution bundle from the registry latest read-model only after ABI, SBOM, SLSA/in-toto verification, durable evidence promotion, materialized subject-store verification, source/trust-root matching, and consumer trust-gate allow/warn succeeds.",
+    "registry_required": true,
+    "subject_store_required": true,
+    "admission_gate": "fail_closed_consumer_admission",
+    "consumer_verdict": "allow_or_deny_required_before_use"
   },
   "consumer_command": [
     "python -m build",
     "python mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py --json",
-    "abyss-machine artifacts bundle-register dist/abyss-artifact-bundle --registry-dir dist/abyss-artifact-registry --lifecycle-state release-ready --consumer-ref aoa-sdk:release-audit-publish-helper --source-repo aoa-sdk --json",
-    "abyss-machine artifacts materialize-subjects dist/abyss-artifact-bundle --registry-dir dist/abyss-artifact-registry --manifest sdk/distribution/manifests/python_distribution.bundle.json --consumer-intent agent --source-repo aoa-sdk --json",
-    "abyss-machine artifacts trust-gate --registry-dir dist/abyss-artifact-registry --artifact-class aoa_sdk_python_distribution --consumer-intent agent --source-repo aoa-sdk --subject-digest SUBJECT_DIGEST --json",
-    "abyss-machine artifacts registry-latest --registry-dir dist/abyss-artifact-registry --artifact-class aoa_sdk_python_distribution --source-repo aoa-sdk --json"
+    "abyss-machine artifacts evidence-promote dist/abyss-artifact-bundle --registry-dir dist/abyss-artifact-registry --lifecycle-state release-ready --consumer-ref aoa-sdk:release-audit-publish-helper --evidence-ref dist/abyss-artifact-bundle/artifact.verify.json --source-repo aoa-sdk --source-ref sdk/distribution/manifests/python_distribution.bundle.json --producer aoa-sdk-release-audit-publish-helper --trust-root-mode host_managed --json",
+    "abyss-machine artifacts materialize-subjects dist/abyss-artifact-bundle --store-root dist/abyss-artifact-subjects --registry-dir dist/abyss-artifact-registry --manifest sdk/distribution/manifests/python_distribution.bundle.json --consumer-intent agent --source-repo aoa-sdk --trust-root-mode host_managed --json",
+    "abyss-machine artifacts trust-gate --registry-dir dist/abyss-artifact-registry --artifact-class aoa_sdk_python_distribution --consumer-intent agent --source-repo aoa-sdk --trust-root-mode host_managed --subject-digest SUBJECT_DIGEST --json",
+    "abyss-machine artifacts registry-latest --registry-dir dist/abyss-artifact-registry --artifact-class aoa_sdk_python_distribution --consumer-intent agent --source-repo aoa-sdk --trust-root-mode host_managed --json"
   ]
 }

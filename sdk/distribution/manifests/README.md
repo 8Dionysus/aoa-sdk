@@ -15,7 +15,9 @@ python mechanics/release-support/parts/release-audit-publish-helper/scripts/vali
 ```
 
 Generated sidecars are written under `dist/abyss-artifact-bundle/`; the local
-registry read-model is written under `dist/abyss-artifact-registry/`. Both are
-ignored build output, not source truth, and the helper checks the consumer
-`trust-gate` and materialized package subject store before treating the bundle
-as release-ready.
+registry read-model is written under `dist/abyss-artifact-registry/`, and the
+materialized subject store is written under `dist/abyss-artifact-subjects/`.
+These are ignored build outputs, not source truth. The helper promotes durable
+evidence with source and host-managed trust-root metadata, materializes the
+package subject store, and checks the consumer `trust-gate` before treating the
+bundle as release-ready.

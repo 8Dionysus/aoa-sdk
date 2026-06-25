@@ -32,9 +32,9 @@ state.
 Route real publication through protected branch checks, tags, GitHub Release
 verification, and package publication verification.
 
-The package artifact helper must not stop at generated sidecars. It writes the
-local OS Abyss bundle registry read-model, confirms release-ready latest
-selection, materializes the package subject store, checks consumer `trust-gate`
-admission, and rehearses missing SBOM, wrong SLSA subject, private path
-leakage, unverified latest, and revoked-record denial before a package carrier
-is trusted.
+The package artifact helper must not stop at generated sidecars. It promotes
+durable OS Abyss evidence with source and host-managed trust-root metadata,
+confirms release-ready latest selection, materializes the package subject store,
+checks consumer `trust-gate` admission, and rehearses missing SBOM, wrong SLSA
+subject, private path leakage, unverified latest, and revoked-record denial
+before a package carrier is trusted.
