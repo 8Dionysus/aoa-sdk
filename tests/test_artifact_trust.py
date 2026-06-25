@@ -10,6 +10,7 @@ from aoa_sdk.models import (
     ArtifactAffectedReport,
     ArtifactBundleRegistry,
     ArtifactClassificationReport,
+    ArtifactDriftState,
     ArtifactRequirementsReport,
     ArtifactProducerProfile,
     ArtifactProducerProfilesReport,
@@ -233,7 +234,18 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
         "abi_ref": "generated/contract_abi_signatures.min.json",
         "artifact_class_filter": None,
         "changed_paths": ["src/aoa_sdk/artifacts/api.py"],
+        "raw_changed_paths": ["/srv/AbyssOS/aoa-sdk/src/aoa_sdk/artifacts/api.py"],
+        "changed_path_analysis": [
+            {
+                "raw": "/srv/AbyssOS/aoa-sdk/src/aoa_sdk/artifacts/api.py",
+                "normalized": "src/aoa_sdk/artifacts/api.py",
+                "source_repo": "aoa-sdk",
+                "source_repo_inferred": True,
+                "scope": "source_repo_relative",
+            }
+        ],
         "changed_source_repo": None,
+        "changed_source_repo_inferred": "aoa-sdk",
         "changed_source_ref": "commit:e89d46184339adc67418025f06b83b002b6d5038",
         "changed_path_source": {"mode": "explicit"},
         "accept_sibling_lag": False,
@@ -246,7 +258,22 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
             "accepted_lag",
             "manual_review_required",
         ],
-        "summary": {"artifact_classes": 1, "affected": 0, "status_counts": {"fresh": 1}},
+        "known_drift_statuses": [
+            "fresh",
+            "missing_durable_evidence",
+            "rebuild_required",
+            "reverify_required",
+            "blocked_missing_sibling",
+            "accepted_lag",
+            "manual_review_required",
+        ],
+        "summary": {
+            "artifact_classes": 1,
+            "affected": 0,
+            "status_counts": {"fresh": 1},
+            "operationally_blocking": 0,
+            "accepted_lag": 0,
+        },
         "rows": [
             {
                 "schema": "abyss_machine_artifact_affected_row_v1",
@@ -258,7 +285,29 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
                 "reasons": [],
                 "matches": [],
                 "changed_source_repo": None,
+                "changed_source_repo_inferred": "aoa-sdk",
                 "contract_surface_status": "external_subject_or_owner_bundle_required",
+                "drift": {
+                    "status": "fresh",
+                    "known_statuses": [
+                        "fresh",
+                        "missing_durable_evidence",
+                        "rebuild_required",
+                        "reverify_required",
+                        "blocked_missing_sibling",
+                        "accepted_lag",
+                        "manual_review_required",
+                    ],
+                    "operationally_blocking": False,
+                    "needs_rebuild": False,
+                    "needs_reverify": False,
+                    "accepted_lag": False,
+                    "lag_policy": "not_accepted",
+                    "source_ref_state": "proved_current",
+                    "evidence_state": "durable_latest_present",
+                    "reason_count": 0,
+                    "explanation": "latest durable evidence is current",
+                },
                 "registry": {
                     "checked": True,
                     "has_latest": True,
@@ -364,10 +413,20 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
     assert update_verify.update_consideration_allowed is True
     assert isinstance(affected, ArtifactAffectedReport)
     assert affected.changed_source_ref == "commit:e89d46184339adc67418025f06b83b002b6d5038"
+    assert affected.changed_source_repo_inferred == "aoa-sdk"
+    assert affected.changed_path_analysis[0].normalized == "src/aoa_sdk/artifacts/api.py"
+    assert affected.known_drift_statuses[-1] == "manual_review_required"
     assert affected.rows[0].verdict == "fresh"
+    assert isinstance(affected.rows[0].drift, ArtifactDriftState)
+    assert affected.rows[0].drift.status == "fresh"
+    assert affected.rows[0].drift.blocks_operation is False
+    assert affected.rows[0].operationally_blocking is False
+    assert affected.rows[0].lag_accepted is False
     assert isinstance(affected.rows[0].source_ref_status, ArtifactSourceRefStatus)
     assert affected.rows[0].source_ref_status.proven is True
     assert affected.rows[0].source_ref_proven is True
+    unrequested_ref = ArtifactSourceRefStatus.model_validate({"required": False, "matched": None})
+    assert unrequested_ref.proven is False
     assert isinstance(trust_coverage, ArtifactTrustCoverageReport)
     assert trust_coverage.rows[0].status == "FULLY_COVERED"
 

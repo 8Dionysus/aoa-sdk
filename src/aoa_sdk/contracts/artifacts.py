@@ -15,6 +15,15 @@ ArtifactAffectedVerdict = Literal[
     "accepted_lag",
     "manual_review_required",
 ]
+ArtifactDriftStatus = Literal[
+    "fresh",
+    "missing_durable_evidence",
+    "rebuild_required",
+    "reverify_required",
+    "blocked_missing_sibling",
+    "accepted_lag",
+    "manual_review_required",
+]
 
 
 class ArtifactHostSurface(BaseModel):
@@ -276,13 +285,43 @@ class ArtifactScittReceiptVerification(ArtifactHostSurface):
 class ArtifactSourceRefStatus(ArtifactHostSurface):
     required: bool = False
     expected: str | None = None
-    matched: bool = False
+    matched: bool | None = None
     matched_ref: str | None = None
     known_refs: list[str] = Field(default_factory=list)
 
     @property
     def proven(self) -> bool:
-        return self.required and self.matched and bool(self.matched_ref)
+        return self.required and self.matched is True and bool(self.matched_ref)
+
+
+class ArtifactDriftState(ArtifactHostSurface):
+    status: ArtifactDriftStatus
+    known_statuses: list[ArtifactDriftStatus] = Field(default_factory=list)
+    operationally_blocking: bool = False
+    needs_rebuild: bool = False
+    needs_reverify: bool = False
+    accepted_lag: bool = False
+    lag_policy: str | None = None
+    source_ref_state: str | None = None
+    evidence_state: str | None = None
+    reason_count: int = 0
+    explanation: str | None = None
+
+    @property
+    def blocks_operation(self) -> bool:
+        return self.operationally_blocking
+
+    @property
+    def current_proof_missing(self) -> bool:
+        return self.source_ref_state == "missing_current_proof"
+
+
+class ArtifactChangedPathAnalysis(ArtifactHostSurface):
+    raw: str
+    normalized: str
+    source_repo: str | None = None
+    source_repo_inferred: bool = False
+    scope: str | None = None
 
 
 class ArtifactAffectedRow(ArtifactHostSurface):
@@ -293,9 +332,11 @@ class ArtifactAffectedRow(ArtifactHostSurface):
     verdict: ArtifactAffectedVerdict
     freshness: ArtifactAffectedVerdict
     reasons: list[str] = Field(default_factory=list)
-    matches: list[str] = Field(default_factory=list)
+    matches: list[dict[str, Any]] = Field(default_factory=list)
     changed_source_repo: str | None = None
+    changed_source_repo_inferred: str | None = None
     contract_surface_status: str | None = None
+    drift: ArtifactDriftState | None = None
     registry: dict[str, Any] = Field(default_factory=dict)
     trust_gate: dict[str, Any] = Field(default_factory=dict)
     source_ref_status: ArtifactSourceRefStatus | None = None
@@ -306,6 +347,14 @@ class ArtifactAffectedRow(ArtifactHostSurface):
     def source_ref_proven(self) -> bool:
         return bool(self.source_ref_status and self.source_ref_status.proven)
 
+    @property
+    def operationally_blocking(self) -> bool:
+        return bool(self.drift and self.drift.operationally_blocking)
+
+    @property
+    def lag_accepted(self) -> bool:
+        return bool(self.drift and self.drift.accepted_lag)
+
 
 class ArtifactAffectedReport(ArtifactHostSurface):
     schema_: str = Field(alias="schema")
@@ -314,11 +363,15 @@ class ArtifactAffectedReport(ArtifactHostSurface):
     abi_ref: str | None = None
     artifact_class_filter: str | None = None
     changed_paths: list[str] = Field(default_factory=list)
+    raw_changed_paths: list[str] = Field(default_factory=list)
+    changed_path_analysis: list[ArtifactChangedPathAnalysis] = Field(default_factory=list)
     changed_source_repo: str | None = None
+    changed_source_repo_inferred: str | None = None
     changed_source_ref: str | None = None
-    changed_path_source: dict[str, Any] = Field(default_factory=dict)
+    changed_path_source: dict[str, Any] | str | None = Field(default_factory=dict)
     accept_sibling_lag: bool = False
     known_verdicts: list[ArtifactAffectedVerdict] = Field(default_factory=list)
+    known_drift_statuses: list[ArtifactDriftStatus] = Field(default_factory=list)
     summary: dict[str, Any] = Field(default_factory=dict)
     rows: list[ArtifactAffectedRow] = Field(default_factory=list)
     errors: list[str] = Field(default_factory=list)
