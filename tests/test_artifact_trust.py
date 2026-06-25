@@ -16,6 +16,7 @@ from aoa_sdk.models import (
     ArtifactSourceRefStatus,
     ArtifactTrustCoverageReport,
     ArtifactTrustGateReport,
+    ArtifactScittReceiptVerification,
     ArtifactUpdateLaneStatus,
     ArtifactUpdateMetadataVerification,
 )
@@ -143,7 +144,7 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
         "ok": True,
         "summary": {
             "tuf_status": "prepared_v1",
-            "scitt_status": "future_external_accountability_layer",
+            "scitt_status": "local_stub_fail_closed_external_v1",
             "updateable_artifact_classes": 1,
             "blocking_v1": False,
         },
@@ -159,9 +160,61 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
                 "status": "TUF_REQUIRED_FOR_UPDATE_CLIENT",
             }
         ],
-        "tuf": {"status": "prepared_v1"},
-        "scitt": {"blocking_v1": False},
-        "claim_limits": ["not a full external TUF repository"],
+        "tuf": {
+            "status": "prepared_v1",
+            "external_repository_verifier": {"status": "structural_v1"},
+        },
+        "scitt": {
+            "status": "local_stub_fail_closed_external_v1",
+            "blocking_v1": False,
+            "external_relying_party_mode": {
+                "receipt_required": True,
+                "missing_receipt_verdict": "deny",
+                "binding": "receipt.statement_digest must equal canonical signed statement digest",
+                "not_external_service_yet": True,
+            },
+        },
+        "claim_limits": [
+            "not a full external TUF repository",
+            "local statement/receipt binding stub",
+        ],
+    }
+    scitt_verify_allow_payload = {
+        "schema": "abyss_machine_scitt_receipt_verify_v1",
+        "ok": True,
+        "policy_ref": "manifests/artifact_signature_policy.manifest.json",
+        "statement_schema": "abyss_machine_scitt_signed_statement_v1",
+        "receipt_schema": "abyss_machine_scitt_receipt_v1",
+        "statement_digest": "sha256:statement",
+        "statement_class": "release_update_artifact",
+        "issuer": "did:web:abyss.example:issuer:release",
+        "artifact_digest": "sha256:artifact",
+        "external_relying_party": True,
+        "receipt_required": True,
+        "receipt_present": True,
+        "receipt_ok": True,
+        "transparency_service": "did:web:transparency.abyss.example",
+        "verdict": "allow",
+        "known_statement_classes": ["release_update_artifact", "artifact_evidence_record", "eval_report_result"],
+        "scitt_policy": {"status": "local_stub_fail_closed_external_v1"},
+        "checked": {"expected_statement_class": "release_update_artifact"},
+        "errors": [],
+        "warnings": [],
+        "claim_limits": ["local verifier/stub"],
+    }
+    scitt_verify_deny_payload = {
+        **scitt_verify_allow_payload,
+        "ok": False,
+        "receipt_schema": None,
+        "receipt_present": False,
+        "receipt_ok": False,
+        "transparency_service": None,
+        "verdict": "deny",
+        "errors": ["scitt_receipt_required"],
+    }
+    scitt_verify_inconsistent_payload = {
+        **scitt_verify_allow_payload,
+        "receipt_present": False,
     }
     update_verify_payload = {
         "schema": "abyss_machine_update_metadata_verify_v1",
@@ -274,6 +327,9 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
     registry = api.load_registry(registry_path)
     requirements = api.parse_requirements(requirements_payload)
     update_lane = api.parse_update_lane(update_lane_payload)
+    scitt_verify_allow = api.parse_scitt_receipt_verification(scitt_verify_allow_payload)
+    scitt_verify_deny = api.parse_scitt_receipt_verification(scitt_verify_deny_payload)
+    scitt_verify_inconsistent = api.parse_scitt_receipt_verification(scitt_verify_inconsistent_payload)
     update_verify = api.parse_update_verification(update_verify_payload)
     affected = api.parse_affected(affected_payload)
     trust_coverage = api.parse_trust_coverage(trust_coverage_payload)
@@ -291,6 +347,19 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
     assert requirements.rows[0].agent_loop["trust_gate"].startswith("abyss-machine artifacts trust-gate")
     assert isinstance(update_lane, ArtifactUpdateLaneStatus)
     assert update_lane.rows[0].metadata_sidecar == "artifact.update.tuf.json"
+    assert update_lane.tuf_status == "prepared_v1"
+    assert update_lane.scitt_status == "local_stub_fail_closed_external_v1"
+    assert update_lane.has_structural_tuf_repository_verifier is True
+    assert update_lane.has_scitt_receipt_binding_stub is True
+    assert update_lane.external_relying_party_receipt_required is True
+    assert isinstance(scitt_verify_allow, ArtifactScittReceiptVerification)
+    assert scitt_verify_allow.external_relying_party_allowed is True
+    assert scitt_verify_allow.consumable is True
+    assert isinstance(scitt_verify_deny, ArtifactScittReceiptVerification)
+    assert scitt_verify_deny.consumable is False
+    assert scitt_verify_deny.fail_closed_missing_receipt is True
+    assert scitt_verify_inconsistent.consumable is True
+    assert scitt_verify_inconsistent.external_relying_party_allowed is False
     assert isinstance(update_verify, ArtifactUpdateMetadataVerification)
     assert update_verify.update_consideration_allowed is True
     assert isinstance(affected, ArtifactAffectedReport)

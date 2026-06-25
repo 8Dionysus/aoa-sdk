@@ -131,6 +131,25 @@ def allow_gate_response() -> dict[str, Any]:
     }
 
 
+def deny_missing_subject_store_gate_response() -> dict[str, Any]:
+    return {
+        "ok": False,
+        "verdict": "deny",
+        "decision": {
+            "model": "fail_closed_consumer_admission",
+            "allow": False,
+            "blockers": ["required_artifact_subject_store_not_verified"],
+        },
+        "inspected_claims": {
+            "registry_latest": {"selected_record_is_latest": True},
+            "controls": {"required_controls_missing": []},
+            "source": {"source_repo_matched": True},
+            "trust_root": {"trust_root_mode_matched": True},
+            "artifact_subject_store": {"ok": False, "required": True},
+        },
+    }
+
+
 def deny_terminal_gate_response() -> dict[str, Any]:
     return {
         "ok": True,
@@ -320,6 +339,54 @@ def test_package_artifact_trust_gate_requires_fail_closed_latest_controls_and_so
             else:
                 response[key] = value
         assert validator._trust_gate_allow_latest(FakeArtifactBundles(response), tmp_path, registry_roundtrip)["ok"] is False
+
+
+def test_package_artifact_pre_materialization_gate_denies_only_missing_subject_store(tmp_path: Path) -> None:
+    validator = _artifact_bundle_validator_module()
+    fake = FakeArtifactBundles(deny_missing_subject_store_gate_response())
+    registry_roundtrip = {"promoted": {"record": {"subject_digest": "sha256:" + "2" * 64}}}
+
+    result = validator._trust_gate_denies_only_missing_subject_store(fake, tmp_path, registry_roundtrip)
+
+    assert result["ok"] is True
+    assert result["expected_blocker"] == "required_artifact_subject_store_not_verified"
+    assert fake.trust_gate_calls == [
+        {
+            "registry_dir": tmp_path,
+            "artifact_class": "aoa_sdk_python_distribution",
+            "subject_digest": "sha256:" + "2" * 64,
+            "consumer_intent": "agent",
+            "expected_source_repo": "aoa-sdk",
+            "expected_trust_root_mode": "host_managed",
+        }
+    ]
+
+    for mutated_claim in (
+        {"decision": {"model": "fail_closed_consumer_admission", "allow": True, "blockers": []}},
+        {
+            "decision": {
+                "model": "fail_closed_consumer_admission",
+                "allow": False,
+                "blockers": ["wrong_blocker"],
+            }
+        },
+        {"verdict": "allow"},
+        {"inspected_claims": {"registry_latest": {"selected_record_is_latest": False}}},
+        {"inspected_claims": {"controls": {"required_controls_missing": ["sbom"]}}},
+        {"inspected_claims": {"source": {"source_repo_matched": False}}},
+        {"inspected_claims": {"trust_root": {"trust_root_mode_matched": False}}},
+        {"inspected_claims": {"artifact_subject_store": {"ok": True, "required": True}}},
+    ):
+        response = deny_missing_subject_store_gate_response()
+        for key, value in mutated_claim.items():
+            if key == "inspected_claims":
+                response[key].update(value)
+            else:
+                response[key] = value
+        assert (
+            validator._trust_gate_denies_only_missing_subject_store(FakeArtifactBundles(response), tmp_path, registry_roundtrip)["ok"]
+            is False
+        )
 
 
 def test_package_artifact_terminal_registry_state_requires_revoked_gate_deny(tmp_path: Path) -> None:

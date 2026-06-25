@@ -32,6 +32,7 @@ from .contracts.artifacts import (
     ArtifactUpdateLaneRow,
     ArtifactUpdateLaneStatus,
     ArtifactUpdateMetadataVerification,
+    ArtifactScittReceiptVerification,
 )
 from .contracts.closeout import (
     KernelNextStepBrief,
@@ -254,6 +255,7 @@ __all__ = [
     "ArtifactUpdateLaneRow",
     "ArtifactUpdateLaneStatus",
     "ArtifactUpdateMetadataVerification",
+    "ArtifactScittReceiptVerification",
     "KernelNextStepBrief",
     "OwnerFollowThroughBrief",
     "WorkflowFollowThroughBrief",
