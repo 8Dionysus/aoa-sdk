@@ -123,6 +123,46 @@ class ArtifactRequirementsReport(ArtifactHostSurface):
     summary: dict[str, Any] = Field(default_factory=dict)
 
 
+class ArtifactProducerProfile(ArtifactHostSurface):
+    profile_id: str
+    owner_repo: str
+    owner_route_refs: list[str] = Field(default_factory=list)
+    artifact_classes: list[str] = Field(default_factory=list)
+    release_export_triggers: list[str] = Field(default_factory=list)
+    validator_commands: list[str] = Field(default_factory=list)
+    produced_sidecars: list[str] = Field(default_factory=list)
+    consumer_expectations: list[str] = Field(default_factory=list)
+    owner_boundaries: list[str] = Field(default_factory=list)
+    trust_root_modes: list[str] = Field(default_factory=list)
+
+
+class ArtifactProducerProfilesReport(ArtifactHostSurface):
+    schema_: str = Field(alias="schema")
+    ok: bool
+    policy_ref: str | None = None
+    policy_version: str | None = None
+    abi_ref: str | None = None
+    profile_filter: str | None = None
+    owner_repo_filter: str | None = None
+    artifact_class_filter: str | None = None
+    summary: dict[str, Any] = Field(default_factory=dict)
+    rows: list[ArtifactProducerProfile] = Field(default_factory=list)
+    agent_loop: dict[str, str] = Field(default_factory=dict)
+    claim_limits: list[str] = Field(default_factory=list)
+    errors: list[str] = Field(default_factory=list)
+    latest: str | None = None
+
+    @property
+    def read_model_only(self) -> bool:
+        return True
+
+    def for_artifact_class(self, artifact_class: str) -> list[ArtifactProducerProfile]:
+        return [row for row in self.rows if artifact_class in row.artifact_classes]
+
+    def for_owner_repo(self, owner_repo: str) -> list[ArtifactProducerProfile]:
+        return [row for row in self.rows if row.owner_repo == owner_repo]
+
+
 class ArtifactUpdateLaneRow(ArtifactHostSurface):
     schema_: str = Field(alias="schema")
     artifact_class: str

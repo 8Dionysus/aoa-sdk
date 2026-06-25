@@ -7,6 +7,7 @@ from ..contracts.artifacts import (
     ArtifactAffectedReport,
     ArtifactBundleRegistry,
     ArtifactClassificationReport,
+    ArtifactProducerProfilesReport,
     ArtifactRequirementsReport,
     ArtifactTrustCoverageReport,
     ArtifactTrustGateReport,
@@ -46,6 +47,12 @@ class ArtifactsAPI:
 
     def load_requirements(self, path: str | Path) -> ArtifactRequirementsReport:
         return self.parse_requirements(load_json(path))
+
+    def parse_producer_profiles(self, payload: dict[str, Any]) -> ArtifactProducerProfilesReport:
+        return ArtifactProducerProfilesReport.model_validate(payload)
+
+    def load_producer_profiles(self, path: str | Path) -> ArtifactProducerProfilesReport:
+        return self.parse_producer_profiles(load_json(path))
 
     def parse_update_lane(self, payload: dict[str, Any]) -> ArtifactUpdateLaneStatus:
         return ArtifactUpdateLaneStatus.model_validate(payload)
