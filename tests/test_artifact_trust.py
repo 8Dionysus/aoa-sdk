@@ -11,6 +11,8 @@ from aoa_sdk.models import (
     ArtifactBundleRegistry,
     ArtifactClassificationReport,
     ArtifactRequirementsReport,
+    ArtifactProducerProfile,
+    ArtifactProducerProfilesReport,
     ArtifactSourceRefStatus,
     ArtifactTrustCoverageReport,
     ArtifactTrustGateReport,
@@ -299,3 +301,83 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
     assert affected.rows[0].source_ref_proven is True
     assert isinstance(trust_coverage, ArtifactTrustCoverageReport)
     assert trust_coverage.rows[0].status == "FULLY_COVERED"
+
+
+def test_artifact_producer_profiles_are_typed_read_model_only(tmp_path) -> None:
+    api = ArtifactsAPI()
+    payload = {
+        "schema": "abyss_machine_artifact_producer_profiles_v1",
+        "ok": True,
+        "policy_ref": "manifests/artifact_signature_policy.manifest.json",
+        "policy_version": "0.2.4",
+        "abi_ref": "generated/contract_abi_signatures.min.json",
+        "profile_filter": None,
+        "owner_repo_filter": None,
+        "artifact_class_filter": "public_media_export",
+        "summary": {
+            "profiles": 2,
+            "owner_repos": ["Tree-of-Sophia", "abyss-machine"],
+            "artifact_classes": ["public_media_export", "public_source_seed"],
+            "artifact_class_count": 2,
+        },
+        "rows": [
+            {
+                "profile_id": "Tree-of-Sophia",
+                "owner_repo": "Tree-of-Sophia",
+                "owner_route_refs": ["AGENTS.md", "ToS/derived-exports"],
+                "artifact_classes": ["tree_of_sophia_generated_readmodel_bundle", "public_media_export"],
+                "release_export_triggers": ["public PDF, visualization, image, or other media export is published"],
+                "validator_commands": ["python scripts/release_check.py"],
+                "produced_sidecars": ["artifact.identity.json", "artifact.c2pa"],
+                "consumer_expectations": [
+                    "media consumers verify C2PA before public use",
+                ],
+                "owner_boundaries": [
+                    "Tree-of-Sophia authored meaning remains stronger than generated readmodels",
+                ],
+                "trust_root_modes": ["local_dev", "github_oidc", "public_release"],
+            },
+            {
+                "profile_id": "abyss-machine",
+                "owner_repo": "abyss-machine",
+                "owner_route_refs": ["AGENTS.md", "BOUNDARIES.md"],
+                "artifact_classes": ["public_source_seed", "public_media_export"],
+                "release_export_triggers": ["public seed or bootstrap release is cut"],
+                "validator_commands": ["python scripts/release_check.py", "abyss-machine artifacts validate --json"],
+                "produced_sidecars": ["artifact.identity.json", "artifact.verify.json"],
+                "consumer_expectations": [
+                    "agents consume only after durable registry promotion and trust-gate verdict",
+                ],
+                "owner_boundaries": [
+                    "owns host enforcement, durable registry, trust gates, trust roots, update lane, and public bootstrap seed",
+                ],
+                "trust_root_modes": ["local_dev", "host_managed", "github_oidc", "oci_registry", "public_release"],
+            },
+        ],
+        "agent_loop": {
+            "producer_profiles": "abyss-machine artifacts producer-profiles --artifact-class ARTIFACT_CLASS --json",
+            "trust_gate": "abyss-machine artifacts trust-gate --artifact-class ARTIFACT_CLASS --json",
+        },
+        "claim_limits": [
+            "Producer profiles are OS Abyss policy/read-model data; they do not run owner validators or produce sidecars by themselves.",
+        ],
+        "errors": [],
+        "latest": "/var/lib/abyss-machine/artifacts/producer-profiles/latest.json",
+    }
+    profile_path = tmp_path / "producer-profiles.json"
+    profile_path.write_text(json.dumps(payload), encoding="utf-8")
+
+    profiles = api.load_producer_profiles(profile_path)
+
+    assert isinstance(profiles, ArtifactProducerProfilesReport)
+    assert profiles.read_model_only is True
+    assert profiles.artifact_class_filter == "public_media_export"
+    assert profiles.agent_loop["producer_profiles"].startswith("abyss-machine artifacts producer-profiles")
+    assert profiles.claim_limits
+    assert isinstance(profiles.rows[0], ArtifactProducerProfile)
+    assert profiles.rows[0].owner_repo == "Tree-of-Sophia"
+    assert "public_media_export" in profiles.rows[0].artifact_classes
+    assert profiles.rows[0].trust_root_modes == ["local_dev", "github_oidc", "public_release"]
+    assert profiles.for_artifact_class("public_media_export") == profiles.rows
+    assert [row.profile_id for row in profiles.for_owner_repo("abyss-machine")] == ["abyss-machine"]
+    assert profiles.for_artifact_class("runtime_or_container_artifact") == []

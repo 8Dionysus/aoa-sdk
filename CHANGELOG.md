@@ -15,6 +15,10 @@ Tracking starts with the community-docs baseline for this repository.
 - Add an OS Abyss artifact bundle gate for built `aoa-sdk` wheel/sdist outputs,
   producing ABI, SBOM, SLSA/in-toto, signature-decision, and verify sidecars
   under ignored `dist/abyss-artifact-bundle/` before release artifacts upload.
+- Add typed SDK loading for OS Abyss artifact producer-profile read models so
+  agents can inspect owner repos, artifact classes, validator commands, sidecars,
+  trust-root modes, and consumer expectations without treating the SDK as host
+  enforcement authority.
 
 ### Notes
 
