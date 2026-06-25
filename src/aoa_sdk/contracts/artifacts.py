@@ -183,6 +183,30 @@ class ArtifactUpdateLaneStatus(ArtifactHostSurface):
     scitt: dict[str, Any] = Field(default_factory=dict)
     claim_limits: list[str] = Field(default_factory=list)
 
+    @property
+    def tuf_status(self) -> str | None:
+        value = self.summary.get("tuf_status")
+        return str(value) if value else None
+
+    @property
+    def scitt_status(self) -> str | None:
+        value = self.summary.get("scitt_status")
+        return str(value) if value else None
+
+    @property
+    def has_structural_tuf_repository_verifier(self) -> bool:
+        verifier = self.tuf.get("external_repository_verifier")
+        return isinstance(verifier, dict) and verifier.get("status") == "structural_v1"
+
+    @property
+    def has_scitt_receipt_binding_stub(self) -> bool:
+        return self.scitt_status == "local_stub_fail_closed_external_v1"
+
+    @property
+    def external_relying_party_receipt_required(self) -> bool:
+        mode = self.scitt.get("external_relying_party_mode")
+        return isinstance(mode, dict) and mode.get("receipt_required") is True
+
 
 class ArtifactUpdateMetadataVerification(ArtifactHostSurface):
     schema_: str = Field(alias="schema")
@@ -197,6 +221,56 @@ class ArtifactUpdateMetadataVerification(ArtifactHostSurface):
     @property
     def update_consideration_allowed(self) -> bool:
         return self.ok and self.verdict == "allow"
+
+
+class ArtifactScittReceiptVerification(ArtifactHostSurface):
+    schema_: str = Field(alias="schema")
+    ok: bool
+    verdict: ArtifactTrustVerdict
+    policy_ref: str | None = None
+    statement_schema: str | None = None
+    receipt_schema: str | None = None
+    statement_digest: str | None = None
+    statement_class: str | None = None
+    issuer: str | None = None
+    artifact_digest: str | None = None
+    external_relying_party: bool = False
+    receipt_required: bool = False
+    receipt_present: bool = False
+    receipt_ok: bool = False
+    transparency_service: str | None = None
+    known_statement_classes: list[str] = Field(default_factory=list)
+    scitt_policy: dict[str, Any] = Field(default_factory=dict)
+    checked: dict[str, Any] = Field(default_factory=dict)
+    errors: list[str] = Field(default_factory=list)
+    warnings: list[str] = Field(default_factory=list)
+    claim_limits: list[str] = Field(default_factory=list)
+    statement_path: str | None = None
+    receipt_path: str | None = None
+
+    @property
+    def consumable(self) -> bool:
+        return self.ok and self.verdict == "allow"
+
+    @property
+    def external_relying_party_allowed(self) -> bool:
+        return (
+            self.consumable
+            and self.external_relying_party
+            and self.receipt_required
+            and self.receipt_present
+            and self.receipt_ok
+        )
+
+    @property
+    def fail_closed_missing_receipt(self) -> bool:
+        return (
+            self.external_relying_party
+            and self.receipt_required
+            and not self.receipt_present
+            and self.verdict == "deny"
+            and "scitt_receipt_required" in self.errors
+        )
 
 
 class ArtifactSourceRefStatus(ArtifactHostSurface):

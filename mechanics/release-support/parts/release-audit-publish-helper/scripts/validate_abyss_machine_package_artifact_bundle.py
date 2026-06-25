@@ -31,6 +31,7 @@ CONSUMER_REF = "aoa-sdk:release-audit-publish-helper"
 TRUST_ROOT_MODE = "host_managed"
 PRODUCER = "aoa-sdk release audit publish helper for built Python distributions"
 EXPECTED_REQUIRED_CONTROLS = ["abi_signature", "sbom", "slsa_in_toto"]
+MISSING_SUBJECT_STORE_BLOCKER = "required_artifact_subject_store_not_verified"
 
 
 def _candidate_abyss_machine_roots() -> list[Path]:
@@ -315,8 +316,6 @@ def _trust_gate_allow_latest(
     artifact_bundles: Any,
     registry_dir: Path,
     registry_roundtrip: dict[str, Any],
-    *,
-    require_subject_store: bool = True,
 ) -> dict[str, Any]:
     record = registry_roundtrip.get("promoted", {}).get("record", {})
     trust_gate = artifact_bundles.trust_gate(
@@ -338,11 +337,47 @@ def _trust_gate_allow_latest(
             and inspected_claims.get("controls", {}).get("required_controls_missing") == []
             and inspected_claims.get("source", {}).get("source_repo_matched") is True
             and inspected_claims.get("trust_root", {}).get("trust_root_mode_matched") is True
-            and (
-                not require_subject_store
-                or inspected_claims.get("artifact_subject_store", {}).get("ok") is True
-            )
+            and inspected_claims.get("artifact_subject_store", {}).get("ok") is True
         ),
+        "trust_gate": trust_gate,
+    }
+
+
+def _trust_gate_denies_only_missing_subject_store(
+    artifact_bundles: Any,
+    registry_dir: Path,
+    registry_roundtrip: dict[str, Any],
+) -> dict[str, Any]:
+    record = registry_roundtrip.get("promoted", {}).get("record", {})
+    trust_gate = artifact_bundles.trust_gate(
+        registry_dir,
+        artifact_class=ARTIFACT_CLASS,
+        subject_digest=str(record.get("subject_digest") or ""),
+        consumer_intent=CONSUMER_INTENT,
+        expected_source_repo=OWNER_REPO,
+        expected_trust_root_mode=TRUST_ROOT_MODE,
+    )
+    decision = trust_gate.get("decision", {})
+    inspected_claims = trust_gate.get("inspected_claims", {})
+    blockers = decision.get("blockers")
+    if not isinstance(blockers, list):
+        blockers = trust_gate.get("blockers")
+    if not isinstance(blockers, list):
+        blockers = trust_gate.get("reasons", [])
+    return {
+        "ok": bool(
+            trust_gate.get("verdict") == "deny"
+            and decision.get("model") == "fail_closed_consumer_admission"
+            and decision.get("allow") is False
+            and blockers == [MISSING_SUBJECT_STORE_BLOCKER]
+            and inspected_claims.get("registry_latest", {}).get("selected_record_is_latest") is True
+            and inspected_claims.get("controls", {}).get("required_controls_missing") == []
+            and inspected_claims.get("source", {}).get("source_repo_matched") is True
+            and inspected_claims.get("trust_root", {}).get("trust_root_mode_matched") is True
+            and inspected_claims.get("artifact_subject_store", {}).get("ok") is False
+            and inspected_claims.get("artifact_subject_store", {}).get("required") is True
+        ),
+        "expected_blocker": MISSING_SUBJECT_STORE_BLOCKER,
         "trust_gate": trust_gate,
     }
 
@@ -608,11 +643,10 @@ def validate_bundle(
         manifest=manifest,
         abyss_repo_root=abyss_repo_root,
     )
-    pre_materialization_gate = _trust_gate_allow_latest(
+    pre_materialization_gate = _trust_gate_denies_only_missing_subject_store(
         artifact_bundles,
         registry_dir,
         registry,
-        require_subject_store=False,
     )
     materialized = artifact_bundles.materialize_artifact_subjects(
         bundle_dir,

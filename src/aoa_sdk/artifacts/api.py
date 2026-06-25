@@ -12,6 +12,7 @@ from ..contracts.artifacts import (
     ArtifactTrustCoverageReport,
     ArtifactTrustGateReport,
     ArtifactTrustVerdict,
+    ArtifactScittReceiptVerification,
     ArtifactUpdateLaneStatus,
     ArtifactUpdateMetadataVerification,
 )
@@ -65,6 +66,12 @@ class ArtifactsAPI:
 
     def load_update_verification(self, path: str | Path) -> ArtifactUpdateMetadataVerification:
         return self.parse_update_verification(load_json(path))
+
+    def parse_scitt_receipt_verification(self, payload: dict[str, Any]) -> ArtifactScittReceiptVerification:
+        return ArtifactScittReceiptVerification.model_validate(payload)
+
+    def load_scitt_receipt_verification(self, path: str | Path) -> ArtifactScittReceiptVerification:
+        return self.parse_scitt_receipt_verification(load_json(path))
 
     def parse_affected(self, payload: dict[str, Any]) -> ArtifactAffectedReport:
         return ArtifactAffectedReport.model_validate(payload)
