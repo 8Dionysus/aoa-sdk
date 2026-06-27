@@ -10,6 +10,13 @@
       "source_class": "sdk_source",
       "role": "owner_route",
       "authority": "authored_source"
+    },
+    {
+      "repo": "aoa-sdk",
+      "path": "src/aoa_sdk/kag/registry.py",
+      "source_class": "sdk_source",
+      "role": "supporting",
+      "authority": "authored_source"
     }
   ],
   "source_owner": "aoa-sdk",
