@@ -1,0 +1,69 @@
+{
+  "schema_version": "aoa-local-kag-manifest-v1",
+  "repo": "aoa-sdk",
+  "owner_surface": "kag/AGENTS.md",
+  "source_surfaces": [
+    {
+      "repo": "aoa-sdk",
+      "path": "sdk/source_home.manifest.json",
+      "source_class": "sdk_source",
+      "role": "primary",
+      "authority": "authored_source"
+    },
+    {
+      "repo": "aoa-sdk",
+      "path": "sdk/README.md",
+      "source_class": "sdk_source",
+      "role": "owner_route",
+      "authority": "authored_source"
+    },
+    {
+      "repo": "aoa-sdk",
+      "path": "src/aoa_sdk/kag/__init__.py",
+      "source_class": "sdk_source",
+      "role": "supporting",
+      "authority": "authored_source"
+    },
+    {
+      "repo": "aoa-sdk",
+      "path": "src/aoa_sdk/kag/registry.py",
+      "source_class": "sdk_source",
+      "role": "supporting",
+      "authority": "authored_source"
+    }
+  ],
+  "record_classes": [
+    "node",
+    "edge",
+    "index",
+    "projection",
+    "receipt"
+  ],
+  "storage_posture": {
+    "git_surface": "portable_records",
+    "payload_class": "manifest",
+    "runtime_route": "source-repo"
+  },
+  "validation_routes": [
+    {
+      "route": "scripts/validate_sdk_source_home.py",
+      "lane": "owner-local"
+    },
+    {
+      "route": "aoa-kag:scripts/validate_kag.py",
+      "lane": "local-kag"
+    }
+  ],
+  "consumer_routes": [
+    "aoa-kag registry",
+    "abyss-stack federation mirror",
+    "aoa-kag-mcp resource"
+  ],
+  "owner_return_routes": [
+    {
+      "repo": "aoa-sdk",
+      "surface": "sdk/README.md",
+      "route_kind": "authored_meaning"
+    }
+  ]
+}
