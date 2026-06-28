@@ -1,0 +1,46 @@
+{
+  "schema_version": "aoa-local-kag-record-v1",
+  "repo": "aoa-sdk",
+  "local_id": "node:sdk:sdk-source-route",
+  "record_class": "node",
+  "source_refs": [
+    {
+      "repo": "aoa-sdk",
+      "path": "sdk/README.md",
+      "source_class": "sdk_source",
+      "role": "owner_route",
+      "authority": "authored_source"
+    }
+  ],
+  "source_owner": "aoa-sdk",
+  "provenance_mode": "strict_source_linked",
+  "derived_method": "source-linked local KAG node over SDK source home and typed KAG helper route",
+  "generated_or_authored": "authored_control",
+  "status": "active",
+  "owner_return_route": {
+    "repo": "aoa-sdk",
+    "surface": "sdk/README.md",
+    "route_kind": "authored_meaning"
+  },
+  "freshness": {
+    "mode": "source_snapshot",
+    "state": "current",
+    "checked_ref": "sdk/README.md"
+  },
+  "builder": {
+    "route": "SDK source topology validator",
+    "surface": "scripts/validate_sdk_source_home.py"
+  },
+  "validator": {
+    "route": "scripts/validate_sdk_source_home.py",
+    "lane": "owner-local"
+  },
+  "storage_posture": {
+    "git_surface": "portable_records",
+    "payload_class": "node",
+    "runtime_route": "source-repo"
+  },
+  "consumer_route": "aoa-kag registry",
+  "node_kind": "route_surface",
+  "label": "SDK source home"
+}
