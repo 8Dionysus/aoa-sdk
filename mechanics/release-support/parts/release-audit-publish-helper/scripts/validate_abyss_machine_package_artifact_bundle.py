@@ -8,6 +8,7 @@ import os
 import shutil
 import sys
 import tempfile
+from contextlib import contextmanager
 from pathlib import Path
 from typing import Any
 
@@ -134,7 +135,8 @@ def _sanitize_public_payload(payload: Any, abyss_machine_root: Path | None) -> A
     return payload
 
 
-def _sanitize_public_json_tree(root: Path, abyss_machine_root: Path | None) -> None:
+def _sanitize_public_json_tree(root: Path, abyss_machine_root: Path | None) -> bool:
+    tree_changed = False
     for path in sorted(root.rglob("*")) if root.exists() else []:
         if not path.is_file() or path.suffix not in {".json", ".jsonl"}:
             continue
@@ -148,11 +150,14 @@ def _sanitize_public_json_tree(root: Path, abyss_machine_root: Path | None) -> N
                 lines.append(json.dumps(sanitized, ensure_ascii=False, sort_keys=True))
             if changed:
                 path.write_text("\n".join(lines) + ("\n" if lines else ""), encoding="utf-8")
+                tree_changed = True
             continue
         payload = json.loads(path.read_text(encoding="utf-8"))
         sanitized = _sanitize_public_payload(payload, abyss_machine_root)
         if sanitized != payload:
             path.write_text(json.dumps(sanitized, ensure_ascii=False, sort_keys=True, indent=2) + "\n", encoding="utf-8")
+            tree_changed = True
+    return tree_changed
 
 
 def _default_tmp_root() -> Path | None:
@@ -163,6 +168,37 @@ def _default_tmp_root() -> Path | None:
         if path.is_dir():
             return path
     return None
+
+
+@contextmanager
+def _artifact_subject_store_roots(store_root: Path, artifact_bundles: Any | None = None):
+    env_root = "ABYSS_MACHINE_ARTIFACT_SUBJECT_STORE_ROOT"
+    env_roots = "ABYSS_MACHINE_ARTIFACT_SUBJECT_STORE_ROOTS"
+    old_root = os.environ.get(env_root)
+    old_roots = os.environ.get(env_roots)
+    missing = object()
+    old_default = (
+        getattr(artifact_bundles, "DEFAULT_ARTIFACT_SUBJECT_STORE_ROOT", missing)
+        if artifact_bundles is not None
+        else missing
+    )
+    os.environ[env_root] = str(store_root)
+    os.environ[env_roots] = str(store_root)
+    if old_default is not missing:
+        artifact_bundles.DEFAULT_ARTIFACT_SUBJECT_STORE_ROOT = store_root
+    try:
+        yield
+    finally:
+        if old_default is not missing:
+            artifact_bundles.DEFAULT_ARTIFACT_SUBJECT_STORE_ROOT = old_default
+        if old_root is None:
+            os.environ.pop(env_root, None)
+        else:
+            os.environ[env_root] = old_root
+        if old_roots is None:
+            os.environ.pop(env_roots, None)
+        else:
+            os.environ[env_roots] = old_roots
 
 
 def _assert_dist_subjects_exist() -> None:
@@ -634,20 +670,22 @@ def validate_bundle(
     release_check = artifact_bundles.release_check(bundle_dir, repo_root=abyss_repo_root)
     _assert_expected_controls(verify)
     _assert_public_sidecars_do_not_leak_local_roots(bundle_dir, abyss_machine_root)
-    registry = _registry_roundtrip(
-        artifact_bundles,
-        bundle_dir,
-        registry_dir,
-        lifecycle_state="release-ready",
-        evidence_ref=f"{_path_ref(bundle_dir)}/artifact.verify.json",
-        manifest=manifest,
-        abyss_repo_root=abyss_repo_root,
-    )
-    pre_materialization_gate = _trust_gate_denies_only_missing_subject_store(
-        artifact_bundles,
-        registry_dir,
-        registry,
-    )
+    with tempfile.TemporaryDirectory(prefix="aoa-sdk-pre-subject-store-", dir=_default_tmp_root()) as pre_store:
+        with _artifact_subject_store_roots(Path(pre_store), artifact_bundles):
+            registry = _registry_roundtrip(
+                artifact_bundles,
+                bundle_dir,
+                registry_dir,
+                lifecycle_state="release-ready",
+                evidence_ref=f"{_path_ref(bundle_dir)}/artifact.verify.json",
+                manifest=manifest,
+                abyss_repo_root=abyss_repo_root,
+            )
+            pre_materialization_gate = _trust_gate_denies_only_missing_subject_store(
+                artifact_bundles,
+                registry_dir,
+                registry,
+            )
     materialized = artifact_bundles.materialize_artifact_subjects(
         bundle_dir,
         store_root=subject_store_root,
@@ -668,6 +706,12 @@ def validate_bundle(
         manifest=manifest,
         abyss_repo_root=abyss_repo_root,
     )
+    registry_sanitized = _sanitize_public_json_tree(registry_dir, abyss_machine_root)
+    subject_store_sanitized = _sanitize_public_json_tree(subject_store_root, abyss_machine_root)
+    _assert_public_registry_does_not_leak_local_roots(registry_dir, abyss_machine_root)
+    _assert_public_subject_store_does_not_leak_local_roots(subject_store_root, abyss_machine_root)
+    latest_registry = artifact_bundles.read_bundle_registry(registry_dir, artifact_class=ARTIFACT_CLASS)
+    latest_registry_ok = latest_registry.get("ok") is not False and bool(latest_registry.get("latest_by_artifact_class"))
     trust_gate = _trust_gate_allow_latest(artifact_bundles, registry_dir, registry_with_subject_store)
     subject_store_gate = artifact_bundles.trust_gate(
         registry_dir,
@@ -677,11 +721,6 @@ def validate_bundle(
         expected_source_repo=OWNER_REPO,
         expected_trust_root_mode=TRUST_ROOT_MODE,
     )
-    _sanitize_public_json_tree(registry_dir, abyss_machine_root)
-    _sanitize_public_json_tree(subject_store_root, abyss_machine_root)
-    _assert_public_registry_does_not_leak_local_roots(registry_dir, abyss_machine_root)
-    _assert_public_subject_store_does_not_leak_local_roots(subject_store_root, abyss_machine_root)
-    latest_registry = artifact_bundles.read_bundle_registry(registry_dir, artifact_class=ARTIFACT_CLASS)
     adversarial = _run_adversarial_checks(artifact_bundles, abyss_repo_root, manifest, bundle_dir, registry_dir)
 
     manifest_payload = _load_json(manifest)
@@ -695,6 +734,7 @@ def validate_bundle(
             and pre_materialization_gate.get("ok")
             and materialized.get("ok")
             and registry_with_subject_store.get("ok")
+            and latest_registry_ok
             and trust_gate.get("ok")
             and subject_store_gate.get("ok")
             and subject_store_gate.get("verdict") in {"allow", "warn"}
@@ -717,6 +757,10 @@ def validate_bundle(
         "materialized_subject_store": _sanitize_public_payload(materialized, abyss_machine_root),
         "trust_gate": _sanitize_public_payload(trust_gate, abyss_machine_root),
         "subject_store_gate": _sanitize_public_payload(subject_store_gate, abyss_machine_root),
+        "sanitization": {
+            "registry_changed_before_gate": registry_sanitized,
+            "subject_store_changed_before_gate": subject_store_sanitized,
+        },
         "adversarial_checks": adversarial,
         "steps": {
             "build_sidecars": build,

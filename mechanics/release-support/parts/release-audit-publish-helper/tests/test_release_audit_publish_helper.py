@@ -305,6 +305,19 @@ def test_package_artifact_bundle_validator_reports_external_paths(tmp_path: Path
     assert validator._path_ref(tmp_path / "bundle") == str((tmp_path / "bundle").resolve())
 
 
+def test_package_artifact_bundle_sanitizer_reports_tree_changes(tmp_path: Path) -> None:
+    validator = _artifact_bundle_validator_module()
+    payload = tmp_path / "registry.json"
+    payload.write_text(
+        json.dumps({"path": str(_repo_root() / "dist" / "aoa_sdk-0.0.0-py3-none-any.whl")}),
+        encoding="utf-8",
+    )
+
+    assert validator._sanitize_public_json_tree(tmp_path, None) is True
+    assert validator._sanitize_public_json_tree(tmp_path, None) is False
+    assert json.loads(payload.read_text(encoding="utf-8"))["path"] == "dist/aoa_sdk-0.0.0-py3-none-any.whl"
+
+
 def test_package_artifact_trust_gate_requires_fail_closed_latest_controls_and_source(tmp_path: Path) -> None:
     validator = _artifact_bundle_validator_module()
     fake = FakeArtifactBundles(allow_gate_response())

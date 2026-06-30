@@ -29,3 +29,4 @@
 - `tests/test_playbook_surface_reader.py`
 - `tests/test_routing_surface_actions.py`
 - `tests/test_stats_surface_reader.py`
+- `tests/test_workspace_control_plane_compatibility.py`
