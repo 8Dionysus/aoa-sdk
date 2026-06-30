@@ -93,7 +93,7 @@ class ArtifactsAPI:
     ) -> ArtifactTrustGateReport:
         parsed = report if isinstance(report, ArtifactTrustGateReport) else self.parse_trust_gate(report)
         allowed = set(allowed_verdicts)
-        if parsed.verdict not in allowed or not parsed.decision.allow:
+        if not parsed.ok or parsed.verdict not in allowed or not parsed.decision.allow:
             reasons = parsed.blockers or parsed.reasons or parsed.decision.blockers
             detail = ", ".join(reasons) if reasons else parsed.verdict
             raise InvalidSurface(f"Artifact trust gate did not allow consumption: {detail}")

@@ -56,7 +56,7 @@ class ArtifactTrustGateReport(ArtifactHostSurface):
 
     @property
     def consumable(self) -> bool:
-        return self.verdict in {"allow", "warn"} and self.decision.allow
+        return self.ok and self.verdict in {"allow", "warn"} and self.decision.allow
 
 
 class ArtifactClassificationReport(ArtifactHostSurface):
@@ -332,7 +332,7 @@ class ArtifactAffectedRow(ArtifactHostSurface):
     verdict: ArtifactAffectedVerdict
     freshness: ArtifactAffectedVerdict
     reasons: list[str] = Field(default_factory=list)
-    matches: list[dict[str, Any]] = Field(default_factory=list)
+    matches: list[str | dict[str, Any]] = Field(default_factory=list)
     changed_source_repo: str | None = None
     changed_source_repo_inferred: str | None = None
     contract_surface_status: str | None = None

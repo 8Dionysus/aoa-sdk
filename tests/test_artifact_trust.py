@@ -56,15 +56,24 @@ def test_artifact_trust_gate_report_is_typed_and_fail_closed() -> None:
         },
         "blockers": ["missing_required_control:sbom"],
     }
+    errored_allow_payload = {
+        **allow_payload,
+        "ok": False,
+        "reasons": ["trust-gate verification error"],
+    }
 
     report = api.parse_trust_gate(allow_payload)
+    errored_allow = api.parse_trust_gate(errored_allow_payload)
 
     assert isinstance(report, ArtifactTrustGateReport)
     assert report.consumable is True
+    assert errored_allow.consumable is False
     assert report.inspected_claims["trust_root"]["trust_root_mode_actual"] == "host_managed"
     assert api.assert_consumable(report) is report
     with pytest.raises(InvalidSurface, match="missing_required_control:sbom"):
         api.assert_consumable(deny_payload)
+    with pytest.raises(InvalidSurface, match="trust-gate verification error"):
+        api.assert_consumable(errored_allow_payload)
 
 
 def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) -> None:
@@ -283,7 +292,7 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
                 "verdict": "fresh",
                 "freshness": "fresh",
                 "reasons": [],
-                "matches": [],
+                "matches": ["src/aoa_sdk/artifacts/api.py"],
                 "changed_source_repo": None,
                 "changed_source_repo_inferred": "aoa-sdk",
                 "contract_surface_status": "external_subject_or_owner_bundle_required",
@@ -417,6 +426,7 @@ def test_artifact_registry_requirements_and_update_surfaces_are_typed(tmp_path) 
     assert affected.changed_path_analysis[0].normalized == "src/aoa_sdk/artifacts/api.py"
     assert affected.known_drift_statuses[-1] == "manual_review_required"
     assert affected.rows[0].verdict == "fresh"
+    assert affected.rows[0].matches == ["src/aoa_sdk/artifacts/api.py"]
     assert isinstance(affected.rows[0].drift, ArtifactDriftState)
     assert affected.rows[0].drift.status == "fresh"
     assert affected.rows[0].drift.blocks_operation is False
