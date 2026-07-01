@@ -72,6 +72,7 @@ def detect_skills(
         "user-install",
         "not-provided",
     ] = "not-provided",
+    stress_context: dict[str, Any] | None = None,
 ) -> SkillDetectionReport:
     if phase not in PHASES:
         raise ValueError(f"unsupported phase {phase!r}")
@@ -246,6 +247,17 @@ def detect_skills(
             "host inventory demoted one or more auto-activation candidates into must_confirm because they were router-only for this session."
         )
 
+    activate_now, stress_blocked_items, stress_blocked_actions, stress_reasoning = _apply_stress_posture_gate(
+        activate_now=activate_now,
+        phase=phase,
+        mutation_surface=mutation_surface,
+        stress_context=stress_context,
+    )
+    if stress_blocked_items:
+        must_confirm.extend(stress_blocked_items)
+    blocked_actions.extend(stress_blocked_actions)
+    reasoning.extend(stress_reasoning)
+
     checkpoint_bridge_item = _checkpoint_bridge_must_confirm(
         workspace=workspace,
         repo_root=str(resolved_repo_root),
@@ -301,6 +313,7 @@ def dispatch_skills(
         "user-install",
         "not-provided",
     ] = "not-provided",
+    stress_context: dict[str, Any] | None = None,
 ) -> SkillDetectionReport:
     from .discovery import SkillsAPI
 
@@ -313,6 +326,7 @@ def dispatch_skills(
         closeout_path=closeout_path,
         host_available_skills=host_available_skills,
         host_availability_source=host_availability_source,
+        stress_context=stress_context,
     )
     if phase == "closeout" or not report.activate_now:
         return report
@@ -783,6 +797,44 @@ def _demote_non_executable_activate_now(
             )
         )
     return kept, demoted
+
+
+def _apply_stress_posture_gate(
+    *,
+    activate_now: list[SkillDispatchItem],
+    phase: str,
+    mutation_surface: str,
+    stress_context: dict[str, Any] | None,
+) -> tuple[list[SkillDispatchItem], list[SkillDispatchItem], list[str], list[str]]:
+    if not stress_context or stress_context.get("active") is not True:
+        return activate_now, [], [], []
+
+    preferred_posture = stress_context.get("preferred_posture")
+    posture = preferred_posture if isinstance(preferred_posture, str) else "unspecified"
+    reasoning = [f"stress posture active: {posture}"]
+    review_required = (
+        stress_context.get("operator_review_required") is True
+        or posture in {"human_review_first", "stop_before_mutation"}
+    )
+    if not review_required or not activate_now:
+        return activate_now, [], [], reasoning
+
+    blocked_items = [
+        item.model_copy(
+            update={
+                "reason": f"{item.reason}; blocked by active stress posture requiring human review",
+                "host_availability": item.host_availability.model_copy(
+                    update={"manual_equivalence_allowed": True}
+                ),
+            }
+        )
+        for item in activate_now
+    ]
+    blocked_actions = ["stress_posture_requires_human_review"]
+    if phase == "pre-mutation" and mutation_surface != "none":
+        blocked_actions.append("stress_posture_blocks_auto_activation_before_mutation")
+    reasoning.append("active stress posture demoted auto-activation candidates into must_confirm.")
+    return [], blocked_items, blocked_actions, reasoning
 
 
 def _actionability_gaps(
