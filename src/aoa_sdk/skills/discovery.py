@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Literal
+from typing import Any, Literal
 
 from ..compatibility import load_surface
 from ..loaders import extract_records
@@ -172,6 +172,7 @@ class SkillsAPI:
             "user-install",
             "not-provided",
         ] = "not-provided",
+        stress_context: dict[str, Any] | None = None,
     ) -> SkillDetectionReport:
         return detect_skills(
             self.workspace,
@@ -182,6 +183,7 @@ class SkillsAPI:
             closeout_path=closeout_path,
             host_available_skills=host_available_skills,
             host_availability_source=host_availability_source,
+            stress_context=stress_context,
         )
 
     def dispatch(
@@ -202,6 +204,7 @@ class SkillsAPI:
             "user-install",
             "not-provided",
         ] = "not-provided",
+        stress_context: dict[str, Any] | None = None,
     ) -> SkillDetectionReport:
         return dispatch_skills(
             self.workspace,
@@ -213,4 +216,5 @@ class SkillsAPI:
             session_file=session_file,
             host_available_skills=host_available_skills,
             host_availability_source=host_availability_source,
+            stress_context=stress_context,
         )
