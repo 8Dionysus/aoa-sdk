@@ -7,8 +7,13 @@
   "project_config_active": true,
   "hooks_active": true,
   "active_mcp_servers": [
-    "aoa_workspace",
+    "abyss_machine",
+    "aoa_decisions",
+    "aoa_evals",
+    "aoa_memo",
+    "aoa_session_memory",
     "aoa_stats",
+    "aoa_workspace",
     "dionysus"
   ],
   "rollout_state": "verified",
