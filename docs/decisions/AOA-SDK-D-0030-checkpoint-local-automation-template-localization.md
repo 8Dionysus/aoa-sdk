@@ -76,8 +76,5 @@ part-local. Do not reintroduce root hook or unit fallback homes.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py
-python scripts/validate_nested_agents.py
-python scripts/validate_mechanics_topology.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

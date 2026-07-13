@@ -514,7 +514,7 @@ activation = sdk.skills.activate(
 verify_binding = sdk.agents.binding_for_phase("verify")
 artifact = sdk.agents.new_artifact(
     phase="verify",
-    payload={"summary": "contract checks passed", "evidence": ["pytest -q"]},
+    payload={"summary": "contract checks passed", "evidence": ["contract-check-receipt"]},
 )
 
 # runtime

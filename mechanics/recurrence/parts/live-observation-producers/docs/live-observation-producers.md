@@ -1,6 +1,6 @@
 # Recurrence Live Observation Producers
 
-This seed adds the first live producer layer for recurrence. It reads owner-authored artifact families and emits `ObservationRecord` / `ObservationPacket` surfaces for the existing `observe -> beacon -> ledger -> review` path.
+This part supplies the live producer layer for recurrence. It reads owner-authored artifact families and emits `ObservationRecord` / `ObservationPacket` surfaces for the existing `observe -> beacon -> ledger -> review` path.
 
 The producers are not a scheduler, not an owner decision engine, and not an agent-spawn mechanism. They do not mutate canon, promote techniques, activate skills, author eval bundles, create playbooks, update KAG, or widen routing authority.
 
@@ -16,23 +16,9 @@ The producers are not a scheduler, not an owner decision engine, and not an agen
 
 ## CLI
 
-```bash
-aoa recur live producers --root /srv/AbyssOS/workspace --json
-
-aoa recur live observe \
-  --root /srv/AbyssOS/workspace \
-  --producer technique_readiness_watch \
-  --producer skill_trigger_surface_watch \
-  --json
-```
-
-Script route:
-
-```bash
-python mechanics/recurrence/parts/live-observation-producers/scripts/collect_live_recurrence_observations.py \
-  --workspace-root /srv/AbyssOS/workspace \
-  --json
-```
+Producer discovery and observation entrypoints are owned by the recurrence CLI
+and part-local collection script. Exact operator and test routes live in
+`../VALIDATION.md`.
 
 ## Boundary
 

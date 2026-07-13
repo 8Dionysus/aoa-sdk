@@ -14,6 +14,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
 
+      - name: Checkout aoa-stats validator
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-stats
+          ref: b0ffe46f5cf942d02e20ea5895e8a32a82f85da5
+          path: .aoa-stats-validator
+
       - name: Check repo-local KAG index family
         uses: 8Dionysus/aoa-kag/.github/actions/repo-local-kag-index@da9f50a581645b2173b99dbf771a63d447ec2fec
         with:
@@ -37,4 +44,5 @@ jobs:
       - name: Run release audit
         env:
           ABYSS_MACHINE_REPO_ROOT: .abyss-machine-verifier
+          AOA_STATS_ROOT: .aoa-stats-validator
         run: python scripts/release_check.py

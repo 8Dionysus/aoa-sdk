@@ -58,7 +58,7 @@ The current bridge target is the shared-root stable hook family:
 - `user_prompt_submit`
 - `session_stop`
 
-This route seeds owner bindings on `session_stop` because that is the safest place to read
+This route binds owner observations on `session_stop` because that is the safest place to read
 receipts, trigger refreshes, harvest notes, and runtime evidence without pretending that the
 hook itself owns execution.
 
@@ -72,10 +72,8 @@ hook itself owns execution.
 
 ## CLI
 
-```bash
-aoa recur hooks list --event session_stop --root /srv/AbyssOS/federation
-aoa recur hooks run --event session_stop --root /srv/AbyssOS/federation --json
-aoa recur observe --hook-run /srv/federation/aoa-sdk/.aoa/recurrence/hooks/session_stop.latest.json --json
-```
+Hook listing, bounded execution, and observation intake are owned by the
+recurrence CLI. Exact operator and test routes live in the part
+`VALIDATION.md`.
 
 The last step keeps hook output subordinate to the existing observe -> beacon -> ledger path.

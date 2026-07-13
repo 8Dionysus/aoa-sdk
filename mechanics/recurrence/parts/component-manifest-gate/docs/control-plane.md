@@ -51,12 +51,8 @@ Agon-shaped observation manifests as diagnostics instead of trying to coerce
 them into components.
 
 Run the gate before graph closure, observation producers, or downstream
-projection work:
-
-```bash
-aoa recur manifest-scan --root /srv/AbyssOS --json
-python mechanics/recurrence/parts/component-manifest-gate/scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS
-```
+projection work. The executable scan and validator routes are owned by the
+recurrence CLI, the part-local validator, and this part's `VALIDATION.md`.
 
 `adapter_required` Agon diagnostics are observation-only. They must not create
 arena sessions, verdicts, scars, ranks, owner mutations, or agent spawns.
@@ -70,37 +66,19 @@ edge strength, cycles, skipped edges, external impacts, and topological
 propagation batches before planner or review work. Snapshots record graph shape
 for comparison; deltas are review input, not routing authority.
 
-```bash
-aoa recur graph snapshot --root /srv/AbyssOS --json
-aoa recur graph closure --root /srv/AbyssOS --component component:<owner>:<name> --depth-limit 8 --json
-aoa recur graph diff before.snapshot.json after.snapshot.json --root /srv/AbyssOS --json
-python mechanics/recurrence/parts/graph-closure-snapshot/scripts/build_recurrence_graph_snapshot.py --workspace-root /srv/AbyssOS --json
-```
+Snapshot, closure, diff, and snapshot building are owned by the graph-closure
+part and its `VALIDATION.md`.
 
-## Control-plane commands
+## Control-plane route
 
-```bash
-aoa recur manifest-scan --root /srv/AbyssOS --json
-aoa recur graph snapshot --root /srv/AbyssOS --json
-aoa recur graph closure --root /srv/AbyssOS --component component:<owner>:<name> --depth-limit 8 --json
-aoa recur graph diff before.snapshot.json after.snapshot.json --root /srv/AbyssOS --json
-aoa recur live producers --root /srv/AbyssOS --json
-aoa recur live observe --root /srv/AbyssOS --json
-aoa recur review decision-template /srv/AbyssOS/aoa-sdk/.aoa/recurrence/review-queues/latest.json --item-ref review-item:0001 --decision defer --root /srv/AbyssOS --json
-aoa recur review close /srv/AbyssOS/aoa-sdk/.aoa/recurrence/review-queues/latest.json --decision /srv/AbyssOS/aoa-sdk/.aoa/recurrence/review-decisions/decision.example.json --root /srv/AbyssOS --json
-aoa recur project routing --root /srv/AbyssOS --json
-aoa recur project stats --root /srv/AbyssOS --json
-aoa recur project kag --root /srv/AbyssOS --json
-aoa recur project build --root /srv/AbyssOS --json
-aoa recur detect /srv/AbyssOS/8Dionysus --from git:HEAD~1..HEAD --root /srv/AbyssOS --json
-aoa recur plan /srv/AbyssOS/aoa-sdk/.aoa/recurrence/signals/8Dionysus.latest.json --root /srv/AbyssOS --json
-aoa recur doctor /srv/AbyssOS/aoa-sdk/.aoa/recurrence/signals/8Dionysus.latest.json --root /srv/AbyssOS --json
-aoa recur handoff /srv/AbyssOS/aoa-sdk/.aoa/recurrence/plans/component.codex-plane.shared-root.latest.json --reviewed --root /srv/AbyssOS --json
-```
+Manifest, graph, live-observation, review, projection, detection, planning,
+doctor, and reviewed-handoff command families are owned by the recurrence CLI.
+Each part's `VALIDATION.md` owns its exact focused checks; root `AGENTS.md`
+owns the repository-wide executable route.
 
 ## Honesty rules
 
-Wave one must not:
+This control plane must not:
 
 - mutate owner repos on detection
 - claim validation already passed when only a plan exists

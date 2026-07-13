@@ -77,12 +77,8 @@ next owner-status landing, use the companion carry in
 `aoa surfaces handoff` does not auto-emit that packet, and it does not auto-run
 owner refresh.
 
-## Commands
+## Executable route
 
-```bash
-aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json \
-  --session-ref session:2026-04-07-surface-initial-boundary \
-  --reviewed \
-  --root /srv/AbyssOS/aoa-sdk \
-  --json
-```
+Reviewed handoff execution is owned by the surface CLI. Exact operator and
+regression routes are maintained in the part `VALIDATION.md` and root
+`AGENTS.md`.

@@ -83,8 +83,5 @@ compatibility path drift into sibling source ownership or hidden SDK fallback.
 
 ## Verification
 
-```bash
-python scripts/generate_decision_indexes.py --check
-python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py tests/test_decision_indexes.py
-aoa compatibility check /srv/AbyssOS/aoa-sdk
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

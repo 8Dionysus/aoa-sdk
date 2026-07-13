@@ -21,17 +21,13 @@ This surface stays on the control plane:
 
 ## Install
 
-From the `aoa-sdk` checkout:
-
-```bash
-python -m pip install -e '.[mcp]'
-```
+The MCP package extra in `pyproject.toml` owns installation dependencies.
+Exact operator and regression routes live in this part's `VALIDATION.md`.
 
 ## Run
 
-```bash
-python mechanics/codex-projection/parts/workspace-mcp-server/scripts/aoa_workspace_mcp_server.py
-```
+The part-local server script is the executable entrypoint; its checked route is
+owned by this part's `VALIDATION.md`.
 
 For the `/srv/AbyssOS` federation workspace, the project-level Codex config should wire
 the server from [`/srv/AbyssOS/.codex/config.toml`](/srv/AbyssOS/.codex/config.toml) with:

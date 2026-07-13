@@ -89,7 +89,5 @@ Recurrence, Titan, checkpoint, and boundary payloads.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/experience/parts/capture-pipeline-helper/tests/test_capture_pipeline_helper.py mechanics/experience/parts/adoption-federation-helper-contracts/tests/test_adoption_federation_helper_contracts.py mechanics/experience/parts/deployment-watchtower-helper-contracts/tests/test_deployment_watchtower_helper_contracts.py mechanics/experience/parts/governance-runtime-helper-contracts/tests/test_governance_runtime_helper_contracts.py mechanics/experience/parts/office-release-train-helper-contracts/tests/test_office_release_train_helper_contracts.py
-python scripts/validate_mechanics_topology.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

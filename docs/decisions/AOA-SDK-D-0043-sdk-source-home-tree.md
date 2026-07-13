@@ -102,8 +102,5 @@ they touch implementation or mechanics.
 
 ## Verification
 
-```bash
-python scripts/validate_sdk_source_home.py
-python scripts/validate_nested_agents.py --strict-advisory --fail-on-untracked
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

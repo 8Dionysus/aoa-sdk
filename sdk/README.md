@@ -20,7 +20,7 @@ mechanic routes, validation routes, and stronger-owner stop lines.
 | owner | `sdk/source_home.manifest.json` plus nearest branch `AGENTS.md` |
 | next route | target branch, implementation surface, mechanic package, validator, or decision record |
 | tools | `scripts/validate_sdk_source_home.py`, `scripts/validate_nested_agents.py`, and owner-specific tests |
-| validation | `python scripts/validate_sdk_source_home.py` plus branch-specific checks |
+| validation | `scripts/validate_sdk_source_home.py` plus branch-specific executable-owner checks |
 
 ## Active Source Branches
 

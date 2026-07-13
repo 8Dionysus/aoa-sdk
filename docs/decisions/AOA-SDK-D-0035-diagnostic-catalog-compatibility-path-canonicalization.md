@@ -76,7 +76,5 @@ canonical path and add an explicit negative test for stale root fallback.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py mechanics/codex-projection/parts/workspace-mcp-server/tests/test_workspace_mcp_server.py
-python -m ruff check src/aoa_sdk/compatibility/policy.py src/aoa_sdk/codex/workspace_mcp.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py mechanics/codex-projection/parts/workspace-mcp-server/tests/test_workspace_mcp_server.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

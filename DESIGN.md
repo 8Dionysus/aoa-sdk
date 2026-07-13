@@ -21,6 +21,7 @@ Adjacent routes:
 - durable rationale: `docs/decisions/`
 - mechanics operation topology: `mechanics/`
 - SDK source home: `sdk/`
+- SDK-local statistical port: `stats/`
 - importable SDK source: `src/aoa_sdk/`
 - generated control-plane capsule: `generated/workspace_control_plane.min.json`
 
@@ -74,6 +75,7 @@ and where does the next stronger claim return?
 | `docs/` | authored root explanation for boundaries, workspace layout, compatibility, release route doors, decisions, and control-plane posture |
 | `docs/decisions/` | durable rationale for topology, route-law, source-home, validation, and mechanics choices |
 | `evals/` | SDK-local eval pressure port for intake, suites, and reports before proof adoption by `aoa-evals` |
+| `stats/` | SDK-local measurement questions and evidence-linked reference packets; shared statistical grammar remains in `aoa-stats` |
 | `mechanics/` | repeatable SDK operation topology, part-local artifact homes, source maps, and package route law |
 | `.aoa/` | workspace metadata and local control-plane runtime artifacts, not hidden source truth |
 | `schemas/` | shared SDK helper contract schemas and root-published generated contracts |

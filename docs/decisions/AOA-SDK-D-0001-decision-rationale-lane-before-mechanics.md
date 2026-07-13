@@ -85,7 +85,5 @@ SDK rule for shared AoA mechanics versus justified local SDK mechanics.
 
 ## Verification
 
-```bash
-python scripts/generate_decision_indexes.py --check
-python scripts/validate_nested_agents.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

@@ -3,21 +3,11 @@
 This SDK seam reads recursor readiness surfaces from `aoa-agents` and emits
 compact workspace projections for recurrence. It is read-only.
 
-## Commands to wire later
+## Executable route
 
-```bash
-aoa recur agents readiness --root /srv/AbyssOS/workspace --json
-aoa recur agents boundary-check --root /srv/AbyssOS/workspace --json
-aoa recur agents projection-candidates --root /srv/AbyssOS/workspace --json
-```
-
-The part-local script included in this seed already supports the same three modes:
-
-```bash
-python mechanics/recurrence/parts/recursor-readiness/scripts/recursor_agent_readiness.py readiness --workspace-root /srv/AbyssOS/workspace --json
-python mechanics/recurrence/parts/recursor-readiness/scripts/recursor_agent_readiness.py boundary-check --workspace-root /srv/AbyssOS/workspace --json
-python mechanics/recurrence/parts/recursor-readiness/scripts/recursor_agent_readiness.py projection-candidates --workspace-root /srv/AbyssOS/workspace --json
-```
+Readiness, boundary-check, and projection-candidate modes are owned by the
+recurrence CLI and the part-local readiness script. Their canonical operator
+and test route is `../VALIDATION.md`.
 
 ## Boundary
 

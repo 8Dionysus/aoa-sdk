@@ -1,15 +1,12 @@
-# CLI insert: downstream recurrence projections
+# Downstream Recurrence Projection CLI Route
 
-Add a `project` sub-command group under `aoa recur`.
+The recurrence CLI owns bounded routing, stats, KAG, and complete-bundle
+projection modes. Their executable definitions remain under
+`src/aoa_sdk/recurrence/`; focused checks are routed through
+`../VALIDATION.md`.
 
-```bash
-aoa recur project routing --root /srv/AbyssOS/workspace --json
-aoa recur project stats --root /srv/AbyssOS/workspace --json
-aoa recur project kag --root /srv/AbyssOS/workspace --json
-aoa recur project build --root /srv/AbyssOS/workspace --json
-```
-
-Primary inputs are optional so Codex can run the pack incrementally during landing:
+Primary inputs are optional so a reviewed projection can be assembled
+incrementally:
 
 - `--plan`
 - `--doctor`

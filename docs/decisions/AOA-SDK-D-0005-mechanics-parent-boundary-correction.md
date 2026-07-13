@@ -121,9 +121,5 @@ represented as a part of `boundary-bridge`, `checkpoint`, `runtime-seam`,
 
 ## Verification
 
-```bash
-python scripts/generate_decision_indexes.py --check
-python scripts/validate_mechanics_topology.py
-python scripts/validate_nested_agents.py
-python -m pytest -q tests/test_mechanics_topology.py tests/test_validate_nested_agents.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

@@ -45,4 +45,4 @@ Former root sibling-canary script, matrix, and regression moved into
 
 OS Abyss package artifact bundle validation is part-local to
 `release-audit-publish-helper`; root `scripts/release_check.py` only
-orchestrates it after `python -m build`.
+orchestrates it after the package build step.

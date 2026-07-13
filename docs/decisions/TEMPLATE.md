@@ -47,6 +47,5 @@ Name the next owner surface or validator that should carry future work.
 
 ## Verification
 
-```bash
-python scripts/generate_decision_indexes.py --check
-```
+Name the owning validator path in the source or follow-up route. Executable
+decision-index checks remain routed through `docs/decisions/AGENTS.md`.

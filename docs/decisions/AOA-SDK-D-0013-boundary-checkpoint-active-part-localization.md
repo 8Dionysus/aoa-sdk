@@ -95,10 +95,5 @@ antifragility, design-route tests, and cross-mechanic public contracts.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py
-python -m pytest -q mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_sdk_api.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_skill_contract.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_assessment.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_checkpoint_and_return.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_codex_and_closeout.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_e2e_fixture.py
-python scripts/build_workspace_control_plane.py --check
-python scripts/validate_workspace_control_plane.py
-python scripts/validate_mechanics_topology.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

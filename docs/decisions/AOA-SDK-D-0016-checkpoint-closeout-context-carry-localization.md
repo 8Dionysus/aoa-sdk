@@ -91,7 +91,5 @@ cross-mechanic public contracts.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py
-python scripts/validate_mechanics_topology.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

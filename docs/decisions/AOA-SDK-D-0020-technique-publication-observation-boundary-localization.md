@@ -69,8 +69,5 @@ payload, and remaining cross-mechanic public contracts.
 
 ## Verification
 
-```bash
-python scripts/validate_mechanics_topology.py
-python -m pytest -q tests/test_docs_routes.py tests/test_mechanics_topology.py
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

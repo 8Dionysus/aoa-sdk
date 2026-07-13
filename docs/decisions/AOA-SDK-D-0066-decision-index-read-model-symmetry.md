@@ -83,7 +83,5 @@ decision-lane route card together.
 
 ## Verification
 
-```bash
-python scripts/generate_decision_indexes.py --check
-python -m pytest -q tests/test_decision_indexes.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

@@ -65,8 +65,5 @@ at root.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py tests/test_docs_routes.py
-python scripts/validate_mechanics_topology.py
-python scripts/generate_decision_indexes.py --check
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

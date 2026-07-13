@@ -81,9 +81,5 @@ commands, or model families.
 
 ## Verification
 
-```bash
-python scripts/build_source_topology_index.py --check
-python scripts/validate_source_topology_index.py
-python -m pytest -q tests/test_source_topology_index.py
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

@@ -48,19 +48,19 @@ Use the tiers below when you need to verify a current SDK claim:
 
 | tier | purpose | surface |
 |---|---|---|
-| Tier 1 | local control-plane battery | `python -m pytest -q`, `python -m ruff check .`, `aoa workspace inspect /srv/AbyssOS/aoa-sdk`, `aoa compatibility check /srv/AbyssOS/aoa-sdk` |
-| Tier 2 | release reinforcement | `python -m mypy src`, `python -m build`, `.github/workflows/repo-validation.yml` |
-| Tier 3 | live sibling drift detection | `python mechanics/release-support/parts/public-support-ci-posture/scripts/run_sibling_canary.py --repo-root .`, `.github/workflows/latest-sibling-canary.yml` |
+| Tier 1 | local control-plane battery | root `AGENTS.md#verify` and `scripts/release_check.py` |
+| Tier 2 | release reinforcement | `scripts/release_check.py` and `.github/workflows/repo-validation.yml` |
+| Tier 3 | live sibling drift detection | the part-local sibling-canary runner and `.github/workflows/latest-sibling-canary.yml` |
 
-For a repo-scoped compatibility view, use `aoa compatibility check /srv/AbyssOS/aoa-sdk --repo <repo> --json`.
+Repo-scoped compatibility inspection remains owned by the SDK CLI and is
+routed through root `AGENTS.md#verify`.
 
 ## Release audit surface
 
-The SDK also owns the bounded federation release control plane:
-
-- `aoa release audit /srv/AbyssOS --phase preflight|postpublish|cadence --all --json`
-- `aoa release publish /srv/AbyssOS --repo <repo>|--all-due --dry-run|--confirm --json`
-- `python scripts/release_check.py`
+The SDK also owns the bounded federation release control plane. Its executable
+audit and publication routes live in the release CLI and the canonical
+release runbook; repository validation remains owned by
+`scripts/release_check.py`.
 
 Those helpers verify or publish release surfaces.
 They do not author sibling changelog meaning.

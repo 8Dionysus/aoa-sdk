@@ -96,11 +96,5 @@ add hidden closeout, review, harvest, memory, or owner actions.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_session_memory.py
-python scripts/generate_decision_indexes.py --check
-python scripts/build_source_topology_index.py --check
-python scripts/validate_source_topology_index.py
-aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

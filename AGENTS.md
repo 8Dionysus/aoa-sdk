@@ -16,6 +16,8 @@ This repository owns:
 - the SDK source-home topology under `sdk/`, including
   `sdk/source_home.manifest.json`, branch route cards, and SDK posture routes
 - workspace discovery, topology resolution, compatibility checks, versioning posture, and CLI inspection surfaces
+- the root `stats/` port for SDK-owned measurement questions and
+  evidence-linked reference packets
 - the compact control-plane capsule at `generated/workspace_control_plane.min.json`
 - the mechanics topology under `mechanics/`, including package route cards,
   source-family routes, future-pressure roadmaps, part-local artifact homes,
@@ -43,10 +45,12 @@ It does not own:
 9. `sdk/README.md` and `sdk/source_home.manifest.json` when SDK source-home
    posture, public-interface, facade-boundary, runtime-entry, or distribution
    topology changes
-10. `mechanics/README.md` and `mechanics/ROADMAP.md` when repeatable SDK
+10. `stats/AGENTS.md`, `stats/README.md`, and `stats/port.manifest.json` when
+    an SDK-owned statistical question or reference packet changes
+11. `mechanics/README.md` and `mechanics/ROADMAP.md` when repeatable SDK
    operation topology, package routing, or mechanics future pressure changes
-11. `.aoa/workspace.toml`
-12. source files and tests you plan to touch
+12. `.aoa/workspace.toml`
+13. source files and tests you plan to touch
 
 
 ## AGENTS stack law
@@ -141,6 +145,7 @@ Minimum validation for code, topology, or reviewed-handoff changes:
 ```bash
 python scripts/generate_decision_indexes.py --check
 python scripts/validate_sdk_source_home.py
+python scripts/validate_local_stats_port.py
 python scripts/validate_mechanics_topology.py
 python scripts/build_source_topology_index.py --check
 python scripts/validate_source_topology_index.py
