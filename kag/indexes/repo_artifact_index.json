@@ -1183,7 +1183,7 @@
     {"anchor_id":"aoa:aoa-sdk:anchor:b616f6fdb1d3843838c7cc50","artifact_kind":"script","content_hash":"f82c9582ef35f8e7e4fd6582e4e33f35581d17199cd55ad739454ba0e23948fa","id":"aoa:aoa-sdk:artifact:b3d684e01b3cf8ea5ae69b0b","lineage_path":"scripts/build_source_topology_index.py","mime":"text/x-python","path":"scripts/build_source_topology_index.py","provenance_ref":"deterministic","surface_state":"authored_source","temporal_ref":"current","trust_ref":"deterministic","version_id":"aoa:aoa-sdk:artifact-version:57e5e3d435ae95862cbf1c64"},
     {"anchor_id":"aoa:aoa-sdk:anchor:60331816c0ec081295d64961","artifact_kind":"script","content_hash":"be8d03834aabf72a7b1e747ac854f9a551bba6b537498be7cbd2429d0d7cec5e","id":"aoa:aoa-sdk:artifact:bcbbbbb3f2955d94ce20bd6f","lineage_path":"scripts/build_workspace_control_plane.py","mime":"text/x-python","path":"scripts/build_workspace_control_plane.py","provenance_ref":"deterministic","surface_state":"authored_source","temporal_ref":"current","trust_ref":"deterministic","version_id":"aoa:aoa-sdk:artifact-version:1488c04399cffdf6fc7ea971"},
     {"anchor_id":"aoa:aoa-sdk:anchor:6bb84a896d40403e22ffd860","artifact_kind":"script","content_hash":"cfb0ec17092f69d128f67181899c794471c49701c86694df82049a3939ad7880","id":"aoa:aoa-sdk:artifact:9ee2698c6e40371183b10fdd","lineage_path":"scripts/generate_decision_indexes.py","mime":"text/x-python","path":"scripts/generate_decision_indexes.py","provenance_ref":"deterministic","surface_state":"authored_source","temporal_ref":"current","trust_ref":"deterministic","version_id":"aoa:aoa-sdk:artifact-version:d6ae42c7360746ef50228b24"},
-    {"anchor_id":"aoa:aoa-sdk:anchor:f807a785706e30ed513c4601","artifact_kind":"script","content_hash":"f36500c6fa39a0486458e7f9eb5fdbc71f1828bf9f53ff13b9b249e438ce6fdb","id":"aoa:aoa-sdk:artifact:070046d3ac1483cac58e8963","lineage_path":"scripts/release_check.py","mime":"text/x-python","path":"scripts/release_check.py","provenance_ref":"deterministic","surface_state":"authored_source","temporal_ref":"current","trust_ref":"deterministic","version_id":"aoa:aoa-sdk:artifact-version:35974cfac7f2b1d98bb81b97"},
+    {"anchor_id":"aoa:aoa-sdk:anchor:f807a785706e30ed513c4601","artifact_kind":"script","content_hash":"75471b2f48d16046841814e1be27fc0f3c841222d47ae57fb3b81f5c82737f96","id":"aoa:aoa-sdk:artifact:070046d3ac1483cac58e8963","lineage_path":"scripts/release_check.py","mime":"text/x-python","path":"scripts/release_check.py","provenance_ref":"deterministic","surface_state":"authored_source","temporal_ref":"current","trust_ref":"deterministic","version_id":"aoa:aoa-sdk:artifact-version:f9e2f47209e0a4b079b5652a"},
     {"anchor_id":"aoa:aoa-sdk:anchor:730714fd8de523840f3fc1b6","artifact_kind":"script","content_hash":"ea20a88e02e7d087d3d6bf114b82f19287c4fc2081d83125d1240f8ca362bc2d","id":"aoa:aoa-sdk:artifact:0cc70e0e9c511161407da8c0","lineage_path":"scripts/source_topology_common.py","mime":"text/x-python","path":"scripts/source_topology_common.py","provenance_ref":"deterministic","surface_state":"authored_source","temporal_ref":"current","trust_ref":"deterministic","version_id":"aoa:aoa-sdk:artifact-version:c88be490a991e6cc1cf19ac8"},
     {"anchor_id":"aoa:aoa-sdk:anchor:6810f6ddba8cc0987f3649be","artifact_kind":"validator","content_hash":"efd486b5f0ebebbfdca1b64eb45b38f51036e7918b78539d59b3dc57a0646c0a","id":"aoa:aoa-sdk:artifact:ea1a73c3524c9e1c4469c454","lineage_path":"scripts/validate_local_stats_port.py","mime":"text/x-python","path":"scripts/validate_local_stats_port.py","provenance_ref":"deterministic","surface_state":"authored_source","temporal_ref":"current","trust_ref":"deterministic","version_id":"aoa:aoa-sdk:artifact-version:ee5854d4baf6fb075f104307"},
     {"anchor_id":"aoa:aoa-sdk:anchor:0b336b2ae1c7114119d4eaff","artifact_kind":"validator","content_hash":"19e748aa2faadd628c5699cbdba68a53a596f401d946f7a8f44ef3a26b27f842","id":"aoa:aoa-sdk:artifact:2914a033b829ebf6138973ce","lineage_path":"scripts/validate_mechanics_topology.py","mime":"text/x-python","path":"scripts/validate_mechanics_topology.py","provenance_ref":"deterministic","surface_state":"authored_source","temporal_ref":"current","trust_ref":"deterministic","version_id":"aoa:aoa-sdk:artifact-version:bf44771390c23c49b5a21362"},
@@ -1529,7 +1529,7 @@
   ],
   "index_identity": {
     "artifact_kind": "repository_artifact_index",
-    "content_digest": "a2940276cdc46549ca0339a87ee0cbd3c1ccf763678853c917c77cdb2a541b4e",
+    "content_digest": "25376372e8df422e0cd4cd5e04cae81753dbb89938f356292fa8e8dc4358de61",
     "index_kind": "artifact",
     "local_id": "index:repo-local:artifacts",
     "schema_ref": "aoa-kag:schemas/repo-local-kag-repository-index.schema.json"
@@ -1615,7 +1615,7 @@
   },
   "schema_version": "aoa-repo-local-kag-repository-index-v2",
   "source_index": {
-    "content_digest": "289cd60c6759d3c372319346542361d33d0fb0ed37a53bb934cb41191c3086f3",
+    "content_digest": "f98a78f278d94ea61cd2026983f72e1cb2efbf79c47cd72a073fa73587644920",
     "local_id": "index:repo-local:source-surfaces",
     "path": "kag/indexes/source_surface_index.json"
   },
