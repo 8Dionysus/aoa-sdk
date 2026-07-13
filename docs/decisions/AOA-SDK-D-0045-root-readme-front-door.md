@@ -92,9 +92,5 @@ record. Keep the root README as the route selector.
 
 ## Verification
 
-```bash
-python scripts/generate_decision_indexes.py --check
-python scripts/validate_nested_agents.py
-python scripts/validate_mechanics_topology.py
-python -m pytest -q tests/test_docs_routes.py tests/test_design_surfaces.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

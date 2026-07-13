@@ -9,6 +9,14 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
+- Add a root `stats/` port for the SDK-owned question of explicit version
+  negotiation across the federation compatibility policy, with a `77 / 80`
+  source-revision census, evidence-linked reference packet, and central
+  `aoa-stats` protocol validation.
+- Consolidate executable validation and command routes into scripts, CLI
+  owners, part `VALIDATION.md`, and agent route cards; general documentation
+  and decision notes retain meaning and verified results without duplicating
+  command batteries.
 - Align the local `evals/` port with the root README and design anatomy maps
   so SDK-local eval pressure is discoverable while proof authority remains in
   `aoa-evals`.
@@ -22,6 +30,9 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Notes
 
+- Keep the typed sibling stats facade under `src/aoa_sdk/stats/`; the root
+  `stats/` port measures SDK-owned compatibility posture and does not replace
+  that consumer boundary.
 - Add future changes here after the release tag lands. Dated release sections
   own exact reconciliation spans and validation evidence.
 
@@ -181,9 +192,8 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Reconciliation Basis
 
-- This release section was reconstructed from
-  `git log --first-parent v0.2.3..origin/main`, `git diff --name-status`,
-  merged PR metadata, landed decision records, route cards, compatibility
+- This release section was reconstructed from first-parent history, the
+  changed-path inventory, merged PR metadata, landed decision records, route cards, compatibility
   policy, workspace fixtures, mechanics topology, source topology, and the
   current release gate rather than from the moving changelog contour alone.
 - Future `Unreleased` entries should record stable route, owner, and
@@ -512,20 +522,9 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Validation
 
-- `python scripts/generate_decision_indexes.py --check`
-- `python scripts/validate_sdk_source_home.py`
-- `python scripts/validate_mechanics_topology.py`
-- `python scripts/build_workspace_control_plane.py --check`
-- `python scripts/validate_workspace_control_plane.py`
-- `python -m pytest -q`
-- `python -m ruff check .`
-- `python -m mypy src`
-- `python -m build`
-- `aoa compatibility check /srv/AbyssOS/aoa-sdk`
-- `aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json`
-- `aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json`
-- `python scripts/release_check.py`
-- `aoa release audit /srv/AbyssOS --phase preflight --repo aoa-sdk --strict --json`
+- Decision-index, source-home, mechanics, generated control-plane, test,
+  static-analysis, type, package-build, compatibility, checkpoint-lifecycle,
+  and release-preflight gates completed successfully.
 
 ### Notes
 
@@ -578,7 +577,7 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Validation
 
-- `python scripts/release_check.py`
+- The canonical release gate completed successfully.
 
 ### Notes
 
@@ -611,7 +610,7 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Validation
 
-- `python scripts/release_check.py`
+- The canonical release gate completed successfully.
 
 ### Notes
 
@@ -645,12 +644,13 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Fixed
 
-- `aoa release publish` now treats GitHub Release lookup timeouts as an unknown remote state and aborts before tag mutation.
+- Release publication now treats GitHub Release lookup timeouts as an unknown
+  remote state and aborts before tag mutation.
 - checkpoint closeout execution now writes reports and reviewed artifacts into the same runtime-session-scoped ledger as the generated closeout context.
 
 ### Validation
 
-- `python scripts/release_check.py`
+- The canonical release gate completed successfully.
 
 ### Notes
 
@@ -668,7 +668,7 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Validation
 
-- `python scripts/release_check.py`
+- The canonical release gate completed successfully.
 
 ### Notes
 
@@ -732,9 +732,8 @@ This changelog entry uses the release-prep merge date.
 
 ### Validation
 
-- `pytest -q`
-- `python -m ruff check .`
-- `aoa workspace inspect /srv/AbyssOS/aoa-sdk`
+- Unit tests and static checks passed, and workspace inspection returned the
+  expected resolved topology.
 
 ### Notes
 

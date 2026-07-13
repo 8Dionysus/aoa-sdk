@@ -1,14 +1,79 @@
 from __future__ import annotations
 
+import re
+import subprocess
 from pathlib import Path
 
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 CARRY_PART = "mechanics/checkpoint/parts/reviewed-closeout-context-carry"
+PRIMARY_COMMAND_DOCS = frozenset(
+    {"mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md"}
+)
+EXECUTABLE_MARKDOWN_PREFIXES = (".agents/skills/",)
+SHELL_FENCE_PATTERN = re.compile(
+    r"^ {0,3}```(?:bash|console|sh|shell|zsh)(?:\s+.*)?$",
+    re.IGNORECASE | re.MULTILINE,
+)
+REPO_COMMAND_LINE_PATTERN = re.compile(
+    r"^[ \t]*(?:[-*][ \t]+)?`?(?:"
+    r"python3?(?:[ \t]+-m)?[ \t]+|pytest(?=[ \t])|"
+    r"uv[ \t]+run[ \t]+pytest\b|git[ \t]+(?:status|diff)\b|"
+    r"aoa[ \t]+release\b)",
+    re.MULTILINE,
+)
+INLINE_REPO_COMMAND_PATTERN = re.compile(
+    r"(?<!`)`(?!``)(?:python3?(?:\s+-m)?\s+|pytest(?=\s)|"
+    r"uv\s+run\s+pytest\b|git\s+(?:status|diff)\b|"
+    r"aoa\s+release\b)[^`\n]+`(?!`)"
+)
+FENCE_OPEN_PATTERN = re.compile(r"^ {0,3}```")
+COMMAND_BLOCK_LINE_PATTERN = re.compile(
+    r"^[ \t]*(?:\$[ \t]+)?(?:python3?|pytest|uv|pip3?|aoa|git|ruff|mypy|"
+    r"make|tox|hatch|poetry)(?:[ \t]+(?![=:])\S+)"
+)
 
 
 def read_text(relative_path: str) -> str:
     return (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+
+
+def tracked_markdown_paths() -> tuple[Path, ...]:
+    completed = subprocess.run(
+        ("git", "ls-files", "--", "*.md"),
+        cwd=REPO_ROOT,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    return tuple(Path(line) for line in completed.stdout.splitlines() if line)
+
+
+def markdown_command_violations(content: str) -> set[str]:
+    violations: set[str] = set()
+    if SHELL_FENCE_PATTERN.search(content):
+        violations.add("shell command block")
+    elif fenced_command_block_present(content):
+        violations.add("command block")
+    if REPO_COMMAND_LINE_PATTERN.search(content):
+        violations.add("repo command line")
+    if INLINE_REPO_COMMAND_PATTERN.search(content):
+        violations.add("inline repo command")
+    return violations
+
+
+def fenced_command_block_present(content: str) -> bool:
+    in_fence = False
+    for line in content.splitlines():
+        if not in_fence and FENCE_OPEN_PATTERN.match(line):
+            in_fence = True
+            continue
+        if in_fence and line.strip() == "```":
+            in_fence = False
+            continue
+        if in_fence and COMMAND_BLOCK_LINE_PATTERN.match(line):
+            return True
+    return False
 
 
 def changelog_unreleased_section(changelog: str) -> str:
@@ -47,6 +112,46 @@ def test_readme_is_public_front_door_not_command_authority() -> None:
     ]
     for text in forbidden_command_text:
         assert text not in readme
+
+
+def test_non_owner_markdown_routes_runnable_commands_to_command_owners() -> None:
+    offenders: list[str] = []
+    for relative_path in tracked_markdown_paths():
+        route = relative_path.as_posix()
+        if route.startswith(EXECUTABLE_MARKDOWN_PREFIXES):
+            continue
+        if relative_path.name in {"AGENTS.md", "VALIDATION.md"}:
+            continue
+        if route in PRIMARY_COMMAND_DOCS:
+            continue
+        content = (REPO_ROOT / relative_path).read_text(encoding="utf-8")
+        for violation in sorted(markdown_command_violations(content)):
+            offenders.append(f"{route}: {violation}")
+
+    assert offenders == []
+
+
+def test_markdown_command_guard_rejects_scattered_command_forms() -> None:
+    content = """# Drift
+
+```bash
+python scripts/validate_sdk_source_home.py
+```
+
+- `python -m pytest -q`
+- git status -sb
+"""
+
+    assert markdown_command_violations(content) == {
+        "inline repo command",
+        "repo command line",
+        "shell command block",
+    }
+
+    assert markdown_command_violations("```text\naoa recur agents spawn\n```\n") == {
+        "command block"
+    }
+    assert markdown_command_violations("```python\nfrom aoa_sdk import AoASDK\n```\n") == set()
 
 
 def test_readme_license_matches_project_license() -> None:
@@ -168,7 +273,7 @@ def test_changelog_records_current_release_contour() -> None:
     assert "This dated section is the canonical `v0.4.0` reconciliation contour" in changelog
     assert "mechanics topology" in changelog
     assert "retired from the active mechanics root" in changelog
-    assert "python scripts/validate_mechanics_topology.py" in changelog
+    assert "release-preflight gates completed successfully" in changelog
 
 
 def test_changelog_unreleased_avoids_live_reconciliation_counters() -> None:
@@ -304,13 +409,10 @@ def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
     assert "plain `git commit` can trigger one active-session-only checkpoint pass" in checkpoints
     assert "post-commit-report.json" in checkpoints
     assert "aoa-sdk/.aoa/session-growth/post-commit-status/<repo>.latest.json" in checkpoints
-    assert "aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json" in checkpoints
-    assert "aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD" in checkpoints
-    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in checkpoints
-    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in checkpoints
+    assert "Skill prelude, surface detection, checkpoint capture" in checkpoints
+    assert "root `AGENTS.md`" in checkpoints
+    assert "this part's\n`VALIDATION.md`" in checkpoints
     assert "real intermediate findings, candidate notes, stats hints" in checkpoints
-    assert "aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk" in checkpoints
-    assert "aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk" in checkpoints
     assert "aoa-checkpoint-closeout-bridge" in checkpoints
     assert "continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref" in checkpoints
     assert "reanchor_need" in checkpoints

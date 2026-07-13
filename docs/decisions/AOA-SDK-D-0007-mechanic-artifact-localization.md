@@ -108,12 +108,5 @@ need owner review before moving, because their nearest active owner may be
 
 ## Verification
 
-```bash
-python scripts/generate_decision_indexes.py --check
-python scripts/validate_mechanics_topology.py
-python mechanics/agon/parts/recurrence-adapter/scripts/build_agon_recurrence_adapter_registry.py --check
-python mechanics/agon/parts/recurrence-adapter/scripts/validate_agon_recurrence_adapter.py
-python mechanics/agon/parts/recurrence-adapter/scripts/build_agon_recurrence_prebinding_review_lanes.py --check
-python mechanics/agon/parts/recurrence-adapter/scripts/validate_agon_recurrence_prebinding_review_lanes.py
-python -m pytest -q mechanics/agon/parts/recurrence-adapter/tests/test_agon_recurrence_adapter.py mechanics/agon/parts/recurrence-adapter/tests/test_agon_recurrence_prebinding_review_lanes.py tests/test_mechanics_topology.py tests/test_validate_nested_agents.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

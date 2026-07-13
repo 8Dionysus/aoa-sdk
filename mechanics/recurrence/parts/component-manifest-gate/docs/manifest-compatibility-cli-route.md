@@ -1,13 +1,8 @@
-# Insert: Manifest Compatibility Gate
+# Manifest Compatibility CLI Route
 
-Add this insert to `RECURRENCE_CONTROL_PLANE.md` or the local recurrence landing note.
-
-Before recurrence expands into graph closure, run a manifest compatibility scan:
-
-```bash
-aoa recur manifest-scan --root /srv/AbyssOS/workspace --json
-python mechanics/recurrence/parts/component-manifest-gate/scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS/workspace --json
-```
+Manifest compatibility precedes graph closure. The executable scan is owned by
+the recurrence CLI and the part-local manifest validator; its canonical
+operator and test route is `../VALIDATION.md`.
 
 The scan is successful when:
 

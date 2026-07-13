@@ -79,11 +79,5 @@ and validator surfaces.
 
 ## Verification
 
-```bash
-python scripts/build_workspace_control_plane.py --check
-python scripts/validate_workspace_control_plane.py
-python -m pytest -q mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py
-python scripts/validate_mechanics_topology.py
-python scripts/generate_decision_indexes.py --check
-python -m ruff check .
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

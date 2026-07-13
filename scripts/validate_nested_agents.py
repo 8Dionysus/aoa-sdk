@@ -57,6 +57,21 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'mechanics/<parent>/parts/<part>/tests/',
         'python -m pytest -q tests',
     ),
+    'evals/AGENTS.md': (
+        'SDK-layer eval pressure',
+        '`aoa-evals` owns central verdict',
+        'python ../aoa-evals/scripts/validate_local_eval_port.py --target-root .',
+    ),
+    'kag/AGENTS.md': (
+        'local KAG provider home',
+        'shared KAG schema',
+        '`aoa-kag` local subtree validator',
+    ),
+    'stats/AGENTS.md': (
+        'SDK-local statistical questions',
+        'Shared statistical grammar',
+        'python scripts/validate_local_stats_port.py',
+    ),
     'mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/AGENTS.md': (
         'post-commit',
         'active-session-only',

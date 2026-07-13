@@ -1,11 +1,7 @@
-# Insert: graph commands
+# Graph CLI Route
 
-Add this to `RECURRENCE_CONTROL_PLANE.md` near the existing recurrence command list.
-
-```bash
-aoa recur graph snapshot --root /srv/AbyssOS/workspace --json
-aoa recur graph closure --root /srv/AbyssOS/workspace --component component:<owner>:<name> --depth-limit 8 --json
-aoa recur graph diff .aoa/recurrence/graph-snapshots/before.json .aoa/recurrence/graph-snapshots/after.json --json
-```
+Snapshot, closure, and diff entrypoints are owned by the recurrence CLI under
+`src/aoa_sdk/recurrence/cli_graph.py`. Their executable operator and test route
+is `../VALIDATION.md`.
 
 The snapshot/diff commands are read-only. The closure command is also read-only and exists to expose transitive blast radius before planner/review work.

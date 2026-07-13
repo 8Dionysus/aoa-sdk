@@ -79,10 +79,5 @@ payload, and cross-mechanic public contracts.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py tests/test_docs_routes.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py
-python mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/process_closeout_inbox.py --help
-python mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/install_closeout_units.py --help
-python scripts/validate_mechanics_topology.py
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

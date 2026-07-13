@@ -57,7 +57,5 @@ active SDK output.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_sdk_api.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_e2e_fixture.py
-python -m ruff check src/aoa_sdk/a2a/rebase/models.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_sdk_api.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

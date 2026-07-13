@@ -14,8 +14,8 @@ Owner: `sdk/distribution/AGENTS.md` and
 
 Next route: `pyproject.toml`, `src/aoa_sdk/`,
 `sdk/distribution/manifests/python_distribution.bundle.json`,
-`mechanics/release-support/parts/release-audit-publish-helper/`, and
-`python -m build`.
+`mechanics/release-support/parts/release-audit-publish-helper/`, and the
+package build owner in `pyproject.toml`.
 
 Stop line: do not claim package publication before external publication proof
 exists.

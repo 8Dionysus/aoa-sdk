@@ -73,10 +73,5 @@ cross-mechanic public contracts.
 
 ## Verification
 
-```bash
-python scripts/build_workspace_control_plane.py --check
-python scripts/validate_workspace_control_plane.py
-python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py tests/test_docs_routes.py mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py
-python scripts/validate_mechanics_topology.py
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

@@ -94,11 +94,5 @@ matching, reachability, and required-action wording into
 
 ## Verification
 
-```bash
-python -m ruff check src/aoa_sdk/checkpoints/registry.py src/aoa_sdk/checkpoints/review/skipped_recovery.py
-python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py::test_git_boundary_check_blocks_unresolved_skipped_thread_checkpoint mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py::test_review_note_auto_recovers_skipped_thread_checkpoint mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py::test_checkpoint_git_boundary_cli_blocks_unresolved_skipped_thread_checkpoint
-python scripts/build_source_topology_index.py --check
-python scripts/validate_source_topology_index.py
-python -m pytest -q tests/test_source_topology_index.py
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

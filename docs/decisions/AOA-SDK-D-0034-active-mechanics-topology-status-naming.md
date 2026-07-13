@@ -70,7 +70,5 @@ migration vocabulary.
 
 ## Verification
 
-```bash
-python scripts/validate_mechanics_topology.py
-python -m pytest -q tests/test_mechanics_topology.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

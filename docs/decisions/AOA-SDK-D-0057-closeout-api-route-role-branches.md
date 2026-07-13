@@ -105,12 +105,5 @@ sibling repo or reviewed checkpoint closeout context that owns it.
 
 ## Verification
 
-```bash
-python -m ruff check src/aoa_sdk/closeout
-python -m mypy src/aoa_sdk/closeout src/aoa_sdk/skills/detector.py
-python -m pytest -q mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge_cli.py
-python scripts/build_source_topology_index.py --check
-python scripts/validate_source_topology_index.py
-python -m pytest -q tests/test_source_topology_index.py
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

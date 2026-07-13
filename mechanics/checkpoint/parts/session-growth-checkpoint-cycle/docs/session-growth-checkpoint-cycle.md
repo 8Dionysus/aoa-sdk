@@ -249,38 +249,13 @@ When the reread is instead about a drifting owner-owned component,
 `mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/component-refresh-followthrough.md`
 defines the companion hint and reviewed decision packets.
 
-## Commands
+## Executable route
 
-```bash
-aoa skills detect /srv/AbyssOS/aoa-sdk --phase checkpoint --intent-text "plan verify a bounded change" --root /srv/AbyssOS/aoa-sdk --json
-aoa skills enter /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --root /srv/AbyssOS/aoa-sdk --json
-aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
-aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
-aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/AbyssOS/aoa-sdk --json
-aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
-aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
-aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring owner follow-through after green verify" --mutation-surface code --checkpoint-kind verify_green --root /srv/AbyssOS/aoa-sdk --json
-aoa checkpoint mark /srv/AbyssOS/aoa-sdk --kind pr_opened --intent-text "opened PR after protected main rejected direct push" --mutation-surface public-share --root /srv/AbyssOS/aoa-sdk --json
-aoa checkpoint append /srv/AbyssOS/aoa-sdk --kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
-aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json
-aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --kind owner_followthrough --root /srv/AbyssOS --json
-aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD --auto --root /srv/AbyssOS --json
-aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json
-aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
-aoa checkpoint git-boundary-check /srv/AbyssOS/aoa-sdk --boundary merge --root /srv/AbyssOS --json
-aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/AbyssOS/aoa-sdk --json
-aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk --reviewed-artifact /srv/path/to/reviewed_session_artifact.md --root /srv/AbyssOS/aoa-sdk --json
-aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
-aoa checkpoint backlog-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --write-index --json
-aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
-aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --include-stale --apply --json
-aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
-aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --runtime-session-id <runtime-session-id> --apply --json
-aoa checkpoint sweep-closed-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --session <session-or-archive-fragment> --dry-run --json
-aoa checkpoint candidate-intelligence /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --sample-limit 3 --write-index --json
-aoa checkpoint carrier-intelligence /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --sample-limit 3 --write-index --json
-aoa checkpoint status /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS/aoa-sdk --json
-```
+Skill prelude, surface detection, checkpoint capture, Git-boundary hooks,
+lifecycle review, close/archive, reconciliation, intelligence, and reviewed
+closeout entrypoints remain owned by their SDK CLI modules. Exact operator
+routes live in root `AGENTS.md`; focused checks live in this part's
+`VALIDATION.md`.
 
 ## Promotion read
 

@@ -108,11 +108,5 @@ index.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_candidate_intelligence.py
-aoa checkpoint candidate-intelligence /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --sample-limit 3 --write-index --json
-python scripts/generate_decision_indexes.py --check
-python scripts/build_source_topology_index.py --check
-python scripts/validate_source_topology_index.py
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

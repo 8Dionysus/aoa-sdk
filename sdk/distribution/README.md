@@ -8,7 +8,7 @@ and public support claims.
 | Family | Role | Next route |
 | --- | --- | --- |
 | `package-contract/` | package metadata and build posture | `pyproject.toml`, `src/aoa_sdk/`, build checks |
-| `manifests/` | OS Abyss artifact bundle manifests for built package outputs | `python -m build`, `mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py` |
+| `manifests/` | OS Abyss artifact bundle manifests for built package outputs | package build owner and `mechanics/release-support/parts/release-audit-publish-helper/` |
 | `release-posture/` | release audit and publication helper posture | `CHANGELOG.md`, `docs/RELEASING.md`, release-support mechanics |
 | `public-support/` | support and CI tier posture | `docs/RELEASE_CI_POSTURE.md`, CI workflows |
 

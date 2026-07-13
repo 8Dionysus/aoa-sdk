@@ -108,12 +108,5 @@ compatibility is needed.
 
 ## Verification
 
-```bash
-python -m ruff check src/aoa_sdk
-python -m mypy src/aoa_sdk
-python -m pytest -q mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_reference_contracts.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py mechanics/recurrence/parts/downstream-projection-guard/tests/test_recurrence_downstream_projection_seed.py mechanics/recurrence/parts/live-observation-producers/tests/test_recurrence_live_observation_seed.py
-python scripts/build_source_topology_index.py --check
-python scripts/validate_source_topology_index.py
-python -m pytest -q tests/test_source_topology_index.py
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

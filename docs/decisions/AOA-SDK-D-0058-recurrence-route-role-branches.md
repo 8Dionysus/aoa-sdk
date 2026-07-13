@@ -113,12 +113,5 @@ without a new route-role reason beyond file size.
 
 ## Verification
 
-```bash
-python -m ruff check src/aoa_sdk/recurrence
-python -m mypy src/aoa_sdk/recurrence
-python -m pytest -q mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_registry.py mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_seed.py mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_hardening_compat_seed.py mechanics/recurrence/parts/hook-observation-pack/tests/test_recurrence_hook_pack_seed.py mechanics/recurrence/parts/graph-closure-snapshot/tests/test_recurrence_graph_closure_snapshot_seed.py mechanics/recurrence/parts/live-observation-producers/tests/test_recurrence_live_observation_seed.py mechanics/recurrence/parts/beacon-candidate-pressure/tests/test_recurrence_beacon_seed.py mechanics/recurrence/parts/owner-review-surface/tests/test_recurrence_review_pack_seed.py mechanics/recurrence/parts/review-decision-closure/tests/test_recurrence_review_decision_closure_seed.py mechanics/recurrence/parts/downstream-projection-guard/tests/test_recurrence_downstream_projection_seed.py mechanics/recurrence/parts/wiring-rollout-handoff/tests/test_recurrence_wiring_pack_seed.py mechanics/recurrence/parts/recursor-readiness/tests/test_recursor_agent_readiness_seed.py
-python scripts/build_source_topology_index.py --check
-python scripts/validate_source_topology_index.py
-python -m pytest -q tests/test_source_topology_index.py
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

@@ -72,8 +72,5 @@ decision and validator.
 
 ## Verification
 
-```bash
-python -m pytest -q mechanics/release-support/parts/public-support-ci-posture/tests/test_sibling_canary.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py tests/test_docs_routes.py
-python mechanics/release-support/parts/public-support-ci-posture/scripts/run_sibling_canary.py --repo-root . --repo aoa-skills --format json
-python scripts/validate_mechanics_topology.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

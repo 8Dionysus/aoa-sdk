@@ -6,14 +6,9 @@ It ingests receipts and events into candidate-grade records, supports recall que
 
 ## CLI
 
-```bash
-python mechanics/titan/parts/memory-loom-recall-helper-contracts/scripts/titan_memory_loom.py init --workspace /srv/AbyssOS --operator Dionysus --out /srv/AbyssOS/.titan/memory/index.json
-python mechanics/titan/parts/memory-loom-recall-helper-contracts/scripts/titan_memory_loom.py event --index /srv/AbyssOS/.titan/memory/index.json --titan Mneme --kind note --text "A seed landed."
-python mechanics/titan/parts/memory-loom-recall-helper-contracts/scripts/titan_memory_loom.py recall --index /srv/AbyssOS/.titan/memory/index.json --query seed
-python mechanics/titan/parts/memory-loom-recall-helper-contracts/scripts/titan_memory_loom.py digest --index /srv/AbyssOS/.titan/memory/index.json
-python mechanics/titan/parts/memory-loom-recall-helper-contracts/scripts/titan_memory_loom.py redact --index /srv/AbyssOS/.titan/memory/index.json --record-id <id> --reason "operator requested mask"
-python mechanics/titan/parts/memory-loom-recall-helper-contracts/scripts/titan_memory_loom.py close --index /srv/AbyssOS/.titan/memory/index.json
-```
+Initialization, event intake, recall, digest, redaction, and close behavior are
+owned by the part-local `scripts/titan_memory_loom.py`. Canonical operator and
+regression routes are in `../VALIDATION.md`.
 
 ## Authority
 

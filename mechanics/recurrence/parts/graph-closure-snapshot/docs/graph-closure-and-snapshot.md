@@ -1,6 +1,6 @@
 # Recurrence graph closure and snapshot
 
-This seed hardens recurrence from direct edge walking into typed graph closure. It preserves the old `expand_component_graph` seam so the existing planner can keep calling it, but the return now carries depth, lineage, edge strength, cycles, skipped edges, and external impacts.
+This part hardens recurrence from direct edge walking into typed graph closure. It preserves the old `expand_component_graph` seam so the existing planner can keep calling it, but the return now carries depth, lineage, edge strength, cycles, skipped edges, and external impacts.
 
 ## Law
 
@@ -10,14 +10,11 @@ This seed hardens recurrence from direct edge walking into typed graph closure. 
 - Snapshots are memory of shape, not verdicts.
 - Deltas are review input for Codex and owner maintainers.
 
-## Commands
+## Executable route
 
-```bash
-aoa recur graph snapshot --root /srv/AbyssOS/workspace --json
-aoa recur graph closure --root /srv/AbyssOS/workspace --component component:skills:activation-boundary --json
-aoa recur graph diff before.snapshot.json after.snapshot.json --root /srv/AbyssOS/workspace --json
-python mechanics/recurrence/parts/graph-closure-snapshot/scripts/build_recurrence_graph_snapshot.py --workspace-root /srv/AbyssOS/workspace --json
-```
+Snapshot, closure, diff, and snapshot-builder entrypoints are owned by the
+recurrence CLI and part-local script. Exact operator and test routes live in
+`../VALIDATION.md`.
 
 ## What changed
 
@@ -28,4 +25,5 @@ python mechanics/recurrence/parts/graph-closure-snapshot/scripts/build_recurrenc
 
 ## Stop-lines
 
-This seed does not launch agents, does not run proof commands, does not promote techniques, does not update KAG, and does not turn routing into graph authority.
+This part does not launch agents, run proof operations, promote techniques,
+update KAG, or turn routing into graph authority.

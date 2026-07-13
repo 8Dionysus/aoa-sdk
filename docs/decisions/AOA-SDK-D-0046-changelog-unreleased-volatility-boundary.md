@@ -80,8 +80,5 @@ landings should update `Unreleased` only with stable change descriptions.
 
 ## Verification
 
-```bash
-python scripts/generate_decision_indexes.py --check
-python -m pytest -q tests/test_docs_routes.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py
-python scripts/release_check.py
-```
+The executable decision-index and owning-surface checks are routed through
+`docs/decisions/AGENTS.md` and the nearest source-owner validation surface.

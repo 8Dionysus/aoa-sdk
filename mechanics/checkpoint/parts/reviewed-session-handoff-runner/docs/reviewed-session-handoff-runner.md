@@ -157,16 +157,9 @@ spine can route them into separate owner-local logs.
 ## Reviewed submission flow
 
 When the outer session layer already has a reviewed artifact plus emitted owner
-receipts, the highest-level control-plane entrypoint is:
-
-```bash
-aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md \
-  --session-ref session:2026-04-06-session-growth \
-  --receipt-dir /srv/path/to/receipts \
-  --audit-ref /srv/path/to/route_summary.md \
-  --root /srv/AbyssOS/aoa-sdk \
-  --json
-```
+receipts, the closeout CLI's reviewed-submission entrypoint is the highest-level
+control-plane route. Its exact operator form is owned by this part's
+`VALIDATION.md`.
 
 `submit-reviewed` does four bounded things:
 
@@ -179,33 +172,17 @@ This keeps the control plane explicit without forcing outer wrappers to
 hand-author request or manifest JSON.
 
 When an outer reviewed wrapper does not own a receipt publisher yet, use
-`--allow-empty` for an audit-only closeout:
-
-```bash
-aoa closeout submit-reviewed /srv/path/to/W4-closeout.md \
-  --session-ref session:qwen-local-pilot-v1:W4:closeout \
-  --audit-ref /srv/path/to/W4-closeout.json \
-  --trigger runtime-return-closeout \
-  --allow-empty \
-  --root /srv/AbyssOS/aoa-sdk \
-  --json
-```
+the explicit audit-only mode.
 
 Audit-only closeouts still produce the canonical request, manifest, queue item,
 and report trail, but they do not invoke owner-local publishers and they skip
 the stats refresh step on purpose.
 
-## Commands
+## Executable route
 
-Build one explicit checkpoint-to-closeout evidence bundle without publishing
-anything yet:
-
-```bash
-aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk \
-  --reviewed-artifact /srv/path/to/reviewed_session_artifact.md \
-  --root /srv/AbyssOS/aoa-sdk \
-  --json
-```
+The checkpoint CLI owns explicit context building without publication. Exact
+operator and test routes are maintained in this part's `VALIDATION.md` and
+root `AGENTS.md`.
 
 When a matching active runtime session exists, this builder aggregates every
 repo-scoped checkpoint ledger under
@@ -227,69 +204,11 @@ builder now binds that session trace into the context so reviewed closeout can
 reread the whole runtime thread instead of only the reviewed artifact plus one
 narrow checkpoint ledger.
 
-Execute the explicit reviewed-closeout skill chain without publishing or
-refreshing stats:
-
-```bash
-aoa checkpoint execute-closeout-chain /srv/AbyssOS/aoa-sdk \
-  --reviewed-artifact /srv/path/to/reviewed_session_artifact.md \
-  --root /srv/AbyssOS/aoa-sdk \
-  --json
-```
-
-Run one manifest directly:
-
-```bash
-aoa closeout run /srv/path/to/closeout.json --root /srv/AbyssOS/aoa-sdk --json
-```
-
-Queue one reviewed manifest into the canonical inbox:
-
-```bash
-aoa closeout enqueue-current /srv/path/to/closeout.json --root /srv/AbyssOS/aoa-sdk --json
-```
-
-Build one canonical manifest from a reviewed closeout request and enqueue it:
-
-```bash
-aoa closeout build-manifest /srv/path/to/closeout.request.json \
-  --root /srv/AbyssOS/aoa-sdk \
-  --enqueue \
-  --json
-```
-
-Submit one reviewed artifact plus receipt bundle directly:
-
-```bash
-aoa closeout submit-reviewed /srv/path/to/reviewed_session_artifact.md \
-  --session-ref session:2026-04-06-session-growth \
-  --receipt-dir /srv/path/to/receipts \
-  --root /srv/AbyssOS/aoa-sdk \
-  --json
-```
-
-Submit one reviewed artifact without a receipt bundle yet:
-
-```bash
-aoa closeout submit-reviewed /srv/path/to/W4-closeout.md \
-  --session-ref session:qwen-local-pilot-v1:W4:closeout \
-  --audit-ref /srv/path/to/W4-closeout.json \
-  --allow-empty \
-  --root /srv/AbyssOS/aoa-sdk \
-  --json
-```
-
-Process the canonical queue under `aoa-sdk/.aoa/closeout/`:
-
-```bash
-aoa closeout process-inbox /srv/AbyssOS/aoa-sdk --json
-```
-
-Inspect the queue state:
-
-```bash
-aoa closeout status /srv/AbyssOS/aoa-sdk --json
-```
+The checkpoint and closeout CLI modules also own reviewed-chain execution,
+direct manifest processing, canonical queueing, manifest assembly, reviewed
+submission, inbox processing, and queue inspection. These operations do not
+publish or refresh stats unless their explicit reviewed route reaches that
+step.
 
 The queue layout is:
 
@@ -309,12 +228,9 @@ The explicit `aoa-checkpoint-closeout-bridge` should consume those reviewed
 surfaces as hints, but it must still reread the reviewed artifact and any
 receipt evidence before donor harvest, progression lift, and quest harvest run.
 
-Install the user-level inbox watcher when the machine should auto-process new
-reviewed manifests as soon as they land in the canonical inbox:
-
-```bash
-python /srv/AbyssOS/aoa-sdk/mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/install_closeout_units.py --overwrite --enable
-```
+The part-local unit installer owns user-level inbox watcher installation when
+the machine should process reviewed manifests from the canonical inbox. Its
+operator route remains in `VALIDATION.md`.
 
 ## Surface detection handoff
 
@@ -325,17 +241,10 @@ Initial-boundary surface detection is a separate, additive seam.
 - surviving surface notes keep their truth labels; the handoff does not promote
   anything by itself
 
-Use the separate handoff when a reviewed session should preserve surface
-observations for the session-growth kernel without pretending those owner-layer
-candidates were activated:
-
-```bash
-aoa surfaces handoff /srv/AbyssOS/aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json \
-  --session-ref session:2026-04-07-surface-initial-boundary \
-  --reviewed \
-  --root /srv/AbyssOS/aoa-sdk \
-  --json
-```
+Use the separate reviewed surface-handoff CLI route when a session should
+preserve observations for the session-growth kernel without pretending those
+owner-layer candidates were activated. Its exact operator route is owned by
+the signal-handoff part `VALIDATION.md`.
 
 For the initial-boundary boundary, enrichment-layer enrichments, heuristics, and target
 selection rules, use `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md` and

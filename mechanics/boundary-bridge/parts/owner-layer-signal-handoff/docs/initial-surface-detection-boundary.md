@@ -56,14 +56,11 @@ aoa-sdk/.aoa/surface-detection/{label}.{phase}.latest.json
 - `manual-equivalent` never mutates into `activated` during reporting or
   handoff
 
-## Commands
+## Executable route
 
-```bash
-aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress --intent-text "verify recurring handoff proof" --root /srv/AbyssOS/aoa-sdk --json
-aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase in-flight --intent-text "recall prior proof" --root /srv/AbyssOS/aoa-sdk --json
-aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase pre-mutation --intent-text "prove and recall a recurring route" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
-aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --intent-text "recurring owner follow-through after green verify" --root /srv/AbyssOS/aoa-sdk --json
-```
+The surface-detection CLI owns ingress, in-flight, pre-mutation, and checkpoint
+entrypoints. Exact operator and test routes are maintained in the part
+`VALIDATION.md` and root `AGENTS.md`.
 
 Use `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-heuristics.md` for the deterministic ruleset and
 `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md` for the reviewed-only handoff
