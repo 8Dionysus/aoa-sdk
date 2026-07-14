@@ -8,6 +8,17 @@
 - Preflight and postpublish checks over existing release surfaces.
 - GitHub-native release artifact and cadence audit workflow contracts.
 
+## Repo-local verifier discovery
+
+Preflight accepts the first existing executable-owner surface in this order:
+
+1. `scripts/release_check.py`
+2. `scripts/release_gate/release_check.py`
+
+The family-scoped path supports repositories whose script-topology contract
+forbids root-level Python commands. Both routes remain repo-owned and must pass
+without leaving tracked drift.
+
 ## Stop-Lines
 
 - Do not invent versions, changelog prose, tags, or release notes.

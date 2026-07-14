@@ -24,6 +24,10 @@ PUBLIC_SURFACE_FILES = {"README.md", "CHANGELOG.md", "pyproject.toml", "package.
 PACKAGE_VERSION_FILES = {
     "aoa-sdk": ("pyproject.toml", "src/aoa_sdk/cli/main.py"),
 }
+RELEASE_CHECK_PATHS = (
+    "scripts/release_check.py",
+    "scripts/release_gate/release_check.py",
+)
 ReleaseAuditPhase = Literal["preflight", "postpublish", "cadence"]
 REMOTE_COMMAND_TIMEOUT_SECONDS = 60.0
 PUBLISH_COMMAND_TIMEOUT_SECONDS = 120.0
@@ -361,6 +365,14 @@ def _release_doc_path(repo_root: Path) -> Path | None:
     return None
 
 
+def _release_check_path(repo_root: Path) -> Path | None:
+    for relative_path in RELEASE_CHECK_PATHS:
+        candidate = repo_root / relative_path
+        if candidate.is_file():
+            return candidate
+    return None
+
+
 class ReleaseAPI:
     def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
@@ -516,12 +528,17 @@ class ReleaseAPI:
                 detail="docs/RELEASING.md must exist",
             )
         )
-        release_check_path = repo_root / "scripts" / "release_check.py"
+        release_check_path = _release_check_path(repo_root)
+        release_check_detail = (
+            f"{release_check_path.relative_to(repo_root).as_posix()} exists"
+            if release_check_path is not None
+            else "one of " + ", ".join(RELEASE_CHECK_PATHS) + " must exist"
+        )
         checks.append(
             ReleaseCheck(
                 name="release-check",
-                passed=release_check_path.exists(),
-                detail="scripts/release_check.py must exist",
+                passed=release_check_path is not None,
+                detail=release_check_detail,
             )
         )
 
@@ -631,7 +648,7 @@ class ReleaseAPI:
                 ]
             )
 
-        if release_check_path.exists():
+        if release_check_path is not None:
             completed = _run([sys.executable, str(release_check_path)], cwd=repo_root, env=os.environ.copy(), check=False)
             checks.append(
                 ReleaseCheck(

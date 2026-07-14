@@ -29,7 +29,7 @@ app.add_typer(release_app, name="release")
 
 @app.command()
 def version() -> None:
-    print("aoa-sdk 0.5.0")
+    print("aoa-sdk 0.5.1")
 
 
 if __name__ == "__main__":
