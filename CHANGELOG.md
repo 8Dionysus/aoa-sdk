@@ -10,11 +10,19 @@ Tracking starts with the community-docs baseline for this repository.
 ### Summary
 
 - Add future changes here after the release tag lands.
+- Workspace MCP orientation now routes statistical reads through the
+  project-level `aoa_stats` service while keeping `aoa-stats` catalogs and
+  source files as owner entrypoints.
+- SDK repo discovery no longer advertises or depends on the retired
+  `aoa-stats/scripts/aoa_stats_mcp_server.py` launcher.
 
 ### Notes
 
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
+- This applies the existing SDK source-owner and transport-neutral facade
+  boundary; runtime implementation and registration remain with their stronger
+  owners, so no new SDK decision record is introduced.
 
 ## [0.5.1] - 2026-07-13
 

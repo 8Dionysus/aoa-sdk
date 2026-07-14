@@ -92,6 +92,21 @@ def _seed_codex_workspace(workspace_root: Path) -> None:
         encoding="utf-8",
     )
 
+    (workspace_root / "aoa-stats" / "generated").mkdir(parents=True, exist_ok=True)
+    (workspace_root / "aoa-stats" / "generated" / "summary_surface_catalog.min.json").write_text(
+        "{}\n",
+        encoding="utf-8",
+    )
+    (workspace_root / "aoa-stats" / "README.md").write_text(
+        "# aoa-stats\n",
+        encoding="utf-8",
+    )
+    (workspace_root / "aoa-stats" / "scripts").mkdir(parents=True, exist_ok=True)
+    (workspace_root / "aoa-stats" / "scripts" / "aoa_stats_mcp_server.py").write_text(
+        "# retired repo-local launcher\n",
+        encoding="utf-8",
+    )
+
 
 def test_workspace_resolution_prefers_manifest_abyss_stack_source_checkout(workspace_root: Path) -> None:
     state = AoAWorkspaceMCPState.discover(workspace_root / "aoa-sdk")
@@ -129,6 +144,18 @@ def test_workspace_repo_map_lists_curated_entrypoints(workspace_root: Path) -> N
     assert rows["aoa-skills"]["preferred_entrypoints"][0]["path"] == "SKILL_INDEX.md"
 
 
+def test_workspace_repo_map_keeps_aoa_stats_entrypoints_transport_neutral(workspace_root: Path) -> None:
+    _seed_codex_workspace(workspace_root)
+
+    state = AoAWorkspaceMCPState.discover(workspace_root / "aoa-sdk")
+    rows = {row["repo"]: row for row in state.build_repo_map()["repos"]}
+
+    assert [entry["path"] for entry in rows["aoa-stats"]["preferred_entrypoints"]] == [
+        "generated/summary_surface_catalog.min.json",
+        "README.md",
+    ]
+
+
 def test_surface_crosswalk_uses_secondary_surface_not_fallback_route(workspace_root: Path) -> None:
     _seed_codex_workspace(workspace_root)
 
@@ -139,6 +166,8 @@ def test_surface_crosswalk_uses_secondary_surface_not_fallback_route(workspace_r
     assert all("primary_surface" in row for row in payload["crosswalk"])
     assert all("secondary_surface" in row for row in payload["crosswalk"])
     assert all("fallback" not in row for row in payload["crosswalk"])
+    stats_row = next(row for row in payload["crosswalk"] if row["need"].startswith("derived metrics"))
+    assert stats_row["primary_surface"] == "project-level MCP: aoa_stats"
 
 
 def test_workspace_runtime_entrypoints_report_curated_surfaces(workspace_root: Path) -> None:

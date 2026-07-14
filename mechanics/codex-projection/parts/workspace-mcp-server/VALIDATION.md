@@ -12,7 +12,9 @@ python scripts/validate_mechanics_topology.py
 - the runtime entrypoint for the `abyss-stack` diagnostic catalog uses the
   part-local diagnostic-spine path, not the old root generated path;
 - the surface crosswalk exposes `secondary_surface` and does not emit the old
-  substitute-route field.
+  substitute-route field;
+- the `aoa-stats` repo map keeps owner entrypoints but excludes its retired
+  repo-local MCP launcher, and the crosswalk names project-level `aoa_stats`.
 
 For broader Codex Projection routing, also run:
 

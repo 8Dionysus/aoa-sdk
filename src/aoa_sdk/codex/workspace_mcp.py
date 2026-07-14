@@ -79,7 +79,6 @@ REPO_HINTS: dict[str, dict[str, Any]] = {
         "role": "derived-observability",
         "surface": "summary catalogs and derived observability views",
         "entry_candidates": ["generated/summary_surface_catalog.min.json", "README.md"],
-        "launcher": "scripts/aoa_stats_mcp_server.py",
     },
     "aoa-techniques": {
         "role": "technique-canon",
@@ -139,9 +138,9 @@ SURFACE_CROSSWALK: list[dict[str, str]] = [
     },
     {
         "need": "derived metrics, receipts overview, or summary views",
-        "primary_surface": "repo-local MCP: aoa-stats",
+        "primary_surface": "project-level MCP: aoa_stats",
         "secondary_surface": "owner repo source files",
-        "notes": "aoa-stats remains derived-only when semantics matter",
+        "notes": "aoa_stats is a read transport; aoa-stats keeps statistical meaning and owner contracts",
     },
     {
         "need": "seed staging, route map, and planting follow-through",
