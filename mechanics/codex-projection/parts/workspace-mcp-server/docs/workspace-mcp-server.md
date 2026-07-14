@@ -16,7 +16,8 @@ This surface stays on the control plane:
 - project-level Codex wiring health at the sibling workspace root
 - advisory repo-role map and curated entrypoints
 - a surface crosswalk for AGENTS, skills, subagents, project-level MCP, and
-  repo-local MCP, with primary and secondary surfaces named explicitly
+  owner-local source surfaces, with primary and secondary routes named
+  explicitly
 - compact skill index and agent profile previews
 
 ## Install
@@ -43,5 +44,7 @@ cwd = "../aoa-sdk"
 
 - `aoa-sdk` stays the control plane
 - `aoa_workspace` orients; it does not claim semantic ownership
-- repo-local MCP servers such as `aoa_stats` and `dionysus` remain separate layers
+- project-level `aoa_stats` remains a separate read transport; `aoa-stats`
+  keeps its source contracts and does not host the launcher
+- repo-local MCP servers such as `dionysus` remain separate layers
 - `abyss-stack` path resolution must respect preferred source checkouts over runtime mirrors

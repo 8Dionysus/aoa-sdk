@@ -27,6 +27,8 @@ state, or mint owner-layer truth.
 - project-level Codex config at `.codex/config.toml`
 - sibling workspace marker `AOA_WORKSPACE_ROOT`
 - repo-local AGENTS, skill, profile, generated, and runtime entrypoint files
+- project-level `aoa_stats` as the statistical read transport; its runtime
+  implementation and registration remain outside SDK ownership
 - `abyss-stack` diagnostic catalog at
   `mechanics/diagnostic-spine/parts/diagnostic-surfaces/generated/diagnostic_surface_catalog.min.json`
   rather than the old root generated path
@@ -37,6 +39,8 @@ state, or mint owner-layer truth.
 - Do not surface old root diagnostic catalog paths as current runtime
   entrypoints.
 - Expose `secondary_surface` for the next inspectable route.
+- Do not advertise a launcher inside `aoa-stats`; the repo map exposes its
+  owner surfaces and the crosswalk routes transport through `aoa_stats`.
 - Do not make the server a deployment authority or Codex runtime owner.
 - Do not replace sibling repo route cards or semantic owner docs with MCP
   readouts.
