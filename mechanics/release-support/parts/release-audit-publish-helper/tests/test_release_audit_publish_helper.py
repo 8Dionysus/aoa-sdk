@@ -180,6 +180,7 @@ def _write_release_surfaces(
     version: str,
     summary: list[str] | None = None,
     package_repo: bool = False,
+    release_check_path: str = "scripts/release_check.py",
 ) -> None:
     summary = summary or ["Keep releases small and legible."]
     (repo_root / "docs").mkdir(parents=True, exist_ok=True)
@@ -201,7 +202,7 @@ def _write_release_surfaces(
             *(f"- {line}" for line in summary),
             "",
             "### Validation",
-            "- `python scripts/release_check.py`",
+            f"- `python {release_check_path}`",
             "",
             "### Notes",
             "- release contract stays bounded to repo-owned surfaces.",
@@ -210,10 +211,12 @@ def _write_release_surfaces(
     )
     (repo_root / "CHANGELOG.md").write_text(changelog, encoding="utf-8")
     (repo_root / "docs" / "RELEASING.md").write_text(
-        f"# Releasing `{repo_name}`\n\nUse `python scripts/release_check.py` before tagging or publishing.\n",
+        f"# Releasing `{repo_name}`\n\nUse `python {release_check_path}` before tagging or publishing.\n",
         encoding="utf-8",
     )
-    (repo_root / "scripts" / "release_check.py").write_text(
+    release_check = repo_root / release_check_path
+    release_check.parent.mkdir(parents=True, exist_ok=True)
+    release_check.write_text(
         "#!/usr/bin/env python3\nfrom __future__ import annotations\n\nraise SystemExit(0)\n",
         encoding="utf-8",
     )
@@ -585,6 +588,34 @@ def test_preflight_fails_when_package_version_mismatches(tmp_path: Path) -> None
 
     assert result.passed is False
     assert any(check.name == "pyproject-version" and not check.passed for check in result.repo_reports[0].checks)
+
+
+def test_preflight_accepts_family_scoped_release_verifier(tmp_path: Path) -> None:
+    workspace_root = tmp_path / "workspace"
+    repo_root = workspace_root / "Agents-of-Abyss"
+    remote_root = tmp_path / "aoa-origin.git"
+    _init_repo(repo_root, remote_root)
+    _write_release_surfaces(
+        repo_root,
+        repo_name="Agents-of-Abyss",
+        version="0.2.0",
+        release_check_path="scripts/release_gate/release_check.py",
+    )
+    _commit_and_push(repo_root, "0.2.0")
+
+    api = ReleaseAPI(_workspace_for("Agents-of-Abyss", repo_root, workspace_root))
+    result = api.audit(
+        workspace_root=workspace_root,
+        phase="preflight",
+        repo="Agents-of-Abyss",
+        include_all=False,
+        strict=True,
+    )
+
+    assert result.passed is True, [check.model_dump() for check in result.repo_reports[0].checks]
+    release_check = next(check for check in result.repo_reports[0].checks if check.name == "release-check")
+    assert release_check.passed is True
+    assert release_check.detail == "scripts/release_gate/release_check.py exists"
 
 
 def test_cadence_marks_repo_due_when_public_surface_drift_exists(tmp_path: Path, monkeypatch: pytest.MonkeyPatch) -> None:

@@ -44,7 +44,8 @@ A release should make it easy to answer:
 Preflight is red if any of these are false:
 
 - `docs/RELEASING.md` exists as the repo-level preflight route to this part
-- `scripts/release_check.py` exists and passes
+- a repo-owned release verifier exists and passes at either
+  `scripts/release_check.py` or `scripts/release_gate/release_check.py`
 - tracked worktree is clean
 - local `main` is synced with `origin/main`
 - README shows the exact current-release banner

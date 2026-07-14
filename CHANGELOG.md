@@ -16,6 +16,79 @@ Tracking starts with the community-docs baseline for this repository.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
 
+## [0.5.1] - 2026-07-13
+
+### Summary
+
+- Federation preflight now discovers a repository-owned release verifier at
+  either `scripts/release_check.py` or the family-scoped
+  `scripts/release_gate/release_check.py` path.
+- This unblocks repositories with a script-topology law that forbids root-level
+  Python commands, including `Agents-of-Abyss`, without weakening the clean
+  tree, synced-main, green-verifier, or no-drift release gates.
+- `v0.5.0` and pre-patch `origin/main` both resolve to `a89ff64`; there are no
+  intervening first-parent commits to reconstruct. This patch section instead
+  accounts explicitly for every source, contract, test, version, and generated
+  surface changed for the compatibility fix.
+
+### Reconciliation Basis
+
+- The blocking evidence came from a real strict federation preflight against
+  landed `Agents-of-Abyss` `main`, which passed its owner gate and CI but failed
+  the SDK helper's stale single-path existence check.
+- The red test reproduces the family-scoped verifier layout; the green test
+  proves both supported layouts still execute the repo-owned verifier and keep
+  the rest of preflight fail-closed.
+- No sibling verifier is copied, wrapped, or re-authored by the SDK. Discovery
+  remains a bounded compatibility choice over two explicit repo-local paths.
+
+### Changed
+
+- Release audit selects the first existing verifier from the stable root path
+  and the family-scoped release-gate path, reports the selected path, executes
+  it, and retains tracked-drift detection after execution.
+- The release helper contract and runbook now document both supported paths and
+  why the family-scoped path exists.
+- Test release fixtures can model either path, and a dedicated regression test
+  covers the family-scoped `Agents-of-Abyss` shape.
+
+### Release-Prep Reconciliation (0 Historical Commits; 1 Bounded Patch)
+
+Every release-visible surface in this patch is listed explicitly:
+
+- implementation: `src/aoa_sdk/release/api.py`
+- regression contract:
+  `mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py`
+- human contract and runbook:
+  `mechanics/release-support/parts/release-audit-publish-helper/CONTRACT.md`
+  and
+  `mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md`
+- version and public release surfaces: `pyproject.toml`,
+  `src/aoa_sdk/cli/main.py`, `README.md`, `ROADMAP.md`, `CHANGELOG.md`, and
+  `mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py`
+- regenerated implementation read-model:
+  `generated/source_topology.min.json`
+- derived repository KAG outputs: the source, entity, artifact, anchor, event,
+  assertion, and relation indexes under `kag/indexes/`
+
+### Validation
+
+- The focused test was observed red before implementation and green after the
+  minimal discovery change; the complete release-audit/publish-helper test
+  file and mechanics topology validator then passed.
+- Root validators, the full test suite, Ruff, mypy, package build and artifact
+  trust checks, full/incremental KAG parity, compatibility checks, and strict
+  federation preflight remain publication gates.
+
+### Notes
+
+- This is a patch-level SDK compatibility correction. It does not alter
+  sibling release meaning, publication authority, version selection, changelog
+  parsing, GitHub mutation, or repo-local validator behavior.
+- No new ADR is needed: the owner boundary and fail-closed preflight decision
+  are unchanged; the implementation now recognizes the already-landed
+  family-scoped executable-owner topology.
+
 ## [0.5.0] - 2026-07-13
 
 ### Summary
