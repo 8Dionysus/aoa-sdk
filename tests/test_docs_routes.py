@@ -246,34 +246,29 @@ def test_design_lane_is_routed_before_mechanics() -> None:
 
 def test_changelog_records_current_release_contour() -> None:
     changelog = read_text("CHANGELOG.md")
-    release = changelog_release_section(changelog, "0.4.0")
+    release = changelog_release_section(changelog, "0.5.0")
 
     required_sections = [
         "### Summary",
         "### Reconciliation Basis",
-        "### Final Route Sweep",
-        "### Control-Plane Authority And Boundary",
         "### Added",
         "### Changed",
-        "### Moved Or Retired",
+        "### Fixed",
         "### Validation",
         "### Notes",
+        "### Included in this release",
     ]
     for section in required_sections:
         assert section in release
-    assert "52 first-parent commits before the version commit" in release
-    assert "1398 changed paths" in release
-    assert "AOA-SDK-D-0046" in release
-    assert "AOA-SDK-D-0047" in release
-    assert "DESIGN.md" in changelog
-    assert "DESIGN.AGENTS.md" in changelog
-    assert "docs/decisions/" in changelog
-    assert "root-level generated paths" in changelog
-    assert "active routes" in changelog
-    assert "This dated section is the canonical `v0.4.0` reconciliation contour" in changelog
-    assert "mechanics topology" in changelog
-    assert "retired from the active mechanics root" in changelog
-    assert "release-preflight gates completed successfully" in changelog
+    assert "38 first-parent commits" in release
+    assert "193 changed tracked paths" in release
+    assert "34 of the 38 first-parent commits" in release
+    assert "This dated section is the canonical `v0.5.0` reconciliation contour" in release
+    assert "package version, CLI version, README banner, roadmap marker" in release
+    included_commits = re.findall(r"^- `([0-9a-f]{7})` ", release, flags=re.MULTILINE)
+    assert len(included_commits) == 38
+    assert included_commits[0] == "1908d93"
+    assert included_commits[-1] == "f17634f"
 
 
 def test_changelog_unreleased_avoids_live_reconciliation_counters() -> None:
@@ -291,9 +286,9 @@ def test_changelog_unreleased_avoids_live_reconciliation_counters() -> None:
     for fragment in forbidden_live_fragments:
         assert fragment not in unreleased
 
-    assert "root README and design anatomy maps" in unreleased
-    assert "`aoa-evals`" in unreleased
-    assert "Dated release sections\n  own exact reconciliation spans" in unreleased
+    assert "Add future changes here after the release tag lands" in unreleased
+    assert "Dated release sections own exact reconciliation spans" in unreleased
+    assert "complete commit\n  inventories" in unreleased
 
 
 def test_readme_routes_sibling_canary_surfaces_without_roster() -> None:

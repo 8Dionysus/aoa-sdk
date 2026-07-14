@@ -9,32 +9,154 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
-- Add a root `stats/` port for the SDK-owned question of explicit version
-  negotiation across the federation compatibility policy, with a `77 / 80`
-  source-revision census, evidence-linked reference packet, and central
-  `aoa-stats` protocol validation.
-- Consolidate executable validation and command routes into scripts, CLI
-  owners, part `VALIDATION.md`, and agent route cards; general documentation
-  and decision notes retain meaning and verified results without duplicating
-  command batteries.
-- Align the local `evals/` port with the root README and design anatomy maps
-  so SDK-local eval pressure is discoverable while proof authority remains in
-  `aoa-evals`.
-- Add an OS Abyss artifact bundle gate for built `aoa-sdk` wheel/sdist outputs,
-  producing ABI, SBOM, SLSA/in-toto, signature-decision, and verify sidecars
-  under ignored `dist/abyss-artifact-bundle/` before release artifacts upload.
-- Add typed SDK loading for OS Abyss artifact producer-profile read models so
-  agents can inspect owner repos, artifact classes, validator commands, sidecars,
-  trust-root modes, and consumer expectations without treating the SDK as host
-  enforcement authority.
+- Add future changes here after the release tag lands.
 
 ### Notes
 
-- Keep the typed sibling stats facade under `src/aoa_sdk/stats/`; the root
-  `stats/` port measures SDK-owned compatibility posture and does not replace
-  that consumer boundary.
-- Add future changes here after the release tag lands. Dated release sections
-  own exact reconciliation spans and validation evidence.
+- Dated release sections own exact reconciliation spans, complete commit
+  inventories, and validation evidence.
+
+## [0.5.0] - 2026-07-13
+
+### Summary
+
+- `v0.5.0` closes the complete `v0.4.0..f17634f` pre-release span: 38
+  first-parent commits, 193 changed tracked paths, 41,071 insertions, and 949
+  deletions. The largest path families were `docs/` (72 paths), `mechanics/`
+  (51), `src/` (17), `kag/` (16), `scripts/` (7), `evals/` (6), `sdk/` (6),
+  and `tests/` (5).
+- The SDK gains a discoverable local eval port, an owner-local compatibility
+  stats port, typed artifact trust and producer-profile access, a package
+  artifact evidence gate, canonical repo-local KAG indexes, and stricter
+  checkpoint lifecycle recovery boundaries.
+- These additions remain control-plane surfaces. Eval proof stays with
+  `aoa-evals`, artifact policy and host trust roots stay with their stronger
+  owners, KAG shared meaning stays with `aoa-kag`, and sibling source truth
+  remains in sibling repositories.
+
+### Reconciliation Basis
+
+- This section was reconstructed from first-parent Git history, the complete
+  name-status and line-stat diff, merged PR subjects, changed owner surfaces,
+  tests, validators, generated companions, and the release gate. The moving
+  `Unreleased` section was treated as one input, not as the release ledger.
+- 34 of the 38 first-parent commits in the release span did not modify
+  `CHANGELOG.md`; the exact ordered inventory below therefore closes the gap
+  that a changelog-only review would have missed.
+- The 36,494 inserted lines under `kag/` are deterministic repository indexes,
+  not a second authored source plane. Their source-return and parity contracts
+  remain subordinate to tracked SDK sources and the pinned `aoa-kag` builder.
+
+### Added
+
+- A root `evals/` port with local intake, suite, and report routes, aligned with
+  the public README and SDK design maps while keeping proof authority external.
+- Artifact identity in the workspace control-plane capsule and typed SDK
+  contracts for artifact classification, registries, producer profiles,
+  source refs, trust-gate decisions, SCITT receipt verification, update
+  metadata, and affected-drift state.
+- An OS Abyss package artifact gate for built wheel and sdist outputs, including
+  ABI, SBOM, SLSA/in-toto, verification, durable evidence, subject-store, and
+  host-managed trust-root checks before a package carrier is treated as
+  consumable.
+- The SDK KAG provider home and canonical repository index family for source
+  surfaces, anchors, artifacts, entities, events, relations, and assertions,
+  with deterministic CI parity enforcement.
+- A root `stats/` port for the SDK-owned question of explicit version
+  negotiation across the federation compatibility policy, including the
+  `77 / 80` source-revision census, evidence-linked reference packet, and
+  central protocol validation.
+
+### Changed
+
+- Mechanics topology validation now derives source families from tracked repo
+  paths and rejects mechanics source surfaces that escape the repository.
+- Checkpoint lifecycle indexing now includes recoverable trace gaps, preserves
+  explicit session traces and promoted archive state, keeps no-closeout scopes
+  out of stale recovery, and registers the lifecycle index gate in the owning
+  mechanic topology.
+- Artifact release support now promotes durable package evidence with source
+  and trust-root metadata, materializes subject stores, verifies producer and
+  subject identity, and keeps consumer admission fail-closed.
+- Live skill dispatch now consults stress posture before moving beyond bounded
+  discovery, without making the SDK the owner of stress or activation truth.
+- Repo Validation now pins and enforces deterministic full, incremental, and
+  family-contract parity for the complete repo-local KAG index set.
+- Executable validation routes were consolidated into their script, CLI,
+  `VALIDATION.md`, and route-card owners; general docs and decisions retain
+  meaning and verified outcomes without becoming command owners.
+
+### Fixed
+
+- Repeated checkpoint action signatures and saved-event refs retain their real
+  counts instead of collapsing duplicate evidence.
+- Session-memory observations no longer leak into progression scoring, and
+  skipped recovery cannot run ahead of active-session checks.
+- Runtime wave closeout keeps its compatibility alias, closeout receipt time is
+  frozen for deterministic assertions, and runtime trace reports preserve the
+  documented fallback evidence.
+
+### Validation
+
+- Root SDK validators, source-home and mechanics topology checks, generated
+  control-plane checks, complete tests, static analysis, type checking,
+  package build, artifact trust, repo-local KAG parity, compatibility checks,
+  and the canonical release gate completed through their owner routes.
+- Federation preflight is completed through the workspace release owner with
+  the dependency revisions pinned by Repo Validation; GitHub Repo Validation
+  and landed-main checks remain publication gates.
+
+### Notes
+
+- This dated section is the canonical `v0.5.0` reconciliation contour. The
+  package version, CLI version, README banner, roadmap marker, and release
+  support tests move together.
+- The typed sibling stats facade under `src/aoa_sdk/stats/` remains a consumer
+  boundary; the root `stats/` port measures an SDK-owned compatibility
+  question and does not replace that facade.
+- Publication truth exists only after the annotated `v0.5.0` tag, GitHub
+  Release, latest-release marker, and strict postpublish audit agree.
+
+### Included in this release
+
+- `1908d93` Add local eval port skeleton (#167)
+- `51ac67d` Add local eval port landing (#168)
+- `022bd06` Add evals port to SDK design maps (#169)
+- `e1a2290` Include recoverable lifecycle trace gaps (#170)
+- `e0711fe` Count duplicate saved signature refs
+- `5997362` Honor explicit checkpoint session traces
+- `3a99754` Keep no-closeout scopes out of stale archive (#173)
+- `7654fa5` Preserve promoted checkpoint archive state (#174)
+- `b33b908` Keep session memory out of progression scoring (#175)
+- `c3f6ddc` Block skipped recovery before active session checks (#176)
+- `0d8868c` Restore runtime wave closeout alias (#177)
+- `71a14dd` Use tracked source families for mechanics topology (#178)
+- `1f1b08f` Keep mechanics source surfaces inside repo (#179)
+- `cdbcd68` Freeze wave closeout receipt time
+- `1e257db` Update skipped recovery boundary docs
+- `404f1ec` Document promoted checkpoint archive path
+- `83c6d41` Preserve runtime trace report fallback
+- `da48bed` Preserve repeated saved event counts
+- `5801a2c` Register lifecycle index validation
+- `82fd56a` [codex] Add artifact identity to workspace control plane (#186)
+- `e766ceb` Add OS Abyss package artifact gate (#187)
+- `6aea3e5` Add typed artifact trust API (#188)
+- `e89d461` Add package artifact trust-gate producer checks (#189)
+- `2ac2933` Add source-ref artifact trust types (#190)
+- `c45246d` Strengthen package artifact subject trust gate (#191)
+- `d8d67e9` Promote aoa-sdk package evidence with trust roots
+- `8e57a6d` Add artifact producer profile typed access
+- `ffc6aae` type SCITT receipt verification surfaces (#194)
+- `33a59b6` Type artifact affected drift state
+- `a49420f` Add SDK KAG provider home (#196)
+- `fe23e66` Add repo-local KAG indexes (#198)
+- `0ec0c40` Harden artifact trust SDK gates (#199)
+- `f606bf8` Gate live dispatch with stress posture (#200)
+- `c03ab4d` Enforce repo-local KAG index parity (#201)
+- `6a131e6` Pin deterministic repo-local KAG index gate (#202)
+- `cf29944` Add repository KAG index family (#203)
+- `d8d7b21` Publish canonical repository KAG indexes (#204)
+- `f17634f` Add SDK owner-local stats port (#205)
 
 ## [0.4.0] - 2026-06-06
 

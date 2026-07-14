@@ -73,7 +73,7 @@ land a local surface?
 
 ## Current Direction
 
-`aoa-sdk` is past seed bootstrap. The current post-`v0.4.0` direction is
+`aoa-sdk` is past seed bootstrap. The current post-`v0.5.0` direction is
 control-plane contract hardening.
 
 The repo should now:
@@ -113,9 +113,9 @@ subordinate while cross-repo growth becomes denser.
 
 ## Current Public Contour
 
-Current release marker: `v0.4.0`.
+Current release marker: `v0.5.0`.
 
-Current unreleased contour: control-plane contract hardening after `v0.4.0`.
+Current unreleased contour: control-plane contract hardening after `v0.5.0`.
 This is a directional contour, not a changelog replacement.
 
 Current anchors:
