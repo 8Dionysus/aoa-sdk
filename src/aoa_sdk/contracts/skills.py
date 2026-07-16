@@ -1,123 +1,306 @@
 from __future__ import annotations
 
-from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import AliasChoices, BaseModel, Field
-
-from .closeout import KernelNextStepBrief
+from pydantic import BaseModel, ConfigDict, Field
 
 
-class SkillCard(BaseModel):
+class AgentSkillResourceInventory(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    scripts: list[str] = Field(default_factory=list)
+    references: list[str] = Field(default_factory=list)
+    assets: list[str] = Field(default_factory=list)
+    checks: list[str] = Field(default_factory=list)
+    examples: list[str] = Field(default_factory=list)
+
+
+class AgentSkillCatalogEntry(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
     name: str
     display_name: str
     description: str
     short_description: str
     path: str
-    trust_posture: Literal["explicit-risk", "portable-core", "project-overlay"]
-    invocation_mode: Literal["explicit-only", "explicit-preferred"]
+    openai_config_path: str | None = None
+    scope: str
+    status: str
+    invocation_mode: str
+    implicit_activation_policy: str
     allow_implicit_invocation: bool
-    mutation_surface: Literal["none", "repo", "runtime", "sharing"]
-    keywords: list[str] = Field(default_factory=list)
+    manual_invocation_required: bool
+    candidate_only: bool
+    source_skill_path: str
+    trust_posture: str
+    mutation_surface: str
     recommended_install_scopes: list[str] = Field(default_factory=list)
-    explicit_handles: dict[str, Any] = Field(default_factory=dict)
-
-
-class SkillDisclosure(BaseModel):
-    name: str
-    display_name: str
-    description: str
-    short_description: str
-    path: str
-    skill_dir: str
-    compatibility: str = ""
-    metadata: dict[str, Any] = Field(default_factory=dict)
-    headings_available: list[str] = Field(default_factory=list)
-    section_summaries: dict[str, str] = Field(default_factory=dict)
-    resource_inventory: dict[str, list[str]] = Field(default_factory=dict)
-    policy: dict[str, Any] = Field(default_factory=dict)
-    interface: dict[str, Any] = Field(default_factory=dict)
-    runtime_contract_ref: str | None = None
-    context_retention_ref: str | None = None
-    trust_policy_ref: str | None = None
-    collision_family: str | None = None
-
-
-class SkillHostAvailability(BaseModel):
-    model_config = {"populate_by_name": True}
-
-    status: Literal["host-executable", "router-only", "unknown"]
-    source: Literal[
-        "host-manifest",
-        "host-skill-list",
-        "repo-install",
-        "workspace-install",
-        "user-install",
-        "not-provided",
-    ]
-    manual_equivalence_allowed: bool = Field(
-        validation_alias=AliasChoices("manual_equivalence_allowed", "manual_fallback_allowed")
+    resource_inventory: AgentSkillResourceInventory = Field(
+        default_factory=AgentSkillResourceInventory
     )
-    reason: str
+    ui: dict[str, Any] = Field(default_factory=dict)
 
 
-class SkillActivationRequest(BaseModel):
-    skill_name: str
-    session_file: str | None = None
-    explicit_handle: str | None = None
-    include_frontmatter: bool = False
-    wrap_mode: Literal["structured", "markdown", "raw"] = "structured"
+class AgentSkillCatalog(BaseModel):
+    model_config = ConfigDict(extra="forbid")
 
-
-class ActiveSkillRecord(BaseModel):
-    name: str
-    activated_at: datetime
-    activation_count: int
-    protected_from_compaction: bool
-    allowlist_paths: list[str] = Field(default_factory=list)
-    compact_summary: str
-    must_keep: list[str] = Field(default_factory=list)
-    rehydration_hint: str
-
-
-class SkillSession(BaseModel):
-    schema_version: int
+    catalog_version: Literal[2]
     profile: str
-    session_id: str
-    created_at: datetime
-    updated_at: datetime
-    codex_thread_id: str | None = None
-    codex_rollout_path: str | None = None
-    codex_thread_title: str | None = None
-    codex_first_user_message: str | None = None
-    codex_thread_updated_at: datetime | None = None
-    active_skills: list[ActiveSkillRecord] = Field(default_factory=list)
-    activation_log: list[dict[str, Any]] = Field(default_factory=list)
+    root: str
+    source_repo: str
+    source_of_truth: dict[str, str]
+    skills: list[AgentSkillCatalogEntry] = Field(default_factory=list)
 
-class SkillDispatchItem(BaseModel):
-    skill_name: str
-    layer: Literal["kernel", "outer-ring", "risk-ring"]
-    collision_family: str | None = None
-    reason: str
-    host_availability: SkillHostAvailability = Field(
-        default_factory=lambda: SkillHostAvailability(
-            status="unknown",
-            source="not-provided",
-            manual_equivalence_allowed=False,
-            reason="no host skill inventory was supplied",
-        )
+
+class SkillPackEntry(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    name: str
+    source_path: str
+    target_path: str
+    openai_config_path: str | None = None
+    allow_implicit_invocation: bool
+    implicit_activation_policy: str
+    trust_posture: str
+
+
+class SkillPackProfile(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    description: str
+    scope: Literal["user", "repo"]
+    install_mode: Literal["copy"]
+    install_root: str
+    skills: list[SkillPackEntry] = Field(default_factory=list)
+
+
+class SkillPackProfiles(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[2]
+    profile: str
+    source_config: str
+    profiles: dict[str, SkillPackProfile] = Field(default_factory=dict)
+
+
+class CapabilityGraphSourceFile(BaseModel):
+    path: str
+    sha256: str
+
+
+class CapabilityGraphSource(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    root: str
+    family_files: list[CapabilityGraphSourceFile] = Field(default_factory=list)
+    referenced_files: list[CapabilityGraphSourceFile] = Field(default_factory=list)
+    content_hash: str
+
+
+class CapabilityOwner(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    authority: str
+    repo: str
+    surface: str
+
+
+class CapabilityLifecycle(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    state: str
+    visibility: str
+    evidence_state: str | None = None
+    health: str | None = None
+    version: str | int | None = None
+
+
+class CapabilityNode(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    id: str
+    kind: str
+    contract_level: Literal["navigation", "executable"]
+    primary_parent: str | None
+    source_family: str
+    source_path: str
+    owner: CapabilityOwner
+    lifecycle: CapabilityLifecycle
+    title: str | None = None
+    description: str | None = None
+    keywords: list[str] = Field(default_factory=list)
+    abi: dict[str, Any] = Field(default_factory=dict)
+    applicability: dict[str, Any] = Field(default_factory=dict)
+    execution: dict[str, Any] = Field(default_factory=dict)
+    binding: dict[str, Any] = Field(default_factory=dict)
+    provenance: dict[str, Any] = Field(default_factory=dict)
+    trust: dict[str, Any] = Field(default_factory=dict)
+
+
+class CapabilityRelation(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    kind: str
+    source: str
+    target: str
+    source_path: str
+    condition: str | None = None
+
+
+class CapabilityRetrievalDocument(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    id: str
+    kind: str
+    visibility: str
+    title: str
+    description: str
+    search_text: str
+    positive_text: str
+    negative_text: str
+    negative_phrases: list[str] = Field(default_factory=list)
+    routing_tokens: list[str] = Field(default_factory=list)
+    positive_tokens: list[str] = Field(default_factory=list)
+    negative_tokens: list[str] = Field(default_factory=list)
+    tokens: list[str] = Field(default_factory=list)
+
+
+class CapabilityGraph(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["aoa-capability-graph-v1"]
+    authority: Literal[False]
+    source: CapabilityGraphSource
+    roots: list[str]
+    nodes: list[CapabilityNode]
+    relations: list[CapabilityRelation] = Field(default_factory=list)
+    retrieval_documents: list[CapabilityRetrievalDocument]
+
+
+class CapabilityNeighborhood(BaseModel):
+    node: CapabilityNode
+    incoming: list[CapabilityRelation] = Field(default_factory=list)
+    outgoing: list[CapabilityRelation] = Field(default_factory=list)
+
+
+class PortableSkillExport(BaseModel):
+    model_config = ConfigDict(extra="allow")
+
+    name: str
+    source_skill_path: str
+    target_dir: str
+    target_skill_path: str
+    target_openai_config_path: str | None = None
+    invocation_mode: str
+    implicit_activation_policy: str
+    allow_implicit_invocation: bool
+    candidate_only: bool
+    resource_inventory: AgentSkillResourceInventory = Field(
+        default_factory=AgentSkillResourceInventory
     )
 
 
-class SkillDetectionReport(BaseModel):
-    phase: Literal["ingress", "pre-mutation", "checkpoint", "closeout"]
+class PortableExportMap(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    export_version: Literal[2]
+    profile: str
+    root: str
+    source_repo: str
+    source_of_truth: dict[str, str]
+    exports: list[PortableSkillExport] = Field(default_factory=list)
+
+
+class McpSkillDependency(BaseModel):
+    name: str
+    tools: list[str] = Field(default_factory=list)
+
+
+class McpDependencyManifest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal[2]
+    profile: str
+    skills: list[McpSkillDependency] = Field(default_factory=list)
+
+
+class SkillHomeBundle(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    name: str
+    path: str
+    version: str
+    lifecycle: str
+    visibility: str
+    admission_ref: str
+
+
+class SkillHomeProjection(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    runtime: str
+    scope: Literal["repo"]
+    root: str
+    mode: Literal["generated-copy"]
+    skills: list[str] = Field(default_factory=list)
+
+
+class SkillHomePortManifest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    schema_version: Literal["aoa_skill_home_port_v1"]
+    contract_ref: str
+    owner_repo: str
+    owner_ref: str
+    bundles: list[SkillHomeBundle] = Field(default_factory=list)
+    projection: SkillHomeProjection
+
+
+class InstalledSkill(BaseModel):
+    name: str
+    skill_dir: str
+    skill_file: str
+    status: Literal[
+        "current",
+        "drift",
+        "missing",
+        "unmanaged",
+        "source-export",
+        "legacy-unowned",
+    ]
+    admitted: bool = False
+    expected_source_dir: str | None = None
+
+
+class SkillRootInspection(BaseModel):
+    root_kind: Literal[
+        "user",
+        "repo-projection",
+        "repo-unowned",
+        "workspace-legacy",
+        "source-export",
+    ]
+    scope: Literal["user", "repo", "workspace", "source"]
+    path: str
+    exists: bool
+    authority: Literal[
+        "host-projection",
+        "owner-projection",
+        "legacy-unowned",
+        "portable-export",
+    ]
+    owner_repo: str | None = None
+    manifest_path: str | None = None
+    admitted_names: list[str] = Field(default_factory=list)
+    entries: list[InstalledSkill] = Field(default_factory=list)
+    issues: list[str] = Field(default_factory=list)
+
+
+class SkillEnvironmentReport(BaseModel):
     repo_root: str
-    foundation_id: str
-    activate_now: list[SkillDispatchItem] = Field(default_factory=list)
-    must_confirm: list[SkillDispatchItem] = Field(default_factory=list)
-    suggest_next: list[SkillDispatchItem] = Field(default_factory=list)
-    host_inventory_provided: bool = False
-    actionability_gaps: list[str] = Field(default_factory=list)
-    blocked_actions: list[str] = Field(default_factory=list)
-    closeout_chain: KernelNextStepBrief | None = None
-    reasoning: list[str] = Field(default_factory=list)
+    federation_root: str
+    source_repo_root: str
+    user_skill_root: str
+    roots: list[SkillRootInspection] = Field(default_factory=list)
+    duplicate_names: dict[str, list[str]] = Field(default_factory=dict)
+    warnings: list[str] = Field(default_factory=list)

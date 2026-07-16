@@ -122,7 +122,7 @@ def test_build_closeout_context_attaches_session_memory_ref(
         repo_root=str(workspace_root / "aoa-sdk"),
         reviewed_artifact_path=str(reviewed_artifact),
         session_ref="session:checkpoint-session-memory",
-        session_file=str(session_file),
+        runtime_session_file=str(session_file),
     )
 
     assert context.session_memory_ref is not None
@@ -132,7 +132,7 @@ def test_build_closeout_context_attaches_session_memory_ref(
     assert any("freshness caution" in note for note in context.notes)
 
 
-def test_session_memory_route_evidence_does_not_advance_progression_verdict(
+def test_session_memory_route_evidence_does_not_execute_progression(
     workspace_root: Path,
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
@@ -177,7 +177,10 @@ def test_session_memory_route_evidence_does_not_advance_progression_verdict(
         runtime_session_id=runtime_session_id,
         repo_root=repo_root,
     )
-    sdk.checkpoints.status(repo_root=str(repo_root), session_file=str(session_file))
+    sdk.checkpoints.status(
+        repo_root=str(repo_root),
+        runtime_session_file=str(session_file),
+    )
     reviewed_artifact = repo_root / ".aoa" / "reviewed-session-memory-route.json"
     reviewed_artifact.write_text(
         json.dumps(
@@ -190,23 +193,28 @@ def test_session_memory_route_evidence_does_not_advance_progression_verdict(
         encoding="utf-8",
     )
 
-    report = sdk.checkpoints.execute_closeout_chain(
+    report = sdk.checkpoints.materialize_closeout_handoff(
         repo_root=str(repo_root),
         reviewed_artifact_path=str(reviewed_artifact),
-        session_file=str(session_file),
+        runtime_session_file=str(session_file),
     )
 
-    progression_packet_path = next(
-        Path(path) for path in report.produced_artifact_refs if path.endswith("PROGRESSION_DELTA.json")
+    evidence_packet_path = next(
+        Path(path)
+        for path in report.produced_artifact_refs
+        if path.endswith("CHECKPOINT_CLOSEOUT_EVIDENCE_BUNDLE.json")
     )
-    progression_packet = json.loads(progression_packet_path.read_text(encoding="utf-8"))
+    evidence_packet = json.loads(evidence_packet_path.read_text(encoding="utf-8"))
 
     assert report.session_memory_ref is not None
     assert report.session_memory_ref.session_id == THREAD_ID
-    assert progression_packet["session_memory_ref"]["session_id"] == THREAD_ID
-    assert progression_packet["candidate_ids"] == ["candidate:route:session-memory-route"]
-    assert progression_packet["verdict"] == "hold"
-    assert progression_packet["axis_deltas"] == {"change_legibility": 0}
+    assert report.capability_execution_claimed is False
+    assert evidence_packet["session_memory_ref"]["session_id"] == THREAD_ID
+    assert evidence_packet["capability_execution_claimed"] is False
+    assert not any(
+        path.endswith("PROGRESSION_DELTA.json")
+        for path in report.produced_artifact_refs
+    )
 
 
 def _write_session_memory_fixture(workspace_root: Path) -> None:

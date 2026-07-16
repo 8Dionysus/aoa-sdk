@@ -38,8 +38,6 @@ ProgressionAxis = Literal[
 ProgressionMovement = Literal["advance", "hold", "reanchor", "downgrade"]
 SurfaceSignal = Literal[
     "explicit-request",
-    "risk-gate",
-    "router-match",
     "repeated-pattern",
     "proof-need",
     "recall-need",
@@ -53,8 +51,6 @@ SURFACE_PHASES = {"ingress", "in-flight", "pre-mutation", "checkpoint", "closeou
 MUTATION_SURFACES = {"none", "code", "repo-config", "infra", "runtime", "public-share"}
 SIGNAL_ORDER: list[SurfaceSignal] = [
     "explicit-request",
-    "risk-gate",
-    "router-match",
     "repeated-pattern",
     "proof-need",
     "recall-need",

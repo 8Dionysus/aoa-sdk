@@ -38,3 +38,6 @@ exclude = [
   "/.agents",
   "/.aoa",
 ]
+
+[tool.pytest.ini_options]
+pythonpath = ["src"]

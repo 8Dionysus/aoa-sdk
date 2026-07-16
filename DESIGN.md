@@ -127,7 +127,7 @@ or part of a shared parent operation.
 
 Top-level mechanics follow the shared AoA parent vocabulary when that
 vocabulary already carries the operation. Local SDK lanes such as
-compatibility, skill routing, surface detection, workspace topology, closeout,
+compatibility, skill inspection, surface detection, workspace topology, closeout,
 A2A return, or Codex deploy status should live as parts unless they can prove
 an independent parent operation, owner split, stop-line, and validator that
 cannot be represented inside a shared parent.
@@ -139,7 +139,7 @@ A healthy SDK operation follows a bounded route:
 1. Identify the source-owned sibling surface or SDK-owned helper surface.
 2. Load it through explicit workspace configuration or a documented override.
 3. Preserve truth labels such as source, generated, candidate, manual,
-   reviewed, activated, or advisory.
+   reviewed, owner-accepted, executed, or advisory.
 4. Expose typed access without absorbing owner meaning.
 5. Validate schema, generated parity, compatibility, and relevant behavior.
 6. Hand off stronger claims to the owning repository.
@@ -157,7 +157,7 @@ The repository should support:
 - typed facades over published sibling surfaces;
 - compatibility checks that fail on silent drift;
 - generated capsules for low-context orientation;
-- bounded CLI helpers for inspection, activation, checkpoint, closeout,
+- bounded CLI helpers for inspection, checkpoint evidence materialization,
   release, and handoff routes;
 - portable behavior across local checkouts, export bundles, and future
   transport layers;
@@ -168,7 +168,7 @@ The repository should support:
 
 ### 1. Control plane before authority
 
-The SDK may load, validate, expose, activate, suggest, and hand off. It should
+The SDK may load, validate, inspect, expose, and hand off. It should
 not become the source of truth for skills, evals, memo, agents, routing,
 playbooks, KAG, stats, runtime, or progression meaning.
 

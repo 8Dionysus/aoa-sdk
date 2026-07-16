@@ -3,8 +3,8 @@ from aoa_sdk.a2a.rebase import (
     RemoteTaskResult,
     SummonIntent,
     assess_summon,
-    build_checkpoint_bridge_plan,
-    build_checkpoint_context_bundle,
+    build_checkpoint_evidence_bundle,
+    build_checkpoint_evidence_handoff_plan,
     build_summon_request_payload,
     build_return_plan,
     build_transition_decision_payload,
@@ -58,7 +58,7 @@ def test_return_plan_prefers_checkpoint_relaunch_when_checkpoint_exists() -> Non
         result,
         decision,
         checkpoint_note_ref="aoa-sdk/.aoa/session-growth/current/example/checkpoint-note.json",
-        codex_trace_ref="aoa-sdk/.aoa/skill-runtime-sessions/example-trace.json",
+        codex_trace_ref="codex:thread:example",
     )
     payload = build_transition_decision_payload(return_plan)
 
@@ -67,25 +67,25 @@ def test_return_plan_prefers_checkpoint_relaunch_when_checkpoint_exists() -> Non
     assert return_plan.anchor_artifact == "bounded_plan"
     assert payload["decision"] == "return"
     assert payload["checkpoint_note_ref"] is not None
+    assert payload["next_hop"] == "workflow.operations.checkpoint-closeout"
 
 
-def test_checkpoint_bridge_plan_keeps_fixed_order() -> None:
-    plan = build_checkpoint_bridge_plan(
+def test_checkpoint_handoff_preserves_evidence_without_execution_claim() -> None:
+    plan = build_checkpoint_evidence_handoff_plan(
         session_ref="session:example",
         reviewed_artifact_path="/srv/notes/reviewed.md",
         checkpoint_note_ref="aoa-sdk/.aoa/session-growth/current/example/checkpoint-note.json",
-        codex_trace_ref="aoa-sdk/.aoa/skill-runtime-sessions/example-trace.json",
+        codex_trace_ref="codex:thread:example",
         surviving_checkpoint_clusters=["cluster:return"],
     )
-    bundle = build_checkpoint_context_bundle(plan)
+    bundle = build_checkpoint_evidence_bundle(plan)
 
-    assert bundle["execution_order"] == [
-        "aoa-session-donor-harvest",
-        "aoa-session-progression-lift",
-        "aoa-quest-harvest",
+    assert bundle["mode"] == "reviewed-evidence-handoff"
+    assert bundle["capability_candidates"] == [
+        "workflow.operations.checkpoint-closeout"
     ]
-    assert bundle["mechanical_bridge_only"] is True
-    assert bundle["agent_skill_application_required"] is True
+    assert bundle["capability_execution_claimed"] is False
+    assert "execution_order" not in bundle
 
 
 def test_summon_request_override_updates_nested_audit_refs() -> None:

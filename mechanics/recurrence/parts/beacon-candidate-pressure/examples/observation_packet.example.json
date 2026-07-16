@@ -2,12 +2,12 @@
   "schema_version": "aoa_observation_packet_v1",
   "packet_ref": "observations:20260413T120000Z",
   "workspace_root": "/srv/federation",
-  "signal_ref": "signal:20260413T115900Z:aoa-skills",
+  "signal_ref": "signal:20260413T115900Z:aoa-techniques",
   "observations": [
     {
       "observation_ref": "obs:signal:0001",
-      "component_ref": "component:skills:bundle-and-activation-beacons",
-      "owner_repo": "aoa-skills",
+      "component_ref": "component:techniques:canon-and-intake-beacons",
+      "owner_repo": "aoa-techniques",
       "observed_at": "2026-04-13T11:59:00Z",
       "category": "change_pressure",
       "signal": "docs_changed",
@@ -15,46 +15,14 @@
         "change_signal"
       ],
       "evidence_refs": [
-        "aoa-skills:docs/TRIGGER_EVALS.md"
+        "aoa-techniques:docs/CROSS_LAYER_TECHNIQUE_CANDIDATES.md"
       ],
       "attributes": {
         "match_class": "docs",
         "matched_path_count": 1,
-        "repo_name": "aoa-skills"
+        "repo_name": "aoa-techniques"
       },
       "notes": "derived from direct change detection; supplemental review signals may raise this into a beacon"
-    },
-    {
-      "observation_ref": "obs:supp:0001",
-      "component_ref": "component:skills:bundle-and-activation-beacons",
-      "owner_repo": "aoa-skills",
-      "observed_at": "2026-04-13T12:00:05Z",
-      "category": "usage_gap",
-      "signal": "should_trigger_missing",
-      "source_inputs": [
-        "description-trigger-suite"
-      ],
-      "evidence_refs": [
-        "generated/description_trigger_eval_cases.jsonl#case-17"
-      ],
-      "attributes": {},
-      "notes": ""
-    },
-    {
-      "observation_ref": "obs:supp:0002",
-      "component_ref": "component:skills:bundle-and-activation-beacons",
-      "owner_repo": "aoa-skills",
-      "observed_at": "2026-04-13T12:00:07Z",
-      "category": "review_signal",
-      "signal": "prefer_other_skill_gap",
-      "source_inputs": [
-        "skill-evaluation-matrix"
-      ],
-      "evidence_refs": [
-        "generated/skill_evaluation_matrix.md#gap-2"
-      ],
-      "attributes": {},
-      "notes": ""
     },
     {
       "observation_ref": "obs:supp:0003",

@@ -49,9 +49,9 @@ def test_roadmap_keeps_current_control_plane_surface_explicit() -> None:
     assert "generated/workspace_control_plane.min.json" in roadmap
     assert ".aoa/workspace.toml" in roadmap
     assert "compatibility checks" in roadmap
-    assert "`aoa skills enter` / `aoa skills guard`" in roadmap
+    assert "passive skill-environment inspection" in roadmap
     assert "`aoa surfaces detect`" in roadmap
-    assert "checkpoint capture, review-note, and explicit reviewed-session handoff runner" in roadmap
+    assert "checkpoint capture, review-note, and reviewed evidence materialization" in roadmap
     assert "release audit and publish" in roadmap
     assert "Detailed shipped-surface maps live in" in readme
     assert "ROADMAP](ROADMAP.md) keeps direction" in readme
@@ -87,7 +87,7 @@ def test_roadmap_keeps_current_control_plane_surface_explicit() -> None:
         "mechanics/checkpoint/parts/reviewed-closeout-context-carry/schemas/closeout_followthrough_decision.schema.json",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md",
-        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md",
+        "mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md",
         "mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md",
         "mechanics/release-support/parts/public-support-ci-posture/docs/public-support-ci-posture.md",

@@ -46,7 +46,11 @@ def tracked_markdown_paths() -> tuple[Path, ...]:
         capture_output=True,
         text=True,
     )
-    return tuple(Path(line) for line in completed.stdout.splitlines() if line)
+    return tuple(
+        path
+        for line in completed.stdout.splitlines()
+        if line and (path := Path(line)) and (REPO_ROOT / path).is_file()
+    )
 
 
 def markdown_command_violations(content: str) -> set[str]:
@@ -330,88 +334,83 @@ def test_readme_routes_surface_detection_to_owner_surfaces() -> None:
     assert "surface-detection" in readme
     assert "owner-layer-signal-handoff" in boundary_bridge
     assert "aoa surfaces detect" in owner_handoff
-    assert "`aoa skills guard` stay skill-only" in initial_boundary
-    assert "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-heuristics.md" in initial_boundary
-    assert "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md" in initial_boundary
-    assert "sdk.stats.surface_detection()" in enrichment
+    assert "without\nselecting, loading, or executing a skill" in initial_boundary
+    assert "`aoa-skills.agent_skill_catalog`; it is not a dispatch result" in initial_boundary
+    assert "`surface-detection-heuristics.md`" in initial_boundary
+    assert "`surface-closeout-handoff.md`" in initial_boundary
+    assert "descriptive stats re-grounding signals from owner-published stats surfaces" in enrichment
+    assert "all surface items remain non-executable" in enrichment
     assert "mechanics/experience/parts/capture-pipeline-helper/" in experience
-    assert "checkpoint notes carry harvest, progression, and upgrade candidates through the end of the session" in checkpoint
+    assert "preserves\nintermediate evidence" in checkpoint
     assert "agent_review=pending" in checkpoint
-    assert "checkpoint_capture.session_end_skill_targets" in checkpoint
-    assert "aoa checkpoint lifecycle-audit" in checkpoint
-    assert "checkpoint_lifecycle_closed_v1" in checkpoint
-    assert "must not mutate aoa-session-memory" in checkpoint
+    assert "capability_execution_claimed=false" in checkpoint
+    assert "`lifecycle-audit`, `backlog-audit`, `close-archive`" in checkpoint
+    assert "does not\n  mutate session memory" in checkpoint
 
 
-def test_agents_documents_surface_detection_loop_and_truth_rules() -> None:
+def test_agents_documents_passive_skill_inspection_and_checkpoint_truth_rules() -> None:
     agents = read_text("AGENTS.md")
 
-    assert "## Surface Detection Loop" in agents
+    assert "## Inspection And Checkpoint Loop" in agents
+    assert "aoa skills inspect /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json" in agents
+    assert "aoa skills capability workflow.operations.checkpoint-closeout" in agents
     assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress" in agents
     assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint" in agents
     assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in agents
-    assert 'aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json' in agents
-    assert 'aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json' in agents
-    assert "aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text \"reviewable verify-green checkpoint\" --mutation-surface code --checkpoint-kind verify_green" in agents
-    assert 'aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/AbyssOS/aoa-sdk --json' in agents
     assert "aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json" in agents
-    assert "aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD" in agents
+    assert "aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD --auto" in agents
+    assert "aoa checkpoint materialize-closeout-handoff" in agents
     assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in agents
     assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in agents
-    assert "aoa skills ...` remains skill-only" in agents
-    assert "checkpoint notes stay lower-authority than harvest verdicts" in agents
+    assert "`aoa skills ...` is passive inspection only" in agents
+    assert "does not detect, rank,\ndispatch, activate, or create skill-session state" in agents
+    assert "Presence never\n  becomes selection, activation, capability execution, or owner authority" in agents
     assert "skipped_no_active_session" in agents
     assert "agent_review=pending" in agents
-    assert "session-local ledger for harvest, progression, and" in agents
-    assert "checkpoint_capture.session_end_skill_targets" in agents
-    assert "checkpoint_capture.progression_axis_signals" in agents
-    assert "checkpoint_capture.session_end_next_honest_move" in agents
-    assert "aoa-session-progression-lift" in agents
-    assert "aoa-checkpoint-closeout-bridge" in agents
-    assert "manual-equivalent` never becomes `activated`" in agents
-    assert "routing shortlist hints stay advisory only" in agents
+    assert "capability_execution_claimed=false" in agents
 
 
-def test_session_closeout_explicitly_keeps_surface_handoff_separate() -> None:
-    closeout = read_text(
-        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md"
+def test_reviewed_handoffs_explicitly_keep_capability_execution_separate() -> None:
+    checkpoint = read_text(
+        "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md"
+    )
+    child_return = read_text(
+        "mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md"
+    )
+    surface_handoff = read_text(
+        "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md"
     )
 
-    assert "`aoa closeout run` does not auto-run `aoa surfaces handoff`" in closeout
-    assert "`aoa surfaces handoff` is reviewed-only" in closeout
-    assert "`checkpoint_note_ref`" in closeout
-    assert "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md" in closeout
-    assert "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md" in closeout
-    assert "`owner_followthrough_map`" in closeout
-    assert "`followthrough_decision`" in closeout
-    assert "without minting `candidate_ref`, `seed_ref`, or `object_ref`" in closeout
+    assert "materialize-closeout-handoff" in checkpoint
+    assert "Every output keeps `capability_execution_claimed=false`" in checkpoint
+    assert "No checkpoint command invokes inferred sibling publishers" in checkpoint
+    assert "without selecting a skill" in child_return
+    assert "No step invokes an owner publisher, runs a skill" in child_return
+    assert "`capability_execution_claimed=false`" in child_return
+    assert "requires `reviewed=True`" in surface_handoff
+    assert "they are not\n  SDK dispatch instructions" in surface_handoff
+    assert "No target is auto-run, installed, admitted, or promoted" in surface_handoff
 
 
-def test_session_growth_checkpoint_doc_explains_session_end_ledger() -> None:
+def test_session_growth_checkpoint_doc_explains_reviewed_evidence_lifecycle() -> None:
     checkpoints = read_text(
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md"
     )
 
-    assert "carry harvest, progression, and upgrade candidates through the end of the session" in checkpoints
-    assert "candidate movement and stats refresh stay reviewed-closeout decisions" in checkpoints
-    assert "land promptly in tracked owner status surfaces" in checkpoints
-    assert "provenance, and blockers preserved" in checkpoints
-    assert "the final stats-refresh hint" in checkpoints
-    assert "checkpoint_capture.session_end_skill_targets" in checkpoints
-    assert "checkpoint_capture.progression_axis_signals" in checkpoints
-    assert "checkpoint_capture.session_end_next_honest_move" in checkpoints
-    assert "aoa-session-progression-lift" in checkpoints
-    assert "plain `git commit` can trigger one active-session-only checkpoint pass" in checkpoints
+    assert "session-local checkpoint control plane" in checkpoints
+    assert "intermediate evidence, requires semantic review" in checkpoints
+    assert "agent_review=pending" in checkpoints
+    assert "review-note --auto" in checkpoints
+    assert "build-closeout-context" in checkpoints
+    assert "materialize-closeout-handoff" in checkpoints
+    assert "Every output keeps `capability_execution_claimed=false`" in checkpoints
+    assert "No checkpoint command invokes inferred sibling publishers" in checkpoints
+    assert "chooses a next skill" in checkpoints
     assert "post-commit-report.json" in checkpoints
-    assert "aoa-sdk/.aoa/session-growth/post-commit-status/<repo>.latest.json" in checkpoints
-    assert "Skill prelude, surface detection, checkpoint capture" in checkpoints
-    assert "root `AGENTS.md`" in checkpoints
-    assert "this part's\n`VALIDATION.md`" in checkpoints
-    assert "real intermediate findings, candidate notes, stats hints" in checkpoints
-    assert "aoa-checkpoint-closeout-bridge" in checkpoints
-    assert "continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref" in checkpoints
-    assert "reanchor_need" in checkpoints
-    assert f"{CARRY_PART}/docs/self-agency-continuity-carry.md" in checkpoints
+    assert "archived_without_closeout" in checkpoints
+    assert "aoa-session-memory refs are read-only evidence coordinates" in checkpoints
+    assert "Manual lifecycle trials are the behavioral authority" in checkpoints
+    assert "Tests and validators must not replace the reviewed artifact" in checkpoints
 
 
 def test_readme_routes_to_reviewed_closeout_context_carry() -> None:

@@ -122,14 +122,14 @@ def detect_manifest_kind(payload: dict[str, Any]) -> ManifestKind:
     if isinstance(schema_version, str) and schema_version in SCHEMA_VERSION_TO_KIND:
         return SCHEMA_VERSION_TO_KIND[schema_version]
 
-    if any(key in payload for key in ("bindings", "hooks", "hook_binding_set_id", "hook_set_id")):
+    if AGON_SHAPE_KEYS.intersection(payload):
+        return "agon_recurrence_adapter"
+
+    if all(key in payload for key in ("bindings", "component_ref", "owner_repo")):
         return "hook_binding_set"
 
     if "component_ref" in payload and "owner_repo" in payload:
         return "recurrence_component"
-
-    if AGON_SHAPE_KEYS.intersection(payload):
-        return "agon_recurrence_adapter"
 
     return "unknown"
 

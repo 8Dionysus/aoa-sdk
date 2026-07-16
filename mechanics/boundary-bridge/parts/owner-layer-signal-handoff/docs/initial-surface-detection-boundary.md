@@ -1,67 +1,44 @@
-# AoA Surface Detection Initial Boundary
+# AoA Surface Detection Boundary
 
-Initial surface detection adds one read-only control-plane seam to
-`aoa-sdk`. It does not extend the meaning of `aoa skills ...`, and it does not
-move source ownership away from sibling repositories.
+Surface detection is a read-only SDK control-plane seam. It turns explicit
+intent and bounded deterministic signals into owner-surface candidates without
+selecting, loading, or executing a skill.
 
 ## Boundary
 
-- `aoa skills detect`, `aoa skills dispatch`, `aoa skills enter`, and
-  `aoa skills guard` stay skill-only
-- `aoa surfaces detect` is additive and read-only
-- `phase=checkpoint` may recommend local note capture, but it does not emit
-  harvest verdicts or receipts
-- only `skills` may appear in `immediate_skill_dispatch`
-- `eval`, `memo`, `playbook`, `agent`, and `technique` surfaces stay hints,
-  candidates, or reviewed closeout handoffs in the initial boundary
+- `aoa surfaces detect` may emit `candidate-now` or `candidate-later` items.
+- Every item has `executable_now=false`.
+- An explicit `skill` request points to
+  `aoa-skills.agent_skill_catalog`; it is not a dispatch result.
+- The detector does not read installed user or repository skills, skill
+  runtime sessions, activation logs, or session receipts.
+- `phase=checkpoint` may create session-local checkpoint candidates, but it
+  does not promote them into an owner repository.
+- `aoa surfaces handoff` requires an explicit reviewed route.
 
-## Report shape
+## Inputs and output
 
-`sdk.surfaces.detect(...)` and `aoa surfaces detect` emit
-`SurfaceDetectionReport` with:
+The detector uses intent, phase, mutation posture, optional current
+`aoa-routing.owner_layer_shortlist.min` hints, and bounded stats re-grounding
+signals. It emits schema-v2 `SurfaceDetectionReport` objects with candidates,
+owner refs, ambiguity, inspection gaps, and checkpoint carry.
 
-- repo and workspace context
-- the requested surface phase, including `in-flight`
-- optional checkpoint metadata and checkpoint candidate clusters when the phase
-  is `checkpoint`
-- the referenced skill prelude path when one was supplied
-- current active skill names from the runtime session file when present
-- `immediate_skill_dispatch` copied from the skill prelude only
-- additive `items`, `closeout_followups`, `owner_layer_notes`, and
-  `actionability_gaps`
-
-Reports persist under:
+Reports persist only as session-local control-plane evidence under:
 
 ```text
 aoa-sdk/.aoa/surface-detection/{label}.{phase}.latest.json
 ```
 
-## Skill prelude contract
-
-`surfaces.detect` reuses the existing skill detector as a prelude.
-
-- `ingress`, `pre-mutation`, and `closeout` call the matching skill phase
-- `in-flight` reuses ingress scoring without changing the skill detector's
-  public phase enum
-- `checkpoint` also reuses ingress scoring and then adds local note-oriented
-  checkpoint clustering
-- the surface layer never calls `skills.dispatch`
+That location is not owner truth. `aoa-skills`, each repository home, KAG, and
+the host retain their own source, retrieval, projection, and execution roles.
 
 ## Truth rules
 
-- `activated` is reserved for real skill activations from the skill prelude
-- `manual-equivalent` records router-only skill discipline with honest
-  manual-equivalence labeling
-- non-skill surfaces never become `executable_now`
-- `manual-equivalent` never mutates into `activated` during reporting or
-  handoff
+- Filesystem presence is not selection or execution.
+- A routing shortlist is advisory and stale skill refs are reported as gaps.
+- A session receipt cannot upgrade a candidate or modify an owner surface.
+- Capability targets in reviewed handoff packets are refs, not invocations.
 
-## Executable route
-
-The surface-detection CLI owns ingress, in-flight, pre-mutation, and checkpoint
-entrypoints. Exact operator and test routes are maintained in the part
-`VALIDATION.md` and root `AGENTS.md`.
-
-Use `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-heuristics.md` for the deterministic ruleset and
-`mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-closeout-handoff.md` for the reviewed-only handoff
-contract.
+Use `surface-detection-heuristics.md` for the bounded signal map,
+`surface-detection-enrichment.md` for advisory context, and
+`surface-closeout-handoff.md` for reviewed handoff behavior.

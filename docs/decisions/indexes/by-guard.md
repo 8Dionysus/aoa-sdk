@@ -87,6 +87,7 @@
 ## compatibility
 
 - [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) (`docs/decisions/AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md`)
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 
 ## compatibility alias
 
@@ -169,6 +170,15 @@
 
 - [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) (`docs/decisions/AOA-SDK-D-0043-sdk-source-home-tree.md`)
 
+## manual evidence
+
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
+
+## manual validation
+
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
+
 ## MCP wiring
 
 - [AOA-SDK-D-0019 - Codex Workspace MCP Server Localization](../AOA-SDK-D-0019-codex-workspace-mcp-server-localization.md) (`docs/decisions/AOA-SDK-D-0019-codex-workspace-mcp-server-localization.md`)
@@ -222,9 +232,30 @@
 - [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md`)
 - [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) (`docs/decisions/AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md`)
 
+## no hidden routing
+
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+
+## no inferred execution
+
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
+
+## no invented execution
+
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
+
+## no silent no-op
+
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
+
 ## no single-event promotion
 
 - [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0063-checkpoint-candidate-intelligence.md`)
+
+## owner authority
+
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 
 ## owner boundary
 
@@ -238,6 +269,10 @@
 ## owner follow-through
 
 - [AOA-SDK-D-0057 - Closeout API Route-Role Branches](../AOA-SDK-D-0057-closeout-api-route-role-branches.md) (`docs/decisions/AOA-SDK-D-0057-closeout-api-route-role-branches.md`)
+
+## owner scope
+
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 
 ## owner-layer signal handoff
 
@@ -279,6 +314,10 @@
 - [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) (`docs/decisions/AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md`)
 - [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) (`docs/decisions/AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md`)
 
+## profile parity
+
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+
 ## public import compatibility
 
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
@@ -310,6 +349,10 @@
 ## reviewed closeout runner
 
 - [AOA-SDK-D-0057 - Closeout API Route-Role Branches](../AOA-SDK-D-0057-closeout-api-route-role-branches.md) (`docs/decisions/AOA-SDK-D-0057-closeout-api-route-role-branches.md`)
+
+## reviewed evidence
+
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 
 ## roadmap drift
 

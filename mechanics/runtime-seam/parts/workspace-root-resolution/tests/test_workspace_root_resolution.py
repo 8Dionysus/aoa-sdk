@@ -11,7 +11,10 @@ def test_from_workspace_resolves_root(workspace_root: Path) -> None:
     assert sdk.workspace.federation_root_source == "manifest:layout.federation_roots"
     assert sdk.workspace.manifest_path == (workspace_root / "aoa-sdk" / ".aoa" / "workspace.toml").resolve()
     assert sdk.workspace.has_repo("aoa-skills")
-    assert sdk.workspace.surface_path("aoa-skills", "generated/runtime_discovery_index.json").exists()
+    assert sdk.workspace.surface_path(
+        "aoa-skills",
+        "generated/agent_skill_catalog.json",
+    ).exists()
 
 
 def test_prefers_abyss_stack_source_checkout_over_runtime_mirror(

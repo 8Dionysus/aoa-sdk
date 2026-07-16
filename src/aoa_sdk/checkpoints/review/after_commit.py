@@ -13,7 +13,6 @@ from ...models import (
     SessionCheckpointAgentReview,
     SessionCheckpointAutoObservation,
     SessionCheckpointNote,
-    SkillDetectionReport,
     SurfaceDetectionReport,
 )
 from ..kinds import infer_auto_checkpoint_kind
@@ -68,12 +67,10 @@ def build_after_commit_auto_observation(
     commit_metadata: dict[str, Any],
     checkpoint_kind: Literal["commit", "owner_followthrough"],
     mutation_surface: Literal["code", "public-share"],
-    skill_report: SkillDetectionReport,
     surface_report: SurfaceDetectionReport,
     observed_at: datetime,
     observed_at_local: str | None,
     observed_tz: str | None,
-    skill_report_path: str,
     surface_report_path: str,
 ) -> SessionCheckpointAutoObservation:
     commit_sha = cast(str | None, commit_metadata.get("commit_sha"))
@@ -84,21 +81,28 @@ def build_after_commit_auto_observation(
         for path in cast(list[str], commit_metadata.get("changed_paths", []))
         if isinstance(path, str) and path.strip()
     ]
-    active_skills = _dedupe_strings(
+    related_capability_refs = _dedupe_strings(
         [
-            *(item.skill_name for item in skill_report.activate_now),
-            *surface_report.active_skill_names,
-            *surface_report.immediate_skill_dispatch,
+            *(
+                capability_ref
+                for item in surface_report.items
+                for capability_ref in item.related_capability_refs
+            ),
+            *(
+                capability_ref
+                for item in surface_report.items
+                for capability_ref in item.closeout_capability_candidates
+            ),
         ]
     )
     candidate_ids = [cluster.candidate_id for cluster in surface_report.candidate_clusters]
     findings: list[str] = []
     if changed_paths:
         findings.append(f"tracked paths changed: {_preview_strings(changed_paths, limit=5)}")
-    if active_skills:
+    if related_capability_refs:
         findings.append(
-            "checkpoint-phase skill context active before surface detection: "
-            + _preview_strings(active_skills, limit=6)
+            "surface inspection linked capability candidate(s): "
+            + _preview_strings(related_capability_refs, limit=6)
         )
     if surface_report.candidate_clusters:
         findings.append(
@@ -134,13 +138,9 @@ def build_after_commit_auto_observation(
         )
 
     mechanic_hints = [
-        "treat auto-observation output as provisional checkpoint collection rather than agent-reviewed session judgment"
+        "treat auto-observation output as provisional checkpoint collection rather than agent-reviewed session judgment",
+        "treat related capability refs as routing context, not proof that any skill or workflow executed",
     ]
-    if active_skills:
-        mechanic_hints.append(
-            "when the agent writes review-note, keep these active checkpoint skills in scope: "
-            + _preview_strings(active_skills, limit=6)
-        )
     if mutation_surface == "public-share":
         mechanic_hints.append(
             "owner-followthrough capture should preserve publish-surface evidence without reopening or rotating a closed checkpoint ledger"
@@ -171,8 +171,13 @@ def build_after_commit_auto_observation(
         [
             *([f"commit:{commit_sha}"] if commit_sha else []),
             *(f"path:{path}" for path in changed_paths),
-            skill_report_path,
             surface_report_path,
+            *(f"surface-input:{source_ref}" for source_ref in surface_report.source_inputs),
+            *(
+                evidence.ref
+                for item in surface_report.items
+                for evidence in item.evidence_refs
+            ),
             *(cluster.source_surface_ref for cluster in surface_report.candidate_clusters),
             *(ref for cluster in surface_report.candidate_clusters for ref in cluster.evidence_refs[:3]),
         ]
@@ -200,7 +205,7 @@ def build_after_commit_auto_observation(
         commit_short_sha=commit_short_sha,
         commit_subject=commit_subject,
         summary=summary,
-        applied_skill_names=active_skills,
+        related_capability_refs=related_capability_refs,
         findings=findings,
         candidate_notes=candidate_notes,
         stats_hints=stats_hints,

@@ -6,17 +6,17 @@ Status: active topology with part-local payload.
 
 ### Operation
 
-Keep SDK stress-posture dispatch, reviewed stress closeout carry, and via
+Keep SDK stress-posture task dispatch, reviewed stress closeout carry, and via
 negativa pruning bounded, inspectable, and weaker than owner remediation.
 
 ### Trigger
 
-Use this mechanic when SDK stress dispatch examples, reviewed stress closeout
-carry, via negativa checklists, or antifragility route cards change.
+Use this mechanic when SDK stress-aware task-dispatch examples, reviewed stress
+closeout carry, via negativa checklists, or antifragility route cards change.
 
 ### SDK owns
 
-- public-safe stress-posture dispatch examples
+- public-safe stress-posture task-dispatch examples
 - SDK antifragility control-plane posture docs
 - reviewed stress closeout carry route docs and example manifest
 - via negativa checklist routing
@@ -41,7 +41,7 @@ durable memory.
 ### Must not claim
 
 This mechanic must not treat stress fixtures as proof verdicts, deletion
-approval, runtime activation, or owner-local remediation.
+approval, skill activation, runtime execution, or owner-local remediation.
 
 ### Validation
 

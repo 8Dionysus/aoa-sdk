@@ -1,0 +1,24 @@
+{
+  "schema_version": 2,
+  "request_kind": "a2a_return_evidence_handoff",
+  "handoff_id": "return-handoff-example-child",
+  "session_ref": "session:example",
+  "reviewed": true,
+  "reviewed_artifact_path": "/srv/notes/reviewed_session_artifact.md",
+  "audit_refs": [
+    "/srv/notes/reviewed_session_artifact.md"
+  ],
+  "capability_execution_claimed": false,
+  "owner_handoffs": [
+    {
+      "owner_ref": "repo:aoa-playbooks",
+      "candidate_kind": "checkpoint-owner-followthrough",
+      "reason": "the owner decides whether to execute its workflow",
+      "evidence_refs": [
+        "/srv/notes/reviewed_session_artifact.md"
+      ],
+      "capability_ref": "workflow.operations.checkpoint-closeout",
+      "review_required": true
+    }
+  ]
+}

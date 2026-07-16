@@ -178,7 +178,11 @@ def _tracked_source_paths(repo_root: Path) -> list[Path] | None:
     )
     if result.returncode != 0:
         return None
-    return [Path(line) for line in result.stdout.splitlines() if line]
+    return [
+        path
+        for line in result.stdout.splitlines()
+        if line and (path := Path(line)) and (repo_root / path).exists()
+    ]
 
 
 def _source_families(repo_root: Path) -> set[str]:

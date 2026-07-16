@@ -19,23 +19,6 @@ Good for:
 - second-consumer hints
 - route receipts that should stay reviewable
 
-## `skill_trigger_gap_watch`
-
-Use for `aoa-skills` description-trigger suites plus one or more recent skill-evidence surfaces.
-
-This producer compares:
-
-- trigger cases
-- recent skill receipts or session-growth artifacts
-
-It emits bounded gaps such as:
-
-- `should_trigger_missing`
-- `prefer_other_skill_gap`
-- `manual_invocation_boundary_seen`
-
-This is a gap detector, not an activation engine.
-
 ## `harvest_pattern_watch`
 
 Use for harvest JSON, harvest JSONL, real-run Markdown, and gate-review Markdown.
@@ -69,3 +52,7 @@ It never turns runtime artifacts into proof canon by itself.
 
 A missing source file should stay visible in the hook run report.
 That visibility is part of the point. The hook pack is also a connectivity probe.
+
+Skill-use inference is intentionally absent. A missing skill receipt does not
+prove omission, applicability, execution, or benefit; those claims require an
+explicit session evidence route and owner-reviewed comparison.

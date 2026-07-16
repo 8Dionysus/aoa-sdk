@@ -5,34 +5,33 @@
   "event": "session_stop",
   "signal_ref": null,
   "bindings_run": [
-    "skills.trigger_gap.session_stop",
+    "techniques.receipts.session_stop",
     "playbooks.harvest_patterns.session_stop"
   ],
   "missing_paths": [
-    "aoa-skills:.aoa/live_receipts/skill-receipts.jsonl"
+    "aoa-playbooks:examples/harvests/*.json"
   ],
   "warnings": [],
   "observations": [
     {
-      "observation_ref": "obs:hook:skills.trigger_gap.session_stop:0001",
-      "component_ref": "component:skills:bundle-and-activation-beacons",
-      "owner_repo": "aoa-skills",
+      "observation_ref": "obs:hook:techniques.receipts.session_stop:0001",
+      "component_ref": "component:techniques:canon-and-intake-beacons",
+      "owner_repo": "aoa-techniques",
       "observed_at": "2026-04-13T19:00:00Z",
-      "category": "usage_gap",
-      "signal": "should_trigger_missing",
+      "category": "review_signal",
+      "signal": "second_consumer_confirmed",
       "source_inputs": [
-        "description-trigger-suite",
-        "skill-live-receipts"
+        "technique-live-receipts"
       ],
       "evidence_refs": [
-        "aoa-skills:generated/description_trigger_eval_cases.jsonl#case-17"
+        "aoa-techniques:.aoa/live_receipts/technique-receipts.jsonl#tech-2"
       ],
       "attributes": {
-        "binding_ref": "skills.trigger_gap.session_stop",
-        "producer": "skill_trigger_gap_watch",
-        "skill_name": "aoa-change-protocol"
+        "binding_ref": "techniques.receipts.session_stop",
+        "producer": "jsonl_receipt_watch",
+        "second_consumer_ref": "consumer:mirror-B"
       },
-      "notes": "trigger suite suggests this skill should fire, but no recent skill evidence was seen"
+      "notes": "Owner receipt names an additional consumer."
     }
   ]
 }

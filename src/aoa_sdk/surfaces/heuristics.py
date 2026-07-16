@@ -23,7 +23,7 @@ class SurfaceHeuristicRule:
     signal: Literal["repeated-pattern", "proof-need", "recall-need", "scenario-recurring", "role-posture"]
     tokens: tuple[str, ...] = ()
     existing_surface: str | None = None
-    closeout_family_candidates: tuple[str, ...] = ()
+    closeout_capability_candidates: tuple[str, ...] = ()
     promotion_hint: str | None = None
     confidence: Literal["low", "medium", "high"] = "medium"
 
@@ -57,7 +57,7 @@ PROOF_NEED_RULE = SurfaceHeuristicRule(
     signal="proof-need",
     tokens=("verify", "proof", "regression", "quality", "score", "eval", "invariant", "property", "contract"),
     existing_surface="aoa-evals.runtime_candidate_template_index.min",
-    closeout_family_candidates=("aoa-session-donor-harvest",),
+    closeout_capability_candidates=("skill.aoa-session-harvest",),
     promotion_hint="consider a bounded eval bundle if the same claim recurs across reviewed sessions",
 )
 
@@ -73,7 +73,7 @@ RECALL_NEED_RULE = SurfaceHeuristicRule(
     signal="recall-need",
     tokens=("recall", "memory", "previous", "prior", "why", "history", "provenance", "earlier", "context"),
     existing_surface="aoa-memo.memory_catalog.min",
-    closeout_family_candidates=("aoa-session-donor-harvest",),
+    closeout_capability_candidates=("skill.aoa-session-harvest",),
     promotion_hint="write back only bounded, provenance-aware memory; memory is not proof",
 )
 
@@ -89,7 +89,7 @@ SCENARIO_RECURRING_RULE = SurfaceHeuristicRule(
     signal="scenario-recurring",
     tokens=("recurring", "repeat", "again", "runbook", "workflow", "handoff", "sequence", "campaign", "checkpoint"),
     existing_surface="aoa-playbooks.playbook_registry.min",
-    closeout_family_candidates=("aoa-automation-opportunity-scan", "aoa-quest-harvest"),
+    closeout_capability_candidates=("workflow.operations.checkpoint-closeout",),
     promotion_hint="promote only after repeated reviewed runs show a stable recurring scenario",
 )
 
@@ -105,7 +105,7 @@ ROLE_POSTURE_RULE = SurfaceHeuristicRule(
     signal="role-posture",
     tokens=("agent", "role", "handoff", "orchestrator", "subagent", "persona", "tier", "cohort"),
     existing_surface="aoa-agents.runtime_seam_bindings",
-    closeout_family_candidates=("aoa-session-donor-harvest",),
+    closeout_capability_candidates=("skill.aoa-session-harvest",),
 )
 
 REPEATED_PATTERN_RULE = SurfaceHeuristicRule(
@@ -120,7 +120,7 @@ REPEATED_PATTERN_RULE = SurfaceHeuristicRule(
     signal="repeated-pattern",
     tokens=("repeat", "repeated", "again", "pattern", "recurring"),
     existing_surface="aoa-techniques.technique_promotion_readiness.min",
-    closeout_family_candidates=("aoa-session-donor-harvest", "aoa-quest-harvest"),
+    closeout_capability_candidates=("skill.aoa-session-harvest",),
     promotion_hint="keep this as a promotion hint until repeated evidence exists across reviewed sessions",
 )
 
@@ -147,7 +147,7 @@ EXPLICIT_LAYER_RULES: tuple[ExplicitLayerRule, ...] = (
         object_kind="skill",
         surface_ref="aoa-skills:layer-request",
         display_name="Skill layer request",
-        existing_surface="aoa-skills.runtime_discovery_index",
+        existing_surface="aoa-skills.agent_skill_catalog",
     ),
     ExplicitLayerRule(
         token="playbook",

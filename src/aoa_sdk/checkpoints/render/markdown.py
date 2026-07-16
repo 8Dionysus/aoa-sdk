@@ -53,8 +53,11 @@ def render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label: 
                 f"- review refs: {', '.join(f'`{ref}`' for ref in note.review_refs) or '`none`'}",
                 "- auto observation refs: "
                 + (", ".join(f"`{ref}`" for ref in note.auto_observation_refs) or "`none`"),
-                "- applied skills: "
-                + (", ".join(f"`{name}`" for name in note.applied_skill_names) or "`none`"),
+                "- related capability refs: "
+                + (
+                    ", ".join(f"`{ref}`" for ref in note.related_capability_refs)
+                    or "`none`"
+                ),
             ]
         )
         for label, values in (
@@ -77,7 +80,11 @@ def render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label: 
                     f"- review id: `{review.review_id}`",
                     f"- auto observation ref: `{review.auto_observation_ref or 'none'}`",
                     f"- summary: {review.summary}",
-                    f"- applied skills: {', '.join(f'`{name}`' for name in review.applied_skill_names) or '`none`'}",
+                    "- related capability refs: "
+                    + (
+                        ", ".join(f"`{ref}`" for ref in review.related_capability_refs)
+                        or "`none`"
+                    ),
                     f"- defer until closeout: `{'yes' if review.defer_until_closeout else 'no'}`",
                 ]
             )
@@ -187,10 +194,12 @@ def render_checkpoint_note_markdown(note: SessionCheckpointNote, *, repo_label: 
             lines.append(f"  - agent review: `{entry.agent_review_status}`")
         if entry.auto_observation is not None:
             lines.append(f"  - auto observation: {entry.auto_observation.summary}")
-            if entry.auto_observation.applied_skill_names:
+            if entry.auto_observation.related_capability_refs:
                 lines.append(
-                    "  - auto skills: "
-                    + ", ".join(f"`{name}`" for name in entry.auto_observation.applied_skill_names)
+                    "  - related capability refs: "
+                    + ", ".join(
+                        f"`{ref}`" for ref in entry.auto_observation.related_capability_refs
+                    )
                 )
             for label, values in (
                 ("auto findings", entry.auto_observation.findings),

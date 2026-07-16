@@ -9,10 +9,9 @@ flow into the beacon layer and candidate ledger.
 ## Purpose
 
 The beacon layer can only see what it is fed.
-This hook pack feeds it with bounded observations from four current artifact families:
+This hook pack feeds it with bounded observations from three current artifact families:
 
 - receipts
-- description-trigger eval suites
 - harvest and real-run notes
 - runtime evidence-selection artifacts
 
@@ -43,7 +42,6 @@ authorize canonical technique status.
 ## Seed Producers
 
 - `jsonl_receipt_watch`
-- `skill_trigger_gap_watch`
 - `harvest_pattern_watch`
 - `runtime_candidate_watch`
 

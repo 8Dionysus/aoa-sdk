@@ -1,10 +1,10 @@
 from __future__ import annotations
 
-from .models import CheckpointBridgePlan, CloseoutBatchPlan, ReturnPlan
+from .models import CheckpointEvidenceHandoffPlan, OwnerEvidenceHandoff, ReturnPlan
 from .utils import to_jsonable
 
 
-def build_checkpoint_bridge_plan(
+def build_checkpoint_evidence_handoff_plan(
     *,
     session_ref: str,
     reviewed_artifact_path: str,
@@ -12,8 +12,8 @@ def build_checkpoint_bridge_plan(
     codex_trace_ref: str | None = None,
     surviving_checkpoint_clusters: list[str] | None = None,
     return_plan: ReturnPlan | None = None,
-) -> CheckpointBridgePlan:
-    return CheckpointBridgePlan(
+) -> CheckpointEvidenceHandoffPlan:
+    return CheckpointEvidenceHandoffPlan(
         session_ref=session_ref,
         reviewed_artifact_path=reviewed_artifact_path,
         checkpoint_note_ref=checkpoint_note_ref,
@@ -23,10 +23,10 @@ def build_checkpoint_bridge_plan(
     )
 
 
-def build_checkpoint_context_bundle(
-    plan: CheckpointBridgePlan,
+def build_checkpoint_evidence_bundle(
+    plan: CheckpointEvidenceHandoffPlan,
     *,
-    owner_publication_plan: list[CloseoutBatchPlan] | None = None,
+    owner_handoffs: list[OwnerEvidenceHandoff] | None = None,
 ) -> dict:
     return {
         "mode": plan.mode,
@@ -35,12 +35,11 @@ def build_checkpoint_context_bundle(
         "checkpoint_note_ref": plan.checkpoint_note_ref,
         "codex_trace_ref": plan.codex_trace_ref,
         "surviving_checkpoint_clusters": list(plan.surviving_checkpoint_clusters),
-        "execution_order": list(plan.execution_order),
+        "capability_candidates": list(plan.capability_candidates),
         "authority_contract": plan.authority_contract,
-        "mechanical_bridge_only": plan.mechanical_bridge_only,
-        "agent_skill_application_required": plan.agent_skill_application_required,
+        "capability_execution_claimed": plan.capability_execution_claimed,
         "return_anchor_artifact": plan.return_anchor_artifact,
-        "owner_publication_plan": [
-            to_jsonable(item) for item in owner_publication_plan or []
+        "owner_handoffs": [
+            to_jsonable(item) for item in owner_handoffs or []
         ],
     }

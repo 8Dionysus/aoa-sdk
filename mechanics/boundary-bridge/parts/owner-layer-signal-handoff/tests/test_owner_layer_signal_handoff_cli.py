@@ -1,6 +1,7 @@
 import json
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from aoa_sdk.cli.main import app
@@ -39,10 +40,19 @@ def test_surfaces_detect_cli_can_emit_json_and_persist_default_report(
     assert payload["report_path"] == str(expected_path)
     assert expected_path.exists()
     assert payload["report"]["phase"] == "ingress"
-    assert payload["report"]["skill_report_included"] is True
+    assert payload["report"]["schema_version"] == 2
+    assert all(
+        item["execution"]["executable_now"] is False
+        for item in payload["report"]["items"]
+    )
+    assert "skill_report_included" not in payload["report"]
 
 
-def test_surfaces_handoff_cli_can_emit_json(workspace_root: Path) -> None:
+def test_surfaces_handoff_cli_can_emit_json(
+    workspace_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-owner-layer-handoff-cli")
     runner = CliRunner()
     append_result = runner.invoke(
         app,

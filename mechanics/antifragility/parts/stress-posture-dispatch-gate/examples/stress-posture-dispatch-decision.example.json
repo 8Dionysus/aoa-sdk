@@ -1,21 +1,35 @@
 {
-  "status": "ok",
-  "dispatch_mode": "stress-aware",
-  "selected_skill_ids": [
-    "aoa-change-protocol"
-  ],
-  "auto_activated_skill_ids": [],
-  "blocked_auto_activation_reasons": [
-    "active stress posture requires human_review_first",
-    "requested mutation surface remains gated while the owner-local degraded surface is unresolved"
-  ],
-  "required_review_steps": [
-    "inspect owner-local source receipt",
-    "inspect owner-local degraded artifact",
-    "run a bounded verify path before mutation"
-  ],
-  "evidence_refs": [
-    "ATM10-Agent:stressor_receipt_v1#stress:2026-04-07:retrieval-only-fallback",
-    "aoa-routing:stress_navigation_hint_v1#route:stress:atm10-hybrid-query:retrieval-only-fallback"
-  ]
+  "stress_bundle": {
+    "selected_posture": "stop_before_mutation",
+    "dominant_source_family": "owner_receipt",
+    "suppression": "active",
+    "blocked_actions": [
+      "mutation",
+      "unsupervised_execution"
+    ],
+    "evidence_refs": [
+      "ATM10-Agent:stressor_receipt_v1#stress:2026-04-07:retrieval-only-fallback",
+      "aoa-routing:stress_navigation_hint_v1#route:stress:atm10-hybrid-query:retrieval-only-fallback"
+    ],
+    "reentry_conditions": [
+      "owner review completed",
+      "bounded verify path passed"
+    ]
+  },
+  "task_dispatch": {
+    "allowed": false,
+    "lane": "human_gate",
+    "execution_surface": "human_gate",
+    "requested_posture": "stop_before_mutation",
+    "reason_codes": [
+      "stress:stop_before_mutation",
+      "stress_blocks_mutation_lane"
+    ],
+    "blocked_actions": [
+      "mutation",
+      "unsupervised_execution"
+    ]
+  },
+  "skill_activation_claimed": false,
+  "runtime_enforcement_claimed": false
 }

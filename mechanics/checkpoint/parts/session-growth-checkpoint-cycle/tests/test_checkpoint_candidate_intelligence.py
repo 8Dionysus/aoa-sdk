@@ -3,10 +3,16 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from aoa_sdk import AoASDK
 from aoa_sdk.cli.main import app
+
+
+@pytest.fixture(autouse=True)
+def _explicit_runtime_identity(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("AOA_SESSION_ID", "runtime-candidate-intelligence-tests")
 
 
 def _signature_by_action(report, action: str):  # type: ignore[no-untyped-def]
@@ -133,9 +139,21 @@ def test_checkpoint_candidate_intelligence_counts_repetition_after_deduping_even
 
 def test_checkpoint_candidate_intelligence_backfills_legacy_candidate_clusters(
     workspace_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setenv(
+        "AOA_SESSION_ID", "runtime-legacy-candidate-intelligence"
+    )
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir = (
+        workspace_root
+        / "aoa-sdk"
+        / ".aoa"
+        / "session-growth"
+        / "current"
+        / "runtime-legacy-candidate-intelligence"
+        / "aoa-sdk"
+    )
     _write_legacy_checkpoint_entry(note_dir, observed_at="2026-04-10T14:00:00Z")
     _write_legacy_checkpoint_entry(note_dir, observed_at="2026-04-10T14:01:00Z")
 
@@ -157,9 +175,19 @@ def test_checkpoint_candidate_intelligence_backfills_legacy_candidate_clusters(
 
 def test_checkpoint_candidate_intelligence_enriches_legacy_flat_signatures(
     workspace_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setenv("AOA_SESSION_ID", "runtime-legacy-flat-signatures")
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir = (
+        workspace_root
+        / "aoa-sdk"
+        / ".aoa"
+        / "session-growth"
+        / "current"
+        / "runtime-legacy-flat-signatures"
+        / "aoa-sdk"
+    )
     note_dir.mkdir(parents=True, exist_ok=True)
     surface = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),
@@ -224,9 +252,21 @@ def test_checkpoint_candidate_intelligence_enriches_legacy_flat_signatures(
 
 def test_checkpoint_candidate_intelligence_counts_duplicate_saved_signature_refs(
     workspace_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setenv(
+        "AOA_SESSION_ID", "runtime-legacy-duplicate-saved-signatures"
+    )
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir = (
+        workspace_root
+        / "aoa-sdk"
+        / ".aoa"
+        / "session-growth"
+        / "current"
+        / "runtime-legacy-duplicate-saved-signatures"
+        / "aoa-sdk"
+    )
     note_dir.mkdir(parents=True, exist_ok=True)
     surface = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),
@@ -282,9 +322,21 @@ def test_checkpoint_candidate_intelligence_counts_duplicate_saved_signature_refs
 
 def test_checkpoint_candidate_intelligence_preserves_repeated_saved_signature_refs(
     workspace_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setenv(
+        "AOA_SESSION_ID", "runtime-legacy-repeated-saved-signature-refs"
+    )
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir = (
+        workspace_root
+        / "aoa-sdk"
+        / ".aoa"
+        / "session-growth"
+        / "current"
+        / "runtime-legacy-repeated-saved-signature-refs"
+        / "aoa-sdk"
+    )
     note_dir.mkdir(parents=True, exist_ok=True)
     surface = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),

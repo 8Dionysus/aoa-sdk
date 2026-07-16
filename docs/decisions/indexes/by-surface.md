@@ -68,6 +68,7 @@
 - [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0063-checkpoint-candidate-intelligence.md`)
 - [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md`)
 - [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) (`docs/decisions/AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md`)
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 
 ## ci
 
@@ -89,6 +90,7 @@
 ## closeout
 
 - [AOA-SDK-D-0057 - Closeout API Route-Role Branches](../AOA-SDK-D-0057-closeout-api-route-role-branches.md) (`docs/decisions/AOA-SDK-D-0057-closeout-api-route-role-branches.md`)
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 
 ## Codex projection
 
@@ -98,6 +100,9 @@
 
 - [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) (`docs/decisions/AOA-SDK-D-0003-refactored-sibling-surface-paths.md`)
 - [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) (`docs/decisions/AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md`)
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 
 ## compatibility accounting
 
@@ -217,14 +222,26 @@
 - [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) (`docs/decisions/AOA-SDK-D-0044-mechanics-root-doc-slimming.md`)
 - [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) (`docs/decisions/AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md`)
 - [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) (`docs/decisions/AOA-SDK-D-0050-checkpoint-path-topology-tree.md`)
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 
 ## models
 
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
 
+## owner boundary
+
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
+
 ## parent boundary
 
 - [AOA-SDK-D-0033 - Questbook Parent Withdrawal After Quest Localization](../AOA-SDK-D-0033-questbook-parent-withdrawal-after-quest-localization.md) (`docs/decisions/AOA-SDK-D-0033-questbook-parent-withdrawal-after-quest-localization.md`)
+
+## public API
+
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 
 ## public API naming
 
@@ -237,6 +254,7 @@
 ## recurrence
 
 - [AOA-SDK-D-0058 - Recurrence Route-Role Branches](../AOA-SDK-D-0058-recurrence-route-role-branches.md) (`docs/decisions/AOA-SDK-D-0058-recurrence-route-role-branches.md`)
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 
 ## release
 
@@ -418,6 +436,7 @@
 - [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md`)
 - [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) (`docs/decisions/AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md`)
 - [AOA-SDK-D-0066 - Decision Index Read Model Symmetry](../AOA-SDK-D-0066-decision-index-read-model-symmetry.md) (`docs/decisions/AOA-SDK-D-0066-decision-index-read-model-symmetry.md`)
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 
 ## validation guard
 
@@ -442,6 +461,10 @@
 - [AOA-SDK-D-0027 - Public Support CI Posture Test Localization](../AOA-SDK-D-0027-public-support-ci-posture-test-localization.md) (`docs/decisions/AOA-SDK-D-0027-public-support-ci-posture-test-localization.md`)
 - [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) (`docs/decisions/AOA-SDK-D-0032-root-technical-district-route-card-hardening.md`)
 - [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) (`docs/decisions/AOA-SDK-D-0036-root-technical-district-allowlist-validation.md`)
+
+## workspace bootstrap
+
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 
 ## wrapper-gap
 

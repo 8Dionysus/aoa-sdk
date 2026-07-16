@@ -6,8 +6,8 @@
 
 ## Role
 
-Route the shared Antifragility mechanic for SDK stress-posture dispatch gates,
-reviewed stress closeout carry, and via negativa pruning.
+Route the shared Antifragility mechanic for SDK stress-posture task-dispatch
+gates, reviewed stress closeout carry, and via negativa pruning.
 
 ## Read before editing
 
@@ -34,5 +34,5 @@ python -m pytest -q mechanics/antifragility/parts/stress-posture-dispatch-gate/t
 
 ## Closeout
 
-Report stress-posture dispatch, reviewed stress closeout carry, or via
+Report stress-posture task dispatch, reviewed stress closeout carry, or via
 negativa pruning changes.

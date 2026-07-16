@@ -7,9 +7,10 @@ Status: active topology with part-local payload.
 ### Operation
 
 Capture session-growth checkpoint notes, guard git boundaries, require semantic
-review, build explicit review-context bundles, route child-task re-entry
-packets, attach session-memory archive refs, and carry reviewed closeout
-context without minting owner truth. Audit checkpoint lifecycle state so
+review, build explicit review-context bundles, materialize reviewed evidence
+and owner candidates, route child-task re-entry packets, attach session-memory
+archive refs, and carry reviewed closeout context without minting owner truth
+or claiming capability execution. Audit checkpoint lifecycle state so
 `current/` means active-now or still-blocked review work, while reviewed
 closeout scopes can be closed and archived without deleting evidence. Reconcile
 runtime sessions that ended without reviewed closeout by reading
@@ -25,8 +26,8 @@ making the SDK an accepted wrapper owner.
 
 Use this mechanic when checkpoint CLI behavior, hook integration, pending
 review gates, active-session aggregation, review-context construction,
-reviewed session handoff, child-task re-entry packets, or reviewed closeout
-context carry changes.
+reviewed evidence materialization, child-task re-entry packets, or reviewed
+closeout context carry changes.
 
 ### SDK owns
 
@@ -43,7 +44,7 @@ context carry changes.
 - candidate-intelligence action signatures, repetition clusters, wrapper-gap
   navigation, and generated candidate index writing
 - read-only session-memory archive attachment for checkpoint closeout
-- reviewed session handoff request/inbox/manifest assembly
+- reviewed evidence bundle, materialization receipt, and explicit owner-candidate handoff
 - child-task checkpoint and re-entry packet assembly
 - reviewed closeout context carry schemas, examples, and advisory maps
 
@@ -56,13 +57,10 @@ status remain outside SDK checkpoint authority.
 
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md`
-- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md`
 - `mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md`
 - `mechanics/checkpoint/parts/child-task-reentry/docs/return-reentry.md`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/`
-- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/`
-- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/`
 - `mechanics/checkpoint/parts/reviewed-closeout-context-carry/`
 - `src/aoa_sdk/checkpoints/`
 - `src/aoa_sdk/checkpoints/lifecycle.py`
@@ -72,7 +70,6 @@ status remain outside SDK checkpoint authority.
 - `src/aoa_sdk/checkpoints/indexes.py`
 - `src/aoa_sdk/checkpoints/candidate_intelligence.py`
 - `src/aoa_sdk/checkpoints/candidate_indexes.py`
-- `src/aoa_sdk/closeout/`
 - `src/aoa_sdk/a2a/`
 - `mechanics/checkpoint/parts/child-task-reentry/`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py`
@@ -82,12 +79,10 @@ status remain outside SDK checkpoint authority.
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_session_memory.py`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_candidate_intelligence.py`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_carrier_intelligence.py`
-- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py`
 
 ### Candidate parts
 
 - session-growth-checkpoint-cycle
-- reviewed-session-handoff-runner
 - child-task-reentry
 - reviewed-closeout-context-carry
 
@@ -115,9 +110,10 @@ and then run the mechanics topology gate from the root route card.
 
 ### Next route
 
-If checkpoint evidence survives review, route it through closeout, memory,
-proof, progression, or owner surfaces rather than strengthening the checkpoint
-ledger or reviewed carry packet itself.
+If checkpoint evidence survives review, materialize it locally with exact
+owner candidates, then route real follow-through to the owner workflow,
+memory, proof, progression, or other owner surface. Do not strengthen the
+checkpoint ledger or reviewed carry packet into execution truth.
 Use lifecycle audit when `current/` no longer looks like active work; use
 close/archive only after pending review is clear and reviewed closeout execution
 exists, or when moving nonpending stale scopes as archive evidence without

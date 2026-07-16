@@ -1,118 +1,57 @@
 # Session Growth Checkpoints
 
-`aoa-sdk` owns the control-plane seam for checkpoint-aware session growth.
-It keeps checkpoint capture local-first and reviewable without turning the
-existing session-harvest family into an automatic runtime authority.
+`aoa-sdk` owns a session-local checkpoint control plane. It preserves
+intermediate evidence, requires semantic review, materializes reviewed evidence,
+and moves closed scopes without becoming a skill runtime, memory owner, proof
+owner, or cross-repository workflow runner.
 
 ## Boundary
 
-- `aoa surfaces detect --phase checkpoint` stays additive and read-only
-- `aoa skills enter` and `aoa skills guard` stay skill-first; `enter` stays read-only unless `--checkpoint-kind` is explicit, while `guard` can auto-append one local checkpoint note only when checkpoint-phase surface detection finds a real growth signal
-- explicit `commit`, `verify-green`, `pr_opened`, `pr_merged`, or `owner_followthrough` intents on a non-`none` mutation surface also count as local growth signals, even when recurring-route heuristics stay quiet
-- use `--no-auto-checkpoint` to keep `aoa skills guard` read-only apart from the persisted skill report; `aoa skills enter` is already read-only unless an explicit `--checkpoint-kind` is present
-- use `--checkpoint-kind` to override the inferred checkpoint kind when one explicit checkpoint event matters
-- `aoa checkpoint mark` is the agent-facing way to record an explicit milestone, and `aoa checkpoint append` remains the lower-level append surface; both write only local note state under `.aoa/`
-- plain `git commit` can trigger one active-session-only checkpoint pass through the installed `post-commit` hook and `aoa checkpoint after-commit`; when no active session file already exists, that path exits as `skipped_no_active_session` and does not mint a fresh session just to emit noise, but a reviewable skipped Codex-thread commit remains unresolved checkpoint pressure rather than a clean boundary
-- post-commit kind selection defaults to `auto`; ordinary commits resolve to `commit/code`, explicit `owner_followthrough`, owner-follow-through commit text, or closed-session follow-through resolves to `owner_followthrough/public-share`, and a closed note is never rotated or reopened by the hook
-- use `AOA_CHECKPOINT_KIND=owner_followthrough git commit ...` when the commit is the final owner follow-through after reviewed closeout; if the note has already been closed or promoted, or if the note is already `reviewed` and the session owner-handoff bundle already routes this repo, the hook records a report-only follow-through artifact instead of mutating ledger state or reopening checkpoint review
-- a captured post-commit checkpoint starts with `agent_review=pending`, but it now also writes one structured `auto_observation` into the checkpoint history using commit metadata plus checkpoint-phase skill and surface outputs
-- the Codex agent must then apply the checkpoint skill protocol and run `aoa checkpoint review-note`; `--auto` now lifts the matching `auto_observation` into the stronger semantic layer without retyping summary/findings by hand, and when it finds a matching unresolved `skipped_no_active_session` post-commit status for the current Codex thread it first creates the thread-scoped runtime session and replays the matching capture before writing the semantic review; manual flags remain available when the agent wants to add more specific judgment and still record real intermediate findings, candidate notes, stats hints, mechanic hints, closeout questions, and evidence refs in the note
-- while any checkpoint commit still has `agent_review=pending`, next-step guidance must point to the missing `review-note --auto` rather than directly to reviewed closeout
-- installed `pre-push` and `pre-merge-commit` hooks now fail closed through `aoa checkpoint git-boundary-check` when any aggregated runtime-session checkpoint note still carries pending checkpoint reviews; they stay non-minting at git-boundary time, and before active-session aggregation they also fail closed on a reachable unresolved `skipped_no_active_session` post-commit status that requested checkpoint review, so an active session does not bypass that recovery gate
-- while any aggregated runtime-session checkpoint note still has `agent_review=pending`, `aoa checkpoint build-closeout-context` and `aoa checkpoint execute-closeout-chain` fail closed instead of building reviewed-closeout artifacts too early
-- `aoa checkpoint lifecycle-audit` reads every checkpoint note under
-  `.aoa/session-growth/current/` and classifies it as active current,
-  pending review, reviewed awaiting closeout, closeout built, closeout
-  executed, closed, or stale current scope
-- `aoa checkpoint close-archive` previews by default and only moves files with
-  `--apply`; it closes reviewed closeout-executed scopes by appending a
-  lifecycle event before archival, archives already `closed` or `promoted`
-  runtime-scoped ledgers without appending another close event, and uses
-  `--include-stale` only to move nonpending stale current scopes as archive
-  evidence without marking them closed
-- lifecycle audit may report aoa-session-memory archive refs from closeout
-  context or execution reports, but those refs stay read-only route evidence
-  and the checkpoint mechanic must not mutate aoa-session-memory
-- lifecycle audit may also resolve aoa-session-memory archive refs from the
-  checkpoint runtime-session trace when the operator closed the Codex session
-  without reviewed closeout; those refs produce `session_closed_*` lifecycle
-  states, not reviewed closeout claims
-- `aoa checkpoint backlog-audit` reads lifecycle state and SDK-local
-  runtime-session traces without moving files; it reports pending reviews,
-  reviewed-not-closed scopes, runtime trace gaps, session-memory archive refs,
-  required actions, raw refs, and next routes so an operator can decide whether
-  to review, recover session-memory archive evidence, reconcile, or inspect a
-  missing trace
-- `aoa checkpoint reconcile-sessions` and its
-  `aoa checkpoint sweep-closed-sessions` alias preview by default, write a
-  generated navigation index when requested, and with `--apply` archive only
-  session-memory-backed no-closeout scopes or existing closeout-executed
-  scopes; pending-review scopes return required actions instead of moving
-  evidence
-- `aoa checkpoint candidate-intelligence` reads the current checkpoint note and
-  derives action facets, action signatures, repetition clusters, wrapper-gap
-  candidates, existing-wrapper fit, wrapper readiness, and bounded sample-audit
-  targets; with `--write-index` it writes a generated navigation index only,
-  not accepted memory, proof, owner truth, GraphRAG truth, or wrapper authority
-- `aoa checkpoint carrier-intelligence` reads the current checkpoint note via
-  candidate-intelligence evidence and derives carrier candidates for mechanic,
-  tool, MCP, hook, script, daemon, service, index, or unknown pressure; with
-  `--write-index` it writes a generated navigation index only, not accepted
-  mechanics, installed tools, registered MCP services, installed hooks,
-  runtime automation, memory, proof, RAG/GraphRAG truth, or owner authority
-- once reviewed closeout is allowed, `closeout-context.json` carries one aggregated checkpoint-review bundle with review refs, inherited auto-observation refs, findings, candidate notes, stats hints, mechanic hints, closeout questions, evidence refs, and deferred next-owner moves
-- the mechanical donor, progression, and quest artifacts emitted by `aoa-checkpoint-closeout-bridge` now carry the same checkpoint-review bundle forward so reviewed closeout does not drop the semantic checkpoint layer immediately after context build
-- when that bridge also reaches owner follow-through, it now writes one persistent `.aoa/closeout/handoffs/*.owner-handoff.json` bundle rooted in the reviewed `closeout-context.json`; this stays a follow-through queue, not final owner truth, and it must not mint canonical owner landing state by itself
-- once a matching semantic review exists and no checkpoint review remains pending, the checkpoint note itself now resolves to `review_status=reviewed`
-- `aoa checkpoint promote` now fails closed while `agent_review=pending` remains anywhere on the note
-- checkpoint capture does not emit `HARVEST_PACKET`
-- checkpoint capture does not emit `CORE_SKILL_APPLICATION_RECEIPT`
-- promotion remains explicit through `aoa checkpoint promote`
-- post-commit checkpoint capture always stays mid-session and reviewable: it may dispatch checkpoint-phase skills, run additive checkpoint surface detection, and append a local reviewable note, but it never runs closeout, promotion, harvest, push, or release logic
-- full harvest still belongs to the existing reviewed closeout path
-- checkpoint notes carry harvest, progression, and upgrade candidates through the end of the session
-- checkpoint notes may also carry provisional lineage hints rooted in
-  `cluster_ref`; that carry may name owner hypothesis, owner shape, nearest
-  wrong target, evidence refs, axis pressure, supersession metadata, and
-  status posture, but it must not mint `candidate_ref`, `seed_ref`, or
-  `object_ref`
-- checkpoint notes may also carry candidate-intelligence refs rooted in action
-  signatures; that carry may name repeated action shape, wrapper-family hint,
-  owner pressure, existing-wrapper fit, wrapper gaps, and sample-audit targets,
-  but it must not accept a skill, playbook, technique, eval, memo entry,
-  SDK-local checkpoint mechanic, owner-local wrapper, or promotion from one
-  event
-- checkpoint carrier intelligence may derive carrier candidates rooted in
-  action signatures; that carry may name carrier kind, owner scope,
-  installability, execution posture, execution risk, existing-carrier fit, and
-  sample-audit targets, but it must not install, register, execute, start
-  runtime automation, claim owner acceptance, or turn generated graph-ready
-  anchors into RAG/GraphRAG authority
-- runtime trace refs from SDK-local skill session files are evidence
-  coordinates only; they may route aoa-session-memory freshness/import/recovery
-  checks, but they do not prove a session-memory archive exists and do not make
-  a scope reconcile-ready by themselves
-- reviewed closeout may also carry one separate self-agency continuity hint
-  surface rooted in
-  `continuity_ref_hint -> revision_window_ref_hint -> anchor_artifact_ref`; it
-  may name `reanchor_need` and `continuity_status_hint`, but it must not claim
-  reviewed continuity truth or runtime self-agency authority
-- checkpoint and reviewed closeout may also carry
-  `component_drift_hint` and reviewed
-  `component_refresh_followthrough_decision` packets rooted in `component_ref`;
-  they may name owner repo, signals, route class, evidence refs, rollback
-  anchor, and whether stats or memo follow-through is worth considering, but
-  they must not auto-run owner refresh or stand in for owner receipts
-- checkpoint notes keep provisional multi-axis movement for `boundary_integrity`, `execution_reliability`, `change_legibility`, `review_sharpness`, `proof_discipline`, `provenance_hygiene`, and `deep_readiness`
-- candidate movement and stats refresh stay reviewed-closeout decisions, not
-  mid-session auto-promotion; after reviewed closeout, surviving candidates
-  should land promptly in tracked owner status surfaces with early, reanchor, or
-  thin-evidence posture instead of remaining only in runtime-local `.aoa`
-  state
+- `aoa checkpoint mark`, `append`, `after-commit`, and `review-note`
+  are the explicit capture and review routes.
+- `aoa surfaces detect --phase checkpoint` may add advisory owner candidates;
+  it does not select or execute skills.
+- Post-commit capture reads an existing host runtime identity. It never creates
+  an SDK skill session merely to make a checkpoint possible.
+- A captured commit begins with `agent_review=pending`. Git boundary checks,
+  closeout-context assembly, materialization, and lifecycle closure fail closed
+  while required semantic review remains pending.
+- `review-note --auto` may lift the matching bounded auto-observation into a
+  reviewed note. It remains a session-local review, not owner acceptance.
+- `build-closeout-context` aggregates reviewed notes and exact evidence refs
+  for one host-identified runtime scope. It fails before writing when runtime
+  identity is unavailable.
+- `materialize-closeout-handoff` writes a reviewed evidence bundle,
+  materialization receipt, and, when candidates exist, an explicit owner
+  handoff. Every output keeps `capability_execution_claimed=false`.
+- No checkpoint command invokes inferred sibling publishers, refreshes owner
+  stats, chooses a next skill, or claims that a capability ran.
+- `lifecycle-audit`, `backlog-audit`, `close-archive`,
+  `reconcile-sessions`, and `sweep-closed-sessions` preserve the distinction
+  between pending review, reviewed materialization, closed evidence, stale
+  evidence, and a session that ended without reviewed closeout.
+- aoa-session-memory refs are read-only evidence coordinates. The SDK does not
+  mutate session memory or promote its interpretation.
 
-## Local storage
+## Runtime Identity
 
-Checkpoint state lives under:
+Checkpoint scope comes from host-provided runtime evidence such as
+`CODEX_THREAD_ID`, an explicit runtime metadata file, or compatible host
+metadata. The public file option is `--runtime-session-file`.
+
+Legacy `.aoa/skill-runtime-session.json` and
+`.aoa/skill-runtime-sessions/*.json` files may still be classified as
+`legacy-skill-session` evidence when supplied explicitly. They are read-only
+compatibility inputs, not current runtime authority, and are never created or
+repaired by the SDK.
+
+A mismatch between explicit thread identity and runtime metadata is a conflict,
+not permission to merge two sessions. A post-commit report is trace evidence,
+not a runtime session.
+
+## Local Storage
+
+The active ledger lives under:
 
 ```text
 aoa-sdk/.aoa/session-growth/current/<runtime-session-id>/<repo-label>/
@@ -120,163 +59,71 @@ aoa-sdk/.aoa/session-growth/current/<runtime-session-id>/<repo-label>/
   checkpoint-note.json
   checkpoint-note.md
   post-commit-report.json
-  harvest-handoff.json
   closeout-context.json
-  closeout-execution-report.json
-aoa-sdk/.aoa/session-growth/indexes/
-  checkpoint-backlog-navigation.min.json
-  checkpoint-carrier-candidate-intelligence.min.json
-  checkpoint-candidate-intelligence.min.json
-  checkpoint-lifecycle-navigation.min.json
+  CHECKPOINT_CLOSEOUT_EVIDENCE_BUNDLE.json
+  CHECKPOINT_CLOSEOUT_MATERIALIZATION_RECEIPT.json
 ```
 
-When no runtime session is available yet, the legacy unscoped ledger remains
-`current/<repo-label>/`.
-With an active runtime session, `current/<runtime-session-id>/<repo-label>/` is
-the live ledger for that repo scope inside one specific session, not a date
-bucket.
-The unscoped ledger stays only as a migration bridge for a note that has no
-`runtime_session_id` yet when no active runtime session exists. With an active
-runtime session, the unscoped ledger becomes quarantine-only: it may stay on
-disk as migration evidence, but it does not auto-attach to the live session,
-block git boundaries, or join reviewed closeout fan-in. If an unscoped ledger
-explicitly points at a different `runtime_session_id`, stateful checkpoint
-flows archive it under
-`aoa-sdk/.aoa/session-growth/archive/` so `current/` stops advertising a stale
-session as live.
-The checkpoint `session_ref` is minted uniquely when a new ledger starts and
-now includes a high-resolution timestamp plus the current runtime-session
-identity suffix when available, so many same-day sessions do not collapse into
-one daily label.
-When a note already ended as `closed` or `promoted`, that runtime-scoped
-`current` ledger is archived under `aoa-sdk/.aoa/session-growth/archive/`
-before the next cycle begins.
-When `CODEX_THREAD_ID` is present, the default runtime session store now lives
-under `aoa-sdk/.aoa/skill-runtime-sessions/<codex-thread>.json`, so parallel
-Codex threads no longer mutate the same singleton session file.
-If you use a non-default runtime session file, pass the same `--session-file`
-to `aoa checkpoint status`, `aoa checkpoint promote`,
-`aoa checkpoint build-closeout-context`, and
-`aoa checkpoint execute-closeout-chain` so those commands resolve the same
-active checkpoint session.
-At reviewed closeout, the builder aggregates every checkpoint ledger under the
-same active runtime-session scope before it derives the closeout candidate map.
-During that aggregation, runtime-scoped ledgers are the only live inputs for
-the active session. Legacy unscoped ledgers stay quarantined unless there is no
-active runtime session at all, and explicit mismatched runtime ledgers are
-archived out of `current/` instead of lingering beside the live scope.
-The repo-root checkpoint note must still agree with the resolved reviewed
-session for the closeout to proceed. This keeps one narrow repo-scoped note
-from silently standing in for the whole session and blocks cross-session
-mismatch when parallel work is in flight.
-Lifecycle audit treats `current/<runtime-session-id>/<repo-label>/` as a
-runtime-scope claim, not as a durable archive. An active runtime match is
-active current; pending semantic review stays blocked; reviewed notes without
-closeout execution remain awaiting closeout; reviewed closeout-executed notes
-can be closed and archived; and nonpending stale scopes can be moved out of
-`current/` without being marked closed. This keeps `current/` active-now or
-still-actionable while preserving evidence under
-`aoa-sdk/.aoa/session-growth/archive/`.
+Owner-candidate handoffs remain SDK-local routing material under the checkpoint
+closeout area. Archived scopes move under
+`.aoa/session-growth/archive/`; append-only JSONL evidence is preserved.
 
-The JSONL file is append-only checkpoint history.
-The JSON and Markdown files are rebuilt snapshots for current review.
-Lifecycle close writes an append-only `checkpoint_lifecycle_closed_v1` event
-to the JSONL before rebuilding snapshots and moving the scope to archive.
-`post-commit-report.json` is the trigger/audit artifact for one plain-commit
-capture pass; it is not the authoritative checkpoint ledger.
-It records whether the agent-authored review is still `pending` or already
-`reviewed`.
-When capture skips because no active session file exists, or fails before a
-runtime-scoped note is available, the latest post-commit status artifact is
-written under `aoa-sdk/.aoa/session-growth/post-commit-status/<repo>.latest.json`.
-If `aoa checkpoint review-note --auto` later recovers a matching skipped
-Codex-thread commit, the thread-scoped runtime ledger becomes authoritative
-and the skipped latest status is marked reviewed so the audit trail no longer
-looks like an unresolved boundary.
-Those rebuilt snapshots now act as the session-local ledger for:
+The unscoped `current/<repo-label>/` form is quarantined legacy evidence for a
+note without runtime identity. New mutable routes never create it and it must
+not silently attach to a different live thread.
+Closed or promoted scopes are archived before a new cycle reuses their repo
+label.
 
-- harvest candidates that should be bundled at reviewed closeout
-- progression candidates and provisional axis movement that should feed `aoa-session-progression-lift` only at reviewed closeout
-- upgrade candidates that should be reviewed once at closeout before any owner-layer promotion
-- action signatures and wrapper gaps that should be sampled, reviewed, and
-  routed to the correct owner before any wrapper is drafted or accepted
-- the final stats-refresh hint that belongs to the same reviewed closeout moment
-- agent-authored intermediate review notes for each commit checkpoint, including what changed, why it matters, where it belongs, and which questions the final closeout must reread against the full session
+## Lifecycle
 
-Machine-facing timestamps stay canonical in UTC with the usual `Z` suffix.
-For human review the same checkpoint and explicit closeout surfaces now also
-publish local companion fields such as `observed_at_local`, `captured_at_local`,
-`built_at_local`, `executed_at_local`, and matching `*_tz` labels so local
-operators do not need to mentally convert reviewed session times.
+1. Capture a bounded checkpoint event.
+2. Review every pending semantic observation.
+3. Build one closeout context for the matching runtime scope.
+4. Materialize the reviewed evidence and owner candidates.
+5. Let each owner workflow decide whether to execute, accept, or reject the
+   candidate.
+6. Close and archive the SDK-local scope only after review and materialization
+   requirements are satisfied.
 
-`aoa skills enter` and `aoa skills guard` also surface that ledger directly in
-their runtime JSON under `checkpoint_capture.session_end_skill_targets`,
-`checkpoint_capture.progression_axis_signals`,
-`checkpoint_capture.session_end_next_honest_move`, and
-`checkpoint_capture.stats_refresh_recommended`.
-At reviewed closeout the explicit bridge skill is
-`aoa-checkpoint-closeout-bridge`: it builds `closeout-context.json`, rereads
-the reviewed artifact, and then executes donor harvest, progression lift, and
-quest harvest in order without refreshing stats inside the bridge itself.
-That runtime-session fan-in narrows attention honestly, but it still does not
-replace rereading the reviewed artifact itself.
-The SDK bridge is a mechanical artifact builder, not proof that an agent has
-applied those skills. Its context and execution reports publish
-`execution_mode`, `mechanical_bridge_only`, `agent_skill_application_required`,
-and the authority contract
-`reviewed_artifact_primary_checkpoint_hints_provisional`; the Codex agent must
-still use the skill as a protocol, reread the session evidence, and separate
-checkpoint hints from final candidates before treating the closeout as a
-session analysis.
-`mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/candidate-lineage-carry.md`
-is the canonical note for what the SDK may and may not carry on that lineage
-seam.
-`mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/component-refresh-followthrough.md`
-is the companion note for control-plane component refresh followthrough that
-stays weaker than owner refresh law and owner receipts.
-`mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/self-agency-continuity-carry.md`
-is the companion note for the narrower self-agency continuity hint seam that
-may survive reviewed closeout without becoming self-agent truth.
-When the active runtime session also carries a live Codex rollout path,
-closeout now binds that rollout trace into the context and rereads it beside
-the reviewed artifact so one narrow checkpoint ledger does not stand in for the
-whole runtime thread.
-That reviewed closeout context may now also carry one deterministic
-`followthrough_decision` naming the next honest kernel class after the reread.
-It stays reviewed-only and advisory, and it does not auto-run kernel skills
-from the SDK.
-When the reread is instead about a drifting owner-owned component,
-`mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/component-refresh-followthrough.md`
-defines the companion hint and reviewed decision packets.
+A session-memory-backed session end without reviewed closeout may be archived
+as `archived_without_closeout`. That state does not mean `closed` and does
+not invent a missing review or execution.
 
-## Executable route
+Nonpending stale scopes may be archived as stale evidence. Pending-review scopes
+remain blocked even when nearby artifacts look complete.
 
-Skill prelude, surface detection, checkpoint capture, Git-boundary hooks,
-lifecycle review, close/archive, reconciliation, intelligence, and reviewed
-closeout entrypoints remain owned by their SDK CLI modules. Exact operator
-routes live in root `AGENTS.md`; focused checks live in this part's
-`VALIDATION.md`.
+## Candidate And Carrier Intelligence
 
-## Promotion read
+`candidate-intelligence` and `carrier-intelligence` derive navigation from
+checkpoint action facets. They may expose repeated signatures, wrapper gaps,
+owner pressure, or possible mechanic/tool/MCP/hook/script/service/index
+carriers.
 
-`aoa checkpoint promote --target dionysus-note` writes one lightweight
-reviewed snapshot into `Dionysus`.
+These outputs are generated review aids only. They do not admit a skill,
+playbook, technique, eval, memo entry, mechanic, tool, MCP, hook, daemon,
+service, generated index, RAG layer, or owner verdict. A single weak event
+cannot become an accepted carrier.
 
-`aoa checkpoint promote --target harvest-handoff` writes one local reviewed
-handoff that can feed the explicit session-harvest family later.
+## Executable Route
 
-Checkpoint notes stay below harvest verdict authority. They exist to preserve
-good mid-session candidates until reviewed promotion is honest.
-They should be carried through the session and only moved, harvested, or paired
-with stats refresh from the final reviewed closeout path.
-Once that reviewed closeout path has run, owner follow-through should not leave
-surviving candidates only in `harvest-handoff.json`. If the relevant owner repo
-has a tracked status surface, land the candidate there with its early status,
-provenance, and blockers preserved, and keep final promotion authority separate
-from that early landing.
-When progression evidence exists, reviewed closeout should raise
-`aoa-session-progression-lift` before `aoa-quest-harvest`, so the final
-multi-axis verdict is gathered once from the carried checkpoint evidence instead
-of being guessed mid-session.
-That reviewed closeout path should be driven through
-`aoa-checkpoint-closeout-bridge`, not by silently widening `aoa closeout run`.
+Root `AGENTS.md#inspection-and-checkpoint-loop` owns the compact operator
+commands. This part's `VALIDATION.md` owns focused manual lifecycle and
+regression routes. Use current CLI help for exact optional flags; this design
+note does not duplicate executable command truth.
+
+## Verification Posture
+
+Manual lifecycle trials are the behavioral authority. A retained regression may
+only encode an invariant already observed in a real current, pending, reviewed,
+materialized, conflict, legacy-evidence, close/archive, or no-closeout trial.
+
+Tests and validators must not replace the reviewed artifact with synthetic green
+status, infer capability execution from receipt presence, or mock removed owner
+publishers back into existence.
+
+## Promotion Read
+
+`aoa checkpoint promote` remains an explicit, review-gated local handoff. It
+does not turn checkpoint notes into memory, proof, progression, quest, stats, or
+owner truth. Surviving evidence must enter the receiving owner's own admission
+route.

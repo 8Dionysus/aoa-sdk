@@ -3,10 +3,10 @@ from __future__ import annotations
 from typing import Any, Iterable
 
 from .models import (
-    CheckpointBridgePlan,
-    CloseoutBatchPlan,
+    CheckpointEvidenceHandoffPlan,
     CodexLocalAgentTarget,
     MemoExportPlan,
+    OwnerEvidenceHandoff,
     QuestPassport,
     ReturnPlan,
     SummonDecision,
@@ -58,26 +58,27 @@ def build_summon_result_payload(
     *,
     codex_local_target: CodexLocalAgentTarget | None = None,
     return_plan: ReturnPlan | None = None,
-    checkpoint_bridge_plan: CheckpointBridgePlan | None = None,
+    checkpoint_handoff_plan: CheckpointEvidenceHandoffPlan | None = None,
     memo_export_plan: MemoExportPlan | None = None,
-    owner_publication_plan: Iterable[CloseoutBatchPlan] | None = None,
+    owner_handoffs: Iterable[OwnerEvidenceHandoff] | None = None,
 ) -> dict[str, Any]:
     payload = to_jsonable(decision)
+    payload["capability_execution_claimed"] = False
     payload["codex_local_target"] = (
         to_jsonable(codex_local_target) if codex_local_target is not None else None
     )
     payload["return_plan"] = (
         to_jsonable(return_plan) if return_plan is not None else None
     )
-    payload["checkpoint_bridge_plan"] = (
-        to_jsonable(checkpoint_bridge_plan)
-        if checkpoint_bridge_plan is not None
+    payload["checkpoint_handoff_plan"] = (
+        to_jsonable(checkpoint_handoff_plan)
+        if checkpoint_handoff_plan is not None
         else None
     )
     payload["memo_export_plan"] = (
         to_jsonable(memo_export_plan) if memo_export_plan is not None else None
     )
-    payload["owner_publication_plan"] = [
-        to_jsonable(item) for item in owner_publication_plan or []
+    payload["owner_handoffs"] = [
+        to_jsonable(item) for item in owner_handoffs or []
     ]
     return payload

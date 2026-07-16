@@ -1,22 +1,22 @@
 {
   "schema_version": "aoa_graph_closure_report_v1",
-  "report_ref": "graph-closure:example:skills",
+  "report_ref": "graph-closure:example:techniques",
   "workspace_root": "/srv/workspace",
   "direct_components": [
-    "component:skills:activation-boundary"
+    "component:techniques:canon-and-intake-beacons"
   ],
   "depth_limit": 8,
   "max_depth_seen": 2,
   "nodes": [
     {
-      "component_ref": "component:skills:activation-boundary",
-      "owner_repo": "aoa-skills",
+      "component_ref": "component:techniques:canon-and-intake-beacons",
+      "owner_repo": "aoa-techniques",
       "depth": 0,
       "parent_component_ref": null,
       "via_edge_kind": null,
       "edge_strength": "required",
       "lineage": [
-        "component:skills:activation-boundary"
+        "component:techniques:canon-and-intake-beacons"
       ]
     }
   ],
@@ -29,7 +29,7 @@
       "batch_ref": "graph-batch:000",
       "order": 0,
       "component_refs": [
-        "component:skills:activation-boundary"
+        "component:techniques:canon-and-intake-beacons"
       ],
       "external_targets": [],
       "rationale": "direct change"

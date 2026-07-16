@@ -74,53 +74,6 @@ def _make_workspace(tmp_path: Path) -> Workspace:
             }
         ]
     }
-    skills_manifest = {
-        "schema_version": "aoa_recurrence_component_v2",
-        "component_ref": "component:skills:bundle-and-activation-beacons",
-        "owner_repo": "aoa-skills",
-        "source_inputs": ["docs/TRIGGER_EVALS.md", "docs/ADAPTIVE_SKILL_ORCHESTRATION.md"],
-        "generated_surfaces": ["generated/skill_evaluation_matrix.md"],
-        "proof_surfaces": ["python scripts/validate_skills.py --fail-on-review-truth-sync"],
-        "refresh_routes": [{"action": "revalidate", "commands": ["python scripts/validate_skills.py --fail-on-review-truth-sync"]}],
-        "observation_inputs": [
-            {"input_ref": "description-trigger-suite", "kind": "trigger_eval", "path_globs": ["generated/description_trigger_eval_cases.jsonl"]},
-            {"input_ref": "skill-evaluation-matrix", "kind": "evaluation_matrix", "path_globs": ["generated/skill_evaluation_matrix.md"]}
-        ],
-        "beacon_rules": [
-            {
-                "beacon_ref": "skills.unused_skill.activation_gap",
-                "kind": "unused_skill_opportunity",
-                "decision_surface": "docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
-                "observation_inputs": ["description-trigger-suite", "skill-evaluation-matrix"],
-                "match_signals": ["should_trigger_missing", "prefer_other_skill_gap"],
-                "match_categories": ["usage_gap", "review_signal"],
-                "thresholds": {
-                    "watch_observations": 1,
-                    "candidate_observations": 2,
-                    "review_ready_observations": 3,
-                    "min_unique_sources": 2,
-                    "min_unique_evidence_refs": 2
-                },
-                "suppress_when": []
-            },
-            {
-                "beacon_ref": "skills.trigger_drift.description_boundary",
-                "kind": "skill_trigger_drift",
-                "decision_surface": "docs/TRIGGER_EVALS.md",
-                "observation_inputs": ["change_signal", "description-trigger-suite"],
-                "match_signals": ["description_changed_without_trigger_refresh", "source_changed", "docs_changed"],
-                "match_categories": ["change_pressure", "usage_gap"],
-                "thresholds": {
-                    "watch_observations": 1,
-                    "candidate_observations": 2,
-                    "review_ready_observations": 3,
-                    "min_unique_sources": 1,
-                    "min_unique_evidence_refs": 1
-                },
-                "suppress_when": []
-            }
-        ]
-    }
     evals_manifest = {
         "schema_version": "aoa_recurrence_component_v2",
         "component_ref": "component:evals:portable-proof-beacons",
@@ -216,14 +169,11 @@ def _make_workspace(tmp_path: Path) -> Workspace:
     }
 
     _write_json(techniques_root / "manifests/recurrence/techniques.json", techniques_manifest)
-    _write_json(skills_root / "manifests/recurrence/skills.json", skills_manifest)
     _write_json(evals_root / "manifests/recurrence/evals.json", evals_manifest)
     _write_json(playbooks_root / "manifests/recurrence/playbooks.json", playbooks_manifest)
 
     (techniques_root / "docs").mkdir(parents=True, exist_ok=True)
     (techniques_root / "docs/CROSS_LAYER_TECHNIQUE_CANDIDATES.md").write_text("# candidate\n", encoding="utf-8")
-    (skills_root / "docs").mkdir(parents=True, exist_ok=True)
-    (skills_root / "docs/TRIGGER_EVALS.md").write_text("# trigger\n", encoding="utf-8")
     (evals_root / "docs").mkdir(parents=True, exist_ok=True)
     (evals_root / "docs/RUNTIME_BENCH_PROMOTION_GUIDE.md").write_text("# runtime\n", encoding="utf-8")
     (playbooks_root / "docs").mkdir(parents=True, exist_ok=True)
@@ -275,30 +225,6 @@ def _supplemental_observations(tmp_path: Path) -> Path:
             "signal": "distillation_pressure_observed",
             "source_inputs": ["technique-live-receipts"],
             "evidence_refs": [".aoa/live_receipts/technique-receipts.jsonl#1"],
-            "attributes": {},
-            "notes": ""
-        },
-        {
-            "observation_ref": "obs:supp:0003",
-            "component_ref": "component:skills:bundle-and-activation-beacons",
-            "owner_repo": "aoa-skills",
-            "observed_at": "2026-04-13T12:02:00Z",
-            "category": "usage_gap",
-            "signal": "should_trigger_missing",
-            "source_inputs": ["description-trigger-suite"],
-            "evidence_refs": ["generated/description_trigger_eval_cases.jsonl#case-17"],
-            "attributes": {},
-            "notes": ""
-        },
-        {
-            "observation_ref": "obs:supp:0004",
-            "component_ref": "component:skills:bundle-and-activation-beacons",
-            "owner_repo": "aoa-skills",
-            "observed_at": "2026-04-13T12:03:00Z",
-            "category": "review_signal",
-            "signal": "prefer_other_skill_gap",
-            "source_inputs": ["skill-evaluation-matrix"],
-            "evidence_refs": ["generated/skill_evaluation_matrix.md#gap-2"],
             "attributes": {},
             "notes": ""
         },
@@ -404,8 +330,8 @@ def test_beacon_pipeline_emits_candidate_pressure(tmp_path: Path) -> None:
     api = RecurrenceAPI(workspace)
 
     signal = api.detect(
-        repo_root=str(workspace.repo_roots["aoa-skills"]),
-        paths=["docs/TRIGGER_EVALS.md"],
+        repo_root=str(workspace.repo_roots["aoa-techniques"]),
+        paths=["docs/CROSS_LAYER_TECHNIQUE_CANDIDATES.md"],
     )
     supplemental_path = _supplemental_observations(tmp_path)
     observations = api.observe(signal, supplemental_paths=[str(supplemental_path)])
@@ -415,15 +341,11 @@ def test_beacon_pipeline_emits_candidate_pressure(tmp_path: Path) -> None:
 
     by_ref = {item.beacon_ref: item for item in beacons.entries}
     assert by_ref["technique.new_candidate.distillation_pressure"].status == "candidate"
-    assert by_ref["skills.unused_skill.activation_gap"].status == "candidate"
     assert by_ref["evals.portable_eval.runtime_pressure"].status == "candidate"
     assert by_ref["playbooks.subagent.recipe_pressure"].status == "candidate"
 
-    assert len(ledger.entries) >= 4
-    assert {item.beacon_ref for item in usage_gaps.items} >= {
-        "skills.unused_skill.activation_gap",
-        "skills.trigger_drift.description_boundary",
-    }
+    assert len(ledger.entries) >= 3
+    assert usage_gaps.items == []
 
 
 def test_suppression_caps_subagent_recipe_to_watch(tmp_path: Path) -> None:
@@ -457,4 +379,8 @@ def test_observe_allows_supplemental_only_mode(tmp_path: Path) -> None:
     api = RecurrenceAPI(workspace)
     packet = api.observe(supplemental_paths=[str(_supplemental_observations(tmp_path))])
     assert packet.signal_ref is None
-    assert len(packet.observations) >= 8
+    assert {item.owner_repo for item in packet.observations} == {
+        "aoa-techniques",
+        "aoa-evals",
+        "aoa-playbooks",
+    }

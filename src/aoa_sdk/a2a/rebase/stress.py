@@ -32,8 +32,8 @@ def default_blocked_actions(posture: StressPosture | None) -> list[str]:
         "degrade_preferred": ["scope_widening"],
         "route_around_unhealthy_surface": ["unsafe_surface_reuse"],
         "reground_first": ["unreviewed_resume"],
-        "human_review_first": ["auto_activation", "unreviewed_mutation"],
-        "stop_before_mutation": ["mutation", "auto_activation"],
+        "human_review_first": ["unsupervised_execution", "unreviewed_mutation"],
+        "stop_before_mutation": ["mutation", "unsupervised_execution"],
     }
     return mapping[posture]
 

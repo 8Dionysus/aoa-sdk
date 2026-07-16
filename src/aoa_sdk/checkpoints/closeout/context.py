@@ -12,7 +12,7 @@ from ...models import (
     CheckpointLineageHint,
     SessionCheckpointCluster,
     SessionCheckpointNote,
-    SessionEndSkillTarget,
+    SessionEndCapabilityTarget,
     SurfaceCloseoutHandoff,
 )
 from ...workspace.discovery import Workspace
@@ -266,11 +266,11 @@ def _collect_candidate_lineage_hints(
     return [deduped[key] for key in order]
 
 
-def _derive_closeout_skill_plan(
+def _derive_closeout_capability_candidates(
     *,
     notes: list[SessionCheckpointNote],
     handoff: SurfaceCloseoutHandoff | None,
-) -> list[SessionEndSkillTarget]:
+) -> list[SessionEndCapabilityTarget]:
     candidate_ids = _dedupe_strings(
         [
             *(cluster.candidate_id for note in notes for cluster in note.candidate_clusters),
@@ -288,20 +288,50 @@ def _derive_closeout_skill_plan(
     upgrade_candidate_ids = _dedupe_strings(
         [candidate_id for note in notes for candidate_id in note.upgrade_candidate_ids]
     )
-    return [
-        SessionEndSkillTarget(
-            skill_name="aoa-session-donor-harvest",
-            why="reviewed closeout should start with donor harvest so checkpoint hints become one bounded packet rooted in the reread session artifact",
-            candidate_ids=harvest_candidate_ids or candidate_ids,
-        ),
-        SessionEndSkillTarget(
-            skill_name="aoa-session-progression-lift",
-            why="reviewed closeout should reread the reviewed artifact and donor packet before lifting one final multi-axis progression delta",
-            candidate_ids=progression_candidate_ids or candidate_ids,
-        ),
-        SessionEndSkillTarget(
-            skill_name="aoa-quest-harvest",
-            why="reviewed closeout should only reach final quest triage after donor harvest and progression lift have both completed",
-            candidate_ids=upgrade_candidate_ids,
-        ),
+    targets = [
+        SessionEndCapabilityTarget(
+            target_ref="workflow.operations.checkpoint-closeout",
+            target_kind="workflow",
+            owner_repo="aoa-playbooks",
+            lifecycle_posture="active",
+            use_posture="review-required",
+            why=(
+                "the reviewed evidence bundle may route to the owner workflow after agent "
+                "review; SDK materialization does not execute the workflow"
+            ),
+            candidate_ids=candidate_ids,
+        )
     ]
+    if progression_candidate_ids:
+        targets.append(
+            SessionEndCapabilityTarget(
+                target_ref="adapter.sessions.progression-review",
+                target_kind="adapter",
+                owner_repo="aoa-agents",
+                lifecycle_posture="active",
+                use_posture="review-required",
+                why=(
+                    "progression-shaped checkpoint evidence can be reviewed by the owner "
+                    "adapter while remaining provisional"
+                ),
+                candidate_ids=progression_candidate_ids,
+            )
+        )
+    if harvest_candidate_ids or upgrade_candidate_ids:
+        targets.append(
+            SessionEndCapabilityTarget(
+                target_ref="skill.aoa-session-harvest",
+                target_kind="skill",
+                owner_repo="aoa-skills",
+                lifecycle_posture="candidate",
+                use_posture="candidate-only",
+                why=(
+                    "session harvest remains a deferred owner candidate and must not be "
+                    "represented as an SDK-executed skill"
+                ),
+                candidate_ids=_dedupe_strings(
+                    [*harvest_candidate_ids, *upgrade_candidate_ids]
+                ),
+            )
+        )
+    return targets

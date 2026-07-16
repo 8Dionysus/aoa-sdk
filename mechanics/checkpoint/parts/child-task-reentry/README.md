@@ -2,12 +2,13 @@
 
 ## Role
 
-Build bounded A2A child-task summon, return, checkpoint bridge, memo handoff,
-and reviewed closeout packets without transferring owner authority into SDK.
+Build bounded A2A child-task request, result, return, checkpoint-evidence,
+memo, and reviewed owner-handoff packets without transferring owner authority
+into SDK or claiming capability execution.
 
 ## Input
 
-- `aoa-skills` summon request and result schemas
+- SDK-owned bounded child-task request and result schemas
 - quest passport, summon intent, stress, progression, and self-agent posture
 - Codex-local projection manifest from `aoa-agents`
 - reviewed child-task artifacts and checkpoint refs
@@ -16,18 +17,19 @@ and reviewed closeout packets without transferring owner authority into SDK.
 
 - summon request/result payloads
 - return plans and transition decisions
-- checkpoint bridge plans and context bundles
-- reviewed closeout requests
-- runtime return closeout receipt candidates
+- checkpoint evidence-handoff plans and bundles
+- reviewed evidence handoff requests
+- runtime return evidence receipt candidates
 - dry-run E2E fixture
 
 ## Owner
 
-`aoa-sdk` owns packet assembly and compatibility with the sibling contracts.
+`aoa-sdk` owns its bounded child-task packet schemas and assembly.
 `aoa-skills`, `aoa-agents`, `aoa-evals`, `aoa-memo`, `aoa-playbooks`,
 `aoa-routing`, and `abyss-stack` keep domain authority.
 
 ## Next Route
 
-Reviewed child-task material routes through checkpoint closeout, owner
-publication, memo writeback, eval proof, playbook review, and routing re-entry.
+Reviewed child-task material routes through checkpoint evidence
+materialization, explicit owner handoff, memo writeback, eval proof, playbook
+review, and routing re-entry.

@@ -154,14 +154,16 @@ def default_actions(kind: str, status: BeaconStatus) -> list[str]:
             "open canonical review only after explicit owner judgment",
         ],
         "unused_skill_opportunity": [
-            "inspect the applicability map and defer/skip notes",
-            "check whether a nearby skill should have triggered",
+            "open an owner-reviewed no-skill/current/candidate comparison",
+            "inspect session evidence refs without claiming invocation from selection or visibility",
         ],
         "skill_trigger_drift": [
-            "refresh trigger evals and mirrored collision cases in the same change set",
+            "return the drift candidate to the skill owner for positive, negative, and coexistence review",
+            "do not infer omission or execution from receipt absence",
         ],
         "skill_bundle_candidate": [
-            "capture the repeated workflow as a bounded skill-bundle candidate",
+            "return a bounded capability candidate to its owner",
+            "require a stable trigger, ABI, composition value, and held-out benefit before admission",
         ],
         "portable_eval_candidate": [
             "open portable eval boundary review",

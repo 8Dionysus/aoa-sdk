@@ -12,7 +12,6 @@ from ..registry import RecurrenceRegistry, normalize_path
 
 DEFAULT_COMPONENT_REFS: dict[str, str] = {
     "aoa-techniques": "component:techniques:canon-and-intake-beacons",
-    "aoa-skills": "component:skills:bundle-and-activation-beacons",
     "aoa-evals": "component:evals:portable-proof-beacons",
     "aoa-playbooks": "component:playbooks:scenario-composition-beacons",
 }

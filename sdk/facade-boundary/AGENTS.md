@@ -26,8 +26,8 @@ implementation and Boundary Bridge mechanics.
 
 - Do not make loaded sibling catalogs SDK source truth.
 - Do not hide missing owner surfaces behind permissive path search.
-- Keep truth labels visible: source, generated, candidate, manual, reviewed,
-  activated, advisory.
+- Keep truth labels visible: source, generated, installed projection,
+  candidate, reviewed evidence, owner-accepted, executed, advisory.
 - Route source-meaning changes to the sibling owner.
 
 ## Validation

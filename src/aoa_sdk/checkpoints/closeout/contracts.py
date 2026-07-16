@@ -1,40 +1,21 @@
-"""Shared contracts for checkpoint closeout mechanical bridge outputs."""
+"""Contracts for checkpoint closeout evidence materialization."""
 
 from __future__ import annotations
 
 from typing import TypedDict
 
-ALLOWED_OWNER_REPOS = {
-    "aoa-techniques",
-    "aoa-skills",
-    "aoa-evals",
-    "aoa-memo",
-    "aoa-playbooks",
-    "aoa-agents",
-}
+
 CHECKPOINT_CLOSEOUT_AUTHORITY_CONTRACT: dict[str, object] = {
-    "contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
-    "bridge_output": "mechanical_artifact_build",
+    "contract": "reviewed_evidence_primary_candidates_are_routing_only",
+    "materialization": "reviewed_evidence_bundle",
     "checkpoint_notes": "focus_hints_only_not_final_authority",
     "reviewed_artifact": "primary_closeout_evidence",
-    "agent_skill_application": "required_for_final_session_analysis",
+    "capability_execution_claimed": False,
+    "owner_decision_required": True,
 }
 
-class DonorHarvestOutputs(TypedDict):
-    packet: dict[str, object]
-    artifact_refs: list[str]
-    receipt_refs: list[str]
-    reviewed_tokens: set[str]
-    receipt_payloads: list[dict[str, object]]
 
-
-class ProgressionLiftOutputs(TypedDict):
-    packet: dict[str, object]
-    artifact_refs: list[str]
-    receipt_refs: list[str]
-
-
-class QuestHarvestOutputs(TypedDict):
+class ReviewedEvidenceBundleOutputs(TypedDict):
     packet: dict[str, object]
     artifact_refs: list[str]
     receipt_refs: list[str]

@@ -7,9 +7,9 @@
   "edge_count": 1,
   "nodes": [
     {
-      "node_ref": "node:component:skills:activation-boundary",
-      "component_ref": "component:skills:activation-boundary",
-      "owner_repo": "aoa-skills",
+      "node_ref": "node:component:techniques:canon-and-intake-beacons",
+      "component_ref": "component:techniques:canon-and-intake-beacons",
+      "owner_repo": "aoa-techniques",
       "description": "",
       "surface_counts": {
         "source": 1,
@@ -21,10 +21,10 @@
   "edges": [
     {
       "edge_ref": "edge:example",
-      "source_component_ref": "component:skills:activation-boundary",
-      "source_owner_repo": "aoa-skills",
+      "source_component_ref": "component:techniques:canon-and-intake-beacons",
+      "source_owner_repo": "aoa-techniques",
       "kind": "evaluated_by",
-      "target": "component:evals:trigger-evals",
+      "target": "component:evals:portable-proof-beacons",
       "target_repo": "aoa-evals",
       "target_kind": "component",
       "required": true,

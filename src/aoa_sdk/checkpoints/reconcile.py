@@ -17,7 +17,7 @@ from .timestamps import local_timestamp_parts
 
 
 RECONCILE_ARCHIVE_STATES = {
-    "closeout_executed",
+    "closeout_materialized",
     "session_closed_reviewed_no_closeout",
     "session_closed_collecting_no_closeout",
 }
@@ -32,7 +32,7 @@ def reconcile_closed_checkpoint_sessions(
     *,
     workspace: Workspace,
     repo_root: str | None = None,
-    session_file: str | None = None,
+    runtime_session_file: str | None = None,
     runtime_session_id: str | None = None,
     session_filter: str | None = None,
     since: str | None = None,
@@ -44,7 +44,7 @@ def reconcile_closed_checkpoint_sessions(
     audit = audit_checkpoint_lifecycle(
         workspace=workspace,
         repo_root=repo_root,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
     )
     selected_entries: list[CheckpointLifecycleEntry] = []
     archived_entries: list[CheckpointLifecycleEntry] = []
@@ -85,7 +85,7 @@ def reconcile_closed_checkpoint_sessions(
             else audit_checkpoint_lifecycle(
                 workspace=workspace,
                 repo_root=repo_root,
-                session_file=session_file,
+                runtime_session_file=runtime_session_file,
             )
         )
         index_ref = str(write_checkpoint_lifecycle_index(workspace=workspace, report=post_report))
@@ -122,7 +122,7 @@ def reconcile_closed_checkpoint_sessions(
 
 
 def _archive_entry(*, workspace: Workspace, entry: CheckpointLifecycleEntry) -> Path:
-    if entry.lifecycle_state == "closeout_executed":
+    if entry.lifecycle_state == "closeout_materialized":
         return close_and_archive_checkpoint_entry(workspace=workspace, entry=entry)
     return archive_checkpoint_entry_without_closeout(workspace=workspace, entry=entry)
 

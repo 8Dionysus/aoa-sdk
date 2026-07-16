@@ -37,7 +37,7 @@ The beacon layer uses four packet shapes.
 
 - `ObservationPacket`
   - raw or normalized evidence signals
-  - may come from change detection, receipts, closeout notes, trigger evals, review notes, runtime artifacts, or harvest notes
+  - may come from change detection, explicit owner receipts, closeout notes, review notes, runtime artifacts, or harvest notes
 - `BeaconPacket`
   - typed candidate pressure
   - status ladder: `hint -> watch -> candidate -> review_ready`
@@ -45,7 +45,8 @@ The beacon layer uses four packet shapes.
   - durable list of candidate pressure records
   - suitable for witness-style note taking and later review
 - `UsageGapReport`
-  - narrow report for missing or drifting skills
+  - narrow transport for explicitly owner-authored skill omission or drift candidates
+  - never inferred from description similarity, prompt visibility, selection, loading, mention, or receipt absence
 
 ## Status ladder
 
@@ -82,7 +83,10 @@ Suppression may cap the status at `watch`, but it should not erase the signal. S
 Beacon output never changes repo truth by itself.
 
 - `aoa-techniques` still owns technique distillation and canonical review
-- `aoa-skills` still owns bounded skill bundles and trigger surfaces
+- `aoa-skills` owns shared procedure truth and common projection contracts;
+  repository owners own admitted home procedures
+- the executing host owns selection and execution evidence; `aoa-evals` and
+  the skill owner judge comparative effect
 - `aoa-evals` still owns claim wording and verdict posture
 - `aoa-playbooks` still owns scenario composition and composition gates
 

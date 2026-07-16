@@ -24,7 +24,7 @@ from .rendering import (
     _print_checkpoint_promotion,
     _print_checkpoint_session_reconcile_result,
     _print_closeout_context,
-    _print_closeout_execution_report,
+    _print_closeout_materialization_report,
 )
 
 
@@ -45,15 +45,10 @@ def checkpoint_append(
         "--mutation-surface",
         help="Mutation class: none, code, repo-config, infra, runtime, or public-share.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional skill runtime session file used to read active skill names.",
-    ),
-    skill_report_path: str | None = typer.Option(
-        None,
-        "--skill-report-path",
-        help="Optional reference to an existing persisted skill report used as prelude context.",
+        "--runtime-session-file",
+        help="Optional external runtime session metadata file.",
     ),
     mark_reviewable: bool = typer.Option(
         False,
@@ -68,8 +63,7 @@ def checkpoint_append(
         checkpoint_kind=kind,  # type: ignore[arg-type]
         intent_text=intent_text,
         mutation_surface=mutation_surface,  # type: ignore[arg-type]
-        session_file=session_file,
-        skill_report_path=skill_report_path,
+        runtime_session_file=runtime_session_file,
         manual_review_requested=mark_reviewable,
     )
     payload = note.model_dump(mode="json")
@@ -97,15 +91,10 @@ def checkpoint_mark(
         "--mutation-surface",
         help="Mutation class: none, code, repo-config, infra, runtime, or public-share.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional skill runtime session file used to read active skill names.",
-    ),
-    skill_report_path: str | None = typer.Option(
-        None,
-        "--skill-report-path",
-        help="Optional reference to an existing persisted skill report used as prelude context.",
+        "--runtime-session-file",
+        help="Optional external runtime session metadata file.",
     ),
     mark_reviewable: bool = typer.Option(
         True,
@@ -120,8 +109,7 @@ def checkpoint_mark(
         checkpoint_kind=kind,  # type: ignore[arg-type]
         intent_text=intent_text,
         mutation_surface=mutation_surface,  # type: ignore[arg-type]
-        session_file=session_file,
-        skill_report_path=skill_report_path,
+        runtime_session_file=runtime_session_file,
         manual_review_requested=mark_reviewable,
     )
     payload = note.model_dump(mode="json")
@@ -141,10 +129,10 @@ def checkpoint_after_commit(
         "--checkpoint-kind",
         help="Post-commit checkpoint kind: auto, commit, or owner_followthrough.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+        "--runtime-session-file",
+        help="Optional external runtime session metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
@@ -152,7 +140,7 @@ def checkpoint_after_commit(
     report = AoASDK.from_workspace(root).checkpoints.after_commit(
         repo_root=repo_root,
         commit_ref=commit_ref,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
         checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
     )
     payload = report.model_dump(mode="json")
@@ -211,15 +199,15 @@ def checkpoint_review_note(
         "--next-owner-move",
         help="Deferred owner move to consider only at reviewed closeout. Repeat for multiple moves.",
     ),
-    applied_skill: list[str] = typer.Option(
+    related_capability_ref: list[str] = typer.Option(
         None,
-        "--applied-skill",
-        help="Skill the agent actually used while writing this review note. Repeat for multiple skills.",
+        "--related-capability-ref",
+        help="Capability related to the review; this does not claim execution. Repeat for multiple refs.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+        "--runtime-session-file",
+        help="Optional external runtime session metadata file; otherwise host environment identity is used.",
     ),
     runtime_session_id: str | None = typer.Option(
         None,
@@ -241,8 +229,8 @@ def checkpoint_review_note(
         closeout_questions=closeout_question or [],
         evidence_refs=evidence_ref or [],
         next_owner_moves=next_owner_move or [],
-        applied_skill_names=applied_skill or [],
-        session_file=session_file,
+        related_capability_refs=related_capability_ref or [],
+        runtime_session_file=runtime_session_file,
         runtime_session_id=runtime_session_id,
     )
     payload = note.model_dump(mode="json")
@@ -345,10 +333,10 @@ def checkpoint_git_boundary_check(
         "--boundary",
         help="Git boundary to check: push or merge.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
@@ -357,7 +345,7 @@ def checkpoint_git_boundary_check(
     report = AoASDK.from_workspace(root).checkpoints.git_boundary_check(
         repo_root=repo_root,
         boundary=resolved_boundary,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
     )
     payload = report.model_dump(mode="json")
     if json_output:
@@ -371,15 +359,15 @@ def checkpoint_git_boundary_check(
 @checkpoint_app.command("status")
 def checkpoint_status(
     repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the checkpoint context."),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
-    note = AoASDK.from_workspace(root).checkpoints.status(repo_root=repo_root, session_file=session_file)
+    note = AoASDK.from_workspace(root).checkpoints.status(repo_root=repo_root, runtime_session_file=runtime_session_file)
     payload = note.model_dump(mode="json")
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
@@ -404,17 +392,17 @@ def checkpoint_candidate_intelligence(
         "--write-index/--no-write-index",
         help="Write the generated checkpoint candidate-intelligence navigation index.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     report = AoASDK.from_workspace(root).checkpoints.candidate_intelligence(
         repo_root=repo_root,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
         sample_limit=sample_limit,
         write_index=write_index,
     )
@@ -442,17 +430,17 @@ def checkpoint_carrier_intelligence(
         "--write-index/--no-write-index",
         help="Write the generated checkpoint carrier-candidate navigation index.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     report = AoASDK.from_workspace(root).checkpoints.carrier_intelligence(
         repo_root=repo_root,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
         sample_limit=sample_limit,
         write_index=write_index,
     )
@@ -469,10 +457,10 @@ def checkpoint_lifecycle_audit(
         None,
         help="Optional repository root or repo name used to filter checkpoint lifecycle entries.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     write_index: bool = typer.Option(
@@ -484,7 +472,7 @@ def checkpoint_lifecycle_audit(
 ) -> None:
     report = AoASDK.from_workspace(root).checkpoints.lifecycle_audit(
         repo_root=repo_root,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
         write_index=write_index,
     )
     payload = report.model_dump(mode="json")
@@ -500,10 +488,10 @@ def checkpoint_backlog_audit(
         None,
         help="Optional repository root or repo name used to filter checkpoint backlog entries.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     write_index: bool = typer.Option(
@@ -515,7 +503,7 @@ def checkpoint_backlog_audit(
 ) -> None:
     report = AoASDK.from_workspace(root).checkpoints.backlog_audit(
         repo_root=repo_root,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
         write_index=write_index,
     )
     payload = report.model_dump(mode="json")
@@ -546,17 +534,17 @@ def checkpoint_close_archive(
         "--dry-run/--apply",
         help="Preview by default; use --apply to move checkpoint evidence from current to archive.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     report = AoASDK.from_workspace(root).checkpoints.close_archive(
         repo_root=repo_root,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
         runtime_session_id=runtime_session_id,
         dry_run=dry_run,
         include_stale=include_stale,
@@ -577,13 +565,13 @@ def _checkpoint_reconcile_sessions_impl(
     until: str | None,
     dry_run: bool,
     write_index: bool,
-    session_file: str | None,
+    runtime_session_file: str | None,
     root: str,
     json_output: bool,
 ) -> None:
     report = AoASDK.from_workspace(root).checkpoints.reconcile_sessions(
         repo_root=repo_root,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
         runtime_session_id=runtime_session_id,
         session_filter=session_filter,
         since=since,
@@ -634,10 +622,10 @@ def checkpoint_reconcile_sessions(
         "--write-index/--no-write-index",
         help="Write the generated checkpoint lifecycle navigation index.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional active runtime session file. Defaults to the current thread-scoped or default session path.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
@@ -650,7 +638,7 @@ def checkpoint_reconcile_sessions(
         until=until,
         dry_run=dry_run,
         write_index=write_index,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
         root=root,
         json_output=json_output,
     )
@@ -668,7 +656,7 @@ def checkpoint_sweep_closed_sessions(
     until: str | None = typer.Option(None, "--until"),
     dry_run: bool = typer.Option(True, "--dry-run/--apply"),
     write_index: bool = typer.Option(True, "--write-index/--no-write-index"),
-    session_file: str | None = typer.Option(None, "--session-file"),
+    runtime_session_file: str | None = typer.Option(None, "--runtime-session-file"),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
@@ -680,7 +668,7 @@ def checkpoint_sweep_closed_sessions(
         until=until,
         dry_run=dry_run,
         write_index=write_index,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
         root=root,
         json_output=json_output,
     )
@@ -694,10 +682,10 @@ def checkpoint_promote(
         "--target",
         help="Promotion target: dionysus-note or harvest-handoff.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
@@ -705,7 +693,7 @@ def checkpoint_promote(
     promotion = AoASDK.from_workspace(root).checkpoints.promote(
         repo_root=repo_root,
         target=target,  # type: ignore[arg-type]
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
     )
     payload = promotion.model_dump(mode="json")
     if json_output:
@@ -720,7 +708,7 @@ def checkpoint_build_closeout_context(
     reviewed_artifact: str = typer.Option(
         ...,
         "--reviewed-artifact",
-        help="Reviewed session artifact that the explicit closeout chain must reread.",
+        help="Reviewed session artifact that anchors the closeout evidence bundle.",
     ),
     session_ref: str | None = typer.Option(
         None,
@@ -742,10 +730,10 @@ def checkpoint_build_closeout_context(
         "--surface-handoff-path",
         help="Optional reviewed surface handoff path. Defaults to the latest local reviewed handoff for the repo label.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
@@ -757,7 +745,7 @@ def checkpoint_build_closeout_context(
         receipt_paths=receipt_path or [],
         receipt_dirs=receipt_dir or [],
         surface_handoff_path=surface_handoff_path,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
     )
     payload = context.model_dump(mode="json")
     if json_output:
@@ -766,13 +754,13 @@ def checkpoint_build_closeout_context(
     _print_closeout_context(context)
 
 
-@checkpoint_app.command("execute-closeout-chain")
-def checkpoint_execute_closeout_chain(
+@checkpoint_app.command("materialize-closeout-handoff")
+def checkpoint_materialize_closeout_handoff(
     repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as the closeout context."),
     reviewed_artifact: str = typer.Option(
         ...,
         "--reviewed-artifact",
-        help="Reviewed session artifact that the explicit closeout chain must reread.",
+        help="Reviewed session artifact that anchors the closeout evidence bundle.",
     ),
     session_ref: str | None = typer.Option(
         None,
@@ -794,25 +782,25 @@ def checkpoint_execute_closeout_chain(
         "--surface-handoff-path",
         help="Optional reviewed surface handoff path. Defaults to the latest local reviewed handoff for the repo label.",
     ),
-    session_file: str | None = typer.Option(
+    runtime_session_file: str | None = typer.Option(
         None,
-        "--session-file",
-        help="Optional skill runtime session file used to resolve the active checkpoint session.",
+        "--runtime-session-file",
+        help="Optional external host runtime metadata file; otherwise host environment identity is used.",
     ),
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
-    report = AoASDK.from_workspace(root).checkpoints.execute_closeout_chain(
+    report = AoASDK.from_workspace(root).checkpoints.materialize_closeout_handoff(
         repo_root=repo_root,
         reviewed_artifact_path=reviewed_artifact,
         session_ref=session_ref,
         receipt_paths=receipt_path or [],
         receipt_dirs=receipt_dir or [],
         surface_handoff_path=surface_handoff_path,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
     )
     payload = report.model_dump(mode="json")
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
         return
-    _print_closeout_execution_report(report)
+    _print_closeout_materialization_report(report)

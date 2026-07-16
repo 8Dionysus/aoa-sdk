@@ -1,17 +1,20 @@
 # Stress Posture Dispatch Gate
 
-This part owns the SDK route from explicit stress context to a visible,
-narrowing-only dispatch decision.
+This part owns the SDK route from caller-supplied typed stress signals to a
+visible, narrowing-only task-dispatch decision.
 
 ## Role
 
-Input: caller-supplied stress context, source receipt refs, routing hint refs,
-memo refs, degraded surface refs, and requested mutation posture.
+Input: `StressSignal` values with explicit source family, posture, severity,
+evidence refs, blocked actions, and re-entry conditions.
 
-Output: selected skill ids, blocked auto-activation reasons, required review
-steps, and evidence refs that explain why mutation stayed gated.
+Output: a merged `StressBundle` and an optional `SummonDecision` whose posture,
+blocked actions, reason codes, and evidence refs explain why task dispatch was
+narrowed or gated.
 
-Owner: `aoa-sdk` owns the typed control-plane carry and examples. Owner
+Owner: `aoa-sdk` owns typed control-plane carry, task-dispatch constraints, and
+examples. `aoa-skills` owns skill bundles and capability relations; KAG owns
+semantic retrieval and composition; host runtimes own execution. Owner
 repositories own degraded behavior and repair; `aoa-evals` owns proof wording;
 `aoa-memo` owns durable memory.
 
@@ -25,3 +28,5 @@ repositories own degraded behavior and repair; `aoa-evals` owns proof wording;
 
 Route proof questions to `aoa-evals`, durable lessons to `aoa-memo`, and
 owner-local repair or runtime degradation to the affected owner repository.
+Route skill discovery and composition to the `aoa-skills` owner surfaces and
+KAG instead of interpreting stress as a skill-selection request.

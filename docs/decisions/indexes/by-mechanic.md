@@ -49,6 +49,8 @@
 - [AOA-SDK-D-0056 - CLI Command Family Route Modules](../AOA-SDK-D-0056-cli-command-family-route-modules.md) (`docs/decisions/AOA-SDK-D-0056-cli-command-family-route-modules.md`)
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
 - [AOA-SDK-D-0060 - Low-Pressure Route Stop-Lines](../AOA-SDK-D-0060-low-pressure-route-stop-lines.md) (`docs/decisions/AOA-SDK-D-0060-low-pressure-route-stop-lines.md`)
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 
 ## checkpoint
 
@@ -80,6 +82,8 @@
 - [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0063-checkpoint-candidate-intelligence.md`)
 - [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md`)
 - [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) (`docs/decisions/AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md`)
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 
 ## codex-projection
 
@@ -127,6 +131,7 @@
 - [AOA-SDK-D-0058 - Recurrence Route-Role Branches](../AOA-SDK-D-0058-recurrence-route-role-branches.md) (`docs/decisions/AOA-SDK-D-0058-recurrence-route-role-branches.md`)
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
 - [AOA-SDK-D-0060 - Low-Pressure Route Stop-Lines](../AOA-SDK-D-0060-low-pressure-route-stop-lines.md) (`docs/decisions/AOA-SDK-D-0060-low-pressure-route-stop-lines.md`)
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 
 ## release-support
 
@@ -166,6 +171,7 @@
 - [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) (`docs/decisions/AOA-SDK-D-0051-implementation-source-topology-index.md`)
 - [AOA-SDK-D-0056 - CLI Command Family Route Modules](../AOA-SDK-D-0056-cli-command-family-route-modules.md) (`docs/decisions/AOA-SDK-D-0056-cli-command-family-route-modules.md`)
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 
 ## titan
 

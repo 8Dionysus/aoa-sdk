@@ -3,7 +3,7 @@
 Typed Python SDK and control-plane helper layer for the AoA federation.
 
 `aoa-sdk` consumes source-owned sibling surfaces and exposes local-first Python
-and CLI handles for discovery, compatibility, routing, skill disclosure,
+and CLI handles for discovery, compatibility, routing, skill inspection,
 checkpoint, closeout, release, and bounded handoff. It keeps federation state
 legible without becoming the source of truth for sibling-layer meaning.
 
@@ -85,7 +85,7 @@ The current landed surface includes:
   [generated/workspace_control_plane.min.json](generated/workspace_control_plane.min.json);
 - the generated implementation tree index at
   [generated/source_topology.min.json](generated/source_topology.min.json);
-- bounded skill, surface-detection, checkpoint, closeout, Codex projection,
+- bounded skill inspection, surface-detection, checkpoint, closeout, Codex projection,
   release, and public support helpers.
 
 Detailed shipped-surface maps live in [mechanics](mechanics/README.md),

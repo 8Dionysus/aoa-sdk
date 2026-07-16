@@ -1,23 +1,40 @@
 {
-  "intent_text": "stabilize a degraded hybrid-query path without widening automation",
-  "phase": "pre-mutation",
-  "repo_root": "/srv/AbyssOS/aoa-sdk",
-  "mutation_surface": "repo-config",
-  "stress_context": {
-    "active": true,
-    "source_receipt_refs": [
-      "ATM10-Agent:stressor_receipt_v1#stress:2026-04-07:retrieval-only-fallback"
-    ],
-    "routing_hint_refs": [
-      "aoa-routing:stress_navigation_hint_v1#route:stress:atm10-hybrid-query:retrieval-only-fallback"
-    ],
-    "memo_refs": [
-      "aoa-memo:failure_lesson_memory_v1#memo:hybrid-query-reground-first"
-    ],
-    "preferred_posture": "human_review_first",
-    "degraded_surfaces": [
-      "ATM10-Agent:hybrid-query"
-    ],
-    "operator_review_required": true
-  }
+  "passport": {
+    "difficulty": "d2_slice",
+    "risk": "r1_repo_local",
+    "control_mode": "codex_supervised",
+    "delegate_tier": "bounded-worker",
+    "route_anchor": "task:stress-posture-trial",
+    "expected_artifacts": [
+      "owner-review.md"
+    ]
+  },
+  "intent": {
+    "desired_role": "implementer",
+    "parent_task_id": "task:stress-posture-trial",
+    "expected_outputs": [
+      "owner-review.md"
+    ]
+  },
+  "stress_signals": [
+    {
+      "source_family": "owner_receipt",
+      "posture": "stop_before_mutation",
+      "severity": "high",
+      "evidence_refs": [
+        {
+          "kind": "owner_receipt",
+          "ref": "ATM10-Agent:stressor_receipt_v1#stress:2026-04-07:retrieval-only-fallback"
+        },
+        {
+          "kind": "route_hint",
+          "ref": "aoa-routing:stress_navigation_hint_v1#route:stress:atm10-hybrid-query:retrieval-only-fallback"
+        }
+      ],
+      "reentry_conditions": [
+        "owner review completed",
+        "bounded verify path passed"
+      ]
+    }
+  ]
 }

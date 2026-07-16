@@ -19,22 +19,6 @@
       "decision_surfaces": [
         "docs/RUNTIME_BENCH_PROMOTION_GUIDE.md"
       ]
-    },
-    {
-      "target_repo": "aoa-skills",
-      "total_items": 1,
-      "by_lane": {
-        "skill": 1
-      },
-      "by_status": {
-        "watch": 1
-      },
-      "by_kind": {
-        "unused_skill_opportunity": 1
-      },
-      "decision_surfaces": [
-        "docs/ADAPTIVE_SKILL_ORCHESTRATION.md"
-      ]
     }
   ]
 }

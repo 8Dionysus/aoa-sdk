@@ -72,34 +72,34 @@
   "signal_edges": [
     {
       "kind": "implemented_by_skill",
-      "target": "component:skills:bundle-and-activation-beacons",
+      "target": "capability:skill.aoa-decision",
       "target_repo": "aoa-skills",
-      "notes": "example cross-layer donation edge"
+      "notes": "example owner route only; this edge does not claim selection or execution"
     }
   ],
   "observation_inputs": [
     {
-      "input_ref": "example-trigger-suite",
-      "kind": "trigger_eval",
+      "input_ref": "owner-reviewed-capability-comparison",
+      "kind": "evaluation_matrix",
       "path_globs": [
-        "generated/example_trigger_cases.jsonl"
+        "evals/owner_reviewed_capability_comparison.json"
       ],
-      "notes": "example activation or usage-gap signal input"
+      "notes": "explicit owner-authored comparison evidence; recurrence does not infer selection, execution, or benefit"
     }
   ],
   "beacon_rules": [
     {
       "beacon_ref": "example.workflow.candidate",
-      "kind": "skill_bundle_candidate",
+      "kind": "automation_seed_candidate",
       "decision_surface": "docs/EXAMPLE_CONTRACT.md",
       "target_repo": "example-repo",
       "observation_inputs": [
         "change_signal",
-        "example-trigger-suite"
+        "owner-reviewed-capability-comparison"
       ],
       "match_signals": [
         "source_changed",
-        "example_candidate_seen"
+        "owner_reviewed_candidate_seen"
       ],
       "match_categories": [
         "change_pressure",

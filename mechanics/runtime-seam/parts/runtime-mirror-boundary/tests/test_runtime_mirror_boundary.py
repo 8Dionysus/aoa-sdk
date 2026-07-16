@@ -29,15 +29,11 @@ CORE_COMPAT_SURFACE_IDS = (
     "aoa-memo.checkpoint_to_memory_contract.example",
     "aoa-memo.runtime_writeback_governance.min",
     "aoa-techniques.technique_promotion_readiness.min",
-    "aoa-skills.project_core_skill_kernel.min",
-    "aoa-skills.project_foundation_profile.min",
-    "aoa-skills.project_core_outer_ring.min",
-    "aoa-skills.project_core_outer_ring_readiness.min",
-    "aoa-skills.project_risk_guard_ring.min",
-    "aoa-skills.project_risk_guard_ring_governance.min",
-    "aoa-skills.tiny_router_candidate_bands",
-    "aoa-skills.tiny_router_capsules.min",
-    "aoa-skills.skill_trigger_collision_matrix",
+    "aoa-skills.agent_skill_catalog",
+    "aoa-skills.skill_pack_profiles.resolved",
+    "aoa-skills.capability_graph",
+    "aoa-skills.portable_export_map",
+    "aoa-skills.mcp_dependency_manifest",
     "aoa-stats.object_summary.min",
     "aoa-stats.core_skill_application_summary.min",
     "aoa-stats.automation_pipeline_summary.min",
@@ -79,11 +75,12 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     writeback_governance = sdk.memo.writeback_governance("checkpoint_export")
     technique_readiness = sdk.techniques.promotion_readiness("AOA-T-0001")
     technique_readiness_entries = sdk.techniques.promotion_readiness()
-    foundation = sdk.skills.project_foundation()
-    outer_ring = sdk.skills.project_core_outer_ring()
-    outer_ring_readiness = sdk.skills.project_core_outer_ring_readiness()
-    risk_ring = sdk.skills.project_risk_guard_ring()
-    risk_ring_governance = sdk.skills.project_risk_guard_ring_governance()
+    skill_catalog = sdk.skills.catalog()
+    user_profile = sdk.skills.profile("user-default")
+    capability_graph = sdk.skills.capability_graph()
+    decision_capability = sdk.skills.capability("skill.aoa-decision")
+    portable_exports = sdk.skills.portable_exports()
+    mcp_dependencies = sdk.skills.mcp_dependencies()
     core_kernel = sdk.stats.core_skill_applications()
     automation = sdk.stats.automation_pipelines()
 
@@ -93,20 +90,18 @@ def test_live_workspace_prefers_home_src_abyss_stack_and_keeps_core_compat_green
     assert writeback_governance.governance_passed is True
     assert technique_readiness.readiness_passed is True
     assert len(technique_readiness_entries) >= 90
-    assert foundation.foundation_id == "project-foundation-v1"
-    assert foundation.skill_count == len(foundation.skills)
-    assert len(foundation.skills) >= 23
-    assert "aoa-change-protocol" in foundation.skills
-    assert "aoa-sanitized-share" in foundation.skills
-    assert outer_ring.ring_id == "project-core-engineering-ring-v1"
-    assert outer_ring.skill_count == len(outer_ring.skills)
-    assert len(outer_ring.skills) >= 10
-    assert [entry.skill_name for entry in outer_ring_readiness] == outer_ring.skills
-    assert all(item.readiness_passed for item in outer_ring_readiness)
-    assert risk_ring.ring_id == "project-risk-guard-ring-v1"
-    assert len(risk_ring.skills) == 5
-    assert len(risk_ring_governance) == 5
-    assert all(item.governance_passed for item in risk_ring_governance)
+    assert skill_catalog.catalog_version == 2
+    assert [entry.name for entry in skill_catalog.skills if not entry.candidate_only] == [
+        "aoa-decision"
+    ]
+    assert user_profile.scope == "user"
+    assert [entry.name for entry in user_profile.skills] == ["aoa-decision"]
+    assert capability_graph.authority is False
+    assert decision_capability.node.kind == "skill"
+    assert decision_capability.node.owner.repo == "aoa-skills"
+    assert portable_exports.export_version == 2
+    assert any(entry.name == "aoa-decision" for entry in portable_exports.exports)
+    assert mcp_dependencies.schema_version == 2
     assert isinstance(core_kernel, list)
     assert automation
     assert any(item.seed_ready_count >= 1 for item in automation)

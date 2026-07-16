@@ -10,9 +10,9 @@
     },
     {
       "former_name": "skill-routing",
-      "active_route": "boundary-bridge/skill-runtime-bridge",
+      "active_route": "boundary-bridge/skill-environment-inspector",
       "status": "distilled",
-      "rationale": "Skill runtime routing is a bridge part below aoa-skills meaning, not an independent SDK parent mechanic."
+      "rationale": "The retired routing bridge was replaced by passive owner-scoped inspection below aoa-skills, host, and KAG authority."
     },
     {
       "former_name": "surface-detection",

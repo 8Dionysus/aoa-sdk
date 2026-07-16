@@ -7,12 +7,13 @@ mean.
 
 ## Current Contour
 
-- Keep typed facades, consumed-surface posture gates, skill runtime bridges,
+- Keep typed facades, consumed-surface posture gates, skill environment inspectors,
   technique promotion readiness readers, and owner-layer signal handoff routed
   through active `parts/`.
 - Keep consumed sibling paths explicit and compatibility-checked before new
   readers become normal routes.
-- Keep skill runtime reporting below `aoa-skills` meaning and host truth.
+- Keep skill environment inspection below `aoa-skills` meaning, host runtime
+  selection, and KAG retrieval/composition authority.
 - Keep owner-layer signal detection additive, inspectable, and weaker than
   owner acceptance.
 
@@ -27,7 +28,7 @@ mean.
 ## When Time Comes
 
 - Add a new bridge part when repeated cross-owner pressure cannot stay inside
-  compatibility, skill bridge, technique readiness, or owner-layer handoff.
+  compatibility, skill inspection, technique readiness, or owner-layer handoff.
 - Widen facade behavior only after sibling source paths, fail-closed drift
   checks, and owner stop lines stay stable.
 - Add generated bridge companions only when their builders and source routes are

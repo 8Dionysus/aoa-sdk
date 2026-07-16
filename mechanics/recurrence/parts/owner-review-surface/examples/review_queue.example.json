@@ -26,30 +26,6 @@
       "recommended_actions": [
         "open portable eval boundary review"
       ]
-    },
-    {
-      "item_ref": "review-item:0002",
-      "lane": "skill",
-      "priority": "medium",
-      "target_repo": "aoa-skills",
-      "owner_repo": "aoa-skills",
-      "component_ref": "component:skills:bundle-and-activation-beacons",
-      "beacon_ref": "skills.unused_skill.activation_gap",
-      "kind": "unused_skill_opportunity",
-      "status": "watch",
-      "decision_surface": "docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
-      "summary": "description-trigger suite suggests a relevant skill should have appeared, but the receipt trail does not show it",
-      "evidence_refs": [
-        "trigger-case:case-004",
-        "receipt:skill-20260414-01"
-      ],
-      "source_inputs": [
-        "description-trigger-suite",
-        "skill-live-receipts"
-      ],
-      "recommended_actions": [
-        "inspect the applicability map and defer notes"
-      ]
     }
   ]
 }

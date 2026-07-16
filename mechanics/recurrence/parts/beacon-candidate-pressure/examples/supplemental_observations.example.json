@@ -1,37 +1,5 @@
 [
   {
-    "observation_ref": "obs:supp:0001",
-    "component_ref": "component:skills:bundle-and-activation-beacons",
-    "owner_repo": "aoa-skills",
-    "observed_at": "2026-04-13T12:00:05Z",
-    "category": "usage_gap",
-    "signal": "should_trigger_missing",
-    "source_inputs": [
-      "description-trigger-suite"
-    ],
-    "evidence_refs": [
-      "generated/description_trigger_eval_cases.jsonl#case-17"
-    ],
-    "attributes": {},
-    "notes": ""
-  },
-  {
-    "observation_ref": "obs:supp:0002",
-    "component_ref": "component:skills:bundle-and-activation-beacons",
-    "owner_repo": "aoa-skills",
-    "observed_at": "2026-04-13T12:00:07Z",
-    "category": "review_signal",
-    "signal": "prefer_other_skill_gap",
-    "source_inputs": [
-      "skill-evaluation-matrix"
-    ],
-    "evidence_refs": [
-      "generated/skill_evaluation_matrix.md#gap-2"
-    ],
-    "attributes": {},
-    "notes": ""
-  },
-  {
     "observation_ref": "obs:supp:0003",
     "component_ref": "component:techniques:canon-and-intake-beacons",
     "owner_repo": "aoa-techniques",

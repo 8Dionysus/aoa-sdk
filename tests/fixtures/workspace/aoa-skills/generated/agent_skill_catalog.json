@@ -1,0 +1,40 @@
+{
+  "catalog_version": 2,
+  "profile": "codex-facing-v2",
+  "root": ".agents/skills",
+  "source_repo": "8Dionysus/aoa-skills",
+  "source_of_truth": {
+    "skill_sources": "skills/**/SKILL.md",
+    "capability_families": "capabilities/families/*.yaml",
+    "profile_matrix": "config/skill_pack_profiles.json"
+  },
+  "skills": [
+    {
+      "name": "aoa-decision",
+      "display_name": "AoA Decision",
+      "description": "Find, record, or correct durable repository decisions through one decision family.",
+      "short_description": "Find, record, or correct durable decisions",
+      "path": ".agents/skills/aoa-decision/SKILL.md",
+      "openai_config_path": ".agents/skills/aoa-decision/agents/openai.yaml",
+      "scope": "core",
+      "status": "reviewed",
+      "invocation_mode": "implicit-friendly",
+      "implicit_activation_policy": "invoke",
+      "allow_implicit_invocation": true,
+      "manual_invocation_required": false,
+      "candidate_only": false,
+      "source_skill_path": "skills/core/engineering/aoa-decision/SKILL.md",
+      "trust_posture": "portable-core",
+      "mutation_surface": "owner-scoped",
+      "recommended_install_scopes": ["user", "repo"],
+      "resource_inventory": {
+        "scripts": [],
+        "references": [],
+        "assets": ["assets/large-logo.svg", "assets/small-logo.svg"],
+        "checks": ["checks/review.md"],
+        "examples": []
+      },
+      "ui": {}
+    }
+  ]
+}

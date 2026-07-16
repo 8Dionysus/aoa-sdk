@@ -139,24 +139,26 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
         report["aoa-stats.source_coverage_summary.min"].detected_version
         == "aoa_stats_source_coverage_summary_v1"
     )
-    assert report["aoa-skills.project_core_skill_kernel.min"].detected_version == 1
-    assert report["aoa-skills.project_core_skill_kernel.min"].compatible is True
-    assert report["aoa-skills.project_foundation_profile.min"].detected_version == 1
-    assert report["aoa-skills.project_foundation_profile.min"].compatible is True
-    assert report["aoa-skills.project_core_outer_ring.min"].detected_version == 1
-    assert report["aoa-skills.project_core_outer_ring.min"].compatible is True
-    assert report["aoa-skills.project_core_outer_ring_readiness.min"].detected_version == 1
-    assert report["aoa-skills.project_core_outer_ring_readiness.min"].compatible is True
-    assert report["aoa-skills.project_risk_guard_ring.min"].detected_version == 1
-    assert report["aoa-skills.project_risk_guard_ring.min"].compatible is True
-    assert report["aoa-skills.project_risk_guard_ring_governance.min"].detected_version == 1
-    assert report["aoa-skills.project_risk_guard_ring_governance.min"].compatible is True
-    assert report["aoa-skills.tiny_router_candidate_bands"].detected_version == 1
-    assert report["aoa-skills.tiny_router_candidate_bands"].compatible is True
-    assert report["aoa-skills.tiny_router_capsules.min"].detected_version == 1
-    assert report["aoa-skills.tiny_router_capsules.min"].compatible is True
-    assert report["aoa-skills.skill_trigger_collision_matrix"].detected_version == 1
-    assert report["aoa-skills.skill_trigger_collision_matrix"].compatible is True
+    assert report["aoa-skills.agent_skill_catalog"].detected_version == 2
+    assert report["aoa-skills.agent_skill_catalog"].compatible is True
+    assert report["aoa-skills.skill_pack_profiles.resolved"].detected_version == 2
+    assert report["aoa-skills.skill_pack_profiles.resolved"].compatible is True
+    assert (
+        report["aoa-skills.capability_graph"].detected_version
+        == "aoa-capability-graph-v1"
+    )
+    assert report["aoa-skills.capability_graph"].compatible is True
+    assert report["aoa-skills.portable_export_map"].detected_version == 2
+    assert report["aoa-skills.portable_export_map"].compatible is True
+    assert report["aoa-skills.mcp_dependency_manifest"].detected_version == 2
+    assert report["aoa-skills.mcp_dependency_manifest"].compatible is True
+    for retired_surface_id in (
+        "aoa-skills.runtime_discovery_index",
+        "aoa-skills.project_foundation_profile.min",
+        "aoa-skills.skill_capsules",
+        "aoa-skills.skill_sections.full",
+    ):
+        assert retired_surface_id not in report
     assert report["aoa-agents.codex_projection_manifest"].detected_version == 2
     assert report["aoa-agents.codex_projection_manifest"].compatible is True
     assert report["aoa-kag.kag_registry.min"].detected_version == 1
@@ -360,15 +362,19 @@ def test_center_entry_map_current_v2_is_compatible(workspace_root: Path) -> None
 
 
 def test_assert_compatible_raises_on_version_mismatch(workspace_root: Path) -> None:
-    target = workspace_root / "aoa-skills" / "generated" / "runtime_discovery_index.json"
-    target.write_text(
-        target.read_text(encoding="utf-8").replace('"schema_version": 1', '"schema_version": 99'),
-        encoding="utf-8",
+    target = (
+        workspace_root
+        / "aoa-skills"
+        / "generated"
+        / "skill_pack_profiles.resolved.json"
     )
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    payload["schema_version"] = 99
+    target.write_text(json.dumps(payload) + "\n", encoding="utf-8")
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     with pytest.raises(IncompatibleSurfaceVersion):
-        sdk.compatibility.assert_compatible("aoa-skills.runtime_discovery_index")
+        sdk.compatibility.assert_compatible("aoa-skills.skill_pack_profiles.resolved")
 
 
 def test_compatibility_rules_cover_every_literal_sdk_surface_load() -> None:
@@ -398,21 +404,28 @@ def test_routing_action_surfaces_are_compatibility_checked(workspace_root: Path)
             if surface_id is not None:
                 routed_surface_ids.add(surface_id)
 
-    assert "aoa-skills.skill_capsules" in routed_surface_ids
-    assert "aoa-skills.skill_sections.full" in routed_surface_ids
+    assert not any(repo == "aoa-skills" for repo, _ in ROUTING_ACTION_SURFACE_IDS)
+    assert "aoa-skills.skill_capsules" not in routed_surface_ids
+    assert "aoa-skills.skill_sections.full" not in routed_surface_ids
     assert routed_surface_ids.issubset(available_rule_ids)
 
 
-def test_routing_inspect_rejects_unmapped_action_surface(workspace_root: Path, monkeypatch: pytest.MonkeyPatch) -> None:
-    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    monkeypatch.delitem(
-        ROUTING_ACTION_SURFACE_IDS,
-        ("aoa-skills", "generated/skill_capsules.json"),
-        raising=False,
+def test_non_skill_routing_inspect_rejects_unmapped_action_surface(
+    workspace_root: Path,
+) -> None:
+    hints_path = (
+        workspace_root
+        / "aoa-routing"
+        / "generated"
+        / "task_to_surface_hints.json"
     )
+    payload = json.loads(hints_path.read_text(encoding="utf-8"))
+    payload["hints"][0]["kind"] = "technique"
+    hints_path.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     with pytest.raises(ValueError, match="add a compatibility rule before exposing it"):
-        sdk.routing.inspect(kind="skill", id_or_name="aoa-change-protocol")
+        sdk.routing.inspect(kind="technique", id_or_name="aoa-change-protocol")
 
 
 def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surfaces(workspace_root: Path) -> None:

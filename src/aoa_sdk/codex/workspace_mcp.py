@@ -46,9 +46,15 @@ REPO_HINTS: dict[str, dict[str, Any]] = {
         "entry_candidates": ["README.md", "generated/federation_entrypoints.min.json"],
     },
     "aoa-skills": {
-        "role": "workflow-canon",
-        "surface": "canonical skills, exports, and runtime discovery indexes",
-        "entry_candidates": ["SKILL_INDEX.md", "generated/runtime_discovery_index.json", "skills"],
+        "role": "capability-and-skill-owner",
+        "surface": "source bundles, install profiles, portable exports, and typed capability graph",
+        "entry_candidates": [
+            "generated/agent_skill_catalog.min.json",
+            "generated/capability_graph.json",
+            "generated/skill_pack_profiles.resolved.json",
+            "README.md",
+            "skills",
+        ],
     },
     "aoa-agents": {
         "role": "role-canon",
@@ -276,16 +282,16 @@ class AoAWorkspaceMCPState:
                 "need": "federation-center map and constitutional entrypoint",
             },
             {
-                "name": "skill_index",
+                "name": "agent_skill_catalog",
                 "scope": "aoa-skills",
-                "path": "SKILL_INDEX.md",
-                "need": "canonical skill catalog entrypoint",
+                "path": "generated/agent_skill_catalog.min.json",
+                "need": "compact owner catalog for exact bundle inspection",
             },
             {
-                "name": "skill_runtime_discovery",
+                "name": "capability_graph",
                 "scope": "aoa-skills",
-                "path": "generated/runtime_discovery_index.json",
-                "need": "generated skill discovery index",
+                "path": "generated/capability_graph.json",
+                "need": "typed capability relations without SDK-side retrieval or dispatch",
             },
             {
                 "name": "agent_profiles",
@@ -320,8 +326,12 @@ class AoAWorkspaceMCPState:
             "entrypoints": [self._resolve_entrypoint(entry) for entry in entries],
         }
 
-    def load_skill_index(self, mode: str = "preview", limit: int = 80) -> dict[str, Any]:
-        return self._text_payload("aoa-skills", "SKILL_INDEX.md", mode=mode, limit=limit, label="skill_index")
+    def load_agent_skill_catalog(self) -> dict[str, Any]:
+        return self._json_payload(
+            "aoa-skills",
+            "generated/agent_skill_catalog.min.json",
+            label="agent_skill_catalog",
+        )
 
     def load_agent_profiles(self) -> dict[str, Any]:
         repo_root = self.workspace.repo_roots.get("aoa-agents")
@@ -434,13 +444,11 @@ class AoAWorkspaceMCPState:
             "abs_path": str(abs_path) if abs_path is not None else None,
         }
 
-    def _text_payload(
+    def _json_payload(
         self,
         repo: str,
         relative_path: str,
         *,
-        mode: str,
-        limit: int,
         label: str,
     ) -> dict[str, Any]:
         repo_root = self.workspace.repo_roots.get(repo)
@@ -450,18 +458,25 @@ class AoAWorkspaceMCPState:
                 "label": label,
                 "path": str(path) if path is not None else None,
                 "exists": False,
-                "mode": mode,
-                "content": None,
+                "payload": None,
+                "parse_error": None,
             }
-
-        text = path.read_text(encoding="utf-8")
-        content = text if mode == "full" else "\n".join(text.splitlines()[:limit])
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except json.JSONDecodeError as exc:
+            return {
+                "label": label,
+                "path": str(path),
+                "exists": True,
+                "payload": None,
+                "parse_error": str(exc),
+            }
         return {
             "label": label,
             "path": str(path),
             "exists": True,
-            "mode": mode,
-            "content": content,
+            "payload": payload,
+            "parse_error": None,
         }
 
     def _load_toml(self, path: Path) -> tuple[dict[str, Any] | None, str | None]:
@@ -513,9 +528,9 @@ def build_server(start: str | Path | None = None) -> Any:
         return current_state().build_runtime_entrypoints()
 
     @mcp.tool()
-    def workspace_skill_index(mode: str = "preview", limit: int = 80) -> dict[str, Any]:
-        """Return aoa-skills/SKILL_INDEX.md as preview text or full text."""
-        return current_state().load_skill_index(mode=mode, limit=limit)
+    def workspace_agent_skill_catalog() -> dict[str, Any]:
+        """Return the compact owner-authored AoA skill catalog without selecting a skill."""
+        return current_state().load_agent_skill_catalog()
 
     @mcp.tool()
     def workspace_agent_profiles() -> dict[str, Any]:
@@ -542,9 +557,13 @@ def build_server(start: str | Path | None = None) -> Any:
     def runtime_entrypoints_resource() -> str:
         return json.dumps(current_state().build_runtime_entrypoints(), ensure_ascii=False, indent=2)
 
-    @mcp.resource("aoa-workspace://skill-index")
-    def skill_index_resource() -> str:
-        return json.dumps(current_state().load_skill_index(mode="preview", limit=80), ensure_ascii=False, indent=2)
+    @mcp.resource("aoa-workspace://agent-skill-catalog")
+    def agent_skill_catalog_resource() -> str:
+        return json.dumps(
+            current_state().load_agent_skill_catalog(),
+            ensure_ascii=False,
+            indent=2,
+        )
 
     @mcp.resource("aoa-workspace://agent-profiles")
     def agent_profiles_resource() -> str:

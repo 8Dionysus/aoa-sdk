@@ -7,7 +7,7 @@ import typer
 from ..models import (
     CheckpointAfterCommitReport,
     CheckpointCloseoutContext,
-    CheckpointCloseoutExecutionReport,
+    CheckpointCloseoutMaterializationReport,
     CheckpointCaptureResult,
     CheckpointBacklogAuditReport,
     CheckpointGitBoundaryCheck,
@@ -18,77 +18,14 @@ from ..models import (
     CheckpointLifecycleArchiveResult,
     CheckpointLifecycleAuditReport,
     CheckpointSessionReconcileResult,
-    KernelNextStepBrief,
-    OwnerFollowThroughBrief,
     SessionCheckpointNote,
     SessionCheckpointPromotion,
     SurfaceCloseoutHandoff,
     SurfaceDetectionReport,
     SurfaceOpportunityItem,
-    SkillDetectionReport,
-    SkillDispatchItem,
-    WorkflowFollowThroughBrief,
 )
 from ..release.api import ReleaseAuditResult, ReleasePublishResult
 
-
-def _print_kernel_next_brief(brief: KernelNextStepBrief | None, *, indent: str = "") -> None:
-    if brief is None:
-        return
-    typer.echo(f"{indent}kernel_next:")
-    typer.echo(f"{indent}  action: {brief.suggested_action}")
-    if brief.suggested_skill_name is not None:
-        typer.echo(f"{indent}  skill: {brief.suggested_skill_name}")
-    if brief.suggested_owner_repo is not None:
-        typer.echo(f"{indent}  owner_repo: {brief.suggested_owner_repo}")
-    if brief.missing_kernel_skill_names:
-        typer.echo(f"{indent}  missing: {', '.join(brief.missing_kernel_skill_names)}")
-    typer.echo(f"{indent}  reason: {brief.reason}")
-
-def _print_owner_follow_through(
-    briefs: list[OwnerFollowThroughBrief],
-    *,
-    handoff_path: str | None = None,
-    indent: str = "",
-) -> None:
-    if not briefs:
-        return
-    typer.echo(f"{indent}owner_follow_through:")
-    if handoff_path is not None:
-        typer.echo(f"{indent}  handoff: {handoff_path}")
-    for item in briefs:
-        unit_label = item.unit_name or item.unit_ref
-        typer.echo(
-            f"{indent}  - [{item.suggested_action}] {unit_label} -> {item.owner_repo}:{item.next_surface}"
-        )
-        typer.echo(f"{indent}    reason: {item.reason}")
-
-def _print_workflow_follow_through(
-    briefs: list[WorkflowFollowThroughBrief],
-    *,
-    indent: str = "",
-) -> None:
-    if not briefs:
-        return
-    typer.echo(f"{indent}workflow_follow_through:")
-    for item in briefs:
-        typer.echo(f"{indent}  - [{item.suggested_action}] {item.skill_name}")
-        typer.echo(f"{indent}    reason: {item.reason}")
-
-def _print_skill_items(label: str, items: list[SkillDispatchItem]) -> None:
-    typer.echo(f"{label}:")
-    if not items:
-        typer.echo("  - none")
-        return
-    for item in items:
-        family = item.collision_family or "none"
-        availability = item.host_availability.status
-        typer.echo(f"  - {item.skill_name} [{item.layer} / {family} / {availability}]")
-        typer.echo(f"    reason: {item.reason}")
-        host_line = f"{item.host_availability.status} via {item.host_availability.source}"
-        if item.host_availability.manual_equivalence_allowed:
-            host_line += "; manual equivalence allowed"
-        typer.echo(f"    host: {host_line}")
 
 def _print_surface_items(label: str, items: list[SurfaceOpportunityItem]) -> None:
     typer.echo(f"{label}:")
@@ -112,33 +49,12 @@ def _print_surface_items(label: str, items: list[SurfaceOpportunityItem]) -> Non
                 )
             )
 
-def _print_skill_detection_report(report: SkillDetectionReport) -> None:
-    typer.echo(f"phase: {report.phase}")
-    typer.echo(f"repo_root: {report.repo_root}")
-    typer.echo(f"foundation_id: {report.foundation_id}")
-    _print_skill_items("activate_now", report.activate_now)
-    _print_skill_items("must_confirm", report.must_confirm)
-    _print_skill_items("suggest_next", report.suggest_next)
-    typer.echo(f"host_inventory_provided: {'yes' if report.host_inventory_provided else 'no'}")
-    typer.echo(f"actionability_gaps: {', '.join(report.actionability_gaps) if report.actionability_gaps else 'none'}")
-    typer.echo(f"blocked_actions: {', '.join(report.blocked_actions) if report.blocked_actions else 'none'}")
-    _print_kernel_next_brief(report.closeout_chain)
-    typer.echo("reasoning:")
-    for line in report.reasoning:
-        typer.echo(f"  - {line}")
-
 def _print_surface_detection_report(report: SurfaceDetectionReport) -> None:
     typer.echo(f"phase: {report.phase}")
     typer.echo(f"repo_root: {report.repo_root}")
     typer.echo(f"workspace_root: {report.workspace_root}")
-    typer.echo(f"skill_report_path: {report.skill_report_path or 'none'}")
-    typer.echo(f"skill_report_included: {'yes' if report.skill_report_included else 'no'}")
+    typer.echo(f"source_inputs: {', '.join(report.source_inputs) if report.source_inputs else 'none'}")
     typer.echo(f"shortlist_included: {'yes' if report.shortlist_included else 'no'}")
-    typer.echo(f"active_skill_names: {', '.join(report.active_skill_names) if report.active_skill_names else 'none'}")
-    typer.echo(
-        "immediate_skill_dispatch: "
-        f"{', '.join(report.immediate_skill_dispatch) if report.immediate_skill_dispatch else 'none'}"
-    )
     typer.echo(f"regrounding_required: {'yes' if report.regrounding_required else 'no'}")
     if report.regrounding_hints:
         typer.echo("regrounding_hints:")
@@ -171,7 +87,7 @@ def _print_surface_detection_report(report: SurfaceDetectionReport) -> None:
     _print_surface_items("items", report.items)
     typer.echo(f"closeout_followups: {', '.join(report.closeout_followups) if report.closeout_followups else 'none'}")
     typer.echo(f"owner_layer_notes: {', '.join(report.owner_layer_notes) if report.owner_layer_notes else 'none'}")
-    typer.echo(f"actionability_gaps: {', '.join(report.actionability_gaps) if report.actionability_gaps else 'none'}")
+    typer.echo(f"inspection_gaps: {', '.join(report.inspection_gaps) if report.inspection_gaps else 'none'}")
 
 def _print_surface_handoff(report: SurfaceCloseoutHandoff) -> None:
     typer.echo(f"session_ref: {report.session_ref}")
@@ -225,7 +141,7 @@ def _print_surface_handoff(report: SurfaceCloseoutHandoff) -> None:
         typer.echo("  - none")
     else:
         for item in report.handoff_targets:
-            typer.echo(f"  - {item.skill_name}")
+            typer.echo(f"  - {item.target_ref} [{item.target_kind}; {item.owner_repo}]")
             typer.echo(f"    why: {item.why}")
             typer.echo(f"    triggered_by: {', '.join(item.triggered_by) if item.triggered_by else 'none'}")
     typer.echo(f"notes: {', '.join(report.notes) if report.notes else 'none'}")
@@ -335,10 +251,10 @@ def _print_checkpoint_note(note: SessionCheckpointNote) -> None:
         typer.echo(f"    agent_review: {entry.agent_review_status}")
         if entry.auto_observation is not None:
             typer.echo(f"    auto_summary: {entry.auto_observation.summary}")
-            if entry.auto_observation.applied_skill_names:
+            if entry.auto_observation.related_capability_refs:
                 typer.echo(
-                    "    auto_skills: "
-                    + ", ".join(entry.auto_observation.applied_skill_names)
+                    "    related_capability_refs: "
+                    + ", ".join(entry.auto_observation.related_capability_refs)
                 )
 
 
@@ -501,17 +417,20 @@ def _print_checkpoint_capture(result: CheckpointCaptureResult | None) -> None:
                 "    candidate_ids: "
                 f"{', '.join(signal.candidate_ids) if signal.candidate_ids else 'none'}"
             )
-    if result.session_end_skill_targets:
-        typer.echo("session_end_skill_targets:")
-        for target in result.session_end_skill_targets:
-            typer.echo(f"  - {target.skill_name} [{target.phase}]")
+    if result.session_end_capability_candidates:
+        typer.echo("session_end_capability_candidates:")
+        for target in result.session_end_capability_candidates:
+            typer.echo(
+                f"  - {target.target_ref} "
+                f"[{target.target_kind} / {target.lifecycle_posture} / {target.use_posture}]"
+            )
             typer.echo(f"    why: {target.why}")
             typer.echo(
                 "    candidate_ids: "
                 f"{', '.join(target.candidate_ids) if target.candidate_ids else 'none'}"
             )
     else:
-        typer.echo("session_end_skill_targets: none")
+        typer.echo("session_end_capability_candidates: none")
     typer.echo(f"stats_refresh_recommended: {'yes' if result.stats_refresh_recommended else 'no'}")
     if result.session_end_next_honest_move:
         typer.echo(f"session_end_next_honest_move: {result.session_end_next_honest_move}")
@@ -628,7 +547,9 @@ def _print_checkpoint_lifecycle_audit(report: CheckpointLifecycleAuditReport) ->
     typer.echo(f"  archive_scope_count: {report.archive_scope_count}")
     typer.echo(f"  pending_review_count: {report.pending_review_count}")
     typer.echo(f"  reviewed_not_closed_count: {report.reviewed_not_closed_count}")
-    typer.echo(f"  closeout_execution_count: {report.closeout_execution_count}")
+    typer.echo(
+        f"  closeout_materialization_count: {report.closeout_materialization_count}"
+    )
     typer.echo(f"  session_memory_ref_count: {report.session_memory_ref_count}")
     typer.echo(
         f"  session_closed_without_closeout_count: {report.session_closed_without_closeout_count}"
@@ -794,14 +715,10 @@ def _print_checkpoint_lifecycle_archive_result(report: CheckpointLifecycleArchiv
 
 def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
     typer.echo(f"session_ref: {context.session_ref}")
-    typer.echo(f"orchestrator_skill_name: {context.orchestrator_skill_name}")
-    typer.echo(f"execution_mode: {context.execution_mode}")
-    typer.echo(f"mechanical_bridge_only: {'yes' if context.mechanical_bridge_only else 'no'}")
-    typer.echo(
-        "agent_skill_application_required: "
-        f"{'yes' if context.agent_skill_application_required else 'no'}"
-    )
+    typer.echo(f"materialization_mode: {context.materialization_mode}")
+    typer.echo(f"capability_execution_claimed: {'yes' if context.capability_execution_claimed else 'no'}")
     typer.echo(f"authority_contract: {context.authority_contract}")
+    typer.echo(f"related_workflow_ref: {context.related_workflow_ref}")
     typer.echo(
         "built_at_canonical_utc: "
         + _format_dual_timestamp(
@@ -844,12 +761,15 @@ def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
         f"questions={len(context.checkpoint_review_carry.closeout_questions)}, "
         f"findings={len(context.checkpoint_review_carry.findings)}"
     )
-    typer.echo("ordered_skill_plan:")
-    if not context.ordered_skill_plan:
+    typer.echo("capability_candidates:")
+    if not context.capability_candidates:
         typer.echo("  - none")
     else:
-        for target in context.ordered_skill_plan:
-            typer.echo(f"  - {target.skill_name}")
+        for target in context.capability_candidates:
+            typer.echo(
+                f"  - {target.target_ref} "
+                f"[{target.target_kind} / {target.lifecycle_posture} / {target.use_posture}]"
+            )
             typer.echo(
                 "    candidate_ids: "
                 f"{', '.join(target.candidate_ids) if target.candidate_ids else 'none'}"
@@ -857,22 +777,20 @@ def _print_closeout_context(context: CheckpointCloseoutContext) -> None:
             typer.echo(f"    why: {target.why}")
     typer.echo(f"notes: {', '.join(context.notes) if context.notes else 'none'}")
 
-def _print_closeout_execution_report(report: CheckpointCloseoutExecutionReport) -> None:
+def _print_closeout_materialization_report(
+    report: CheckpointCloseoutMaterializationReport,
+) -> None:
     typer.echo(f"session_ref: {report.session_ref}")
-    typer.echo(f"orchestrator_skill_name: {report.orchestrator_skill_name}")
-    typer.echo(f"execution_mode: {report.execution_mode}")
-    typer.echo(f"mechanical_bridge_only: {'yes' if report.mechanical_bridge_only else 'no'}")
-    typer.echo(
-        "agent_skill_application_required: "
-        f"{'yes' if report.agent_skill_application_required else 'no'}"
-    )
+    typer.echo(f"materialization_mode: {report.materialization_mode}")
+    typer.echo(f"capability_execution_claimed: {'yes' if report.capability_execution_claimed else 'no'}")
     typer.echo(f"authority_contract: {report.authority_contract}")
+    typer.echo(f"related_workflow_ref: {report.related_workflow_ref}")
     typer.echo(
-        "executed_at_canonical_utc: "
+        "materialized_at_canonical_utc: "
         + _format_dual_timestamp(
-            utc_value=report.executed_at,
-            local_value=report.executed_at_local,
-            tz_name=report.executed_tz,
+            utc_value=report.materialized_at,
+            local_value=report.materialized_at_local,
+            tz_name=report.materialized_tz,
         )
     )
     typer.echo(f"context_ref: {report.context_ref}")
@@ -896,37 +814,29 @@ def _print_closeout_execution_report(report: CheckpointCloseoutExecutionReport) 
     )
     typer.echo(f"surface_handoff_ref: {report.surface_handoff_ref or 'none'}")
     typer.echo(f"owner_handoff_path: {report.owner_handoff_path or 'none'}")
-    _print_owner_follow_through(
-        report.owner_follow_through_briefs,
-        handoff_path=report.owner_handoff_path,
-    )
-    _print_workflow_follow_through(report.workflow_follow_through_briefs)
-    typer.echo("executed_skills:")
-    if not report.executed_skills:
+    if report.owner_handoff is not None:
+        typer.echo("owner_handoff_items:")
+        for handoff_item in report.owner_handoff.items:
+            typer.echo(
+                f"  - {handoff_item.candidate_ref} -> "
+                f"{handoff_item.owner_ref}:{handoff_item.proposed_surface} "
+                f"[{handoff_item.decision_posture}]"
+            )
+    typer.echo("materialization_stages:")
+    if not report.stages:
         typer.echo("  - none")
     else:
-        for item in report.executed_skills:
-            typer.echo(f"  - {item.skill_name}")
-            typer.echo(f"    execution_mode: {item.execution_mode}")
-            typer.echo(
-                "    agent_skill_application_required: "
-                f"{'yes' if item.agent_skill_application_required else 'no'}"
-            )
-            typer.echo(f"    reason: {item.reason}")
+        for stage in report.stages:
+            typer.echo(f"  - {stage.stage_id} [{stage.status}]")
+            typer.echo(f"    reason: {stage.reason}")
             typer.echo(
                 "    artifact_refs: "
-                f"{', '.join(item.artifact_refs) if item.artifact_refs else 'none'}"
+                f"{', '.join(stage.artifact_refs) if stage.artifact_refs else 'none'}"
             )
             typer.echo(
                 "    receipt_refs: "
-                f"{', '.join(item.receipt_refs) if item.receipt_refs else 'none'}"
+                f"{', '.join(stage.receipt_refs) if stage.receipt_refs else 'none'}"
             )
-    typer.echo("skipped_skills:")
-    if not report.skipped_skills:
-        typer.echo("  - none")
-    else:
-        for item in report.skipped_skills:
-            typer.echo(f"  - {item.skill_name}: {item.reason}")
     typer.echo(
         "produced_artifact_refs: "
         f"{', '.join(report.produced_artifact_refs) if report.produced_artifact_refs else 'none'}"

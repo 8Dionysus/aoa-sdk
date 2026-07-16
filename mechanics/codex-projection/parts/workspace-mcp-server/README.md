@@ -15,7 +15,7 @@ workspace-level `aoa_workspace` MCP server from the SDK checkout.
 ## Output
 
 - MCP tools for workspace resolution, health, repo map, surface crosswalk,
-  runtime entrypoints, skill index, and agent profile previews; the surface
+  runtime entrypoints, compact owner skill catalog, and agent profile previews; the surface
   crosswalk names `primary_surface` and `secondary_surface` rather than a
   substitute route
 - a transport-neutral `aoa-stats` repo map: owner catalogs remain direct
@@ -23,6 +23,8 @@ workspace-level `aoa_workspace` MCP server from the SDK checkout.
   `aoa_stats` service
 - MCP resources over the same readouts
 - MCP prompts that route Codex toward the next owner surface
+- exact skill catalog reads remain passive; semantic retrieval stays with KAG
+  and runtime selection stays with the host
 
 ## Owner
 

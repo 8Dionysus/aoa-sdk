@@ -1,11 +1,11 @@
 from __future__ import annotations
 
-import json
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Iterable
 
 from ..workspace.discovery import Workspace
+from .compat import classify_manifest
 from .models import HookBinding, HookBindingSet, HookEvent
 from .registry import iter_recurrence_manifest_roots
 
@@ -52,12 +52,14 @@ def load_hook_registry(workspace: Workspace) -> HookRegistry:
     loaded: list[LoadedHookBindingSet] = []
     for repo, repo_root in workspace.repo_roots.items():
         for manifest_root in iter_recurrence_manifest_roots(repo_root):
-            hook_root = manifest_root / "hooks"
-            if not hook_root.is_dir():
-                continue
-            for path in sorted(hook_root.glob("*.json")):
-                payload = json.loads(path.read_text(encoding="utf-8"))
-                binding_set = HookBindingSet.model_validate(payload)
+            for path in sorted(manifest_root.rglob("*.json")):
+                classification = classify_manifest(repo, repo_root, path)
+                if (
+                    classification.manifest_kind != "hook_binding_set"
+                    or classification.payload is None
+                ):
+                    continue
+                binding_set = HookBindingSet.model_validate(classification.payload)
                 if binding_set.owner_repo != repo:
                     binding_set = binding_set.model_copy(update={"owner_repo": repo})
 

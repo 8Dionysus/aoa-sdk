@@ -33,9 +33,9 @@ LANE_BOUNDARIES = {
         "second-consumer pressure is evidence, not auto-canonical promotion",
     ],
     "skill": [
-        "skill activation boundaries stay in authored skill surfaces",
-        "trigger eval changes remain owner-reviewed",
-        "omission signals distinguish genuine misses from explicit restraint",
+        "skill procedure, admission, and lifecycle stay with the authored owner surface",
+        "session visibility, selection, loading, and mention do not prove invocation or benefit",
+        "effect claims require evidence refs plus owner-reviewed no-skill and challenger comparison",
     ],
     "eval": [
         "runtime evidence remains bounded sidecar until eval ownership gives it proof meaning",
@@ -163,10 +163,10 @@ def owner_shape_for_item(item: ReviewQueueItem) -> str:
         return "technique_candidate_intake_decision"
     if item.lane == "skill":
         if item.kind == "unused_skill_opportunity":
-            return "skill_usage_gap_decision"
+            return "owner_reviewed_skill_comparison_decision"
         if item.kind == "skill_trigger_drift":
-            return "trigger_eval_or_activation_boundary_decision"
-        return "skill_bundle_candidate_decision"
+            return "skill_applicability_and_routing_review_decision"
+        return "skill_capability_candidate_admission_decision"
     if item.lane == "eval":
         if item.kind == "overclaim_alarm":
             return "eval_claim_boundary_tightening_decision"

@@ -1,77 +1,38 @@
+from __future__ import annotations
+
 import json
-import os
 import subprocess
-from datetime import datetime
 from pathlib import Path
 
-import pytest
 from typer.testing import CliRunner
 
-from aoa_sdk import AoASDK
-from aoa_sdk.cli.main import _resolve_checkpoint_hook_repos, app
+from aoa_sdk.cli.main import app
 
 
-def _repo_root() -> Path:
-    for candidate in Path(__file__).resolve().parents:
-        if (candidate / "pyproject.toml").is_file() and (candidate / "src" / "aoa_sdk").is_dir():
-            return candidate
-    raise RuntimeError("could not resolve aoa-sdk repo root")
-
-
-@pytest.fixture(autouse=True)
-def _clear_codex_thread_id(monkeypatch) -> None:
-    monkeypatch.delenv("CODEX_THREAD_ID", raising=False)
-
-
-def _checkpoint_note_dir(
-    workspace_root: Path,
-    *,
-    repo_label: str,
-    runtime_session_id: str | None = None,
-) -> Path:
-    current_root = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current"
-    if runtime_session_id is None:
-        return current_root / repo_label
-    return current_root / runtime_session_id / repo_label
-
-
-def _write_runtime_session_file(path: Path, *, session_id: str) -> Path:
+def _write_runtime_metadata(path: Path, *, session_id: str) -> Path:
     path.parent.mkdir(parents=True, exist_ok=True)
-    payload = {
-        "schema_version": 1,
-        "profile": "aoa-sdk",
-        "session_id": session_id,
-        "created_at": "2026-04-10T14:00:00Z",
-        "updated_at": "2026-04-10T14:00:00Z",
-        "codex_thread_id": "thread-cli",
-        "codex_rollout_path": str((path.parent / "runtime-trace.jsonl").resolve()),
-        "active_skills": [],
-        "activation_log": [],
-    }
-    path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-    return path
-
-
-def _mark_checkpoint_note_reviewed(note_dir: Path) -> None:
-    payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
-    payload["review_status"] = "reviewed"
-    payload["agent_review_status"] = "reviewed"
-    payload["agent_review_required"] = False
-    payload["agent_review_pending_refs"] = []
-    (note_dir / "checkpoint-note.json").write_text(
-        json.dumps(payload, indent=2) + "\n",
+    rollout_path = path.parent / f"{session_id}.jsonl"
+    rollout_path.write_text(
+        json.dumps(
+            {
+                "type": "event_msg",
+                "payload": {
+                    "type": "user_message",
+                    "message": "review the checkpoint evidence",
+                },
+            }
+        )
+        + "\n",
         encoding="utf-8",
     )
-
-
-def _write_closeout_execution_report(note_dir: Path, *, session_ref: str, runtime_session_id: str) -> Path:
-    path = note_dir / "closeout-execution-report.json"
     path.write_text(
         json.dumps(
             {
-                "session_ref": session_ref,
-                "runtime_session_id": runtime_session_id,
-                "session_memory_ref": None,
+                "schema_version": 1,
+                "session_id": session_id,
+                "created_at": "2026-07-15T12:00:00Z",
+                "codex_thread_id": f"thread-{session_id}",
+                "codex_rollout_path": str(rollout_path.resolve()),
             },
             indent=2,
         )
@@ -81,81 +42,21 @@ def _write_closeout_execution_report(note_dir: Path, *, session_ref: str, runtim
     return path
 
 
-def _write_session_memory_archive(
-    workspace_root: Path,
-    *,
-    thread_id: str,
-    rollout_path: str,
-    label: str,
-) -> Path:
-    session_dir = workspace_root / ".aoa" / "sessions" / label
-    raw_dir = session_dir / "raw"
-    raw_dir.mkdir(parents=True, exist_ok=True)
-    raw_path = raw_dir / "session.raw.jsonl"
-    raw_path.write_text('{"type":"session_meta"}\n', encoding="utf-8")
-    blocks_index = raw_dir / "blocks.index.json"
-    blocks_index.write_text("[]\n", encoding="utf-8")
-    (session_dir / "session.manifest.json").write_text(
-        json.dumps(
-            {
-                "session_id": thread_id,
-                "session_label": label,
-                "session_title": "Checkpoint CLI no-closeout",
-                "updated_at": "2026-04-10T15:00:00Z",
-                "archive_status": "indexed",
-                "distillation_status": "raw_archived",
-                "review_status": "provisional",
-                "source": {"transcript_path": rollout_path},
-                "raw": {
-                    "path": str(raw_path),
-                    "line_count": 1,
-                    "indexing_status": "indexed",
-                    "blocks_index": str(blocks_index),
-                },
-                "raw_blocks": {"index": str(blocks_index), "blocks": []},
-                "segments": [],
-            }
-        ),
-        encoding="utf-8",
-    )
-    (session_dir / "session.index.json").write_text(
-        json.dumps(
-            {
-                "session_id": thread_id,
-                "updated_at": "2026-04-10T15:00:00Z",
-                "event_count": 1,
-                "work_context": {"status": "resolved", "work_name": "aoa-sdk"},
-                "conversation_act_counts": {"operator_prompt": 1},
-                "session_act_counts": {"operator_prompt": 1},
-                "route_signal_counts": {"authority_surface": {"checkpoint": 1}},
-            }
-        ),
-        encoding="utf-8",
-    )
-    registry = {
-        "schema_version": 1,
-        "updated_at": "2026-04-10T15:00:00Z",
-        "sessions": [
-            {
-                "session_id": thread_id,
-                "session_label": label,
-                "path": str(session_dir),
-                "transcript_path": rollout_path,
-                "archive_status": "indexed",
-                "distillation_status": "raw_archived",
-                "event_count": 1,
-                "segment_count": 0,
-                "updated_at": "2026-04-10T15:00:00Z",
-            }
-        ],
-    }
-    (workspace_root / ".aoa" / "session-registry.json").write_text(json.dumps(registry), encoding="utf-8")
-    return session_dir
-
-
 def _init_git_repo(repo_root: Path) -> None:
-    subprocess.run(["git", "init"], cwd=repo_root, check=True, capture_output=True, text=True)
-    subprocess.run(["git", "config", "user.name", "AoA Test"], cwd=repo_root, check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "init"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
+        ["git", "config", "user.name", "AoA Test"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
     subprocess.run(
         ["git", "config", "user.email", "aoa@example.test"],
         cwd=repo_root,
@@ -165,1117 +66,116 @@ def _init_git_repo(repo_root: Path) -> None:
     )
 
 
-def _git_commit(repo_root: Path, *, subject: str, extra_env: dict[str, str] | None = None) -> subprocess.CompletedProcess[str]:
+def _commit(repo_root: Path, subject: str) -> str:
     readme = repo_root / "README.md"
-    base_text = readme.read_text(encoding="utf-8")
-    readme.write_text(base_text + f"\n{subject}\n", encoding="utf-8")
-    subprocess.run(["git", "add", "README.md"], cwd=repo_root, check=True, capture_output=True, text=True)
-    env = None if extra_env is None else {**os.environ, **extra_env}
-    return subprocess.run(
+    readme.write_text(
+        readme.read_text(encoding="utf-8") + f"\n{subject}\n",
+        encoding="utf-8",
+    )
+    subprocess.run(
+        ["git", "add", "README.md"],
+        cwd=repo_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+    subprocess.run(
         ["git", "commit", "-m", subject],
         cwd=repo_root,
         check=True,
         capture_output=True,
         text=True,
-        env=env,
     )
-
-
-def _git_commit_file(
-    repo_root: Path,
-    *,
-    relative_path: str,
-    content: str,
-    subject: str,
-    extra_env: dict[str, str] | None = None,
-) -> subprocess.CompletedProcess[str]:
-    target = repo_root / relative_path
-    target.parent.mkdir(parents=True, exist_ok=True)
-    target.write_text(content, encoding="utf-8")
-    subprocess.run(["git", "add", relative_path], cwd=repo_root, check=True, capture_output=True, text=True)
-    env = None if extra_env is None else {**os.environ, **extra_env}
     return subprocess.run(
-        ["git", "commit", "-m", subject],
-        cwd=repo_root,
-        check=True,
-        capture_output=True,
-        text=True,
-        env=env,
-    )
-
-
-def _write_aoa_shim(path: Path) -> Path:
-    import pydantic
-
-    src_root = _repo_root() / "src"
-    site_packages_root = Path(pydantic.__file__).resolve().parents[1]
-    script = (
-        "#!/bin/sh\n"
-        f'PYTHONPATH="{src_root}:{site_packages_root}:$PYTHONPATH" exec python -m aoa_sdk.cli.main "$@"\n'
-    )
-    path.write_text(script, encoding="utf-8")
-    path.chmod(0o755)
-    return path
-
-
-def _git_run(
-    repo_root: Path,
-    *args: str,
-    extra_env: dict[str, str] | None = None,
-    check: bool = True,
-) -> subprocess.CompletedProcess[str]:
-    env = None if extra_env is None else {**os.environ, **extra_env}
-    return subprocess.run(
-        ["git", *args],
-        cwd=repo_root,
-        check=check,
-        capture_output=True,
-        text=True,
-        env=env,
-    )
-
-
-def _hook_results_by_name(payload: dict[str, object]) -> dict[str, dict[str, object]]:
-    return {
-        item["hook_name"]: item
-        for item in payload["results"]  # type: ignore[index]
-    }
-
-
-def test_surfaces_detect_cli_supports_checkpoint_phase(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    result = runner.invoke(
-        app,
-        [
-            "surfaces",
-            "detect",
-            str(workspace_root / "aoa-sdk"),
-            "--phase",
-            "checkpoint",
-            "--checkpoint-kind",
-            "commit",
-            "--intent-text",
-            "recurring workflow needs better handoff proof and recall",
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["report"]["phase"] == "checkpoint"
-    assert payload["report"]["checkpoint_kind"] == "commit"
-    assert payload["report"]["checkpoint_should_capture"] is True
-
-
-def test_checkpoint_cli_append_status_and_promote_handoff(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    append = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "append",
-            str(workspace_root / "aoa-sdk"),
-            "--kind",
-            "commit",
-            "--intent-text",
-            "recurring workflow needs better handoff proof and recall",
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-    assert append.exit_code == 0
-
-    append_two = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "append",
-            str(workspace_root / "aoa-sdk"),
-            "--kind",
-            "verify_green",
-            "--intent-text",
-            "recurring workflow needs better handoff proof and recall",
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-    assert append_two.exit_code == 0
-
-    status = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "status",
-            str(workspace_root / "aoa-sdk"),
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-    promote = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "promote",
-            str(workspace_root / "aoa-sdk"),
-            "--target",
-            "harvest-handoff",
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-
-    assert status.exit_code == 0
-    assert promote.exit_code == 0
-    status_payload = json.loads(status.stdout)
-    promote_payload = json.loads(promote.stdout)
-    handoff_path = (
-        _checkpoint_note_dir(
-            workspace_root,
-            repo_label="aoa-sdk",
-            runtime_session_id=status_payload["runtime_session_id"],
-        )
-        / "harvest-handoff.json"
-    )
-    assert status_payload["state"] == "reviewable"
-    assert status_payload["checkpoint_history"][-1]["observed_at_local"]
-    assert status_payload["checkpoint_history"][-1]["observed_tz"]
-    assert promote_payload["target"] == "harvest-handoff"
-    assert promote_payload["promoted_at_local"]
-    assert promote_payload["promoted_tz"]
-    assert handoff_path.exists()
-
-
-def test_checkpoint_lifecycle_audit_and_close_archive_cli_json_dry_run(workspace_root: Path) -> None:
-    runner = CliRunner()
-    session_file = _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-lifecycle-session.json",
-        session_id="runtime-cli-lifecycle",
-    )
-
-    append = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "append",
-            str(workspace_root / "aoa-sdk"),
-            "--kind",
-            "verify_green",
-            "--intent-text",
-            "reviewed closeout candidate survived this runtime session",
-            "--mutation-surface",
-            "code",
-            "--session-file",
-            str(session_file),
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-
-    assert append.exit_code == 0
-    append_payload = json.loads(append.stdout)
-    note_dir = _checkpoint_note_dir(
-        workspace_root,
-        repo_label="aoa-sdk",
-        runtime_session_id="runtime-cli-lifecycle",
-    )
-    _mark_checkpoint_note_reviewed(note_dir)
-    _write_closeout_execution_report(
-        note_dir,
-        session_ref=append_payload["session_ref"],
-        runtime_session_id="runtime-cli-lifecycle",
-    )
-
-    audit = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "lifecycle-audit",
-            str(workspace_root / "aoa-sdk"),
-            "--session-file",
-            str(session_file),
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-    close_archive = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "close-archive",
-            str(workspace_root / "aoa-sdk"),
-            "--runtime-session-id",
-            "runtime-cli-lifecycle",
-            "--session-file",
-            str(session_file),
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-
-    assert audit.exit_code == 0
-    audit_payload = json.loads(audit.stdout)
-    assert audit_payload["closable_count"] == 1
-    assert audit_payload["entries"][0]["lifecycle_state"] == "closeout_executed"
-    assert close_archive.exit_code == 0
-    close_payload = json.loads(close_archive.stdout)
-    assert close_payload["dry_run"] is True
-    assert close_payload["archived_count"] == 1
-    assert note_dir.exists()
-
-
-def test_checkpoint_reconcile_sessions_cli_json_dry_run_writes_index(workspace_root: Path) -> None:
-    runner = CliRunner()
-    active_session = _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
-        session_id="runtime-cli-active",
-    )
-    closed_session = _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "closed-session.json",
-        session_id="runtime-cli-no-closeout",
-    )
-    closed_payload = json.loads(closed_session.read_text(encoding="utf-8"))
-    _write_session_memory_archive(
-        workspace_root,
-        thread_id=closed_payload["codex_thread_id"],
-        rollout_path=closed_payload["codex_rollout_path"],
-        label="2026-04-10__006__cli-no-closeout",
-    )
-
-    append = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "append",
-            str(workspace_root / "aoa-sdk"),
-            "--kind",
-            "verify_green",
-            "--intent-text",
-            "reviewed checkpoint exists but closeout was skipped",
-            "--mutation-surface",
-            "code",
-            "--session-file",
-            str(closed_session),
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-    assert append.exit_code == 0
-    note_dir = _checkpoint_note_dir(
-        workspace_root,
-        repo_label="aoa-sdk",
-        runtime_session_id="runtime-cli-no-closeout",
-    )
-    _mark_checkpoint_note_reviewed(note_dir)
-
-    result = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "reconcile-sessions",
-            str(workspace_root / "aoa-sdk"),
-            "--runtime-session-id",
-            "runtime-cli-no-closeout",
-            "--session-file",
-            str(active_session),
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["dry_run"] is True
-    assert payload["archived_count"] == 1
-    assert payload["archived_entries"][0]["lifecycle_state"] == "session_closed_reviewed_no_closeout"
-    assert payload["generated_index_ref"]
-    assert Path(payload["generated_index_ref"]).exists()
-
-
-def test_checkpoint_backlog_audit_cli_json_writes_trace_gap_index(workspace_root: Path) -> None:
-    runner = CliRunner()
-    (workspace_root / ".aoa" / "sessions").mkdir(parents=True, exist_ok=True)
-    (workspace_root / ".aoa" / "session-registry.json").write_text(
-        json.dumps({"schema_version": 1, "updated_at": "2026-06-03T00:00:00Z", "sessions": []}),
-        encoding="utf-8",
-    )
-    active_session = _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "active-session.json",
-        session_id="runtime-cli-active",
-    )
-    gap_session = _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-cli-gap.json",
-        session_id="runtime-cli-trace-gap",
-    )
-    append = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "append",
-            str(workspace_root / "aoa-sdk"),
-            "--kind",
-            "verify_green",
-            "--intent-text",
-            "reviewed checkpoint exists but session memory archive is missing",
-            "--mutation-surface",
-            "code",
-            "--session-file",
-            str(gap_session),
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-    assert append.exit_code == 0
-    note_dir = _checkpoint_note_dir(
-        workspace_root,
-        repo_label="aoa-sdk",
-        runtime_session_id="runtime-cli-trace-gap",
-    )
-    _mark_checkpoint_note_reviewed(note_dir)
-
-    result = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "backlog-audit",
-            str(workspace_root / "aoa-sdk"),
-            "--session-file",
-            str(active_session),
-            "--write-index",
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["report_type"] == "checkpoint_backlog_audit_v1"
-    assert payload["counts"]["runtime_trace_gaps"] == 1
-    assert payload["entries"][0]["next_route"] == "recover_session_memory_archive"
-    assert payload["entries"][0]["runtime_trace_status"] == "resolved"
-    assert payload["entries"][0]["session_memory_status"] == "missing"
-    index_ref = Path(payload["generated_index_ref"])
-    assert index_ref.exists()
-    index = json.loads(index_ref.read_text(encoding="utf-8"))
-    assert index["by_next_route"]["recover_session_memory_archive"] == [
-        "runtime-cli-trace-gap"
-    ]
-
-
-def test_skills_guard_can_auto_append_checkpoint_note(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    result = runner.invoke(
-        app,
-        [
-            "skills",
-            "guard",
-            str(workspace_root / "aoa-sdk"),
-            "--intent-text",
-            "recurring workflow needs better handoff proof and recall",
-            "--mutation-surface",
-            "code",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["checkpoint_capture"]["mode"] == "auto"
-    assert payload["checkpoint_capture"]["appended"] is True
-    assert payload["checkpoint_capture"]["checkpoint_kind"] == "commit"
-    assert payload["checkpoint_capture"]["captured_at_local"]
-    assert payload["checkpoint_capture"]["captured_tz"]
-    assert payload["checkpoint_capture"]["harvest_candidate_ids"]
-    assert payload["checkpoint_capture"]["progression_candidate_ids"]
-    assert payload["checkpoint_capture"]["session_end_skill_targets"]
-    assert payload["checkpoint_capture"]["stats_refresh_recommended"] is True
-    assert payload["checkpoint_capture"]["session_end_next_honest_move"]
-    assert any(item["skill_name"] == "aoa-checkpoint-closeout-bridge" for item in payload["report"]["must_confirm"])
-    assert payload["checkpoint_note"]["state"] in {"collecting", "reviewable"}
-    note_path = (
-        _checkpoint_note_dir(
-            workspace_root,
-            repo_label="aoa-sdk",
-            runtime_session_id=payload["checkpoint_note"]["runtime_session_id"],
-        )
-        / "checkpoint-note.json"
-    )
-    assert note_path.exists()
-
-
-def test_skills_guard_explicit_checkpoint_kind_still_wins(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    result = runner.invoke(
-        app,
-        [
-            "skills",
-            "guard",
-            str(workspace_root / "aoa-sdk"),
-            "--intent-text",
-            "reviewable verify-green checkpoint",
-            "--mutation-surface",
-            "code",
-            "--checkpoint-kind",
-            "verify_green",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["checkpoint_capture"]["mode"] == "explicit"
-    assert payload["checkpoint_capture"]["appended"] is True
-    assert payload["checkpoint_capture"]["checkpoint_kind"] == "verify_green"
-    assert payload["checkpoint_capture"]["captured_at_local"]
-    assert payload["checkpoint_capture"]["captured_tz"]
-    assert payload["checkpoint_note"]["state"] in {"collecting", "reviewable"}
-
-
-def test_skills_guard_reports_no_checkpoint_signal_when_auto_capture_skips(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    result = runner.invoke(
-        app,
-        [
-            "skills",
-            "guard",
-            str(workspace_root / "aoa-sdk"),
-            "--intent-text",
-            "refresh generated contracts",
-            "--mutation-surface",
-            "code",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["checkpoint_capture"]["mode"] == "auto"
-    assert payload["checkpoint_capture"]["appended"] is False
-    assert payload["checkpoint_capture"]["reason"] == "no_checkpoint_signal"
-    assert payload["checkpoint_capture"]["session_end_skill_targets"] == []
-    assert payload["checkpoint_capture"]["stats_refresh_recommended"] is False
-    assert "checkpoint_note" not in payload
-
-
-def test_skills_guard_reports_existing_session_end_targets_even_when_skip_occurs(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    first = runner.invoke(
-        app,
-        [
-            "skills",
-            "guard",
-            str(workspace_root / "aoa-sdk"),
-            "--intent-text",
-            "recurring workflow needs better handoff proof and recall",
-            "--mutation-surface",
-            "code",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert first.exit_code == 0
-
-    result = runner.invoke(
-        app,
-        [
-            "skills",
-            "guard",
-            str(workspace_root / "aoa-sdk"),
-            "--intent-text",
-            "refresh generated contracts",
-            "--mutation-surface",
-            "code",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["checkpoint_capture"]["appended"] is False
-    assert payload["checkpoint_capture"]["reason"] == "no_checkpoint_signal"
-    assert [target["skill_name"] for target in payload["checkpoint_capture"]["session_end_skill_targets"]] == [
-        "aoa-session-donor-harvest",
-        "aoa-session-progression-lift",
-        "aoa-quest-harvest",
-    ]
-    assert payload["checkpoint_capture"]["progression_axis_signals"]
-    assert payload["checkpoint_capture"]["stats_refresh_recommended"] is True
-    assert payload["checkpoint_capture"]["session_end_next_honest_move"]
-    assert payload["checkpoint_note"]["session_end_recommendation"] == "harvest_progression_and_upgrade"
-
-
-def test_checkpoint_status_cli_backfills_local_timestamp_for_legacy_history_entry(workspace_root: Path) -> None:
-    runner = CliRunner()
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
-    note_dir.mkdir(parents=True, exist_ok=True)
-    legacy_payload = {
-        "session_ref": "session:2026-04-09-aoa-sdk-checkpoint-growth",
-        "repo_root": str(workspace_root / "aoa-sdk"),
-        "repo_label": "aoa-sdk",
-        "history_entry": {
-            "checkpoint_kind": "commit",
-            "observed_at": "2026-04-09T17:54:04Z",
-            "report_ref": str(note_dir / "legacy-report.json"),
-            "intent_text": "legacy checkpoint",
-            "checkpoint_should_capture": False,
-            "blocked_by": [],
-            "candidate_clusters": [],
-            "manual_review_requested": False,
-        },
-    }
-    (note_dir / "checkpoint-note.jsonl").write_text(json.dumps(legacy_payload) + "\n", encoding="utf-8")
-
-    result = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "status",
-            str(workspace_root / "aoa-sdk"),
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    expected_local = datetime.fromisoformat("2026-04-09T17:54:04+00:00").astimezone().isoformat()
-    assert payload["checkpoint_history"][0]["observed_at_local"] == expected_local
-    assert payload["checkpoint_history"][0]["observed_tz"]
-
-
-def test_checkpoint_status_cli_hides_stale_current_note_for_changed_runtime_session(workspace_root: Path) -> None:
-    runner = CliRunner()
-    session_file = workspace_root / "aoa-sdk" / ".aoa" / "checkpoint-skill-session.json"
-
-    append = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "append",
-            str(workspace_root / "aoa-sdk"),
-            "--kind",
-            "commit",
-            "--intent-text",
-            "commit bounded patch",
-            "--session-file",
-            str(session_file),
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-    assert append.exit_code == 0
-
-    session_payload = json.loads(session_file.read_text(encoding="utf-8"))
-    session_payload["session_id"] = "runtime-session-two"
-    session_payload["created_at"] = "2026-04-10T12:00:00Z"
-    session_payload["updated_at"] = "2026-04-10T12:00:00Z"
-    session_file.write_text(json.dumps(session_payload, indent=2) + "\n", encoding="utf-8")
-
-    status = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "status",
-            str(workspace_root / "aoa-sdk"),
-            "--session-file",
-            str(session_file),
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-
-    assert status.exit_code != 0
-    assert (
-        "no active checkpoint note exists yet" in status.stdout
-        or "no active checkpoint note exists yet" in str(status.exception)
-        or "no checkpoint note exists yet" in status.stdout
-        or "no checkpoint note exists yet" in str(status.exception)
-    )
-
-
-def test_skills_guard_auto_captures_explicit_commit_growth(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    result = runner.invoke(
-        app,
-        [
-            "skills",
-            "guard",
-            str(workspace_root / "aoa-sdk"),
-            "--intent-text",
-            "commit bounded patch",
-            "--mutation-surface",
-            "code",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["checkpoint_capture"]["mode"] == "auto"
-    assert payload["checkpoint_capture"]["appended"] is True
-    assert payload["checkpoint_capture"]["checkpoint_kind"] == "commit"
-    assert payload["checkpoint_capture"]["captured_at_local"]
-    assert payload["checkpoint_capture"]["captured_tz"]
-    assert any(cluster["candidate_kind"] == "growth" for cluster in payload["checkpoint_note"]["candidate_clusters"])
-
-
-def test_skills_guard_can_disable_auto_checkpoint(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    result = runner.invoke(
-        app,
-        [
-            "skills",
-            "guard",
-            str(workspace_root / "aoa-sdk"),
-            "--intent-text",
-            "recurring workflow needs better handoff proof and recall",
-            "--mutation-surface",
-            "code",
-            "--no-auto-checkpoint",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["checkpoint_capture"]["appended"] is False
-    assert payload["checkpoint_capture"]["reason"] == "auto_disabled"
-    assert payload["checkpoint_capture"]["attempted"] is False
-    assert "checkpoint_note" not in payload
-
-
-def test_surfaces_detect_cli_can_append_checkpoint_note(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    result = runner.invoke(
-        app,
-        [
-            "surfaces",
-            "detect",
-            str(workspace_root / "aoa-sdk"),
-            "--phase",
-            "checkpoint",
-            "--checkpoint-kind",
-            "commit",
-            "--append-note",
-            "--intent-text",
-            "recurring workflow needs better handoff proof and recall",
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["report"]["phase"] == "checkpoint"
-    assert payload["checkpoint_note"]["promotion_recommendation"] in {
-        "local_note",
-        "dionysus_note",
-        "harvest_handoff",
-    }
-
-
-def test_checkpoint_mark_cli_records_reviewable_opened_pr_milestone(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    result = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "mark",
-            str(workspace_root / "aoa-sdk"),
-            "--kind",
-            "pr_opened",
-            "--intent-text",
-            "opened aoa-skills PR #157 after protected main rejected direct push",
-            "--mutation-surface",
-            "public-share",
-            "--root",
-            str(workspace_root / "aoa-sdk"),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["state"] == "reviewable"
-    assert payload["checkpoint_history"][-1]["checkpoint_kind"] == "pr_opened"
-    assert payload["checkpoint_history"][-1]["checkpoint_should_capture"] is True
-    assert payload["checkpoint_history"][-1]["manual_review_requested"] is True
-    assert any(
-        cluster["source_surface_ref"] == "aoa-sdk:checkpoint_auto_capture.pr_opened"
-        for cluster in payload["checkpoint_history"][-1]["candidate_clusters"]
-    )
-
-
-def test_checkpoint_build_closeout_context_cli_emits_json(workspace_root: Path) -> None:
-    runner = CliRunner()
-    seed = runner.invoke(
-        app,
-        [
-            "skills",
-            "guard",
-            str(workspace_root / "aoa-sdk"),
-            "--intent-text",
-            "recurring workflow needs better handoff proof and recall",
-            "--mutation-surface",
-            "code",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert seed.exit_code == 0
-    seed_payload = json.loads(seed.stdout)
-    session_ref = seed_payload["checkpoint_note"]["session_ref"]
-    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-closeout.md"
-    reviewed_artifact.parent.mkdir(parents=True, exist_ok=True)
-    reviewed_artifact.write_text(
-        "\n".join(
-            [
-                "# Reviewed Session Artifact",
-                "",
-                f"Session ref: `{session_ref}`",
-                "",
-                "- recurring route evidence remained visible",
-            ]
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-
-    result = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "build-closeout-context",
-            str(workspace_root / "aoa-sdk"),
-            "--reviewed-artifact",
-            str(reviewed_artifact),
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["session_ref"] == session_ref
-    assert payload["orchestrator_skill_name"] == "aoa-checkpoint-closeout-bridge"
-    assert payload["built_at_local"]
-    assert payload["built_tz"]
-    assert payload["ordered_skill_plan"]
-    assert [item["skill_name"] for item in payload["ordered_skill_plan"]] == [
-        "aoa-session-donor-harvest",
-        "aoa-session-progression-lift",
-        "aoa-quest-harvest",
-    ]
-
-
-def test_checkpoint_human_cli_marks_canonical_utc_labels(workspace_root: Path) -> None:
-    runner = CliRunner()
-
-    guard = runner.invoke(
-        app,
-        [
-            "skills",
-            "guard",
-            str(workspace_root / "aoa-sdk"),
-            "--intent-text",
-            "commit bounded patch",
-            "--mutation-surface",
-            "code",
-            "--root",
-            str(workspace_root),
-        ],
-    )
-    assert guard.exit_code == 0
-    assert "checkpoint_capture_at_canonical_utc:" in guard.stdout
-    assert "(local " in guard.stdout
-
-    status_result = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "status",
-            str(workspace_root / "aoa-sdk"),
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert status_result.exit_code == 0
-    status_payload = json.loads(status_result.stdout)
-
-    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-closeout-human.md"
-    reviewed_artifact.parent.mkdir(parents=True, exist_ok=True)
-    reviewed_artifact.write_text(
-        "\n".join(
-            [
-                "# Reviewed Session Artifact",
-                "",
-                f"Session ref: `{status_payload['session_ref']}`",
-                "",
-                "- verify green completed",
-            ]
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-
-    context_result = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "build-closeout-context",
-            str(workspace_root / "aoa-sdk"),
-            "--reviewed-artifact",
-            str(reviewed_artifact),
-            "--root",
-            str(workspace_root),
-        ],
-    )
-    assert context_result.exit_code == 0
-    assert "execution_mode: mechanical_bridge_context" in context_result.stdout
-    assert "mechanical_bridge_only: yes" in context_result.stdout
-    assert "agent_skill_application_required: yes" in context_result.stdout
-    assert "built_at_canonical_utc:" in context_result.stdout
-    assert "(local " in context_result.stdout
-
-    execution_result = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "execute-closeout-chain",
-            str(workspace_root / "aoa-sdk"),
-            "--reviewed-artifact",
-            str(reviewed_artifact),
-            "--root",
-            str(workspace_root),
-        ],
-    )
-    assert execution_result.exit_code == 0
-    assert "execution_mode: mechanical_bridge_artifact_build" in execution_result.stdout
-    assert "mechanical_bridge_only: yes" in execution_result.stdout
-    assert "agent_skill_application_required: yes" in execution_result.stdout
-    assert "executed_at_canonical_utc:" in execution_result.stdout
-    assert "(local " in execution_result.stdout
-    assert "owner_handoff_path:" in execution_result.stdout
-
-
-def test_checkpoint_execute_closeout_chain_cli_emits_execution_report(workspace_root: Path) -> None:
-    runner = CliRunner()
-    reviewed_artifact = workspace_root / "aoa-sdk" / ".aoa" / "reviewed-closeout-exec.md"
-    reviewed_artifact.parent.mkdir(parents=True, exist_ok=True)
-    reviewed_artifact.write_text(
-        "\n".join(
-            [
-                "# Reviewed Session Artifact",
-                "",
-                "Session ref: `session:test-checkpoint-execute-cli`",
-                "",
-                "- verify green completed",
-                "- repeated route remained visible",
-            ]
-        )
-        + "\n",
-        encoding="utf-8",
-    )
-
-    result = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "execute-closeout-chain",
-            str(workspace_root / "aoa-sdk"),
-            "--reviewed-artifact",
-            str(reviewed_artifact),
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["session_ref"] == "session:test-checkpoint-execute-cli"
-    assert payload["orchestrator_skill_name"] == "aoa-checkpoint-closeout-bridge"
-    assert payload["execution_mode"] == "mechanical_bridge_artifact_build"
-    assert payload["mechanical_bridge_only"] is True
-    assert payload["agent_skill_application_required"] is True
-    assert payload["authority_contract"] == "reviewed_artifact_primary_checkpoint_hints_provisional"
-    assert payload["executed_at_local"]
-    assert payload["executed_tz"]
-    assert "owner_handoff_path" in payload
-    assert [item["skill_name"] for item in payload["executed_skills"]] == [
-        "aoa-session-donor-harvest",
-        "aoa-session-progression-lift",
-        "aoa-quest-harvest",
-    ]
-    assert payload["produced_receipt_refs"]
-
-
-def test_checkpoint_after_commit_cli_reports_skip_without_active_session(workspace_root: Path) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-    _git_commit(repo_root, subject="plan verify a bounded change")
-
-    result = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "after-commit",
-            str(repo_root),
-            "--commit-ref",
-            "HEAD",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["status"] == "skipped_no_active_session"
-    assert payload["commit_subject"] == "plan verify a bounded change"
-    assert payload["changed_paths"] == ["README.md"]
-
-
-def test_checkpoint_git_boundary_cli_blocks_unresolved_skipped_thread_checkpoint(
-    workspace_root: Path,
-    monkeypatch,
-) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-    _git_commit(repo_root, subject="plan verify a bounded change")
-    commit_sha = subprocess.run(
         ["git", "rev-parse", "HEAD"],
         cwd=repo_root,
         check=True,
         capture_output=True,
         text=True,
     ).stdout.strip()
-    monkeypatch.setenv("CODEX_THREAD_ID", "thread-cli-unresolved-skip")
-
-    skipped = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "after-commit",
-            str(repo_root),
-            "--commit-ref",
-            "HEAD",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert skipped.exit_code == 0
-    assert json.loads(skipped.stdout)["status"] == "skipped_no_active_session"
-
-    boundary = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "git-boundary-check",
-            str(repo_root),
-            "--boundary",
-            "push",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    payload = json.loads(boundary.stdout)
-    assert boundary.exit_code == 1
-    assert payload["status"] == "blocked_unresolved_checkpoint"
-    assert payload["pending_refs"] == [commit_sha]
-    assert "aoa checkpoint review-note" in payload["required_action"]
-    assert "--session-file" in payload["required_action"]
 
 
-def test_checkpoint_after_commit_cli_accepts_owner_followthrough_kind(workspace_root: Path) -> None:
-    runner = CliRunner()
+def test_checkpoint_append_cli_requires_explicit_runtime_identity(
+    workspace_root: Path,
+) -> None:
     repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-    _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
-        session_id="runtime-cli-owner-followthrough",
-    )
-    _git_commit(repo_root, subject="owner follow-through after reviewed closeout")
-
-    result = runner.invoke(
+    runner = CliRunner()
+    missing = runner.invoke(
         app,
         [
             "checkpoint",
-            "after-commit",
+            "append",
             str(repo_root),
-            "--commit-ref",
-            "HEAD",
             "--kind",
-            "owner_followthrough",
+            "manual",
+            "--intent-text",
+            "preserve reviewed checkpoint evidence",
             "--root",
-            str(workspace_root),
+            str(repo_root),
             "--json",
         ],
     )
 
-    assert result.exit_code == 0
-    payload = json.loads(result.stdout)
-    assert payload["status"] == "captured"
-    assert payload["checkpoint_kind"] == "owner_followthrough"
-    assert payload["mutation_surface"] == "public-share"
+    assert missing.exit_code != 0
+    assert not (repo_root / ".aoa" / "session-growth").exists()
+
+    metadata = _write_runtime_metadata(
+        repo_root / ".aoa" / "runtime-cli.json",
+        session_id="runtime-cli",
+    )
+    original_metadata = metadata.read_text(encoding="utf-8")
+    captured = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "append",
+            str(repo_root),
+            "--kind",
+            "manual",
+            "--intent-text",
+            "preserve reviewed checkpoint evidence",
+            "--runtime-session-file",
+            str(metadata),
+            "--root",
+            str(repo_root),
+            "--json",
+        ],
+    )
+
+    assert captured.exit_code == 0, captured.stdout
+    payload = json.loads(captured.stdout)
+    assert payload["runtime_session_id"] == "runtime-cli"
+    assert metadata.read_text(encoding="utf-8") == original_metadata
+    assert (
+        repo_root
+        / ".aoa"
+        / "session-growth"
+        / "current"
+        / "runtime-cli"
+        / "aoa-sdk"
+        / "checkpoint-note.json"
+    ).is_file()
 
 
-def test_checkpoint_review_note_cli_records_agent_authored_review(workspace_root: Path) -> None:
-    runner = CliRunner()
+def test_checkpoint_cli_review_materialize_and_close_archive(
+    workspace_root: Path,
+) -> None:
     repo_root = workspace_root / "aoa-sdk"
     _init_git_repo(repo_root)
-    _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
-        session_id="runtime-cli-review",
+    commit_sha = _commit(repo_root, "refine checkpoint owner handoff")
+    metadata = _write_runtime_metadata(
+        repo_root / ".aoa" / "runtime-cli-closeout.json",
+        session_id="runtime-cli-closeout",
     )
-    _git_commit(repo_root, subject="plan verify a bounded change")
+    runner = CliRunner()
+    common = [
+        "--runtime-session-file",
+        str(metadata),
+        "--root",
+        str(repo_root),
+        "--json",
+    ]
+
     captured = runner.invoke(
         app,
         [
@@ -1284,12 +184,14 @@ def test_checkpoint_review_note_cli_records_agent_authored_review(workspace_root
             str(repo_root),
             "--commit-ref",
             "HEAD",
-            "--root",
-            str(workspace_root),
-            "--json",
+            *common,
         ],
     )
-    assert captured.exit_code == 0
+    assert captured.exit_code == 0, captured.stdout
+    captured_payload = json.loads(captured.stdout)
+    assert captured_payload["status"] == "captured"
+    assert captured_payload["commit_sha"] == commit_sha
+    assert captured_payload["agent_review_status"] == "pending"
 
     reviewed = runner.invoke(
         app,
@@ -1300,693 +202,115 @@ def test_checkpoint_review_note_cli_records_agent_authored_review(workspace_root
             "--commit-ref",
             "HEAD",
             "--summary",
-            "Agent reviewed checkpoint output and recorded deferred closeout notes.",
+            "Reviewed owner candidates; no capability execution was observed.",
             "--finding",
-            "what: checkpoint requires agent-authored review after hook capture",
-            "--candidate-note",
-            "where: aoa-sdk owns the review-note command",
-            "--stats-hint",
-            "stats: refresh only after reviewed closeout",
-            "--mechanic-hint",
-            "mechanic: hook records pending, agent records reviewed",
-            "--closeout-question",
-            "did the final session reread confirm this candidate?",
-            "--applied-skill",
-            "aoa-change-protocol",
-            "--root",
-            str(workspace_root),
-            "--json",
+            "The SDK must only materialize reviewed evidence.",
+            "--related-capability-ref",
+            "workflow.operations.checkpoint-closeout",
+            *common,
         ],
     )
+    assert reviewed.exit_code == 0, reviewed.stdout
+    reviewed_payload = json.loads(reviewed.stdout)
+    assert reviewed_payload["agent_review_status"] == "reviewed"
 
-    assert reviewed.exit_code == 0
-    payload = json.loads(reviewed.stdout)
-    assert payload["agent_review_status"] == "reviewed"
-    assert payload["agent_reviews"][-1]["summary"].startswith("Agent reviewed")
-    assert payload["agent_reviews"][-1]["findings"]
-    assert payload["agent_reviews"][-1]["stats_hints"]
-
-
-def test_checkpoint_review_note_cli_auto_fills_from_observation(workspace_root: Path) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-    _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
-        session_id="runtime-review-cli-auto",
-    )
-    _git_commit(repo_root, subject="stabilize checkpoint review followthrough")
-
-    captured = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "after-commit",
-            str(repo_root),
-            "--commit-ref",
-            "HEAD",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert captured.exit_code == 0
-    captured_payload = json.loads(captured.stdout)
-    assert "--auto" in captured_payload["agent_review_command"]
-
-    reviewed = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "review-note",
-            str(repo_root),
-            "--commit-ref",
-            "HEAD",
-            "--auto",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert reviewed.exit_code == 0
-    payload = json.loads(reviewed.stdout)
-    assert payload["agent_review_status"] == "reviewed"
-    assert payload["review_status"] == "reviewed"
-    assert payload["agent_reviews"][-1]["summary"].startswith(
-        "Agent reviewed the auto-captured commit checkpoint"
-    )
-    assert payload["agent_reviews"][-1]["findings"]
-
-
-def test_checkpoint_review_note_cli_auto_fills_stale_scope_by_runtime_session_id(
-    workspace_root: Path,
-) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-    session_file = _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-sessions" / "thread-cli-stale-review.json",
-        session_id="runtime-cli-stale-review",
-    )
-    _git_commit(repo_root, subject="review stale checkpoint scope from cli")
-
-    captured = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "after-commit",
-            str(repo_root),
-            "--commit-ref",
-            "HEAD",
-            "--session-file",
-            str(session_file),
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert captured.exit_code == 0
-    session_file.unlink()
-
-    reviewed = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "review-note",
-            str(repo_root),
-            "--commit-ref",
-            "HEAD",
-            "--runtime-session-id",
-            "runtime-cli-stale-review",
-            "--auto",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert reviewed.exit_code == 0
-    payload = json.loads(reviewed.stdout)
-    assert payload["runtime_session_id"] == "runtime-cli-stale-review"
-    assert payload["agent_review_status"] == "reviewed"
-    assert payload["review_status"] == "reviewed"
-
-
-def test_checkpoint_hook_status_and_install_detect_missing_current_and_stale(workspace_root: Path) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-
-    missing = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "hook-status",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "post-commit",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert missing.exit_code == 0
-    missing_payload = json.loads(missing.stdout)
-    assert missing_payload["results"][0]["status"] == "missing"
-
-    installed = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "install-hook",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "post-commit",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert installed.exit_code == 0
-    installed_payload = json.loads(installed.stdout)
-    hook_path = Path(installed_payload["results"][0]["hook_path"])
-    assert installed_payload["results"][0]["action"] == "installed"
-    assert hook_path.exists()
-
-    current = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "hook-status",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "post-commit",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert current.exit_code == 0
-    current_payload = json.loads(current.stdout)
-    assert current_payload["results"][0]["status"] == "current"
-
-    hook_path.chmod(0o644)
-
-    non_executable = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "hook-status",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "post-commit",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert non_executable.exit_code == 0
-    non_executable_payload = json.loads(non_executable.stdout)
-    assert non_executable_payload["results"][0]["status"] == "stale"
-
-    refreshed = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "install-hook",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "post-commit",
-            "--overwrite",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert refreshed.exit_code == 0
-    refreshed_payload = json.loads(refreshed.stdout)
-    assert refreshed_payload["results"][0]["action"] == "updated"
-    assert os.access(hook_path, os.X_OK)
-
-    hook_path.write_text(hook_path.read_text(encoding="utf-8") + "\n# stale\n", encoding="utf-8")
-
-    stale = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "hook-status",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "post-commit",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert stale.exit_code == 0
-    stale_payload = json.loads(stale.stdout)
-    assert stale_payload["results"][0]["status"] == "stale"
-
-
-def test_checkpoint_install_hook_all_managed_hooks(workspace_root: Path) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-
-    install = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "install-hook",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "all",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert install.exit_code == 0
-    payload = json.loads(install.stdout)
-    results_by_name = _hook_results_by_name(payload)
-    assert set(results_by_name) == {"post-commit", "pre-push", "pre-merge-commit"}
-    assert all(item["action"] == "installed" for item in results_by_name.values())
-    assert all(Path(item["hook_path"]).exists() for item in results_by_name.values())
-    assert all(os.access(Path(item["hook_path"]), os.X_OK) for item in results_by_name.values())
-
-
-def test_checkpoint_hook_status_prefers_8dionysus_source_templates(workspace_root: Path) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-    template_path = workspace_root / "8Dionysus" / "config" / "git_hooks" / "post-commit.sh"
-    template_path.parent.mkdir(parents=True, exist_ok=True)
-    template_path.write_text(
+    reviewed_artifact = repo_root / ".aoa" / "reviewed-cli-closeout.md"
+    reviewed_artifact.write_text(
         "\n".join(
             [
-                "#!/bin/sh",
-                "# aoa-sdk checkpoint post-commit hook v2",
-                "# GENERATED by 8Dionysus/scripts/manage_workspace_git_hooks.py; edit config/git_hooks/post-commit.sh first.",
-                'workspace_root="${AOA_CHECKPOINT_WORKSPACE_ROOT:-<workspace-root>}"',
-                "printf '%s\\n' \"$workspace_root\"",
+                "# Reviewed checkpoint",
                 "",
+                f"Session ref: `{reviewed_payload['session_ref']}`",
+                "",
+                "- owner candidates remain review-only",
             ]
-        ),
+        )
+        + "\n",
         encoding="utf-8",
     )
-
-    install = runner.invoke(
+    materialized = runner.invoke(
         app,
         [
             "checkpoint",
-            "install-hook",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "post-commit",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert install.exit_code == 0
-    installed_payload = json.loads(install.stdout)
-    installed_result = installed_payload["results"][0]
-    assert installed_result["template_path"].endswith("8Dionysus/config/git_hooks/post-commit.sh")
-    hook_path = Path(installed_result["hook_path"])
-    hook_text = hook_path.read_text(encoding="utf-8")
-    assert "GENERATED by 8Dionysus/scripts/manage_workspace_git_hooks.py" in hook_text
-    assert f'AOA_CHECKPOINT_WORKSPACE_ROOT:-{workspace_root}' in hook_text
-
-    current = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "hook-status",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "post-commit",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-
-    assert current.exit_code == 0
-    current_payload = json.loads(current.stdout)
-    assert current_payload["results"][0]["status"] == "current"
-    assert current_payload["results"][0]["template_path"].endswith(
-        "8Dionysus/config/git_hooks/post-commit.sh"
-    )
-
-
-def test_post_commit_hook_runs_after_real_git_commit(workspace_root: Path) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-    _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
-        session_id="runtime-hook",
-    )
-
-    install = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "install-hook",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "post-commit",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert install.exit_code == 0
-
-    shim_path = _write_aoa_shim(workspace_root / "aoa-bin")
-    commit = _git_commit(
-        repo_root,
-        subject="plan verify a bounded change",
-        extra_env={"AOA_CHECKPOINT_AOA_BIN": str(shim_path)},
-    )
-    combined_output = "\n".join(part for part in (commit.stdout, commit.stderr) if part)
-    note_dir = _checkpoint_note_dir(
-        workspace_root,
-        repo_label="aoa-sdk",
-        runtime_session_id="runtime-hook",
-    )
-    note_payload = json.loads((note_dir / "checkpoint-note.json").read_text(encoding="utf-8"))
-
-    assert "post_commit_checkpoint: captured" in combined_output
-    assert "agent_review=pending" in combined_output
-    assert (note_dir / "checkpoint-note.json").exists()
-    assert (note_dir / "post-commit-report.json").exists()
-    assert note_payload["checkpoint_history"][-1]["auto_observation"]["summary"].startswith(
-        "Auto-captured commit checkpoint observation"
-    )
-
-
-def test_pre_push_hook_blocks_until_pending_checkpoint_review_is_written(workspace_root: Path) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-    _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
-        session_id="runtime-pre-push",
-    )
-    remote_root = workspace_root / "push-remote.git"
-    subprocess.run(["git", "init", "--bare", str(remote_root)], check=True, capture_output=True, text=True)
-    _git_run(repo_root, "remote", "add", "origin", str(remote_root))
-
-    install = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "install-hook",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "all",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert install.exit_code == 0
-
-    shim_path = _write_aoa_shim(workspace_root / "aoa-bin")
-    env = {"AOA_CHECKPOINT_AOA_BIN": str(shim_path)}
-    commit = _git_commit(
-        repo_root,
-        subject="block push until checkpoint review is written",
-        extra_env=env,
-    )
-    blocked_push = _git_run(repo_root, "push", "-u", "origin", "HEAD", extra_env=env, check=False)
-    blocked_output = "\n".join(part for part in (commit.stdout, commit.stderr, blocked_push.stdout, blocked_push.stderr) if part)
-
-    assert blocked_push.returncode != 0
-    assert "checkpoint_git_boundary: blocked boundary=push" in blocked_output
-
-    reviewed = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "review-note",
+            "materialize-closeout-handoff",
             str(repo_root),
-            "--commit-ref",
-            "HEAD",
-            "--auto",
-            "--root",
-            str(workspace_root),
-            "--json",
+            "--reviewed-artifact",
+            str(reviewed_artifact),
+            *common,
         ],
     )
-    assert reviewed.exit_code == 0
-
-    allowed_push = _git_run(repo_root, "push", "-u", "origin", "HEAD", extra_env=env, check=False)
-    allowed_output = "\n".join(part for part in (allowed_push.stdout, allowed_push.stderr) if part)
-
-    assert allowed_push.returncode == 0
-    assert "checkpoint_git_boundary: clear boundary=push" in allowed_output
-
-
-def test_pre_push_hook_blocks_when_sibling_repo_has_pending_checkpoint_review(workspace_root: Path) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    sibling_repo_root = workspace_root / "aoa-playbooks"
-    _init_git_repo(repo_root)
-    _init_git_repo(sibling_repo_root)
-    session_file = _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
-        session_id="runtime-pre-push-sibling",
+    assert materialized.exit_code == 0, materialized.stdout
+    materialized_payload = json.loads(materialized.stdout)
+    assert materialized_payload["capability_execution_claimed"] is False
+    assert materialized_payload["materialization_mode"] == (
+        "reviewed_evidence_bundle"
     )
-    remote_root = workspace_root / "push-sibling-remote.git"
-    subprocess.run(["git", "init", "--bare", str(remote_root)], check=True, capture_output=True, text=True)
-    _git_run(repo_root, "remote", "add", "origin", str(remote_root))
-    _git_commit_file(
-        repo_root,
-        relative_path="base-before-install.txt",
-        content="base before hook install\n",
-        subject="base commit before hook install",
-    )
-    _git_run(repo_root, "push", "-u", "origin", "HEAD")
-    _git_commit_file(
-        repo_root,
-        relative_path="sdk-ahead-before-install.txt",
-        content="sdk ahead before hook install\n",
-        subject="sdk ahead before hook install",
+    assert all(
+        Path(ref).resolve().is_relative_to((repo_root / ".aoa").resolve())
+        for ref in [
+            *materialized_payload["produced_artifact_refs"],
+            *materialized_payload["produced_receipt_refs"],
+        ]
     )
 
-    install = runner.invoke(
+    lifecycle = runner.invoke(
         app,
         [
             "checkpoint",
-            "install-hook",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "all",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert install.exit_code == 0
-
-    _git_commit_file(
-        sibling_repo_root,
-        relative_path="playbook-pending-review.txt",
-        content="playbook pending checkpoint review\n",
-        subject="playbook commit with pending checkpoint review",
-    )
-    sibling_commit_sha = _git_run(sibling_repo_root, "rev-parse", "HEAD").stdout.strip()
-    captured = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "after-commit",
-            str(sibling_repo_root),
-            "--commit-ref",
-            "HEAD",
-            "--session-file",
-            str(session_file),
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert captured.exit_code == 0
-
-    shim_path = _write_aoa_shim(workspace_root / "aoa-bin-sibling")
-    env = {"AOA_CHECKPOINT_AOA_BIN": str(shim_path)}
-    blocked_push = _git_run(repo_root, "push", "-u", "origin", "HEAD", extra_env=env, check=False)
-    blocked_output = "\n".join(part for part in (blocked_push.stdout, blocked_push.stderr) if part)
-
-    assert blocked_push.returncode != 0
-    assert "checkpoint_git_boundary: blocked boundary=push" in blocked_output
-    assert "blocking=aoa-playbooks" in blocked_output
-
-    reviewed = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "review-note",
-            str(sibling_repo_root),
-            "--commit-ref",
-            sibling_commit_sha,
-            "--auto",
-            "--session-file",
-            str(session_file),
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert reviewed.exit_code == 0
-
-    allowed_push = _git_run(repo_root, "push", "-u", "origin", "HEAD", extra_env=env, check=False)
-    allowed_output = "\n".join(part for part in (allowed_push.stdout, allowed_push.stderr) if part)
-
-    assert allowed_push.returncode == 0
-    assert "checkpoint_git_boundary: clear boundary=push" in allowed_output
-
-
-def test_pre_merge_commit_hook_blocks_until_pending_checkpoint_review_is_written(workspace_root: Path) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "aoa-sdk"
-    _init_git_repo(repo_root)
-    base_branch = _git_run(repo_root, "branch", "--show-current").stdout.strip() or "master"
-    _git_commit(repo_root, subject="base commit before hook install")
-    _git_run(repo_root, "checkout", "-b", "feature")
-    _git_commit_file(
-        repo_root,
-        relative_path="feature-before-install.txt",
-        content="feature branch before hook install\n",
-        subject="feature commit before hook install",
-    )
-    _git_run(repo_root, "checkout", base_branch)
-    _git_commit_file(
-        repo_root,
-        relative_path="main-before-install.txt",
-        content="main branch before hook install\n",
-        subject="main divergence before hook install",
-    )
-
-    _write_runtime_session_file(
-        workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json",
-        session_id="runtime-pre-merge",
-    )
-    install = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "install-hook",
-            "--repo",
-            "aoa-sdk",
-            "--hook",
-            "all",
-            "--root",
-            str(workspace_root),
-            "--json",
-        ],
-    )
-    assert install.exit_code == 0
-
-    shim_path = _write_aoa_shim(workspace_root / "aoa-bin-merge")
-    env = {"AOA_CHECKPOINT_AOA_BIN": str(shim_path)}
-    _git_run(repo_root, "checkout", "feature")
-    _git_commit_file(
-        repo_root,
-        relative_path="feature-pending-review.txt",
-        content="feature branch pending review\n",
-        subject="feature commit with pending checkpoint review",
-        extra_env=env,
-    )
-    feature_commit_sha = _git_run(repo_root, "rev-parse", "HEAD").stdout.strip()
-    _git_run(repo_root, "checkout", base_branch)
-
-    blocked_merge = _git_run(repo_root, "merge", "--no-ff", "feature", extra_env=env, check=False)
-    blocked_output = "\n".join(part for part in (blocked_merge.stdout, blocked_merge.stderr) if part)
-
-    assert blocked_merge.returncode != 0
-    assert "checkpoint_git_boundary: blocked boundary=merge" in blocked_output
-
-    _git_run(repo_root, "merge", "--abort", check=False)
-
-    reviewed = runner.invoke(
-        app,
-        [
-            "checkpoint",
-            "review-note",
+            "lifecycle-audit",
             str(repo_root),
-            "--commit-ref",
-            feature_commit_sha,
-            "--auto",
-            "--root",
-            str(workspace_root),
-            "--json",
+            *common,
         ],
     )
-    assert reviewed.exit_code == 0
+    assert lifecycle.exit_code == 0, lifecycle.stdout
+    lifecycle_payload = json.loads(lifecycle.stdout)
+    entry = next(
+        item
+        for item in lifecycle_payload["entries"]
+        if item["runtime_session_id"] == "runtime-cli-closeout"
+    )
+    assert entry["lifecycle_state"] == "closeout_materialized"
 
-    allowed_merge = _git_run(repo_root, "merge", "--no-ff", "feature", extra_env=env, check=False)
-    allowed_output = "\n".join(part for part in (allowed_merge.stdout, allowed_merge.stderr) if part)
-
-    assert allowed_merge.returncode == 0
-    assert "checkpoint_git_boundary: clear boundary=merge" in allowed_output
-
-
-def test_install_hook_allows_explicit_8dionysus(workspace_root: Path) -> None:
-    runner = CliRunner()
-    repo_root = workspace_root / "8Dionysus"
-    _init_git_repo(repo_root)
-
-    install = runner.invoke(
+    preview = runner.invoke(
         app,
         [
             "checkpoint",
-            "install-hook",
-            "--repo",
-            "8Dionysus",
-            "--hook",
-            "post-commit",
-            "--root",
-            str(workspace_root),
-            "--json",
+            "close-archive",
+            str(repo_root),
+            "--runtime-session-id",
+            "runtime-cli-closeout",
+            *common,
         ],
     )
+    assert preview.exit_code == 0, preview.stdout
+    assert json.loads(preview.stdout)["dry_run"] is True
 
-    assert install.exit_code == 0
-    payload = json.loads(install.stdout)
-    assert payload["results"][0]["repo"] == "8Dionysus"
-    assert payload["results"][0]["action"] == "installed"
-    hook_path = Path(payload["results"][0]["hook_path"])
-    assert hook_path.exists()
-    assert os.access(hook_path, os.X_OK)
-
-
-def test_install_hook_all_owner_still_excludes_8dionysus(workspace_root: Path) -> None:
-    workspace = AoASDK.from_workspace(str(workspace_root)).workspace
-
-    repo_names = _resolve_checkpoint_hook_repos(
-        workspace=workspace,
-        repo=None,
-        all_owner=True,
-        allow_readonly=True,
+    applied = runner.invoke(
+        app,
+        [
+            "checkpoint",
+            "close-archive",
+            str(repo_root),
+            "--runtime-session-id",
+            "runtime-cli-closeout",
+            "--apply",
+            *common,
+        ],
     )
+    assert applied.exit_code == 0, applied.stdout
+    applied_payload = json.loads(applied.stdout)
+    assert applied_payload["archived_count"] == 1
+    archived_note = json.loads(
+        (Path(applied_payload["archive_refs"][0]) / "checkpoint-note.json").read_text(
+            encoding="utf-8"
+        )
+    )
+    assert archived_note["state"] == "closed"
 
-    assert "aoa-sdk" in repo_names
-    assert "8Dionysus" not in repo_names
+
+def test_checkpoint_cli_exposes_materialization_not_execution() -> None:
+    result = CliRunner().invoke(app, ["checkpoint", "--help"])
+
+    assert result.exit_code == 0
+    assert "materialize-closeout-handoff" in result.stdout
+    assert "execute-closeout-chain" not in result.stdout

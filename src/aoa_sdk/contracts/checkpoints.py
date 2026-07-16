@@ -3,9 +3,7 @@ from __future__ import annotations
 from datetime import datetime
 from typing import Any, Literal
 
-from pydantic import BaseModel, Field, model_validator
-
-from .closeout import OwnerFollowThroughBrief, WorkflowFollowThroughBrief
+from pydantic import AliasChoices, BaseModel, Field
 
 
 class CheckpointLineageHint(BaseModel):
@@ -32,7 +30,7 @@ class CloseoutOwnerFollowthroughHint(BaseModel):
     owner_shape: str
     nearest_wrong_target: str | None = None
     status_posture: Literal["early", "reanchor", "thin-evidence", "stable"]
-    recommended_owner_status_surface: str
+    owner_ref: str
     requested_next_decision_class: Literal[
         "land_direct",
         "stage_seed",
@@ -43,62 +41,6 @@ class CloseoutOwnerFollowthroughHint(BaseModel):
         "drop",
     ]
     evidence_refs: list[str] = Field(default_factory=list)
-
-
-class CloseoutFollowthroughDecision(BaseModel):
-    schema_version: Literal["aoa_sdk_closeout_followthrough_decision_v1"] = (
-        "aoa_sdk_closeout_followthrough_decision_v1"
-    )
-    session_ref: str
-    reviewed_closeout_context_ref: str
-    cluster_ref: str
-    candidate_ref: str | None = None
-    recommended_next_skill: Literal[
-        "aoa-session-route-forks",
-        "aoa-session-self-diagnose",
-        "aoa-session-self-repair",
-        "aoa-session-progression-lift",
-        "aoa-automation-opportunity-scan",
-        "aoa-quest-harvest",
-    ]
-    also_considered: list[
-        Literal[
-            "aoa-session-route-forks",
-            "aoa-session-self-diagnose",
-            "aoa-session-self-repair",
-            "aoa-session-progression-lift",
-            "aoa-automation-opportunity-scan",
-            "aoa-quest-harvest",
-        ]
-    ] = Field(default_factory=list)
-    reason_codes: list[
-        Literal[
-            "multiple_plausible_next_moves",
-            "repeated_friction",
-            "blocked_automation_readiness",
-            "reviewed_diagnosis_present",
-            "smallest_repair_clear",
-            "explicit_axis_movement",
-            "no_repair_needed",
-            "repeated_manual_route",
-            "stable_output_shape",
-            "checkpoint_sensitive",
-            "reviewed_quest_unit",
-            "promotion_pressure",
-        ]
-    ] = Field(default_factory=list)
-    checkpoint_required: bool
-    approval_posture: Literal["not_required", "review_required", "approval_required"]
-    defer_allowed: bool
-    owner_hypothesis: str
-    nearest_wrong_target: str | None = None
-    status_posture: Literal["early", "reanchor", "thin-evidence", "stable"]
-
-    @model_validator(mode="after")
-    def _validate_also_considered(self) -> "CloseoutFollowthroughDecision":
-        if self.recommended_next_skill in self.also_considered:
-            raise ValueError("also_considered must not repeat recommended_next_skill")
-        return self
 
 
 class CheckpointSessionMemoryRouteSignalSummary(BaseModel):
@@ -157,16 +99,39 @@ class CheckpointSessionMemoryFreshness(BaseModel):
     cautions: list[str] = Field(default_factory=list)
 
 
+class CheckpointRuntimeSessionRef(BaseModel):
+    """Read-only identity and trace coordinates supplied by the host runtime."""
+
+    schema_version: Literal["aoa_checkpoint_runtime_session_ref_v1"] = (
+        "aoa_checkpoint_runtime_session_ref_v1"
+    )
+    source: Literal[
+        "host-environment",
+        "explicit-metadata",
+        "legacy-skill-session",
+    ]
+    session_id: str
+    created_at: datetime | None = None
+    codex_thread_id: str | None = None
+    codex_rollout_path: str | None = None
+    codex_thread_title: str | None = None
+    codex_first_user_message: str | None = None
+    codex_thread_updated_at: datetime | None = None
+    metadata_file_ref: str | None = None
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
 class CheckpointRuntimeTraceRef(BaseModel):
     schema_version: Literal["aoa_checkpoint_runtime_trace_ref_v1"] = (
         "aoa_checkpoint_runtime_trace_ref_v1"
     )
     source: Literal[
-        "aoa-sdk-skill-runtime-session",
+        "host-runtime-metadata",
+        "legacy-skill-session",
         "checkpoint-post-commit-report",
-    ] = "aoa-sdk-skill-runtime-session"
+    ] = "host-runtime-metadata"
     runtime_session_id: str
-    runtime_session_file_ref: str
+    runtime_session_file_ref: str | None = None
     codex_thread_id: str | None = None
     codex_rollout_path: str | None = None
     evidence_refs: list[str] = Field(default_factory=list)
@@ -593,9 +558,12 @@ class CarrierIntelligenceReport(BaseModel):
 
 
 class SessionCheckpointAutoObservation(BaseModel):
-    schema_version: int = 1
-    observation_type: Literal["auto_post_commit_checkpoint_observation_v1"] = (
-        "auto_post_commit_checkpoint_observation_v1"
+    schema_version: Literal[1, 2] = 2
+    observation_type: Literal[
+        "auto_post_commit_checkpoint_observation_v1",
+        "auto_post_commit_checkpoint_observation_v2",
+    ] = (
+        "auto_post_commit_checkpoint_observation_v2"
     )
     observation_id: str
     observed_at: datetime
@@ -608,7 +576,7 @@ class SessionCheckpointAutoObservation(BaseModel):
     commit_short_sha: str | None = None
     commit_subject: str | None = None
     summary: str
-    applied_skill_names: list[str] = Field(default_factory=list)
+    related_capability_refs: list[str] = Field(default_factory=list)
     findings: list[str] = Field(default_factory=list)
     candidate_notes: list[str] = Field(default_factory=list)
     stats_hints: list[str] = Field(default_factory=list)
@@ -619,9 +587,12 @@ class SessionCheckpointAutoObservation(BaseModel):
 
 
 class SessionCheckpointAgentReview(BaseModel):
-    schema_version: int = 1
-    review_type: Literal["agent_post_commit_checkpoint_review_v1"] = (
-        "agent_post_commit_checkpoint_review_v1"
+    schema_version: Literal[1, 2] = 2
+    review_type: Literal[
+        "agent_post_commit_checkpoint_review_v1",
+        "agent_post_commit_checkpoint_review_v2",
+    ] = (
+        "agent_post_commit_checkpoint_review_v2"
     )
     review_id: str
     auto_observation_ref: str | None = None
@@ -635,7 +606,7 @@ class SessionCheckpointAgentReview(BaseModel):
     commit_short_sha: str | None = None
     commit_subject: str | None = None
     summary: str
-    applied_skill_names: list[str] = Field(default_factory=list)
+    related_capability_refs: list[str] = Field(default_factory=list)
     findings: list[str] = Field(default_factory=list)
     candidate_notes: list[str] = Field(default_factory=list)
     stats_hints: list[str] = Field(default_factory=list)
@@ -662,7 +633,7 @@ class SessionCheckpointLifecycleEvent(BaseModel):
     runtime_session_id: str | None = None
     lifecycle_state: Literal["closed", "archived_without_closeout"] = "closed"
     closeout_context_ref: str | None = None
-    closeout_execution_report_ref: str | None = None
+    closeout_materialization_report_ref: str | None = None
     session_memory_archive_ref: str | None = None
     archive_reason: str
     evidence_refs: list[str] = Field(default_factory=list)
@@ -734,8 +705,11 @@ class ProgressionAxisSignal(BaseModel):
 
 
 class SessionCheckpointNote(BaseModel):
-    schema_version: int = 1
-    contract_type: Literal["session_checkpoint_note_v1"] = "session_checkpoint_note_v1"
+    schema_version: Literal[1, 2] = 2
+    contract_type: Literal[
+        "session_checkpoint_note_v1",
+        "session_checkpoint_note_v2",
+    ] = "session_checkpoint_note_v2"
     session_ref: str
     runtime_session_id: str | None = None
     runtime_session_created_at: datetime | None = None
@@ -769,7 +743,7 @@ class SessionCheckpointNote(BaseModel):
     agent_review_pending_refs: list[str] = Field(default_factory=list)
     review_refs: list[str] = Field(default_factory=list)
     auto_observation_refs: list[str] = Field(default_factory=list)
-    applied_skill_names: list[str] = Field(default_factory=list)
+    related_capability_refs: list[str] = Field(default_factory=list)
     summaries: list[str] = Field(default_factory=list)
     findings: list[str] = Field(default_factory=list)
     candidate_notes: list[str] = Field(default_factory=list)
@@ -797,7 +771,7 @@ class SessionCheckpointPromotion(BaseModel):
 
 
 class CheckpointCaptureResult(BaseModel):
-    schema_version: int = 1
+    schema_version: Literal[1, 2] = 2
     mode: Literal["auto", "explicit"]
     attempted: bool = True
     appended: bool = False
@@ -815,7 +789,9 @@ class CheckpointCaptureResult(BaseModel):
     captured_tz: str | None = None
     reason: Literal["explicit_request", "checkpoint_signal", "no_checkpoint_signal", "auto_disabled"]
     note_ref: str | None = None
-    session_end_skill_targets: list["SessionEndSkillTarget"] = Field(default_factory=list)
+    session_end_capability_candidates: list["SessionEndCapabilityTarget"] = Field(
+        default_factory=list
+    )
     session_end_next_honest_move: str | None = None
     harvest_candidate_ids: list[str] = Field(default_factory=list)
     progression_candidate_ids: list[str] = Field(default_factory=list)
@@ -851,10 +827,12 @@ class CheckpointAfterCommitReport(BaseModel):
     captured_at: datetime
     captured_at_local: str | None = None
     captured_tz: str | None = None
-    session_file: str | None = None
+    runtime_session_file_ref: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("runtime_session_file_ref", "session_file"),
+    )
     runtime_session_id: str | None = None
     runtime_session_created_at: datetime | None = None
-    skill_report_path: str | None = None
     surface_report_path: str | None = None
     note_ref: str | None = None
     agent_review_required: bool = False
@@ -913,7 +891,7 @@ class CheckpointLifecycleEntry(BaseModel):
     note_ref: str | None = None
     post_commit_report_ref: str | None = None
     closeout_context_ref: str | None = None
-    closeout_execution_report_ref: str | None = None
+    closeout_materialization_report_ref: str | None = None
     runtime_trace_ref: str | None = None
     runtime_trace_thread_id: str | None = None
     runtime_trace_status: Literal["resolved", "recoverable", "missing", "not_checked"] | None = None
@@ -933,7 +911,7 @@ class CheckpointLifecycleEntry(BaseModel):
         "session_closed_collecting_no_closeout",
         "reviewed_awaiting_closeout",
         "closeout_built",
-        "closeout_executed",
+        "closeout_materialized",
         "closed",
         "stale_current_scope",
     ]
@@ -958,13 +936,16 @@ class CheckpointLifecycleAuditReport(BaseModel):
     checked_tz: str | None = None
     repo_root: str | None = None
     repo_label: str | None = None
-    session_file: str | None = None
+    runtime_session_file_ref: str | None = Field(
+        default=None,
+        validation_alias=AliasChoices("runtime_session_file_ref", "session_file"),
+    )
     active_runtime_session_id: str | None = None
     current_scope_count: int = 0
     note_count: int = 0
     archive_scope_count: int = 0
     closeout_context_count: int = 0
-    closeout_execution_count: int = 0
+    closeout_materialization_count: int = 0
     session_memory_ref_count: int = 0
     session_closed_without_closeout_count: int = 0
     pending_review_count: int = 0
@@ -1072,12 +1053,12 @@ class CheckpointBacklogAuditReport(BaseModel):
     notes: list[str] = Field(default_factory=list)
 
 
-class SessionEndSkillTarget(BaseModel):
-    skill_name: Literal[
-        "aoa-session-donor-harvest",
-        "aoa-session-progression-lift",
-        "aoa-quest-harvest",
-    ]
+class SessionEndCapabilityTarget(BaseModel):
+    target_ref: str
+    target_kind: Literal["workflow", "adapter", "skill"]
+    owner_repo: str
+    lifecycle_posture: Literal["active", "candidate"]
+    use_posture: Literal["review-required", "candidate-only"]
     phase: Literal["reviewed-closeout"] = "reviewed-closeout"
     why: str
     candidate_ids: list[str] = Field(default_factory=list)
@@ -1092,7 +1073,7 @@ class CloseoutContextCandidateMap(BaseModel):
 class CheckpointCloseoutReviewCarry(BaseModel):
     review_refs: list[str] = Field(default_factory=list)
     auto_observation_refs: list[str] = Field(default_factory=list)
-    applied_skill_names: list[str] = Field(default_factory=list)
+    related_capability_refs: list[str] = Field(default_factory=list)
     summaries: list[str] = Field(default_factory=list)
     findings: list[str] = Field(default_factory=list)
     candidate_notes: list[str] = Field(default_factory=list)
@@ -1104,16 +1085,18 @@ class CheckpointCloseoutReviewCarry(BaseModel):
 
 
 class CheckpointCloseoutContext(BaseModel):
-    schema_version: int = 1
-    context_type: Literal["checkpoint_closeout_context_v1"] = "checkpoint_closeout_context_v1"
-    execution_mode: Literal["mechanical_bridge_context"] = "mechanical_bridge_context"
-    mechanical_bridge_only: bool = True
-    agent_skill_application_required: bool = True
-    authority_contract: Literal["reviewed_artifact_primary_checkpoint_hints_provisional"] = (
-        "reviewed_artifact_primary_checkpoint_hints_provisional"
+    schema_version: Literal[1, 2] = 2
+    context_type: Literal[
+        "checkpoint_closeout_context_v1",
+        "checkpoint_closeout_context_v2",
+    ] = "checkpoint_closeout_context_v2"
+    materialization_mode: Literal["reviewed_evidence_bundle"] = "reviewed_evidence_bundle"
+    capability_execution_claimed: Literal[False] = False
+    authority_contract: Literal["reviewed_evidence_primary_candidates_are_routing_only"] = (
+        "reviewed_evidence_primary_candidates_are_routing_only"
     )
-    orchestrator_skill_name: Literal["aoa-checkpoint-closeout-bridge"] = (
-        "aoa-checkpoint-closeout-bridge"
+    related_workflow_ref: Literal["workflow.operations.checkpoint-closeout"] = (
+        "workflow.operations.checkpoint-closeout"
     )
     session_ref: str
     built_at: datetime
@@ -1137,46 +1120,65 @@ class CheckpointCloseoutContext(BaseModel):
     checkpoint_review_carry: CheckpointCloseoutReviewCarry = Field(default_factory=CheckpointCloseoutReviewCarry)
     candidate_lineage_map: list[CheckpointLineageHint] = Field(default_factory=list)
     owner_followthrough_map: list[CloseoutOwnerFollowthroughHint] = Field(default_factory=list)
-    followthrough_decision: CloseoutFollowthroughDecision | None = None
     progression_axis_signals: list[ProgressionAxisSignal] = Field(default_factory=list)
-    ordered_skill_plan: list[SessionEndSkillTarget] = Field(default_factory=list)
+    capability_candidates: list[SessionEndCapabilityTarget] = Field(default_factory=list)
     notes: list[str] = Field(default_factory=list)
 
 
-class CloseoutExecutionStep(BaseModel):
-    skill_name: Literal[
-        "aoa-session-donor-harvest",
-        "aoa-session-progression-lift",
-        "aoa-quest-harvest",
-    ]
-    execution_mode: Literal["mechanical_artifact_builder"] = "mechanical_artifact_builder"
-    agent_skill_application_required: bool = True
-    status: Literal["executed", "skipped"]
+class CheckpointCloseoutMaterializationStage(BaseModel):
+    stage_id: Literal["reviewed-evidence-bundle", "owner-candidate-handoff"]
+    implementation_owner: Literal["aoa-sdk"] = "aoa-sdk"
+    status: Literal["materialized", "skipped"]
     reason: str
     artifact_refs: list[str] = Field(default_factory=list)
     receipt_refs: list[str] = Field(default_factory=list)
 
 
-class CheckpointCloseoutExecutionReport(BaseModel):
-    schema_version: int = 1
-    report_type: Literal["checkpoint_closeout_execution_report_v1"] = (
-        "checkpoint_closeout_execution_report_v1"
-    )
-    execution_mode: Literal["mechanical_bridge_artifact_build"] = (
-        "mechanical_bridge_artifact_build"
-    )
-    mechanical_bridge_only: bool = True
-    agent_skill_application_required: bool = True
-    authority_contract: Literal["reviewed_artifact_primary_checkpoint_hints_provisional"] = (
-        "reviewed_artifact_primary_checkpoint_hints_provisional"
-    )
-    orchestrator_skill_name: Literal["aoa-checkpoint-closeout-bridge"] = (
-        "aoa-checkpoint-closeout-bridge"
+class CheckpointOwnerHandoffItem(BaseModel):
+    candidate_ref: str
+    owner_repo: str
+    owner_ref: str
+    proposed_surface: str
+    decision_posture: Literal["review-required", "prove-first", "reanchor-owner"]
+    abstraction_shape: str | None = None
+    nearest_wrong_target: str | None = None
+    why: str
+    evidence_refs: list[str] = Field(default_factory=list)
+
+
+class CheckpointOwnerHandoff(BaseModel):
+    schema_version: Literal[2] = 2
+    handoff_type: Literal["checkpoint_owner_candidate_handoff_v2"] = (
+        "checkpoint_owner_candidate_handoff_v2"
     )
     session_ref: str
-    executed_at: datetime
-    executed_at_local: str | None = None
-    executed_tz: str | None = None
+    context_ref: str
+    generated_at: datetime
+    reviewed: bool = True
+    items: list[CheckpointOwnerHandoffItem] = Field(default_factory=list)
+    stop_line: str = (
+        "Handoff items remain owner-review candidates; materialization does not create, "
+        "promote, or execute owner artifacts."
+    )
+
+
+class CheckpointCloseoutMaterializationReport(BaseModel):
+    schema_version: Literal[2] = 2
+    report_type: Literal["checkpoint_closeout_materialization_report_v2"] = (
+        "checkpoint_closeout_materialization_report_v2"
+    )
+    materialization_mode: Literal["reviewed_evidence_bundle"] = "reviewed_evidence_bundle"
+    capability_execution_claimed: Literal[False] = False
+    authority_contract: Literal["reviewed_evidence_primary_candidates_are_routing_only"] = (
+        "reviewed_evidence_primary_candidates_are_routing_only"
+    )
+    related_workflow_ref: Literal["workflow.operations.checkpoint-closeout"] = (
+        "workflow.operations.checkpoint-closeout"
+    )
+    session_ref: str
+    materialized_at: datetime
+    materialized_at_local: str | None = None
+    materialized_tz: str | None = None
     reviewed_artifact_ref: str
     runtime_session_id: str | None = None
     session_trace_ref: str | None = None
@@ -1190,10 +1192,8 @@ class CheckpointCloseoutExecutionReport(BaseModel):
     surface_handoff_ref: str | None = None
     context_ref: str
     owner_handoff_path: str | None = None
-    owner_follow_through_briefs: list["OwnerFollowThroughBrief"] = Field(default_factory=list)
-    workflow_follow_through_briefs: list["WorkflowFollowThroughBrief"] = Field(default_factory=list)
-    executed_skills: list[CloseoutExecutionStep] = Field(default_factory=list)
-    skipped_skills: list[CloseoutExecutionStep] = Field(default_factory=list)
+    owner_handoff: CheckpointOwnerHandoff | None = None
+    stages: list[CheckpointCloseoutMaterializationStage] = Field(default_factory=list)
     produced_artifact_refs: list[str] = Field(default_factory=list)
     produced_receipt_refs: list[str] = Field(default_factory=list)
     final_stop_reason: str

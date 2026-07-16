@@ -215,7 +215,7 @@ def _graph_ready(
             ("lifecycle_event", entry.lifecycle_state),
             ("next_route", entry.next_route),
             ("closeout_artifact", entry.closeout_context_ref),
-            ("closeout_artifact", entry.closeout_execution_report_ref),
+            ("closeout_artifact", entry.closeout_materialization_report_ref),
         ):
             if not value:
                 continue

@@ -8,12 +8,12 @@ owner acceptance.
 ## Current Contour
 
 - Keep session-growth capture, dirty-gate hook posture, review-note gates,
-  reviewed session handoff runner behavior, child-task re-entry, and reviewed
+  reviewed evidence materialization, child-task re-entry, and reviewed
   closeout context carry routed through active `parts/`.
 - Keep checkpoint notes session-local until a reviewed promotion route accepts
   them.
-- Keep reviewed handoff runner output operator-visible and evidence-linked, not
-  an automatic closeout result.
+- Keep reviewed materialization output operator-visible and evidence-linked,
+  with `capability_execution_claimed=false`.
 - Keep reviewed closeout carry fields advisory and owner-routed.
 - Keep `current/` lifecycle-visible: active runtime scopes stay current,
   pending-review scopes remain blocked, reviewed closeout execution can be
@@ -65,7 +65,7 @@ owner acceptance.
 ## When Time Comes
 
 - Add a new checkpoint part when a repeated checkpoint route cannot fit capture,
-  handoff runner, re-entry, or reviewed carry.
+  evidence materialization, re-entry, or reviewed carry.
 - Promote checkpoint output toward durable memory only through the memory owner
   and reviewed intake route.
 - Add stronger closeout helpers only after checkpoint, questbook, release

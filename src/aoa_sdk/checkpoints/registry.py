@@ -10,7 +10,7 @@ from ..loaders import write_json
 from ..models import (
     CheckpointAfterCommitReport,
     CheckpointCloseoutContext,
-    CheckpointCloseoutExecutionReport,
+    CheckpointCloseoutMaterializationReport,
     CheckpointCaptureResult,
     CheckpointGitBoundaryCheck,
     CheckpointHookInstallResult,
@@ -22,7 +22,7 @@ from ..models import (
     CarrierIntelligenceReport,
     CandidateIntelligenceReport,
     CloseoutContextCandidateMap,
-    CloseoutExecutionStep,
+    CheckpointCloseoutMaterializationStage,
     SessionCheckpointAutoObservation,
     SessionCheckpointAgentReview,
     SessionCheckpointHistoryEntry,
@@ -30,7 +30,6 @@ from ..models import (
     SessionCheckpointPromotion,
     SurfaceDetectionReport,
 )
-from ..skills.discovery import SkillsAPI
 from ..surfaces import SurfacesAPI
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
@@ -38,7 +37,7 @@ from .closeout.context import (
     _closeout_candidate_clusters,
     _collect_candidate_lineage_hints,
     _collect_receipt_paths,
-    _derive_closeout_skill_plan,
+    _derive_closeout_capability_candidates,
     _load_context_checkpoint_notes,
     _load_context_surface_handoff,
     _load_receipt_payloads,
@@ -52,13 +51,8 @@ from .closeout.evidence import (
     _read_reviewed_artifact,
     _read_session_trace,
 )
-from .closeout.execution import (
-    _build_donor_harvest_outputs,
-    _build_progression_lift_outputs,
-    _build_quest_harvest_outputs,
-)
+from .closeout.execution import _materialize_reviewed_evidence_bundle
 from .closeout.followthrough import (
-    _build_closeout_followthrough_decision,
     _build_owner_followthrough_map,
 )
 from .closeout.owner_handoff import (
@@ -94,7 +88,7 @@ from .ledger.notes import (
     build_checkpoint_note as _build_checkpoint_note,
     default_session_ref as _default_session_ref,
     derive_session_end_next_honest_move as _derive_session_end_next_honest_move,
-    derive_session_end_skill_targets as _derive_session_end_skill_targets,
+    derive_session_end_capability_candidates as _derive_session_end_capability_candidates,
     load_checkpoint_note as _load_checkpoint_note,
     load_runtime_checkpoint_note as _load_runtime_checkpoint_note,
     load_runtime_checkpoint_notes_for_closeout as _load_runtime_checkpoint_notes_for_closeout,
@@ -139,12 +133,12 @@ from .review.skipped_recovery import (
     unresolved_skipped_post_commit_status_for_boundary as _unresolved_skipped_post_commit_status_for_boundary,
 )
 from .runtime.sessions import (
-    ensure_checkpoint_runtime_session,
     load_checkpoint_runtime_session,
     peek_checkpoint_runtime_session,
     probe_active_runtime_session_for_after_commit,
     probe_checkpoint_runtime_session,
     probe_existing_checkpoint_runtime_session,
+    resolve_checkpoint_runtime_session_identity,
 )
 from .session_memory import (
     resolve_checkpoint_session_memory as _resolve_checkpoint_session_memory,
@@ -193,8 +187,7 @@ class CheckpointsAPI:
         ],
         intent_text: str = "",
         mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
-        session_file: str | None = None,
-        skill_report_path: str | None = None,
+        runtime_session_file: str | None = None,
         surface_report: SurfaceDetectionReport | None = None,
         surface_report_path: str | None = None,
         manual_review_requested: bool = False,
@@ -207,10 +200,15 @@ class CheckpointsAPI:
         observed_at_local: str | None = None,
         observed_tz: str | None = None,
     ) -> SessionCheckpointNote:
-        runtime_session_id, runtime_session_created_at = ensure_checkpoint_runtime_session(
+        runtime_session_id, runtime_session_created_at = resolve_checkpoint_runtime_session_identity(
             workspace=self.workspace,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
         )
+        if runtime_session_id is None:
+            raise SurfaceNotFound(
+                "checkpoint append requires a host-provided runtime session identity "
+                "(CODEX_THREAD_ID, AOA_SESSION_ID, or explicit metadata file)"
+            )
         paths = _resolve_runtime_checkpoint_paths(
             self.workspace,
             repo_root=repo_root,
@@ -231,8 +229,6 @@ class CheckpointsAPI:
             phase="checkpoint",
             intent_text=intent_text,
             mutation_surface=mutation_surface,
-            session_file=session_file,
-            skill_report_path=skill_report_path,
             checkpoint_kind=checkpoint_kind,
         )
         if report.phase != "checkpoint":
@@ -299,17 +295,16 @@ class CheckpointsAPI:
         paths.jsonl.parent.mkdir(parents=True, exist_ok=True)
         with paths.jsonl.open("a", encoding="utf-8") as handle:
             handle.write(json.dumps(payload, ensure_ascii=True) + "\n")
-        return self.status(repo_root=repo_root, session_file=session_file)
+        return self.status(repo_root=repo_root, runtime_session_file=runtime_session_file)
 
-    def capture_from_skill_phase(
+    def capture_from_phase(
         self,
         *,
         repo_root: str,
         phase: Literal["ingress", "pre-mutation"],
         intent_text: str = "",
         mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
-        session_file: str | None = None,
-        skill_report_path: str | None = None,
+        runtime_session_file: str | None = None,
         checkpoint_kind: Literal[
             "manual",
             "commit",
@@ -329,11 +324,10 @@ class CheckpointsAPI:
                 checkpoint_kind=checkpoint_kind,
                 intent_text=intent_text,
                 mutation_surface=mutation_surface,
-                session_file=session_file,
-                skill_report_path=skill_report_path,
+                runtime_session_file=runtime_session_file,
                 manual_review_requested=manual_review_requested,
             )
-            session_end_targets = _derive_session_end_skill_targets(note)
+            session_end_targets = _derive_session_end_capability_candidates(note)
             return CheckpointCaptureResult(
                 mode="explicit",
                 attempted=True,
@@ -348,7 +342,7 @@ class CheckpointsAPI:
                     repo_root,
                     runtime_session_id=note.runtime_session_id,
                 ),
-                session_end_skill_targets=session_end_targets,
+                session_end_capability_candidates=session_end_targets,
                 session_end_next_honest_move=_derive_session_end_next_honest_move(
                     note=note,
                     session_end_targets=session_end_targets,
@@ -365,7 +359,7 @@ class CheckpointsAPI:
             return _checkpoint_capture_result_without_append(
                 self,
                 repo_root=repo_root,
-                session_file=session_file,
+                runtime_session_file=runtime_session_file,
                 reason="auto_disabled",
                 attempted=False,
                 checkpoint_kind=None,
@@ -376,7 +370,7 @@ class CheckpointsAPI:
             return _checkpoint_capture_result_without_append(
                 self,
                 repo_root=repo_root,
-                session_file=session_file,
+                runtime_session_file=runtime_session_file,
                 reason="no_checkpoint_signal",
                 attempted=True,
                 checkpoint_kind=None,
@@ -389,15 +383,13 @@ class CheckpointsAPI:
             phase="checkpoint",
             intent_text=intent_text,
             mutation_surface=mutation_surface,
-            session_file=session_file,
-            skill_report_path=skill_report_path,
             checkpoint_kind=inferred_kind,
         )
         if not report.checkpoint_should_capture:
             return _checkpoint_capture_result_without_append(
                 self,
                 repo_root=repo_root,
-                session_file=session_file,
+                runtime_session_file=runtime_session_file,
                 reason="no_checkpoint_signal",
                 attempted=True,
                 checkpoint_kind=inferred_kind,
@@ -409,12 +401,11 @@ class CheckpointsAPI:
             checkpoint_kind=inferred_kind,
             intent_text=intent_text,
             mutation_surface=mutation_surface,
-            session_file=session_file,
-            skill_report_path=skill_report_path,
+            runtime_session_file=runtime_session_file,
             surface_report=report,
             manual_review_requested=manual_review_requested,
         )
-        session_end_targets = _derive_session_end_skill_targets(note)
+        session_end_targets = _derive_session_end_capability_candidates(note)
         captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
         return CheckpointCaptureResult(
             mode="auto",
@@ -430,7 +421,7 @@ class CheckpointsAPI:
                 repo_root,
                 runtime_session_id=note.runtime_session_id,
             ),
-            session_end_skill_targets=session_end_targets,
+            session_end_capability_candidates=session_end_targets,
             session_end_next_honest_move=_derive_session_end_next_honest_move(
                 note=note,
                 session_end_targets=session_end_targets,
@@ -448,7 +439,7 @@ class CheckpointsAPI:
         *,
         repo_root: str,
         commit_ref: str = "HEAD",
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
         checkpoint_kind: Literal["auto", "commit", "owner_followthrough"] = "auto",
     ) -> CheckpointAfterCommitReport:
         if checkpoint_kind not in POST_COMMIT_CHECKPOINT_KINDS:
@@ -460,7 +451,6 @@ class CheckpointsAPI:
         session_path: Path | None = None
         runtime_session_id: str | None = None
         runtime_session_created_at: datetime | None = None
-        skill_report_path: str | None = None
         surface_report_path: str | None = None
         note_ref: str | None = None
         commit_metadata: dict[str, Any] = {
@@ -476,7 +466,7 @@ class CheckpointsAPI:
             session_path, runtime_session, session_probe_error = (
                 probe_active_runtime_session_for_after_commit(
                     self.workspace,
-                    session_file,
+                    runtime_session_file,
                 )
             )
             captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
@@ -507,13 +497,19 @@ class CheckpointsAPI:
                     captured_at=captured_at,
                     captured_at_local=captured_at_local,
                     captured_tz=captured_tz,
-                    session_file=str(session_path),
+                    runtime_session_file_ref=(
+                        str(session_path) if session_path is not None else None
+                    ),
                 )
                 _write_after_commit_report(report_path, report)
                 return report
 
             runtime_session_id = runtime_session.session_id
-            runtime_session_created_at = runtime_session.created_at.astimezone(UTC)
+            runtime_session_created_at = (
+                runtime_session.created_at.astimezone(UTC)
+                if runtime_session.created_at is not None
+                else None
+            )
             paths = _resolve_runtime_checkpoint_paths(
                 self.workspace,
                 repo_root=repo_root,
@@ -521,7 +517,7 @@ class CheckpointsAPI:
                 migrate_legacy=True,
             )
             report_path = paths.post_commit_report
-            session_file_ref = str(session_path)
+            runtime_session_file_ref = str(session_path) if session_path is not None else None
             existing_note = _load_checkpoint_note(paths.note_json) if paths.note_json.exists() else None
             resolved_checkpoint_kind = _resolve_after_commit_checkpoint_kind(
                 checkpoint_kind=checkpoint_kind,
@@ -559,7 +555,7 @@ class CheckpointsAPI:
                     captured_at=captured_at,
                     captured_at_local=captured_at_local,
                     captured_tz=captured_tz,
-                    session_file=session_file_ref,
+                    runtime_session_file_ref=runtime_session_file_ref,
                     runtime_session_id=runtime_session_id,
                     runtime_session_created_at=runtime_session_created_at,
                     note_ref=_checkpoint_note_ref_for_capture(
@@ -604,7 +600,7 @@ class CheckpointsAPI:
                     captured_at=captured_at,
                     captured_at_local=captured_at_local,
                     captured_tz=captured_tz,
-                    session_file=session_file_ref,
+                    runtime_session_file_ref=runtime_session_file_ref,
                     runtime_session_id=runtime_session_id,
                     runtime_session_created_at=runtime_session_created_at,
                     note_ref=_checkpoint_note_ref_for_capture(
@@ -621,26 +617,11 @@ class CheckpointsAPI:
                 _write_after_commit_report(report_path, report)
                 return report
 
-            skill_report = SkillsAPI(self.workspace).dispatch(
-                repo_root=repo_root,
-                phase="checkpoint",
-                intent_text=intent_text,
-                mutation_surface=mutation_surface,
-                session_file=session_file_ref,
-            )
-            skill_report_path = str(_checkpoint_skill_report_path(self.workspace, repo_root))
-            _write_skill_detection_report(
-                Path(skill_report_path),
-                skill_report.model_dump(mode="json"),
-            )
-
             surface_report = self._surfaces.detect(
                 repo_root=repo_root,
                 phase="checkpoint",
                 intent_text=intent_text,
                 mutation_surface=mutation_surface,
-                session_file=session_file_ref,
-                skill_report_path=skill_report_path,
                 checkpoint_kind=resolved_checkpoint_kind,
             )
             surface_report_path = str(paths.surface_report)
@@ -650,8 +631,7 @@ class CheckpointsAPI:
                 checkpoint_kind=resolved_checkpoint_kind,
                 intent_text=intent_text,
                 mutation_surface=mutation_surface,
-                session_file=session_file_ref,
-                skill_report_path=skill_report_path,
+                runtime_session_file=runtime_session_file_ref,
                 surface_report=surface_report,
                 surface_report_path=surface_report_path,
                 manual_review_requested=True,
@@ -665,12 +645,10 @@ class CheckpointsAPI:
                     commit_metadata=commit_metadata,
                     checkpoint_kind=resolved_checkpoint_kind,
                     mutation_surface=mutation_surface,
-                    skill_report=skill_report,
                     surface_report=surface_report,
                     observed_at=observed_at,
                     observed_at_local=observed_at_local,
                     observed_tz=observed_tz,
-                    skill_report_path=skill_report_path,
                     surface_report_path=surface_report_path,
                 ),
                 observed_at=observed_at,
@@ -698,10 +676,9 @@ class CheckpointsAPI:
                 captured_at=captured_at,
                 captured_at_local=captured_at_local,
                 captured_tz=captured_tz,
-                session_file=session_file_ref,
+                runtime_session_file_ref=runtime_session_file_ref,
                 runtime_session_id=runtime_session_id,
                 runtime_session_created_at=runtime_session_created_at,
-                skill_report_path=skill_report_path,
                 surface_report_path=surface_report_path,
                 note_ref=note_ref,
                 agent_review_required=True,
@@ -748,16 +725,15 @@ class CheckpointsAPI:
                 captured_at=captured_at,
                 captured_at_local=captured_at_local,
                 captured_tz=captured_tz,
-                session_file=(
+                runtime_session_file_ref=(
                     str(session_path)
                     if session_path is not None
-                    else str(session_file)
-                    if session_file is not None
+                    else str(runtime_session_file)
+                    if runtime_session_file is not None
                     else None
                 ),
                 runtime_session_id=runtime_session_id,
                 runtime_session_created_at=runtime_session_created_at,
-                skill_report_path=skill_report_path,
                 surface_report_path=surface_report_path,
                 note_ref=note_ref,
                 error_text=str(exc),
@@ -781,15 +757,15 @@ class CheckpointsAPI:
         closeout_questions: list[str] | None = None,
         evidence_refs: list[str] | None = None,
         next_owner_moves: list[str] | None = None,
-        applied_skill_names: list[str] | None = None,
-        session_file: str | None = None,
+        related_capability_refs: list[str] | None = None,
+        runtime_session_file: str | None = None,
         runtime_session_id: str | None = None,
     ) -> SessionCheckpointNote:
         repo_root_path = _resolve_context_root(self.workspace, repo_root)
         repo_label = _resolve_context_label(self.workspace, repo_root)
         commit_metadata = read_git_commit_metadata(repo_root_path, commit_ref)
-        if runtime_session_id is not None and session_file is not None:
-            raise ValueError("checkpoint review-note accepts either session_file or runtime_session_id, not both")
+        if runtime_session_id is not None and runtime_session_file is not None:
+            raise ValueError("checkpoint review-note accepts either runtime_session_file or runtime_session_id, not both")
         explicit_runtime_session_id = (
             runtime_session_id.strip() if isinstance(runtime_session_id, str) else None
         )
@@ -808,7 +784,7 @@ class CheckpointsAPI:
         else:
             session_path, runtime_session = probe_existing_checkpoint_runtime_session(
                 workspace=self.workspace,
-                session_file=session_file,
+                runtime_session_file=runtime_session_file,
             )
             if runtime_session is None and auto_fill:
                 recovered_session = _recover_skipped_after_commit_for_review(
@@ -830,7 +806,10 @@ class CheckpointsAPI:
                 runtime_session_id=runtime_session.session_id,
                 migrate_legacy=True,
             )
-            current_note = self.status(repo_root=repo_root, session_file=str(session_path))
+            current_note = self.status(
+                repo_root=repo_root,
+                runtime_session_file=str(session_path) if session_path is not None else None,
+            )
         if not paths.jsonl.exists():
             raise SurfaceNotFound(f"no checkpoint note exists yet for {paths.repo_label}")
         auto_observation = _matching_auto_observation(
@@ -874,7 +853,6 @@ class CheckpointsAPI:
                 str(paths.post_commit_report),
                 str(paths.note_json),
                 str(paths.surface_report),
-                _checkpoint_skill_report_path(self.workspace, repo_root).as_posix(),
                 *(auto_observation.evidence_refs if auto_observation is not None else []),
                 *(
                     _history_auto_review_evidence_refs(history_entry)
@@ -903,10 +881,14 @@ class CheckpointsAPI:
             commit_short_sha=commit_metadata["commit_short_sha"],
             commit_subject=commit_metadata["commit_subject"],
             summary=cast(str, resolved_summary),
-            applied_skill_names=_dedupe_strings(
+            related_capability_refs=_dedupe_strings(
                 [
-                    *(applied_skill_names or []),
-                    *(auto_observation.applied_skill_names if auto_observation is not None else []),
+                    *(related_capability_refs or []),
+                    *(
+                        auto_observation.related_capability_refs
+                        if auto_observation is not None
+                        else []
+                    ),
                 ]
             ),
             findings=_merge_auto_review_items(
@@ -961,7 +943,7 @@ class CheckpointsAPI:
         )
         runtime_created_at = (
             runtime_session.created_at.astimezone(UTC)
-            if runtime_session is not None
+            if runtime_session is not None and runtime_session.created_at is not None
             else current_note.runtime_session_created_at
         )
         payload_runtime_session_id = (
@@ -995,7 +977,10 @@ class CheckpointsAPI:
                 encoding="utf-8",
             )
         else:
-            note = self.status(repo_root=repo_root, session_file=str(session_path))
+            note = self.status(
+                repo_root=repo_root,
+                runtime_session_file=str(session_path) if session_path is not None else None,
+            )
         _mark_after_commit_report_reviewed(paths.post_commit_report, review=review)
         _mark_after_commit_report_reviewed(post_commit_status_path(self.workspace, repo_label), review=review)
         return note
@@ -1058,13 +1043,13 @@ class CheckpointsAPI:
         *,
         repo_root: str,
         boundary: Literal["push", "merge"],
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
     ) -> CheckpointGitBoundaryCheck:
         repo_root_path = _resolve_context_root(self.workspace, repo_root)
         repo_label = _resolve_context_label(self.workspace, repo_root)
         session_path, runtime_metadata = probe_checkpoint_runtime_session(
             workspace=self.workspace,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
         )
         runtime_session_id = cast(str | None, runtime_metadata["runtime_session_id"])
         unresolved_skipped_status = _unresolved_skipped_post_commit_status_for_boundary(
@@ -1101,7 +1086,7 @@ class CheckpointsAPI:
         primary_note = _peek_runtime_checkpoint_note(
             self,
             repo_root=repo_root,
-            session_file=str(session_path),
+            runtime_session_file=str(session_path) if session_path is not None else None,
         )
         if primary_note is not None:
             session_records = _load_runtime_checkpoint_notes_for_closeout(
@@ -1176,13 +1161,13 @@ class CheckpointsAPI:
         self,
         *,
         repo_root: str | None = None,
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
         write_index: bool = False,
     ) -> CheckpointLifecycleAuditReport:
         return _audit_checkpoint_lifecycle(
             workspace=self.workspace,
             repo_root=repo_root,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
             write_index=write_index,
         )
 
@@ -1190,7 +1175,7 @@ class CheckpointsAPI:
         self,
         *,
         repo_root: str | None = None,
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
         runtime_session_id: str | None = None,
         dry_run: bool = True,
         include_stale: bool = False,
@@ -1198,7 +1183,7 @@ class CheckpointsAPI:
         return _close_archive_checkpoint_lifecycle(
             workspace=self.workspace,
             repo_root=repo_root,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
             runtime_session_id=runtime_session_id,
             dry_run=dry_run,
             include_stale=include_stale,
@@ -1208,7 +1193,7 @@ class CheckpointsAPI:
         self,
         *,
         repo_root: str | None = None,
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
         runtime_session_id: str | None = None,
         session_filter: str | None = None,
         since: str | None = None,
@@ -1219,7 +1204,7 @@ class CheckpointsAPI:
         return _reconcile_closed_checkpoint_sessions(
             workspace=self.workspace,
             repo_root=repo_root,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
             runtime_session_id=runtime_session_id,
             session_filter=session_filter,
             since=since,
@@ -1232,13 +1217,13 @@ class CheckpointsAPI:
         self,
         *,
         repo_root: str | None = None,
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
         write_index: bool = False,
     ) -> CheckpointBacklogAuditReport:
         return _audit_checkpoint_backlog(
             workspace=self.workspace,
             repo_root=repo_root,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
             write_index=write_index,
         )
 
@@ -1246,11 +1231,11 @@ class CheckpointsAPI:
         self,
         *,
         repo_root: str,
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
         sample_limit: int = 0,
         write_index: bool = False,
     ) -> CandidateIntelligenceReport:
-        note = self.status(repo_root=repo_root, session_file=session_file)
+        note = self.status(repo_root=repo_root, runtime_session_file=runtime_session_file)
         report = _build_candidate_intelligence_from_note(
             workspace=self.workspace,
             repo_root=repo_root,
@@ -1272,13 +1257,13 @@ class CheckpointsAPI:
         self,
         *,
         repo_root: str,
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
         sample_limit: int = 0,
         write_index: bool = False,
     ) -> CarrierIntelligenceReport:
         candidate_report = self.candidate_intelligence(
             repo_root=repo_root,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
             sample_limit=0,
             write_index=False,
         )
@@ -1294,16 +1279,15 @@ class CheckpointsAPI:
             report = report.model_copy(update={"generated_index_ref": str(index_path)})
         return report
 
-    def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:
+    def status(self, *, repo_root: str, runtime_session_file: str | None = None) -> SessionCheckpointNote:
         runtime_session_metadata = peek_checkpoint_runtime_session(
             workspace=self.workspace,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
         )
         runtime_session_id = cast(str | None, runtime_session_metadata["runtime_session_id"])
-        if runtime_session_id is None and session_file is not None:
-            runtime_session_id, _ = ensure_checkpoint_runtime_session(
-                workspace=self.workspace,
-                session_file=session_file,
+        if runtime_session_id is None:
+            raise SurfaceNotFound(
+                "checkpoint status requires a host-provided runtime session identity"
             )
         paths = _resolve_runtime_checkpoint_paths(
             self.workspace,
@@ -1323,12 +1307,16 @@ class CheckpointsAPI:
         paths.note_md.write_text(_render_checkpoint_note_markdown(note, repo_label=paths.repo_label), encoding="utf-8")
         return note
 
-    def peek_status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote:
+    def peek_status(self, *, repo_root: str, runtime_session_file: str | None = None) -> SessionCheckpointNote:
         runtime_session_metadata = peek_checkpoint_runtime_session(
             workspace=self.workspace,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
         )
         runtime_session_id = cast(str | None, runtime_session_metadata["runtime_session_id"])
+        if runtime_session_id is None:
+            raise SurfaceNotFound(
+                "checkpoint status requires a host-provided runtime session identity"
+            )
         paths = _resolve_runtime_checkpoint_paths(
             self.workspace,
             repo_root=repo_root,
@@ -1348,12 +1336,12 @@ class CheckpointsAPI:
         *,
         repo_root: str,
         target: Literal["dionysus-note", "harvest-handoff"],
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
     ) -> SessionCheckpointPromotion:
         if target not in PROMOTION_TARGETS:
             raise ValueError(f"unsupported target {target!r}")
 
-        note = self.status(repo_root=repo_root, session_file=session_file)
+        note = self.status(repo_root=repo_root, runtime_session_file=runtime_session_file)
         paths = _resolve_runtime_checkpoint_paths(
             self.workspace,
             repo_root=repo_root,
@@ -1412,7 +1400,7 @@ class CheckpointsAPI:
         receipt_paths: list[str] | None = None,
         receipt_dirs: list[str] | None = None,
         surface_handoff_path: str | None = None,
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
     ) -> CheckpointCloseoutContext:
         reviewed_artifact = Path(reviewed_artifact_path).expanduser().resolve()
         if not reviewed_artifact.exists():
@@ -1420,16 +1408,21 @@ class CheckpointsAPI:
 
         runtime_session_metadata = load_checkpoint_runtime_session(
             workspace=self.workspace,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
         )
         active_runtime_session_id = cast(str | None, runtime_session_metadata["runtime_session_id"])
+        if active_runtime_session_id is None:
+            raise SurfaceNotFound(
+                "checkpoint closeout context requires a host-provided runtime session "
+                "identity (CODEX_THREAD_ID, AOA_SESSION_ID, or explicit metadata file)"
+            )
         paths = _resolve_runtime_checkpoint_paths(
             self.workspace,
             repo_root=repo_root,
             runtime_session_id=active_runtime_session_id,
             migrate_legacy=True,
         )
-        note = _load_runtime_checkpoint_note(self, repo_root=repo_root, session_file=session_file)
+        note = _load_runtime_checkpoint_note(self, repo_root=repo_root, runtime_session_file=runtime_session_file)
         handoff = _load_reviewed_surface_handoff(
             workspace=self.workspace,
             repo_root=repo_root,
@@ -1545,21 +1538,12 @@ class CheckpointsAPI:
         )
         candidate_lineage_map = _collect_candidate_lineage_hints(shortlisted_clusters)
         owner_followthrough_map = _build_owner_followthrough_map(candidate_lineage_map)
-        ordered_skill_plan = _derive_closeout_skill_plan(notes=aggregated_notes, handoff=handoff)
-        followthrough_decision = _build_closeout_followthrough_decision(
-            session_ref=resolved_session_ref,
-            reviewed_closeout_context_ref=str(paths.closeout_context),
-            clusters=shortlisted_clusters,
-            progression_axis_signals=_merge_progression_axis_signals(
-                [
-                    signal
-                    for candidate_note in aggregated_notes
-                    for signal in candidate_note.progression_axis_signals
-                ]
-            ),
+        capability_candidates = _derive_closeout_capability_candidates(
+            notes=aggregated_notes,
+            handoff=handoff,
         )
         if not aggregated_notes:
-            notes.append("no matching local checkpoint note was available; the reviewed artifact becomes the primary execution source")
+            notes.append("no matching local checkpoint note was available; the reviewed artifact remains the primary evidence source")
         if handoff is None:
             notes.append("no matching reviewed surface closeout handoff was available; closeout will reread the reviewed artifact without a reviewed surface shortlist")
         if session_trace_ref is None:
@@ -1575,13 +1559,13 @@ class CheckpointsAPI:
         for caution in session_memory_freshness.cautions:
             notes.append(f"session-memory freshness caution: {caution}")
         if not collected_receipt_paths:
-            notes.append("no prior receipt refs were supplied; closeout execution will rely on the reviewed artifact and any local checkpoint evidence only")
+            notes.append("no prior receipt refs were supplied; closeout materialization will rely on the reviewed artifact and any local checkpoint evidence only")
         if checkpoint_review_carry.review_refs:
             notes.append(
                 f"bound {len(checkpoint_review_carry.review_refs)} agent-authored checkpoint review(s) into the closeout context so the final reread can revisit semantic findings and questions"
             )
         notes.append(
-            "checkpoint closeout bridge builds mechanical artifacts only; a Codex agent must still apply the listed skills by rereading session evidence before treating outputs as final analysis"
+            "checkpoint closeout materializes navigation evidence only; it does not execute capabilities, promote candidates, or author owner artifacts"
         )
 
         built_at, built_at_local, built_tz = _local_timestamp_parts()
@@ -1606,7 +1590,6 @@ class CheckpointsAPI:
             checkpoint_review_carry=checkpoint_review_carry,
             candidate_lineage_map=candidate_lineage_map,
             owner_followthrough_map=owner_followthrough_map,
-            followthrough_decision=followthrough_decision,
             progression_axis_signals=_merge_progression_axis_signals(
                 [
                     signal
@@ -1614,13 +1597,13 @@ class CheckpointsAPI:
                     for signal in candidate_note.progression_axis_signals
                 ]
             ),
-            ordered_skill_plan=ordered_skill_plan,
+            capability_candidates=capability_candidates,
             notes=notes,
         )
         write_json(paths.closeout_context, context.model_dump(mode="json"))
         return context
 
-    def execute_closeout_chain(
+    def materialize_closeout_handoff(
         self,
         *,
         repo_root: str,
@@ -1629,8 +1612,8 @@ class CheckpointsAPI:
         receipt_paths: list[str] | None = None,
         receipt_dirs: list[str] | None = None,
         surface_handoff_path: str | None = None,
-        session_file: str | None = None,
-    ) -> CheckpointCloseoutExecutionReport:
+        runtime_session_file: str | None = None,
+    ) -> CheckpointCloseoutMaterializationReport:
         context = self.build_closeout_context(
             repo_root=repo_root,
             reviewed_artifact_path=reviewed_artifact_path,
@@ -1638,7 +1621,7 @@ class CheckpointsAPI:
             receipt_paths=receipt_paths,
             receipt_dirs=receipt_dirs,
             surface_handoff_path=surface_handoff_path,
-            session_file=session_file,
+            runtime_session_file=runtime_session_file,
         )
         paths = _resolve_runtime_checkpoint_paths(
             self.workspace,
@@ -1646,8 +1629,8 @@ class CheckpointsAPI:
             runtime_session_id=context.runtime_session_id,
             migrate_legacy=False,
         )
-        execution_dir = paths.closeout_artifacts / _safe_name(context.session_ref)
-        execution_dir.mkdir(parents=True, exist_ok=True)
+        materialization_dir = paths.closeout_artifacts / _safe_name(context.session_ref)
+        materialization_dir.mkdir(parents=True, exist_ok=True)
 
         reviewed_artifact_path_obj = Path(context.reviewed_artifact_ref)
         reviewed_artifact_evidence = _merge_closeout_evidence(
@@ -1663,92 +1646,64 @@ class CheckpointsAPI:
         receipt_payloads = _load_receipt_payloads(context.receipt_refs)
         shortlisted_clusters = _closeout_candidate_clusters(notes=notes, handoff=handoff)
 
-        executed_steps: list[CloseoutExecutionStep] = []
-        produced_artifact_refs: list[str] = []
-        produced_receipt_refs: list[str] = []
-
-        donor_outputs = _build_donor_harvest_outputs(
+        bundle_outputs = _materialize_reviewed_evidence_bundle(
             context=context,
             reviewed_artifact=reviewed_artifact_path_obj,
             reviewed_artifact_evidence=reviewed_artifact_evidence,
             shortlisted_clusters=shortlisted_clusters,
             receipt_payloads=receipt_payloads,
-            output_dir=execution_dir,
+            output_dir=materialization_dir,
         )
-        executed_steps.append(
-            CloseoutExecutionStep(
-                skill_name="aoa-session-donor-harvest",
-                status="executed",
-                reason="mechanical bridge artifact build for donor-harvest-shaped output; final donor harvest analysis still requires the Codex agent to apply the skill protocol against reviewed session evidence",
-                artifact_refs=donor_outputs["artifact_refs"],
-                receipt_refs=donor_outputs["receipt_refs"],
+        stages = [
+            CheckpointCloseoutMaterializationStage(
+                stage_id="reviewed-evidence-bundle",
+                status="materialized",
+                reason=(
+                    "materialized reviewed evidence and routing candidates without "
+                    "claiming capability execution"
+                ),
+                artifact_refs=bundle_outputs["artifact_refs"],
+                receipt_refs=bundle_outputs["receipt_refs"],
             )
-        )
-        produced_artifact_refs.extend(donor_outputs["artifact_refs"])
-        produced_receipt_refs.extend(donor_outputs["receipt_refs"])
+        ]
+        produced_artifact_refs = list(bundle_outputs["artifact_refs"])
+        produced_receipt_refs = list(bundle_outputs["receipt_refs"])
 
-        progression_outputs = _build_progression_lift_outputs(
+        owner_handoff_path, owner_handoff = _write_checkpoint_owner_handoff(
+            workspace=self.workspace,
+            closeout_context_ref=paths.closeout_context,
             context=context,
-            reviewed_artifact=reviewed_artifact_path_obj,
-            reviewed_artifact_evidence=reviewed_artifact_evidence,
-            donor_packet=donor_outputs["packet"],
             shortlisted_clusters=shortlisted_clusters,
-            receipt_payloads=receipt_payloads,
-            output_dir=execution_dir,
-        )
-        executed_steps.append(
-            CloseoutExecutionStep(
-                skill_name="aoa-session-progression-lift",
-                status="executed",
-                reason="mechanical bridge artifact build for progression-lift-shaped output; final progression analysis still requires the Codex agent to apply the skill protocol against reviewed session evidence",
-                artifact_refs=progression_outputs["artifact_refs"],
-                receipt_refs=progression_outputs["receipt_refs"],
-            )
-        )
-        produced_artifact_refs.extend(progression_outputs["artifact_refs"])
-        produced_receipt_refs.extend(progression_outputs["receipt_refs"])
-
-        quest_outputs = _build_quest_harvest_outputs(
-            context=context,
             reviewed_artifact=reviewed_artifact_path_obj,
-            reviewed_artifact_evidence=reviewed_artifact_evidence,
-            donor_packet=donor_outputs["packet"],
-            progression_packet=progression_outputs["packet"],
-            shortlisted_clusters=shortlisted_clusters,
-            receipt_payloads=receipt_payloads,
-            output_dir=execution_dir,
-        )
-        executed_steps.append(
-            CloseoutExecutionStep(
-                skill_name="aoa-quest-harvest",
-                status="executed",
-                reason="mechanical bridge artifact build for quest-harvest-shaped output; final quest triage still requires the Codex agent to apply the skill protocol against reviewed session evidence",
-                artifact_refs=quest_outputs["artifact_refs"],
-                receipt_refs=quest_outputs["receipt_refs"],
-            )
-        )
-        produced_artifact_refs.extend(quest_outputs["artifact_refs"])
-        produced_receipt_refs.extend(quest_outputs["receipt_refs"])
-
-        owner_handoff_path, owner_follow_through_briefs, workflow_follow_through_briefs = (
-            _write_checkpoint_owner_handoff(
-                workspace=self.workspace,
-                closeout_context_ref=paths.closeout_context,
-                context=context,
-                donor_outputs=donor_outputs,
-                quest_outputs=quest_outputs,
-                reviewed_artifact=reviewed_artifact_path_obj,
-            )
         )
         if owner_handoff_path is not None:
             produced_artifact_refs.append(str(owner_handoff_path))
+            stages.append(
+                CheckpointCloseoutMaterializationStage(
+                    stage_id="owner-candidate-handoff",
+                    status="materialized",
+                    reason=(
+                        "materialized owner-review candidates; no owner artifact was "
+                        "created or promoted"
+                    ),
+                    artifact_refs=[str(owner_handoff_path)],
+                )
+            )
+        else:
+            stages.append(
+                CheckpointCloseoutMaterializationStage(
+                    stage_id="owner-candidate-handoff",
+                    status="skipped",
+                    reason="no reviewed checkpoint candidate required an owner handoff",
+                )
+            )
 
-        executed_at, executed_at_local, executed_tz = _local_timestamp_parts()
-        report = CheckpointCloseoutExecutionReport(
+        materialized_at, materialized_at_local, materialized_tz = _local_timestamp_parts()
+        report = CheckpointCloseoutMaterializationReport(
             session_ref=context.session_ref,
-            executed_at=executed_at,
-            executed_at_local=executed_at_local,
-            executed_tz=executed_tz,
+            materialized_at=materialized_at,
+            materialized_at_local=materialized_at_local,
+            materialized_tz=materialized_tz,
             reviewed_artifact_ref=context.reviewed_artifact_ref,
             runtime_session_id=context.runtime_session_id,
             session_trace_ref=context.session_trace_ref,
@@ -1760,17 +1715,17 @@ class CheckpointsAPI:
             surface_handoff_ref=context.surface_handoff_ref,
             context_ref=str(paths.closeout_context),
             owner_handoff_path=str(owner_handoff_path) if owner_handoff_path is not None else None,
-            owner_follow_through_briefs=owner_follow_through_briefs,
-            workflow_follow_through_briefs=workflow_follow_through_briefs,
-            executed_skills=executed_steps,
-            skipped_skills=[],
+            owner_handoff=owner_handoff,
+            stages=stages,
             produced_artifact_refs=_dedupe_strings(produced_artifact_refs),
             produced_receipt_refs=_dedupe_strings(produced_receipt_refs),
             final_stop_reason=(
-                "Mechanical checkpoint-closeout bridge artifacts were built; final session analysis requires agent-led skill application over reviewed evidence, and owner-local publication plus stats refresh remain downstream steps."
+                "Reviewed evidence and owner-review candidates were materialized. "
+                "Capability execution, owner artifact creation, promotion, publication, "
+                "and stats refresh remain separate downstream decisions."
             ),
         )
-        write_json(paths.closeout_execution_report, report.model_dump(mode="json"))
+        write_json(paths.closeout_materialization_report, report.model_dump(mode="json"))
         return report
 
 
@@ -1852,26 +1807,11 @@ def _checkpoint_note_ref_for_capture(
     )
 
 
-def _checkpoint_skill_report_path(workspace: Workspace, repo_root: str) -> Path:
-    repo_label = _resolve_context_label(workspace, repo_root)
-    return workspace.repo_path("aoa-sdk") / ".aoa" / "skill-dispatch" / f"{repo_label}.checkpoint.latest.json"
-
-
-def _write_skill_detection_report(path: Path, report: object) -> None:
-    write_json(
-        path,
-        {
-            "report_path": str(path),
-            "report": report,
-        },
-    )
-
-
 def _checkpoint_capture_result_without_append(
     api: CheckpointsAPI,
     *,
     repo_root: str,
-    session_file: str | None,
+    runtime_session_file: str | None,
     reason: Literal["no_checkpoint_signal", "auto_disabled"],
     attempted: bool,
     checkpoint_kind: Literal[
@@ -1887,11 +1827,11 @@ def _checkpoint_capture_result_without_append(
 ) -> CheckpointCaptureResult:
     captured_at, captured_at_local, captured_tz = _local_timestamp_parts()
     current_note = (
-        _peek_runtime_checkpoint_note(api, repo_root=repo_root, session_file=session_file)
+        _peek_runtime_checkpoint_note(api, repo_root=repo_root, runtime_session_file=runtime_session_file)
         if read_only
-        else _load_runtime_checkpoint_note(api, repo_root=repo_root, session_file=session_file)
+        else _load_runtime_checkpoint_note(api, repo_root=repo_root, runtime_session_file=runtime_session_file)
     )
-    session_end_targets = _derive_session_end_skill_targets(current_note)
+    session_end_targets = _derive_session_end_capability_candidates(current_note)
     return CheckpointCaptureResult(
         mode="auto",
         attempted=attempted,
@@ -1910,7 +1850,7 @@ def _checkpoint_capture_result_without_append(
             if current_note is not None
             else None
         ),
-        session_end_skill_targets=session_end_targets,
+        session_end_capability_candidates=session_end_targets,
         session_end_next_honest_move=_derive_session_end_next_honest_move(
             note=current_note,
             session_end_targets=session_end_targets,

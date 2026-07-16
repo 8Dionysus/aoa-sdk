@@ -72,7 +72,6 @@ Current protected local cards include:
 
 - `.aoa/AGENTS.md`
 - `.github/AGENTS.md`
-- `.agents/skills/AGENTS.md`
 - `docs/AGENTS.md`
 - `docs/decisions/AGENTS.md`
 - `generated/AGENTS.md`
@@ -83,7 +82,6 @@ Current protected local cards include:
 - `sdk/distribution/AGENTS.md`
 - `mechanics/AGENTS.md`
 - `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/AGENTS.md`
-- `mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/AGENTS.md`
 - `schemas/AGENTS.md`
 - `scripts/AGENTS.md`
 - `src/aoa_sdk/AGENTS.md`

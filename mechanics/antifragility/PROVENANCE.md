@@ -24,7 +24,7 @@
 
 Owner repositories decide remediation and deletion. `aoa-evals` owns proof
 verdicts. The SDK owns bounded control-plane examples, route docs, and
-validation for its stress-posture dispatch and reviewed closeout carry.
+validation for its stress-posture task dispatch and reviewed closeout carry.
 
 ## Notes
 
