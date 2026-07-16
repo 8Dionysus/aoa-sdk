@@ -1,0 +1,31 @@
+{
+  "export_version": 2,
+  "profile": "codex-facing-v2",
+  "root": ".agents/skills",
+  "source_repo": "8Dionysus/aoa-skills",
+  "source_of_truth": {
+    "skill_sources": "skills/**/SKILL.md",
+    "capability_families": "capabilities/families/*.yaml",
+    "profile_matrix": "config/skill_pack_profiles.json"
+  },
+  "exports": [
+    {
+      "name": "aoa-decision",
+      "source_skill_path": "skills/core/engineering/aoa-decision/SKILL.md",
+      "target_dir": ".agents/skills/aoa-decision",
+      "target_skill_path": ".agents/skills/aoa-decision/SKILL.md",
+      "target_openai_config_path": ".agents/skills/aoa-decision/agents/openai.yaml",
+      "invocation_mode": "implicit-friendly",
+      "implicit_activation_policy": "invoke",
+      "allow_implicit_invocation": true,
+      "candidate_only": false,
+      "resource_inventory": {
+        "scripts": [],
+        "references": [],
+        "assets": ["assets/large-logo.svg", "assets/small-logo.svg"],
+        "checks": ["checks/review.md"],
+        "examples": []
+      }
+    }
+  ]
+}

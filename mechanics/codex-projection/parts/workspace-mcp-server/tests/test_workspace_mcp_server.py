@@ -56,13 +56,25 @@ def _seed_codex_workspace(workspace_root: Path) -> None:
     )
 
     (workspace_root / "aoa-skills").mkdir(parents=True, exist_ok=True)
-    (workspace_root / "aoa-skills" / "SKILL_INDEX.md").write_text(
-        "# Skill index\n- aoa-change-protocol\n",
+    (workspace_root / "aoa-skills" / "README.md").write_text(
+        "# aoa-skills\n",
         encoding="utf-8",
     )
     (workspace_root / "aoa-skills" / "generated").mkdir(parents=True, exist_ok=True)
-    (workspace_root / "aoa-skills" / "generated" / "runtime_discovery_index.json").write_text(
-        "{}\n",
+    (
+        workspace_root
+        / "aoa-skills"
+        / "generated"
+        / "agent_skill_catalog.min.json"
+    ).write_text(
+        json.dumps(
+            {
+                "catalog_version": 2,
+                "profile": "codex-facing-v2",
+                "skills": [{"name": "aoa-decision", "candidate_only": False}],
+            }
+        )
+        + "\n",
         encoding="utf-8",
     )
 
@@ -141,7 +153,9 @@ def test_workspace_repo_map_lists_curated_entrypoints(workspace_root: Path) -> N
 
     assert rows["Agents-of-Abyss"]["role"] == "federation-center"
     assert rows["Agents-of-Abyss"]["preferred_entrypoints"][0]["path"] == "ECOSYSTEM_MAP.md"
-    assert rows["aoa-skills"]["preferred_entrypoints"][0]["path"] == "SKILL_INDEX.md"
+    assert rows["aoa-skills"]["preferred_entrypoints"][0]["path"] == (
+        "generated/agent_skill_catalog.min.json"
+    )
 
 
 def test_workspace_repo_map_keeps_aoa_stats_entrypoints_transport_neutral(workspace_root: Path) -> None:
@@ -180,8 +194,8 @@ def test_workspace_runtime_entrypoints_report_curated_surfaces(workspace_root: P
     assert entries["workspace_marker"]["exists"] is True
     assert entries["project_codex_config"]["exists"] is True
     assert entries["workspace_control_plane"]["exists"] is True
-    assert entries["skill_index"]["exists"] is True
-    assert entries["skill_runtime_discovery"]["exists"] is True
+    assert entries["agent_skill_catalog"]["exists"] is True
+    assert entries["capability_graph"]["exists"] is True
     assert entries["seed_route_map"]["exists"] is True
     assert entries["abyss_stack_diagnostic_catalog"]["exists"] is True
     assert entries["abyss_stack_diagnostic_catalog"]["path"] == (
@@ -190,7 +204,7 @@ def test_workspace_runtime_entrypoints_report_curated_surfaces(workspace_root: P
     )
 
 
-def test_load_agent_profiles_and_skill_index_preview(workspace_root: Path) -> None:
+def test_load_agent_profiles_and_passive_skill_catalog(workspace_root: Path) -> None:
     _seed_codex_workspace(workspace_root)
 
     state = AoAWorkspaceMCPState.discover(workspace_root / "aoa-sdk")
@@ -199,6 +213,10 @@ def test_load_agent_profiles_and_skill_index_preview(workspace_root: Path) -> No
     assert profiles["profile_count"] == 1
     assert profiles["profiles"][0]["name"] == "architect"
 
-    skill_index = state.load_skill_index()
-    assert skill_index["exists"] is True
-    assert "Skill index" in skill_index["content"]
+    skill_catalog = state.load_agent_skill_catalog()
+    assert skill_catalog["exists"] is True
+    assert skill_catalog["parse_error"] is None
+    assert skill_catalog["payload"]["catalog_version"] == 2
+    assert skill_catalog["payload"]["skills"] == [
+        {"name": "aoa-decision", "candidate_only": False}
+    ]

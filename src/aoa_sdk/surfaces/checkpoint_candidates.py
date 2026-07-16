@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 import re
 from pathlib import Path
 from typing import Literal, cast
@@ -10,10 +11,8 @@ from ..models import (
     CheckpointLineageHint,
     ProgressionAxisSignal,
     SessionCheckpointNote,
-    SkillDetectionReport,
     SurfaceOpportunityItem,
 )
-from ..skills.session import load_session
 from ..workspace.discovery import Workspace
 from .common import (
     CheckpointKind,
@@ -62,7 +61,7 @@ def derive_explicit_mutation_growth_clusters(
     mutation_surface: MutationSurface,
     intent_text: str,
     checkpoint_kind: CheckpointKind | None,
-    skill_report: SkillDetectionReport,
+    source_refs: list[str],
 ) -> list[CheckpointCandidateCluster]:
     if checkpoint_kind not in {
         "commit",
@@ -86,7 +85,7 @@ def derive_explicit_mutation_growth_clusters(
 
     label = context_label(workspace, repo_root)
     evidence_refs = explicit_mutation_growth_evidence_refs(
-        skill_report=skill_report,
+        source_refs=source_refs,
         mutation_surface=mutation_surface,
         context_label=label,
     )
@@ -300,7 +299,7 @@ def intent_explicitly_requests_checkpoint_kind(
 
 def explicit_mutation_growth_evidence_refs(
     *,
-    skill_report: SkillDetectionReport,
+    source_refs: list[str],
     mutation_surface: MutationSurface,
     context_label: str,
 ) -> list[str]:
@@ -308,8 +307,7 @@ def explicit_mutation_growth_evidence_refs(
         f"context:{context_label}",
         f"mutation_surface:{mutation_surface}",
     ]
-    for item in [*skill_report.activate_now, *skill_report.must_confirm, *skill_report.suggest_next]:
-        refs.append(f"aoa-skills:{item.skill_name}")
+    refs.extend(source_refs)
     return dedupe_strings(refs)
 
 
@@ -320,8 +318,6 @@ def derive_checkpoint_candidate_clusters(
 ) -> list[CheckpointCandidateCluster]:
     clusters: list[CheckpointCandidateCluster] = []
     for item in items:
-        if item.state == "activated":
-            continue
         evidence_refs = dedupe_strings(
             [
                 *[ref.ref for ref in item.family_entry_refs],
@@ -334,8 +330,6 @@ def derive_checkpoint_candidate_clusters(
             blocked_by.append("owner-ambiguity")
         if len(evidence_refs) < 2 or item.confidence == "low":
             blocked_by.append("thin-evidence")
-        if item.state == "manual-equivalent" and "risk-gate" in item.signals:
-            blocked_by.append("requires-reviewed-route")
         candidate_kind = candidate_kind_for_item(item)
         defer_reason = None
         if "owner-ambiguity" in blocked_by:
@@ -491,7 +485,9 @@ def candidate_checkpoint_note_paths(
 
 
 def active_runtime_session_id(workspace: Workspace) -> str | None:
-    try:
-        return load_session(workspace, None).session_id
-    except Exception:
-        return None
+    del workspace
+    for env_name in ("AOA_SESSION_ID", "CODEX_THREAD_ID"):
+        value = os.environ.get(env_name)
+        if isinstance(value, str) and value.strip():
+            return value.strip()
+    return None

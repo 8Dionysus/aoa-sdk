@@ -42,20 +42,22 @@ def plan() -> PropagationPlan:
         plan_ref="plan:test",
         signal_ref="signal:test",
         workspace_root="/srv/workspace",
-        direct_components=["component:skills:trigger-evals"],
+        direct_components=["component:techniques:canon-and-intake-beacons"],
         impacted_components=[
-            "component:skills:trigger-evals",
+            "component:techniques:canon-and-intake-beacons",
             "component:kag:donor-refresh",
         ],
         ordered_steps=[
             PlanStep(
-                step_ref="step:skills:trigger-evals",
+                step_ref="step:techniques:canon-and-intake",
                 order=1,
-                component_ref="component:skills:trigger-evals",
-                owner_repo="aoa-skills",
+                component_ref="component:techniques:canon-and-intake-beacons",
+                owner_repo="aoa-techniques",
                 action="revalidate",
-                reason="trigger boundary changed",
-                surface_refs=["docs/TRIGGER_EVALS.md"],
+                reason="technique candidate intake changed",
+                surface_refs=[
+                    "mechanics/distillation/parts/cross-layer-candidate-ledger/README.md"
+                ],
             ),
             PlanStep(
                 step_ref="step:kag:donor-refresh",
@@ -75,7 +77,7 @@ def gap_report() -> ConnectivityGapReport:
         report_ref="doctor:test",
         workspace_root="/srv/workspace",
         signal_ref="signal:test",
-        components_checked=["component:skills:trigger-evals"],
+        components_checked=["component:techniques:canon-and-intake-beacons"],
         gaps=[
             ConnectivityGap(
                 gap_ref="gap:kag:donor",
@@ -132,17 +134,17 @@ def review_queue() -> ReviewQueue:
         workspace_root="/srv/workspace",
         items=[
             ReviewQueueItem(
-                item_ref="review-item:skill-gap",
-                lane="skill",
+                item_ref="review-item:technique-candidate",
+                lane="technique",
                 priority="medium",
-                target_repo="aoa-skills",
-                owner_repo="aoa-skills",
-                component_ref="component:skills:trigger-evals",
-                beacon_ref="beacon:skill-gap",
-                kind="unused_skill_opportunity",
+                target_repo="aoa-techniques",
+                owner_repo="aoa-techniques",
+                component_ref="component:techniques:canon-and-intake-beacons",
+                beacon_ref="technique.new_candidate.distillation_pressure",
+                kind="new_technique_candidate",
                 status="watch",
-                decision_surface="docs/TRIGGER_EVALS.md",
-                summary="skill might fit but was not used",
+                decision_surface="mechanics/distillation/parts/cross-layer-candidate-ledger/README.md",
+                summary="owner-authored candidate pressure needs technique review",
             )
         ],
     )
@@ -213,12 +215,12 @@ def test_stats_projection_is_derived_observability_only() -> None:
         gap_report=gap_report(),
         beacon_packet=beacon_packet(),
         review_queue=review_queue(),
-        loaded_components=["component:skills:trigger-evals"],
+        loaded_components=["component:techniques:canon-and-intake-beacons"],
     )
     assert projection.surface_strength == "derived_observability_only"
     assert projection.gaps.by_kind["unresolved_edge"] == 1
     assert projection.beacons.by_kind["overclaim_alarm"] == 1
-    assert projection.review.by_kind["unused_skill_opportunity"] == 1
+    assert projection.review.by_kind["new_technique_candidate"] == 1
 
 
 def test_stats_projection_no_input_path_keeps_schema_provenance() -> None:
@@ -290,7 +292,7 @@ def test_bundle_carries_guard_report_and_surface_postures() -> None:
         return_handoff=handoff(),
         beacon_packet=beacon_packet(),
         review_queue=review_queue(),
-        loaded_components=["component:skills:trigger-evals"],
+        loaded_components=["component:techniques:canon-and-intake-beacons"],
     )
     assert len(bundle.surfaces) >= 5
     assert {surface.target_repo for surface in bundle.surfaces} == {

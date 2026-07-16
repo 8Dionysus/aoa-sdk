@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-from .checkpoint import build_checkpoint_bridge_plan, build_checkpoint_context_bundle
+from .checkpoint import (
+    build_checkpoint_evidence_bundle,
+    build_checkpoint_evidence_handoff_plan,
+)
 from .closeout import (
-    build_reviewed_closeout_request,
+    build_owner_evidence_handoff,
+    build_reviewed_return_handoff,
     build_runtime_return_closeout_receipt,
-    plan_owner_publications,
 )
 from .codex import build_codex_local_target
 from .contracts import build_summon_request_payload, build_summon_result_payload
@@ -21,12 +24,9 @@ CHECKPOINT_NOTE_REF = (
     "aoa-sdk/.aoa/session-growth/current/"
     "a2a-return-checkpoint/checkpoint-note.json"
 )
-CODEX_TRACE_REF = (
-    "aoa-sdk/.aoa/skill-runtime-sessions/"
-    "a2a-return-checkpoint/codex-trace.json"
-)
+CODEX_TRACE_REF = "codex:thread:a2a-return-checkpoint"
 REVIEWED_ARTIFACT_PATH = "/srv/notes/a2a-reviewed-child-return.md"
-OBSERVED_AT = "2026-04-14T00:00:00.000Z"
+OBSERVED_AT = "2026-07-15T00:00:00.000Z"
 
 
 def build_summon_return_checkpoint_fixture(
@@ -43,7 +43,10 @@ def build_summon_return_checkpoint_fixture(
     )
     intent = SummonIntent(
         desired_role="reviewer",
-        skill_refs=["aoa-summon", "aoa-checkpoint-closeout-bridge"],
+        capability_refs=[
+            "workflow.operations.delegation",
+            "workflow.operations.checkpoint-closeout",
+        ],
         expected_outputs=["verification_result", "bounded_plan"],
         parent_task_id="parent:a2a-return-checkpoint",
         session_ref=SESSION_REF,
@@ -85,7 +88,7 @@ def build_summon_return_checkpoint_fixture(
     if return_plan is None:  # pragma: no cover - fixture state is intentionally terminal
         raise ValueError("expected fixture child task to require a return plan")
 
-    checkpoint_bridge_plan = build_checkpoint_bridge_plan(
+    checkpoint_handoff_plan = build_checkpoint_evidence_handoff_plan(
         session_ref=SESSION_REF,
         reviewed_artifact_path=REVIEWED_ARTIFACT_PATH,
         checkpoint_note_ref=CHECKPOINT_NOTE_REF,
@@ -102,33 +105,46 @@ def build_summon_return_checkpoint_fixture(
         return_plan=return_plan,
         checkpoint_note_ref=CHECKPOINT_NOTE_REF,
     )
-    publication_plan = plan_owner_publications(
-        runtime_receipt_paths=[
-            "/srv/receipts/a2a-return-checkpoint/runtime_return_closeout_receipt.json"
-        ],
-        eval_receipt_paths=[
-            "/srv/receipts/a2a-return-checkpoint/a2a_return_eval_packet.json"
-        ],
-        playbook_receipt_paths=[
-            "/srv/receipts/a2a-return-checkpoint/playbook_review_harvest_receipt.json"
-        ],
-        memo_receipt_paths=[
-            "/srv/receipts/a2a-return-checkpoint/memo_writeback_receipt.json"
-        ],
-    )
-    reviewed_closeout_request = build_reviewed_closeout_request(
+    owner_handoffs = [
+        build_owner_evidence_handoff(
+            owner_ref="repo:abyss-stack",
+            candidate_kind="runtime-return-receipt",
+            reason="runtime owner must decide whether to admit the reviewed return receipt",
+            evidence_refs=[REVIEWED_ARTIFACT_PATH, *remote_task.artifact_refs],
+        ),
+        build_owner_evidence_handoff(
+            owner_ref="repo:aoa-evals",
+            candidate_kind="child-return-eval",
+            reason="eval owner must verify the returned artifacts before any proof claim",
+            evidence_refs=[REVIEWED_ARTIFACT_PATH, *remote_task.artifact_refs],
+        ),
+        build_owner_evidence_handoff(
+            owner_ref="repo:aoa-memo",
+            candidate_kind="reviewed-writeback-candidate",
+            reason="memo owner must decide whether the reviewed return is durable memory",
+            evidence_refs=[REVIEWED_ARTIFACT_PATH],
+        ),
+        build_owner_evidence_handoff(
+            owner_ref="repo:aoa-playbooks",
+            candidate_kind="checkpoint-owner-followthrough",
+            reason="the owner playbook may compose reviewed checkpoint follow-through",
+            evidence_refs=[REVIEWED_ARTIFACT_PATH, CHECKPOINT_NOTE_REF],
+            capability_ref="workflow.operations.checkpoint-closeout",
+        ),
+    ]
+    reviewed_return_handoff = build_reviewed_return_handoff(
         remote_task,
         decision,
         session_ref=SESSION_REF,
         reviewed_artifact_path=REVIEWED_ARTIFACT_PATH,
-        publication_plan=publication_plan,
+        owner_handoffs=owner_handoffs,
         audit_refs=[
             REVIEWED_ARTIFACT_PATH,
             "repo:aoa-sdk/mechanics/checkpoint/parts/child-task-reentry/examples/summon_return_checkpoint_e2e.fixture.json",
         ],
         memo_export_plan=memo_export_plan,
         return_plan=return_plan,
-        checkpoint_bridge_plan=checkpoint_bridge_plan,
+        checkpoint_handoff_plan=checkpoint_handoff_plan,
         codex_target=codex_target,
     )
     runtime_return_closeout_receipt = build_runtime_return_closeout_receipt(
@@ -137,7 +153,7 @@ def build_summon_return_checkpoint_fixture(
         session_ref=SESSION_REF,
         reviewed_artifact_path=REVIEWED_ARTIFACT_PATH,
         return_plan=return_plan,
-        checkpoint_bridge_plan=checkpoint_bridge_plan,
+        checkpoint_handoff_plan=checkpoint_handoff_plan,
         codex_target=codex_target,
         observed_at=observed_at,
     )
@@ -145,21 +161,24 @@ def build_summon_return_checkpoint_fixture(
         decision,
         codex_local_target=codex_target,
         return_plan=return_plan,
-        checkpoint_bridge_plan=checkpoint_bridge_plan,
+        checkpoint_handoff_plan=checkpoint_handoff_plan,
         memo_export_plan=memo_export_plan,
-        owner_publication_plan=publication_plan,
+        owner_handoffs=owner_handoffs,
     )
 
     return {
         "fixture_id": FIXTURE_ID,
-        "schema_version": 1,
+        "schema_version": 2,
         "fixture_kind": "a2a_summon_return_checkpoint_e2e",
         "dry_run": True,
         "live_automation": False,
+        "capability_execution_claimed": False,
         "playbook_id": "AOA-P-0031",
         "eval_anchor": "aoa-a2a-summon-return-checkpoint",
         "owner_refs": {
-            "summon_contract": "repo:aoa-skills/skills/aoa-summon/SKILL.md",
+            "delegation_capability": "workflow.operations.delegation",
+            "checkpoint_capability": "workflow.operations.checkpoint-closeout",
+            "sdk_contract": "repo:aoa-sdk/mechanics/checkpoint/parts/child-task-reentry/schemas/summon-request-v4.schema.json",
             "sdk_helper": "repo:aoa-sdk/mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md",
             "playbook": "repo:aoa-playbooks/playbooks/a2a-summon-return-checkpoint/PLAYBOOK.md",
             "eval_hook": "repo:aoa-evals/examples/artifact_to_verdict_hook.a2a-summon-return-checkpoint.example.json",
@@ -179,10 +198,10 @@ def build_summon_return_checkpoint_fixture(
         },
         "return_plan": to_jsonable(return_plan),
         "transition_decision": build_transition_decision_payload(return_plan),
-        "checkpoint_bridge_plan": to_jsonable(checkpoint_bridge_plan),
-        "checkpoint_context_bundle": build_checkpoint_context_bundle(
-            checkpoint_bridge_plan,
-            owner_publication_plan=publication_plan,
+        "checkpoint_handoff_plan": to_jsonable(checkpoint_handoff_plan),
+        "checkpoint_evidence_bundle": build_checkpoint_evidence_bundle(
+            checkpoint_handoff_plan,
+            owner_handoffs=owner_handoffs,
         ),
         "a2a_return_eval_packet": {
             "hook_id": "aoa-p-0031-a2a-summon-return-checkpoint-hook",
@@ -194,7 +213,7 @@ def build_summon_return_checkpoint_fixture(
                 "codex_local_target",
                 "child_task_result",
                 "return_plan",
-                "checkpoint_bridge_plan",
+                "checkpoint_handoff_plan",
                 "memo_writeback_ref",
                 "runtime_closeout_dry_run_receipt",
             ],
@@ -206,15 +225,15 @@ def build_summon_return_checkpoint_fixture(
             "memo_export_plan": to_jsonable(memo_export_plan),
             "contains_raw_trace": memo_export_plan.contains_raw_trace,
         },
-        "owner_publication_plan": [to_jsonable(plan) for plan in publication_plan],
-        "reviewed_closeout_request": reviewed_closeout_request,
+        "owner_handoffs": [to_jsonable(item) for item in owner_handoffs],
+        "reviewed_return_handoff": reviewed_return_handoff,
         "runtime_return_closeout_receipt": runtime_return_closeout_receipt,
         "runtime_closeout_dry_run_receipt_contract": {
             "artifact_kind": "aoa.runtime-a2a-return-closeout-dry-run",
             "dry_run": True,
             "live_automation": False,
             "exported_by": "scripts/aoa-a2a-return-closeout-dry-run",
-            "source_payload": "reviewed_closeout_request",
+            "source_payload": "reviewed_return_handoff",
         },
         "routing_reentry": {
             "entry_id": "AOA-P-0031",

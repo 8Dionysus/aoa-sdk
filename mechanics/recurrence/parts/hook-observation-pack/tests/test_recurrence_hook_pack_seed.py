@@ -72,32 +72,6 @@ def _make_workspace(tmp_path: Path) -> Workspace:
             }
         ]
     }
-    skills_manifest = {
-        "schema_version": "aoa_recurrence_component_v2",
-        "component_ref": "component:skills:bundle-and-activation-beacons",
-        "owner_repo": "aoa-skills",
-        "source_inputs": ["docs/TRIGGER_EVALS.md"],
-        "proof_surfaces": ["python scripts/validate_skills.py --fail-on-review-truth-sync"],
-        "refresh_routes": [{"action": "revalidate", "commands": ["python scripts/validate_skills.py --fail-on-review-truth-sync"]}],
-        "beacon_rules": [
-            {
-                "beacon_ref": "skills.unused_skill.activation_gap",
-                "kind": "unused_skill_opportunity",
-                "decision_surface": "docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
-                "observation_inputs": ["description-trigger-suite", "skill-live-receipts"],
-                "match_signals": ["should_trigger_missing", "prefer_other_skill_gap"],
-                "match_categories": ["usage_gap"],
-                "thresholds": {
-                    "watch_observations": 1,
-                    "candidate_observations": 2,
-                    "review_ready_observations": 3,
-                    "min_unique_sources": 1,
-                    "min_unique_evidence_refs": 1
-                },
-                "suppress_when": []
-            }
-        ]
-    }
     evals_manifest = {
         "schema_version": "aoa_recurrence_component_v2",
         "component_ref": "component:evals:portable-proof-beacons",
@@ -183,13 +157,17 @@ def _make_workspace(tmp_path: Path) -> Workspace:
         ]
     }
 
-    _write_json(techniques_root / "manifests/recurrence/techniques.json", technique_manifest)
-    _write_json(skills_root / "manifests/recurrence/skills.json", skills_manifest)
+    _write_json(
+        techniques_root
+        / "mechanics/recurrence/parts/live-observation-producers/manifests/recurrence/techniques.json",
+        technique_manifest,
+    )
     _write_json(evals_root / "manifests/recurrence/evals.json", evals_manifest)
     _write_json(playbooks_root / "manifests/recurrence/playbooks.json", playbooks_manifest)
 
     _write_json(
-        techniques_root / "manifests/recurrence/hooks/techniques.hooks.json",
+        techniques_root
+        / "mechanics/recurrence/parts/live-observation-producers/manifests/recurrence/hooks/techniques.hooks.json",
         {
             "schema_version": "aoa_hook_binding_set_v1",
             "component_ref": "component:techniques:canon-and-intake-beacons",
@@ -210,36 +188,6 @@ def _make_workspace(tmp_path: Path) -> Workspace:
                         {"signal": "distillation_pressure_observed", "category": "review_signal", "match": "exists", "field": "candidate_ref"},
                         {"signal": "second_consumer_confirmed", "category": "evidence_pressure", "match": "exists", "field": "second_consumer_ref"}
                     ]
-                }
-            ]
-        },
-    )
-    _write_json(
-        skills_root / "manifests/recurrence/hooks/skills.hooks.json",
-        {
-            "schema_version": "aoa_hook_binding_set_v1",
-            "component_ref": "component:skills:bundle-and-activation-beacons",
-            "owner_repo": "aoa-skills",
-            "bindings": [
-                {
-                    "binding_ref": "skills.trigger_gap.session_stop",
-                    "event": "session_stop",
-                    "producer": "skill_trigger_gap_watch",
-                    "component_ref": "component:skills:bundle-and-activation-beacons",
-                    "owner_repo": "aoa-skills",
-                    "input_ref": "description-trigger-suite",
-                    "path_globs": ["generated/description_trigger_eval_cases.jsonl"],
-                    "config": {
-                        "receipt_globs": [".aoa/live_receipts/skill-receipts.jsonl", "examples/session_growth_artifacts/*.skill-growth.json"],
-                        "positive_case_values": ["should-trigger", "explicit-handle"],
-                        "prefer_other_case_values": ["prefer-other-skill"],
-                        "manual_case_values": ["manual-invocation-required"],
-                        "receipt_skill_fields": ["applied_skills", "skill_name", "skill_ref", "skill_refs"],
-                        "record_id_field": "case_id",
-                        "case_class_field": "case_class",
-                        "skill_field": "skill_name"
-                    },
-                    "signal_rules": []
                 }
             ]
         },
@@ -338,6 +286,29 @@ def _make_workspace(tmp_path: Path) -> Workspace:
             ]
         },
     )
+    _write_json(
+        sdk_root
+        / "mechanics/recurrence/parts/hook-observation-pack/manifests/hooks/agon-observation-only.hooks.json",
+        {
+            "component_id": "component:agon:observation-only",
+            "hook_binding_set_id": "hooks:agon:observation-only",
+            "hook_mode": "observe_only",
+            "observation_producers": ["stop_line_integrity"],
+            "forbidden_actions": ["open_session", "issue_verdict"],
+            "owner_repo": "aoa-sdk",
+        },
+    )
+    _write_json(
+        sdk_root
+        / "mechanics/recurrence/parts/hook-observation-pack/manifests/hooks/foreign-review-posture.hooks.json",
+        {
+            "hook_set_id": "component:agon:review-posture.hooks",
+            "observes_component": "component:agon:review-posture",
+            "posture": "review_queue_only",
+            "allowed_outputs": ["recurrence_observation"],
+            "forbidden_effects": ["live_verdict_authority"],
+        },
+    )
 
     (techniques_root / "docs").mkdir(parents=True, exist_ok=True)
     (techniques_root / "docs/CROSS_LAYER_TECHNIQUE_CANDIDATES.md").write_text("# candidates\n", encoding="utf-8")
@@ -347,25 +318,6 @@ def _make_workspace(tmp_path: Path) -> Workspace:
             {"receipt_ref": "tech-1", "candidate_ref": "AOA-T-CAND-001"},
             {"receipt_ref": "tech-2", "second_consumer_ref": "consumer:mirror-B"}
         ],
-    )
-
-    (skills_root / "docs").mkdir(parents=True, exist_ok=True)
-    (skills_root / "docs/TRIGGER_EVALS.md").write_text("# trigger evals\n", encoding="utf-8")
-    _write_jsonl(
-        skills_root / "generated/description_trigger_eval_cases.jsonl",
-        [
-            {"case_id": "case-1", "skill_name": "aoa-change-protocol", "case_class": "should-trigger"},
-            {"case_id": "case-2", "skill_name": "aoa-closeout-bridge", "case_class": "prefer-other-skill"},
-            {"case_id": "case-3", "skill_name": "aoa-manual-skill", "case_class": "manual-invocation-required"}
-        ],
-    )
-    _write_json(
-        skills_root / "examples/session_growth_artifacts/run.skill-growth.json",
-        {"applied_skills": ["other-skill"], "surface_detection_context": {"shortlist": ["aoa-change-protocol"]}},
-    )
-    _write_jsonl(
-        skills_root / ".aoa/live_receipts/skill-receipts.jsonl",
-        [{"receipt_ref": "skill-1", "applied_skills": ["other-skill"]}],
     )
 
     (evals_root / "docs").mkdir(parents=True, exist_ok=True)
@@ -436,16 +388,13 @@ def test_hooks_list_and_run_session_stop(tmp_path: Path) -> None:
     api = RecurrenceAPI(workspace)
 
     bindings = api.hooks(event="session_stop")
-    assert len(bindings) == 4
+    assert len(bindings) == 3
 
     report = api.run_hooks(event="session_stop")
     signals = {item.signal for item in report.observations}
 
     assert "candidate_harvested" in signals
     assert "second_consumer_confirmed" in signals
-    assert "should_trigger_missing" in signals
-    assert "prefer_other_skill_gap" in signals
-    assert "manual_invocation_boundary_seen" in signals
     assert "trace_bridge_receipt_ready" in signals
     assert "portable_claim_repeat" in signals
     assert "overclaim_detected" in signals
@@ -471,19 +420,7 @@ def test_observe_can_merge_hook_run_report_and_emit_beacons(tmp_path: Path) -> N
     by_ref = {item.beacon_ref: item for item in beacons.entries}
     assert by_ref["technique.new_candidate.distillation_pressure"].status == "candidate"
     assert by_ref["technique.canonical.second_consumer_pressure"].status == "candidate"
-    assert by_ref["skills.unused_skill.activation_gap"].status == "candidate"
     assert by_ref["evals.portable_eval.runtime_pressure"].status in {"candidate", "review_ready"}
     assert by_ref["evals.overclaim.guard"].status == "candidate"
     assert by_ref["playbooks.recurring_scenario.candidate"].status in {"candidate", "review_ready"}
     assert by_ref["playbooks.subagent.recipe_pressure"].status in {"candidate", "review_ready"}
-
-
-def test_skill_trigger_gap_reports_missing_receipt_surface_instead_of_hiding_it(tmp_path: Path) -> None:
-    workspace = _make_workspace(tmp_path)
-    api = RecurrenceAPI(workspace)
-
-    # Remove the optional local receipt stream so the hook run surfaces the gap honestly.
-    (workspace.repo_roots["aoa-skills"] / ".aoa/live_receipts/skill-receipts.jsonl").unlink(missing_ok=True)
-
-    report = api.run_hooks(event="session_stop")
-    assert "aoa-skills:.aoa/live_receipts/skill-receipts.jsonl" in report.missing_paths

@@ -2,7 +2,7 @@
   "schema_version": "aoa_beacon_packet_v1",
   "packet_ref": "beacons:20260413T120100Z",
   "workspace_root": "/srv/federation",
-  "signal_ref": "signal:20260413T115900Z:aoa-skills",
+  "signal_ref": "signal:20260413T115900Z:aoa-techniques",
   "entries": [
     {
       "beacon_ref": "technique.new_candidate.distillation_pressure",
@@ -29,33 +29,6 @@
       "recommended_actions": [
         "refresh cross-layer technique candidate intake",
         "check overlap and boundedness before distillation"
-      ]
-    },
-    {
-      "beacon_ref": "skills.unused_skill.activation_gap",
-      "kind": "unused_skill_opportunity",
-      "status": "candidate",
-      "component_ref": "component:skills:bundle-and-activation-beacons",
-      "owner_repo": "aoa-skills",
-      "target_repo": "aoa-skills",
-      "decision_surface": "docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
-      "reason": "unused_skill_opportunity reached candidate with 2 matching observation(s), 2 unique source input(s), and 2 evidence ref(s)",
-      "evidence_refs": [
-        "generated/description_trigger_eval_cases.jsonl#case-17",
-        "generated/skill_evaluation_matrix.md#gap-2"
-      ],
-      "source_inputs": [
-        "description-trigger-suite",
-        "skill-evaluation-matrix"
-      ],
-      "related_signals": [
-        "prefer_other_skill_gap",
-        "should_trigger_missing"
-      ],
-      "suppression_flags": [],
-      "recommended_actions": [
-        "inspect the applicability map and defer/skip notes",
-        "check whether a nearby skill should have triggered"
       ]
     },
     {

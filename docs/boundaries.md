@@ -7,7 +7,11 @@ repositories remain authoritative.
 ## Source Ownership
 
 - `aoa-routing` owns navigation surfaces and the dispatch ABI.
-- `aoa-skills` owns skill execution canon and activation meaning.
+- `aoa-skills` owns shared skill sources, capability families, install
+  profiles, and portable exports.
+- Each repository owns admission and projection of its home skills.
+- The host owns skill discovery and execution; KAG and the executing agent own
+  semantic retrieval and task-local composition.
 - `aoa-agents` owns role contracts, phase seams, and handoff doctrine.
 - `aoa-playbooks` owns scenario composition surfaces.
 - `aoa-memo` owns recall and memory objects.
@@ -30,6 +34,7 @@ repositories remain authoritative.
 - session and orchestration helpers that preserve source ownership
 - policy-aware guards around approval, mutation, and trust posture
 - adapters that can change transport without changing ownership
+- passive skill-environment inspection and exact owner-profile user bootstrap
 - reviewed-session closeout helpers that call owner-owned publisher scripts and
   refresh derived stats without taking over workflow or proof meaning
 
@@ -45,6 +50,8 @@ repositories remain authoritative.
 - `sdk/` folders that pretend to be a second Python implementation tree or a
   sibling-source owner
 - hidden ranking, routing, or memory policy
+- skill selection, activation, task-local composition, or repository-home
+  admission
 - daemon or service responsibilities
 - project-specific overlays inside portable-core modules
 

@@ -1,0 +1,120 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aoa-sdk:a2a:summon-request:v4",
+  "title": "AoA bounded child-task request v4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["quest_passport", "summon_request", "expected_outputs"],
+  "allOf": [
+    {
+      "anyOf": [
+        {
+          "properties": {
+            "quest_passport": {
+              "required": ["route_anchor"],
+              "properties": {
+                "route_anchor": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "summon_request": {
+              "required": ["parent_task_id"],
+              "properties": {
+                "parent_task_id": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        },
+        {
+          "properties": {
+            "summon_request": {
+              "required": ["session_ref"],
+              "properties": {
+                "session_ref": {"type": "string", "minLength": 1}
+              }
+            }
+          }
+        }
+      ]
+    }
+  ],
+  "properties": {
+    "quest_passport": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["difficulty", "risk", "control_mode", "delegate_tier"],
+      "properties": {
+        "difficulty": {"type": "string"},
+        "risk": {"type": "string"},
+        "control_mode": {"type": "string"},
+        "delegate_tier": {"type": "string"},
+        "secondary_tier": {"type": ["string", "null"]},
+        "wrapper_class": {"type": ["string", "null"]},
+        "route_anchor": {"type": ["string", "null"]},
+        "expected_artifacts": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "self_agent": {"type": "boolean"}
+      }
+    },
+    "summon_request": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "capability_refs",
+        "expected_outputs",
+        "review_required",
+        "transport_preference",
+        "require_progression",
+        "workspace_root"
+      ],
+      "properties": {
+        "desired_role": {"type": ["string", "null"]},
+        "child_agent_id": {"type": ["string", "null"]},
+        "capability_refs": {
+          "type": "array",
+          "items": {"type": "string", "minLength": 1}
+        },
+        "expected_outputs": {
+          "type": "array",
+          "minItems": 1,
+          "items": {"type": "string", "minLength": 1}
+        },
+        "parent_task_id": {"type": ["string", "null"]},
+        "session_ref": {"type": ["string", "null"]},
+        "reviewed_artifact_path": {"type": ["string", "null"]},
+        "audit_refs": {
+          "type": "array",
+          "items": {"type": "string"}
+        },
+        "playbook_ref": {"type": ["string", "null"]},
+        "review_required": {"type": "boolean"},
+        "transport_preference": {
+          "type": "string",
+          "enum": ["codex_local", "a2a_remote", "either"]
+        },
+        "require_progression": {"type": "boolean"},
+        "workspace_root": {"type": "string", "minLength": 1}
+      }
+    },
+    "expected_outputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {"type": "string", "minLength": 1}
+    },
+    "progression_overlay_ref": {"type": ["string", "null"]},
+    "self_agent_checkpoint_ref": {"type": ["string", "null"]},
+    "stress_bundle_ref": {"type": ["string", "null"]},
+    "checkpoint_note_ref": {"type": ["string", "null"]},
+    "codex_trace_ref": {"type": ["string", "null"]},
+    "reviewed_artifact_path": {"type": ["string", "null"]},
+    "audit_refs": {
+      "type": "array",
+      "items": {"type": "string"}
+    }
+  }
+}

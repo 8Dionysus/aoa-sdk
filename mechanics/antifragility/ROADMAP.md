@@ -6,9 +6,9 @@ or proof verdicts.
 
 ## Current Contour
 
-- Keep stress-posture dispatch, reviewed stress closeout carry, and via
+- Keep stress-posture task dispatch, reviewed stress closeout carry, and via
   negativa pruning routed through active `parts/`.
-- Keep dispatch decisions advisory until the stronger owner accepts the
+- Keep task-dispatch decisions advisory until the stronger owner accepts the
   remediation or follow-through route.
 - Keep reviewed stress carry as evidence for return and handoff, not as proof
   that a fix landed.
@@ -24,8 +24,8 @@ or proof verdicts.
 
 ## When Time Comes
 
-- Add a new part when a recurring stress route no longer fits dispatch, carry,
-  or via negativa without blurring the operation.
+- Add a new part when a recurring stress route no longer fits task dispatch,
+  carry, or via negativa without blurring the operation.
 - Add stronger machine checks when stress patterns begin to drive CI or release
   decisions.
 - Add generated posture views only after they stay visibly weaker than source

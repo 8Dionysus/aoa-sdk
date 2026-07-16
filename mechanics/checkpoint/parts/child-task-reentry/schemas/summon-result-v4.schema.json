@@ -1,0 +1,81 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "urn:aoa-sdk:a2a:summon-result:v4",
+  "title": "AoA bounded child-task result v4",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "allowed",
+    "lane",
+    "execution_surface",
+    "cohort_pattern",
+    "closeout_required",
+    "capability_execution_claimed",
+    "checkpoint_handoff_plan",
+    "owner_handoffs"
+  ],
+  "properties": {
+    "allowed": {"type": "boolean"},
+    "lane": {
+      "type": "string",
+      "enum": [
+        "codex_local_leaf",
+        "codex_local_reviewed",
+        "remote_reviewed",
+        "split_required",
+        "human_gate"
+      ]
+    },
+    "execution_surface": {"type": "string"},
+    "cohort_pattern": {"type": "string"},
+    "require_split": {"type": "boolean"},
+    "closeout_required": {"type": "boolean"},
+    "capability_execution_claimed": {"const": false},
+    "checkpoint_required": {"type": "boolean"},
+    "progression_required": {"type": "boolean"},
+    "codex_projection_required": {"type": "boolean"},
+    "requested_posture": {"type": ["string", "null"]},
+    "reason_codes": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "blocked_actions": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "expected_outputs": {
+      "type": "array",
+      "items": {"type": "string"}
+    },
+    "codex_local_target": {"type": ["object", "null"]},
+    "return_plan": {"type": ["object", "null"]},
+    "checkpoint_handoff_plan": {"type": ["object", "null"]},
+    "memo_export_plan": {"type": ["object", "null"]},
+    "owner_handoffs": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": [
+          "owner_ref",
+          "candidate_kind",
+          "reason",
+          "evidence_refs",
+          "review_required"
+        ],
+        "properties": {
+          "owner_ref": {"type": "string", "minLength": 1},
+          "candidate_kind": {"type": "string", "minLength": 1},
+          "reason": {"type": "string", "minLength": 1},
+          "evidence_refs": {
+            "type": "array",
+            "minItems": 1,
+            "items": {"type": "string", "minLength": 1}
+          },
+          "capability_ref": {"type": ["string", "null"]},
+          "review_required": {"type": "boolean"}
+        },
+        "additionalProperties": false
+      }
+    }
+  }
+}

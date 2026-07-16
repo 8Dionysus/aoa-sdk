@@ -27,5 +27,7 @@ It may not say:
 
 ## Visibility posture
 
-By default the queue keeps `candidate` and `review_ready` rows, plus watch-level omission signals for skill usage gaps.
-That keeps subtle activation misses visible without flooding every lane with low-grade noise.
+By default the queue keeps `candidate` and `review_ready` rows, plus watch-level
+skill usage gaps only when an owner explicitly authored the evidence-backed
+beacon. The SDK does not create those gaps from visibility, selection, loading,
+mention, semantic similarity, or missing receipts.

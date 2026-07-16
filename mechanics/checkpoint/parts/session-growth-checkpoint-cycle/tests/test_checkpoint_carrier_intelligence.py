@@ -4,6 +4,7 @@ import json
 from datetime import UTC, datetime
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from aoa_sdk import AoASDK
@@ -21,6 +22,11 @@ from aoa_sdk.models import (
     RepetitionCluster,
     WrapperReadiness,
 )
+
+
+@pytest.fixture(autouse=True)
+def _explicit_runtime_identity(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("AOA_SESSION_ID", "runtime-carrier-intelligence-tests")
 
 
 def _signature(
@@ -392,9 +398,21 @@ def test_checkpoint_carrier_intelligence_cli_writes_generated_navigation_index(
 
 def test_checkpoint_carrier_intelligence_backfills_legacy_candidate_clusters(
     workspace_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
 ) -> None:
+    monkeypatch.setenv(
+        "AOA_SESSION_ID", "runtime-legacy-carrier-intelligence"
+    )
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    note_dir = workspace_root / "aoa-sdk" / ".aoa" / "session-growth" / "current" / "aoa-sdk"
+    note_dir = (
+        workspace_root
+        / "aoa-sdk"
+        / ".aoa"
+        / "session-growth"
+        / "current"
+        / "runtime-legacy-carrier-intelligence"
+        / "aoa-sdk"
+    )
     _write_legacy_checkpoint_entry(note_dir, observed_at="2026-04-10T14:00:00Z")
     _write_legacy_checkpoint_entry(note_dir, observed_at="2026-04-10T14:01:00Z")
 

@@ -24,7 +24,7 @@
 - `src/aoa_sdk/surfaces/`
 - `src/aoa_sdk/techniques/`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`
-- `mechanics/boundary-bridge/parts/skill-runtime-bridge/`
+- `mechanics/boundary-bridge/parts/skill-environment-inspector/`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_agent_phase_binding_surface_reader.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py`
@@ -38,9 +38,8 @@
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py`
-- `mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge.py`
-- `mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge_cli.py`
-- `mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_reference_contracts.py`
+- `mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py`
+- `mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py`
 
 ## Stronger Owners
 
@@ -54,10 +53,12 @@ surface, keep ownership outside.
 
 Former parent-name candidates for this package live only in
 `legacy/INDEX.md`. Active Boundary Bridge routes name the operation: consumed
-surface posture gate, skill runtime bridge, and owner-layer signal handoff.
+surface posture gate, skill environment inspector, and owner-layer signal handoff.
 
-Former root skill runtime docs and tests moved into
-`mechanics/boundary-bridge/parts/skill-runtime-bridge/`. Old root paths such as
+The former skill runtime bridge was retired by AOA-SDK-D-0067 after owner
+profiles and the typed capability graph replaced SDK dispatch and session
+state. Its active replacement is
+`mechanics/boundary-bridge/parts/skill-environment-inspector/`. Old root paths such as
 `docs/skill-runtime-recommendation-gap.md`,
 `docs/skill-runtime-recommendation-gap-fix-spec.md`, and
 `tests/test_skills.py` are provenance only, not active routes.
@@ -73,5 +74,5 @@ test names such as `tests/test_compatibility.py`, `tests/test_memo.py`, and
 
 Former root CLI cases from `tests/test_cli.py` moved into
 `consumed-surface-posture-gate` for compatibility commands and
-`skill-runtime-bridge` for skill commands. The old root CLI test file is
+`skill-environment-inspector` for skill commands. The old root CLI test file is
 provenance only, not an active route.

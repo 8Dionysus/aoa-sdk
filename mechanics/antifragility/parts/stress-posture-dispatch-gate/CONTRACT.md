@@ -3,22 +3,25 @@
 ## Allowed Outputs
 
 - Stress posture disclosure in SDK-visible reports.
-- Narrowed dispatch decisions.
-- Blocked auto-activation reasons.
-- Required review steps.
+- Merged `StressBundle` values from explicit typed signals.
+- Narrowed `SummonDecision` task-dispatch results.
+- Blocked-action and re-entry conditions.
 - Evidence refs for closeout or owner handoff.
 
 ## Stop-Lines
 
 - Do not widen permissions because stress context is present.
-- Do not auto-activate skills that still require review.
+- Do not select, activate, execute, or mutate skills.
+- Do not interpret a blocked action as proof that a runtime enforced it.
 - Do not auto-repair owner runtime or degraded surfaces.
 - Do not convert routing hints, memo refs, or eval refs into source truth.
 
 ## Owner Split
 
-The SDK may carry and disclose the decision. Owners decide remediation,
-runtime behavior, deletion, proof acceptance, and durable memory.
+The SDK may carry and disclose the decision. `aoa-skills` owns skill truth;
+KAG owns semantic retrieval and task-local composition; the host runtime owns
+execution. Affected owners decide remediation, runtime behavior, deletion,
+proof acceptance, and durable memory.
 
 ## External Source Tokens
 

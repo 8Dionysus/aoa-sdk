@@ -4,9 +4,9 @@
   "entries": [
     {
       "former_name": "closeout",
-      "active_route": "checkpoint/reviewed-session-handoff-runner",
+      "active_route": "checkpoint/session-growth-checkpoint-cycle",
       "status": "distilled",
-      "rationale": "Closeout assembly is a reviewed checkpoint bridge part, not an independent SDK parent mechanic."
+      "rationale": "Reviewed closeout is evidence materialization inside the checkpoint cycle; owner execution stays outside the SDK."
     },
     {
       "former_name": "a2a-return",

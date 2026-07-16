@@ -7,9 +7,10 @@ Functioning Antifragility parts under `mechanics/antifragility/parts/`.
 ## Role
 
 These parts hold active SDK antifragility payload after it leaves root
-districts. They route stress posture, reviewed closeout carry, and via
-negativa pruning without turning the SDK into proof, repair, deletion, memory,
-or runtime authority.
+districts. They route stress posture into task-dispatch constraints, carry
+reviewed closeout evidence, and keep via negativa pruning explicit without
+turning the SDK into proof, repair, deletion, memory, skill-routing, or runtime
+authority.
 
 ## Boundaries
 

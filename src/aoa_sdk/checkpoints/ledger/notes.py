@@ -16,7 +16,7 @@ from ...models import (
     SessionCheckpointHistoryEntry,
     SessionCheckpointLifecycleEvent,
     SessionCheckpointNote,
-    SessionEndSkillTarget,
+    SessionEndCapabilityTarget,
 )
 from ...workspace.discovery import Workspace
 from ..candidate_intelligence import build_candidate_intelligence_from_note
@@ -43,8 +43,8 @@ SESSION_REF_TIMESTAMP_FORMAT = "%Y-%m-%dT%H-%M-%S-%fZ"
 class CheckpointStatusAPI(Protocol):
     workspace: Workspace
 
-    def status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote: ...
-    def peek_status(self, *, repo_root: str, session_file: str | None = None) -> SessionCheckpointNote: ...
+    def status(self, *, repo_root: str, runtime_session_file: str | None = None) -> SessionCheckpointNote: ...
+    def peek_status(self, *, repo_root: str, runtime_session_file: str | None = None) -> SessionCheckpointNote: ...
 
 
 def load_checkpoint_note(path: Path) -> SessionCheckpointNote | None:
@@ -112,7 +112,8 @@ def archive_current_checkpoint(paths: CheckpointPaths) -> Path:
         paths.harvest_handoff,
         paths.post_commit_report,
         paths.closeout_context,
-        paths.closeout_execution_report,
+        paths.closeout_materialization_report,
+        paths.legacy_closeout_execution_report,
     ):
         if source.exists():
             source.rename(archive_dir / source.name)
@@ -137,7 +138,14 @@ def move_current_checkpoint(*, source_paths: CheckpointPaths, target_paths: Chec
         (source_paths.harvest_handoff, target_paths.harvest_handoff),
         (source_paths.post_commit_report, target_paths.post_commit_report),
         (source_paths.closeout_context, target_paths.closeout_context),
-        (source_paths.closeout_execution_report, target_paths.closeout_execution_report),
+        (
+            source_paths.closeout_materialization_report,
+            target_paths.closeout_materialization_report,
+        ),
+        (
+            source_paths.legacy_closeout_execution_report,
+            target_paths.legacy_closeout_execution_report,
+        ),
     ):
         if source.exists():
             source.rename(target)
@@ -448,7 +456,7 @@ def build_checkpoint_note(paths: CheckpointPaths) -> SessionCheckpointNote:
         agent_review_pending_refs=_dedupe_strings(pending_agent_review_refs),
         review_refs=note_review_carry.review_refs,
         auto_observation_refs=note_review_carry.auto_observation_refs,
-        applied_skill_names=note_review_carry.applied_skill_names,
+        related_capability_refs=note_review_carry.related_capability_refs,
         summaries=note_review_carry.summaries,
         findings=note_review_carry.findings,
         candidate_notes=note_review_carry.candidate_notes,
@@ -501,10 +509,10 @@ def load_runtime_checkpoint_note(
     api: CheckpointStatusAPI,
     *,
     repo_root: str,
-    session_file: str | None = None,
+    runtime_session_file: str | None = None,
 ) -> SessionCheckpointNote | None:
     try:
-        return api.status(repo_root=repo_root, session_file=session_file)
+        return api.status(repo_root=repo_root, runtime_session_file=runtime_session_file)
     except SurfaceNotFound:
         return None
 
@@ -513,10 +521,10 @@ def peek_runtime_checkpoint_note(
     api: CheckpointStatusAPI,
     *,
     repo_root: str,
-    session_file: str | None = None,
+    runtime_session_file: str | None = None,
 ) -> SessionCheckpointNote | None:
     try:
-        return api.peek_status(repo_root=repo_root, session_file=session_file)
+        return api.peek_status(repo_root=repo_root, runtime_session_file=runtime_session_file)
     except SurfaceNotFound:
         return None
 
@@ -636,34 +644,68 @@ def checkpoint_note_matches_closeout_scope(
     return note.session_ref == resolved_session_ref
 
 
-def derive_session_end_skill_targets(note: SessionCheckpointNote | None) -> list[SessionEndSkillTarget]:
+def derive_session_end_capability_candidates(
+    note: SessionCheckpointNote | None,
+) -> list[SessionEndCapabilityTarget]:
     if note is None or not note.candidate_clusters:
         return []
 
     all_candidate_ids = [cluster.candidate_id for cluster in note.candidate_clusters]
-    return [
-        SessionEndSkillTarget(
-            skill_name="aoa-session-donor-harvest",
-            why="reviewed closeout should start from donor harvest so checkpoint-led hints are reread against the full reviewed artifact before any later verdict",
-            candidate_ids=list(note.harvest_candidate_ids or all_candidate_ids),
-        ),
-        SessionEndSkillTarget(
-            skill_name="aoa-session-progression-lift",
-            why="reviewed closeout should gather one final multi-axis progression delta after donor harvest rereads the reviewed artifact",
-            candidate_ids=list(note.progression_candidate_ids or all_candidate_ids),
-        ),
-        SessionEndSkillTarget(
-            skill_name="aoa-quest-harvest",
-            why="reviewed closeout should keep final quest triage last, after donor harvest and progression lift have both completed",
-            candidate_ids=list(note.upgrade_candidate_ids),
-        ),
+    targets = [
+        SessionEndCapabilityTarget(
+            target_ref="workflow.operations.checkpoint-closeout",
+            target_kind="workflow",
+            owner_repo="aoa-playbooks",
+            lifecycle_posture="active",
+            use_posture="review-required",
+            why=(
+                "reviewed closeout may use the owner workflow as routing context after the "
+                "full evidence bundle is reread; this checkpoint does not execute it"
+            ),
+            candidate_ids=list(all_candidate_ids),
+        )
     ]
+    if note.progression_candidate_ids or note.progression_axis_signals:
+        targets.append(
+            SessionEndCapabilityTarget(
+                target_ref="adapter.sessions.progression-review",
+                target_kind="adapter",
+                owner_repo="aoa-agents",
+                lifecycle_posture="active",
+                use_posture="review-required",
+                why=(
+                    "progression-shaped evidence may be handed to the session review adapter; "
+                    "the SDK keeps the axis signals provisional"
+                ),
+                candidate_ids=list(note.progression_candidate_ids or all_candidate_ids),
+            )
+        )
+    if note.harvest_candidate_ids or note.upgrade_candidate_ids:
+        targets.append(
+            SessionEndCapabilityTarget(
+                target_ref="skill.aoa-session-harvest",
+                target_kind="skill",
+                owner_repo="aoa-skills",
+                lifecycle_posture="candidate",
+                use_posture="candidate-only",
+                why=(
+                    "the owner graph currently marks session harvest as a deferred candidate, "
+                    "so this is visibility for review rather than an invocation request"
+                ),
+                candidate_ids=list(
+                    dict.fromkeys(
+                        [*note.harvest_candidate_ids, *note.upgrade_candidate_ids]
+                    )
+                ),
+            )
+        )
+    return targets
 
 
 def derive_session_end_next_honest_move(
     *,
     note: SessionCheckpointNote | None,
-    session_end_targets: list[SessionEndSkillTarget],
+    session_end_targets: list[SessionEndCapabilityTarget],
 ) -> str | None:
     if note is None or not session_end_targets:
         return None
@@ -678,14 +720,18 @@ def derive_session_end_next_honest_move(
             + "."
         )
 
-    skill_names = [target.skill_name for target in session_end_targets]
+    capability_refs = [target.target_ref for target in session_end_targets]
     if note.stats_refresh_recommended:
         return (
-            "At reviewed closeout, run aoa-checkpoint-closeout-bridge so it raises "
-            + ", ".join(skill_names)
-            + " and refresh stats only after the reviewed handoff is assembled."
+            "At reviewed closeout, materialize the reviewed evidence bundle; consider "
+            + ", ".join(capability_refs)
+            + " only as routed capability context, and refresh stats only after owner review."
         )
-    return "At reviewed closeout, run aoa-checkpoint-closeout-bridge and raise " + ", ".join(skill_names) + "."
+    return (
+        "At reviewed closeout, materialize the reviewed evidence bundle and treat "
+        + ", ".join(capability_refs)
+        + " as review candidates, not executed capabilities."
+    )
 
 
 def merge_progression_axis_signals(values: list[ProgressionAxisSignal]) -> list[ProgressionAxisSignal]:

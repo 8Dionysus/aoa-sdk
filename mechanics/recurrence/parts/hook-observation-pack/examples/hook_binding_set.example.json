@@ -1,28 +1,35 @@
 {
   "schema_version": "aoa_hook_binding_set_v1",
-  "component_ref": "component:skills:bundle-and-activation-beacons",
-  "owner_repo": "aoa-skills",
+  "component_ref": "component:techniques:canon-and-intake-beacons",
+  "owner_repo": "aoa-techniques",
   "bindings": [
     {
-      "binding_ref": "skills.trigger_gap.session_stop",
+      "binding_ref": "techniques.receipts.session_stop",
       "event": "session_stop",
-      "producer": "skill_trigger_gap_watch",
-      "component_ref": "component:skills:bundle-and-activation-beacons",
-      "owner_repo": "aoa-skills",
-      "input_ref": "description-trigger-suite",
+      "producer": "jsonl_receipt_watch",
+      "component_ref": "component:techniques:canon-and-intake-beacons",
+      "owner_repo": "aoa-techniques",
+      "input_ref": "technique-live-receipts",
       "path_globs": [
-        "generated/description_trigger_eval_cases.jsonl"
+        ".aoa/live_receipts/technique-receipts.jsonl"
       ],
       "config": {
-        "receipt_globs": [
-          "examples/session_growth_artifacts/*.skill-growth.json"
-        ],
-        "positive_case_values": [
-          "should-trigger",
-          "explicit-handle"
-        ]
+        "record_id_field": "receipt_ref"
       },
-      "signal_rules": [],
+      "signal_rules": [
+        {
+          "signal": "second_consumer_confirmed",
+          "category": "review_signal",
+          "match": "exists",
+          "field": "second_consumer_ref",
+          "value": null,
+          "source_inputs": [],
+          "attributes_from_fields": [
+            "second_consumer_ref"
+          ],
+          "notes": "Owner receipt names an additional consumer."
+        }
+      ],
       "notes": "Example only."
     }
   ]

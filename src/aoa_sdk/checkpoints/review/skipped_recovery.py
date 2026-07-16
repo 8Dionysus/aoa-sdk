@@ -6,11 +6,10 @@ from pathlib import Path
 from typing import Any, Literal, Protocol, cast
 
 from ...errors import SurfaceNotFound
-from ...models import CheckpointAfterCommitReport, SkillSession
+from ...models import CheckpointAfterCommitReport, CheckpointRuntimeSessionRef
 from ...workspace.discovery import Workspace
 from ..hooks.git_boundary import run_git
 from ..runtime.sessions import (
-    ensure_checkpoint_runtime_session,
     probe_existing_checkpoint_runtime_session,
 )
 from ..topology.paths import post_commit_status_path
@@ -22,7 +21,7 @@ class AfterCommitCapture(Protocol):
         *,
         repo_root: str,
         commit_ref: str = "HEAD",
-        session_file: str | None = None,
+        runtime_session_file: str | None = None,
         checkpoint_kind: Literal["auto", "commit", "owner_followthrough"] = "auto",
     ) -> CheckpointAfterCommitReport: ...
 
@@ -69,15 +68,12 @@ def after_commit_report_matches_session_path(
     report: CheckpointAfterCommitReport,
     session_path: Path,
 ) -> bool:
-    if report.session_file is None:
+    if report.runtime_session_file_ref is None:
         return False
-    return Path(report.session_file).expanduser().resolve() == session_path.expanduser().resolve()
-
-
-def after_commit_report_has_thread_scoped_session_file(report: CheckpointAfterCommitReport) -> bool:
-    if report.session_file is None:
-        return False
-    return "skill-runtime-sessions" in Path(report.session_file).parts
+    return (
+        Path(report.runtime_session_file_ref).expanduser().resolve()
+        == session_path.expanduser().resolve()
+    )
 
 
 def after_commit_report_is_reachable_head(
@@ -109,8 +105,6 @@ def unresolved_skipped_post_commit_status_for_boundary(
     status_path, report = loaded
     if not is_unresolved_skipped_after_commit_report(report):
         return None
-    if not after_commit_report_has_thread_scoped_session_file(report):
-        return None
     if not after_commit_report_is_reachable_head(repo_root_path, report):
         return None
     return status_path, report
@@ -131,10 +125,9 @@ def skipped_after_commit_required_action(
     return (
         "unresolved skipped checkpoint blocks "
         f"{boundary}; post-commit requested review for {pending_ref} "
-        "but no active runtime session existed; run "
-        f"`aoa checkpoint review-note {repo_root_path} --commit-ref {pending_ref} "
-        f"--auto --session-file {report.session_file} "
-        f"--root {workspace_root}`"
+        "but no host runtime identity existed; from the active Codex/AoA session run "
+        f"`aoa checkpoint after-commit {repo_root_path} --commit-ref {pending_ref} "
+        f"--root {workspace_root}`, then run the reported review command"
     )
 
 
@@ -145,9 +138,9 @@ def recover_skipped_after_commit_for_review(
     repo_label: str,
     commit_ref: str,
     commit_metadata: dict[str, Any],
-    session_path: Path,
+    session_path: Path | None,
     capture_after_commit: AfterCommitCapture,
-) -> tuple[Path, SkillSession] | None:
+) -> tuple[Path | None, CheckpointRuntimeSessionRef] | None:
     loaded = load_latest_post_commit_status(workspace, repo_label)
     if loaded is None:
         return None
@@ -160,22 +153,20 @@ def recover_skipped_after_commit_for_review(
         commit_ref=commit_ref,
     ):
         return None
-    if not after_commit_report_matches_session_path(skipped_report, session_path):
-        return None
-
-    runtime_session_id, _ = ensure_checkpoint_runtime_session(
+    active_session_path, runtime_session = probe_existing_checkpoint_runtime_session(
         workspace=workspace,
-        session_file=str(session_path),
+        runtime_session_file=str(session_path) if session_path is not None else None,
     )
-    if runtime_session_id is None:
+    if runtime_session is None:
         raise SurfaceNotFound(
-            "checkpoint review recovery could not create an active runtime session"
+            "checkpoint review recovery requires an existing host runtime identity; "
+            "SDK does not create session state"
         )
 
     recovered_report = capture_after_commit(
         repo_root=repo_root,
         commit_ref=commit_ref,
-        session_file=str(session_path),
+        runtime_session_file=str(active_session_path) if active_session_path is not None else None,
         checkpoint_kind=skipped_report.checkpoint_kind,
     )
     if recovered_report.status != "captured":
@@ -187,10 +178,10 @@ def recover_skipped_after_commit_for_review(
 
     recovered_session_path, runtime_session = probe_existing_checkpoint_runtime_session(
         workspace=workspace,
-        session_file=str(session_path),
+        runtime_session_file=str(active_session_path) if active_session_path is not None else None,
     )
     if runtime_session is None:
         raise SurfaceNotFound(
-            "checkpoint review recovery created a runtime session path but could not reload it"
+            "checkpoint review recovery lost the host runtime identity after capture"
         )
     return recovered_session_path, runtime_session

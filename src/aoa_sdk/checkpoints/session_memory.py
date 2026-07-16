@@ -164,7 +164,7 @@ def resolve_checkpoint_session_memory_for_runtime_session(
             status="missing",
             checked_at=checked_at,
             cautions=[
-                "no aoa-sdk skill runtime session file or recoverable raw transcript matched this checkpoint runtime session"
+                "no host runtime metadata or recoverable raw transcript matched this checkpoint runtime session"
             ],
         )
 
@@ -215,6 +215,7 @@ def resolve_checkpoint_runtime_trace_ref(
             post_commit_report_ref=post_commit_report_ref,
         )
     return CheckpointRuntimeTraceRef(
+        source=runtime_session_ref.source,
         runtime_session_id=runtime_session_id,
         runtime_session_file_ref=str(runtime_session_ref.path),
         codex_thread_id=codex_thread_id,
@@ -256,9 +257,16 @@ def _candidate_aoa_roots(workspace: Workspace) -> list[Path]:
 
 
 class _RuntimeSessionRef:
-    def __init__(self, *, path: Path, payload: dict[str, Any]) -> None:
+    def __init__(
+        self,
+        *,
+        path: Path,
+        payload: dict[str, Any],
+        source: Literal["host-runtime-metadata", "legacy-skill-session"],
+    ) -> None:
         self.path = path
         self.payload = payload
+        self.source = source
 
 
 def _runtime_session_ref_for_id(
@@ -270,17 +278,22 @@ def _runtime_session_ref_for_id(
         return None
     aoa_root = workspace.repo_path("aoa-sdk") / ".aoa"
     candidate_paths: list[Path] = []
+    legacy_singleton = aoa_root / "skill-runtime-session.json"
+    if legacy_singleton.is_file():
+        candidate_paths.append(legacy_singleton)
     session_root = aoa_root / "skill-runtime-sessions"
     if session_root.is_dir():
         candidate_paths.extend(sorted(session_root.glob("*.json")))
-    if aoa_root.is_dir():
-        candidate_paths.extend(sorted(aoa_root.glob("*.json")))
     for path in candidate_paths:
         payload = _load_json_object(path)
         if payload is None:
             continue
         if _string_value(payload, "session_id") == runtime_session_id:
-            return _RuntimeSessionRef(path=path, payload=payload)
+            return _RuntimeSessionRef(
+                path=path,
+                payload=payload,
+                source="legacy-skill-session",
+            )
     return None
 
 
@@ -297,7 +310,28 @@ def _runtime_session_ref_from_path(
         return None
     if _string_value(payload, "session_id") != runtime_session_id:
         return None
-    return _RuntimeSessionRef(path=path, payload=payload)
+    return _RuntimeSessionRef(
+        path=path,
+        payload=payload,
+        source=(
+            "legacy-skill-session"
+            if _looks_like_legacy_skill_session(payload)
+            else "host-runtime-metadata"
+        ),
+    )
+
+
+def _looks_like_legacy_skill_session(payload: dict[str, Any]) -> bool:
+    return any(
+        key in payload
+        for key in (
+            "active_skills",
+            "activation_log",
+            "profile",
+            "profile_ref",
+            "skill_session_type",
+        )
+    )
 
 
 def _runtime_trace_ref_from_post_commit_report(
@@ -315,15 +349,18 @@ def _runtime_trace_ref_from_post_commit_report(
     report_runtime_session_id = _string_value(report, "runtime_session_id")
     if report_runtime_session_id and report_runtime_session_id != runtime_session_id:
         return None
-    session_file = _string_value(report, "session_file")
-    if session_file is None:
+    runtime_session_file = _string_value(report, "runtime_session_file_ref") or _string_value(
+        report,
+        "session_file",
+    )
+    if runtime_session_file is None:
         return None
-    session_path = Path(session_file).expanduser().resolve(strict=False)
+    session_path = Path(runtime_session_file).expanduser().resolve(strict=False)
     session_payload = _load_json_object(session_path)
     codex_thread_id = _string_value(session_payload, "codex_thread_id")
     codex_rollout_path = _string_value(session_payload, "codex_rollout_path")
     if codex_thread_id is None:
-        codex_thread_id = _thread_id_from_session_file(session_path)
+        codex_thread_id = _thread_id_from_runtime_metadata_path(session_path)
     if codex_rollout_path is None and codex_thread_id is not None:
         raw_path = _find_codex_raw_transcript(
             workspace=workspace,
@@ -350,12 +387,12 @@ def _runtime_trace_ref_from_post_commit_report(
     )
 
 
-def _thread_id_from_session_file(path: Path) -> str | None:
+def _thread_id_from_runtime_metadata_path(path: Path) -> str | None:
     stem = path.stem.strip()
     if not stem:
         return None
     # Codex rollout thread ids are UUID-like or long sortable ids embedded in
-    # legacy SDK runtime session filenames.
+    # legacy SDK runtime metadata filenames.
     if "-" in stem and len(stem) >= 16:
         return stem
     return None

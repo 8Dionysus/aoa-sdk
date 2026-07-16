@@ -5,11 +5,8 @@ import pytest
 
 from aoa_sdk import AoASDK
 from aoa_sdk.models import (
-    SkillHostAvailability,
     SurfaceCloseoutHandoff,
     SurfaceDetectionReport,
-    SurfaceOpportunityExecutionHint,
-    SurfaceOpportunityItem,
 )
 
 
@@ -79,9 +76,7 @@ def _install_stats_regrounding_fixture(workspace_root: Path) -> None:
 
 def test_surface_detection_and_handoff_models_round_trip(
     workspace_root: Path,
-    install_host_skills,
 ) -> None:
-    install_host_skills(workspace_root, ["aoa-change-protocol"])
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     report = sdk.surfaces.detect(
@@ -103,67 +98,27 @@ def test_surface_detection_and_handoff_models_round_trip(
     assert round_tripped_handoff.surface_detection_report_ref == "in-memory:surface-detection-report"
 
 
-def test_surface_detect_maps_activate_now_to_activated_skill_item(
+def test_surface_detect_keeps_explicit_skill_request_non_executable(
     workspace_root: Path,
-    install_host_skills,
 ) -> None:
-    install_host_skills(workspace_root, ["aoa-change-protocol"])
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     report = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="ingress",
-        intent_text="plan verify a bounded change",
+        intent_text="inspect the skill layer",
     )
-    item = _surface_item(report, "aoa-skills:aoa-change-protocol")
+    item = _surface_item(report, "aoa-skills:layer-request")
 
-    assert report.immediate_skill_dispatch == ["aoa-change-protocol"]
     assert item.object_kind == "skill"
-    assert item.state == "activated"
-    assert item.execution.lane == "skill-dispatch"
-    assert item.execution.executable_now is True
-
-
-def test_surface_detect_maps_router_only_skill_to_manual_equivalent(
-    workspace_root: Path,
-    install_host_skills,
-) -> None:
-    install_host_skills(workspace_root, ["aoa-approval-gate-check"])
-    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-
-    report = sdk.surfaces.detect(
-        repo_root=str(workspace_root / "aoa-sdk"),
-        phase="ingress",
-        intent_text="plan verify a bounded change",
-    )
-    item = _surface_item(report, "aoa-skills:aoa-change-protocol")
-
-    assert report.immediate_skill_dispatch == []
-    assert item.state == "manual-equivalent"
-    assert item.execution.lane == "manual-equivalence"
+    assert item.state == "candidate-now"
+    assert item.execution.lane == "inspect-expand-use"
     assert item.execution.executable_now is False
-    assert item.execution.manual_equivalence_allowed is True
-
-
-def test_manual_equivalence_models_accept_old_payload_keys_without_emitting_them() -> None:
-    availability = SkillHostAvailability(
-        status="router-only",
-        source="host-skill-list",
-        manual_fallback_allowed=True,
-        reason="older payload",
-    )
-    execution = SurfaceOpportunityExecutionHint(
-        lane="manual-equivalence",
-        manual_fallback_allowed=True,
-        manual_fallback_note="older payload",
-    )
-
-    assert availability.manual_equivalence_allowed is True
-    assert execution.manual_equivalence_allowed is True
-    assert execution.manual_equivalence_note == "older payload"
-    assert "manual_fallback_allowed" not in availability.model_dump()
-    assert "manual_fallback_allowed" not in execution.model_dump()
-    assert "manual_fallback_note" not in execution.model_dump()
+    assert item.execution.existing_surface == "aoa-skills.agent_skill_catalog"
+    report_payload = report.model_dump()
+    assert "immediate_skill_dispatch" not in report_payload
+    assert "active_skill_names" not in report_payload
+    assert "skill_report_included" not in report_payload
 
 
 def test_surface_detect_maps_eval_and_memo_candidates_from_tokens(workspace_root: Path) -> None:
@@ -199,62 +154,53 @@ def test_surface_detect_maps_playbook_candidate_from_recurring_tokens(workspace_
     assert item.object_kind == "playbook"
     assert item.state == "candidate-later"
     assert item.execution.lane == "closeout-harvest"
-    assert "aoa-automation-opportunity-scan" in item.closeout_family_candidates
+    assert item.closeout_capability_candidates == [
+        "workflow.operations.checkpoint-closeout"
+    ]
 
 
-def test_surface_detect_repeated_pattern_requires_runtime_or_closeout_signal(
+def test_surface_detect_repeated_pattern_requires_closeout_or_checkpoint_phase(
     workspace_root: Path,
-    install_host_skills,
-    tmp_path: Path,
 ) -> None:
-    install_host_skills(workspace_root, ["aoa-change-protocol"])
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    session_file = tmp_path / ".aoa" / "skill-runtime-session.json"
 
-    ingress_without_session = sdk.surfaces.detect(
+    ingress = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="ingress",
         intent_text="this pattern happens again",
-        session_file=str(session_file),
     )
-
-    sdk.skills.activate("aoa-change-protocol", session_file=str(session_file))
-    ingress_with_session = sdk.surfaces.detect(
+    closeout = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),
-        phase="ingress",
+        phase="closeout",
         intent_text="this pattern happens again",
-        session_file=str(session_file),
     )
 
     assert "aoa-techniques.technique_promotion_readiness.min" not in {
-        item.surface_ref for item in ingress_without_session.items
+        item.surface_ref for item in ingress.items
     }
     technique_item = _surface_item(
-        ingress_with_session,
+        closeout,
         "aoa-techniques.technique_promotion_readiness.min",
     )
-    assert ingress_with_session.active_skill_names == ["aoa-change-protocol"]
     assert technique_item.state == "candidate-later"
     assert technique_item.execution.executable_now is False
 
 
-def test_surface_detect_supports_in_flight_phase_without_writing_skill_session(
+def test_surface_detect_supports_in_flight_phase_without_execution_state(
     workspace_root: Path,
-    install_host_skills,
 ) -> None:
-    install_host_skills(workspace_root, ["aoa-change-protocol"])
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
 
     report = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="in-flight",
-        intent_text="plan verify a bounded change",
+        intent_text="inspect the skill layer",
     )
 
     assert report.phase == "in-flight"
-    assert report.immediate_skill_dispatch == ["aoa-change-protocol"]
-    assert _surface_item(report, "aoa-skills:aoa-change-protocol").phase_detected == "in-flight"
+    assert _surface_item(report, "aoa-skills:layer-request").phase_detected == "in-flight"
+    assert all(item.execution.executable_now is False for item in report.items)
     assert not session_file.exists()
 
 
@@ -276,9 +222,7 @@ def test_surface_handoff_requires_reviewed(workspace_root: Path) -> None:
 
 def test_surface_handoff_targets_are_deterministic(
     workspace_root: Path,
-    install_host_skills,
 ) -> None:
-    install_host_skills(workspace_root, ["aoa-approval-gate-check"])
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     report = sdk.surfaces.detect(
@@ -292,17 +236,17 @@ def test_surface_handoff_targets_are_deterministic(
         session_ref="session:test-surface-handoff-targets",
     )
 
-    target_names = [target.skill_name for target in handoff.handoff_targets]
+    target_refs = [target.target_ref for target in handoff.handoff_targets]
 
-    assert "aoa-session-donor-harvest" in target_names
-    assert "aoa-automation-opportunity-scan" in target_names
-    assert "aoa-session-self-diagnose" in target_names
-    assert "aoa-quest-harvest" in target_names
-    assert all(item.state != "activated" for item in handoff.surviving_items)
-    assert "aoa-session-route-forks" not in target_names
+    assert target_refs == [
+        "skill.aoa-session-harvest",
+        "aoa-playbooks:generated/playbook_registry.min.json",
+        "aoa-techniques:generated/technique_promotion_readiness.min.json",
+    ]
+    assert all(item.execution.executable_now is False for item in handoff.surviving_items)
 
 
-def test_surface_handoff_does_not_offer_automation_scan_for_explicit_playbook_request_only(
+def test_surface_handoff_does_not_promote_explicit_playbook_request_only(
     workspace_root: Path,
 ) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
@@ -317,10 +261,10 @@ def test_surface_handoff_does_not_offer_automation_scan_for_explicit_playbook_re
         session_ref="session:test-surface-explicit-playbook",
     )
 
-    target_names = [target.skill_name for target in handoff.handoff_targets]
+    target_refs = [target.target_ref for target in handoff.handoff_targets]
 
-    assert "aoa-session-donor-harvest" in target_names
-    assert "aoa-automation-opportunity-scan" not in target_names
+    assert "skill.aoa-session-harvest" in target_refs
+    assert "aoa-playbooks:generated/playbook_registry.min.json" not in target_refs
 
 
 def test_surface_detect_orders_explicit_layer_hints_stably(
@@ -349,7 +293,9 @@ def test_surface_detect_orders_explicit_layer_hints_stably(
     ]
 
 
-def test_surface_detect_does_not_write_skill_runtime_session(workspace_root: Path) -> None:
+def test_surface_detect_does_not_read_or_write_skill_runtime_session(
+    workspace_root: Path,
+) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
 
@@ -359,26 +305,16 @@ def test_surface_detect_does_not_write_skill_runtime_session(workspace_root: Pat
         intent_text="verify recurring handoff proof",
     )
 
-    assert report.skill_report_included is True
+    assert all(item.execution.executable_now is False for item in report.items)
+    assert "skill-runtime-session" not in " ".join(report.source_inputs)
     assert not session_file.exists()
 
 
-def test_surface_detect_ignores_empty_runtime_session_file(workspace_root: Path) -> None:
-    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    session_file = workspace_root / "aoa-sdk" / ".aoa" / "skill-runtime-session.json"
-    session_file.parent.mkdir(parents=True, exist_ok=True)
-    session_file.write_text("", encoding="utf-8")
-
-    report = sdk.surfaces.detect(
-        repo_root=str(workspace_root / "aoa-sdk"),
-        phase="ingress",
-        intent_text="verify recurring handoff proof",
-    )
-
-    assert report.active_skill_names == []
-
-
-def test_surface_handoff_ignores_non_open_checkpoint_notes(workspace_root: Path) -> None:
+def test_surface_handoff_ignores_non_open_checkpoint_notes(
+    workspace_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("CODEX_THREAD_ID", "thread-owner-layer-handoff")
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
     sdk.checkpoints.append(
         repo_root=str(workspace_root / "aoa-sdk"),
@@ -635,97 +571,41 @@ def test_surface_detect_accepts_runtime_seed_and_profile_shortlist_hints(
     }
 
 
-def test_surface_detect_enriches_skill_items_from_core_receipt_context(
+def test_surface_detect_does_not_promote_session_receipts_into_owner_truth(
     workspace_root: Path,
 ) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
-    core_skill_log_path = workspace_root / "aoa-skills" / ".aoa" / "live_receipts" / "core-skill-applications.jsonl"
-    core_skill_log_path.parent.mkdir(parents=True, exist_ok=True)
-    core_skill_log_path.write_text(
+    receipt_path = (
+        workspace_root
+        / "aoa-skills"
+        / ".aoa"
+        / "live_receipts"
+        / "core-skill-applications.jsonl"
+    )
+    receipt_path.parent.mkdir(parents=True, exist_ok=True)
+    receipt_path.write_text(
         json.dumps(
             {
                 "event_kind": "core_skill_application_receipt",
-                "event_id": "evt-core-surface-0001",
-                "observed_at": "2026-04-06T20:25:00Z",
-                "run_ref": "run-core-surface-001",
-                "session_ref": "session:test-surface-context",
-                "actor_ref": "aoa-skills:automation-opportunity-scan",
-                "object_ref": {
-                    "repo": "aoa-skills",
-                    "kind": "skill",
-                    "id": "aoa-automation-opportunity-scan",
-                    "version": "main",
-                },
-                "evidence_refs": [
-                    {"kind": "receipt", "ref": "repo:aoa-skills/tmp/AUTOMATION_CANDIDATE_RECEIPT.json"}
-                ],
+                "session_ref": "session:legacy-runtime-evidence",
                 "payload": {
-                    "kernel_id": "project-core-session-growth-v1",
                     "skill_name": "aoa-automation-opportunity-scan",
-                    "application_stage": "finish",
-                    "detail_event_kind": "automation_candidate_receipt",
-                    "detail_receipt_ref": "repo:aoa-skills/tmp/AUTOMATION_CANDIDATE_RECEIPT.json",
-                    "surface_detection_context": {
-                        "activation_truth": "activated",
-                        "adjacent_owner_repos": ["aoa-playbooks", "aoa-techniques"],
-                        "owner_layer_ambiguity": True,
-                        "surface_detection_report_ref": "repo:aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout.latest.json",
-                        "surface_closeout_handoff_ref": "repo:aoa-sdk/.aoa/surface-detection/aoa-sdk.closeout-handoff.latest.json",
-                        "family_entry_refs": [
-                            "aoa-playbooks.playbook_registry.min",
-                            "aoa-techniques.technique_promotion_readiness.min"
-                        ]
-                    }
-                }
+                    "activation_truth": "activated",
+                },
             }
         )
         + "\n",
         encoding="utf-8",
     )
 
-    from aoa_sdk.surfaces.context import (
-        enrich_item_with_skill_receipt_context,
-        load_core_skill_receipt_contexts,
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"),
+        phase="ingress",
+        intent_text="inspect the skill layer",
     )
+    item = _surface_item(report, "aoa-skills:layer-request")
 
-    item = SurfaceOpportunityItem(
-        surface_ref="aoa-skills:aoa-automation-opportunity-scan",
-        display_name="AoA Automation Opportunity Scan",
-        object_kind="skill",
-        owner_repo="aoa-skills",
-        state="manual-equivalent",
-        phase_detected="closeout",
-        reason="router-only closeout helper",
-        signals=["risk-gate", "closeout-chain"],
-        confidence="medium",
-        execution=SurfaceOpportunityExecutionHint(
-            lane="manual-equivalence",
-            executable_now=False,
-            requires_confirmation=True,
-            existing_command="aoa skills detect",
-            existing_surface=None,
-            manual_equivalence_allowed=True,
-            manual_equivalence_note="keep truth visible",
-            host_availability_status="router-only",
-        ),
-        related_skill_names=[],
-        closeout_family_candidates=["aoa-session-donor-harvest"],
-        promotion_hint=None,
-    )
-    contexts = load_core_skill_receipt_contexts(sdk.workspace)
-    item = enrich_item_with_skill_receipt_context(
-        item,
-        skill_receipt_contexts=contexts,
-    )
-
-    assert item.state == "manual-equivalent"
-    assert any(ref.role == "runtime-receipt" for ref in item.evidence_refs)
-    assert any(ref.role == "skill-report" for ref in item.evidence_refs)
-    assert any(ref.role == "closeout-handoff" for ref in item.evidence_refs)
-    assert {
-        ref.ref for ref in item.family_entry_refs if ref.role == "family-entry"
-    } >= {
-        "aoa-playbooks.playbook_registry.min",
-        "aoa-techniques.technique_promotion_readiness.min",
-    }
-    assert item.owner_layer_ambiguity_note is not None
+    assert item.state == "candidate-now"
+    assert item.execution.executable_now is False
+    assert item.evidence_refs == []
+    assert not any("receipt" in source for source in report.source_inputs)

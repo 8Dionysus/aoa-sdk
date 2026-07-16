@@ -57,7 +57,7 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
     modules = {module["path"]: module for module in _walk_modules(payload["tree"])}
 
     expected_packages = {
-        "src/aoa_sdk/checkpoints/closeout": "closeout pipeline",
+        "src/aoa_sdk/checkpoints/closeout": "reviewed evidence materialization",
         "src/aoa_sdk/checkpoints/hooks": "Git hook",
         "src/aoa_sdk/checkpoints/ledger": "note ledger",
         "src/aoa_sdk/checkpoints/promotion": "promotion target",
@@ -100,15 +100,12 @@ def test_source_topology_index_names_checkpoint_route_role_branches() -> None:
     ]["role"]
     assert "checkpoint lifecycle audit" in modules["src/aoa_sdk/checkpoints/lifecycle.py"]["role"]
     assert "close/archive orchestration" in modules["src/aoa_sdk/checkpoints/lifecycle.py"]["role"]
-    assert modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["split_pressure"] == "low"
-    assert "compatibility facade" in modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["role"]
-    assert "facade thin" in modules["src/aoa_sdk/checkpoints/closeout/bridge.py"]["next_route"]
     closeout_module_roles = {
         "src/aoa_sdk/checkpoints/closeout/context.py": "candidate-map owner",
         "src/aoa_sdk/checkpoints/closeout/evidence.py": "Codex trace evidence reader owner",
-        "src/aoa_sdk/checkpoints/closeout/execution.py": "mechanical packet and receipt builder owner",
-        "src/aoa_sdk/checkpoints/closeout/followthrough.py": "next-skill posture owner",
-        "src/aoa_sdk/checkpoints/closeout/owner_handoff.py": "owner follow-through handoff owner",
+        "src/aoa_sdk/checkpoints/closeout/execution.py": "no-execution receipt materializer",
+        "src/aoa_sdk/checkpoints/closeout/followthrough.py": "routing-only followthrough metadata owner",
+        "src/aoa_sdk/checkpoints/closeout/owner_handoff.py": "owner-candidate handoff materializer",
     }
     for path, role_fragment in closeout_module_roles.items():
         assert role_fragment in modules[path]["role"]
@@ -160,12 +157,11 @@ def test_source_topology_index_names_cli_command_family_modules() -> None:
     assert "command-family module" in modules["src/aoa_sdk/cli/main.py"]["next_route"]
     cli_module_roles = {
         "src/aoa_sdk/cli/checkpoint.py": "checkpoint capture",
-        "src/aoa_sdk/cli/closeout.py": "reviewed closeout run",
         "src/aoa_sdk/cli/common.py": "shared path resolution",
         "src/aoa_sdk/cli/compatibility.py": "compatibility check",
         "src/aoa_sdk/cli/release.py": "release audit",
         "src/aoa_sdk/cli/rendering.py": "human-readable report rendering",
-        "src/aoa_sdk/cli/skills.py": "skill detect",
+        "src/aoa_sdk/cli/skills.py": "passive skill-environment inspection",
         "src/aoa_sdk/cli/surfaces.py": "surface detect",
         "src/aoa_sdk/cli/workspace.py": "workspace inspect",
     }
@@ -173,27 +169,19 @@ def test_source_topology_index_names_cli_command_family_modules() -> None:
         assert role_fragment in modules[path]["role"]
 
 
-def test_source_topology_index_names_closeout_route_role_branches() -> None:
+def test_source_topology_index_excludes_retired_sdk_closeout_runtime() -> None:
     payload = source_topology.build_payload()
     packages = {package["path"]: package for package in _walk_packages(payload["tree"])}
     modules = {module["path"]: module for module in _walk_modules(payload["tree"])}
 
-    assert "route-role branches" in packages["src/aoa_sdk/closeout"]["role"]
-    assert "publisher" in packages["src/aoa_sdk/closeout"]["next_route"]
-    assert modules["src/aoa_sdk/closeout/api.py"]["split_pressure"] == "low"
-    assert "public facade" in modules["src/aoa_sdk/closeout/api.py"]["role"]
-    assert "owning closeout route branch" in modules["src/aoa_sdk/closeout/api.py"]["next_route"]
-    closeout_module_roles = {
-        "src/aoa_sdk/closeout/filesystem.py": "safe filename",
-        "src/aoa_sdk/closeout/followthrough.py": "owner follow-through",
-        "src/aoa_sdk/closeout/manifests.py": "manifest assembly",
-        "src/aoa_sdk/closeout/publishers.py": "subprocess execution",
-        "src/aoa_sdk/closeout/queue.py": "inbox processing",
-        "src/aoa_sdk/closeout/receipts.py": "publisher detection",
-        "src/aoa_sdk/closeout/runner.py": "reviewed manifest run",
-    }
-    for path, role_fragment in closeout_module_roles.items():
-        assert role_fragment in modules[path]["role"]
+    assert "src/aoa_sdk/closeout" not in packages
+    assert not any(path.startswith("src/aoa_sdk/closeout/") for path in modules)
+    assert "reviewed evidence materialization" in packages[
+        "src/aoa_sdk/checkpoints/closeout"
+    ]["role"]
+    assert "no-execution receipt materializer" in modules[
+        "src/aoa_sdk/checkpoints/closeout/execution.py"
+    ]["role"]
 
 
 def test_source_topology_index_names_recurrence_route_role_branches() -> None:
@@ -223,11 +211,14 @@ def test_source_topology_index_names_recurrence_route_role_branches() -> None:
         "src/aoa_sdk/recurrence/contracts/projections.py": "projection guard",
         "src/aoa_sdk/recurrence/contracts/review.py": "owner decision",
         "src/aoa_sdk/recurrence/live/techniques.py": "technique intake",
-        "src/aoa_sdk/recurrence/live/skills.py": "skill trigger",
+        "src/aoa_sdk/recurrence/live/generated.py": "generated staleness",
+        "src/aoa_sdk/recurrence/live/runtime.py": "runtime evidence selection",
+        "src/aoa_sdk/recurrence/live/playbooks.py": "playbook harvest",
         "src/aoa_sdk/recurrence/live/events.py": "event repetition",
     }
     for path, role_fragment in recurrence_module_roles.items():
         assert role_fragment in modules[path]["role"]
+    assert "src/aoa_sdk/recurrence/live/skills.py" not in modules
 
 
 def test_source_topology_index_names_shared_contract_branches() -> None:
@@ -244,15 +235,13 @@ def test_source_topology_index_names_shared_contract_branches() -> None:
     assert "aoa_sdk/contracts branches" in modules["src/aoa_sdk/models.py"]["next_route"]
     contract_module_roles = {
         "src/aoa_sdk/contracts/routing.py": "surface compatibility",
-        "src/aoa_sdk/contracts/skills.py": "skill card",
+        "src/aoa_sdk/contracts/skills.py": "owner skill catalog",
         "src/aoa_sdk/contracts/playbooks.py": "playbook registry",
         "src/aoa_sdk/contracts/memo.py": "memo surface",
         "src/aoa_sdk/contracts/evals.py": "eval card",
         "src/aoa_sdk/contracts/checkpoints.py": "checkpoint lineage",
         "src/aoa_sdk/contracts/surfaces.py": "surface opportunity",
-        "src/aoa_sdk/contracts/closeout.py": "reviewed closeout runner",
         "src/aoa_sdk/contracts/stats.py": "stats summary",
-        "src/aoa_sdk/contracts/project_core.py": "project-core kernel",
     }
     for path, role_fragment in contract_module_roles.items():
         assert role_fragment in modules[path]["role"]
@@ -264,7 +253,7 @@ def test_source_topology_index_records_low_pressure_stop_lines() -> None:
 
     stop_lines = {
         "src/aoa_sdk/release/api.py": "release-support route owner",
-        "src/aoa_sdk/skills/detector.py": "new skill-detection owner route",
+        "src/aoa_sdk/skills/inspection.py": "retrieval to KAG",
         "src/aoa_sdk/compatibility/policy.py": "new compatibility owner route",
         "src/aoa_sdk/recurrence/hooks.py": "hook owner routes diverge",
     }

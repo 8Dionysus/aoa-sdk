@@ -12,7 +12,9 @@ Use the smallest route that matches your need:
 3. `docs/workspace-layout.md` for local-first path rules
 4. `docs/versioning.md` for compatibility posture
 
-Use `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md` only when you need the reviewed-session closeout path after those first four surfaces.
+Use `mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md`
+only when you need the reviewed child-task evidence-handoff path after those
+first four surfaces.
 
 ## Public support posture
 
@@ -21,13 +23,15 @@ Use `mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-se
 - typed local-first loaders over source-owned generated surfaces
 - workspace discovery and sibling-repo resolution
 - compatibility checks across consumed local surfaces
-- bounded activation, ingress, guard, and closeout helpers that preserve source ownership
+- passive skill inspection, surface detection, checkpoint, reviewed evidence
+  handoff, and closeout helpers that preserve source ownership
 
 `aoa-sdk` does not publicly support:
 
 - source-authored meaning owned by sibling repositories
 - hidden routing or memory policy
 - runtime or service authority
+- skill retrieval, composition, activation, or execution authority
 - product-edge support guarantees for `ATM10-Agent`
 
 ## Release semantics

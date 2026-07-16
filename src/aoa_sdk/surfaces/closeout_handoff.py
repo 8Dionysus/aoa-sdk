@@ -32,7 +32,7 @@ def build_surface_closeout_handoff(
         raise ValueError("surface closeout handoff requires reviewed=True")
 
     report, report_ref = load_surface_report(report_or_path)
-    surviving_items = [item for item in report.items if item.state != "activated"]
+    surviving_items = list(report.items)
     checkpoint_note = load_current_checkpoint_note(workspace, report.repo_root)
     surviving_checkpoint_clusters = closeout_surviving_checkpoint_clusters(checkpoint_note)
     checkpoint_progression_axes = (
@@ -73,11 +73,11 @@ def build_surface_closeout_handoff(
             checkpoint_progression_candidates=checkpoint_progression_candidates,
             checkpoint_progression_axes=checkpoint_progression_axes,
             checkpoint_upgrade_candidates=checkpoint_upgrade_candidates,
-            actionability_gaps=report.actionability_gaps,
+            inspection_gaps=report.inspection_gaps,
         ),
         notes=[
-            "use the session-growth kernel only after reviewed run, closure, or pause",
-            "do not let donor-harvest or automation scan become hidden live routing authority",
+            "use deferred session-harvest capability only after explicit reviewed invocation",
+            "capability and owner-surface targets are handoffs, not hidden routing or activation authority",
             *(
                 ["checkpoint candidates stayed local until reviewed closeout; move candidates and stats only from the final handoff"]
                 if checkpoint_note is not None and checkpoint_note.carry_until_session_closeout
@@ -125,21 +125,19 @@ def derive_closeout_followups(
         else:
             followups.append("bundle surviving notes into a reviewed closeout handoff before any promotion decision")
     if any(item.object_kind == "playbook" for item in items):
-        followups.append("route recurring-route evidence through aoa-automation-opportunity-scan before naming automation authority")
+        followups.append("route recurring-route evidence to the aoa-playbooks owner before naming automation authority")
     if any(item.object_kind in {"playbook", "technique"} and item.promotion_hint for item in items):
-        followups.append("use aoa-quest-harvest only for the final promote-or-defer decision after repeated reviewed evidence exists")
+        followups.append("route promotion evidence to its technique or playbook owner only after repeated reviewed evidence exists")
     return followups
 
 
 def owner_layer_notes(*, items: list[SurfaceOpportunityItem]) -> list[str]:
     notes = [
-        "aoa-sdk stays on the control plane; it may detect and hand off but does not become the source of truth for eval, memo, playbook, technique, or agent meaning",
-        "playbook, eval, memo, agent, and technique items remain hints, candidates, or closeout handoffs in the initial boundary; they are not auto-activatable runtime objects here",
+        "aoa-sdk stays on the control plane; it may expose candidates and handoffs but does not become the source of truth for skill, eval, memo, playbook, technique, or agent meaning",
+        "skill, playbook, eval, memo, agent, and technique items remain owner-scoped candidates; none is auto-activatable here",
     ]
     if any(item.shortlist_hints for item in items):
-        notes.append("routing shortlist hints stay advisory only; they can sharpen inspection and ambiguity reporting but never overwrite activation truth")
-    if any(item.state == "manual-equivalent" for item in items):
-        notes.append("manual-equivalent remains distinct from activated all the way through reporting and closeout")
+        notes.append("routing shortlist hints stay advisory only; they can sharpen inspection and ambiguity reporting but never become selection truth")
     return notes
 
 
@@ -151,22 +149,26 @@ def derive_closeout_handoff_targets(
     checkpoint_progression_candidates: list[SessionCheckpointCluster],
     checkpoint_progression_axes: list[ProgressionAxisSignal],
     checkpoint_upgrade_candidates: list[SessionCheckpointCluster],
-    actionability_gaps: list[str],
+    inspection_gaps: list[str],
 ) -> list[SurfaceCloseoutHandoffTarget]:
     targets: list[SurfaceCloseoutHandoffTarget] = []
     checkpoint_triggered_by = [f"checkpoint:{cluster.candidate_id}" for cluster in surviving_checkpoint_clusters]
     if surviving_items or surviving_checkpoint_clusters:
         targets.append(
             SurfaceCloseoutHandoffTarget(
-                skill_name="aoa-session-donor-harvest",
-                why="bundle the surviving bounded notes into a reviewable harvest packet instead of leaving them as session residue",
+                target_ref="skill.aoa-session-harvest",
+                target_kind="capability",
+                owner_repo="aoa-skills",
+                why="prepare an explicit reviewed harvest candidate instead of leaving bounded notes as session residue; the deferred skill is not invoked automatically",
                 triggered_by=[*([item.surface_ref for item in surviving_items]), *checkpoint_triggered_by],
             )
         )
     if checkpoint_progression_candidates or checkpoint_progression_axes:
         targets.append(
             SurfaceCloseoutHandoffTarget(
-                skill_name="aoa-session-progression-lift",
+                target_ref="adapter.sessions.progression-review",
+                target_kind="capability",
+                owner_repo="aoa-agents",
                 why="reviewed closeout should turn provisional checkpoint axis movement into one explicit progression delta before any final quest verdict",
                 triggered_by=[
                     *[f"checkpoint-progression:{cluster.candidate_id}" for cluster in checkpoint_progression_candidates],
@@ -182,22 +184,21 @@ def derive_closeout_handoff_targets(
     if playbook_items:
         targets.append(
             SurfaceCloseoutHandoffTarget(
-                skill_name="aoa-automation-opportunity-scan",
+                target_ref="aoa-playbooks:generated/playbook_registry.min.json",
+                target_kind="owner-surface",
+                owner_repo="aoa-playbooks",
                 why="the recurring-route candidate is about repeated manual process and owner-layer routing, not immediate activation",
                 triggered_by=[item.surface_ref for item in playbook_items],
             )
         )
-    diagnose_items = [
-        item
-        for item in surviving_items
-        if item.state == "manual-equivalent" and "risk-gate" in item.signals
-    ]
-    if diagnose_items or actionability_gaps:
+    if inspection_gaps:
         targets.append(
             SurfaceCloseoutHandoffTarget(
-                skill_name="aoa-session-self-diagnose",
-                why="router-only risk-gate or actionability-gap notes should become explicit diagnosis rather than hidden route residue",
-                triggered_by=[item.surface_ref for item in diagnose_items] or [f"skill-gap:{name}" for name in actionability_gaps],
+                target_ref="skill.aoa-session-recovery",
+                target_kind="capability",
+                owner_repo="aoa-skills",
+                why="unresolved inspection gaps may become an explicit reviewed recovery candidate, never automatic repair",
+                triggered_by=[f"inspection-gap:{name}" for name in inspection_gaps],
             )
         )
     promotion_items = [
@@ -208,16 +209,20 @@ def derive_closeout_handoff_targets(
     if promotion_items:
         targets.append(
             SurfaceCloseoutHandoffTarget(
-                skill_name="aoa-quest-harvest",
-                why="playbook-versus-technique promotion questions should stay reviewed closeout decisions rather than live-session guesses",
+                target_ref="aoa-techniques:generated/technique_promotion_readiness.min.json",
+                target_kind="owner-surface",
+                owner_repo="aoa-techniques",
+                why="playbook-versus-technique promotion questions stay with their owner review surfaces rather than live-session guesses",
                 triggered_by=[item.surface_ref for item in promotion_items],
             )
         )
     elif checkpoint_upgrade_candidates:
         targets.append(
             SurfaceCloseoutHandoffTarget(
-                skill_name="aoa-quest-harvest",
-                why="checkpoint-marked upgrade candidates should be reviewed after progression lift, not promoted during the session",
+                target_ref="workflow.operations.checkpoint-closeout",
+                target_kind="capability",
+                owner_repo="aoa-playbooks",
+                why="checkpoint-marked upgrade candidates require the reviewed owner closeout workflow, not in-session promotion",
                 triggered_by=[f"checkpoint-upgrade:{cluster.candidate_id}" for cluster in checkpoint_upgrade_candidates],
             )
         )

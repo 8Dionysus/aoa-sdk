@@ -49,10 +49,6 @@
       ],
       "reason": "the CLI is a cross-mechanic command facade, not an independent parent operation"
     },
-    "closeout": {
-      "primary_mechanic": "checkpoint",
-      "reason": "reviewed session handoff remains below checkpoint review"
-    },
     "codex": {
       "primary_mechanic": "codex-projection",
       "reason": "Codex workspace MCP and live rollout status readouts are projection surfaces"
@@ -113,7 +109,7 @@
     },
     "skills": {
       "primary_mechanic": "boundary-bridge",
-      "reason": "skill discovery and dispatch remain below aoa-skills ownership"
+      "reason": "skill owner contracts and distinct installation scopes are exposed through passive inspection below aoa-skills ownership"
     },
     "stats": {
       "primary_mechanic": "boundary-bridge",
@@ -145,7 +141,7 @@
     ],
     "boundary-bridge": [
       "consumed-surface-posture-gate",
-      "skill-runtime-bridge",
+      "skill-environment-inspector",
       "technique-promotion-readiness-reader",
       "owner-layer-signal-handoff"
     ],
@@ -156,7 +152,6 @@
     ],
     "checkpoint": [
       "session-growth-checkpoint-cycle",
-      "reviewed-session-handoff-runner",
       "child-task-reentry",
       "reviewed-closeout-context-carry"
     ],
@@ -313,7 +308,7 @@
     {
       "slug": "boundary-bridge",
       "name_type": "shared",
-      "operation": "Keep SDK typed facades, consumed-surface posture gates, skill bridges, and owner-layer signal handoffs as handles while sibling repositories retain meaning.",
+      "operation": "Keep SDK typed facades, consumed-surface posture gates, passive skill environment inspection, and owner-layer signal handoffs as handles while sibling repositories retain meaning.",
       "source_surfaces": [
         "docs/boundaries.md",
         "src/aoa_sdk/AGENTS.md",
@@ -334,12 +329,9 @@
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_surface_actions.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py",
-        "mechanics/boundary-bridge/parts/skill-runtime-bridge",
-        "mechanics/boundary-bridge/parts/skill-runtime-bridge/docs/recommendation-actionability-gap.md",
-        "mechanics/boundary-bridge/parts/skill-runtime-bridge/docs/host-actionability-reporting-design.md",
-        "mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge.py",
-        "mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge_cli.py",
-        "mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_reference_contracts.py",
+        "mechanics/boundary-bridge/parts/skill-environment-inspector",
+        "mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py",
+        "mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py",
         "mechanics/boundary-bridge/parts/technique-promotion-readiness-reader",
         "mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff",
@@ -369,31 +361,28 @@
       ],
       "candidate_parts": [
         "consumed-surface-posture-gate",
-        "skill-runtime-bridge",
+        "skill-environment-inspector",
         "technique-promotion-readiness-reader",
         "owner-layer-signal-handoff"
       ],
       "validation": [
-        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_agent_phase_binding_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_posture_cli.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_eval_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_governed_run_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_kag_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_memo_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_playbook_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_surface_actions.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_runtime_bridge_cli.py mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/test_skill_reference_contracts.py mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py"
+        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_agent_phase_binding_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_compatibility_gate.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_consumed_surface_posture_cli.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_eval_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_governed_run_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_kag_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_memo_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_playbook_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_surface_actions.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py"
       ]
     },
     {
       "slug": "checkpoint",
       "name_type": "shared",
-      "operation": "Capture session checkpoints, gate review, assemble review-context bundles, run reviewed session closeout handoffs, route child-task re-entry packets, and carry reviewed closeout context without owner-truth transfer.",
+      "operation": "Capture session checkpoints, gate review, materialize reviewed evidence and owner candidates, route child-task re-entry packets, and carry reviewed closeout context without owner-truth transfer or capability-execution claims.",
       "source_surfaces": [
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/reviewed-checkpoint-note-promotion.md",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py",
-        "mechanics/checkpoint/parts/reviewed-session-handoff-runner",
-        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/docs/reviewed-session-handoff-runner.md",
-        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/install_closeout_units.py",
-        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/scripts/process_closeout_inbox.py",
-        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units",
         "mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md",
         "mechanics/checkpoint/parts/child-task-reentry/docs/return-reentry.md",
+        "mechanics/checkpoint/parts/child-task-reentry/schemas/summon-request-v4.schema.json",
+        "mechanics/checkpoint/parts/child-task-reentry/schemas/summon-result-v4.schema.json",
         "mechanics/checkpoint/parts/child-task-reentry/examples/summon_return_checkpoint_e2e.fixture.json",
         "mechanics/checkpoint/parts/reviewed-closeout-context-carry",
         "mechanics/checkpoint/parts/reviewed-closeout-context-carry/docs/candidate-lineage-carry.md",
@@ -417,31 +406,28 @@
         "mechanics/checkpoint/parts/reviewed-closeout-context-carry/examples/closeout_followthrough_decision.example.json",
         "src/aoa_sdk/a2a",
         "src/aoa_sdk/checkpoints",
-        "src/aoa_sdk/closeout",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_lifecycle_indexes.py",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_session_memory.py",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_candidate_intelligence.py",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_carrier_intelligence.py",
-        "mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py",
         "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_sdk_api.py",
-        "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_skill_contract.py",
+        "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_transport_contract.py",
         "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_assessment.py",
         "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_checkpoint_and_return.py",
-        "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_codex_and_closeout.py",
+        "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_owner_handoff.py",
         "mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_e2e_fixture.py",
         "mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py",
         "mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py"
       ],
       "candidate_parts": [
         "session-growth-checkpoint-cycle",
-        "reviewed-session-handoff-runner",
         "child-task-reentry",
         "reviewed-closeout-context-carry"
       ],
       "validation": [
-        "python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_lifecycle_indexes.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_session_memory.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_candidate_intelligence.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_carrier_intelligence.py mechanics/checkpoint/parts/reviewed-session-handoff-runner/tests/test_reviewed_session_handoff_runner.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_sdk_api.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_skill_contract.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_assessment.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_checkpoint_and_return.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_codex_and_closeout.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_e2e_fixture.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py"
+        "python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_lifecycle_indexes.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_session_memory.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_candidate_intelligence.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_carrier_intelligence.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_sdk_api.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_transport_contract.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_assessment.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_checkpoint_and_return.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_owner_handoff.py mechanics/checkpoint/parts/child-task-reentry/tests/test_a2a_e2e_fixture.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py"
       ]
     },
     {

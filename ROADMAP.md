@@ -91,9 +91,9 @@ The repo should now:
 - keep workspace discovery explicit through `.aoa/workspace.toml`,
   `docs/workspace-layout.md`, and `generated/workspace_control_plane.min.json`;
 - keep compatibility checks explicit and source-subordinate;
-- keep `aoa skills enter` / `aoa skills guard`, `aoa surfaces detect`,
-  checkpoint capture, review-note, and explicit reviewed-session handoff runner
-  surfaces bounded and weaker than owner truth;
+- keep passive skill-environment inspection, `aoa surfaces detect`,
+  checkpoint capture, review-note, and reviewed evidence materialization
+  bounded and weaker than capability execution or owner truth;
 - keep typed Codex Projection reads and release audit and publish helpers below
   rollout, release, and sibling-owner authority.
 
@@ -129,7 +129,7 @@ Current anchors:
 | Compatibility posture | `docs/versioning.md` and compatibility checks | Keep consumed sibling surfaces explicit, versioned where possible, and fail-closed on drift. |
 | SDK source home | `sdk/README.md`, `sdk/source_home.manifest.json`, `src/aoa_sdk/` | Keep public SDK posture separate from importable implementation. |
 | Mechanics atlas | `mechanics/README.md`, `mechanics/ROADMAP.md`, `mechanics/topology.json`, parent cards, parent roadmaps, part `VALIDATION.md` | Keep operation detail and package future pressure local while root watches repo-wide direction. |
-| Bounded helpers | skill guards, surface detection, checkpoint and closeout route cards | Keep loaded, suggested, manual-equivalent, and activated states visibly separate. |
+| Bounded helpers | skill inspection, surface detection, checkpoint evidence, and owner handoff route cards | Keep presence, candidate, reviewed evidence, owner acceptance, and execution visibly separate. |
 | Release support | `docs/RELEASING.md`, `docs/RELEASE_CI_POSTURE.md`, release-support parts | Keep release preflight, CI posture, sibling canaries, audit, and publish helpers subordinate to owner truth. |
 
 ## Horizons
@@ -170,7 +170,7 @@ Current anchors:
 
 | Field | Direction |
 | --- | --- |
-| Current posture | Skill guards, surface detection, checkpoint notes, reviewed closeout carry, owner followthrough hints, and reviewed-session handoff runner surfaces are available as bounded helper routes. |
+| Current posture | Passive skill-environment inspection, surface detection, checkpoint notes, reviewed evidence handoff, reviewed closeout carry, and owner followthrough hints are available as bounded helper routes. |
 | Next honest move | Preserve truth labels and owner-subordination while making handoff evidence easier to inspect and validate. |
 | Guardrail | No helper silently becomes activation, progression, proof, durable memory, routing, or runtime authority. |
 
@@ -190,8 +190,8 @@ These are repo-level triggers that should wait for real evidence:
   mode, validator, and typed read posture are clear.
 - Widen CLI or orchestration breadth only after existing workspace,
   compatibility, and truth-label helpers stay green under sibling drift.
-- Promote a helper closer to activation only after the source owner has named
-  the meaning and rollback/approval posture.
+- Add any execution-bearing helper only after the source owner has named the
+  meaning and the runtime owner has defined rollback and approval posture.
 - Add a new mechanic parent only when an existing parent would become less
   clear by owning the pressure.
 - Add broader remote adapter or MCP/A2A behavior only after local-first

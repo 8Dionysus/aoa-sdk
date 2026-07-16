@@ -10,7 +10,6 @@ from ..loaders import load_json
 from ..models import (
     CheckpointCaptureResult,
     SessionCheckpointNote,
-    SkillDetectionReport,
     SurfaceCloseoutHandoff,
     SurfaceDetectionReport,
 )
@@ -44,31 +43,6 @@ def _workspace_payload(workspace: Workspace) -> dict[str, Any]:
         "repos": repos,
     }
 
-def _resolve_host_available_skills(
-    *,
-    host_skills: list[str],
-    host_skill_manifest: str | None,
-) -> tuple[list[str] | None, str]:
-    if host_skills:
-        return list(dict.fromkeys(skill_name for skill_name in host_skills if skill_name)), "host-skill-list"
-    if host_skill_manifest is None:
-        return None, "not-provided"
-
-    manifest_path = Path(host_skill_manifest).expanduser().resolve()
-    try:
-        payload = json.loads(manifest_path.read_text(encoding="utf-8"))
-    except OSError as exc:
-        raise typer.BadParameter(f"could not read host skill manifest: {exc}") from exc
-    except json.JSONDecodeError as exc:
-        raise typer.BadParameter(f"host skill manifest is not valid JSON: {exc}") from exc
-
-    if not isinstance(payload, dict):
-        raise typer.BadParameter("host skill manifest must be a JSON object with a non-empty string list at 'skills'")
-    skills = payload.get("skills")
-    if not isinstance(skills, list) or not all(isinstance(item, str) and item for item in skills):
-        raise typer.BadParameter("host skill manifest must be a JSON object with a non-empty string list at 'skills'")
-    return list(dict.fromkeys(skills)), "host-manifest"
-
 def _resolve_context_root(workspace: Workspace, repo_root: str) -> Path:
     resolved_repo_root = Path(repo_root).expanduser()
     if not resolved_repo_root.is_absolute():
@@ -78,32 +52,6 @@ def _resolve_context_root(workspace: Workspace, repo_root: str) -> Path:
 def _resolve_context_label(workspace: Workspace, repo_root: str) -> str:
     resolved_repo_root = _resolve_context_root(workspace, repo_root)
     return "workspace" if resolved_repo_root == workspace.federation_root else resolved_repo_root.name
-
-def _resolve_skill_report_path(
-    *,
-    workspace: Workspace,
-    repo_root: str,
-    phase: str,
-    mutation_surface: str = "none",
-    report_output: str | None = None,
-) -> Path:
-    if report_output is not None:
-        return Path(report_output).expanduser().resolve()
-
-    label = _resolve_context_label(workspace, repo_root)
-    suffix = phase
-    if phase == "pre-mutation":
-        suffix = f"{phase}-{mutation_surface}"
-    return workspace.repo_path("aoa-sdk") / ".aoa" / "skill-dispatch" / f"{label}.{suffix}.latest.json"
-
-def _write_skill_report(path: Path, report: SkillDetectionReport) -> dict[str, Any]:
-    payload = {
-        "report_path": str(path),
-        "report": report.model_dump(mode="json"),
-    }
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(json.dumps(payload, indent=2, ensure_ascii=True) + "\n", encoding="utf-8")
-    return payload
 
 def _resolve_surface_report_path(
     *,

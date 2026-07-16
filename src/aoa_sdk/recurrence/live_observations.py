@@ -8,7 +8,6 @@ from .live.events import _collect_recurrence_event_repetition
 from .live.generated import _collect_generated_staleness
 from .live.playbooks import _collect_playbook_harvest
 from .live.runtime import _collect_runtime_evidence_selection
-from .live.skills import _collect_skill_trigger_surface
 from .live.techniques import _collect_technique_intake, _collect_technique_readiness
 from .models import ObservationPacket, ObservationRecord
 from .observations import _dedupe_and_sort
@@ -21,7 +20,6 @@ LIVE_PRODUCERS: tuple[LiveProducerName, ...] = (
     "generated_staleness_watch",
     "technique_intake_watch",
     "technique_readiness_watch",
-    "skill_trigger_surface_watch",
     "runtime_evidence_selection_watch",
     "playbook_harvest_watch",
     "recurrence_event_repetition_watch",
@@ -33,7 +31,6 @@ LIVE_PRODUCER_COLLECTORS: dict[
     "generated_staleness_watch": _collect_generated_staleness,
     "technique_intake_watch": _collect_technique_intake,
     "technique_readiness_watch": _collect_technique_readiness,
-    "skill_trigger_surface_watch": _collect_skill_trigger_surface,
     "runtime_evidence_selection_watch": _collect_runtime_evidence_selection,
     "playbook_harvest_watch": _collect_playbook_harvest,
     "recurrence_event_repetition_watch": _collect_recurrence_event_repetition,

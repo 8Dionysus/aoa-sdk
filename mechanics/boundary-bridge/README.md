@@ -12,7 +12,7 @@ sibling repositories retain meaning.
 ### Trigger
 
 Use this mechanic when a typed facade, registry, consumed-surface posture gate,
-skill runtime bridge, technique promotion readiness reader, owner-layer signal
+skill environment inspector, technique promotion readiness reader, owner-layer signal
 handoff, route hint, stats read, or sibling-owned generated reader changes.
 
 ### SDK owns
@@ -21,7 +21,7 @@ handoff, route hint, stats read, or sibling-owned generated reader changes.
 - local truth labels
 - source references and route hints
 - consumed-surface posture gates
-- skill runtime bridge behavior below `aoa-skills`
+- scope-preserving skill environment inspection below `aoa-skills`
 - technique promotion readiness reader behavior below `aoa-techniques`
 - additive owner-layer signal review and handoff
 - owner return path after stronger claims appear
@@ -56,17 +56,16 @@ retain their domain meaning.
 - `src/aoa_sdk/surfaces/`
 - `src/aoa_sdk/techniques/`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`
-- `mechanics/boundary-bridge/parts/skill-runtime-bridge/`
+- `mechanics/boundary-bridge/parts/skill-environment-inspector/`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/`
 - `mechanics/boundary-bridge/parts/owner-layer-signal-handoff/`
 - facade and compatibility tests under `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/`
-- skill runtime bridge tests under `mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/`
-- skill reference contract tests under `mechanics/boundary-bridge/parts/skill-runtime-bridge/tests/`
+- skill environment inspection tests under `mechanics/boundary-bridge/parts/skill-environment-inspector/tests/`
 
 ### Candidate parts
 
 - consumed-surface-posture-gate
-- skill-runtime-bridge
+- skill-environment-inspector
 - technique-promotion-readiness-reader
 - owner-layer-signal-handoff
 

@@ -4,6 +4,11 @@
 
 Accepted.
 
+The route-role split remains accepted, but AOA-SDK-D-0069 supersedes the
+`recurrence/live/skills.py` branch and the SDK-owned skill trigger/usage-gap
+producer. The remaining live producer, CLI, and contract branches keep their
+placement rationale.
+
 ## Index Metadata
 
 - Decision ID: AOA-SDK-D-0058
@@ -52,7 +57,6 @@ Move implementation and contracts into route branches:
 - `recurrence/live/common.py` owns shared live observation helpers.
 - `recurrence/live/generated.py` owns generated staleness observations.
 - `recurrence/live/techniques.py` owns technique intake/readiness observations.
-- `recurrence/live/skills.py` owns skill trigger and usage-gap observations.
 - `recurrence/live/runtime.py` owns runtime evidence selection observations.
 - `recurrence/live/playbooks.py` owns playbook harvest observations.
 - `recurrence/live/events.py` owns recurrence event repetition observations.

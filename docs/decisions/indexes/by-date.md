@@ -82,3 +82,9 @@
 - [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md`)
 - [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) (`docs/decisions/AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md`)
 - [AOA-SDK-D-0066 - Decision Index Read Model Symmetry](../AOA-SDK-D-0066-decision-index-read-model-symmetry.md) (`docs/decisions/AOA-SDK-D-0066-decision-index-read-model-symmetry.md`)
+
+## 2026-07-15
+
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)

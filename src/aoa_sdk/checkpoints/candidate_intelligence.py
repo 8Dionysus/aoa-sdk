@@ -207,7 +207,7 @@ def build_candidate_intelligence_from_surface(
     mutation_surface: str,
     items: list[SurfaceOpportunityItem],
     candidate_clusters: Sequence[CandidateCluster],
-    actionability_gaps: list[str],
+    inspection_gaps: list[str],
     sample_limit: int = 0,
 ) -> CandidateIntelligenceReport:
     repo_root_path = _resolve_repo_root(workspace, repo_root)
@@ -220,7 +220,7 @@ def build_candidate_intelligence_from_surface(
         mutation_surface=mutation_surface,
         items=items,
         candidate_clusters=candidate_clusters,
-        actionability_gaps=actionability_gaps,
+        inspection_gaps=inspection_gaps,
     )
     occurrence_counts = _signature_occurrence_counts(events)
     signatures = _signatures_for_events(events, occurrence_counts=occurrence_counts)
@@ -333,7 +333,7 @@ def _derive_action_events(
     mutation_surface: str,
     items: list[SurfaceOpportunityItem],
     candidate_clusters: Sequence[CandidateCluster],
-    actionability_gaps: list[str],
+    inspection_gaps: list[str],
 ) -> list[CheckpointActionEvent]:
     events: list[CheckpointActionEvent] = []
     for item in items:
@@ -372,7 +372,7 @@ def _derive_action_events(
                 extra_route_signals=(f"candidate_kind:{cluster.candidate_kind}",),
             )
         )
-    generic = _generic_profile(intent_text=intent_text, actionability_gaps=actionability_gaps)
+    generic = _generic_profile(intent_text=intent_text, inspection_gaps=inspection_gaps)
     if generic is not None and not events:
         events.append(
             _event_from_profile(
@@ -479,8 +479,8 @@ def _profile_for_cluster(cluster: CandidateCluster) -> ActionProfile:
     )
 
 
-def _generic_profile(*, intent_text: str, actionability_gaps: list[str]) -> ActionProfile | None:
-    normalized = " ".join([intent_text, *actionability_gaps]).lower()
+def _generic_profile(*, intent_text: str, inspection_gaps: list[str]) -> ActionProfile | None:
+    normalized = " ".join([intent_text, *inspection_gaps]).lower()
     for tokens, profile in GENERIC_PROFILES:
         if any(token in normalized for token in tokens):
             return profile
@@ -1010,7 +1010,7 @@ def _item_evidence_refs(item: SurfaceOpportunityItem) -> list[str]:
             item.surface_ref,
             *(ref.ref for ref in item.family_entry_refs),
             *(ref.ref for ref in item.evidence_refs),
-            *(f"skill:{name}" for name in item.related_skill_names),
+            *(f"capability:{ref}" for ref in item.related_capability_refs),
         ]
     )
 

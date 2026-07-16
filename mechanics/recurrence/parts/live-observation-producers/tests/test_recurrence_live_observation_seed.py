@@ -98,37 +98,6 @@ def _workspace(tmp_path: Path) -> Workspace:
         ),
     )
     _write_json(
-        skills / "manifests/recurrence/component.skills.json",
-        _component(
-            "component:skills:bundle-and-activation-beacons",
-            "aoa-skills",
-            source=["docs/TRIGGER_EVALS.md"],
-            generated=["generated/description_trigger_eval_manifest.json"],
-            observation_inputs=[
-                {
-                    "input_ref": "description-trigger-evals",
-                    "kind": "trigger_eval",
-                    "path_globs": ["generated/description_trigger_eval_cases.jsonl"],
-                }
-            ],
-            beacon_rules=[
-                {
-                    "beacon_ref": "skills.activation.omission",
-                    "kind": "unused_skill_opportunity",
-                    "match_signals": ["skill_trigger_gap"],
-                    "match_categories": ["usage_gap"],
-                    "thresholds": {
-                        "watch_observations": 1,
-                        "candidate_observations": 1,
-                        "review_ready_observations": 2,
-                        "min_unique_sources": 1,
-                        "min_unique_evidence_refs": 1,
-                    },
-                }
-            ],
-        ),
-    )
-    _write_json(
         evals / "manifests/recurrence/component.evals.json",
         _component(
             "component:evals:portable-proof-beacons",
@@ -156,12 +125,6 @@ def _workspace(tmp_path: Path) -> Workspace:
     _write_json(
         techniques / "generated/technique_promotion_readiness.min.json",
         {"items": [{"technique": "AOA-T-1", "status": "needs another live adopter"}]},
-    )
-
-    _write(skills / "docs/TRIGGER_EVALS.md", "trigger eval doctrine changed\n")
-    _write(
-        skills / "generated/description_trigger_eval_cases.jsonl",
-        '{"case_id":"case-1","skill_name":"aoa-change-protocol","case_class":"should-trigger"}\n{"case_id":"case-2","skill_name":"aoa-change-protocol","case_class":"prefer-other-skill"}\n',
     )
 
     _write(
@@ -210,8 +173,8 @@ def _workspace(tmp_path: Path) -> Workspace:
 
 
 def test_live_producer_list_is_stable() -> None:
-    assert "skill_trigger_surface_watch" in list_live_producers()
     assert "generated_staleness_watch" in list_live_producers()
+    assert "skill_trigger_surface_watch" not in list_live_producers()
 
 
 def test_live_observations_collect_owner_surfaces(tmp_path: Path) -> None:
@@ -221,8 +184,6 @@ def test_live_observations_collect_owner_surfaces(tmp_path: Path) -> None:
     signals = {item.signal for item in packet.observations}
     assert "overlap_hold_open" in signals
     assert "second_consumer_pressure_seen" in signals
-    assert "skill_trigger_gap" in signals
-    assert "skill_collision_pressure" in signals
     assert "runtime_candidate_selected" in signals
     assert "portable_eval_boundary_seen" in signals
     assert "repeated_scenario_shape" in signals
@@ -235,9 +196,8 @@ def test_live_observations_feed_existing_beacon_rules(tmp_path: Path) -> None:
     workspace = _workspace(tmp_path)
     api = RecurrenceAPI(workspace)
     packet = api.live_observations(
-        producers=["technique_readiness_watch", "skill_trigger_surface_watch"]
+        producers=["technique_readiness_watch"]
     )
     beacons = api.beacon(packet)
     kinds = {entry.kind for entry in beacons.entries}
     assert "canonical_pressure" in kinds
-    assert "unused_skill_opportunity" in kinds

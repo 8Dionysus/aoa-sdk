@@ -29,7 +29,8 @@ class CheckpointPaths:
         self.note_md = current_dir / "checkpoint-note.md"
         self.harvest_handoff = current_dir / "harvest-handoff.json"
         self.closeout_context = current_dir / "closeout-context.json"
-        self.closeout_execution_report = current_dir / "closeout-execution-report.json"
+        self.closeout_materialization_report = current_dir / "closeout-materialization-report.json"
+        self.legacy_closeout_execution_report = current_dir / "closeout-execution-report.json"
         self.closeout_artifacts = current_dir / "reviewed-closeout"
         self.post_commit_report = current_dir / "post-commit-report.json"
         self.surface_report = surface_report

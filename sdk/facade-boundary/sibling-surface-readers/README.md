@@ -14,7 +14,7 @@ Owner: `sdk/facade-boundary/AGENTS.md` and
 
 Next route: `src/aoa_sdk/*/registry.py`,
 `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`,
-`mechanics/boundary-bridge/parts/skill-runtime-bridge/`, and
+`mechanics/boundary-bridge/parts/skill-environment-inspector/`, and
 `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/`.
 
 Stop line: do not absorb sibling meaning into SDK reader names.

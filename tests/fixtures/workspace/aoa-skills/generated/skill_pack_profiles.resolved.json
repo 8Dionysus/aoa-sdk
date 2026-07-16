@@ -1,0 +1,41 @@
+{
+  "schema_version": 2,
+  "profile": "codex-facing-v2",
+  "source_config": "config/skill_pack_profiles.json",
+  "profiles": {
+    "user-default": {
+      "description": "Install the advertised AoA decision family into the host-selected user skill root.",
+      "scope": "user",
+      "install_mode": "copy",
+      "install_root": "$HOME/.codex/skills",
+      "skills": [
+        {
+          "name": "aoa-decision",
+          "source_path": ".agents/skills/aoa-decision/SKILL.md",
+          "target_path": "$HOME/.codex/skills/aoa-decision/SKILL.md",
+          "openai_config_path": "$HOME/.codex/skills/aoa-decision/agents/openai.yaml",
+          "allow_implicit_invocation": true,
+          "implicit_activation_policy": "invoke",
+          "trust_posture": "portable-core"
+        }
+      ]
+    },
+    "repo-default": {
+      "description": "Repository profile consumed only by an admitted owner-home builder.",
+      "scope": "repo",
+      "install_mode": "copy",
+      "install_root": ".agents/skills",
+      "skills": [
+        {
+          "name": "aoa-decision",
+          "source_path": ".agents/skills/aoa-decision/SKILL.md",
+          "target_path": ".agents/skills/aoa-decision/SKILL.md",
+          "openai_config_path": ".agents/skills/aoa-decision/agents/openai.yaml",
+          "allow_implicit_invocation": true,
+          "implicit_activation_policy": "invoke",
+          "trust_posture": "portable-core"
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,79 @@
+{
+  "schema_version": "aoa-capability-graph-v1",
+  "authority": false,
+  "source": {
+    "root": "capabilities/families",
+    "family_files": [],
+    "referenced_files": [],
+    "content_hash": "fixture-current-owner-shape"
+  },
+  "roots": ["aoa"],
+  "nodes": [
+    {
+      "id": "aoa",
+      "kind": "capability",
+      "contract_level": "navigation",
+      "primary_parent": null,
+      "source_family": "system",
+      "source_path": "capabilities/families/system.yaml",
+      "owner": {
+        "authority": "owner-authority",
+        "repo": "aoa-skills",
+        "surface": "capabilities/families/system.yaml"
+      },
+      "lifecycle": {"state": "active", "visibility": "advertised"},
+      "title": "Agents of Abyss"
+    },
+    {
+      "id": "stewardship.decisions",
+      "kind": "capability",
+      "contract_level": "navigation",
+      "primary_parent": "aoa",
+      "source_family": "decisions",
+      "source_path": "capabilities/families/decisions.yaml",
+      "owner": {
+        "authority": "owner-authority",
+        "repo": "aoa-skills",
+        "surface": "capabilities/families/decisions.yaml"
+      },
+      "lifecycle": {"state": "active", "visibility": "advertised"},
+      "title": "Decision stewardship"
+    },
+    {
+      "id": "skill.aoa-decision",
+      "kind": "skill",
+      "contract_level": "executable",
+      "primary_parent": "stewardship.decisions",
+      "source_family": "decisions",
+      "source_path": "capabilities/families/decisions.yaml",
+      "owner": {
+        "authority": "owner-authority",
+        "repo": "aoa-skills",
+        "surface": "skills/core/engineering/aoa-decision/SKILL.md"
+      },
+      "lifecycle": {
+        "state": "active",
+        "visibility": "advertised",
+        "evidence_state": "manual-baseline",
+        "health": "healthy",
+        "version": "0.1.0"
+      },
+      "title": "AoA Decision"
+    }
+  ],
+  "relations": [
+    {
+      "kind": "primary-parent",
+      "source": "stewardship.decisions",
+      "target": "aoa",
+      "source_path": "capabilities/families/decisions.yaml"
+    },
+    {
+      "kind": "primary-parent",
+      "source": "skill.aoa-decision",
+      "target": "stewardship.decisions",
+      "source_path": "capabilities/families/decisions.yaml"
+    }
+  ],
+  "retrieval_documents": []
+}

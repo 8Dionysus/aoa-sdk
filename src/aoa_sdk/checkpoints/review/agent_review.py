@@ -212,8 +212,12 @@ def collect_review_carry(reviews: list[SessionCheckpointAgentReview]) -> Checkpo
                 if review.auto_observation_ref is not None
             ]
         ),
-        applied_skill_names=_dedupe_strings(
-            [name for review in reviews for name in review.applied_skill_names]
+        related_capability_refs=_dedupe_strings(
+            [
+                capability_ref
+                for review in reviews
+                for capability_ref in review.related_capability_refs
+            ]
         ),
         summaries=_dedupe_strings([review.summary for review in reviews]),
         findings=_dedupe_strings([item for review in reviews for item in review.findings]),

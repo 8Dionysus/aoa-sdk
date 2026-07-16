@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from pydantic import AliasChoices, BaseModel, Field
+from pydantic import BaseModel, Field
 
 from .checkpoints import (
     ActionSignature,
@@ -17,12 +17,8 @@ from .stats import StatsRegroundingSignal
 
 
 class SurfaceOpportunityExecutionHint(BaseModel):
-    model_config = {"populate_by_name": True}
-
     lane: Literal[
-        "skill-dispatch",
         "inspect-expand-use",
-        "manual-equivalence",
         "closeout-harvest",
         "defer",
     ]
@@ -30,24 +26,12 @@ class SurfaceOpportunityExecutionHint(BaseModel):
     requires_confirmation: bool = False
     existing_command: str | None = None
     existing_surface: str | None = None
-    manual_equivalence_allowed: bool = Field(
-        default=False,
-        validation_alias=AliasChoices("manual_equivalence_allowed", "manual_fallback_allowed"),
-    )
-    manual_equivalence_note: str | None = Field(
-        default=None,
-        validation_alias=AliasChoices("manual_equivalence_note", "manual_fallback_note"),
-    )
-    host_availability_status: Literal["host-executable", "router-only", "unknown"] | None = None
 
 
 class SurfaceOpportunityReference(BaseModel):
     role: Literal[
         "family-entry",
         "inspect",
-        "runtime-receipt",
-        "skill-report",
-        "closeout-handoff",
     ]
     ref: str
     owner_repo: str | None = None
@@ -66,14 +50,12 @@ class SurfaceOpportunityItem(BaseModel):
         "aoa-playbooks",
         "aoa-agents",
     ]
-    state: Literal["activated", "manual-equivalent", "candidate-now", "candidate-later"]
+    state: Literal["candidate-now", "candidate-later"]
     phase_detected: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"]
     reason: str
     signals: list[
         Literal[
             "explicit-request",
-            "risk-gate",
-            "router-match",
             "repeated-pattern",
             "proof-need",
             "recall-need",
@@ -84,8 +66,8 @@ class SurfaceOpportunityItem(BaseModel):
     ] = Field(default_factory=list)
     confidence: Literal["low", "medium", "high"] = "medium"
     execution: SurfaceOpportunityExecutionHint
-    related_skill_names: list[str] = Field(default_factory=list)
-    closeout_family_candidates: list[str] = Field(default_factory=list)
+    related_capability_refs: list[str] = Field(default_factory=list)
+    closeout_capability_candidates: list[str] = Field(default_factory=list)
     promotion_hint: str | None = None
     shortlist_hints: list[RoutingOwnerLayerShortlistHint] = Field(default_factory=list)
     owner_layer_ambiguity_note: str | None = None
@@ -94,7 +76,7 @@ class SurfaceOpportunityItem(BaseModel):
 
 
 class SurfaceDetectionReport(BaseModel):
-    schema_version: int = 1
+    schema_version: Literal[2] = 2
     repo_root: str
     workspace_root: str
     phase: Literal["ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"]
@@ -109,11 +91,8 @@ class SurfaceDetectionReport(BaseModel):
         "pause",
         "owner_followthrough",
     ] | None = None
-    skill_report_path: str | None = None
-    skill_report_included: bool = False
+    source_inputs: list[str] = Field(default_factory=list)
     shortlist_included: bool = False
-    active_skill_names: list[str] = Field(default_factory=list)
-    immediate_skill_dispatch: list[str] = Field(default_factory=list)
     items: list[SurfaceOpportunityItem] = Field(default_factory=list)
     regrounding_hints: list[StatsRegroundingSignal] = Field(default_factory=list)
     regrounding_required: bool = False
@@ -127,24 +106,18 @@ class SurfaceDetectionReport(BaseModel):
     blocked_by: list[str] = Field(default_factory=list)
     closeout_followups: list[str] = Field(default_factory=list)
     owner_layer_notes: list[str] = Field(default_factory=list)
-    actionability_gaps: list[str] = Field(default_factory=list)
+    inspection_gaps: list[str] = Field(default_factory=list)
 
 class SurfaceCloseoutHandoffTarget(BaseModel):
-    skill_name: Literal[
-        "aoa-session-donor-harvest",
-        "aoa-automation-opportunity-scan",
-        "aoa-session-route-forks",
-        "aoa-session-self-diagnose",
-        "aoa-session-self-repair",
-        "aoa-session-progression-lift",
-        "aoa-quest-harvest",
-    ]
+    target_ref: str
+    target_kind: Literal["capability", "owner-surface"]
+    owner_repo: str
     why: str
     triggered_by: list[str] = Field(default_factory=list)
 
 
 class SurfaceCloseoutHandoff(BaseModel):
-    schema_version: int = 1
+    schema_version: Literal[2] = 2
     session_ref: str
     reviewed: bool
     surface_detection_report_ref: str

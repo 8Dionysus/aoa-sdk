@@ -31,20 +31,10 @@ def surfaces_detect(
         "--mutation-surface",
         help="Mutation class: none, code, repo-config, infra, runtime, or public-share.",
     ),
-    session_file: str | None = typer.Option(
-        None,
-        "--session-file",
-        help="Optional skill runtime session file used to read active skill names.",
-    ),
     closeout_path: str | None = typer.Option(
         None,
         "--closeout-path",
         help="Optional closeout report or manifest path when phase=closeout.",
-    ),
-    skill_report_path: str | None = typer.Option(
-        None,
-        "--skill-report-path",
-        help="Optional reference to an existing persisted skill report used as prelude context.",
     ),
     report_output: str | None = typer.Option(
         None,
@@ -80,9 +70,7 @@ def surfaces_detect(
         phase=phase,  # type: ignore[arg-type]
         intent_text=intent_text,
         mutation_surface=mutation_surface,  # type: ignore[arg-type]
-        session_file=session_file,
         closeout_path=closeout_path,
-        skill_report_path=skill_report_path,
         checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
     )
     report_path = _resolve_surface_report_path(
@@ -99,8 +87,6 @@ def surfaces_detect(
             checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
             intent_text=intent_text,
             mutation_surface=mutation_surface,  # type: ignore[arg-type]
-            session_file=session_file,
-            skill_report_path=skill_report_path,
             surface_report=report,
             surface_report_path=str(report_path),
             manual_review_requested=mark_checkpoint_reviewable,

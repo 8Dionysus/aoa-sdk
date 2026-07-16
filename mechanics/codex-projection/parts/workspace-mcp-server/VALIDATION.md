@@ -15,6 +15,8 @@ python scripts/validate_mechanics_topology.py
   substitute-route field;
 - the `aoa-stats` repo map keeps owner entrypoints but excludes its retired
   repo-local MCP launcher, and the crosswalk names project-level `aoa_stats`.
+- the skill readout uses the compact owner catalog and capability graph, not
+  retired index or runtime-discovery files.
 
 For broader Codex Projection routing, also run:
 

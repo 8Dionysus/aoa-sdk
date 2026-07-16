@@ -17,6 +17,21 @@ def find_repo_root(start: Path) -> Path:
 
 
 FIXTURE_WORKSPACE = find_repo_root(Path(__file__).resolve()) / "tests" / "fixtures" / "workspace"
+RUNTIME_IDENTITY_ENV_KEYS = (
+    "AOA_RUNTIME_SESSION_FILE",
+    "AOA_SESSION_CREATED_AT",
+    "AOA_SESSION_ID",
+    "CODEX_ROLLOUT_PATH",
+    "CODEX_THREAD_ID",
+)
+
+
+@pytest.fixture(autouse=True)
+def isolate_host_runtime_identity(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Keep mechanics tests from inheriting the live Codex session."""
+
+    for key in RUNTIME_IDENTITY_ENV_KEYS:
+        monkeypatch.delenv(key, raising=False)
 
 
 @pytest.fixture()

@@ -5,7 +5,6 @@ from pathlib import Path
 from .a2a import A2AAPI
 from .artifacts import ArtifactsAPI
 from .compatibility import CompatibilityAPI
-from .closeout import CloseoutAPI
 from .checkpoints import CheckpointsAPI
 from .codex import CodexAPI
 from .evals import EvalsAPI
@@ -46,7 +45,6 @@ class AoASDK:
         self.kag = KagAPI(workspace)
         self.rpg = RpgAPI(workspace)
         self.governed_runs = GovernedRunsAPI(workspace)
-        self.closeout = CloseoutAPI(workspace)
         self.release = ReleaseAPI(workspace)
 
     @classmethod

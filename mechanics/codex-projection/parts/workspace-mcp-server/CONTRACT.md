@@ -26,7 +26,8 @@ state, or mint owner-layer truth.
 
 - project-level Codex config at `.codex/config.toml`
 - sibling workspace marker `AOA_WORKSPACE_ROOT`
-- repo-local AGENTS, skill, profile, generated, and runtime entrypoint files
+- repo-local AGENTS, owner skill catalog, capability graph, profile, generated,
+  and runtime entrypoint files
 - project-level `aoa_stats` as the statistical read transport; its runtime
   implementation and registration remain outside SDK ownership
 - `abyss-stack` diagnostic catalog at
@@ -44,3 +45,6 @@ state, or mint owner-layer truth.
 - Do not make the server a deployment authority or Codex runtime owner.
 - Do not replace sibling repo route cards or semantic owner docs with MCP
   readouts.
+- Do not expose the retired `SKILL_INDEX.md` or runtime discovery surface as a
+  current skill route.
+- Do not select, rank, or execute a skill through the workspace MCP server.

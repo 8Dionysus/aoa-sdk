@@ -119,8 +119,6 @@ def _run_binding(
     match binding.producer:
         case "jsonl_receipt_watch":
             return _run_jsonl_receipt_watch(repo_root, binding=binding)
-        case "skill_trigger_gap_watch":
-            return _run_skill_trigger_gap_watch(repo_root, binding=binding)
         case "harvest_pattern_watch":
             return _run_harvest_pattern_watch(repo_root, binding=binding)
         case "runtime_candidate_watch":
@@ -186,136 +184,6 @@ def _run_jsonl_receipt_watch(
                         counter=counter,
                     )
                 )
-    return observations, missing, warnings
-
-
-def _run_skill_trigger_gap_watch(
-    repo_root: Path,
-    *,
-    binding: HookBinding,
-) -> tuple[list[ObservationRecord], list[str], list[HookRunWarning]]:
-    case_files, missing = _resolve_paths(repo_root, binding.path_globs)
-    receipt_globs = [str(item) for item in binding.config.get("receipt_globs", [])]
-    receipt_files, receipt_missing = _resolve_paths(repo_root, receipt_globs)
-    missing.extend(receipt_missing)
-
-    warnings: list[HookRunWarning] = []
-    observations: list[ObservationRecord] = []
-    counter = 0
-
-    case_class_field = str(binding.config.get("case_class_field") or "case_class")
-    skill_field = str(binding.config.get("skill_field") or "skill_name")
-    record_id_field = str(binding.config.get("record_id_field") or "case_id")
-    positive_values = {str(item) for item in binding.config.get("positive_case_values", ["should-trigger", "explicit-handle"])}
-    prefer_other_values = {str(item) for item in binding.config.get("prefer_other_case_values", ["prefer-other-skill"])}
-    manual_values = {str(item) for item in binding.config.get("manual_case_values", ["manual-invocation-required"])}
-    receipt_skill_fields = [str(item) for item in binding.config.get("receipt_skill_fields", ["skill_name", "skill_ref", "skill_refs", "applied_skills", "applied_skill_refs"])]
-
-    skill_case_refs: dict[str, list[str]] = defaultdict(list)
-    skill_modes: dict[str, set[str]] = defaultdict(set)
-
-    for file_path in case_files:
-        try:
-            records = _read_records_from_file(file_path)
-        except Exception as exc:  # pragma: no cover - defensive seed path
-            warnings.append(
-                HookRunWarning(
-                    binding_ref=binding.binding_ref,
-                    message=f"failed to parse trigger case file: {exc}",
-                    paths=[_relative_path(repo_root, file_path)],
-                )
-            )
-            continue
-
-        for index, record in enumerate(records, start=1):
-            if not isinstance(record, dict):
-                continue
-            skill_name = _string_or_none(_get_field(record, skill_field))
-            case_class = _string_or_none(_get_field(record, case_class_field))
-            if not skill_name or not case_class:
-                continue
-
-            record_id = _string_or_none(_get_field(record, record_id_field)) or f"record-{index}"
-            evidence_ref = f"{binding.owner_repo}:{_relative_path(repo_root, file_path)}#{record_id}"
-            skill_case_refs[skill_name].append(evidence_ref)
-            skill_modes[skill_name].add(case_class)
-
-            if case_class in manual_values:
-                counter += 1
-                observations.append(
-                    _make_observation(
-                        binding=binding,
-                        signal="manual_invocation_boundary_seen",
-                        category="review_signal",
-                        source_inputs=[binding.input_ref],
-                        evidence_refs=[evidence_ref],
-                        attributes={
-                            "binding_ref": binding.binding_ref,
-                            "producer": binding.producer,
-                            "skill_name": skill_name,
-                            "case_class": case_class,
-                        },
-                        notes="manual invocation remains an explicit boundary in the trigger suite",
-                        counter=counter,
-                    )
-                )
-
-    seen_skills: set[str] = set()
-    for file_path in receipt_files:
-        try:
-            records = _read_records_from_file(file_path)
-        except Exception as exc:  # pragma: no cover - defensive seed path
-            warnings.append(
-                HookRunWarning(
-                    binding_ref=binding.binding_ref,
-                    message=f"failed to parse skill receipt surface: {exc}",
-                    paths=[_relative_path(repo_root, file_path)],
-                )
-            )
-            continue
-        for record in records:
-            if not isinstance(record, dict):
-                continue
-            seen_skills.update(_extract_skill_names(record, receipt_skill_fields))
-
-    for skill_name, case_modes in sorted(skill_modes.items()):
-        evidence_refs = skill_case_refs.get(skill_name, [])
-        if positive_values.intersection(case_modes) and skill_name not in seen_skills:
-            counter += 1
-            observations.append(
-                _make_observation(
-                    binding=binding,
-                    signal="should_trigger_missing",
-                    category="usage_gap",
-                    source_inputs=[binding.input_ref, "skill-live-receipts"],
-                    evidence_refs=evidence_refs[:3],
-                    attributes={
-                        "binding_ref": binding.binding_ref,
-                        "producer": binding.producer,
-                        "skill_name": skill_name,
-                    },
-                    notes="trigger suite suggests this skill should fire, but no recent skill evidence was seen",
-                    counter=counter,
-                )
-            )
-        if prefer_other_values.intersection(case_modes) and skill_name not in seen_skills:
-            counter += 1
-            observations.append(
-                _make_observation(
-                    binding=binding,
-                    signal="prefer_other_skill_gap",
-                    category="usage_gap",
-                    source_inputs=[binding.input_ref, "skill-live-receipts"],
-                    evidence_refs=evidence_refs[:3],
-                    attributes={
-                        "binding_ref": binding.binding_ref,
-                        "producer": binding.producer,
-                        "skill_name": skill_name,
-                    },
-                    notes="trigger suite shows neighboring-skill pressure, but no confirming skill evidence was seen",
-                    counter=counter,
-                )
-            )
     return observations, missing, warnings
 
 
@@ -668,25 +536,6 @@ def _extract_attributes(record: dict[str, Any], fields: list[str]) -> dict[str, 
             continue
         payload[field] = value
     return payload
-
-
-def _extract_skill_names(record: dict[str, Any], fields: list[str]) -> set[str]:
-    names: set[str] = set()
-    for field in fields:
-        value = _get_field(record, field)
-        if value is None:
-            continue
-        if isinstance(value, str):
-            names.add(value)
-        elif isinstance(value, list):
-            for item in value:
-                if isinstance(item, str):
-                    names.add(item)
-                elif isinstance(item, dict):
-                    for key in ("skill_name", "skill_ref", "name", "ref"):
-                        if isinstance(item.get(key), str):
-                            names.add(item[key])
-    return names
 
 
 def _get_field(payload: Any, dotted: str) -> Any:

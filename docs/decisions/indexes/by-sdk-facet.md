@@ -64,6 +64,7 @@
 - [AOA-SDK-D-0013 - Boundary Bridge And Checkpoint Active Part Localization](../AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md) (`docs/decisions/AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md`)
 - [AOA-SDK-D-0017 - Skill Runtime Bridge Part Localization](../AOA-SDK-D-0017-skill-runtime-bridge-part-localization.md) (`docs/decisions/AOA-SDK-D-0017-skill-runtime-bridge-part-localization.md`)
 - [AOA-SDK-D-0028 - CLI Surface Test Localization](../AOA-SDK-D-0028-cli-surface-test-localization.md) (`docs/decisions/AOA-SDK-D-0028-cli-surface-test-localization.md`)
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 
 ## Boundary Bridge
 
@@ -105,6 +106,7 @@
 ## child-task reentry
 
 - [AOA-SDK-D-0039 - A2A Quest Passport Secondary Tier Naming](../AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md) (`docs/decisions/AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md`)
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 
 ## CLI
 
@@ -228,6 +230,10 @@
 
 - [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) (`docs/decisions/AOA-SDK-D-0051-implementation-source-topology-index.md`)
 
+## hook bindings
+
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
+
 ## hook observation
 
 - [AOA-SDK-D-0020 - Technique Publication Observation Boundary Localization](../AOA-SDK-D-0020-technique-publication-observation-boundary-localization.md) (`docs/decisions/AOA-SDK-D-0020-technique-publication-observation-boundary-localization.md`)
@@ -246,6 +252,10 @@
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
 - [AOA-SDK-D-0060 - Low-Pressure Route Stop-Lines](../AOA-SDK-D-0060-low-pressure-route-stop-lines.md) (`docs/decisions/AOA-SDK-D-0060-low-pressure-route-stop-lines.md`)
 - [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) (`docs/decisions/AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md`)
+
+## live observations
+
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 
 ## managed hooks
 
@@ -399,6 +409,10 @@
 
 - [AOA-SDK-D-0057 - Closeout API Route-Role Branches](../AOA-SDK-D-0057-closeout-api-route-role-branches.md) (`docs/decisions/AOA-SDK-D-0057-closeout-api-route-role-branches.md`)
 
+## reviewed evidence handoff
+
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
+
 ## reviewed session handoff runner
 
 - [AOA-SDK-D-0022 - Reviewed Session Handoff Runner Localization](../AOA-SDK-D-0022-reviewed-session-handoff-runner-localization.md) (`docs/decisions/AOA-SDK-D-0022-reviewed-session-handoff-runner-localization.md`)
@@ -474,6 +488,10 @@
 - [AOA-SDK-D-0026 - Runtime Seam Test Surface Localization](../AOA-SDK-D-0026-runtime-seam-test-surface-localization.md) (`docs/decisions/AOA-SDK-D-0026-runtime-seam-test-surface-localization.md`)
 - [AOA-SDK-D-0028 - CLI Surface Test Localization](../AOA-SDK-D-0028-cli-surface-test-localization.md) (`docs/decisions/AOA-SDK-D-0028-cli-surface-test-localization.md`)
 
+## runtime session identity
+
+- [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
+
 ## schema validation
 
 - [AOA-SDK-D-0010 - Experience Helper Contract Part Localization](../AOA-SDK-D-0010-experience-helper-contract-part-localization.md) (`docs/decisions/AOA-SDK-D-0010-experience-helper-contract-part-localization.md`)
@@ -495,6 +513,14 @@
 ## sibling read path
 
 - [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) (`docs/decisions/AOA-SDK-D-0003-refactored-sibling-surface-paths.md`)
+
+## skill environment inspection
+
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+
+## skill evidence transport
+
+- [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 
 ## skill runtime bridge
 
@@ -545,6 +571,7 @@
 ## typed contracts
 
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 
 ## typed facades
 
@@ -558,6 +585,10 @@
 ## workspace
 
 - [AOA-SDK-D-0026 - Runtime Seam Test Surface Localization](../AOA-SDK-D-0026-runtime-seam-test-surface-localization.md) (`docs/decisions/AOA-SDK-D-0026-runtime-seam-test-surface-localization.md`)
+
+## workspace bootstrap
+
+- [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 
 ## workspace control plane
 

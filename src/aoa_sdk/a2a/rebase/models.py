@@ -45,25 +45,7 @@ MemoryScope = Literal["thread", "session", "repo", "project", "workspace", "ecos
 RankLabel = Literal["initiate", "adept", "specialist", "veteran", "master"]
 
 
-CANONICAL_STATS_EVENT_KINDS = {
-    "automation_candidate_receipt",
-    "core_skill_application_receipt",
-    "decision_fork_receipt",
-    "diagnosis_packet_receipt",
-    "eval_result_receipt",
-    "harvest_packet_receipt",
-    "memo_writeback_receipt",
-    "playbook_publication_receipt",
-    "playbook_review_harvest_receipt",
-    "progression_delta_receipt",
-    "quest_promotion_receipt",
-    "repair_cycle_receipt",
-    "runtime_return_closeout_receipt",
-    "skill_run_receipt",
-    "technique_publication_receipt",
-    "technique_promotion_receipt",
-    "technique_trace_receipt",
-}
+CANONICAL_RUNTIME_EVENT_KINDS = {"runtime_return_closeout_receipt"}
 
 
 @dataclass(slots=True)
@@ -90,7 +72,7 @@ class QuestPassport:
 class SummonIntent:
     desired_role: str | None = None
     child_agent_id: str | None = None
-    skill_refs: list[str] = field(default_factory=list)
+    capability_refs: list[str] = field(default_factory=list)
     expected_outputs: list[str] = field(default_factory=list)
     parent_task_id: str | None = None
     session_ref: str | None = None
@@ -225,41 +207,28 @@ class MemoExportPlan:
 
 
 @dataclass(slots=True)
-class CloseoutBatchPlan:
-    publisher: str
+class OwnerEvidenceHandoff:
+    owner_ref: str
+    candidate_kind: str
     reason: str
-    receipt_kind: str | None = None
-    input_paths: list[str] = field(default_factory=list)
-    required: bool = False
+    evidence_refs: list[str] = field(default_factory=list)
+    capability_ref: str | None = None
+    review_required: bool = True
 
 
 @dataclass(slots=True)
-class CheckpointBridgePlan:
-    mode: Literal["reviewed-closeout-execute"] = "reviewed-closeout-execute"
+class CheckpointEvidenceHandoffPlan:
+    mode: Literal["reviewed-evidence-handoff"] = "reviewed-evidence-handoff"
     session_ref: str = ""
     reviewed_artifact_path: str = ""
     checkpoint_note_ref: str | None = None
     codex_trace_ref: str | None = None
     surviving_checkpoint_clusters: list[str] = field(default_factory=list)
-    execution_order: list[str] = field(
-        default_factory=lambda: [
-            "aoa-session-donor-harvest",
-            "aoa-session-progression-lift",
-            "aoa-quest-harvest",
-        ]
+    capability_candidates: list[str] = field(
+        default_factory=lambda: ["workflow.operations.checkpoint-closeout"]
     )
-    authority_contract: str = "reviewed_artifact_primary_checkpoint_hints_provisional"
-    mechanical_bridge_only: bool = True
-    agent_skill_application_required: bool = True
+    authority_contract: str = (
+        "reviewed_artifact_primary_capability_candidates_are_routing_only"
+    )
+    capability_execution_claimed: bool = False
     return_anchor_artifact: str | None = None
-
-
-MANIFEST_BATCH_PUBLISHERS = {
-    "abyss-stack.runtime-return-closeouts",
-    "aoa-skills.session-harvest-family",
-    "aoa-skills.core-kernel-applications",
-    "aoa-evals.eval-result",
-    "aoa-playbooks.reviewed-run",
-    "aoa-techniques.promotion",
-    "aoa-memo.writeback",
-}

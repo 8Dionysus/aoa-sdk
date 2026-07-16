@@ -185,7 +185,7 @@
       ],
       "mechanic_routes": [
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
-        "mechanics/boundary-bridge/parts/skill-runtime-bridge",
+        "mechanics/boundary-bridge/parts/skill-environment-inspector",
         "mechanics/boundary-bridge/parts/technique-promotion-readiness-reader"
       ],
       "validators": [
@@ -293,25 +293,24 @@
       "id": "closeout_entrypoints",
       "branch": "runtime_entry",
       "path": "sdk/runtime-entry/closeout-entrypoints",
-      "source_kind": "reviewed_closeout_entry_posture",
-      "meaning": "Route contract for checkpoint and reviewed closeout entrypoints below owner truth.",
+      "source_kind": "reviewed_evidence_entry_posture",
+      "meaning": "Route contract for checkpoint review, evidence materialization, and owner-candidate handoff below capability execution and owner truth.",
       "owner_surface": "sdk/runtime-entry/AGENTS.md",
       "implementation_routes": [
         "src/aoa_sdk/checkpoints",
-        "src/aoa_sdk/closeout",
         "src/aoa_sdk/a2a"
       ],
       "mechanic_routes": [
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle",
-        "mechanics/checkpoint/parts/reviewed-session-handoff-runner",
-        "mechanics/checkpoint/parts/child-task-reentry"
+        "mechanics/checkpoint/parts/child-task-reentry",
+        "mechanics/checkpoint/parts/reviewed-closeout-context-carry"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
         "python -m pytest -q mechanics/checkpoint/parts"
       ],
       "stop_lines": [
-        "Do not treat checkpoint or closeout artifacts as memory, proof, or owner verdicts."
+        "Do not treat checkpoint or closeout artifacts as capability execution, memory, proof, or owner verdicts."
       ]
     },
     {

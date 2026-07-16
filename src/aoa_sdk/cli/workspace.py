@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 import json
-from typing import Literal
 
 import typer
 
@@ -43,55 +42,48 @@ def workspace_inspect(
 
 @workspace_app.command("bootstrap")
 def workspace_bootstrap(
-    target_root: str = typer.Argument(..., help="Sibling-workspace root that already contains the public repos."),
-    mode: Literal["symlink", "copy"] = typer.Option("symlink", "--mode", help="Foundation install mode: symlink or copy."),
+    discovery_root: str = typer.Argument(
+        ...,
+        help="Workspace or repository path used to discover the aoa-skills owner checkout.",
+    ),
+    profile_name: str = typer.Option(
+        "user-default",
+        "--profile",
+        help="Exact aoa-skills install profile to apply.",
+    ),
+    user_skill_root: str | None = typer.Option(
+        None,
+        "--user-skill-root",
+        help="Override the user skill root; otherwise use CODEX_HOME/skills or ~/.codex/skills.",
+    ),
     execute: bool = typer.Option(False, "--execute", help="Apply the bootstrap plan instead of only reporting it."),
     overwrite: bool = typer.Option(
         False,
         "--overwrite",
-        help="Replace conflicting foundation installs when the current target does not match the source export.",
-    ),
-    write_agents: bool = typer.Option(
-        True,
-        "--write-agents/--no-write-agents",
-        help="Write one root-level AGENTS.md when it is missing.",
-    ),
-    overwrite_agents: bool = typer.Option(
-        False,
-        "--overwrite-agents",
-        help="Replace an existing root-level AGENTS.md with the canonical workspace guidance.",
-    ),
-    allow_partial: bool = typer.Option(
-        False,
-        "--allow-partial",
-        help="Allow bootstrap planning even when the canonical sibling workspace is incomplete.",
+        help="Replace a conflicting target copy when it differs from the owner export.",
     ),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     report = bootstrap_workspace(
-        target_root,
-        mode=mode,
+        discovery_root,
+        profile_name=profile_name,
+        user_skill_root=user_skill_root,
         execute=execute,
         overwrite=overwrite,
-        write_agents=write_agents,
-        overwrite_agents=overwrite_agents,
-        strict_layout=not allow_partial,
     )
     payload = report.model_dump(mode="json")
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
     else:
-        typer.echo(f"workspace_root: {report.workspace_root}")
-        typer.echo(f"foundation_id: {report.foundation_id}")
-        typer.echo(f"profile: {report.canonical_install_profile}")
+        typer.echo(f"discovery_root: {report.discovery_root}")
+        typer.echo(f"source_repo_root: {report.source_repo_root}")
+        typer.echo(f"profile: {report.profile_name} [{report.profile_scope}]")
+        typer.echo(f"install_root: {report.install_root}")
         typer.echo(f"ready: {report.ready}")
         typer.echo(f"executed: {report.executed}")
         typer.echo(f"verified: {report.verified if report.verified is not None else 'not-run'}")
-        typer.echo(f"missing_required_repos: {', '.join(report.missing_required_repos) or 'none'}")
-        if report.agents_file is not None:
-            typer.echo(f"root_agents: {report.agents_file.path} [{report.agents_file.action}]")
-        typer.echo("install_steps:")
-        for step in report.install_steps:
+        typer.echo("steps:")
+        for step in report.steps:
             typer.echo(f"  - {step.skill_name}: {step.action}")
         if report.warnings:
             typer.echo("warnings:")

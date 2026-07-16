@@ -18,6 +18,7 @@ def test_sdk_exposes_a2a_rebase_bridge(workspace_root) -> None:
     )
     intent = SummonIntent(
         desired_role="reviewer",
+        capability_refs=["workflow.operations.delegation"],
         expected_outputs=["verification_result"],
         reviewed_artifact_path="/tmp/reviewed.md",
     )
@@ -41,10 +42,24 @@ def test_sdk_exposes_a2a_rebase_bridge(workspace_root) -> None:
         decision,
         checkpoint_note_ref="aoa-sdk/.aoa/session-growth/current/example/checkpoint-note.json",
     )
+    checkpoint_plan = sdk.a2a.build_checkpoint_evidence_handoff_plan(
+        session_ref="session:example",
+        reviewed_artifact_path="/tmp/reviewed.md",
+        return_plan=return_plan,
+    )
+    owner_handoff = sdk.a2a.build_owner_evidence_handoff(
+        owner_ref="repo:aoa-playbooks",
+        candidate_kind="checkpoint-owner-followthrough",
+        reason="owner review is required",
+        evidence_refs=["/tmp/reviewed.md"],
+        capability_ref="workflow.operations.checkpoint-closeout",
+    )
     result_payload = sdk.a2a.build_summon_result(
         decision,
         codex_local_target=target,
         return_plan=return_plan,
+        checkpoint_handoff_plan=checkpoint_plan,
+        owner_handoffs=[owner_handoff],
     )
 
     assert request_payload["expected_outputs"] == ["verification_result"]
@@ -64,7 +79,20 @@ def test_sdk_exposes_a2a_rebase_bridge(workspace_root) -> None:
         "/.codex/agents/reviewer.toml"
     )
     assert result_payload["return_plan"]["reentry_mode"] == "checkpoint_relaunch"
-    assert result_payload["owner_publication_plan"] == []
+    assert result_payload["return_plan"]["next_hop"] == (
+        "workflow.operations.checkpoint-closeout"
+    )
+    assert result_payload["capability_execution_claimed"] is False
+    assert result_payload["owner_handoffs"] == [
+        {
+            "owner_ref": "repo:aoa-playbooks",
+            "candidate_kind": "checkpoint-owner-followthrough",
+            "reason": "owner review is required",
+            "evidence_refs": ["/tmp/reviewed.md"],
+            "capability_ref": "workflow.operations.checkpoint-closeout",
+            "review_required": True,
+        }
+    ]
 
 
 def test_sdk_prefers_aoa_agents_projection_manifest_for_local_target(

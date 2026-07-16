@@ -1,0 +1,7 @@
+policy:
+  allow_implicit_invocation: true
+  implicit_activation_policy: invoke
+interface:
+  display_name: AoA Decision
+  short_description: Find, record, or correct durable decisions
+  default_prompt: Use $aoa-decision with exactly one internal mode.

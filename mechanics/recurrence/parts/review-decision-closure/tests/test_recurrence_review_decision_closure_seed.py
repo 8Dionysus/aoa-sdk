@@ -16,19 +16,19 @@ def _queue() -> ReviewQueue:
         items=[
             ReviewQueueItem(
                 item_ref="review-item:0001",
-                lane="skill",
+                lane="technique",
                 priority="medium",
-                target_repo="aoa-skills",
-                owner_repo="aoa-skills",
-                component_ref="component:skills:bundle-and-activation-beacons",
-                beacon_ref="skills.unused_skill.activation_gap",
-                kind="unused_skill_opportunity",
+                target_repo="aoa-techniques",
+                owner_repo="aoa-techniques",
+                component_ref="component:techniques:canon-and-intake-beacons",
+                beacon_ref="technique.canonical.second_consumer_pressure",
+                kind="canonical_pressure",
                 status="watch",
-                decision_surface="docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
-                summary="Skill looked applicable but stayed unused.",
+                decision_surface="docs/PROMOTION_READINESS_MATRIX.md",
+                summary="A second consumer appeared but promotion remains owner-reviewed.",
                 evidence_refs=["receipt:001"],
-                source_inputs=["generated/description_trigger_eval_cases.jsonl"],
-                recommended_actions=["inspect trigger boundary"],
+                source_inputs=["technique-live-receipts"],
+                recommended_actions=["refresh promotion-readiness evidence"],
             ),
             ReviewQueueItem(
                 item_ref="review-item:0002",
@@ -57,17 +57,17 @@ def test_decision_template_carries_owner_boundaries_without_minting_owner_refs()
         _queue(),
         item_ref="review-item:0001",
         decision="defer",
-        reviewer="aoa-skills-review",
-        cluster_ref="cluster:skills:unused:001",
+        reviewer="aoa-techniques-review",
+        cluster_ref="cluster:techniques:second-consumer:001",
     )
 
-    assert decision.owner_repo == "aoa-skills"
-    assert decision.input_beacon_refs == ["skills.unused_skill.activation_gap"]
+    assert decision.owner_repo == "aoa-techniques"
+    assert decision.input_beacon_refs == ["technique.canonical.second_consumer_pressure"]
     assert decision.lineage_bridge is not None
-    assert decision.lineage_bridge.cluster_ref == "cluster:skills:unused:001"
+    assert decision.lineage_bridge.cluster_ref == "cluster:techniques:second-consumer:001"
     assert decision.lineage_bridge.owner_assigned_ref is None
-    assert "sdk_does_not_accept_skill" in decision.forbidden_implications
-    assert any("trigger" in boundary for boundary in decision.boundaries_preserved)
+    assert "sdk_does_not_mint_owner_candidate_seed_or_object_ref" in decision.forbidden_implications
+    assert any("technique" in boundary for boundary in decision.boundaries_preserved)
 
 
 def test_decision_template_preserves_source_owner_when_target_differs() -> None:
@@ -106,13 +106,49 @@ def test_decision_template_preserves_source_owner_when_target_differs() -> None:
     assert ledger.by_owner == {"aoa-techniques": 1}
 
 
+def test_explicit_skill_drift_routes_to_owner_review_without_activation_claim() -> None:
+    queue = ReviewQueue(
+        queue_ref="review-queue:owner-authored-skill-evidence",
+        workspace_root="/tmp/workspace",
+        items=[
+            ReviewQueueItem(
+                item_ref="review-item:owner-authored-skill-drift",
+                lane="skill",
+                priority="medium",
+                target_repo="example-skill-owner",
+                owner_repo="example-skill-owner",
+                component_ref="component:example:owner-authored-skill-evidence",
+                beacon_ref="skills.owner_authored.applicability_drift",
+                kind="skill_trigger_drift",
+                status="watch",
+                decision_surface="skills/example/SKILL.md",
+                summary="Owner comparison found an applicability-boundary candidate.",
+                evidence_refs=["session-evidence:reviewed-case-002"],
+            )
+        ],
+    )
+
+    decision = build_owner_review_decision_template(
+        queue,
+        item_ref="review-item:owner-authored-skill-drift",
+        decision="defer",
+    )
+
+    assert decision.lineage_bridge is not None
+    assert (
+        decision.lineage_bridge.owner_shape
+        == "skill_applicability_and_routing_review_decision"
+    )
+    assert any("do not prove invocation" in item for item in decision.boundaries_preserved)
+
+
 def test_close_report_records_suppression_and_unresolved_items() -> None:
     queue = _queue()
     decision = build_owner_review_decision_template(
         queue,
-        beacon_ref="skills.unused_skill.activation_gap",
+        beacon_ref="technique.canonical.second_consumer_pressure",
         decision="suppress",
-        rationale="Noisy because this skill is explicit-only in this context.",
+        rationale="The same consumer was counted twice in this context.",
     )
     report = close_review_decisions(
         workspace_root="/tmp/workspace",
@@ -122,7 +158,7 @@ def test_close_report_records_suppression_and_unresolved_items() -> None:
 
     assert report.closed_item_refs == ["review-item:0001"]
     assert report.unresolved_item_refs == ["review-item:0002"]
-    assert report.suppressed_beacon_refs == ["skills.unused_skill.activation_gap"]
+    assert report.suppressed_beacon_refs == ["technique.canonical.second_consumer_pressure"]
     assert report.ledger.by_decision == {"suppress": 1}
     assert report.suppression_memory.rules[0].scope == "beacon"
     assert not report.warnings

@@ -5,7 +5,7 @@ Root route card for `aoa-sdk`.
 ## Purpose
 
 `aoa-sdk` is the typed Python SDK and control-plane helper layer for the AoA federation.
-It consumes source-owned sibling surfaces and exposes local-first APIs for loading, validating, disclosing, activating, and handing off bounded federation objects.
+It consumes source-owned sibling surfaces and exposes local-first APIs for loading, validating, inspecting, materializing reviewed evidence, and handing off bounded federation objects.
 It helps the federation stay legible without becoming the source of truth for sibling-layer meaning.
 
 ## Owner lane
@@ -23,7 +23,8 @@ This repository owns:
   source-family routes, future-pressure roadmaps, part-local artifact homes,
   `mechanics/topology.json`, package provenance cards, and part-local
   validation homes
-- additive surface detection and reviewed closeout handoff helpers that remain owner-subordinate
+- additive surface detection, passive skill-environment inspection, and
+  reviewed checkpoint evidence handoff helpers that remain owner-subordinate
 
 It does not own:
 
@@ -76,7 +77,8 @@ lands through `aoa-memo`.
 - Prefer explicit config and manifest-driven behavior over magical discovery.
 - Keep source checkouts distinct from deployed runtime mirrors.
 - Usual federation root is `/srv/AbyssOS`; `abyss-stack` source may live at `~/src/abyss-stack`, while `/srv/AbyssOS/abyss-stack` can be a runtime mirror.
-- Non-skill surfaces may be loaded, suggested, or handed off. They do not become executable-now activation authority.
+- Consumed surfaces may be loaded, inspected, or handed off. Presence never
+  becomes selection, activation, capability execution, or owner authority.
 
 ## Decision review
 
@@ -102,25 +104,32 @@ expectations, or agent-facing design law.
 Design surfaces describe form. They do not override active source code,
 validators, decisions, nested route cards, or sibling-owner truth.
 
-## Surface Detection Loop
+## Inspection And Checkpoint Loop
 
-Use these compact anchors when a task touches checkpoint, handoff, or additive surface detection behavior:
+Use these compact anchors when a task touches skills, checkpoint evidence, or
+additive surface detection:
 
 ```bash
+aoa skills inspect /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
+aoa skills capability workflow.operations.checkpoint-closeout --root /srv/AbyssOS --json
 aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress
 aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint
 aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note
-aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "recurring workflow needs better handoff proof and recall" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
-aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "commit bounded patch" --mutation-surface code --root /srv/AbyssOS/aoa-sdk --json
-aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "reviewable verify-green checkpoint" --mutation-surface code --checkpoint-kind verify_green
-aoa skills guard /srv/AbyssOS/aoa-sdk --intent-text "refresh generated contracts" --mutation-surface code --no-auto-checkpoint --root /srv/AbyssOS/aoa-sdk --json
 aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json
 aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD --auto
+aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
+aoa checkpoint materialize-closeout-handoff /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
+aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
 aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json
 aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
 ```
 
-`aoa skills ...` remains skill-only. checkpoint notes stay lower-authority than harvest verdicts; `skipped_no_active_session` and `agent_review=pending` are session-local signals, not final review. A reviewable `skipped_no_active_session` tied to the current Codex thread must be recovered with `aoa checkpoint review-note --auto`, not treated as a clean boundary. A checkpoint note is a session-local ledger for harvest, progression, and quest hints through `checkpoint_capture.session_end_skill_targets`, `checkpoint_capture.progression_axis_signals`, and `checkpoint_capture.session_end_next_honest_move`. Keep `aoa-session-progression-lift` and `aoa-checkpoint-closeout-bridge` as reviewed-closeout helpers, remember that `manual-equivalent` never becomes `activated`, and routing shortlist hints stay advisory only.
+`aoa skills ...` is passive inspection only; it does not detect, rank,
+dispatch, activate, or create skill-session state. Checkpoint notes and
+materialized evidence stay session-local and owner-subordinate. A
+`skipped_no_active_session` or `agent_review=pending` state is not final
+review, and `capability_execution_claimed=false` must remain explicit through
+materialization and A2A return.
 
 ## GitHub landing workflow
 

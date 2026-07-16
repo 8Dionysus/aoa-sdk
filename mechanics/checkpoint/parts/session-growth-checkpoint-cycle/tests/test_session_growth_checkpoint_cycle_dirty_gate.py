@@ -9,6 +9,11 @@ from aoa_sdk import AoASDK
 from aoa_sdk.errors import SurfaceNotFound
 
 
+@pytest.fixture(autouse=True)
+def _explicit_runtime_identity(monkeypatch: pytest.MonkeyPatch) -> None:
+    monkeypatch.setenv("AOA_SESSION_ID", "runtime-dionysus-promotion-tests")
+
+
 def _init_clean_git_repo(repo_root: Path) -> None:
     repo_root.mkdir(parents=True, exist_ok=True)
     subprocess.run(["git", "init", "-b", "main", str(repo_root)], check=True, capture_output=True, text=True)

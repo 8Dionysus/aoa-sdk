@@ -7,7 +7,6 @@ from ..models import (
     SurfaceDetectionReport,
 )
 from ..checkpoints.candidate_intelligence import build_candidate_intelligence_from_surface
-from ..skills.detector import detect_skills
 from ..workspace.discovery import Workspace
 from .checkpoint_candidates import (
     checkpoint_blocked_by,
@@ -30,10 +29,9 @@ from .common import (
 )
 from .context import (
     enrich_surface_items,
-    load_active_skill_names,
-    load_core_skill_receipt_contexts,
     load_shortlist_hints,
     load_stats_regrounding_hints,
+    partition_current_shortlist_hints,
     regrounding_reason_codes,
 )
 from .items import derive_surface_items
@@ -50,9 +48,7 @@ class SurfacesAPI:
         phase: SurfacePhase,
         intent_text: str = "",
         mutation_surface: MutationSurface = "none",
-        session_file: str | None = None,
         closeout_path: str | None = None,
-        skill_report_path: str | None = None,
         include_shortlist: bool = True,
         checkpoint_kind: CheckpointKind | None = None,
     ) -> SurfaceDetectionReport:
@@ -61,18 +57,12 @@ class SurfacesAPI:
         if mutation_surface not in MUTATION_SURFACES:
             raise ValueError(f"unsupported mutation_surface {mutation_surface!r}")
 
-        skill_phase = phase if phase != "in-flight" else "ingress"
-        skill_report = detect_skills(
-            self.workspace,
-            repo_root=repo_root,
-            phase=skill_phase,  # type: ignore[arg-type]
-            intent_text=intent_text,
-            mutation_surface=mutation_surface,
-            closeout_path=closeout_path,
+        all_shortlist_hints = (
+            load_shortlist_hints(self.workspace) if include_shortlist else []
         )
-        active_skill_names = load_active_skill_names(self.workspace, session_file=session_file)
-        shortlist_hints = load_shortlist_hints(self.workspace) if include_shortlist else []
-        skill_receipt_contexts = load_core_skill_receipt_contexts(self.workspace)
+        shortlist_hints, inspection_gaps = partition_current_shortlist_hints(
+            all_shortlist_hints
+        )
         regrounding_hints = load_stats_regrounding_hints(
             self.workspace,
             intent_text=intent_text,
@@ -81,14 +71,11 @@ class SurfacesAPI:
         )
         items = enrich_surface_items(
             derive_surface_items(
-                skill_report=skill_report,
                 surface_phase=phase,
                 intent_text=intent_text,
-                active_skill_names=active_skill_names,
-                closeout_signal=phase == "closeout" or skill_report.closeout_chain is not None,
+                closeout_signal=phase == "closeout" or closeout_path is not None,
             ),
             shortlist_hints=shortlist_hints,
-            skill_receipt_contexts=skill_receipt_contexts,
         )
         candidate_clusters = (
             derive_checkpoint_candidate_clusters(
@@ -108,7 +95,7 @@ class SurfacesAPI:
                         mutation_surface=mutation_surface,
                         intent_text=intent_text,
                         checkpoint_kind=checkpoint_kind,
-                        skill_report=skill_report,
+                        source_refs=[item.surface_ref for item in items],
                     ),
                 ]
             )
@@ -121,7 +108,7 @@ class SurfacesAPI:
                 mutation_surface=mutation_surface,
                 items=items,
                 candidate_clusters=candidate_clusters,
-                actionability_gaps=list(skill_report.actionability_gaps),
+                inspection_gaps=inspection_gaps,
             )
             if phase == "checkpoint"
             else None
@@ -148,17 +135,17 @@ class SurfacesAPI:
             phase == "checkpoint" and checkpoint_kind in {"manual", "pause"} and bool(items)
         )
         return SurfaceDetectionReport(
-            repo_root=skill_report.repo_root,
+            repo_root=str(_resolve_repo_root(self.workspace, repo_root)),
             workspace_root=str(self.workspace.federation_root),
             phase=phase,
             intent_text=intent_text,
             mutation_surface=mutation_surface,
             checkpoint_kind=checkpoint_kind,
-            skill_report_path=skill_report_path,
-            skill_report_included=True,
+            source_inputs=[
+                *(["aoa-routing.owner_layer_shortlist.min"] if all_shortlist_hints else []),
+                *(["aoa-stats.regrounding-signals"] if regrounding_hints else []),
+            ],
             shortlist_included=bool(shortlist_hints),
-            active_skill_names=active_skill_names,
-            immediate_skill_dispatch=[item.skill_name for item in skill_report.activate_now],
             items=items,
             regrounding_hints=regrounding_hints,
             regrounding_required=any(
@@ -193,7 +180,7 @@ class SurfacesAPI:
             blocked_by=blocked_by,
             closeout_followups=derive_closeout_followups(items=items, surface_phase=phase),
             owner_layer_notes=owner_layer_notes(items=items),
-            actionability_gaps=list(skill_report.actionability_gaps),
+            inspection_gaps=inspection_gaps,
         )
 
     def build_closeout_handoff(
@@ -209,3 +196,12 @@ class SurfacesAPI:
             session_ref=session_ref,
             reviewed=reviewed,
         )
+
+
+def _resolve_repo_root(workspace: Workspace, repo_root: str) -> Path:
+    candidate = Path(repo_root).expanduser()
+    if candidate.is_absolute():
+        return candidate.resolve(strict=False)
+    if repo_root in workspace.repo_roots:
+        return workspace.repo_path(repo_root)
+    return (workspace.root / candidate).resolve(strict=False)

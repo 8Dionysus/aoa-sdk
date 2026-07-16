@@ -1,15 +1,14 @@
 from __future__ import annotations
 
-from typing import Any, Iterable
+from typing import Any
 
 from .models import (
-    CANONICAL_STATS_EVENT_KINDS,
-    MANIFEST_BATCH_PUBLISHERS,
-    CheckpointBridgePlan,
-    CloseoutBatchPlan,
+    CANONICAL_RUNTIME_EVENT_KINDS,
+    CheckpointEvidenceHandoffPlan,
     CodexLocalAgentTarget,
     EvidenceRef,
     MemoExportPlan,
+    OwnerEvidenceHandoff,
     RemoteTaskResult,
     ReturnPlan,
     StressBundle,
@@ -26,33 +25,39 @@ def build_runtime_return_closeout_receipt(
     reviewed_artifact_path: str | None = None,
     stress_bundle: StressBundle | None = None,
     return_plan: ReturnPlan | None = None,
-    checkpoint_bridge_plan: CheckpointBridgePlan | None = None,
+    checkpoint_handoff_plan: CheckpointEvidenceHandoffPlan | None = None,
     codex_target: CodexLocalAgentTarget | None = None,
     observed_at: str | None = None,
     owner_repo: str = "abyss-stack",
     actor_ref: str = "abyss-stack.runtime-a2a",
-) -> dict:
+) -> dict[str, Any]:
+    """Build a candidate runtime receipt without publishing it or claiming a skill run."""
+
     event_kind = "runtime_return_closeout_receipt"
-    if event_kind not in CANONICAL_STATS_EVENT_KINDS:
+    if event_kind not in CANONICAL_RUNTIME_EVENT_KINDS:
         raise ValueError(f"unsupported event kind: {event_kind}")
 
     evidence_refs: list[EvidenceRef] = [
         EvidenceRef(
-            kind="remote_task", ref=f"a2a:task:{remote_task.task_id}", role="child_task"
+            kind="remote_task",
+            ref=f"a2a:task:{remote_task.task_id}",
+            role="child_task",
         )
     ]
     if reviewed_artifact_path:
         evidence_refs.append(
             EvidenceRef(
-                kind="reviewed_artifact", ref=reviewed_artifact_path, role="closeout"
+                kind="reviewed_artifact",
+                ref=reviewed_artifact_path,
+                role="return_review",
             )
         )
     if stress_bundle:
         evidence_refs.extend(stress_bundle.evidence_refs)
-    for ref in remote_task.artifact_refs:
-        evidence_refs.append(
-            EvidenceRef(kind="remote_artifact", ref=ref, role="returned_artifact")
-        )
+    evidence_refs.extend(
+        EvidenceRef(kind="remote_artifact", ref=ref, role="returned_artifact")
+        for ref in remote_task.artifact_refs
+    )
 
     payload: dict[str, Any] = {
         "selected_agent_id": remote_task.agent_id,
@@ -68,8 +73,8 @@ def build_runtime_return_closeout_receipt(
         "requested_posture": decision.requested_posture,
         "blocked_actions": list(decision.blocked_actions),
         "expected_outputs": list(decision.expected_outputs),
+        "capability_execution_claimed": False,
     }
-
     if return_plan:
         payload.update(
             {
@@ -80,11 +85,14 @@ def build_runtime_return_closeout_receipt(
                 "codex_trace_ref": return_plan.codex_trace_ref,
             }
         )
-    if checkpoint_bridge_plan:
-        if checkpoint_bridge_plan.checkpoint_note_ref is not None:
-            payload["checkpoint_note_ref"] = checkpoint_bridge_plan.checkpoint_note_ref
-        if checkpoint_bridge_plan.codex_trace_ref is not None:
-            payload["codex_trace_ref"] = checkpoint_bridge_plan.codex_trace_ref
+    if checkpoint_handoff_plan:
+        if checkpoint_handoff_plan.checkpoint_note_ref is not None:
+            payload["checkpoint_note_ref"] = checkpoint_handoff_plan.checkpoint_note_ref
+        if checkpoint_handoff_plan.codex_trace_ref is not None:
+            payload["codex_trace_ref"] = checkpoint_handoff_plan.codex_trace_ref
+        payload["capability_candidates"] = list(
+            checkpoint_handoff_plan.capability_candidates
+        )
     if codex_target:
         payload["codex_role"] = codex_target.role
         payload["codex_config_path"] = codex_target.config_path
@@ -108,120 +116,37 @@ def build_runtime_return_closeout_receipt(
     }
 
 
-def build_runtime_wave_closeout_receipt(
-    remote_task: RemoteTaskResult,
-    decision: SummonDecision,
+def build_owner_evidence_handoff(
     *,
-    session_ref: str,
-    reviewed_artifact_path: str | None = None,
-    stress_bundle: StressBundle | None = None,
-    return_plan: ReturnPlan | None = None,
-    checkpoint_bridge_plan: CheckpointBridgePlan | None = None,
-    codex_target: CodexLocalAgentTarget | None = None,
-    observed_at: str | None = None,
-    owner_repo: str = "abyss-stack",
-    actor_ref: str = "abyss-stack.runtime-a2a",
-) -> dict:
-    return build_runtime_return_closeout_receipt(
-        remote_task,
-        decision,
-        session_ref=session_ref,
-        reviewed_artifact_path=reviewed_artifact_path,
-        stress_bundle=stress_bundle,
-        return_plan=return_plan,
-        checkpoint_bridge_plan=checkpoint_bridge_plan,
-        codex_target=codex_target,
-        observed_at=observed_at,
-        owner_repo=owner_repo,
-        actor_ref=actor_ref,
+    owner_ref: str,
+    candidate_kind: str,
+    reason: str,
+    evidence_refs: list[str],
+    capability_ref: str | None = None,
+    review_required: bool = True,
+) -> OwnerEvidenceHandoff:
+    """Create one explicit owner candidate; do not infer or invoke an owner publisher."""
+
+    if not owner_ref.strip():
+        raise ValueError("owner_ref must be non-empty")
+    if not candidate_kind.strip():
+        raise ValueError("candidate_kind must be non-empty")
+    if not reason.strip():
+        raise ValueError("reason must be non-empty")
+    refs = [ref for ref in unique_preserve_order(evidence_refs) if ref.strip()]
+    if not refs:
+        raise ValueError("owner evidence handoff requires at least one evidence ref")
+    return OwnerEvidenceHandoff(
+        owner_ref=owner_ref,
+        candidate_kind=candidate_kind,
+        reason=reason,
+        evidence_refs=refs,
+        capability_ref=capability_ref,
+        review_required=review_required,
     )
 
 
-def plan_owner_publications(
-    *,
-    runtime_receipt_paths: Iterable[str] | None = None,
-    harvest_receipt_paths: Iterable[str] | None = None,
-    core_skill_receipt_paths: Iterable[str] | None = None,
-    eval_receipt_paths: Iterable[str] | None = None,
-    playbook_receipt_paths: Iterable[str] | None = None,
-    technique_receipt_paths: Iterable[str] | None = None,
-    memo_receipt_paths: Iterable[str] | None = None,
-) -> list[CloseoutBatchPlan]:
-    plans: list[CloseoutBatchPlan] = []
-
-    def _add(
-        publisher: str,
-        reason: str,
-        receipt_kind: str | None,
-        input_paths: Iterable[str] | None,
-        required: bool,
-    ) -> None:
-        paths = [path for path in (input_paths or []) if path]
-        if not paths:
-            return
-        plans.append(
-            CloseoutBatchPlan(
-                publisher=publisher,
-                reason=reason,
-                receipt_kind=receipt_kind,
-                input_paths=paths,
-                required=required,
-            )
-        )
-
-    _add(
-        "abyss-stack.runtime-return-closeouts",
-        "publish canonical runtime closeout receipts under the runtime owner lane",
-        "runtime_return_closeout_receipt",
-        runtime_receipt_paths,
-        True,
-    )
-    _add(
-        "aoa-skills.session-harvest-family",
-        "publish parent-session harvest and progression receipts when present",
-        "harvest_packet_receipt",
-        harvest_receipt_paths,
-        False,
-    )
-    _add(
-        "aoa-skills.core-kernel-applications",
-        "publish generic core-skill application receipts when present",
-        "core_skill_application_receipt",
-        core_skill_receipt_paths,
-        False,
-    )
-    _add(
-        "aoa-evals.eval-result",
-        "publish eval-backed proof receipts when present",
-        "eval_result_receipt",
-        eval_receipt_paths,
-        False,
-    )
-    _add(
-        "aoa-playbooks.reviewed-run",
-        "publish reviewed playbook receipts when present",
-        "playbook_review_harvest_receipt",
-        playbook_receipt_paths,
-        False,
-    )
-    _add(
-        "aoa-techniques.promotion",
-        "publish technique promotion receipts when present",
-        "technique_promotion_receipt",
-        technique_receipt_paths,
-        False,
-    )
-    _add(
-        "aoa-memo.writeback",
-        "publish reviewed memo writeback receipts when present",
-        "memo_writeback_receipt",
-        memo_receipt_paths,
-        False,
-    )
-    return plans
-
-
-def closeout_summary_lines(
+def return_summary_lines(
     remote_task: RemoteTaskResult,
     decision: SummonDecision,
     *,
@@ -257,41 +182,31 @@ def closeout_summary_lines(
     return lines
 
 
-def build_reviewed_closeout_request(
+def build_reviewed_return_handoff(
     remote_task: RemoteTaskResult,
     decision: SummonDecision,
     *,
     session_ref: str,
     reviewed_artifact_path: str,
-    publication_plan: list[CloseoutBatchPlan],
+    owner_handoffs: list[OwnerEvidenceHandoff],
     audit_refs: list[str] | None = None,
     stress_bundle: StressBundle | None = None,
     memo_export_plan: MemoExportPlan | None = None,
     return_plan: ReturnPlan | None = None,
-    checkpoint_bridge_plan: CheckpointBridgePlan | None = None,
+    checkpoint_handoff_plan: CheckpointEvidenceHandoffPlan | None = None,
     codex_target: CodexLocalAgentTarget | None = None,
-) -> dict:
-    refs = list(audit_refs or [])
-    if reviewed_artifact_path not in refs:
-        refs.append(reviewed_artifact_path)
-
-    manifest_batches = [
-        {"publisher": plan.publisher, "input_paths": list(plan.input_paths)}
-        for plan in publication_plan
-        if plan.publisher in MANIFEST_BATCH_PUBLISHERS and plan.input_paths
-    ]
-
-    request = {
-        "schema_version": 1,
-        "request_kind": "a2a_return_closeout_request",
-        "closeout_id": f"closeout-{slugify(remote_task.task_id)}",
+) -> dict[str, Any]:
+    refs = unique_preserve_order([*(audit_refs or []), reviewed_artifact_path])
+    request: dict[str, Any] = {
+        "schema_version": 2,
+        "request_kind": "a2a_return_evidence_handoff",
+        "handoff_id": f"return-handoff-{slugify(remote_task.task_id)}",
         "session_ref": session_ref,
         "reviewed": True,
         "reviewed_artifact_path": reviewed_artifact_path,
-        "trigger": "reviewed-closeout",
         "audit_refs": refs,
-        "batches": manifest_batches,
-        "owner_local_publications": [to_jsonable(plan) for plan in publication_plan],
+        "capability_execution_claimed": False,
+        "owner_handoffs": [to_jsonable(item) for item in owner_handoffs],
         "a2a_child": {
             "selected_agent_id": remote_task.agent_id,
             "endpoint": remote_task.endpoint,
@@ -303,7 +218,7 @@ def build_reviewed_closeout_request(
             "decision_lane": decision.lane,
             "execution_surface": decision.execution_surface,
         },
-        "summary_lines": closeout_summary_lines(
+        "summary_lines": return_summary_lines(
             remote_task,
             decision,
             stress_bundle=stress_bundle,
@@ -323,8 +238,8 @@ def build_reviewed_closeout_request(
         }
     if return_plan:
         request["return_plan"] = to_jsonable(return_plan)
-    if checkpoint_bridge_plan:
-        request["checkpoint_bridge_plan"] = to_jsonable(checkpoint_bridge_plan)
+    if checkpoint_handoff_plan:
+        request["checkpoint_handoff_plan"] = to_jsonable(checkpoint_handoff_plan)
     if codex_target:
         request["codex_local_target"] = to_jsonable(codex_target)
     return request

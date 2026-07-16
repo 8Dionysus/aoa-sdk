@@ -1,0 +1,17 @@
+{
+  "mode": "reviewed-evidence-handoff",
+  "session_ref": "session:example",
+  "reviewed_artifact_path": "/srv/notes/reviewed_session_artifact.md",
+  "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/example/checkpoint-note.json",
+  "codex_trace_ref": "codex:thread:example",
+  "surviving_checkpoint_clusters": [
+    "cluster:return-anchor",
+    "cluster:child-result-review"
+  ],
+  "capability_candidates": [
+    "workflow.operations.checkpoint-closeout"
+  ],
+  "authority_contract": "reviewed_artifact_primary_capability_candidates_are_routing_only",
+  "capability_execution_claimed": false,
+  "return_anchor_artifact": "bounded_plan"
+}

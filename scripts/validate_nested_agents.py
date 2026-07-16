@@ -33,12 +33,6 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         "Do not add secrets",
         "weaker than source-owned repository docs",
     ),
-    '.agents/skills/AGENTS.md': (
-        'bundled skill export surfaces',
-        'not the source of truth for skill doctrine',
-        'Route SDK behavior changes through `skill-runtime-bridge`',
-        'python -m pytest -q mechanics/boundary-bridge/parts/skill-runtime-bridge/tests',
-    ),
     'docs/AGENTS.md': (
         'Root docs are public route',
         'part-local docs lane',
@@ -77,12 +71,6 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'active-session-only',
         'must not create a new session',
         'never run closeout, promotion, harvest, push, or release',
-    ),
-    'mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units/AGENTS.md': (
-        'closeout inbox user unit templates',
-        'aoa-closeout-inbox.path',
-        'aoa-closeout-inbox.service',
-        'systemd-analyze --user verify mechanics/checkpoint/parts/reviewed-session-handoff-runner/closeout-inbox-user-units',
     ),
     'generated/AGENTS.md': (
         'generated control-plane summaries',

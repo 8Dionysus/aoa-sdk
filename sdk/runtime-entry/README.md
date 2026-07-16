@@ -9,10 +9,10 @@ workspace context, Codex orientation, or reviewed closeout flow.
 | --- | --- | --- |
 | `workspace-context/` | workspace root and mirror boundary posture | `.aoa/workspace.toml`, `src/aoa_sdk/workspace/`, runtime-seam mechanics |
 | `codex-entrypoints/` | Codex-facing orientation posture | `src/aoa_sdk/codex/`, codex-projection mechanics |
-| `closeout-entrypoints/` | checkpoint and reviewed closeout posture | `src/aoa_sdk/checkpoints/`, `src/aoa_sdk/closeout/`, checkpoint mechanics |
+| `closeout-entrypoints/` | checkpoint review and evidence-materialization posture | `src/aoa_sdk/checkpoints/`, `src/aoa_sdk/a2a/`, checkpoint mechanics |
 
 ## Stop Lines
 
 - Runtime entry is not runtime authority.
-- Checkpoint and closeout artifacts stay below reviewed owner truth.
+- Checkpoint and closeout artifacts stay below capability execution and owner truth.
 - Workspace discovery must stay explicit and testable.

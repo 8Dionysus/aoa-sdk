@@ -17,30 +17,35 @@ def _write_json(path: Path, payload: dict | list) -> None:
 def _make_workspace(tmp_path: Path) -> Workspace:
     root = tmp_path / "federation"
     sdk = root / "aoa-sdk"
-    skills = root / "aoa-skills"
-    for repo in (sdk, skills):
+    techniques = root / "aoa-techniques"
+    for repo in (sdk, techniques):
         repo.mkdir(parents=True, exist_ok=True)
     _write_json(
-        skills / "manifests/recurrence/component.skills.activation.json",
+        techniques
+        / "mechanics/recurrence/parts/live-observation-producers/manifests/recurrence/component.techniques.canon-and-intake-beacons.json",
         {
             "manifest_kind": "recurrence_component",
             "schema_version": "aoa_recurrence_component_v2",
-            "component_ref": "component:skills:activation-boundary",
-            "owner_repo": "aoa-skills",
-            "source_inputs": ["docs/TRIGGER_EVALS.md"],
-            "proof_surfaces": ["python scripts/validate_skills.py --case generated/*.jsonl"],
+            "component_ref": "component:techniques:canon-and-intake-beacons",
+            "owner_repo": "aoa-techniques",
+            "source_inputs": [
+                "techniques/**/*.md",
+                "mechanics/distillation/parts/cross-layer-candidate-ledger/README.md",
+            ],
+            "proof_surfaces": ["python scripts/validate_repo.py"],
             "refresh_routes": [
-                {"action": "revalidate", "commands": ["python scripts/validate_skills.py"]}
+                {"action": "revalidate", "commands": ["python scripts/validate_repo.py"]}
             ],
         },
     )
     _write_json(
-        skills / "manifests/recurrence/hooks/skills.hooks.json",
+        techniques
+        / "mechanics/recurrence/parts/live-observation-producers/manifests/recurrence/hooks/component.techniques.canon-and-intake-beacons.hooks.json",
         {
             "manifest_kind": "hook_binding_set",
             "schema_version": "aoa_hook_binding_set_v1",
-            "component_ref": "component:skills:activation-boundary",
-            "owner_repo": "aoa-skills",
+            "component_ref": "component:techniques:canon-and-intake-beacons",
+            "owner_repo": "aoa-techniques",
             "bindings": [],
         },
     )
@@ -84,8 +89,8 @@ def _make_workspace(tmp_path: Path) -> Workspace:
         federation_root=root,
         federation_root_source="test",
         manifest_path=None,
-        repo_roots={"aoa-sdk": sdk, "aoa-skills": skills},
-        repo_origins={"aoa-sdk": "test", "aoa-skills": "test"},
+        repo_roots={"aoa-sdk": sdk, "aoa-techniques": techniques},
+        repo_origins={"aoa-sdk": "test", "aoa-techniques": "test"},
     )
 
 
@@ -94,7 +99,7 @@ def test_tolerant_registry_loads_components_and_quarantines_mixed_manifests(tmp_
     registry = load_registry(workspace)
 
     assert [item.component.component_ref for item in registry.iter_components()] == [
-        "component:skills:activation-boundary"
+        "component:techniques:canon-and-intake-beacons"
     ]
     diagnostics = list(registry.iter_manifest_diagnostics())
     kinds = {item.diagnostic_kind for item in diagnostics}
@@ -128,6 +133,9 @@ def test_doctor_converts_manifest_diagnostics_to_gaps(tmp_path: Path) -> None:
 def test_api_manifest_scan_and_pattern_tokens(tmp_path: Path) -> None:
     workspace = _make_workspace(tmp_path)
     scan = RecurrenceAPI(workspace).manifest_scan()
-    assert scan.loaded_components == ["component:skills:activation-boundary"]
-    assert pattern_matches("python scripts/validate_skills.py --case generated/*.jsonl", "generated/foo.jsonl")
-    assert pattern_matches("docs/", "docs/TRIGGER_EVALS.md")
+    assert scan.loaded_components == ["component:techniques:canon-and-intake-beacons"]
+    assert pattern_matches("techniques/**/*.md", "techniques/canonical/README.md")
+    assert pattern_matches(
+        "mechanics/distillation/parts/cross-layer-candidate-ledger/",
+        "mechanics/distillation/parts/cross-layer-candidate-ledger/README.md",
+    )

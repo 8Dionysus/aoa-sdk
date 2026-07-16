@@ -38,7 +38,7 @@ LifecycleState = Literal[
     "session_closed_collecting_no_closeout",
     "reviewed_awaiting_closeout",
     "closeout_built",
-    "closeout_executed",
+    "closeout_materialized",
     "closed",
     "stale_current_scope",
 ]
@@ -55,13 +55,13 @@ def audit_checkpoint_lifecycle(
     *,
     workspace: Workspace,
     repo_root: str | None = None,
-    session_file: str | None = None,
+    runtime_session_file: str | None = None,
     write_index: bool = False,
 ) -> CheckpointLifecycleAuditReport:
     checked_at, checked_at_local, checked_tz = local_timestamp_parts()
     session_path, runtime_metadata = probe_checkpoint_runtime_session(
         workspace=workspace,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
     )
     active_runtime_session_id = runtime_metadata["runtime_session_id"]
     repo_label = _resolve_context_label(workspace, repo_root) if repo_root is not None else None
@@ -83,7 +83,9 @@ def audit_checkpoint_lifecycle(
             _entry_from_current_dir(
                 workspace=workspace,
                 current_dir=current_dir,
-                active_runtime_session_file_ref=str(session_path),
+                active_runtime_session_file_ref=(
+                    str(session_path) if session_path is not None else None
+                ),
                 active_runtime_session_id=(
                     active_runtime_session_id if isinstance(active_runtime_session_id, str) else None
                 ),
@@ -141,7 +143,7 @@ def audit_checkpoint_lifecycle(
         checked_tz=checked_tz,
         repo_root=resolved_repo_root,
         repo_label=repo_label,
-        session_file=str(session_path),
+        runtime_session_file_ref=str(session_path) if session_path is not None else None,
         active_runtime_session_id=(
             active_runtime_session_id if isinstance(active_runtime_session_id, str) else None
         ),
@@ -149,7 +151,9 @@ def audit_checkpoint_lifecycle(
         note_count=len(entries),
         archive_scope_count=_archive_scope_count(archive_root),
         closeout_context_count=sum(1 for entry in entries if entry.closeout_context_ref),
-        closeout_execution_count=sum(1 for entry in entries if entry.closeout_execution_report_ref),
+        closeout_materialization_count=sum(
+            1 for entry in entries if entry.closeout_materialization_report_ref
+        ),
         session_memory_ref_count=session_memory_ref_count,
         session_closed_without_closeout_count=session_closed_without_closeout_count,
         pending_review_count=pending_review_count,
@@ -170,7 +174,7 @@ def close_archive_checkpoint_lifecycle(
     *,
     workspace: Workspace,
     repo_root: str | None = None,
-    session_file: str | None = None,
+    runtime_session_file: str | None = None,
     runtime_session_id: str | None = None,
     dry_run: bool = True,
     include_stale: bool = False,
@@ -179,7 +183,7 @@ def close_archive_checkpoint_lifecycle(
     audit = audit_checkpoint_lifecycle(
         workspace=workspace,
         repo_root=repo_root,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
     )
     archived_entries: list[CheckpointLifecycleEntry] = []
     skipped_entries: list[CheckpointLifecycleEntry] = []
@@ -249,9 +253,10 @@ def _entry_from_current_dir(
     note = build_checkpoint_note(paths)
     note_ref = str(paths.note_json) if paths.note_json.exists() else None
     closeout_context_ref = str(paths.closeout_context) if paths.closeout_context.exists() else None
-    closeout_execution_ref = (
-        str(paths.closeout_execution_report)
-        if paths.closeout_execution_report.exists()
+    closeout_materialization_path = _closeout_materialization_path(paths)
+    closeout_materialization_ref = (
+        str(closeout_materialization_path)
+        if closeout_materialization_path is not None
         else None
     )
     post_commit_ref = str(paths.post_commit_report) if paths.post_commit_report.exists() else None
@@ -268,7 +273,7 @@ def _entry_from_current_dir(
     runtime_trace_status: Literal["resolved", "recoverable", "missing"] = (
         "resolved"
         if runtime_trace_ref is not None
-        and runtime_trace_ref.source == "aoa-sdk-skill-runtime-session"
+        and runtime_trace_ref.source == "host-runtime-metadata"
         else "recoverable"
         if runtime_trace_ref is not None
         else "missing"
@@ -286,7 +291,11 @@ def _entry_from_current_dir(
     session_memory_archive_ref = _dedupe_strings(
         [
             _session_memory_archive_ref(
-                paths.closeout_execution_report,
+                *(
+                    [closeout_materialization_path]
+                    if closeout_materialization_path is not None
+                    else []
+                ),
                 paths.closeout_context,
             ),
             session_memory_ref.archive_path if session_memory_ref is not None else None,
@@ -300,11 +309,11 @@ def _entry_from_current_dir(
         active_runtime_scope=active_runtime_scope,
         has_session_memory_archive=bool(session_memory_archive_ref),
         has_closeout_context=closeout_context_ref is not None,
-        has_closeout_execution=closeout_execution_ref is not None,
+        has_closeout_materialization=closeout_materialization_ref is not None,
     )
     pending_refs = list(note.agent_review_pending_refs)
     closable = (
-        lifecycle_state == "closeout_executed"
+        lifecycle_state == "closeout_materialized"
         and note.review_status == "reviewed"
         and not pending_refs
     )
@@ -320,7 +329,7 @@ def _entry_from_current_dir(
             *(str(paths.note_json) if paths.note_json.exists() else None,),
             *(post_commit_ref,),
             *(closeout_context_ref,),
-            *(closeout_execution_ref,),
+            *(closeout_materialization_ref,),
             *(runtime_trace_ref.evidence_refs if runtime_trace_ref is not None else []),
             *(session_memory_ref.evidence_refs if session_memory_ref is not None else []),
             *note.evidence_refs,
@@ -363,7 +372,7 @@ def _entry_from_current_dir(
         note_ref=note_ref,
         post_commit_report_ref=post_commit_ref,
         closeout_context_ref=closeout_context_ref,
-        closeout_execution_report_ref=closeout_execution_ref,
+        closeout_materialization_report_ref=closeout_materialization_ref,
         runtime_trace_ref=(
             runtime_trace_ref.runtime_session_file_ref if runtime_trace_ref is not None else None
         ),
@@ -407,7 +416,7 @@ def _lifecycle_state(
     active_runtime_scope: bool,
     has_session_memory_archive: bool,
     has_closeout_context: bool,
-    has_closeout_execution: bool,
+    has_closeout_materialization: bool,
 ) -> tuple[LifecycleState, str]:
     if note_state in {"closed", "promoted"}:
         return "closed", "checkpoint note is already closed or promoted"
@@ -419,12 +428,12 @@ def _lifecycle_state(
         )
     if pending_review:
         return "pending_review", "pending agent review blocks close/archive"
-    if has_closeout_execution:
-        return "closeout_executed", "reviewed closeout execution report exists"
+    if has_closeout_materialization:
+        return "closeout_materialized", "reviewed closeout materialization report exists"
     if has_session_memory_archive and not active_runtime_scope and review_status == "reviewed":
         return (
             "session_closed_reviewed_no_closeout",
-            "aoa-session-memory archive exists, but reviewed closeout execution is missing",
+            "aoa-session-memory archive exists, but reviewed closeout materialization is missing",
         )
     if has_session_memory_archive and not active_runtime_scope:
         return (
@@ -432,9 +441,9 @@ def _lifecycle_state(
             "aoa-session-memory archive exists, but checkpoint review or closeout did not complete",
         )
     if has_closeout_context:
-        return "closeout_built", "reviewed closeout context exists but execution report is missing"
+        return "closeout_built", "reviewed closeout context exists but materialization report is missing"
     if review_status == "reviewed":
-        return "reviewed_awaiting_closeout", "checkpoint note is reviewed but no reviewed closeout execution exists"
+        return "reviewed_awaiting_closeout", "checkpoint note is reviewed but no reviewed closeout materialization exists"
     if active_runtime_scope:
         return "active_current", "checkpoint note belongs to the active runtime session"
     return "stale_current_scope", "checkpoint note is outside the active runtime session"
@@ -484,8 +493,9 @@ def _close_and_archive_entry(*, workspace: Workspace, entry: CheckpointLifecycle
     note = build_checkpoint_note(paths)
     if note.agent_review_status == "pending" or note.agent_review_pending_refs:
         raise ValueError("pending checkpoint agent review blocks lifecycle close/archive")
-    if not paths.closeout_execution_report.exists() and note.state not in {"closed", "promoted"}:
-        raise ValueError("checkpoint close/archive requires reviewed closeout execution evidence")
+    closeout_materialization_path = _closeout_materialization_path(paths)
+    if closeout_materialization_path is None and note.state not in {"closed", "promoted"}:
+        raise ValueError("checkpoint close/archive requires reviewed closeout materialization evidence")
 
     observed_at, observed_at_local, observed_tz = local_timestamp_parts()
     event = SessionCheckpointLifecycleEvent(
@@ -498,19 +508,19 @@ def _close_and_archive_entry(*, workspace: Workspace, entry: CheckpointLifecycle
         session_ref=note.session_ref,
         runtime_session_id=note.runtime_session_id,
         closeout_context_ref=str(paths.closeout_context) if paths.closeout_context.exists() else None,
-        closeout_execution_report_ref=(
-            str(paths.closeout_execution_report)
-            if paths.closeout_execution_report.exists()
+        closeout_materialization_report_ref=(
+            str(closeout_materialization_path)
+            if closeout_materialization_path is not None
             else None
         ),
-        archive_reason="reviewed closeout execution exists; checkpoint scope can leave current",
+        archive_reason="reviewed closeout materialization exists; checkpoint scope can leave current",
         evidence_refs=_dedupe_strings(
             [
                 str(paths.jsonl),
                 *(str(paths.closeout_context) if paths.closeout_context.exists() else None,),
                 *(
-                    str(paths.closeout_execution_report)
-                    if paths.closeout_execution_report.exists()
+                    str(closeout_materialization_path)
+                    if closeout_materialization_path is not None
                     else None,
                 ),
             ]
@@ -599,11 +609,11 @@ def archive_checkpoint_entry_without_closeout(
         runtime_session_id=note.runtime_session_id,
         lifecycle_state="archived_without_closeout",
         closeout_context_ref=str(paths.closeout_context) if paths.closeout_context.exists() else None,
-        closeout_execution_report_ref=None,
+        closeout_materialization_report_ref=None,
         session_memory_archive_ref=entry.session_memory_archive_ref,
         archive_reason=(
             "aoa-session-memory archive exists for a checkpoint runtime session "
-            "that ended without reviewed checkpoint closeout execution"
+            "that ended without reviewed checkpoint closeout materialization"
         ),
         evidence_refs=_dedupe_strings(
             [
@@ -729,6 +739,14 @@ def _archive_scope_count(archive_root: Path) -> int:
     return sum(1 for path in archive_root.iterdir() if path.is_dir())
 
 
+def _closeout_materialization_path(paths: CheckpointPaths) -> Path | None:
+    if paths.closeout_materialization_report.exists():
+        return paths.closeout_materialization_report
+    if paths.legacy_closeout_execution_report.exists():
+        return paths.legacy_closeout_execution_report
+    return None
+
+
 def _session_memory_archive_ref(*paths: Path) -> str | None:
     for path in paths:
         if not path.exists():
@@ -758,7 +776,7 @@ def _next_route(
         return "review_checkpoint_note"
     if lifecycle_state == "active_current":
         return "continue_active_session"
-    if lifecycle_state == "closeout_executed":
+    if lifecycle_state == "closeout_materialized":
         return "close_archive"
     if lifecycle_state in {
         "session_closed_reviewed_no_closeout",
@@ -766,7 +784,7 @@ def _next_route(
     }:
         return "reconcile_without_closeout"
     if lifecycle_state == "closeout_built":
-        return "execute_reviewed_closeout_or_inspect"
+        return "materialize_reviewed_closeout_or_inspect"
     if lifecycle_state == "reviewed_awaiting_closeout":
         if active_runtime_scope:
             return "run_reviewed_closeout"

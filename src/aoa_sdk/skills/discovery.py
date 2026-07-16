@@ -1,220 +1,65 @@
 from __future__ import annotations
 
-import re
-from typing import Any, Literal
+from pathlib import Path
 
-from ..compatibility import load_surface
-from ..loaders import extract_records
 from ..models import (
-    ProjectFoundationProfileSurface,
-    ProjectRiskGuardRingGovernanceEntry,
-    ProjectRiskGuardRingGovernanceSurface,
-    ProjectRiskGuardRingSurface,
-    ProjectCoreOuterRingReadinessEntry,
-    ProjectCoreOuterRingReadinessSurface,
-    ProjectCoreOuterRingSurface,
-    SkillDetectionReport,
-    SkillActivationRequest,
-    SkillCard,
-    SkillDisclosure,
-    SkillSession,
+    AgentSkillCatalog,
+    CapabilityGraph,
+    CapabilityNeighborhood,
+    McpDependencyManifest,
+    PortableExportMap,
+    SkillEnvironmentReport,
+    SkillPackProfile,
+    SkillPackProfiles,
 )
 from ..workspace.discovery import Workspace
-from .activation import activate_skill
-from .detector import detect_skills, dispatch_skills, load_project_foundation
-from .disclosure import disclose_skill
-from .session import compact_session, deactivate_session_skill, ensure_session, load_session, save_session
-
-def load_skill_cards(workspace: Workspace) -> list[SkillCard]:
-    data = load_surface(workspace, "aoa-skills.runtime_discovery_index")
-    records = extract_records(data, preferred_keys=("skills",))
-    return [SkillCard.model_validate(item) for item in records]
-
-
-def rank_skill_cards(cards: list[SkillCard], query: str) -> list[SkillCard]:
-    if not query.strip():
-        return sorted(cards, key=lambda card: card.name)
-
-    query_text = query.casefold()
-    tokens = re.findall(r"[a-z0-9_-]+", query_text)
-
-    def score(card: SkillCard) -> tuple[int, str]:
-        total = 0
-        fields = [
-            card.name.casefold(),
-            card.display_name.casefold(),
-            card.description.casefold(),
-            card.short_description.casefold(),
-        ]
-        if query_text in card.name.casefold():
-            total += 40
-        if query_text in card.display_name.casefold():
-            total += 30
-        if query_text in card.description.casefold():
-            total += 20
-
-        for token in tokens:
-            for field in fields:
-                if token in field:
-                    total += 10
-            for keyword in card.keywords:
-                if token in keyword.casefold():
-                    total += 8
-
-        return total, card.name
-
-    ranked = sorted(cards, key=score, reverse=True)
-    return [card for card in ranked if score(card)[0] > 0]
+from .inspection import (
+    inspect_skill_environment,
+    load_agent_skill_catalog,
+    load_capability_graph,
+    load_capability_neighborhood,
+    load_mcp_dependency_manifest,
+    load_portable_export_map,
+    load_skill_pack_profile,
+    load_skill_pack_profiles,
+)
 
 
 class SkillsAPI:
-    def __init__(self, workspace) -> None:
+    """Passive typed facade over owner-authored skill ecosystem surfaces."""
+
+    def __init__(self, workspace: Workspace) -> None:
         self.workspace = workspace
 
-    def discover(
+    def catalog(self) -> AgentSkillCatalog:
+        return load_agent_skill_catalog(self.workspace)
+
+    def profiles(self) -> SkillPackProfiles:
+        return load_skill_pack_profiles(self.workspace)
+
+    def profile(self, profile_name: str) -> SkillPackProfile:
+        return load_skill_pack_profile(self.workspace, profile_name)
+
+    def capability_graph(self) -> CapabilityGraph:
+        return load_capability_graph(self.workspace)
+
+    def capability(self, node_id: str) -> CapabilityNeighborhood:
+        return load_capability_neighborhood(self.workspace, node_id)
+
+    def portable_exports(self) -> PortableExportMap:
+        return load_portable_export_map(self.workspace)
+
+    def mcp_dependencies(self) -> McpDependencyManifest:
+        return load_mcp_dependency_manifest(self.workspace)
+
+    def inspect(
         self,
         *,
-        query: str = "",
-        trust_posture: str | None = None,
-        invocation_mode: str | None = None,
-        mutation_surface: str | None = None,
-        allow_implicit_invocation: bool | None = None,
-        limit: int | None = None,
-    ) -> list[SkillCard]:
-        cards = load_skill_cards(self.workspace)
-
-        if trust_posture is not None:
-            cards = [card for card in cards if card.trust_posture == trust_posture]
-        if invocation_mode is not None:
-            cards = [card for card in cards if card.invocation_mode == invocation_mode]
-        if mutation_surface is not None:
-            cards = [card for card in cards if card.mutation_surface == mutation_surface]
-        if allow_implicit_invocation is not None:
-            cards = [
-                card
-                for card in cards
-                if card.allow_implicit_invocation == allow_implicit_invocation
-            ]
-
-        ranked = rank_skill_cards(cards, query)
-        if limit is not None:
-            return ranked[:limit]
-        return ranked
-
-    def disclose(self, skill_name: str) -> SkillDisclosure:
-        return disclose_skill(self.workspace, skill_name)
-
-    def activate(
-        self,
-        skill_name: str,
-        *,
-        session_file: str | None = None,
-        explicit_handle: str | None = None,
-        include_frontmatter: bool = False,
-        wrap_mode: Literal["structured", "markdown", "raw"] = "structured",
-    ) -> dict:
-        request = SkillActivationRequest(
-            skill_name=skill_name,
-            session_file=session_file,
-            explicit_handle=explicit_handle,
-            include_frontmatter=include_frontmatter,
-            wrap_mode=wrap_mode,
-        )
-        return activate_skill(self.workspace, request)
-
-    def session_status(self, session_file: str | None = None) -> SkillSession:
-        return load_session(self.workspace, session_file)
-
-    def deactivate(self, skill_name: str, session_file: str) -> SkillSession:
-        path, session = ensure_session(self.workspace, session_file)
-        updated = deactivate_session_skill(session, skill_name)
-        save_session(path, updated)
-        return updated
-
-    def compact(self, session_file: str) -> dict:
-        return compact_session(load_session(self.workspace, session_file))
-
-    def project_foundation(self) -> ProjectFoundationProfileSurface:
-        return load_project_foundation(self.workspace)
-
-    def project_core_outer_ring(self) -> ProjectCoreOuterRingSurface:
-        data = load_surface(self.workspace, "aoa-skills.project_core_outer_ring.min")
-        return ProjectCoreOuterRingSurface.model_validate(data)
-
-    def project_core_outer_ring_readiness(self) -> list[ProjectCoreOuterRingReadinessEntry]:
-        data = load_surface(self.workspace, "aoa-skills.project_core_outer_ring_readiness.min")
-        readiness = ProjectCoreOuterRingReadinessSurface.model_validate(data)
-        return readiness.skills
-
-    def project_risk_guard_ring(self) -> ProjectRiskGuardRingSurface:
-        data = load_surface(self.workspace, "aoa-skills.project_risk_guard_ring.min")
-        return ProjectRiskGuardRingSurface.model_validate(data)
-
-    def project_risk_guard_ring_governance(self) -> list[ProjectRiskGuardRingGovernanceEntry]:
-        data = load_surface(self.workspace, "aoa-skills.project_risk_guard_ring_governance.min")
-        governance = ProjectRiskGuardRingGovernanceSurface.model_validate(data)
-        return governance.skills
-
-    def detect(
-        self,
-        *,
-        repo_root: str,
-        phase: Literal["ingress", "pre-mutation", "checkpoint", "closeout"],
-        intent_text: str = "",
-        mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
-        closeout_path: str | None = None,
-        host_available_skills: list[str] | None = None,
-        host_availability_source: Literal[
-            "host-manifest",
-            "host-skill-list",
-            "repo-install",
-            "workspace-install",
-            "user-install",
-            "not-provided",
-        ] = "not-provided",
-        stress_context: dict[str, Any] | None = None,
-    ) -> SkillDetectionReport:
-        return detect_skills(
+        repo_root: str | Path,
+        user_skill_root: str | Path | None = None,
+    ) -> SkillEnvironmentReport:
+        return inspect_skill_environment(
             self.workspace,
             repo_root=repo_root,
-            phase=phase,
-            intent_text=intent_text,
-            mutation_surface=mutation_surface,
-            closeout_path=closeout_path,
-            host_available_skills=host_available_skills,
-            host_availability_source=host_availability_source,
-            stress_context=stress_context,
-        )
-
-    def dispatch(
-        self,
-        *,
-        repo_root: str,
-        phase: Literal["ingress", "pre-mutation", "checkpoint", "closeout"],
-        intent_text: str = "",
-        mutation_surface: Literal["none", "code", "repo-config", "infra", "runtime", "public-share"] = "none",
-        closeout_path: str | None = None,
-        session_file: str | None = None,
-        host_available_skills: list[str] | None = None,
-        host_availability_source: Literal[
-            "host-manifest",
-            "host-skill-list",
-            "repo-install",
-            "workspace-install",
-            "user-install",
-            "not-provided",
-        ] = "not-provided",
-        stress_context: dict[str, Any] | None = None,
-    ) -> SkillDetectionReport:
-        return dispatch_skills(
-            self.workspace,
-            repo_root=repo_root,
-            phase=phase,
-            intent_text=intent_text,
-            mutation_surface=mutation_surface,
-            closeout_path=closeout_path,
-            session_file=session_file,
-            host_available_skills=host_available_skills,
-            host_availability_source=host_availability_source,
-            stress_context=stress_context,
+            user_skill_root=user_skill_root,
         )

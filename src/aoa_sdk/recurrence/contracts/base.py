@@ -108,7 +108,6 @@ HookEvent = Literal[
 
 HookProducerKind = Literal[
     "jsonl_receipt_watch",
-    "skill_trigger_gap_watch",
     "harvest_pattern_watch",
     "runtime_candidate_watch",
 ]

@@ -29,7 +29,7 @@ def _select_reentry_mode(
 
 def _select_next_hop(reentry_mode: ReturnReentryMode) -> str:
     mapping = {
-        "checkpoint_relaunch": "aoa-checkpoint-closeout-bridge",
+        "checkpoint_relaunch": "workflow.operations.checkpoint-closeout",
         "review_gate": "review_gate",
         "rollback_gate": "rollback_marker",
         "router_reentry": "aoa-routing/generated/return_navigation_hints.min.json",

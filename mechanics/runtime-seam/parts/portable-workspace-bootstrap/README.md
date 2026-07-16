@@ -2,28 +2,29 @@
 
 ## Role
 
-`portable-workspace-bootstrap` prepares a non-default AoA workspace using the
-SDK workspace manifest, required repo list, root `AGENTS.md` route, and skill
-install profile without treating generated sibling content as SDK-owned truth.
+`portable-workspace-bootstrap` plans or applies one exact user-scoped
+`aoa-skills` install profile into a host-selected Codex skill root without
+turning the SDK into a workspace, repository-home, or runtime owner.
 
 ## Input
 
 - `src/aoa_sdk/workspace/bootstrap.py`
 - `src/aoa_sdk/workspace/roots.py`
-- fixture workspace repos and generated foundation profiles
+- current `aoa-skills` resolved install profiles and portable exports
 - `aoa workspace bootstrap ...` CLI calls
 
 ## Output
 
-- readiness reports for missing required repos
+- readiness reports for exact owner-profile copies
 - explicit dry-run versus executed bootstrap status
-- installed workspace skill links or copies
-- root `AGENTS.md` install/update reports
+- verified user-root copies, conflicts, and explicit overwrite plans
+- repository-profile rejection with an owner-builder return route
 
 ## Owner
 
 `aoa-sdk` owns the bootstrap helper and report shape. Sibling repositories own
-their generated foundation profiles, skill meanings, and source content.
+their skill meanings, source content, home admission, and repository
+projections. The host owns the user root and runtime discovery.
 
 ## Validation
 

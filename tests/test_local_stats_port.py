@@ -51,8 +51,8 @@ def test_reference_ratio_matches_current_federation_compatibility_policy() -> No
     packet = load_packet()
     versioned, unversioned = version_negotiation_census()
 
-    assert len(SURFACE_COMPATIBILITY_RULES) == 80
-    assert len(versioned) == 77
+    assert len(SURFACE_COMPATIBILITY_RULES) == 69
+    assert len(versioned) == 66
     assert unversioned == {
         "aoa-playbooks.playbook_activation_surfaces.min",
         "aoa-playbooks.playbook_federation_surfaces.min",

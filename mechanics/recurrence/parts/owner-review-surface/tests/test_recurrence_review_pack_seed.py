@@ -42,26 +42,26 @@ from aoa_sdk.recurrence.review import (
 )
 
 
-def test_review_queue_keeps_candidates_and_watch_usage_gaps() -> None:
+def test_review_queue_keeps_explicit_owner_authored_watch_usage_gaps() -> None:
     packet = BeaconPacket(
         packet_ref="beacons:test",
         workspace_root="/tmp/workspace",
         signal_ref="signal:test",
         entries=[
             BeaconEntry(
-                beacon_ref="skills.unused_skill.activation_gap",
+                beacon_ref="skills.owner_authored.omission_review",
                 kind="unused_skill_opportunity",
                 status="watch",
-                component_ref="component:skills:bundle-and-activation-beacons",
-                owner_repo="aoa-skills",
-                target_repo="aoa-skills",
-                decision_surface="docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
-                reason="usage gap seen twice in nearby receipts",
-                evidence_refs=["receipt:001"],
-                source_inputs=["description-trigger-suite"],
-                related_signals=["should_trigger_missing"],
+                component_ref="component:example:owner-authored-skill-evidence",
+                owner_repo="example-skill-owner",
+                target_repo="example-skill-owner",
+                decision_surface="skills/example/SKILL.md",
+                reason="owner-reviewed comparison marks a possible omission",
+                evidence_refs=["session-evidence:reviewed-case-001"],
+                source_inputs=["owner-reviewed-skill-evidence"],
+                related_signals=["owner_reviewed_skill_omission"],
                 suppression_flags=[],
-                recommended_actions=["inspect the applicability map"],
+                recommended_actions=["rerun held-out owner comparison"],
             ),
             BeaconEntry(
                 beacon_ref="evals.portable_eval.runtime_pressure",
@@ -87,14 +87,14 @@ def test_review_queue_keeps_candidates_and_watch_usage_gaps() -> None:
         items=[
             UsageGapItem(
                 gap_ref="usage-gap:0001",
-                component_ref="component:skills:bundle-and-activation-beacons",
-                owner_repo="aoa-skills",
-                beacon_ref="skills.unused_skill.activation_gap",
+                component_ref="component:example:owner-authored-skill-evidence",
+                owner_repo="example-skill-owner",
+                beacon_ref="skills.owner_authored.omission_review",
                 status="watch",
-                reason="usage gap seen twice in nearby receipts",
-                decision_surface="docs/ADAPTIVE_SKILL_ORCHESTRATION.md",
-                evidence_refs=["receipt:001"],
-                recommended_actions=["inspect the applicability map"],
+                reason="owner-reviewed comparison marks a possible omission",
+                decision_surface="skills/example/SKILL.md",
+                evidence_refs=["session-evidence:reviewed-case-001"],
+                recommended_actions=["rerun held-out owner comparison"],
             )
         ],
     )

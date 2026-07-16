@@ -4,27 +4,27 @@
   "contract_version": "1.0.0",
   "measurement_id": "aoa-sdk/federation-compatibility-version-negotiation-ratio",
   "writer_repo": "aoa-sdk",
-  "observation_id": "aoa-sdk:federation-compatibility-version-negotiation-ratio:d8d7b21d7d81329c",
-  "observed_at": "2026-07-13T07:47:09-06:00",
+  "observation_id": "aoa-sdk:federation-compatibility-version-negotiation-ratio:1e1bebc72eea313b",
+  "observed_at": "2026-07-16T00:59:05-06:00",
   "object_ref": {
     "kind": "federation-compatibility-rule",
-    "id": "surface-compatibility-rules:d8d7b21d7d81329c",
-    "version": "d8d7b21d7d81329c53995715f2fb35f5dd68a7bc"
+    "id": "surface-compatibility-rules:1e1bebc72eea313b",
+    "version": "git-blob:1e1bebc72eea313be58cf3b00f4d54ffcf589780"
   },
   "population": {
-    "id": "current-federation-compatibility-rules:d8d7b21d7d81329c",
+    "id": "current-federation-compatibility-rules:1e1bebc72eea313b",
     "definition_ref": "stats/port.manifest.json#/measurements/0/population",
-    "size": 80
+    "size": 69
   },
   "sample": {
-    "size": 80,
+    "size": 69,
     "selection": "census of SURFACE_COMPATIBILITY_RULES"
   },
   "cohort": null,
   "window": {
-    "id": "source-revision:d8d7b21d7d81329c53995715f2fb35f5dd68a7bc",
-    "start": "2026-07-13T07:47:09-06:00",
-    "end": "2026-07-13T07:47:09-06:00",
+    "id": "policy-blob:1e1bebc72eea313be58cf3b00f4d54ffcf589780",
+    "start": "2026-07-16T00:59:05-06:00",
+    "end": "2026-07-16T00:59:05-06:00",
     "temporality": "instant"
   },
   "dimensions": {},
@@ -32,13 +32,13 @@
     "status": "observed",
     "kind": "ratio",
     "unit": "1",
-    "number": 0.9625,
-    "numerator": 77,
-    "denominator": 80
+    "number": 0.9565217391304348,
+    "numerator": 66,
+    "denominator": 69
   },
   "uncertainty": {
     "status": "not_applicable",
-    "sample_size": 80,
+    "sample_size": 69,
     "method": "not_applicable",
     "reason": "The packet is a census of the source-revision federation compatibility policy map."
   },
@@ -54,7 +54,7 @@
       }
     ],
     "derivation_ref": "stats/README.md#current-reference-measurement",
-    "source_revision": "d8d7b21d7d81329c53995715f2fb35f5dd68a7bc"
+    "source_revision": "git-blob:1e1bebc72eea313be58cf3b00f4d54ffcf589780"
   },
   "reporting_rule": {
     "id": "aoa-sdk/federation-compatibility-version-negotiation-ratio/reference-census",
@@ -68,7 +68,7 @@
   },
   "progress": {
     "state": "terminal",
-    "completed": 80,
-    "total": 80
+    "completed": 69,
+    "total": 69
   }
 }

@@ -29,8 +29,8 @@ mechanic routes, validation routes, and stronger-owner stop lines.
 - `sdk/public-interface/` for public API, CLI, and model contract posture.
 - `sdk/facade-boundary/` for sibling-reader, compatibility, and truth-label
   boundaries.
-- `sdk/runtime-entry/` for workspace, Codex, and reviewed closeout entry
-  posture.
+- `sdk/runtime-entry/` for workspace, Codex, and reviewed checkpoint evidence
+  entry posture.
 - `sdk/distribution/` for package, release, and public support promises.
 
 | Family | Path | Routes To |
@@ -43,7 +43,7 @@ mechanic routes, validation routes, and stronger-owner stop lines.
 | truth-label posture | `sdk/facade-boundary/truth-label-posture/` | truth labels in models, docs, and tests |
 | workspace context | `sdk/runtime-entry/workspace-context/` | workspace discovery and runtime-seam mechanics |
 | Codex entrypoints | `sdk/runtime-entry/codex-entrypoints/` | Codex projection implementation and mechanics |
-| closeout entrypoints | `sdk/runtime-entry/closeout-entrypoints/` | checkpoint and closeout mechanics |
+| closeout entrypoints | `sdk/runtime-entry/closeout-entrypoints/` | checkpoint evidence materialization and owner-handoff mechanics |
 | package contract | `sdk/distribution/package-contract/` | `pyproject.toml`, build checks |
 | release posture | `sdk/distribution/release-posture/` | release-support mechanics and release docs |
 | public support posture | `sdk/distribution/public-support/` | support/CI posture docs and checks |

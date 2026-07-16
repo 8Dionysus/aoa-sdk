@@ -10,8 +10,8 @@ This card applies to `sdk/runtime-entry/`.
 posture.
 
 It keeps entry surfaces below runtime authority. The SDK may inspect, build
-packets, enqueue reviewed work, or orient Codex; it must not become a runtime
-worker.
+packets, materialize reviewed evidence, or orient Codex; it must not become a
+runtime worker.
 
 ## Read Before Editing
 

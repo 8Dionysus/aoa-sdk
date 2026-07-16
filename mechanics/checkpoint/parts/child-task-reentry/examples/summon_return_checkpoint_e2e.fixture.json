@@ -1,13 +1,16 @@
 {
   "fixture_id": "a2a-summon-return-checkpoint-e2e",
-  "schema_version": 1,
+  "schema_version": 2,
   "fixture_kind": "a2a_summon_return_checkpoint_e2e",
   "dry_run": true,
   "live_automation": false,
+  "capability_execution_claimed": false,
   "playbook_id": "AOA-P-0031",
   "eval_anchor": "aoa-a2a-summon-return-checkpoint",
   "owner_refs": {
-    "summon_contract": "repo:aoa-skills/skills/aoa-summon/SKILL.md",
+    "delegation_capability": "workflow.operations.delegation",
+    "checkpoint_capability": "workflow.operations.checkpoint-closeout",
+    "sdk_contract": "repo:aoa-sdk/mechanics/checkpoint/parts/child-task-reentry/schemas/summon-request-v4.schema.json",
     "sdk_helper": "repo:aoa-sdk/mechanics/checkpoint/parts/child-task-reentry/docs/summon-return-checkpoint.md",
     "playbook": "repo:aoa-playbooks/playbooks/a2a-summon-return-checkpoint/PLAYBOOK.md",
     "eval_hook": "repo:aoa-evals/examples/artifact_to_verdict_hook.a2a-summon-return-checkpoint.example.json",
@@ -33,9 +36,9 @@
     "summon_request": {
       "desired_role": "reviewer",
       "child_agent_id": null,
-      "skill_refs": [
-        "aoa-summon",
-        "aoa-checkpoint-closeout-bridge"
+      "capability_refs": [
+        "workflow.operations.delegation",
+        "workflow.operations.checkpoint-closeout"
       ],
       "expected_outputs": [
         "verification_result",
@@ -62,7 +65,7 @@
     "self_agent_checkpoint_ref": null,
     "stress_bundle_ref": null,
     "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json",
-    "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/a2a-return-checkpoint/codex-trace.json",
+    "codex_trace_ref": "codex:thread:a2a-return-checkpoint",
     "reviewed_artifact_path": "/srv/notes/a2a-reviewed-child-return.md",
     "audit_refs": [
       "repo:aoa-playbooks/playbooks/a2a-summon-return-checkpoint/PLAYBOOK.md",
@@ -88,6 +91,7 @@
       "verification_result",
       "bounded_plan"
     ],
+    "capability_execution_claimed": false,
     "codex_local_target": {
       "agent_id": "reviewer",
       "role": "reviewer",
@@ -118,33 +122,30 @@
       "decision": "return",
       "anchor_artifact": "bounded_plan",
       "reentry_mode": "checkpoint_relaunch",
-      "next_hop": "aoa-checkpoint-closeout-bridge",
+      "next_hop": "workflow.operations.checkpoint-closeout",
       "reentry_note": "Remote child lost shape or ended in terminal state. Re-enter through checkpoint relaunch with the reviewed artifact primary and checkpoint hints provisional.",
       "reason_codes": [
         "remote_terminal_failure"
       ],
       "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json",
-      "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/a2a-return-checkpoint/codex-trace.json",
+      "codex_trace_ref": "codex:thread:a2a-return-checkpoint",
       "navigation_target": "aoa-routing/generated/return_navigation_hints.min.json"
     },
-    "checkpoint_bridge_plan": {
-      "mode": "reviewed-closeout-execute",
+    "checkpoint_handoff_plan": {
+      "mode": "reviewed-evidence-handoff",
       "session_ref": "session:a2a-return-checkpoint-e2e",
       "reviewed_artifact_path": "/srv/notes/a2a-reviewed-child-return.md",
       "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json",
-      "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/a2a-return-checkpoint/codex-trace.json",
+      "codex_trace_ref": "codex:thread:a2a-return-checkpoint",
       "surviving_checkpoint_clusters": [
         "cluster:return-anchor",
         "cluster:child-result-review"
       ],
-      "execution_order": [
-        "aoa-session-donor-harvest",
-        "aoa-session-progression-lift",
-        "aoa-quest-harvest"
+      "capability_candidates": [
+        "workflow.operations.checkpoint-closeout"
       ],
-      "authority_contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
-      "mechanical_bridge_only": true,
-      "agent_skill_application_required": true,
+      "authority_contract": "reviewed_artifact_primary_capability_candidates_are_routing_only",
+      "capability_execution_claimed": false,
       "return_anchor_artifact": "bounded_plan"
     },
     "memo_export_plan": {
@@ -337,42 +338,51 @@
       "adjunct_targets": [],
       "contains_raw_trace": false
     },
-    "owner_publication_plan": [
+    "owner_handoffs": [
       {
-        "publisher": "abyss-stack.runtime-return-closeouts",
-        "reason": "publish canonical runtime closeout receipts under the runtime owner lane",
-        "receipt_kind": "runtime_return_closeout_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/runtime_return_closeout_receipt.json"
+        "owner_ref": "repo:abyss-stack",
+        "candidate_kind": "runtime-return-receipt",
+        "reason": "runtime owner must decide whether to admit the reviewed return receipt",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md",
+          "/srv/artifacts/a2a-return-checkpoint/verification_result.json",
+          "/srv/artifacts/a2a-return-checkpoint/bounded_plan.md"
         ],
-        "required": true
+        "capability_ref": null,
+        "review_required": true
       },
       {
-        "publisher": "aoa-evals.eval-result",
-        "reason": "publish eval-backed proof receipts when present",
-        "receipt_kind": "eval_result_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/a2a_return_eval_packet.json"
+        "owner_ref": "repo:aoa-evals",
+        "candidate_kind": "child-return-eval",
+        "reason": "eval owner must verify the returned artifacts before any proof claim",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md",
+          "/srv/artifacts/a2a-return-checkpoint/verification_result.json",
+          "/srv/artifacts/a2a-return-checkpoint/bounded_plan.md"
         ],
-        "required": false
+        "capability_ref": null,
+        "review_required": true
       },
       {
-        "publisher": "aoa-playbooks.reviewed-run",
-        "reason": "publish reviewed playbook receipts when present",
-        "receipt_kind": "playbook_review_harvest_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/playbook_review_harvest_receipt.json"
+        "owner_ref": "repo:aoa-memo",
+        "candidate_kind": "reviewed-writeback-candidate",
+        "reason": "memo owner must decide whether the reviewed return is durable memory",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md"
         ],
-        "required": false
+        "capability_ref": null,
+        "review_required": true
       },
       {
-        "publisher": "aoa-memo.writeback",
-        "reason": "publish reviewed memo writeback receipts when present",
-        "receipt_kind": "memo_writeback_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/memo_writeback_receipt.json"
+        "owner_ref": "repo:aoa-playbooks",
+        "candidate_kind": "checkpoint-owner-followthrough",
+        "reason": "the owner playbook may compose reviewed checkpoint follow-through",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md",
+          "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json"
         ],
-        "required": false
+        "capability_ref": "workflow.operations.checkpoint-closeout",
+        "review_required": true
       }
     ]
   },
@@ -449,102 +459,105 @@
     "decision": "return",
     "anchor_artifact": "bounded_plan",
     "reentry_mode": "checkpoint_relaunch",
-    "next_hop": "aoa-checkpoint-closeout-bridge",
+    "next_hop": "workflow.operations.checkpoint-closeout",
     "reentry_note": "Remote child lost shape or ended in terminal state. Re-enter through checkpoint relaunch with the reviewed artifact primary and checkpoint hints provisional.",
     "reason_codes": [
       "remote_terminal_failure"
     ],
     "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json",
-    "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/a2a-return-checkpoint/codex-trace.json",
+    "codex_trace_ref": "codex:thread:a2a-return-checkpoint",
     "navigation_target": "aoa-routing/generated/return_navigation_hints.min.json"
   },
   "transition_decision": {
     "artifact_kind": "transition_decision",
     "decision": "return",
-    "next_hop": "aoa-checkpoint-closeout-bridge",
+    "next_hop": "workflow.operations.checkpoint-closeout",
     "anchor_artifact": "bounded_plan",
     "reentry_note": "Remote child lost shape or ended in terminal state. Re-enter through checkpoint relaunch with the reviewed artifact primary and checkpoint hints provisional.",
     "reason_codes": [
       "remote_terminal_failure"
     ],
     "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json",
-    "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/a2a-return-checkpoint/codex-trace.json"
+    "codex_trace_ref": "codex:thread:a2a-return-checkpoint"
   },
-  "checkpoint_bridge_plan": {
-    "mode": "reviewed-closeout-execute",
+  "checkpoint_handoff_plan": {
+    "mode": "reviewed-evidence-handoff",
     "session_ref": "session:a2a-return-checkpoint-e2e",
     "reviewed_artifact_path": "/srv/notes/a2a-reviewed-child-return.md",
     "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json",
-    "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/a2a-return-checkpoint/codex-trace.json",
+    "codex_trace_ref": "codex:thread:a2a-return-checkpoint",
     "surviving_checkpoint_clusters": [
       "cluster:return-anchor",
       "cluster:child-result-review"
     ],
-    "execution_order": [
-      "aoa-session-donor-harvest",
-      "aoa-session-progression-lift",
-      "aoa-quest-harvest"
+    "capability_candidates": [
+      "workflow.operations.checkpoint-closeout"
     ],
-    "authority_contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
-    "mechanical_bridge_only": true,
-    "agent_skill_application_required": true,
+    "authority_contract": "reviewed_artifact_primary_capability_candidates_are_routing_only",
+    "capability_execution_claimed": false,
     "return_anchor_artifact": "bounded_plan"
   },
-  "checkpoint_context_bundle": {
-    "mode": "reviewed-closeout-execute",
+  "checkpoint_evidence_bundle": {
+    "mode": "reviewed-evidence-handoff",
     "session_ref": "session:a2a-return-checkpoint-e2e",
     "reviewed_artifact_path": "/srv/notes/a2a-reviewed-child-return.md",
     "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json",
-    "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/a2a-return-checkpoint/codex-trace.json",
+    "codex_trace_ref": "codex:thread:a2a-return-checkpoint",
     "surviving_checkpoint_clusters": [
       "cluster:return-anchor",
       "cluster:child-result-review"
     ],
-    "execution_order": [
-      "aoa-session-donor-harvest",
-      "aoa-session-progression-lift",
-      "aoa-quest-harvest"
+    "capability_candidates": [
+      "workflow.operations.checkpoint-closeout"
     ],
-    "authority_contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
-    "mechanical_bridge_only": true,
-    "agent_skill_application_required": true,
+    "authority_contract": "reviewed_artifact_primary_capability_candidates_are_routing_only",
+    "capability_execution_claimed": false,
     "return_anchor_artifact": "bounded_plan",
-    "owner_publication_plan": [
+    "owner_handoffs": [
       {
-        "publisher": "abyss-stack.runtime-return-closeouts",
-        "reason": "publish canonical runtime closeout receipts under the runtime owner lane",
-        "receipt_kind": "runtime_return_closeout_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/runtime_return_closeout_receipt.json"
+        "owner_ref": "repo:abyss-stack",
+        "candidate_kind": "runtime-return-receipt",
+        "reason": "runtime owner must decide whether to admit the reviewed return receipt",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md",
+          "/srv/artifacts/a2a-return-checkpoint/verification_result.json",
+          "/srv/artifacts/a2a-return-checkpoint/bounded_plan.md"
         ],
-        "required": true
+        "capability_ref": null,
+        "review_required": true
       },
       {
-        "publisher": "aoa-evals.eval-result",
-        "reason": "publish eval-backed proof receipts when present",
-        "receipt_kind": "eval_result_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/a2a_return_eval_packet.json"
+        "owner_ref": "repo:aoa-evals",
+        "candidate_kind": "child-return-eval",
+        "reason": "eval owner must verify the returned artifacts before any proof claim",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md",
+          "/srv/artifacts/a2a-return-checkpoint/verification_result.json",
+          "/srv/artifacts/a2a-return-checkpoint/bounded_plan.md"
         ],
-        "required": false
+        "capability_ref": null,
+        "review_required": true
       },
       {
-        "publisher": "aoa-playbooks.reviewed-run",
-        "reason": "publish reviewed playbook receipts when present",
-        "receipt_kind": "playbook_review_harvest_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/playbook_review_harvest_receipt.json"
+        "owner_ref": "repo:aoa-memo",
+        "candidate_kind": "reviewed-writeback-candidate",
+        "reason": "memo owner must decide whether the reviewed return is durable memory",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md"
         ],
-        "required": false
+        "capability_ref": null,
+        "review_required": true
       },
       {
-        "publisher": "aoa-memo.writeback",
-        "reason": "publish reviewed memo writeback receipts when present",
-        "receipt_kind": "memo_writeback_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/memo_writeback_receipt.json"
+        "owner_ref": "repo:aoa-playbooks",
+        "candidate_kind": "checkpoint-owner-followthrough",
+        "reason": "the owner playbook may compose reviewed checkpoint follow-through",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md",
+          "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json"
         ],
-        "required": false
+        "capability_ref": "workflow.operations.checkpoint-closeout",
+        "review_required": true
       }
     ]
   },
@@ -558,7 +571,7 @@
       "codex_local_target",
       "child_task_result",
       "return_plan",
-      "checkpoint_bridge_plan",
+      "checkpoint_handoff_plan",
       "memo_writeback_ref",
       "runtime_closeout_dry_run_receipt"
     ],
@@ -759,118 +772,110 @@
     },
     "contains_raw_trace": false
   },
-  "owner_publication_plan": [
+  "owner_handoffs": [
     {
-      "publisher": "abyss-stack.runtime-return-closeouts",
-      "reason": "publish canonical runtime closeout receipts under the runtime owner lane",
-      "receipt_kind": "runtime_return_closeout_receipt",
-      "input_paths": [
-        "/srv/receipts/a2a-return-checkpoint/runtime_return_closeout_receipt.json"
+      "owner_ref": "repo:abyss-stack",
+      "candidate_kind": "runtime-return-receipt",
+      "reason": "runtime owner must decide whether to admit the reviewed return receipt",
+      "evidence_refs": [
+        "/srv/notes/a2a-reviewed-child-return.md",
+        "/srv/artifacts/a2a-return-checkpoint/verification_result.json",
+        "/srv/artifacts/a2a-return-checkpoint/bounded_plan.md"
       ],
-      "required": true
+      "capability_ref": null,
+      "review_required": true
     },
     {
-      "publisher": "aoa-evals.eval-result",
-      "reason": "publish eval-backed proof receipts when present",
-      "receipt_kind": "eval_result_receipt",
-      "input_paths": [
-        "/srv/receipts/a2a-return-checkpoint/a2a_return_eval_packet.json"
+      "owner_ref": "repo:aoa-evals",
+      "candidate_kind": "child-return-eval",
+      "reason": "eval owner must verify the returned artifacts before any proof claim",
+      "evidence_refs": [
+        "/srv/notes/a2a-reviewed-child-return.md",
+        "/srv/artifacts/a2a-return-checkpoint/verification_result.json",
+        "/srv/artifacts/a2a-return-checkpoint/bounded_plan.md"
       ],
-      "required": false
+      "capability_ref": null,
+      "review_required": true
     },
     {
-      "publisher": "aoa-playbooks.reviewed-run",
-      "reason": "publish reviewed playbook receipts when present",
-      "receipt_kind": "playbook_review_harvest_receipt",
-      "input_paths": [
-        "/srv/receipts/a2a-return-checkpoint/playbook_review_harvest_receipt.json"
+      "owner_ref": "repo:aoa-memo",
+      "candidate_kind": "reviewed-writeback-candidate",
+      "reason": "memo owner must decide whether the reviewed return is durable memory",
+      "evidence_refs": [
+        "/srv/notes/a2a-reviewed-child-return.md"
       ],
-      "required": false
+      "capability_ref": null,
+      "review_required": true
     },
     {
-      "publisher": "aoa-memo.writeback",
-      "reason": "publish reviewed memo writeback receipts when present",
-      "receipt_kind": "memo_writeback_receipt",
-      "input_paths": [
-        "/srv/receipts/a2a-return-checkpoint/memo_writeback_receipt.json"
+      "owner_ref": "repo:aoa-playbooks",
+      "candidate_kind": "checkpoint-owner-followthrough",
+      "reason": "the owner playbook may compose reviewed checkpoint follow-through",
+      "evidence_refs": [
+        "/srv/notes/a2a-reviewed-child-return.md",
+        "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json"
       ],
-      "required": false
+      "capability_ref": "workflow.operations.checkpoint-closeout",
+      "review_required": true
     }
   ],
-  "reviewed_closeout_request": {
-    "schema_version": 1,
-    "request_kind": "a2a_return_closeout_request",
-    "closeout_id": "closeout-task-a2a-return-child",
+  "reviewed_return_handoff": {
+    "schema_version": 2,
+    "request_kind": "a2a_return_evidence_handoff",
+    "handoff_id": "return-handoff-task-a2a-return-child",
     "session_ref": "session:a2a-return-checkpoint-e2e",
     "reviewed": true,
     "reviewed_artifact_path": "/srv/notes/a2a-reviewed-child-return.md",
-    "trigger": "reviewed-closeout",
     "audit_refs": [
       "/srv/notes/a2a-reviewed-child-return.md",
       "repo:aoa-sdk/mechanics/checkpoint/parts/child-task-reentry/examples/summon_return_checkpoint_e2e.fixture.json"
     ],
-    "batches": [
+    "capability_execution_claimed": false,
+    "owner_handoffs": [
       {
-        "publisher": "abyss-stack.runtime-return-closeouts",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/runtime_return_closeout_receipt.json"
-        ]
-      },
-      {
-        "publisher": "aoa-evals.eval-result",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/a2a_return_eval_packet.json"
-        ]
-      },
-      {
-        "publisher": "aoa-playbooks.reviewed-run",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/playbook_review_harvest_receipt.json"
-        ]
-      },
-      {
-        "publisher": "aoa-memo.writeback",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/memo_writeback_receipt.json"
-        ]
-      }
-    ],
-    "owner_local_publications": [
-      {
-        "publisher": "abyss-stack.runtime-return-closeouts",
-        "reason": "publish canonical runtime closeout receipts under the runtime owner lane",
-        "receipt_kind": "runtime_return_closeout_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/runtime_return_closeout_receipt.json"
+        "owner_ref": "repo:abyss-stack",
+        "candidate_kind": "runtime-return-receipt",
+        "reason": "runtime owner must decide whether to admit the reviewed return receipt",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md",
+          "/srv/artifacts/a2a-return-checkpoint/verification_result.json",
+          "/srv/artifacts/a2a-return-checkpoint/bounded_plan.md"
         ],
-        "required": true
+        "capability_ref": null,
+        "review_required": true
       },
       {
-        "publisher": "aoa-evals.eval-result",
-        "reason": "publish eval-backed proof receipts when present",
-        "receipt_kind": "eval_result_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/a2a_return_eval_packet.json"
+        "owner_ref": "repo:aoa-evals",
+        "candidate_kind": "child-return-eval",
+        "reason": "eval owner must verify the returned artifacts before any proof claim",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md",
+          "/srv/artifacts/a2a-return-checkpoint/verification_result.json",
+          "/srv/artifacts/a2a-return-checkpoint/bounded_plan.md"
         ],
-        "required": false
+        "capability_ref": null,
+        "review_required": true
       },
       {
-        "publisher": "aoa-playbooks.reviewed-run",
-        "reason": "publish reviewed playbook receipts when present",
-        "receipt_kind": "playbook_review_harvest_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/playbook_review_harvest_receipt.json"
+        "owner_ref": "repo:aoa-memo",
+        "candidate_kind": "reviewed-writeback-candidate",
+        "reason": "memo owner must decide whether the reviewed return is durable memory",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md"
         ],
-        "required": false
+        "capability_ref": null,
+        "review_required": true
       },
       {
-        "publisher": "aoa-memo.writeback",
-        "reason": "publish reviewed memo writeback receipts when present",
-        "receipt_kind": "memo_writeback_receipt",
-        "input_paths": [
-          "/srv/receipts/a2a-return-checkpoint/memo_writeback_receipt.json"
+        "owner_ref": "repo:aoa-playbooks",
+        "candidate_kind": "checkpoint-owner-followthrough",
+        "reason": "the owner playbook may compose reviewed checkpoint follow-through",
+        "evidence_refs": [
+          "/srv/notes/a2a-reviewed-child-return.md",
+          "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json"
         ],
-        "required": false
+        "capability_ref": "workflow.operations.checkpoint-closeout",
+        "review_required": true
       }
     ],
     "a2a_child": {
@@ -918,33 +923,30 @@
       "decision": "return",
       "anchor_artifact": "bounded_plan",
       "reentry_mode": "checkpoint_relaunch",
-      "next_hop": "aoa-checkpoint-closeout-bridge",
+      "next_hop": "workflow.operations.checkpoint-closeout",
       "reentry_note": "Remote child lost shape or ended in terminal state. Re-enter through checkpoint relaunch with the reviewed artifact primary and checkpoint hints provisional.",
       "reason_codes": [
         "remote_terminal_failure"
       ],
       "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json",
-      "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/a2a-return-checkpoint/codex-trace.json",
+      "codex_trace_ref": "codex:thread:a2a-return-checkpoint",
       "navigation_target": "aoa-routing/generated/return_navigation_hints.min.json"
     },
-    "checkpoint_bridge_plan": {
-      "mode": "reviewed-closeout-execute",
+    "checkpoint_handoff_plan": {
+      "mode": "reviewed-evidence-handoff",
       "session_ref": "session:a2a-return-checkpoint-e2e",
       "reviewed_artifact_path": "/srv/notes/a2a-reviewed-child-return.md",
       "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json",
-      "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/a2a-return-checkpoint/codex-trace.json",
+      "codex_trace_ref": "codex:thread:a2a-return-checkpoint",
       "surviving_checkpoint_clusters": [
         "cluster:return-anchor",
         "cluster:child-result-review"
       ],
-      "execution_order": [
-        "aoa-session-donor-harvest",
-        "aoa-session-progression-lift",
-        "aoa-quest-harvest"
+      "capability_candidates": [
+        "workflow.operations.checkpoint-closeout"
       ],
-      "authority_contract": "reviewed_artifact_primary_checkpoint_hints_provisional",
-      "mechanical_bridge_only": true,
-      "agent_skill_application_required": true,
+      "authority_contract": "reviewed_artifact_primary_capability_candidates_are_routing_only",
+      "capability_execution_claimed": false,
       "return_anchor_artifact": "bounded_plan"
     },
     "codex_local_target": {
@@ -977,7 +979,7 @@
   "runtime_return_closeout_receipt": {
     "event_kind": "runtime_return_closeout_receipt",
     "event_id": "runtime-return-closeout::task-a2a-return-child",
-    "observed_at": "2026-04-14T00:00:00.000Z",
+    "observed_at": "2026-07-15T00:00:00.000Z",
     "run_ref": "run:a2a:task-a2a-return-child",
     "session_ref": "session:a2a-return-checkpoint-e2e",
     "actor_ref": "abyss-stack.runtime-a2a",
@@ -995,7 +997,7 @@
       {
         "kind": "reviewed_artifact",
         "ref": "/srv/notes/a2a-reviewed-child-return.md",
-        "role": "closeout"
+        "role": "return_review"
       },
       {
         "kind": "remote_artifact",
@@ -1029,11 +1031,15 @@
         "verification_result",
         "bounded_plan"
       ],
+      "capability_execution_claimed": false,
       "return_required": true,
       "return_anchor_artifact": "bounded_plan",
       "return_reentry_mode": "checkpoint_relaunch",
       "checkpoint_note_ref": "aoa-sdk/.aoa/session-growth/current/a2a-return-checkpoint/checkpoint-note.json",
-      "codex_trace_ref": "aoa-sdk/.aoa/skill-runtime-sessions/a2a-return-checkpoint/codex-trace.json",
+      "codex_trace_ref": "codex:thread:a2a-return-checkpoint",
+      "capability_candidates": [
+        "workflow.operations.checkpoint-closeout"
+      ],
       "codex_role": "reviewer",
       "codex_config_path": "/srv/AbyssOS/.codex/agents/reviewer.toml"
     }
@@ -1043,7 +1049,7 @@
     "dry_run": true,
     "live_automation": false,
     "exported_by": "scripts/aoa-a2a-return-closeout-dry-run",
-    "source_payload": "reviewed_closeout_request"
+    "source_payload": "reviewed_return_handoff"
   },
   "routing_reentry": {
     "entry_id": "AOA-P-0031",

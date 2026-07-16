@@ -21,7 +21,7 @@ from .timestamps import local_timestamp_parts
 BACKLOG_STOP_LINES = (
     "no_raw_or_session_evidence_deletion",
     "no_aoa_session_memory_mutation",
-    "no_closeout_execution",
+    "no_closeout_materialization",
     "no_candidate_promotion",
     "no_owner_verdict",
     "no_rag_or_graphrag_authority",
@@ -33,14 +33,14 @@ def audit_checkpoint_backlog(
     *,
     workspace: Workspace,
     repo_root: str | None = None,
-    session_file: str | None = None,
+    runtime_session_file: str | None = None,
     write_index: bool = False,
 ) -> CheckpointBacklogAuditReport:
     checked_at, checked_at_local, checked_tz = local_timestamp_parts()
     lifecycle_report = audit_checkpoint_lifecycle(
         workspace=workspace,
         repo_root=repo_root,
-        session_file=session_file,
+        runtime_session_file=runtime_session_file,
         write_index=False,
     )
     entries = [

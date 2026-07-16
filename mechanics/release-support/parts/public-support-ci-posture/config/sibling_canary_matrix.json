@@ -15,7 +15,7 @@
     {
       "repo": "aoa-skills",
       "target_ref": "main",
-      "purpose": "runtime and project-core skill surfaces"
+      "purpose": "owner-authored skill catalog, install profiles, capability graph, portable exports, and MCP dependencies"
     },
     {
       "repo": "aoa-techniques",

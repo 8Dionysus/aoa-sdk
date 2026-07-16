@@ -67,11 +67,10 @@ def test_sibling_canary_reports_incompatible_surface(workspace_root: Path) -> No
     repo_root = workspace_root / "aoa-sdk"
     matrix_path = repo_root / CANARY_MATRIX_REF
     write_matrix(matrix_path, ["aoa-skills"])
-    target = workspace_root / "aoa-skills" / "generated" / "runtime_discovery_index.json"
-    target.write_text(
-        target.read_text(encoding="utf-8").replace('"schema_version": 1', '"schema_version": 99'),
-        encoding="utf-8",
-    )
+    target = workspace_root / "aoa-skills" / "generated" / "skill_pack_profiles.resolved.json"
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    payload["schema_version"] = 99
+    target.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
 
     stdout = io.StringIO()
     with contextlib.redirect_stdout(stdout):
@@ -85,4 +84,6 @@ def test_sibling_canary_reports_incompatible_surface(workspace_root: Path) -> No
         )
 
     assert exit_code == 1
-    assert "aoa-skills [failed]" in stdout.getvalue()
+    output = stdout.getvalue()
+    assert "aoa-skills [failed]" in output
+    assert "aoa-skills.skill_pack_profiles.resolved" in output

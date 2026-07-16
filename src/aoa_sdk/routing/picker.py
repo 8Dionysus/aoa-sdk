@@ -3,6 +3,7 @@ from __future__ import annotations
 from typing import Any
 
 from ..compatibility import load_surface
+from ..errors import InvalidSurface
 from ..loaders import extract_records, find_record
 from ..models import (
     RegistryEntry,
@@ -25,13 +26,18 @@ from .hints import (
 ROUTING_ACTION_SURFACE_IDS = {
     ("aoa-techniques", "generated/technique_capsules.json"): "aoa-techniques.technique_capsules",
     ("aoa-techniques", "generated/technique_sections.full.json"): "aoa-techniques.technique_sections.full",
-    ("aoa-skills", "generated/skill_capsules.json"): "aoa-skills.skill_capsules",
-    ("aoa-skills", "generated/skill_sections.full.json"): "aoa-skills.skill_sections.full",
     ("aoa-evals", "generated/eval_capsules.json"): "aoa-evals.eval_capsules",
     ("aoa-evals", "generated/eval_sections.full.json"): "aoa-evals.eval_sections.full",
     ("aoa-memo", "generated/memory/memory_catalog.min.json"): "aoa-memo.memory_catalog.min",
     ("aoa-memo", "generated/memory/memory_sections.full.json"): "aoa-memo.memory_sections.full",
 }
+
+
+_SKILL_ROUTING_BLOCKER = (
+    "aoa-sdk does not rank, retrieve, inspect, or expand skills through the generic "
+    "routing facade; use sdk.skills for exact owner-surface inspection and route "
+    "semantic retrieval or task-local composition to KAG."
+)
 
 
 class RoutingAPI:
@@ -72,6 +78,7 @@ class RoutingAPI:
         ]
 
     def pick(self, *, kind: str, query: str) -> list[RegistryEntry]:
+        _reject_skill_routing(kind)
         hint = hint_for_kind(self.workspace, kind)
         if not hint.enabled or not hint.actions.get("pick", None) or not hint.actions["pick"].enabled:
             return []
@@ -80,11 +87,13 @@ class RoutingAPI:
         return rank_registry_entries(entries, query)
 
     def inspect(self, *, kind: str, id_or_name: str) -> dict[str, Any]:
+        _reject_skill_routing(kind)
         hint = hint_for_kind(self.workspace, kind)
         action = hint.actions["inspect"]
         return self._load_action_record(hint, action_repo=action.surface_repo or hint.source_repo, surface_file=action.surface_file, match_field=action.match_field, value=id_or_name)
 
     def expand(self, *, kind: str, id_or_name: str, sections: list[str] | None = None) -> dict[str, Any]:
+        _reject_skill_routing(kind)
         hint = hint_for_kind(self.workspace, kind)
         action = hint.actions["expand"]
         record = self._load_action_record(
@@ -135,3 +144,8 @@ class RoutingAPI:
 
 def _surface_id_for(repo: str, surface_file: str) -> str | None:
     return ROUTING_ACTION_SURFACE_IDS.get((repo, surface_file))
+
+
+def _reject_skill_routing(kind: str) -> None:
+    if kind == "skill":
+        raise InvalidSurface(_SKILL_ROUTING_BLOCKER)

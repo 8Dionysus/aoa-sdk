@@ -6,7 +6,7 @@ The part captures and reviews local checkpoint evidence during a session. It
 keeps checkpoint notes below harvest verdicts and fails closed when semantic
 review is still pending. It audits lifecycle state for checkpoint scopes under
 `current/` and can close/archive only reviewed, nonpending scopes with reviewed
-closeout execution evidence, or archive already `closed` or `promoted`
+closeout materialization evidence, or archive already `closed` or `promoted`
 runtime-scoped ledgers without appending another close event. Nonpending stale
 scopes may be archived as stale evidence without being marked closed. When
 aoa-session-memory has preserved a runtime session that ended without reviewed
@@ -55,11 +55,17 @@ services, mint memory/proof, or grant RAG/GraphRAG authority.
 
 ## Stop-Lines
 
+- Do not append, review, build closeout context, or materialize mutable
+  checkpoint state without a host-provided runtime session identity.
+- Do not attach unscoped legacy checkpoint evidence to a current runtime
+  session merely because an old payload contains a similar identifier.
 - Do not treat `agent_review=pending` as reviewed.
 - Do not close or stale-archive a pending-review scope.
 - Do not reconcile/archive a session-closed pending-review scope until the
   required review action is explicit.
 - Do not auto-run handoff, harvest, push, merge, or release logic from capture.
+- Do not infer capability execution or owner acceptance from a materialization
+  receipt or owner-candidate handoff.
 - Do not mutate aoa-session-memory when attaching or reporting session-memory
   archive refs.
 - Do not treat `archived_without_closeout` as `closed`.

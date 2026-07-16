@@ -37,9 +37,9 @@ def _component(
         "component_ref": ref,
         "owner_repo": owner,
         "source_inputs": [source],
-        "proof_surfaces": [f"python scripts/validate_{owner}.py"],
+        "proof_surfaces": ["python scripts/validate_repo.py"],
         "refresh_routes": [
-            {"action": action, "commands": [f"python scripts/{ref.split(':')[-1]}.py"]}
+            {"action": action, "commands": ["python scripts/validate_repo.py"]}
         ],
         "consumer_edges": edges or [],
     }
@@ -48,21 +48,22 @@ def _component(
 def _workspace(tmp_path: Path) -> Workspace:
     root = tmp_path / "federation"
     sdk = root / "aoa-sdk"
-    skills = root / "aoa-skills"
+    techniques = root / "aoa-techniques"
     evals = root / "aoa-evals"
     routing = root / "aoa-routing"
-    for repo in (sdk, skills, evals, routing):
+    for repo in (sdk, techniques, evals, routing):
         repo.mkdir(parents=True, exist_ok=True)
     _write_json(
-        skills / "manifests/recurrence/component.skills.activation.json",
+        techniques
+        / "mechanics/recurrence/parts/live-observation-producers/manifests/recurrence/component.techniques.canon-and-intake-beacons.json",
         _component(
-            "component:skills:activation-boundary",
-            "aoa-skills",
-            source="docs/TRIGGER_EVALS.md",
+            "component:techniques:canon-and-intake-beacons",
+            "aoa-techniques",
+            source="mechanics/distillation/parts/cross-layer-candidate-ledger/README.md",
             edges=[
                 {
                     "kind": "evaluated_by",
-                    "target": "component:evals:trigger-evals",
+                    "target": "component:evals:portable-proof-beacons",
                     "target_repo": "aoa-evals",
                     "required": True,
                     "suggested_action": "revalidate",
@@ -78,16 +79,17 @@ def _workspace(tmp_path: Path) -> Workspace:
         ),
     )
     _write_json(
-        evals / "manifests/recurrence/component.evals.trigger.json",
+        evals
+        / "mechanics/recurrence/parts/portable-proof-beacons/manifests/recurrence/component.evals.portable-proof-beacons.json",
         _component(
-            "component:evals:trigger-evals",
+            "component:evals:portable-proof-beacons",
             "aoa-evals",
-            source="docs/TRIGGER_EVALS.md",
+            source="mechanics/recurrence/docs/RECURRENCE_PROOF_PROGRAM.md",
             edges=[
                 {
                     "kind": "documents",
-                    "target": "component:skills:activation-boundary",
-                    "target_repo": "aoa-skills",
+                    "target": "component:techniques:canon-and-intake-beacons",
+                    "target_repo": "aoa-techniques",
                     "required": False,
                     "suggested_action": "repair",
                 },
@@ -101,9 +103,13 @@ def _workspace(tmp_path: Path) -> Workspace:
             ],
         ),
     )
-    (skills / "docs").mkdir(parents=True, exist_ok=True)
-    (skills / "docs/TRIGGER_EVALS.md").write_text(
-        "trigger boundary changed\n", encoding="utf-8"
+    technique_source = (
+        techniques
+        / "mechanics/distillation/parts/cross-layer-candidate-ledger/README.md"
+    )
+    technique_source.parent.mkdir(parents=True, exist_ok=True)
+    technique_source.write_text(
+        "technique candidate intake changed\n", encoding="utf-8"
     )
     return Workspace(
         root=root,
@@ -112,13 +118,13 @@ def _workspace(tmp_path: Path) -> Workspace:
         manifest_path=None,
         repo_roots={
             "aoa-sdk": sdk,
-            "aoa-skills": skills,
+            "aoa-techniques": techniques,
             "aoa-evals": evals,
             "aoa-routing": routing,
         },
         repo_origins={
             "aoa-sdk": "test",
-            "aoa-skills": "test",
+            "aoa-techniques": "test",
             "aoa-evals": "test",
             "aoa-routing": "test",
         },
@@ -131,13 +137,13 @@ def test_graph_closure_detects_transitive_edges_cycles_and_external_impacts(
     workspace = _workspace(tmp_path)
     registry = load_registry(workspace)
     expansion = expand_component_graph(
-        direct_component_refs=["component:skills:activation-boundary"],
+        direct_component_refs=["component:techniques:canon-and-intake-beacons"],
         registry=registry,
         depth_limit=6,
     )
     assert [node.component_ref for node in expansion.component_nodes] == [
-        "component:skills:activation-boundary",
-        "component:evals:trigger-evals",
+        "component:techniques:canon-and-intake-beacons",
+        "component:evals:portable-proof-beacons",
     ]
     assert expansion.component_nodes[1].depth == 1
     assert expansion.cycles, (
@@ -148,7 +154,7 @@ def test_graph_closure_detects_transitive_edges_cycles_and_external_impacts(
         "aoa-kag",
     }
     required_only = expand_component_graph(
-        direct_component_refs=["component:skills:activation-boundary"],
+        direct_component_refs=["component:techniques:canon-and-intake-beacons"],
         registry=registry,
         depth_limit=6,
         include_optional=False,
@@ -160,11 +166,11 @@ def test_graph_closure_detects_transitive_edges_cycles_and_external_impacts(
 
     report = build_graph_closure_report(
         workspace,
-        direct_component_refs=["component:skills:activation-boundary"],
+        direct_component_refs=["component:techniques:canon-and-intake-beacons"],
         registry=registry,
     )
     assert report.propagation_batches[0].component_refs == [
-        "component:skills:activation-boundary"
+        "component:techniques:canon-and-intake-beacons"
     ]
     assert any(item.target_repo == "aoa-kag" for item in report.external_impacts)
 
@@ -177,11 +183,11 @@ def test_snapshot_and_delta_report_edge_changes(tmp_path: Path) -> None:
     assert before.edge_count == 4
 
     # Add a new external edge and compare snapshots.
-    skills_manifest = (
-        workspace.repo_roots["aoa-skills"]
-        / "manifests/recurrence/component.skills.activation.json"
+    techniques_manifest = (
+        workspace.repo_roots["aoa-techniques"]
+        / "mechanics/recurrence/parts/live-observation-producers/manifests/recurrence/component.techniques.canon-and-intake-beacons.json"
     )
-    payload = json.loads(skills_manifest.read_text(encoding="utf-8"))
+    payload = json.loads(techniques_manifest.read_text(encoding="utf-8"))
     payload["consumer_edges"].append(
         {
             "kind": "summarized_by",
@@ -191,7 +197,7 @@ def test_snapshot_and_delta_report_edge_changes(tmp_path: Path) -> None:
             "suggested_action": "restat",
         }
     )
-    _write_json(skills_manifest, payload)
+    _write_json(techniques_manifest, payload)
 
     after = build_graph_snapshot(workspace, registry=load_registry(workspace))
     delta = diff_graph_snapshots(before, after)
@@ -205,8 +211,8 @@ def test_planner_gets_batches_depths_and_edge_strengths(tmp_path: Path) -> None:
     registry = load_registry(workspace)
     signal = detect_change_signal(
         workspace,
-        repo_root=str(workspace.repo_roots["aoa-skills"]),
-        paths=["docs/TRIGGER_EVALS.md"],
+        repo_root=str(workspace.repo_roots["aoa-techniques"]),
+        paths=["mechanics/distillation/parts/cross-layer-candidate-ledger/README.md"],
         registry=registry,
     )
     plan = build_propagation_plan(workspace, signal=signal, registry=registry)

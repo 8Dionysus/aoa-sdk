@@ -8,7 +8,7 @@ runtime response, owner-local repair, and deletion.
 
 | Part | Role | Active surfaces |
 | --- | --- | --- |
-| [`stress-posture-dispatch-gate`](stress-posture-dispatch-gate/README.md) | Turns caller-supplied stress context into a narrowing-only SDK dispatch decision. | docs, examples, tests |
+| [`stress-posture-dispatch-gate`](stress-posture-dispatch-gate/README.md) | Turns typed stress signals into narrowing-only SDK task-dispatch constraints. | docs, examples, tests |
 | [`reviewed-stress-closeout-carry`](reviewed-stress-closeout-carry/README.md) | Carries reviewed stress evidence through closeout without promotion or repair authority. | docs, example manifest, tests |
 | [`via-negativa`](via-negativa/README.md) | Keeps SDK pruning questions explicit before adding new helper surface. | checklist doc, test |
 
