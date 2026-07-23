@@ -20,6 +20,8 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
 - typed SDK readouts that preserve source-owner authority
 - routing action checks that reject unmapped surface reads
 - facade regression tests bound to part-local validation
+- read-only succession baselines that pin consumed producer, consumer,
+  runtime, trust, cost, and disposition evidence without switching authority
 
 ## Owner
 
@@ -32,6 +34,11 @@ the consumed surfaces.
 When a sibling surface changes shape, update the owning sibling repo and its
 public contract first, then update this gate, facade models, fixtures, and
 compatibility expectations.
+
+For the proposed `aoa-routing` succession, start with
+[`docs/routing-succession-r0-baseline.md`](docs/routing-succession-r0-baseline.md).
+Its G0 verdict only authorizes target-model and decision work. It does not
+authorize producer migration or an owner switch.
 
 ## Validation
 

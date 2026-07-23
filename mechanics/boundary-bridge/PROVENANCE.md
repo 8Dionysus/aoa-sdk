@@ -35,6 +35,9 @@
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_memo_surface_reader.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_playbook_surface_reader.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_surface_actions.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r0-baseline.md`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_r0_baseline.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py`

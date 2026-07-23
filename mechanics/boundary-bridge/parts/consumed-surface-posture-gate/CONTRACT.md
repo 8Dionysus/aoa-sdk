@@ -10,6 +10,8 @@
   compatibility inputs.
 - Rejects routing action surfaces that do not have an explicit compatibility
   rule.
+- Keeps a succession baseline explicitly weaker than the current source owner
+  until a durable owner-succession decision and canonical switch are landed.
 
 ## Non-Goals
 
@@ -17,6 +19,7 @@
 - It does not promote loaded data into SDK-owned truth.
 - It surfaces incompatible, malformed, or missing owner paths as compatibility
   failures.
+- A dependency or disposition audit is not an authority transfer.
 
 ## Active Test Home
 
@@ -30,3 +33,4 @@
 - `tests/test_routing_surface_actions.py`
 - `tests/test_stats_surface_reader.py`
 - `tests/test_workspace_control_plane_compatibility.py`
+- `tests/test_routing_succession_r0_baseline.py`
