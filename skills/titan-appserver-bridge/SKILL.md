@@ -15,15 +15,23 @@ Resolve the canonical `aoa-sdk` root before owner reads:
 
 1. Record `<bundle_dir>` from this loaded `SKILL.md`.
 2. Inspect only `<bundle_dir>/.aoa-skill-source.json`. If present, require
-   `aoa_skill_source_receipt_v1`, bundle `titan-appserver-bridge`, owner
-   `aoa-sdk`, valid absolute `owner_root`, safe `source_path`, and matching
-   owner `SKILL.md`. A malformed present handle is terminal.
+   schema `aoa_skill_source_receipt_v1` or
+   `aoa_skill_source_receipt_v2`, bundle `titan-appserver-bridge`, owner
+   `aoa-sdk`, version `0.1.1`, valid absolute `owner_root`, safe
+   `source_path`, and matching owner `SKILL.md`. For v2 also require non-empty
+   `digest`, `source_fingerprint`, `source_fingerprint_scope`, and
+   `prompt_description_sha256`; preserve `capability_graph_hash` when present.
+   A malformed present handle is terminal.
 3. Only when absent, run
    `git -C <bundle_dir> rev-parse --show-toplevel`.
 4. Later read only `<owner_root>/skills/port.manifest.json`; require owner
    `aoa-sdk`, this bundle, and path `skills/titan-appserver-bridge`.
 5. Stop `blocked_missing_owner_source` on mismatch. Do not discover another
    checkout.
+
+Report the receipt schema and v2 identity dimensions when present. They locate
+and identify the installed source package; they do not prove helper execution
+or current owner parity.
 
 ## Select exactly one mode
 

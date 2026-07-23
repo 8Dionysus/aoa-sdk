@@ -15,10 +15,14 @@ Resolve the canonical `aoa-sdk` root before reading or running owner helpers:
 
 1. Record `<bundle_dir>` as the directory containing this loaded `SKILL.md`.
 2. In one tool turn, inspect only
-   `<bundle_dir>/.aoa-skill-source.json`. If it exists, require
-   `aoa_skill_source_receipt_v1`, bundle `titan-console`, owner `aoa-sdk`, an
-   existing absolute `owner_root`, safe relative `source_path`, and a matching
-   `<owner_root>/<source_path>/SKILL.md`. An invalid present handle is terminal.
+   `<bundle_dir>/.aoa-skill-source.json`. If it exists, require schema
+   `aoa_skill_source_receipt_v1` or `aoa_skill_source_receipt_v2`, bundle
+   `titan-console`, owner `aoa-sdk`, version `0.1.1`, an existing absolute
+   `owner_root`, safe relative `source_path`, and a matching
+   `<owner_root>/<source_path>/SKILL.md`. For v2 also require non-empty
+   `digest`, `source_fingerprint`, `source_fingerprint_scope`, and
+   `prompt_description_sha256`; preserve `capability_graph_hash` when present.
+   An invalid present handle is terminal.
 3. Only when the handle is absent, run exactly
    `git -C <bundle_dir> rev-parse --show-toplevel` and use that result as
    `<owner_root>`.
@@ -28,8 +32,9 @@ Resolve the canonical `aoa-sdk` root before reading or running owner helpers:
 5. Stop with `blocked_missing_owner_source` on any mismatch. Do not scan for a
    substitute checkout.
 
-Report the source route and provenance. Installation metadata does not prove
-owner parity or helper execution.
+Report the source route and provenance, including the receipt schema and v2
+identity dimensions when present. Installation metadata does not prove owner
+parity or helper execution.
 
 ## Select exactly one mode
 
