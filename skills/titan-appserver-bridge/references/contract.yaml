@@ -3,7 +3,7 @@ identity:
   name: titan-appserver-bridge
   owner: aoa-sdk
   canonical_source: skills/titan-appserver-bridge
-  version: 0.1.1
+  version: 0.1.2
   lifecycle: admitted
 purpose: Shape, inspect, validate, and replay visible Titan app-server or session events without sending, steering, or inferring hidden state.
 applicability:
