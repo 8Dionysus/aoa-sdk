@@ -105,9 +105,12 @@ relations:
     - titan-appserver-bridge
     - aoa-memo
   hands-off-to:
-    - {target: aoa-memo, condition: retention, redaction, pruning, promotion, or durable review is requested}
-    - {target: source owner, condition: a recalled claim must be verified}
-    - {target: aoa-session-memory-global-route, condition: raw session evidence is required}
+    - target: aoa-memo
+      condition: retention, redaction, pruning, promotion, or durable review is requested
+    - target: source owner
+      condition: a recalled claim must be verified
+    - target: aoa-session-memory-global-route
+      condition: raw session evidence is required
   conflicts-with:
     - candidate-as-durable-memory
     - recall-as-source-truth

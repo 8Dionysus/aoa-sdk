@@ -102,11 +102,16 @@ relations:
     - titan-console
     - titan-memory-loom
   hands-off-to:
-    - {target: titan-console, condition: an isolated approval queue status or decision is requested}
-    - {target: titan-console, condition: an isolated Forge or Delta gate decision is requested}
-    - {target: Codex or app-server runtime owner, condition: send, spawn, or live steering is requested}
-    - {target: aoa-session-memory-global-route, condition: hidden or archived session evidence is required}
-    - {target: aoa-memo, condition: reviewed replay may become durable memory}
+    - target: titan-console
+      condition: an isolated approval queue status or decision is requested
+    - target: titan-console
+      condition: an isolated Forge or Delta gate decision is requested
+    - target: Codex or app-server runtime owner
+      condition: send, spawn, or live steering is requested
+    - target: aoa-session-memory-global-route
+      condition: hidden or archived session evidence is required
+    - target: aoa-memo
+      condition: reviewed replay may become durable memory
   conflicts-with:
     - local-emit-as-send
     - replay-as-runtime-proof

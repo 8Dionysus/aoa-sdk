@@ -138,7 +138,8 @@ provenance:
 relations:
   primary-capability-parent: titan operator-visible control witnesses
   requires:
-    - {target: guard.operations.approval, condition: an external operator decision is required before recording an approval witness}
+    - target: guard.operations.approval
+      condition: an external operator decision is required before recording an approval witness
   produces:
     - titan-console-result-v1
     - titan-console-witness
@@ -150,9 +151,12 @@ relations:
     - titan-memory-loom
     - titan-summon
   hands-off-to:
-    - {target: runtime owner, condition: execution or enforcement is requested}
-    - {target: aoa-agents, condition: summon execution is requested}
-    - {target: aoa-memo, condition: durable memory or retention is requested}
+    - target: runtime owner
+      condition: execution or enforcement is requested
+    - target: aoa-agents
+      condition: summon execution is requested
+    - target: aoa-memo
+      condition: durable memory or retention is requested
   conflicts-with:
     - implicit approval
     - plan-as-execution
