@@ -17,5 +17,11 @@ ingress, and gate helper surfaces without owning live Titan authority.
 ## Stop-Lines
 
 - Do not treat helper receipts as live runtime state.
+- Use `titanctl.py witness-init` rather than `summon` when no live summon is
+  being represented; witness receipts must carry explicit no-runtime and
+  no-transport fields and contain no summon event.
 - Do not treat gate payload validity as operator acceptance.
+- Every gate event requires an external decision reference and an explicitly
+  unauthenticated approver-attribution label. Recording a gate against a
+  witness receipt leaves its incarnation locked and does not claim execution.
 - Do not make SDK lineage commands the owner of Titan bearer identity truth.

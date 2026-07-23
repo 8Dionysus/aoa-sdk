@@ -1,0 +1,138 @@
+schema_version: aoa-skill-contract-v1
+identity:
+  name: titan-memory-loom
+  owner: aoa-sdk
+  canonical_source: skills/titan-memory-loom
+  version: 0.1.0
+  lifecycle: admitted
+purpose: Ingest and recall local Titan memory candidates and hand retention decisions to aoa-memo without promoting helper state.
+applicability:
+  positive:
+    - explicit Titan receipt-to-candidate ingestion
+    - explicit bounded recall from a concrete Titan memory index
+    - explicit retention, redaction, tombstone, or prune question for a concrete Titan record
+  negative:
+    - generic memory or note taking
+    - first writeback without a Titan artifact
+    - raw session retrieval
+    - immediate redaction, prune, or durable promotion
+    - proof or source-truth replacement
+input_abi:
+  type: titan-memory-request-v1
+  required:
+    - mode
+    - explicit_titan_intent
+    - concrete_target
+  conditional:
+    ingest:
+      - receipt source ref
+      - index path
+    recall:
+      - index path
+      - bounded query
+    retention-handoff:
+      - record id
+      - reason
+      - requested retention action
+output_abi:
+  type: titan-memory-result-v1
+  required:
+    - mode
+    - source_return
+    - target
+    - source_refs
+    - candidate_records
+    - disposition
+    - actual_effects
+    - verification
+    - memo_handoff
+    - stop_line
+modes:
+  ingest:
+    procedure: references/ingest.md
+    effects: [bounded local candidate index write]
+  recall:
+    procedure: references/recall.md
+    effects: [none]
+  retention-handoff:
+    procedure: references/retention-handoff.md
+    effects: [none]
+freedom_level: bounded-adaptation
+tool_requirements:
+  owner_root: aoa-sdk
+  memory_helper: mechanics/titan/parts/memory-loom-recall-helper-contracts/scripts/titan_memory_loom.py
+  durable_memory_owner: aoa-memo
+verification:
+  - validate the local index after every ingest write
+  - preserve record id, source refs, confidence, state, and authority warning in recall
+  - prove retention-handoff actual_effects is empty and no redact command ran
+termination:
+  success: one validated local candidate operation, bounded recall, or effect-free owner-handoff request prepared without implicit submission
+  blocked: owner source, explicit Titan intent, concrete target, source ref, or memo-owner route is missing
+effects:
+  allowed:
+    - bounded local candidate index write in ingest mode
+  forbidden:
+    - helper redact in retention-handoff mode
+    - durable memory promotion
+    - source deletion or pruning
+    - proof or source-truth mutation
+trust:
+  posture: owner-authored-procedure
+  helper_outputs: candidate-only
+  memory_authority: aoa-memo
+  proof_authority: false
+provenance:
+  source: skills/titan-memory-loom
+  owner_contracts:
+    - mechanics/titan/parts/memory-loom-recall-helper-contracts
+  legacy_baselines:
+    - titan-memory-loom
+    - titan-recall
+    - titan-memory-prune
+  techniques_runtime_dependency: false
+relations:
+  primary-capability-parent: titan candidate memory helpers
+  consumes:
+    - titan-receipt-witness
+    - titan-memory-index
+  produces:
+    - titan-memory-result-v1
+    - titan-memory-candidate
+    - titan-retention-review-request
+  composes-with:
+    - titan-console
+    - titan-appserver-bridge
+    - aoa-memo
+  hands-off-to:
+    - target: aoa-memo
+      condition: retention, redaction, pruning, promotion, or durable review is requested
+    - target: source owner
+      condition: a recalled claim must be verified
+    - target: aoa-session-memory-global-route
+      condition: raw session evidence is required
+  conflicts-with:
+    - candidate-as-durable-memory
+    - recall-as-source-truth
+    - sdk-redact-before-owner-acceptance
+failure_modes:
+  - helper ingest is reported as durable memory acceptance
+  - recall results replace source verification
+  - retention mode calls redact before aoa-memo acceptance
+  - preparing a retention request implicitly invokes or submits to aoa-memo
+  - generic memory work is incorrectly captured by the Titan skill
+  - redacted or tombstoned candidate is treated as proof of source deletion
+health:
+  state: active
+  evidence_posture: manual-evaluated-challenger
+  last_manual_trial: 2026-07-23
+  manual_cases:
+    - receipt ingest into a candidate-only index
+    - bounded recall without index mutation
+    - retention handoff without redact or implicit submission
+    - receipt-to-memory task-local DAG
+    - generic and session-memory negative routing
+  recheck_after:
+    - helper contract change
+    - aoa-memo retention contract change
+    - Codex skill routing change

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Titan Appserver Bridge"
+  short_description: "Normalize visible Titan bridge evidence"
+  default_prompt: "Use $titan-appserver-bridge to normalize or replay one visible Titan app-server evidence stream."
+policy:
+  allow_implicit_invocation: true

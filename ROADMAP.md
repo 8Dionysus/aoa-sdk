@@ -38,6 +38,8 @@ Use the stronger surface when the change is narrower:
 - compatibility posture: [docs/versioning](docs/versioning.md);
 - SDK source-home posture: [sdk](sdk/README.md) and
   `sdk/source_home.manifest.json`;
+- SDK-owned skill-home posture: [skills](skills/README.md) and
+  `skills/port.manifest.json`;
 - operation topology: [mechanics](mechanics/README.md), [mechanics roadmap](mechanics/ROADMAP.md),
   parent route cards, parent `ROADMAP.md`, parent `PARTS.md`, parent
   `PROVENANCE.md`, and part `VALIDATION.md`;
@@ -85,6 +87,8 @@ The repo should now:
   history;
 - keep source-authored SDK posture in `sdk/` while `src/aoa_sdk/` remains the
   importable implementation;
+- keep callable procedures over SDK-owned Titan helpers in `skills/`, with
+  global exposure derived through the OS user profile;
 - keep repeatable SDK operations in `mechanics/`;
 - keep generated companions subordinate to source docs, builders, validators,
   and local route cards;
@@ -128,6 +132,7 @@ Current anchors:
 | Workspace control plane | `.aoa/workspace.toml`, `docs/workspace-layout.md`, `generated/workspace_control_plane.min.json` | Keep source checkouts, runtime mirrors, and generated capsule posture aligned. |
 | Compatibility posture | `docs/versioning.md` and compatibility checks | Keep consumed sibling surfaces explicit, versioned where possible, and fail-closed on drift. |
 | SDK source home | `sdk/README.md`, `sdk/source_home.manifest.json`, `src/aoa_sdk/` | Keep public SDK posture separate from importable implementation. |
+| SDK skill home | `skills/README.md`, `skills/port.manifest.json` | Keep owner-authored helper procedures discoverable without importing runtime or sibling authority. |
 | Mechanics atlas | `mechanics/README.md`, `mechanics/ROADMAP.md`, `mechanics/topology.json`, parent cards, parent roadmaps, part `VALIDATION.md` | Keep operation detail and package future pressure local while root watches repo-wide direction. |
 | Bounded helpers | skill inspection, surface detection, checkpoint evidence, and owner handoff route cards | Keep presence, candidate, reviewed evidence, owner acceptance, and execution visibly separate. |
 | Release support | `docs/RELEASING.md`, `docs/RELEASE_CI_POSTURE.md`, release-support parts | Keep release preflight, CI posture, sibling canaries, audit, and publish helpers subordinate to owner truth. |
@@ -149,6 +154,14 @@ Current anchors:
 | Current posture | `sdk/` is the checked source-authored SDK posture tree; `src/aoa_sdk/` is the importable Python implementation. |
 | Next honest move | Keep public-interface, facade-boundary, runtime-entry, and distribution posture tied to `sdk/source_home.manifest.json`, source tests, and decision rationale. |
 | Guardrail | `sdk/` must not become a second implementation tree, and `src/aoa_sdk/` must not absorb sibling meaning. |
+
+### Horizon: Owner Skill Home
+
+| Field | Direction |
+| --- | --- |
+| Current posture | `skills/` owns three admitted Titan helper bundles whose artifacts remain witness-only or candidate-only. |
+| Next honest move | Keep mode granularity, global exposure, and typed composition tied to manual task evidence and the shared v2 owner-port contract. |
+| Guardrail | No duplicate repo projection, technique runtime dependency, fictional unavailable binding, or transfer of runtime, operator, memory, proof, or playbook authority. |
 
 ### Horizon: Mechanics Atlas
 

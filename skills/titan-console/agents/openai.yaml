@@ -1,0 +1,6 @@
+interface:
+  display_name: "Titan Console"
+  short_description: "Inspect Titan console and approval witnesses"
+  default_prompt: "Use $titan-console to inspect or update one bounded Titan console, approval, plan, or receipt witness without claiming runtime authority."
+policy:
+  allow_implicit_invocation: true

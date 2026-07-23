@@ -7,7 +7,10 @@
     "titan",
     "gate",
     "reason",
-    "approved_by"
+    "decision_ref",
+    "approved_by",
+    "approved_by_authenticated",
+    "authority"
   ],
   "properties": {
     "ts": {
@@ -28,8 +31,19 @@
     "reason": {
       "type": "string"
     },
+    "decision_ref": {
+      "type": "string",
+      "minLength": 1
+    },
     "approved_by": {
-      "type": "string"
+      "type": "string",
+      "minLength": 1
+    },
+    "approved_by_authenticated": {
+      "const": false
+    },
+    "authority": {
+      "const": "witness_only"
     }
   }
 }

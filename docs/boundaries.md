@@ -8,8 +8,9 @@ repositories remain authoritative.
 
 - `aoa-routing` owns navigation surfaces and the dispatch ABI.
 - `aoa-skills` owns shared skill sources, capability families, install
-  profiles, and portable exports.
-- Each repository owns admission and projection of its home skills.
+  profiles, port grammar, and portable exports.
+- Each repository owns authored procedures and admission for its own skill
+  home. `aoa-sdk` owns only procedures over SDK-owned helper contracts.
 - The host owns skill discovery and execution; KAG and the executing agent own
   semantic retrieval and task-local composition.
 - `aoa-agents` owns role contracts, phase seams, and handoff doctrine.
@@ -27,6 +28,8 @@ repositories remain authoritative.
   facade-boundary, runtime-entry, and distribution route shape
 - root system-design and agent-surface design posture in `DESIGN.md` and
   `DESIGN.AGENTS.md`
+- the canonical `skills/` home and admission decisions for SDK-owned Titan
+  helper procedures
 - durable rationale for SDK-owned topology, route-law, compatibility, and
   validation choices
 - mechanics topology cards that map repeatable SDK operations back to their
@@ -50,8 +53,8 @@ repositories remain authoritative.
 - `sdk/` folders that pretend to be a second Python implementation tree or a
   sibling-source owner
 - hidden ranking, routing, or memory policy
-- skill selection, activation, task-local composition, or repository-home
-  admission
+- skill selection, activation, task-local composition, or admission for
+  another repository's home
 - daemon or service responsibilities
 - project-specific overlays inside portable-core modules
 

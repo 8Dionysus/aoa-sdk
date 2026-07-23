@@ -17,5 +17,12 @@ owning Codex app-server execution.
 ## Stop-Lines
 
 - Do not treat replayed approvals as operator decisions.
+- Preserve an explicit external decision reference and an unauthenticated
+  attribution label in every local gate or approval-decision witness. Never
+  overwrite an existing decision.
 - Do not make bridge launch messages a live app-server rollout.
+- Keep new bridge sessions witness-only: declared roster membership is not
+  runtime activation, and local replay is not transport.
+- Require an explicit visible source kind and source ref when a bridge session
+  is initialized, and preserve both through every helper read-write cycle.
 - Do not keep appserver bridge helper artifacts in root technical districts.

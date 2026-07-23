@@ -21,6 +21,20 @@ roster
           -> derived stats
 ```
 
+For an intent or observation that must remain explicitly outside runtime,
+initialize a witness instead:
+
+```text
+witness-init
+  -> validate
+    -> owner review or bounded candidate ingest
+```
+
+`witness-init` records `runtime_execution_state=not_run`,
+`transport_state=not_sent`, and `authority=witness_only`; it never writes a
+`summon` event. Atlas, Sentinel, and Mneme remain `declared`, while Forge and
+Delta remain `locked`; a witness contains no `active` incarnation.
+
 ## Default state
 
 - Atlas: active
@@ -31,8 +45,13 @@ roster
 
 ## Gate state
 
-Forge can only be activated by a mutation gate. Delta can only be activated by a judgment gate.
+Forge uses a mutation gate and Delta uses a judgment gate. Every local gate
+record preserves an external decision reference and unauthenticated approver
+attribution. On a summon-style helper receipt the gate changes the helper
+projection to active; on a `witness-init` receipt it records the decision while
+leaving the incarnation locked. Neither form proves runtime activation.
 
 ## Receipt discipline
 
-Receipts are local artifacts. They are not memory truth, proof truth, or governance truth. They are session witnesses.
+Receipts are local artifacts. They are not memory truth, proof truth,
+governance truth, operator authentication, or runtime execution evidence.

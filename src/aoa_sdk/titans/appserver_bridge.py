@@ -21,21 +21,21 @@ BRIDGE_TITAN_ROSTER: List[Dict[str, Any]] = [
     {
         "name": "Atlas",
         "role": "architect",
-        "state": "active",
+        "state": "declared",
         "gate": None,
         "lane": "structure",
     },
     {
         "name": "Sentinel",
         "role": "reviewer",
-        "state": "active",
+        "state": "declared",
         "gate": None,
         "lane": "risk",
     },
     {
         "name": "Mneme",
         "role": "memory-keeper",
-        "state": "active",
+        "state": "declared",
         "gate": None,
         "lane": "memory",
     },
@@ -224,11 +224,18 @@ def normalize_appserver_message(
 class TitanAppServerBridgeSession:
     session_id: str
     workspace_root: str
+    source_kind: str
+    source_ref: str
     status: str = "open"
     created_at: str = field(default_factory=utc_now)
     closed_at: Optional[str] = None
     summary: Optional[str] = None
     transport: str = "stdio"
+    surface_role: Optional[str] = "titan_appserver_bridge_witness"
+    authority: Optional[str] = "witness_only"
+    runtime_execution_state: Optional[str] = "not_run"
+    transport_state: Optional[str] = "not_sent"
+    state_semantics: Optional[str] = "helper_projection_only"
     thread_id: Optional[str] = None
     turn_id: Optional[str] = None
     titans: List[Dict[str, Any]] = field(
@@ -239,8 +246,23 @@ class TitanAppServerBridgeSession:
     gates: List[Dict[str, Any]] = field(default_factory=list)
 
     @classmethod
-    def new(cls, workspace_root: str) -> "TitanAppServerBridgeSession":
-        s = cls("titan-bridge-" + secrets.token_hex(8), str(workspace_root))
+    def new(
+        cls,
+        workspace_root: str,
+        *,
+        source_kind: str,
+        source_ref: str,
+    ) -> "TitanAppServerBridgeSession":
+        if not source_kind.strip():
+            raise ValueError("Bridge source_kind must be non-empty")
+        if not source_ref.strip():
+            raise ValueError("Bridge source_ref must be non-empty")
+        s = cls(
+            "titan-bridge-" + secrets.token_hex(8),
+            str(workspace_root),
+            source_kind,
+            source_ref,
+        )
         s.add_event(
             "bridge_opened",
             "operator",
@@ -251,19 +273,26 @@ class TitanAppServerBridgeSession:
     @classmethod
     def from_dict(cls, data):
         return cls(
-            data["session_id"],
-            data["workspace_root"],
-            data.get("status", "open"),
-            data.get("created_at") or utc_now(),
-            data.get("closed_at"),
-            data.get("summary"),
-            data.get("transport", "stdio"),
-            data.get("thread_id"),
-            data.get("turn_id"),
-            _copy_titan_roster(data.get("titans", BRIDGE_TITAN_ROSTER)),
-            list(data.get("events", [])),
-            list(data.get("approvals", [])),
-            list(data.get("gates", [])),
+            session_id=data["session_id"],
+            workspace_root=data["workspace_root"],
+            source_kind=data.get("source_kind", ""),
+            source_ref=data.get("source_ref", ""),
+            status=data.get("status", "open"),
+            created_at=data.get("created_at") or utc_now(),
+            closed_at=data.get("closed_at"),
+            summary=data.get("summary"),
+            transport=data.get("transport", "stdio"),
+            surface_role=data.get("surface_role"),
+            authority=data.get("authority"),
+            runtime_execution_state=data.get("runtime_execution_state"),
+            transport_state=data.get("transport_state"),
+            state_semantics=data.get("state_semantics"),
+            thread_id=data.get("thread_id"),
+            turn_id=data.get("turn_id"),
+            titans=_copy_titan_roster(data.get("titans", BRIDGE_TITAN_ROSTER)),
+            events=list(data.get("events", [])),
+            approvals=list(data.get("approvals", [])),
+            gates=list(data.get("gates", [])),
         )
 
     @classmethod
@@ -282,11 +311,18 @@ class TitanAppServerBridgeSession:
             "version": 1,
             "session_id": self.session_id,
             "workspace_root": self.workspace_root,
+            "source_kind": self.source_kind,
+            "source_ref": self.source_ref,
             "status": self.status,
             "created_at": self.created_at,
             "closed_at": self.closed_at,
             "summary": self.summary,
             "transport": self.transport,
+            "surface_role": self.surface_role,
+            "authority": self.authority,
+            "runtime_execution_state": self.runtime_execution_state,
+            "transport_state": self.transport_state,
+            "state_semantics": self.state_semantics,
             "thread_id": self.thread_id,
             "turn_id": self.turn_id,
             "titans": self.titans,
@@ -312,7 +348,19 @@ class TitanAppServerBridgeSession:
                 return t
         raise ValueError(f"Unknown Titan: {name}")
 
-    def unlock(self, titan_name, gate, reason):
+    def unlock(
+        self,
+        titan_name,
+        gate,
+        reason,
+        *,
+        decision_ref,
+        approved_by,
+    ):
+        if not str(decision_ref).strip():
+            raise ValueError("Gate decision_ref must be non-empty")
+        if not str(approved_by).strip():
+            raise ValueError("Gate approved_by attribution must be non-empty")
         t = self.titan(titan_name)
         req = t.get("gate")
         if req is None:
@@ -326,6 +374,10 @@ class TitanAppServerBridgeSession:
             "titan": t["name"],
             "gate": gate,
             "reason": reason,
+            "decision_ref": decision_ref,
+            "approved_by": approved_by,
+            "approved_by_authenticated": False,
+            "authority": "witness_only",
         }
         self.gates.append(rec)
         self.add_event(
@@ -346,24 +398,52 @@ class TitanAppServerBridgeSession:
                     "approval_type": e["approval_type"],
                     "status": "pending",
                     "summary": e["summary"],
+                    "authority": "witness_only",
                 }
             )
         self.events.append(e)
         return e
 
-    def decide_approval(self, request_id, decision, summary):
+    def decide_approval(
+        self,
+        request_id,
+        decision,
+        summary,
+        *,
+        decision_ref,
+        decided_by,
+    ):
         if decision not in {"accept", "acceptForSession", "decline", "cancel"}:
             raise ValueError("Unsupported approval decision")
+        if not str(decision_ref).strip():
+            raise ValueError("Approval decision_ref must be non-empty")
+        if not str(decided_by).strip():
+            raise ValueError("Approval decided_by attribution must be non-empty")
         for a in self.approvals:
             if str(a.get("request_id")) == str(request_id):
+                if a.get("status") != "pending":
+                    raise ValueError(
+                        f"Approval request already decided: {request_id}"
+                    )
                 a["status"] = decision
                 a["decided_at"] = utc_now()
                 a["decision_summary"] = summary
+                a["decision_ref"] = decision_ref
+                a["decided_by"] = decided_by
+                a["decided_by_authenticated"] = False
+                a["authority"] = "witness_only"
                 self.add_event(
                     "approval_decision",
                     "operator",
                     summary,
-                    {"request_id": request_id, "decision": decision},
+                    {
+                        "request_id": request_id,
+                        "decision": decision,
+                        "decision_ref": decision_ref,
+                        "decided_by": decided_by,
+                        "decided_by_authenticated": False,
+                        "authority": "witness_only",
+                    },
                 )
                 return
         raise ValueError(f"Unknown approval request: {request_id}")
@@ -393,6 +473,20 @@ class TitanAppServerBridgeSession:
 
     def validate(self):
         errors = []
+        if not self.source_kind.strip():
+            errors.append("missing source_kind")
+        if not self.source_ref.strip():
+            errors.append("missing source_ref")
+        witness_fields = {
+            "surface_role": "titan_appserver_bridge_witness",
+            "authority": "witness_only",
+            "runtime_execution_state": "not_run",
+            "transport_state": "not_sent",
+            "state_semantics": "helper_projection_only",
+        }
+        for field_name, expected in witness_fields.items():
+            if getattr(self, field_name) != expected:
+                errors.append(f"{field_name} must equal {expected!r}")
         roster = {t.get("name"): t for t in self.titans}
         names = set(roster)
         for req in ["Atlas", "Sentinel", "Mneme", "Forge", "Delta"]:
@@ -410,6 +504,32 @@ class TitanAppServerBridgeSession:
             for g in self.gates
         ):
             errors.append("Delta active without judgment gate")
+        for i, gate in enumerate(self.gates):
+            for key in ("decision_ref", "approved_by"):
+                if not gate.get(key):
+                    errors.append(f"gate[{i}] missing {key}")
+            if gate.get("approved_by_authenticated") is not False:
+                errors.append(f"gate[{i}] approved_by_authenticated must be false")
+            if gate.get("authority") != "witness_only":
+                errors.append(f"gate[{i}] authority must equal 'witness_only'")
+        for i, approval in enumerate(self.approvals):
+            if not approval.get("request_id"):
+                errors.append(f"approval[{i}] missing request_id")
+            if approval.get("authority") != "witness_only":
+                errors.append(f"approval[{i}] authority must equal 'witness_only'")
+            if approval.get("status") != "pending":
+                for key in [
+                    "decided_at",
+                    "decision_summary",
+                    "decision_ref",
+                    "decided_by",
+                ]:
+                    if not approval.get(key):
+                        errors.append(f"approval[{i}] missing {key}")
+                if approval.get("decided_by_authenticated") is not False:
+                    errors.append(
+                        f"approval[{i}] decided_by_authenticated must be false"
+                    )
         return errors
 
     def render_text(self):

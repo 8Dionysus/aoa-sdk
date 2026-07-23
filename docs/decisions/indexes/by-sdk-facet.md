@@ -180,6 +180,7 @@
 - [AOA-SDK-D-0003 - Refactored Sibling Surface Paths](../AOA-SDK-D-0003-refactored-sibling-surface-paths.md) (`docs/decisions/AOA-SDK-D-0003-refactored-sibling-surface-paths.md`)
 - [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) (`docs/decisions/AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md`)
 - [AOA-SDK-D-0066 - Decision Index Read Model Symmetry](../AOA-SDK-D-0066-decision-index-read-model-symmetry.md) (`docs/decisions/AOA-SDK-D-0066-decision-index-read-model-symmetry.md`)
+- [AOA-SDK-D-0070 - Admit the Titan Helper Skill Family](../AOA-SDK-D-0070-titan-owner-skill-family.md) (`docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md`)
 
 ## control-plane routing
 
@@ -311,6 +312,10 @@
 ## nested agents
 
 - [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) (`docs/decisions/AOA-SDK-D-0032-root-technical-district-route-card-hardening.md`)
+
+## operator-visible witnesses
+
+- [AOA-SDK-D-0070 - Admit the Titan Helper Skill Family](../AOA-SDK-D-0070-titan-owner-skill-family.md) (`docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md`)
 
 ## owner boundary
 
@@ -563,6 +568,7 @@
 ## Titan helpers
 
 - [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) (`docs/decisions/AOA-SDK-D-0011-titan-helper-contract-part-localization.md`)
+- [AOA-SDK-D-0070 - Admit the Titan Helper Skill Family](../AOA-SDK-D-0070-titan-owner-skill-family.md) (`docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md`)
 
 ## typed consumer API
 

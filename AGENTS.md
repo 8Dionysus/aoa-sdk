@@ -18,6 +18,9 @@ This repository owns:
 - workspace discovery, topology resolution, compatibility checks, versioning posture, and CLI inspection surfaces
 - the root `stats/` port for SDK-owned measurement questions and
   evidence-linked reference packets
+- the canonical `skills/` home for admitted procedures over SDK-owned Titan
+  helper contracts, without acquiring runtime, operator, memory, proof, or
+  playbook authority
 - the compact control-plane capsule at `generated/workspace_control_plane.min.json`
 - the mechanics topology under `mechanics/`, including package route cards,
   source-family routes, future-pressure roadmaps, part-local artifact homes,
@@ -48,10 +51,12 @@ It does not own:
    topology changes
 10. `stats/AGENTS.md`, `stats/README.md`, and `stats/port.manifest.json` when
     an SDK-owned statistical question or reference packet changes
-11. `mechanics/README.md` and `mechanics/ROADMAP.md` when repeatable SDK
-   operation topology, package routing, or mechanics future pressure changes
-12. `.aoa/workspace.toml`
-13. source files and tests you plan to touch
+11. `skills/AGENTS.md`, `skills/README.md`, and `skills/port.manifest.json`
+    when an SDK-owned Titan helper procedure or owner exposure changes
+12. `mechanics/README.md` and `mechanics/ROADMAP.md` when repeatable SDK
+    operation topology, package routing, or mechanics future pressure changes
+13. `.aoa/workspace.toml`
+14. source files and tests you plan to touch
 
 
 ## AGENTS stack law

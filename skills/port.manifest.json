@@ -1,0 +1,43 @@
+{
+  "schema_version": "aoa_skill_home_port_v2",
+  "contract_ref": "aoa-skills:schemas/skill-home-port.schema.json",
+  "owner_repo": "aoa-sdk",
+  "owner_ref": "AGENTS.md",
+  "bundles": [
+    {
+      "name": "titan-console",
+      "path": "skills/titan-console",
+      "version": "0.1.0",
+      "lifecycle": "admitted",
+      "visibility": "advertised",
+      "admission_ref": "docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md"
+    },
+    {
+      "name": "titan-appserver-bridge",
+      "path": "skills/titan-appserver-bridge",
+      "version": "0.1.0",
+      "lifecycle": "admitted",
+      "visibility": "advertised",
+      "admission_ref": "docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md"
+    },
+    {
+      "name": "titan-memory-loom",
+      "path": "skills/titan-memory-loom",
+      "version": "0.1.0",
+      "lifecycle": "admitted",
+      "visibility": "advertised",
+      "admission_ref": "docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md"
+    }
+  ],
+  "exposure": {
+    "runtime": "codex",
+    "scope": "user",
+    "profile": "os-user-default",
+    "mode": "profile-selected",
+    "skills": [
+      "titan-console",
+      "titan-appserver-bridge",
+      "titan-memory-loom"
+    ]
+  }
+}

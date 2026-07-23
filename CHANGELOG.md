@@ -15,6 +15,11 @@ Tracking starts with the community-docs baseline for this repository.
   source files as owner entrypoints.
 - SDK repo discovery no longer advertises or depends on the retired
   `aoa-stats/scripts/aoa_stats_mcp_server.py` launcher.
+- Add three focused owner skill bundles for Titan console/approval witnesses,
+  visible app-server bridge/replay, and candidate memory-loom procedures.
+- Titan witness helpers now preserve explicit source and decision provenance,
+  distinguish helper projection from runtime state, and reject invented gate
+  payload defaults.
 
 ### Notes
 

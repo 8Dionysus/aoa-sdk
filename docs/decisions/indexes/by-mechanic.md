@@ -180,3 +180,4 @@
 - [AOA-SDK-D-0006 - Mechanics Source Family Crosswalk](../AOA-SDK-D-0006-mechanics-source-family-crosswalk.md) (`docs/decisions/AOA-SDK-D-0006-mechanics-source-family-crosswalk.md`)
 - [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) (`docs/decisions/AOA-SDK-D-0011-titan-helper-contract-part-localization.md`)
 - [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) (`docs/decisions/AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md`)
+- [AOA-SDK-D-0070 - Admit the Titan Helper Skill Family](../AOA-SDK-D-0070-titan-owner-skill-family.md) (`docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md`)

@@ -5,23 +5,21 @@ import json
 import sys
 from pathlib import Path
 
-try:
-    from aoa_sdk.titans.appserver_bridge import (
-        AppServerJsonRpcBuilder,
-        TitanAppServerBridgeSession,
-    )
-except ModuleNotFoundError:
+
+def _repo_root() -> Path:
     for parent in Path(__file__).resolve().parents:
-        src = parent / "src"
-        if (src / "aoa_sdk").is_dir():
-            sys.path.insert(0, str(src))
-            break
-    else:
-        raise
-    from aoa_sdk.titans.appserver_bridge import (
-        AppServerJsonRpcBuilder,
-        TitanAppServerBridgeSession,
-    )
+        if (parent / "src" / "aoa_sdk").is_dir():
+            return parent
+    raise RuntimeError("cannot locate aoa-sdk repo root from titan_appserver_bridge.py")
+
+
+ROOT = _repo_root()
+sys.path.insert(0, str(ROOT / "src"))
+
+from aoa_sdk.titans.appserver_bridge import (  # noqa: E402
+    AppServerJsonRpcBuilder,
+    TitanAppServerBridgeSession,
+)
 
 
 def load(args):
@@ -39,7 +37,11 @@ def iter_messages(args):
 
 
 def cmd_init(a):
-    s = TitanAppServerBridgeSession.new(a.workspace)
+    s = TitanAppServerBridgeSession.new(
+        a.workspace,
+        source_kind=a.source_kind,
+        source_ref=a.source_ref,
+    )
     s.save(Path(a.out))
     print(a.out)
     return 0
@@ -96,7 +98,13 @@ def cmd_replay(a):
 
 def cmd_gate(a):
     s, p = load(a)
-    s.unlock(a.titan, a.gate, a.reason)
+    s.unlock(
+        a.titan,
+        a.gate,
+        a.reason,
+        decision_ref=a.decision_ref,
+        approved_by=a.approved_by,
+    )
     s.save(p)
     print(f"{a.titan} unlocked through {a.gate}")
     return 0
@@ -104,7 +112,13 @@ def cmd_gate(a):
 
 def cmd_approval_decision(a):
     s, p = load(a)
-    s.decide_approval(a.request_id, a.decision, a.summary)
+    s.decide_approval(
+        a.request_id,
+        a.decision,
+        a.summary,
+        decision_ref=a.decision_ref,
+        decided_by=a.decided_by,
+    )
     s.save(p)
     print("approval decision recorded")
     return 0
@@ -140,6 +154,16 @@ def parser():
     sub = p.add_subparsers(dest="cmd", required=True)
     q = sub.add_parser("init")
     q.add_argument("--workspace", required=True)
+    q.add_argument(
+        "--source-kind",
+        required=True,
+        choices=[
+            "bridge-session",
+            "bridge-event-file",
+            "visible-codex-session-export",
+        ],
+    )
+    q.add_argument("--source-ref", required=True)
     q.add_argument("--out", required=True)
     q.set_defaults(func=cmd_init)
     q = sub.add_parser("render")
@@ -172,6 +196,8 @@ def parser():
     )
     q.add_argument("--gate", required=True, choices=["mutation", "judgment"])
     q.add_argument("--reason", required=True)
+    q.add_argument("--decision-ref", required=True)
+    q.add_argument("--approved-by", required=True)
     q.set_defaults(func=cmd_gate)
     q = sub.add_parser("approval-decision")
     q.add_argument("--session", required=True)
@@ -181,6 +207,8 @@ def parser():
         required=True,
         choices=["accept", "acceptForSession", "decline", "cancel"],
     )
+    q.add_argument("--decision-ref", required=True)
+    q.add_argument("--decided-by", required=True)
     q.add_argument("--summary", required=True)
     q.set_defaults(func=cmd_approval_decision)
     q = sub.add_parser("metrics")

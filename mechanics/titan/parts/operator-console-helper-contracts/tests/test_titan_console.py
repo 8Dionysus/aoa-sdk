@@ -22,6 +22,29 @@ def test_new_validate_and_gates(tmp_path):
         "new", "--workspace", str(tmp_path), "--operator", "tester", "--out", str(state)
     )
     run("validate", "--state", str(state))
+    initial = json.loads(state.read_text())
+    assert initial["surface_role"] == "titan_console_witness"
+    assert initial["authority"] == "witness_only"
+    assert initial["runtime_execution_state"] == "not_run"
+    assert initial["transport_state"] == "not_sent"
+    assert initial["state_semantics"] == "helper_projection_only"
+    assert initial["operator_field_authenticated"] is False
+    assert initial["digest"]["active"] == []
+    assert initial["digest"]["declared"] == ["Atlas", "Sentinel", "Mneme"]
+    assert initial["titans"]["Atlas"]["state"] == "declared"
+    assert initial["titans"]["Forge"]["state"] == "locked"
+    missing_explicit_witness = tmp_path / "missing-explicit-witness.json"
+    incomplete = dict(initial)
+    incomplete.pop("authority")
+    missing_explicit_witness.write_text(json.dumps(incomplete), encoding="utf-8")
+    rejected = run(
+        "validate",
+        "--state",
+        str(missing_explicit_witness),
+        check=False,
+    )
+    assert rejected.returncode != 0
+    assert "missing key: authority" in rejected.stderr
     bad = run(
         "gate",
         "--state",
@@ -32,6 +55,10 @@ def test_new_validate_and_gates(tmp_path):
         "judgment",
         "--reason",
         "wrong",
+        "--decision-ref",
+        "manual-trial://wrong-gate",
+        "--approved-by",
+        "manual-trial-operator",
         check=False,
     )
     assert bad.returncode != 0
@@ -45,6 +72,10 @@ def test_new_validate_and_gates(tmp_path):
         "mutation",
         "--reason",
         "bounded patch",
+        "--decision-ref",
+        "manual-trial://forge-mutation",
+        "--approved-by",
+        "manual-trial-operator",
     )
     run(
         "gate",
@@ -56,12 +87,29 @@ def test_new_validate_and_gates(tmp_path):
         "judgment",
         "--reason",
         "regression verdict",
+        "--decision-ref",
+        "manual-trial://delta-judgment",
+        "--approved-by",
+        "manual-trial-operator",
     )
     run("validate", "--state", str(state))
     data = json.loads(state.read_text())
     assert (
         data["titans"]["Forge"]["active"] is True
         and data["titans"]["Delta"]["active"] is True
+    )
+    assert (
+        data["titans"]["Forge"]["state"] == "active"
+        and data["titans"]["Delta"]["state"] == "active"
+    )
+    assert [approval["decision_ref"] for approval in data["approvals"]] == [
+        "manual-trial://forge-mutation",
+        "manual-trial://delta-judgment",
+    ]
+    assert all(
+        approval["approved_by_authenticated"] is False
+        and approval["authority"] == "witness_only"
+        for approval in data["approvals"]
     )
 
 
@@ -82,6 +130,10 @@ def test_gate_rejects_closed_state(tmp_path):
         "mutation",
         "--reason",
         "late mutation",
+        "--decision-ref",
+        "manual-trial://late-mutation",
+        "--approved-by",
+        "manual-trial-operator",
         check=False,
     )
 
@@ -109,3 +161,5 @@ def test_appserver_plan(tmp_path):
         "thread/start",
         "turn/start",
     ]
+    assert "model" not in lines[2]["params"]
+    assert lines[3]["params"]["input"][0]["text"] == "Summon Atlas, Sentinel, and Mneme."

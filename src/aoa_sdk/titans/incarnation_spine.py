@@ -52,7 +52,10 @@ class GateEvent:
     bearer_id: str
     gate_kind: str
     payload: dict[str, Any]
-    approved_by: str | None
+    decision_ref: str
+    approved_by: str
+    approved_by_authenticated: bool = False
+    authority: str = "witness_only"
     created_at: str = field(default_factory=lambda: utc_now())
 
 
@@ -164,7 +167,19 @@ def validate_gate_payload(titan_name: str, gate_kind: str, payload: Any) -> list
     return errors
 
 
-def gate_titan(receipt: dict[str, Any], *, titan_name: str, gate_kind: str, payload: Any, approved_by: str | None = None) -> dict[str, Any]:
+def gate_titan(
+    receipt: dict[str, Any],
+    *,
+    titan_name: str,
+    gate_kind: str,
+    payload: Any,
+    decision_ref: str,
+    approved_by: str,
+) -> dict[str, Any]:
+    if not decision_ref.strip():
+        raise ValueError("gate decision_ref must be non-empty")
+    if not approved_by.strip():
+        raise ValueError("gate approved_by attribution must be non-empty")
     errors = validate_gate_payload(titan_name, gate_kind, payload)
     if errors:
         raise ValueError("; ".join(errors))
@@ -173,8 +188,9 @@ def gate_titan(receipt: dict[str, Any], *, titan_name: str, gate_kind: str, payl
     if len(matches) != 1:
         raise ValueError(f"expected exactly one incarnation for {titan_name}")
     inc = matches[0]
-    inc["state"] = "active"
-    inc["gate_required"] = None
+    if receipt.get("surface_role") != "titan_receipt_witness":
+        inc["state"] = "active"
+        inc["gate_required"] = None
     event = GateEvent(
         gate_ref=_id(f"gate:{titan_name.lower()}"),
         session_id=receipt["session_id"],
@@ -182,6 +198,7 @@ def gate_titan(receipt: dict[str, Any], *, titan_name: str, gate_kind: str, payl
         bearer_id=inc["bearer_id"],
         gate_kind=gate_kind,
         payload=dict(payload),
+        decision_ref=decision_ref,
         approved_by=approved_by,
     )
     receipt.setdefault("gate_events", []).append(asdict(event))
@@ -225,6 +242,23 @@ def validate_receipt(receipt: Mapping[str, Any]) -> list[str]:
     missing_names = set(TITAN_BEARERS) - seen_names
     if missing_names:
         errors.append(f"missing Titan incarnations: {sorted(missing_names)}")
+    gate_events = receipt.get("gate_events")
+    if not isinstance(gate_events, list):
+        errors.append("gate_events must be an array")
+        gate_events = []
+    for index, event in enumerate(gate_events):
+        if not isinstance(event, Mapping):
+            errors.append(f"gate event[{index}] must be an object")
+            continue
+        for key in ("decision_ref", "approved_by"):
+            if not isinstance(event.get(key), str) or not event.get(key, "").strip():
+                errors.append(f"gate event[{index}] missing {key}")
+        if event.get("approved_by_authenticated") is not False:
+            errors.append(
+                f"gate event[{index}] approved_by_authenticated must be false"
+            )
+        if event.get("authority") != "witness_only":
+            errors.append(f"gate event[{index}] authority must equal 'witness_only'")
     return errors
 
 
@@ -266,7 +300,8 @@ def cli(argv: list[str] | None = None) -> int:
     p_gate.add_argument("--titan", required=True)
     p_gate.add_argument("--kind", required=True)
     p_gate.add_argument("--payload", required=True, help="Path to JSON payload")
-    p_gate.add_argument("--approved-by")
+    p_gate.add_argument("--decision-ref", required=True)
+    p_gate.add_argument("--approved-by", required=True)
     p_validate = sub.add_parser("validate")
     p_validate.add_argument("--receipt", required=True)
     p_memory = sub.add_parser("validate-memory")
@@ -283,7 +318,17 @@ def cli(argv: list[str] | None = None) -> int:
         if errors:
             print(json.dumps({"status": "fail", "errors": errors}, ensure_ascii=False, indent=2))
             return 2
-        write_json(Path(args.receipt), gate_titan(receipt, titan_name=args.titan, gate_kind=args.kind, payload=payload, approved_by=args.approved_by))
+        write_json(
+            Path(args.receipt),
+            gate_titan(
+                receipt,
+                titan_name=args.titan,
+                gate_kind=args.kind,
+                payload=payload,
+                decision_ref=args.decision_ref,
+                approved_by=args.approved_by,
+            ),
+        )
         return 0
     if args.cmd == "validate":
         errors = validate_receipt(read_json(Path(args.receipt)))

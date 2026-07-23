@@ -75,6 +75,7 @@ Current protected local cards include:
 - `docs/AGENTS.md`
 - `docs/decisions/AGENTS.md`
 - `generated/AGENTS.md`
+- `skills/AGENTS.md`
 - `sdk/AGENTS.md`
 - `sdk/public-interface/AGENTS.md`
 - `sdk/facade-boundary/AGENTS.md`
@@ -153,6 +154,8 @@ For repository-shape, source-home, route-law, or mechanics topology changes, rea
 - `DESIGN.AGENTS.md` names the agent-facing form. It is not a local card.
 - `docs/decisions/` preserves rationale. It is not active source truth.
 - `sdk/` owns SDK source-home posture and route shape.
+- `skills/` owns callable procedures over SDK-owned helper contracts, not
+  runtime, operator, memory, proof, or playbook meaning.
 - `src/aoa_sdk/` owns importable typed SDK implementation.
 - `docs/` explains SDK posture and boundaries.
 - `schemas/` owns helper contract shape.
