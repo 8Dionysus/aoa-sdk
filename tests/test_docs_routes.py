@@ -10,7 +10,7 @@ CARRY_PART = "mechanics/checkpoint/parts/reviewed-closeout-context-carry"
 PRIMARY_COMMAND_DOCS = frozenset(
     {"mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md"}
 )
-EXECUTABLE_MARKDOWN_PREFIXES = (".agents/skills/",)
+EXECUTABLE_MARKDOWN_PREFIXES = (".agents/skills/", "skills/")
 SHELL_FENCE_PATTERN = re.compile(
     r"^ {0,3}```(?:bash|console|sh|shell|zsh)(?:\s+.*)?$",
     re.IGNORECASE | re.MULTILINE,

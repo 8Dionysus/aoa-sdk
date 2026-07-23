@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 10357373,
+  "allowed_tracked_bytes": 14263711,
+  "approved_by": "repository-owner",
+  "base_ref": "6364ecddf8238b20b90eed08045f89a0288f8b1b",
+  "changed_generated_bytes": 10357373,
+  "changed_generated_files": 313,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "3747d54f84d0991e56fdaa608b8cc3cab2e8a90fd84befe5de05c9b460f3d160",
+  "reason": "Admit three manually evaluated Titan owner skill bundles, harden their helper contracts, expose typed relations as KAG-readable mappings, and recognize the canonical skills home as executable command authority; content-addressed shard fanout exceeds the per-change delta while the tracked family remains below its standing limit.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta",
+  "tracked_bytes": 14263711,
+  "tracked_bytes_max": 15728640
+}
