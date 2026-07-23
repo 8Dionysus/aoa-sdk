@@ -1,0 +1,1057 @@
+{
+  "schema_version": "aoa_sdk_routing_succession_r0_baseline_v1",
+  "captured_at_utc": "2026-07-23T20:04:51Z",
+  "status": "g0_ready",
+  "scope": {
+    "source_owner_before": "aoa-routing",
+    "proposed_successor": "aoa-sdk",
+    "stage": "R0 read-only baseline",
+    "mutation_posture": "No canonical checkout, producer, runtime mirror, trust record, release, or hosting setting was changed.",
+    "authority_posture": "This evidence does not switch routing authority. aoa-routing remains canonical until a later explicit owner-succession landing."
+  },
+  "primary_baseline": {
+    "aoa-routing": {
+      "origin_main": "cde31e568e49c5a50afbd89071cf72abd9733d99",
+      "canonical_checkout_head": "72f91d2a8e21438157a853becd136be30e72234e",
+      "canonical_checkout_branch": "main",
+      "ahead": 0,
+      "behind": 2,
+      "dirty_paths": 0,
+      "latest_release": "v0.3.0",
+      "latest_release_published_at": "2026-07-14T02:25:50Z",
+      "main_branch_required_checks": [
+        "Repo Validation"
+      ],
+      "main_branch_strict": true,
+      "main_branch_enforce_admins": true
+    },
+    "aoa-sdk": {
+      "origin_main": "cdd3af4e1a7d0f0ffc514b65d6dee3b5b838a530",
+      "canonical_checkout_head": "67d7f7cf9d7f05eed8b8e52a7c5e8ba6d9352c91",
+      "canonical_checkout_branch": "main",
+      "ahead": 0,
+      "behind": 2,
+      "dirty_paths": 0,
+      "latest_release": "v0.5.1",
+      "latest_release_published_at": "2026-07-14T03:37:25Z",
+      "package_version": "0.5.1",
+      "main_branch_required_checks": [
+        "Repo Validation"
+      ],
+      "main_branch_strict": true,
+      "main_branch_enforce_admins": true
+    }
+  },
+  "organization_scan": {
+    "owner": "8Dionysus",
+    "active_repository_count": 25,
+    "archived_repositories_excluded": [
+      "8Dionysus/abyss-stack_old"
+    ],
+    "active_repositories_with_no_aoa_routing_reference_at_origin_main": [
+      "aoa-4pda-connector",
+      "aoa-course-connector",
+      "aoa-discord-connector",
+      "aoa-editing",
+      "aoa-stackoverflow-connector",
+      "aoa-telegram-connector",
+      "aoa-xda-connector"
+    ],
+    "search_modes": [
+      "all locally available origin/main trees",
+      "all organization repositories listed through the live GitHub repository surface",
+      "exact checkout, environment, URL, generated-artifact, and mirror path patterns",
+      "host systemd, user configuration, .aoa active config/scripts, Podman mounts, and abyss-machine trust state"
+    ],
+    "github_code_search_note": "The GitHub code-search endpoint reached its search-specific rate limit. Coverage did not depend on it: every active organization repository was present locally, fetched where needed, and searched at origin/main."
+  },
+  "repository_baseline": [
+    {
+      "repo": "8Dionysus",
+      "origin_main": "39cdef104d54d570e7eb4f689ebcd48b2cc6a658",
+      "checkout": "/srv/AbyssOS/8Dionysus",
+      "checkout_head": "7ff7bb4375154577b0793cfd31e37280c764b83d",
+      "ahead": 1,
+      "behind": 13,
+      "dirty_paths": 25
+    },
+    {
+      "repo": "ATM10-Agent",
+      "origin_main": "482a8fc7cb23e33742f7440168c231779d74c5c3",
+      "checkout": "/srv/AbyssOS/ATM10-Agent",
+      "checkout_head": "430c622654362eae2ff3ed35855b42bc172dd552",
+      "ahead": 0,
+      "behind": 1,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "Agents-of-Abyss",
+      "origin_main": "bfeb4bfb447b437f1360b814bbf4f1def5e62859",
+      "checkout": "/srv/AbyssOS/Agents-of-Abyss",
+      "checkout_head": "fe67c18163f40435e5413748f25dfe91e5b5a27d",
+      "ahead": 0,
+      "behind": 1,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "Dionysus",
+      "origin_main": "6c463f6b89a11e85b37e2606525afc7d45005fbd",
+      "checkout": "/srv/AbyssOS/Dionysus",
+      "checkout_head": "6c463f6b89a11e85b37e2606525afc7d45005fbd",
+      "ahead": 0,
+      "behind": 0,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "Tree-of-Sophia",
+      "origin_main": "8126cc379a759990358728bbcedadbd3b24a7b6d",
+      "checkout": "/srv/AbyssOS/Tree-of-Sophia",
+      "checkout_head": "cbc167e376ecdc384793ee86413a7cd0a12a2b38",
+      "checkout_branch": "codex/zarathustra-golden-kernel",
+      "ahead": 4,
+      "behind": 0,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "abyss-machine",
+      "origin_main": "2faa6c6ccfc1309f6c3b6a36ddf04c3334c4547b",
+      "checkout": "/home/dionysus/src/abyss-machine",
+      "checkout_head": "12e4a6976d9c601d867dc0c17ab0cd91e205ec8b",
+      "checkout_branch": "codex/cooling-adapters",
+      "ahead": 1,
+      "behind": 174,
+      "dirty_paths": 80
+    },
+    {
+      "repo": "abyss-stack",
+      "origin_main": "38856c1e4da1e6e0e40d2b76d8aaf828a7ef4b10",
+      "checkout": "/home/dionysus/src/abyss-stack",
+      "checkout_head": "ca2078b213a471b994a21b13dfd8f70f8f84cd7c",
+      "ahead": 1,
+      "behind": 48,
+      "dirty_paths": 80
+    },
+    {
+      "repo": "aoa-agents",
+      "origin_main": "66f8bf22d03518b1e2367fd4f51dab80650f6d37",
+      "checkout": "/srv/AbyssOS/aoa-agents",
+      "checkout_head": "14577cbdc6325d7f676d5929bcfea7673f56afa7",
+      "ahead": 0,
+      "behind": 2,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "aoa-evals",
+      "origin_main": "3412b47f9ee7bec9567f92e1c2d59596c4428a2c",
+      "checkout": "/srv/AbyssOS/aoa-evals",
+      "checkout_head": "f836f94fd8a04dc914b5cab700757bf05b096aa8",
+      "ahead": 0,
+      "behind": 1,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "aoa-kag",
+      "origin_main": "9a5f817f8247b2dfb005e4e0c289d34f27b56314",
+      "checkout": "/srv/AbyssOS/aoa-kag",
+      "checkout_head": "9a5f817f8247b2dfb005e4e0c289d34f27b56314",
+      "ahead": 0,
+      "behind": 0,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "aoa-memo",
+      "origin_main": "7672add5e2bb4ff21c2581ca656998f0ca7c8a3e",
+      "checkout": "/srv/AbyssOS/aoa-memo",
+      "checkout_head": "922701119764babc1c37bdba267dc6686b35fcb9",
+      "ahead": 0,
+      "behind": 1,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "aoa-playbooks",
+      "origin_main": "a15866ec867209288533850cc34939ad81829947",
+      "checkout": "/srv/AbyssOS/aoa-playbooks",
+      "checkout_head": "a0e89191e39a7ed194cfad13e9d7d0a7513aa384",
+      "ahead": 0,
+      "behind": 1,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "aoa-session-memory",
+      "origin_main": "1d79b84e7ae09738936ba7e88adeeefd4f0f28b2",
+      "checkout": "/srv/AbyssOS/bundles/aoa-session-memory",
+      "checkout_head": "3e6163ca50e28e2c7dc9659ed444e68e9ad34865",
+      "ahead": 0,
+      "behind": 7,
+      "dirty_paths": 41
+    },
+    {
+      "repo": "aoa-skills",
+      "origin_main": "7881ddfc6d533f2cf9a43abeba070e99a810e4d3",
+      "checkout": "/srv/AbyssOS/aoa-skills",
+      "checkout_head": "f66ee11d3ba46486aa555ab2a806a80a711aae1d",
+      "ahead": 1,
+      "behind": 101,
+      "dirty_paths": 112
+    },
+    {
+      "repo": "aoa-stats",
+      "origin_main": "504571995cc36905cc886259c0a19be6e8e35045",
+      "checkout": "/srv/AbyssOS/aoa-stats",
+      "checkout_head": "177410ec748b5b58582af039ce082a45609a0782",
+      "ahead": 0,
+      "behind": 3,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "aoa-techniques",
+      "origin_main": "e842c0d0156c58cfb9020b636e81134e96fc8cfb",
+      "checkout": "/srv/AbyssOS/aoa-techniques",
+      "checkout_head": "9364662c7bde35b87fc67e17502f9c78f5934b64",
+      "ahead": 0,
+      "behind": 1,
+      "dirty_paths": 0
+    },
+    {
+      "repo": "aoa-4pda-connector",
+      "origin_main": "a273f71c6fcc30c34759b2ef1e2f08cd8fc6baa3"
+    },
+    {
+      "repo": "aoa-course-connector",
+      "origin_main": "346254a134f6f7dd14c6edc0a519a2681d8813a9"
+    },
+    {
+      "repo": "aoa-discord-connector",
+      "origin_main": "2652b1d657cbe5a7888ac979cc07a8f9ec792887"
+    },
+    {
+      "repo": "aoa-editing",
+      "origin_main": "3c538aa9741f364a469953ab22111872cc5c9070"
+    },
+    {
+      "repo": "aoa-stackoverflow-connector",
+      "origin_main": "a239551bd629f59d32b59649eb308245be99c903"
+    },
+    {
+      "repo": "aoa-telegram-connector",
+      "origin_main": "1d7e4157446839dc03f3ec80b687fdbb12dd8a22"
+    },
+    {
+      "repo": "aoa-xda-connector",
+      "origin_main": "45dc97667c104f17b71fcd13978de5172e5c4c8d"
+    }
+  ],
+  "producer_graph": {
+    "canonical_owner_count": 1,
+    "canonical_owner": "aoa-routing",
+    "runnable_producer_implementation_count": 1,
+    "input_repository_count": 14,
+    "input_repositories": [
+      "aoa-techniques",
+      "aoa-skills",
+      "aoa-evals",
+      "aoa-memo",
+      "aoa-stats",
+      "aoa-agents",
+      "Agents-of-Abyss",
+      "aoa-playbooks",
+      "aoa-kag",
+      "Tree-of-Sophia",
+      "aoa-sdk",
+      "Dionysus",
+      "8Dionysus",
+      "abyss-stack"
+    ],
+    "producer_files": [
+      "scripts/build_router.py",
+      "scripts/router_core.py",
+      "scripts/validate_router.py"
+    ],
+    "root_output_count": 14,
+    "root_outputs": [
+      {
+        "path": "generated/cross_repo_registry.min.json",
+        "producer": "build_outputs plus collect_technique_entries, collect_skill_entries, collect_eval_entries, and collect_memo_entries",
+        "active_consumers": [
+          "abyss-stack route-api and mirror",
+          "aoa-sdk compatibility policy",
+          "aoa-kag readiness",
+          "abyss-machine artifact verification"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/aoa_router.min.json",
+        "producer": "build_router_payload",
+        "active_consumers": [
+          "abyss-stack route-api and mirror",
+          "abyss-machine trust and artifact verification"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/task_to_surface_hints.json",
+        "producer": "build_task_to_surface_hints_payload",
+        "active_consumers": [
+          "abyss-stack route-api and mirror",
+          "aoa-sdk compatibility policy",
+          "aoa-agents validator"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/task_to_tier_hints.json",
+        "producer": "build_task_to_tier_hints_payload",
+        "active_consumers": [
+          "abyss-stack route-api and mirror",
+          "aoa-agents validator"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/quest_dispatch_hints.min.json",
+        "producer": "build_quest_dispatch_hints_payload",
+        "active_consumers": [],
+        "compatibility_consumers": [
+          "thin routing bundle ABI"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/federation_entrypoints.min.json",
+        "producer": "build_federation_entrypoints_payload",
+        "active_consumers": [
+          "abyss-stack route-api and mirror",
+          "aoa-sdk compatibility and workspace MCP",
+          "Agents-of-Abyss role documentation"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/return_navigation_hints.min.json",
+        "producer": "build_return_navigation_hints_payload",
+        "active_consumers": [
+          "abyss-stack route-api and mirror",
+          "aoa-sdk a2a and compatibility APIs",
+          "aoa-agents recurrence manifest",
+          "8Dionysus recurrence manifest"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/recommended_paths.min.json",
+        "producer": "build_recommended_paths_payload",
+        "active_consumers": [
+          "abyss-stack route-api and mirror",
+          "aoa-stats downstream canary"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/kag_source_lift_relation_hints.min.json",
+        "producer": "build_kag_source_lift_relation_hints_payload",
+        "active_consumers": [
+          "abyss-stack route-api and mirror"
+        ],
+        "reference_consumers": [
+          "aoa-techniques"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/composite_stress_route_hints.min.json",
+        "producer": "build_composite_stress_route_hints_payload",
+        "active_consumers": [
+          "abyss-machine artifact verification"
+        ],
+        "reference_consumers": [
+          "aoa-memo"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/stats_regrounding_hints.min.json",
+        "producer": "build_stats_regrounding_hints_payload",
+        "active_consumers": [
+          "aoa-sdk compatibility policy",
+          "aoa-evals boundary eval",
+          "abyss-machine artifact verification"
+        ],
+        "reference_consumers": [
+          "aoa-stats decisions and retired profiles"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/owner_layer_shortlist.min.json",
+        "producer": "build_owner_layer_shortlist_payload",
+        "active_consumers": [
+          "aoa-sdk compatibility, recurrence, and owner-layer handoff",
+          "aoa-stats downstream canary"
+        ],
+        "reference_consumers": [
+          "aoa-playbooks",
+          "aoa-techniques"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/pairing_hints.min.json",
+        "producer": "build_pairing_hints_payload",
+        "active_consumers": [
+          "abyss-stack route-api and mirror"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      },
+      {
+        "path": "generated/tiny_model_entrypoints.json",
+        "producer": "build_tiny_model_entrypoints_payload",
+        "active_consumers": [
+          "abyss-stack route-api and mirror",
+          "aoa-agents validator",
+          "abyss-machine artifact verification"
+        ],
+        "disposition": [
+          "absorb",
+          "preserve"
+        ]
+      }
+    ],
+    "other_generated_surfaces": [
+      {
+        "path": "mechanics/agon/parts/gate-routing/generated/agon_gate_routing_registry.min.json",
+        "producer": "mechanics/agon/parts/gate-routing/scripts/build_agon_gate_routing_registry.py",
+        "disposition": "merge into the SDK agon/control-plane seam while Agents-of-Abyss retains Agon semantics"
+      },
+      {
+        "path": "docs/decisions/indexes/*.md",
+        "producer": "scripts/generate_decision_indexes.py",
+        "disposition": "archive old indexes and regenerate SDK indexes from successor decisions"
+      },
+      {
+        "path": "kag/indexes/**",
+        "producer": "8Dionysus/aoa-kag repo-local-kag-index action and provider tooling",
+        "tracked_file_count": 396,
+        "disposition": "retire old shards and regenerate an SDK-owned index from successor source; do not copy shards"
+      },
+      {
+        "path": "mechanics/questbook/parts/quest-board-seam/generated/quest_board.min.example.json",
+        "producer": "authored example validated by scripts/validate_router.py; not a live generated producer",
+        "disposition": "archive unless selected as a compatibility fixture"
+      },
+      {
+        "path": "mechanics/rpg/parts/navigation-bridge/generated/rpg_navigation.min.example.json",
+        "producer": "authored example validated by scripts/validate_router.py; not a live generated producer",
+        "disposition": "archive; replace future behavior with typed SDK contracts rather than copying the example"
+      },
+      {
+        "path": "stats/packets/stats-regrounding-owner-first-route-ratio.reference.json",
+        "producer": "authored reference packet validated by scripts/validate_local_stats_port.py",
+        "disposition": "merge the measurement question into the SDK stats port and regenerate evidence"
+      }
+    ]
+  },
+  "artifact_baseline": {
+    "origin_main": {
+      "router_sha256": "098c6c781227d7d670780196dda5dbce5a21569a05db3a4492738e84f6c8275b",
+      "entry_count": 168,
+      "router_version": 1,
+      "artifact_class": "thin_routing_readmodel_bundle",
+      "abi_epoch": "aoa_routing_thin_router_v1",
+      "owner_repo": "aoa-routing",
+      "bundle_subject_count": 34
+    },
+    "canonical_checkout": {
+      "router_sha256": "438ed1690df4fb02e866b02f0d9561fc2b7b28c13a49ac14fdfad626b08fde85",
+      "entry_count": 217
+    },
+    "runtime_mirror": {
+      "router_sha256": "72bf60dc5cd2fe190e00e91c1e948fcf0c1a08f5884d51d23b120946c969e2c1",
+      "git_blob": "140050f04df733b4946ae8e39926bfda8987d34a",
+      "matching_source_commit": "4d2b29d01588ed5e033afcf40ec41fc26a334a5b",
+      "matching_source_commit_date": "2026-03-28T19:00:40-06:00",
+      "entry_count": 123,
+      "artifact_identity_present": false,
+      "staleness_days_at_capture": 116.2
+    },
+    "trust_registry": {
+      "record_id": "sha256:3cf0ea3b1db4e03a2e532feecbf6cddca78c92936b4718307587c169c2625a48",
+      "record_created_at": "2026-06-30T01:00:41Z",
+      "lifecycle_state": "release-ready",
+      "source_repo": "aoa-routing",
+      "source_ref": "/srv/AbyssOS/aoa-routing/docs/artifact-bundles/thin_router.bundle.json",
+      "abi_subject_digest": "sha256:438ed1690df4fb02e866b02f0d9561fc2b7b28c13a49ac14fdfad626b08fde85",
+      "artifact_subjects_digest": "sha256:c1963f697ce28b090187574e48346c6359c689b14060da458ba49a826e7af348",
+      "subject_digest": "sha256:8cb247b2ed2d2e0c7cb14afddb0aa53ac4382f2a4359d60ef4bf975d1eeb151b",
+      "required_controls": [
+        "abi_signature",
+        "sbom",
+        "slsa_in_toto"
+      ],
+      "exact_origin_main_admission": {
+        "expected_source_ref": "cde31e568e49c5a50afbd89071cf72abd9733d99",
+        "ok": false,
+        "verdict": "deny",
+        "reason": "source_ref_mismatch"
+      }
+    }
+  },
+  "runtime_loading_map": {
+    "service": "route-api",
+    "container_id": "14ee45d6ec486bc81e2ca0b32225dd5c29ba878468e22771497ae143bcec6981",
+    "image": "localhost/abyss_route-api:latest",
+    "listen": "127.0.0.1:5402",
+    "runtime_owner": "abyss-stack",
+    "source_checkout": "/home/dionysus/src/abyss-stack",
+    "deployed_root": "/srv/AbyssOS/abyss-stack",
+    "host_mirror": "/srv/AbyssOS/abyss-stack/Knowledge/federation/aoa-routing",
+    "container_mirror": "/app/federation/aoa-routing",
+    "mount_mode": "read-only bind",
+    "configuration": "/srv/AbyssOS/abyss-stack/Configs/federation/aoa-routing.yaml",
+    "loader": "/srv/AbyssOS/abyss-stack/Configs/config-templates/Services/route-api/app/main.py",
+    "sync_command": "/srv/AbyssOS/abyss-stack/Configs/scripts/aoa-sync-federation-surfaces",
+    "sync_source_root_before_succession": "/srv/AbyssOS/aoa-routing",
+    "configured_required_file_count": 23,
+    "root_outputs_read_by_runtime_count": 10,
+    "root_outputs_current_against_origin_main": 2,
+    "root_outputs_stale_against_origin_main": 8,
+    "root_outputs_missing_from_runtime_mirror": 4,
+    "missing_outputs": [
+      "generated/quest_dispatch_hints.min.json",
+      "generated/composite_stress_route_hints.min.json",
+      "generated/stats_regrounding_hints.min.json",
+      "generated/owner_layer_shortlist.min.json"
+    ],
+    "sync_check": {
+      "ok": false,
+      "first_failure": "required source file missing: /srv/AbyssOS/aoa-routing/docs/FEDERATION_ENTRY_ABI.md",
+      "cause": "abyss-stack still requires former flat docs and schema paths after aoa-routing moved them into mechanic-local homes"
+    },
+    "health_endpoint": {
+      "reported_state": "ready",
+      "artifact_digest_checked": false,
+      "artifact_identity_checked": false,
+      "source_commit_checked": false,
+      "trust_admission_checked": false,
+      "verdict": "false green"
+    },
+    "free_text_route_intent_supported": false,
+    "observed_task_route": {
+      "request": {
+        "task_family": "bounded-plan-shaping"
+      },
+      "result_class": "advisory tier, role, and artifact references",
+      "run_plan_returned": false
+    }
+  },
+  "consumer_registry": [
+    {
+      "consumer": "aoa-sdk",
+      "class": "hard checkout, typed reader, compatibility, and CI consumer",
+      "active_surfaces": [
+        ".github/workflows/latest-sibling-canary.yml",
+        ".github/workflows/release-cadence-audit.yml",
+        ".aoa/workspace.toml",
+        "src/aoa_sdk/workspace/roots.py",
+        "src/aoa_sdk/compatibility/policy.py",
+        "src/aoa_sdk/routing/hints.py",
+        "src/aoa_sdk/a2a/rebase/",
+        "src/aoa_sdk/recurrence/"
+      ],
+      "consumer_zero_action": "make SDK-owned routing roots local, keep a legacy compatibility facade, and remove every required aoa-routing checkout"
+    },
+    {
+      "consumer": "abyss-stack",
+      "class": "production runtime, mirror, policy, validator, and governed execution consumer",
+      "active_surfaces": [
+        "config-templates/Configs/federation/aoa-routing.yaml",
+        "config-templates/Services/route-api/app/main.py",
+        "mechanics/federation-seams/parts/sync-wrapper/aoa_sync_federation_surfaces.sh",
+        "mechanics/governed-execution/parts/governed-runner/",
+        "mechanics/runtime-lifecycle/parts/layout-install/aoa_check_layout.sh",
+        "scripts/validators/runtime_route_contracts.py",
+        "scripts/validators/federation_surface.py"
+      ],
+      "consumer_zero_action": "source the SDK-produced bundle while retaining the aoa-routing mirror namespace during compatibility; update governed target policies and health provenance"
+    },
+    {
+      "consumer": "aoa-evals",
+      "class": "latest-sibling CI and runtime-integrity evidence consumer",
+      "active_surfaces": [
+        ".github/workflows/latest-sibling-canary.yml",
+        "mechanics/boundary-bridge/parts/latest-sibling-canary/config/sibling_canary_matrix.json",
+        "mechanics/boundary-bridge/parts/latest-sibling-canary/scripts/run_sibling_canary.py",
+        "scripts/validators/root_context.py"
+      ],
+      "consumer_zero_action": "replace AOA_ROUTING_ROOT and checkout with the SDK routing surface while keeping eval verdict ownership here"
+    },
+    {
+      "consumer": "aoa-kag",
+      "class": "pinned provider, validation, and compatibility checkout consumer",
+      "active_surfaces": [
+        ".github/workflows/compatibility-canary.yml",
+        ".github/workflows/repo-validation.yml",
+        "manifests/provider_registry.json",
+        "scripts/generation/context.py"
+      ],
+      "consumer_zero_action": "replace the routing provider root with an SDK-owned routing provider record and rebuild indexes"
+    },
+    {
+      "consumer": "aoa-agents",
+      "class": "optional-root validator and contract-reference consumer",
+      "active_surfaces": [
+        "scripts/validate_agents.py",
+        "tests/test_repo_validator.py",
+        "mechanics/recurrence/parts/component-manifests/manifests/components/codex-subagent-projection.json"
+      ],
+      "consumer_zero_action": "point validation at SDK-produced task/tier/tiny surfaces without moving role or tier meaning"
+    },
+    {
+      "consumer": "aoa-stats",
+      "class": "absolute-path release check and downstream canary consumer",
+      "active_surfaces": [
+        "scripts/release_check.py",
+        "src/aoa_stats_builder/downstream_canaries.py",
+        "mechanics/antifragility/parts/stress-recovery-windows/tests/"
+      ],
+      "consumer_zero_action": "replace /srv/AbyssOS/aoa-routing fallback and artifact references with the SDK routing provider"
+    },
+    {
+      "consumer": "abyss-machine",
+      "class": "stronger trust-policy owner",
+      "active_surfaces": [
+        "manifests/artifact_signature_policy.manifest.json",
+        "scripts/validators/artifact_signature_policy.py",
+        "bundle registry and materialized subject store"
+      ],
+      "consumer_zero_action": "preserve artifact class and ABI epoch, then version the producer profile and source owner to aoa-sdk"
+    },
+    {
+      "consumer": "Agents-of-Abyss",
+      "class": "constitutional role-map and generated projection consumer",
+      "consumer_zero_action": "record the organ succession without moving constitutional or agent semantics"
+    },
+    {
+      "consumer": "8Dionysus",
+      "class": "public route-map and required-check contract consumer",
+      "consumer_zero_action": "route public orientation and required-check inventory to aoa-sdk"
+    },
+    {
+      "consumer": "aoa-techniques",
+      "class": "current docs, contract example, and source-validation reference consumer",
+      "consumer_zero_action": "retarget active examples and source-contract expectations; preserve historical notes"
+    },
+    {
+      "consumer": "aoa-memo",
+      "class": "reference and provenance consumer",
+      "consumer_zero_action": "retarget current routing references while preserving memory authority and historical evidence"
+    },
+    {
+      "consumer": "aoa-playbooks",
+      "class": "current route documentation and historical run reference consumer",
+      "consumer_zero_action": "retarget current route doors; preserve historical PR links"
+    },
+    {
+      "consumer": "Tree-of-Sophia",
+      "class": "tiny-entry route validation reference consumer",
+      "consumer_zero_action": "retarget the route provider without moving ToS meaning"
+    },
+    {
+      "consumer": "Dionysus",
+      "class": "producer input and historical/public route reference",
+      "consumer_zero_action": "retain source-route history and remove any requirement that an archived checkout be present"
+    },
+    {
+      "consumer": "aoa-session-memory",
+      "class": "naming golden-set text fixture only",
+      "consumer_zero_action": "update the fixture only when the wording is intentionally rebaselined"
+    },
+    {
+      "consumer": "ATM10-Agent",
+      "class": "copied skill guidance text only",
+      "consumer_zero_action": "retarget derivative guidance when its source skill is refreshed"
+    }
+  ],
+  "surface_disposition": [
+    {
+      "surface": "scripts/build_router.py and scripts/router_core.py",
+      "disposition": "absorb",
+      "target": "SDK-local routing compiler implementation",
+      "rule": "move function, not the old repository topology"
+    },
+    {
+      "surface": "scripts/validate_router.py and producer/ABI tests",
+      "disposition": "merge",
+      "target": "SDK routing validation and package tests"
+    },
+    {
+      "surface": "generated root routing family and artifact namespace",
+      "disposition": "preserve",
+      "target": "SDK-produced compatibility projection with unchanged filenames and ABI epoch during owner succession"
+    },
+    {
+      "surface": "routing/core/schemas",
+      "disposition": "absorb and preserve",
+      "target": "SDK package data plus legacy schema identifiers and bundle paths"
+    },
+    {
+      "surface": "docs/artifact-bundles/thin_router.bundle.json",
+      "disposition": "merge",
+      "target": "SDK artifact bundle declaration with versioned owner metadata; artifact class remains stable"
+    },
+    {
+      "surface": "producer-coupled mechanic schemas for federation entry, quest dispatch, return navigation, stress routing, stats regrounding, owner shortlist, and ToS/KAG relation hints",
+      "disposition": "merge",
+      "target": "nearest SDK mechanic part or package schema home with compatibility projections"
+    },
+    {
+      "surface": "mechanics/agon/parts/gate-routing",
+      "disposition": "merge",
+      "target": "SDK routing/Agon bridge; Agents-of-Abyss remains semantic owner"
+    },
+    {
+      "surface": "routing-local recurrence adapter and via-negativa scaffolding duplicated in SDK",
+      "disposition": "retire",
+      "target": "existing SDK recurrence and antifragility owners"
+    },
+    {
+      "surface": "remaining routing-local mechanics prototypes and non-ABI schemas",
+      "disposition": "archive",
+      "target": "historical aoa-routing repository; R2 may derive new typed contracts but must not copy prototypes by default"
+    },
+    {
+      "surface": ".agents/skills",
+      "disposition": "external and retire",
+      "target": "aoa-skills or installed skill owner; do not copy 25 repository-local skill bundles into SDK"
+    },
+    {
+      "surface": "kag/indexes",
+      "disposition": "retire and regenerate",
+      "target": "fresh SDK local KAG index; do not copy 396 shards"
+    },
+    {
+      "surface": "kag authored routing nodes, edges, projections, and receipts",
+      "disposition": "merge or archive",
+      "target": "successor SDK source-home records plus historical aoa-routing receipts"
+    },
+    {
+      "surface": "docs/decisions/AOA-RT-D-0001 through AOA-RT-D-0003 and generated indexes",
+      "disposition": "archive and preserve",
+      "target": "immutable predecessor rationale plus paired SDK/routing succession decisions"
+    },
+    {
+      "surface": "root public docs, roadmaps, source-home manifest, and release guidance",
+      "disposition": "merge or archive",
+      "target": "distilled SDK routes and predecessor deprecation history; no flat copy"
+    },
+    {
+      "surface": "quests, eval intake/reports, Spark, and historical mechanics legacy",
+      "disposition": "archive",
+      "target": "preserved predecessor history; only still-open obligations may be re-authored in the SDK quest owner"
+    },
+    {
+      "surface": "stats local port",
+      "disposition": "merge",
+      "target": "SDK stats port with new evidence packet"
+    },
+    {
+      "surface": "routing GitHub workflows, branch check contour, and release stream",
+      "disposition": "retire after compatibility",
+      "target": "SDK validation/release contour; shadow parity remains temporary"
+    },
+    {
+      "surface": "community files, license, generic nested-agent and mechanics scaffolding",
+      "disposition": "retire",
+      "target": "existing SDK equivalents"
+    },
+    {
+      "surface": "broad copied sibling test fixtures",
+      "disposition": "retire",
+      "target": "minimal pinned compatibility fixtures and clean-workspace integration tests"
+    },
+    {
+      "surface": "old aoa-routing repository after consumer-zero",
+      "disposition": "archive",
+      "target": "read-only predecessor history only after compatibility window and explicit operator approval"
+    }
+  ],
+  "cost_baseline": {
+    "canonical_routing_producers": 1,
+    "runnable_producer_implementations": 1,
+    "active_repository_control_planes": 2,
+    "routing_release_streams": 1,
+    "sdk_release_streams": 1,
+    "paired_release_streams": 2,
+    "routing_related_workflow_contours": 6,
+    "validation_and_recurring_workflow_contours_measured": 5,
+    "tag_artifact_workflow_contours": 1,
+    "measured_run_sample_count": 430,
+    "measured_runner_minutes": 476.97,
+    "measured_failed_runs": 225,
+    "measured_failure_rate": 0.523,
+    "known_failed_canary_runner_minutes": 156.73,
+    "workflow_metrics": [
+      {
+        "repo": "aoa-sdk",
+        "workflow": "Repo Validation",
+        "sample": 100,
+        "success": 88,
+        "failure": 12,
+        "runner_minutes": 118.83,
+        "successful_median_seconds": 70,
+        "successful_p90_seconds": 102
+      },
+      {
+        "repo": "aoa-routing",
+        "workflow": "Repo Validation",
+        "sample": 100,
+        "success": 88,
+        "failure": 12,
+        "runner_minutes": 157.85,
+        "successful_median_seconds": 101,
+        "successful_p90_seconds": 122
+      },
+      {
+        "repo": "aoa-routing",
+        "workflow": "Compatibility Canary",
+        "sample": 100,
+        "success": 29,
+        "failure": 71,
+        "runner_minutes": 95.5,
+        "all_median_seconds": 48,
+        "failed_runner_minutes": 51.95
+      },
+      {
+        "repo": "aoa-sdk",
+        "workflow": "Latest Sibling Canary",
+        "sample": 30,
+        "success": 0,
+        "failure": 30,
+        "runner_minutes": 19.15,
+        "all_median_seconds": 36
+      },
+      {
+        "repo": "aoa-sdk",
+        "workflow": "Federation Release Cadence",
+        "sample": 100,
+        "success": 0,
+        "failure": 100,
+        "runner_minutes": 85.63,
+        "all_median_seconds": 50
+      }
+    ],
+    "critical_successful_validation_seconds_if_parallel": 101,
+    "successful_validation_runner_seconds_if_both_repos_change": 171,
+    "checkout_context_roots": {
+      "aoa-routing_repo_validation": 16,
+      "aoa-routing_compatibility_canary": 15,
+      "aoa-sdk_repo_validation": 3,
+      "aoa-sdk_latest_sibling_canary": 10,
+      "aoa-sdk_release_cadence": 14
+    },
+    "duplicate_top_level_surface_names": 18,
+    "duplicate_mechanics_families": 10,
+    "duplicate_root_script_names": 6,
+    "routing_kag_index_files": 396,
+    "runtime_manual_copy_required_files": 23,
+    "automatic_host_sync_timer_found": false,
+    "changed_together_since_2026_04_01": {
+      "routing_commits": 154,
+      "routing_active_days": 44,
+      "sdk_commits": 293,
+      "sdk_active_days": 55,
+      "common_active_days": 41,
+      "routing_commits_on_common_active_days": 147
+    },
+    "changed_together_since_2026_06_01": {
+      "routing_commits": 33,
+      "routing_active_days": 18,
+      "sdk_commits": 73,
+      "sdk_active_days": 25,
+      "common_active_days": 16,
+      "mean_family_repositories_touched_on_routing_author_days": 10.89,
+      "mean_family_repo_denominator": 14,
+      "metric_posture": "temporal-coupling proxy, not causal attribution"
+    },
+    "paired_releases": {
+      "routing_release_count": 5,
+      "near_simultaneous_release_count": 4,
+      "latest_release_wave_shared": true
+    },
+    "agent_process_baseline": {
+      "free_text_intent_to_route_decision": "unsupported",
+      "route_decision_to_run_plan": "unsupported",
+      "run_plan_to_session_handle": "unsupported",
+      "session_handle_to_closeout": "unsupported",
+      "smallest_observed_route_call": "one exact task-family request after manual intent classification",
+      "smallest_observed_result": "advisory role/tier/artifact references, not an executable or runtime-neutral RunPlan",
+      "artifact_maintenance_context_lower_bound": "15 to 16 repository roots in current routing CI",
+      "comparison_rule": "E1 must replay identical tasks and count tool calls, repository roots, manual transformations, elapsed time, and evidence completeness; unsupported old stages remain explicit rather than scored as zero cost"
+    },
+    "known_drift_or_failure_modes": 14
+  },
+  "risk_register": [
+    {
+      "id": "R0-RISK-001",
+      "severity": "critical",
+      "risk": "route-api reports ready while serving a 123-entry artifact without artifact_identity that matches a March 2026 source blob",
+      "control": "make mirror manifest, source ref, content digest, ABI identity, and trust admission part of health/readiness"
+    },
+    {
+      "id": "R0-RISK-002",
+      "severity": "critical",
+      "risk": "the federation sync check cannot currently refresh aoa-routing because required docs and schemas still use former flat paths",
+      "control": "repair abyss-stack source mapping before trusting any shadow or owner-switch runtime proof"
+    },
+    {
+      "id": "R0-RISK-003",
+      "severity": "critical",
+      "risk": "the exact origin/main routing bundle is denied by the stronger artifact gate due to source_ref_mismatch",
+      "control": "admit an exact commit-bound artifact before canonical switch; never reuse the old release-ready record as proof for a new source ref"
+    },
+    {
+      "id": "R0-RISK-004",
+      "severity": "high",
+      "risk": "the current checked-in origin artifact does not carry an exact sibling input revision matrix",
+      "control": "shadow producer receipts must include all 14 owner input refs and content digests"
+    },
+    {
+      "id": "R0-RISK-005",
+      "severity": "high",
+      "risk": "latest aoa-skills capability catalog and graph already break the routing compatibility canary",
+      "control": "fix producer drift before parity; pin an explicit old-input fixture and a latest-input compatibility lane"
+    },
+    {
+      "id": "R0-RISK-006",
+      "severity": "high",
+      "risk": "SDK latest-sibling canary fails on aoa-agents v2 and missing KAG/route expectations",
+      "control": "separate intentional version support from stale path assumptions and make compatibility errors typed"
+    },
+    {
+      "id": "R0-RISK-007",
+      "severity": "high",
+      "risk": "SDK release-cadence audit uses depth-one checkouts and therefore reports tags/releases missing on every sampled run",
+      "control": "fetch the evidence needed by the audit or query the hosting owner; do not retain a permanently false-red gate"
+    },
+    {
+      "id": "R0-RISK-008",
+      "severity": "high",
+      "risk": "default sibling-root discovery can select stale or dirty canonical checkouts and silently change generated output",
+      "control": "require explicit pinned roots for release and parity evidence"
+    },
+    {
+      "id": "R0-RISK-009",
+      "severity": "high",
+      "risk": "changing owner metadata inside artifact_identity can break byte parity even while the routing ABI is intended to stay stable",
+      "control": "separate succession metadata from ABI payload or version it in a dedicated, reviewed compatibility decision"
+    },
+    {
+      "id": "R0-RISK-010",
+      "severity": "medium",
+      "risk": "copying 358 mechanics files, 396 KAG shard files, or 212 installed skill files would move repository cost into the SDK instead of reducing it",
+      "control": "absorb only the producer slice, regenerate indexes, and retire duplicate scaffolding"
+    },
+    {
+      "id": "R0-RISK-011",
+      "severity": "medium",
+      "risk": "governed runner policies and tests are specialized around aoa-routing paths and target detectors",
+      "control": "keep owner switch separate from Runner work and add an explicit runtime adapter/target policy"
+    },
+    {
+      "id": "R0-RISK-012",
+      "severity": "medium",
+      "risk": "old schema IDs and mirror paths embed aoa-routing",
+      "control": "preserve them as compatibility identifiers until consumer-zero; do not equate identifier namespace with current source owner"
+    },
+    {
+      "id": "R0-RISK-013",
+      "severity": "medium",
+      "risk": "several canonical workspaces are intentionally dirty or on active user branches",
+      "control": "use origin/main worktrees and never normalize or overwrite those checkouts"
+    },
+    {
+      "id": "R0-RISK-014",
+      "severity": "medium",
+      "risk": "the goal's literal canonical-producers 2-to-1 metric does not match live state: there is one canonical producer today",
+      "control": "measure canonical owners as 1-to-1, runnable implementations as 1-to-2-shadow-to-1, and active repository control planes as 2-to-1"
+    }
+  ],
+  "unknown_dependencies": [],
+  "known_evidence_gaps_not_classed_as_unknown_dependencies": [
+    "The exact 14 sibling commits used to create origin/main generated outputs are not embedded in the artifact.",
+    "Old-process token cost has no native telemetry; E1 must use a controlled proxy based on calls, loaded roots, bytes, and manual transformations.",
+    "The current runtime mirror has no manifest, so its source provenance was reconstructed by matching the Git blob to aoa-routing history."
+  ],
+  "required_compatibility_fixtures": [
+    "all 14 origin/main root outputs byte-for-byte",
+    "all 14 outputs rebuilt from an explicit pinned input matrix",
+    "34-subject thin routing bundle manifest",
+    "aoa_routing_thin_router_v1 artifact_identity and legacy schema IDs",
+    "aoa_router entry count and deterministic sort",
+    "negative stale, missing, malformed, and forbidden-owner fixtures",
+    "aoa-sdk six-surface reader fixture",
+    "aoa-agents task-to-tier, task-to-surface, and tiny-entrypoint fixture",
+    "aoa-stats recommended-path and owner-shortlist downstream fixture",
+    "aoa-kag provider-registry and source-return fixture",
+    "abyss-stack 23-path legacy mirror fixture",
+    "abyss-stack mirror manifest with source commit and per-file SHA-256",
+    "route-api health provenance fixture",
+    "route-api router, task-family, surface-kind, return, starter, federation, recommended, pairing, and tiny-entry response fixtures",
+    "abyss-machine exact-source-ref admission fixture",
+    "package-install fixture with no aoa-routing checkout",
+    "rollback fixture that reselects the predecessor producer during the compatibility window",
+    "consumer-zero scanner over all active organization repositories and host runtime config"
+  ],
+  "gate_g0": {
+    "all_active_organization_repositories_scanned": true,
+    "all_active_consumers_registered": true,
+    "all_root_generated_artifacts_have_producers": true,
+    "all_other_generated_or_generated_named_surfaces_have_producer_classification": true,
+    "all_top_level_and_mechanic_surface_families_have_dispositions": true,
+    "runtime_path_reproduced": true,
+    "cost_hypothesis_has_measurable_baseline": true,
+    "unknown_dependencies_empty": true,
+    "verdict": "pass",
+    "next_stage": "R1 target operating model and paired durable decisions",
+    "stop_line": "No producer code moves and no authority switch until G1 and G2 pass."
+  }
+}
