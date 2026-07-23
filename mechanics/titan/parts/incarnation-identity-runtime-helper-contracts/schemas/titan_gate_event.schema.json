@@ -11,6 +11,10 @@
     "bearer_id",
     "gate_kind",
     "payload",
+    "decision_ref",
+    "approved_by",
+    "approved_by_authenticated",
+    "authority",
     "created_at"
   ],
   "properties": {
@@ -40,11 +44,19 @@
     "payload": {
       "type": "object"
     },
+    "decision_ref": {
+      "type": "string",
+      "minLength": 1
+    },
     "approved_by": {
-      "type": [
-        "string",
-        "null"
-      ]
+      "type": "string",
+      "minLength": 1
+    },
+    "approved_by_authenticated": {
+      "const": false
+    },
+    "authority": {
+      "const": "witness_only"
     },
     "created_at": {
       "type": "string"

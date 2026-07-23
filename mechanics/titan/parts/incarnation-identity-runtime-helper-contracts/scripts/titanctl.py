@@ -130,6 +130,60 @@ def default_receipt(workspace: str, operator: str) -> Dict[str, Any]:
     return sync_projection(receipt)
 
 
+def witness_receipt(
+    *,
+    workspace: str,
+    recorder: str,
+    event_id: str,
+    intent: str,
+    lane: str,
+    source_refs: list[str],
+) -> Dict[str, Any]:
+    receipt = new_receipt(
+        workspace=workspace,
+        operator=recorder,
+        source_ref=(
+            "mechanics/titan/parts/"
+            "incarnation-identity-runtime-helper-contracts/scripts/"
+            "titanctl.py:witness-init"
+        ),
+    )
+    receipt.update(
+        {
+            "surface_role": "titan_receipt_witness",
+            "authority": "witness_only",
+            "runtime_execution_state": "not_run",
+            "transport_state": "not_sent",
+            "state_semantics": "helper_projection_only",
+            "recorder_attribution": recorder,
+            "operator_field_authenticated": False,
+            "event_id": event_id,
+            "intent": intent,
+            "lane": lane,
+            "source_refs": source_refs,
+            "claim_limits": [
+                "not_runtime_evidence",
+                "not_operator_authentication",
+                "not_role_truth",
+                "not_proof",
+                "not_durable_memory",
+            ],
+        }
+    )
+    for incarnation in receipt.get("incarnations", []):
+        if incarnation.get("titan_name") in DEFAULT_ACTIVE:
+            incarnation["state"] = "declared"
+    append_event(
+        receipt,
+        event_type="witness-init",
+        message=(
+            f"Initialized local Titan receipt witness for {intent}; "
+            "no runtime or transport execution is claimed."
+        ),
+    )
+    return sync_projection(receipt)
+
+
 def validate_receipt(receipt: Mapping[str, Any]) -> list[str]:
     errors = validate_spine_receipt(receipt)
 
@@ -162,10 +216,49 @@ def validate_receipt(receipt: Mapping[str, Any]) -> list[str]:
             if not matching:
                 errors.append(f"{titan} active without recorded {required_gate} gate")
 
+    is_witness = receipt.get("surface_role") == "titan_receipt_witness"
+    expected_default_state = "declared" if is_witness else "active"
     for titan in DEFAULT_ACTIVE:
         inc = by_name.get(titan)
-        if isinstance(inc, Mapping) and inc.get("state") != "active":
-            errors.append(f"{titan} should be active in default service cohort")
+        if isinstance(inc, Mapping) and inc.get("state") != expected_default_state:
+            errors.append(
+                f"{titan} should be {expected_default_state} in "
+                f"{'witness projection' if is_witness else 'default service cohort'}"
+            )
+
+    if is_witness:
+        required_witness_fields = {
+            "authority": "witness_only",
+            "runtime_execution_state": "not_run",
+            "transport_state": "not_sent",
+            "state_semantics": "helper_projection_only",
+            "operator_field_authenticated": False,
+        }
+        for field, expected in required_witness_fields.items():
+            if receipt.get(field) != expected:
+                errors.append(f"witness receipt {field} must be {expected!r}")
+        if not isinstance(receipt.get("recorder_attribution"), str) or not receipt.get(
+            "recorder_attribution"
+        ):
+            errors.append("witness receipt requires recorder_attribution")
+        if not isinstance(receipt.get("event_id"), str) or not receipt.get("event_id"):
+            errors.append("witness receipt requires event_id")
+        source_refs = receipt.get("source_refs")
+        if not isinstance(source_refs, list) or not source_refs or not all(
+            isinstance(ref, str) and ref.strip() for ref in source_refs
+        ):
+            errors.append("witness receipt requires non-empty source_refs")
+        if any(
+            isinstance(event, Mapping) and event.get("type") == "summon"
+            for event in receipt.get("events", [])
+        ):
+            errors.append("witness receipt must not contain summon events")
+        if any(
+            isinstance(incarnation, Mapping)
+            and incarnation.get("state") == "active"
+            for incarnation in receipt.get("incarnations", [])
+        ):
+            errors.append("witness receipt must not contain active incarnations")
 
     return errors
 
@@ -174,28 +267,23 @@ def read_payload(path: str) -> Dict[str, Any]:
     return read_json_object(Path(path), "payload")
 
 
-def default_gate_payload(args: argparse.Namespace, receipt: Mapping[str, Any]) -> Dict[str, Any]:
-    approval_ref = args.approval_ref or (
-        f"titanctl:{receipt.get('session_id', 'session')}:"
-        f"{args.agent.lower()}:{args.kind}"
-    )
-    intent = args.intent.strip()
+def default_gate_payload(args: argparse.Namespace) -> Dict[str, Any]:
+    approval_ref = args.approval_ref or args.decision_ref
     if args.agent == "Forge":
         return {
-            "mutation_surface": args.mutation_surface or "operator_declared",
-            "scope": args.scope or [intent],
-            "expected_files": args.expected_file or ["operator-scoped"],
-            "rollback_note": args.rollback_note
-            or f"Rollback the operator-scoped mutation opened by {approval_ref}.",
+            "mutation_surface": args.mutation_surface,
+            "scope": args.scope or [],
+            "expected_files": args.expected_file or [],
+            "rollback_note": args.rollback_note,
             "approval_ref": approval_ref,
-            "test_plan": args.test_plan or ["operator validation"],
+            "test_plan": args.test_plan or [],
         }
     if args.agent == "Delta":
         return {
-            "claim": args.claim or intent,
-            "criteria": args.criterion or ["operator-declared judgment criteria"],
-            "evidence_refs": args.evidence_ref or [approval_ref],
-            "verdict_scope": args.verdict_scope or "operator-declared judgment scope",
+            "claim": args.claim,
+            "criteria": args.criterion or [],
+            "evidence_refs": args.evidence_ref or [],
+            "verdict_scope": args.verdict_scope,
         }
     raise SystemExit(f"{args.agent} does not accept runtime gates")
 
@@ -231,6 +319,25 @@ def cmd_summon(args: argparse.Namespace) -> int:
     return 0
 
 
+def cmd_witness_init(args: argparse.Namespace) -> int:
+    receipt = witness_receipt(
+        workspace=args.workspace,
+        recorder=args.recorder,
+        event_id=args.event_id,
+        intent=args.intent,
+        lane=args.lane,
+        source_refs=args.source_ref,
+    )
+    out = Path(args.out)
+    if out.exists() and not args.force:
+        raise SystemExit(
+            f"refusing to overwrite existing receipt without --force: {out}"
+        )
+    write_json(out, receipt)
+    print(f"wrote witness {out}")
+    return 0
+
+
 def cmd_gate(args: argparse.Namespace) -> int:
     path = Path(args.receipt)
     receipt = read_json_object(path, "receipt")
@@ -245,7 +352,7 @@ def cmd_gate(args: argparse.Namespace) -> int:
     if args.kind != required:
         raise SystemExit(f"{args.agent} requires {required} gate, got {args.kind}")
 
-    payload = read_payload(args.payload) if args.payload else default_gate_payload(args, receipt)
+    payload = read_payload(args.payload) if args.payload else default_gate_payload(args)
     errors = validate_gate_payload(args.agent, args.kind, payload)
     if errors:
         for err in errors:
@@ -257,6 +364,7 @@ def cmd_gate(args: argparse.Namespace) -> int:
         titan_name=args.agent,
         gate_kind=args.kind,
         payload=payload,
+        decision_ref=args.decision_ref,
         approved_by=args.approved_by,
     )
     append_event(
@@ -275,7 +383,12 @@ def cmd_gate(args: argparse.Namespace) -> int:
         return 2
 
     write_json(path, receipt)
-    print(f"updated {path}: {args.agent} activated by {args.kind} gate")
+    effect = (
+        "approval witness recorded; incarnation remains locked"
+        if receipt.get("surface_role") == "titan_receipt_witness"
+        else "helper projection activated"
+    )
+    print(f"updated {path}: {args.agent}/{args.kind}; {effect}")
     return 0
 
 
@@ -339,13 +452,25 @@ def build_parser() -> argparse.ArgumentParser:
     p.add_argument("--force", action="store_true")
     p.set_defaults(func=cmd_summon)
 
+    p = sub.add_parser("witness-init")
+    p.add_argument("--workspace", required=True)
+    p.add_argument("--recorder", required=True)
+    p.add_argument("--event-id", required=True)
+    p.add_argument("--intent", required=True)
+    p.add_argument("--lane", default="receipt-witness")
+    p.add_argument("--source-ref", action="append", required=True)
+    p.add_argument("--out", required=True)
+    p.add_argument("--force", action="store_true")
+    p.set_defaults(func=cmd_witness_init)
+
     p = sub.add_parser("gate")
     p.add_argument("--receipt", required=True)
     p.add_argument("--agent", required=True, choices=["Forge", "Delta"])
     p.add_argument("--kind", required=True, choices=["mutation", "judgment"])
     p.add_argument("--intent", required=True)
     p.add_argument("--payload", help="Path to a structured gate payload JSON object")
-    p.add_argument("--approved-by")
+    p.add_argument("--decision-ref", required=True)
+    p.add_argument("--approved-by", required=True)
     p.add_argument("--approval-ref")
     p.add_argument("--mutation-surface")
     p.add_argument("--scope", action="append")

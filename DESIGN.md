@@ -22,6 +22,7 @@ Adjacent routes:
 - mechanics operation topology: `mechanics/`
 - SDK source home: `sdk/`
 - SDK-local statistical port: `stats/`
+- SDK-owned skill home: `skills/`
 - importable SDK source: `src/aoa_sdk/`
 - generated control-plane capsule: `generated/workspace_control_plane.min.json`
 
@@ -76,6 +77,7 @@ and where does the next stronger claim return?
 | `docs/decisions/` | durable rationale for topology, route-law, source-home, validation, and mechanics choices |
 | `evals/` | SDK-local eval pressure port for intake, suites, and reports before proof adoption by `aoa-evals` |
 | `stats/` | SDK-local measurement questions and evidence-linked reference packets; shared statistical grammar remains in `aoa-stats` |
+| `skills/` | canonical callable procedures over SDK-owned Titan helper contracts; admission is local, while global exposure is a derived OS-profile concern |
 | `mechanics/` | repeatable SDK operation topology, part-local artifact homes, source maps, and package route law |
 | `.aoa/` | workspace metadata and local control-plane runtime artifacts, not hidden source truth |
 | `schemas/` | shared SDK helper contract schemas and root-published generated contracts |
@@ -87,6 +89,18 @@ and where does the next stronger claim return?
 | `mechanics/<parent>/parts/<part>/` | single-mechanic config, docs, schemas, examples, generated companions, manifests, helper contracts, scripts, tests, and local automation templates |
 Each class may support the others. No class should silently steal another
 class's authority.
+
+## Owner Skill Home Rule
+
+The SDK skill home is `skills/`. It contains only procedures whose helper
+behavior is owned by this repository. The packages may compose SDK witnesses
+and candidates, but they cannot turn those artifacts into runtime execution,
+operator authentication, durable memory, proof, or playbook authority.
+
+The owner package is source truth. Semantic trees, typed relation graphs, KAG
+records, and the managed user installation are derived views. Repository-local
+duplicates are forbidden for bundles exposed through the OS user profile, and
+task-local execution DAGs remain with the executing session.
 
 ## SDK Source Home Rule
 

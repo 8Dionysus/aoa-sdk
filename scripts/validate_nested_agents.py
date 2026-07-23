@@ -66,6 +66,12 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'Shared statistical grammar',
         'python scripts/validate_local_stats_port.py',
     ),
+    'skills/AGENTS.md': (
+        'canonical `aoa-sdk/skills/` owner home',
+        'Global exposure comes from the single OS user profile',
+        'Do not add a duplicate',
+        'Manual isolated',
+    ),
     'mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/AGENTS.md': (
         'post-commit',
         'active-session-only',

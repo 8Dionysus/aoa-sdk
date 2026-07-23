@@ -12,27 +12,31 @@ ROSTER = {
     "Atlas": {
         "role": "architect",
         "lane": "structure",
-        "active": True,
+        "state": "declared",
+        "active": False,
         "gate": None,
         "sandbox_mode": "read-only",
     },
     "Sentinel": {
         "role": "reviewer",
         "lane": "risk",
-        "active": True,
+        "state": "declared",
+        "active": False,
         "gate": None,
         "sandbox_mode": "read-only",
     },
     "Mneme": {
         "role": "memory-keeper",
         "lane": "memory",
-        "active": True,
+        "state": "declared",
+        "active": False,
         "gate": None,
         "sandbox_mode": "read-only",
     },
     "Forge": {
         "role": "coder",
         "lane": "implementation",
+        "state": "locked",
         "active": False,
         "gate": "mutation",
         "sandbox_mode": "workspace-write",
@@ -40,6 +44,7 @@ ROSTER = {
     "Delta": {
         "role": "evaluator",
         "lane": "verdict",
+        "state": "locked",
         "active": False,
         "gate": "judgment",
         "sandbox_mode": "read-only",
@@ -55,6 +60,14 @@ TYPES = {
     "approval",
     "closeout",
     "system",
+}
+WITNESS_DEFAULTS = {
+    "surface_role": "titan_console_witness",
+    "authority": "witness_only",
+    "runtime_execution_state": "not_run",
+    "transport_state": "not_sent",
+    "state_semantics": "helper_projection_only",
+    "operator_field_authenticated": False,
 }
 
 
@@ -81,8 +94,9 @@ def digest(s):
     return {
         "event_count": len(ev),
         "approval_count": len(ap),
+        "declared": [n for n, m in t.items() if m.get("state") == "declared"],
         "active": [n for n, m in t.items() if m.get("active")],
-        "locked": [n for n, m in t.items() if not m.get("active") and m.get("gate")],
+        "locked": [n for n, m in t.items() if m.get("state") == "locked"],
         "opened_gates": [f"{a.get('titan')}:{a.get('gate')}" for a in ap],
         "risk_flags": [e["note"] for e in ev if e.get("type") == "risk"],
         "updated_at": now(),
@@ -96,6 +110,7 @@ def validate_state(s):
         "session_id",
         "workspace",
         "operator",
+        *WITNESS_DEFAULTS,
         "status",
         "titans",
         "events",
@@ -106,6 +121,9 @@ def validate_state(s):
             errs.append(f"missing key: {k}")
     if s.get("version") != 1:
         errs.append("version must be 1")
+    for key, value in WITNESS_DEFAULTS.items():
+        if s.get(key) != value:
+            errs.append(f"{key} must equal {value!r}")
     t = s.get("titans", {})
     for name, exp in ROSTER.items():
         if name not in t:
@@ -115,6 +133,10 @@ def validate_state(s):
             errs.append(f"{name} role mismatch")
         if t[name].get("gate") != exp["gate"]:
             errs.append(f"{name} gate mismatch")
+        if t[name].get("state") not in {"declared", "locked", "active"}:
+            errs.append(f"{name} state invalid")
+        if bool(t[name].get("active")) != (t[name].get("state") == "active"):
+            errs.append(f"{name} active/state mismatch")
     approvals = {(a.get("titan"), a.get("gate")) for a in s.get("approvals", [])}
     if t.get("Forge", {}).get("active") and ("Forge", "mutation") not in approvals:
         errs.append("Forge active without mutation approval")
@@ -127,16 +149,25 @@ def validate_state(s):
             errs.append(f"event[{i}] invalid type")
         if not e.get("note"):
             errs.append(f"event[{i}] empty note")
+    for i, approval in enumerate(s.get("approvals", [])):
+        if not approval.get("decision_ref"):
+            errs.append(f"approval[{i}] missing decision_ref")
+        if not approval.get("approved_by"):
+            errs.append(f"approval[{i}] missing approved_by")
+        if approval.get("approved_by_authenticated") is not False:
+            errs.append(f"approval[{i}] approved_by_authenticated must be false")
+        if approval.get("authority") != "witness_only":
+            errs.append(f"approval[{i}] authority must equal 'witness_only'")
     return errs
 
 
 def cmd_roster(a):
-    payload = {"version": 1, "titans": ROSTER}
+    payload = {"version": 1, **WITNESS_DEFAULTS, "titans": ROSTER}
     print(
         json.dumps(payload, indent=2, ensure_ascii=False)
         if a.json
         else "\n".join(
-            f"{n:8} {m['role']:14} lane={m['lane']:14} {'active' if m['active'] else 'locked':7} gate={m['gate'] or 'none'}"
+            f"{n:8} {m['role']:14} lane={m['lane']:14} state={m['state']:8} gate={m['gate'] or 'none'}"
             for n, m in ROSTER.items()
         )
     )
@@ -149,6 +180,7 @@ def cmd_new(a):
         "session_id": a.session_id or "titan-console-" + uuid.uuid4().hex[:12],
         "workspace": str(Path(a.workspace).resolve()),
         "operator": a.operator,
+        **WITNESS_DEFAULTS,
         "status": "open",
         "created_at": now(),
         "closed_at": None,
@@ -196,12 +228,19 @@ def cmd_gate(a):
     exp = ROSTER[a.titan]["gate"]
     if exp != a.gate:
         raise SystemExit(f"{a.titan} requires gate={exp}, not {a.gate}")
+    if not a.decision_ref.strip():
+        raise SystemExit("decision-ref must be non-empty")
+    if not a.approved_by.strip():
+        raise SystemExit("approved-by attribution must be non-empty")
     approval = {
         "ts": now(),
         "titan": a.titan,
         "gate": a.gate,
         "reason": a.reason,
-        "approved_by": a.approved_by or s.get("operator", "operator"),
+        "decision_ref": a.decision_ref,
+        "approved_by": a.approved_by,
+        "approved_by_authenticated": False,
+        "authority": "witness_only",
     }
     s.setdefault("approvals", []).append(approval)
     s.setdefault("events", []).append(
@@ -210,9 +249,17 @@ def cmd_gate(a):
             "actor": "operator",
             "type": "approval",
             "note": f"Opened {a.titan} through {a.gate} gate: {a.reason}",
-            "metadata": {"titan": a.titan, "gate": a.gate},
+            "metadata": {
+                "titan": a.titan,
+                "gate": a.gate,
+                "decision_ref": a.decision_ref,
+                "approved_by": a.approved_by,
+                "approved_by_authenticated": False,
+                "authority": "witness_only",
+            },
         }
     )
+    s["titans"][a.titan]["state"] = "active"
     s["titans"][a.titan]["active"] = True
     s["digest"] = digest(s)
     write(p, s)
@@ -264,12 +311,11 @@ def cmd_validate(a):
 
 
 def cmd_plan(a):
-    prompt = (
-        Path(a.prompt_file).read_text(encoding="utf-8")
-        if a.prompt_file
-        else "Summon Titan operator console cohort."
-    )
+    prompt = Path(a.prompt_file).read_text(encoding="utf-8")
     cwd = str(Path(a.workspace).resolve())
+    thread_params = {"cwd": cwd, "serviceName": "abyss_console"}
+    if a.model:
+        thread_params["model"] = a.model
     msgs = [
         {
             "method": "initialize",
@@ -286,7 +332,7 @@ def cmd_plan(a):
         {
             "method": "thread/start",
             "id": 1,
-            "params": {"model": a.model, "cwd": cwd, "serviceName": "abyss_console"},
+            "params": thread_params,
         },
         {
             "method": "turn/start",
@@ -321,7 +367,7 @@ def parser():
     s.set_defaults(func=cmd_new)
     s = sub.add_parser("event")
     s.add_argument("--state", required=True)
-    s.add_argument("--actor", required=True)
+    s.add_argument("--actor", required=True, choices=sorted(ACTORS))
     s.add_argument("--type", required=True)
     s.add_argument("--note", required=True)
     s.add_argument("--allow-closed", action="store_true")
@@ -331,7 +377,8 @@ def parser():
     s.add_argument("--titan", required=True, choices=["Forge", "Delta"])
     s.add_argument("--gate", required=True, choices=["mutation", "judgment"])
     s.add_argument("--reason", required=True)
-    s.add_argument("--approved-by")
+    s.add_argument("--decision-ref", required=True)
+    s.add_argument("--approved-by", required=True)
     s.set_defaults(func=cmd_gate)
     s = sub.add_parser("digest")
     s.add_argument("--state", required=True)
@@ -347,9 +394,9 @@ def parser():
     s.set_defaults(func=cmd_validate)
     s = sub.add_parser("appserver-plan")
     s.add_argument("--workspace", required=True)
-    s.add_argument("--prompt-file")
+    s.add_argument("--prompt-file", required=True)
     s.add_argument("--out", required=True)
-    s.add_argument("--model", default="gpt-5.4")
+    s.add_argument("--model")
     s.set_defaults(func=cmd_plan)
     return p
 

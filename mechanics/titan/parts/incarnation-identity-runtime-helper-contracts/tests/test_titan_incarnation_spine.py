@@ -23,8 +23,21 @@ def test_forge_gate_requires_payload_contract():
     errors = validate_gate_payload("Forge", "mutation", {"scope": ["x"]})
     assert "Forge gate requires non-empty expected_files" in errors
     payload = {"mutation_surface": "repo", "scope": ["bounded change"], "expected_files": ["a.py"], "rollback_note": "revert commit", "approval_ref": "approval:1", "test_plan": ["pytest"]}
-    receipt = gate_titan(new_receipt(workspace="/srv/AbyssOS", operator="D"), titan_name="Forge", gate_kind="mutation", payload=payload)
+    receipt = gate_titan(
+        new_receipt(workspace="/srv/AbyssOS", operator="D"),
+        titan_name="Forge",
+        gate_kind="mutation",
+        payload=payload,
+        decision_ref="manual-trial://operator-decision/forge-1",
+        approved_by="manual-trial-operator",
+    )
     assert receipt["gate_events"][0]["titan_name"] == "Forge"
+    assert (
+        receipt["gate_events"][0]["decision_ref"]
+        == "manual-trial://operator-decision/forge-1"
+    )
+    assert receipt["gate_events"][0]["approved_by_authenticated"] is False
+    assert receipt["gate_events"][0]["authority"] == "witness_only"
 
 
 def test_delta_gate_requires_evidence_refs():
@@ -49,6 +62,10 @@ def test_gate_payload_rejects_non_object_without_traceback(tmp_path, capsys):
             "mutation",
             "--payload",
             str(payload),
+            "--decision-ref",
+            "manual-trial://operator-decision/invalid-payload",
+            "--approved-by",
+            "manual-trial-operator",
         ]
     )
 

@@ -1,0 +1,6 @@
+interface:
+  display_name: "Titan Memory Loom"
+  short_description: "Ingest and recall Titan candidates"
+  default_prompt: "Use $titan-memory-loom to ingest or recall bounded Titan memory candidates without promoting durable memory."
+policy:
+  allow_implicit_invocation: true

@@ -2,5 +2,76 @@
   "$schema": "https://json-schema.org/draft/2020-12/schema",
   "title": "Bridge Approval",
   "type": "object",
+  "required": [
+    "timestamp",
+    "request_id",
+    "approval_type",
+    "status",
+    "summary",
+    "authority"
+  ],
+  "properties": {
+    "timestamp": {
+      "type": "string",
+      "minLength": 1
+    },
+    "request_id": {
+      "type": ["string", "number"]
+    },
+    "approval_type": {
+      "type": ["string", "null"]
+    },
+    "status": {
+      "enum": ["pending", "accept", "acceptForSession", "decline", "cancel"]
+    },
+    "summary": {
+      "type": ["string", "null"]
+    },
+    "authority": {
+      "const": "witness_only"
+    },
+    "decided_at": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision_summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decision_ref": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decided_by": {
+      "type": "string",
+      "minLength": 1
+    },
+    "decided_by_authenticated": {
+      "const": false
+    }
+  },
+  "allOf": [
+    {
+      "if": {
+        "properties": {
+          "status": {
+            "not": {
+              "const": "pending"
+            }
+          }
+        },
+        "required": ["status"]
+      },
+      "then": {
+        "required": [
+          "decided_at",
+          "decision_summary",
+          "decision_ref",
+          "decided_by",
+          "decided_by_authenticated"
+        ]
+      }
+    }
+  ],
   "additionalProperties": true
 }

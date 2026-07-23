@@ -24,6 +24,7 @@ follow the linked owner surface instead of expanding this page.
 | Documentation map | [docs](docs/README.md) |
 | Checked SDK source-home posture | [sdk](sdk/README.md), [source home manifest](sdk/source_home.manifest.json) |
 | SDK-owned statistical questions | [stats](stats/README.md), [local stats port](stats/port.manifest.json) |
+| Callable Titan helper procedures | [skills](skills/README.md), [owner skill port](skills/port.manifest.json) |
 | Importable implementation | [src/aoa_sdk](src/aoa_sdk/AGENTS.md) |
 | Repeatable SDK mechanics | [mechanics](mechanics/README.md), [mechanics roadmap](mechanics/ROADMAP.md), [mechanics topology](mechanics/topology.json) |
 | Workspace discovery, source topology, and control-plane capsule | [workspace layout](docs/workspace-layout.md), [.aoa workspace](.aoa/workspace.toml), [generated source topology](generated/source_topology.min.json), [generated capsule](generated/workspace_control_plane.min.json) |
@@ -40,6 +41,7 @@ follow the linked owner surface instead of expanding this page.
 | Decide whether a change belongs in this repo | Read [docs/boundaries](docs/boundaries.md), [DESIGN](DESIGN.md), and the relevant source-home or mechanic card. |
 | Work on SDK-facing source posture | Start at [sdk](sdk/README.md) and the nearest branch `AGENTS.md`. |
 | Change an SDK-owned measurement question or reference packet | Start at [stats](stats/README.md) and [stats/AGENTS](stats/AGENTS.md); shared grammar remains in `aoa-stats`. |
+| Change an SDK-owned Titan helper skill | Start at [skills](skills/README.md) and [skills/AGENTS](skills/AGENTS.md); runtime, operator, memory, proof, and playbook meaning remain with stronger owners. |
 | Change importable Python behavior | Start at [src/aoa_sdk/AGENTS.md](src/aoa_sdk/AGENTS.md), then route to the owning tests or mechanic. |
 | Change repeatable operations, helpers, schemas, examples, or part tests | Start at [mechanics](mechanics/README.md), then package `AGENTS.md`, package `README.md`, package `ROADMAP.md`, package `PARTS.md`, package `PROVENANCE.md`, and the active part `VALIDATION.md`. |
 | Change workspace, compatibility, checkpoint, Codex projection, release, or closeout behavior | Follow the matching mechanic package route before changing root docs. |
@@ -78,6 +80,7 @@ The current landed surface includes:
 - canonical decision rationale under [docs/decisions](docs/decisions/README.md);
 - the checked SDK source-home tree under [sdk](sdk/README.md);
 - the SDK-owned compatibility posture measurement under [stats](stats/README.md);
+- the admitted Titan helper procedure home under [skills](skills/README.md);
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;
@@ -104,6 +107,7 @@ history. Package-local future pressure lives in mechanics package roadmaps.
 | [mechanics](mechanics/) | Repeatable SDK operations with package and part ownership. |
 | [sdk](sdk/) | Source-authored SDK posture and manifest-checked route map. |
 | [stats](stats/) | SDK-owned measurement questions and evidence-linked reference packets using the shared `aoa-stats` grammar. |
+| [skills](skills/) | Admitted callable procedures over SDK-owned Titan helper contracts; globally exposed only through the OS user profile. |
 | [src/aoa_sdk](src/aoa_sdk/) | Importable Python package and public API implementation. |
 | [schemas](schemas/) | Shared contract schemas used across SDK surfaces. |
 | [quests](quests/) | Source records for durable SDK obligations. |

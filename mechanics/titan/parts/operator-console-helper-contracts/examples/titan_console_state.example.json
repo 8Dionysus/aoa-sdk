@@ -2,7 +2,13 @@
   "version": 1,
   "session_id": "titan-console-example",
   "workspace": "/srv/AbyssOS",
-  "operator": "Dionysus",
+  "operator": "unattributed-local-operator",
+  "surface_role": "titan_console_witness",
+  "authority": "witness_only",
+  "runtime_execution_state": "not_run",
+  "transport_state": "not_sent",
+  "state_semantics": "helper_projection_only",
+  "operator_field_authenticated": false,
   "status": "open",
   "created_at": "2026-04-22T00:00:00Z",
   "closed_at": null,
@@ -10,30 +16,35 @@
     "Atlas": {
       "role": "architect",
       "lane": "structure",
-      "active": true,
+      "state": "declared",
+      "active": false,
       "gate": null
     },
     "Sentinel": {
       "role": "reviewer",
       "lane": "risk",
-      "active": true,
+      "state": "declared",
+      "active": false,
       "gate": null
     },
     "Mneme": {
       "role": "memory-keeper",
       "lane": "memory",
-      "active": true,
+      "state": "declared",
+      "active": false,
       "gate": null
     },
     "Forge": {
       "role": "coder",
       "lane": "implementation",
+      "state": "locked",
       "active": false,
       "gate": "mutation"
     },
     "Delta": {
       "role": "evaluator",
       "lane": "verdict",
+      "state": "locked",
       "active": false,
       "gate": "judgment"
     }
@@ -42,14 +53,18 @@
   "approvals": [],
   "digest": {
     "event_count": 0,
-    "active": [
+    "approval_count": 0,
+    "declared": [
       "Atlas",
       "Sentinel",
       "Mneme"
     ],
+    "active": [],
     "locked": [
       "Forge",
       "Delta"
-    ]
+    ],
+    "opened_gates": [],
+    "risk_flags": []
   }
 }

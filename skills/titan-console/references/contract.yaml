@@ -1,0 +1,192 @@
+schema_version: aoa-skill-contract-v1
+identity:
+  name: titan-console
+  owner: aoa-sdk
+  canonical_source: skills/titan-console
+  version: 0.1.0
+  lifecycle: admitted
+purpose: Operate visible Titan console, approval, plan, and receipt helper witnesses without claiming operator or runtime authority.
+applicability:
+  positive:
+    - explicit Titan console or lane-state request
+    - explicit Forge mutation or Delta judgment approval witness request
+    - explicit app-server approval queue status or externally supplied decision
+    - explicit Titan app-server plan without execution
+    - explicit Titan receipt witness operation
+  negative:
+    - ordinary repository work
+    - implicit or unauthenticated approval
+    - live process launch, agent spawn, hidden execution, or runtime enforcement
+    - proof, durable memory, role, or operator authority
+input_abi:
+  type: titan-console-request-v1
+  required:
+    - mode
+    - explicit_titan_intent
+    - bounded_target
+  conditional:
+    plan:
+      - workspace
+      - explicit output path
+      - bounded prompt matching the requested Titan intent
+      - source refs
+    approval_witness:
+      - exact gate kind
+      - target lane
+      - ledger kind and exact ledger path
+      - external operator decision ref
+      - approver attribution
+      - bounded intent
+      - explicit Forge mutation payload or Delta judgment payload
+    approval_queue_inspect:
+      - bridge session path
+      - exact request id
+    approval_queue_decide:
+      - bridge session path
+      - exact request id
+      - current queue entry
+      - exact external operator decision ref
+      - explicit decision
+      - bounded summary
+    receipt:
+      - event identity
+      - source refs
+      - explicit recorder attribution or unresolved-attribution sentinel
+    write:
+      - explicit output path
+      - source refs
+output_abi:
+  type: titan-console-result-v1
+  required:
+    - mode
+    - source_return
+    - inputs
+    - helper_actions
+    - witness_artifacts
+    - gate_state
+    - execution_state
+    - actual_effects
+    - verification
+    - next_owner_route
+    - stop_line
+modes:
+  console:
+    procedure: references/console.md
+    effects: [bounded local console witness write]
+  approval-witness:
+    procedure: references/approval-witness.md
+    effects: [bounded local approval witness write]
+  approval-queue:
+    procedure: references/approval-queue.md
+    operations:
+      inspect:
+        effects: [none]
+      decide:
+        effects: [bounded local approval queue witness write]
+  plan:
+    procedure: references/plan.md
+    effects: [bounded local unsent plan write]
+  receipt:
+    procedure: references/receipt.md
+    effects: [bounded local receipt witness write]
+freedom_level: bounded-adaptation
+tool_requirements:
+  owner_root: aoa-sdk
+  console_helper: mechanics/titan/parts/operator-console-helper-contracts/scripts/titan_console.py
+  receipt_helper: mechanics/titan/parts/incarnation-identity-runtime-helper-contracts/scripts/titanctl.py
+  approval_queue_helper: mechanics/titan/parts/appserver-bridge-helper-contracts/scripts/titan_appserver_bridge.py
+verification:
+  - validate written console state with titan_console.py validate
+  - require new console state to identify itself as a witness-only helper projection with runtime not run and transport not sent
+  - require new ungated console roster entries to be declared rather than active
+  - require unresolved operator attribution to use the explicit unattributed-local-operator sentinel
+  - validate written receipt with titanctl.py validate
+  - validate bridge approval state with titan_appserver_bridge.py validate
+  - require every console, receipt, or bridge approval witness to preserve its external decision ref and unauthenticated approver attribution
+  - require a gate recorded on a witness receipt to leave its incarnation locked
+  - inspect the plan as data and report execution_state not_run
+termination:
+  success: one verified witness, one unsent plan, or one truthful no-change result
+  blocked: owner source, explicit Titan intent, bounded path, required source ref, or a decision operation's external approval ref is missing
+effects:
+  allowed: bounded local helper artifact writes explicitly requested by the user
+  forbidden:
+    - live process launch
+    - child-agent execution
+    - runtime gate enforcement
+    - operator authentication
+    - proof or durable memory promotion
+trust:
+  posture: owner-authored-procedure
+  helper_outputs: witness-only
+  operator_authority: external
+  runtime_authority: false
+  proof_authority: false
+provenance:
+  source: skills/titan-console
+  owner_contracts:
+    - mechanics/titan/parts/operator-console-helper-contracts
+    - mechanics/titan/parts/incarnation-identity-runtime-helper-contracts
+    - mechanics/titan/parts/appserver-bridge-helper-contracts
+  legacy_baselines:
+    - titan-console
+    - titan-approval-ledger
+    - titan-approval-loom
+    - titan-appserver-plan
+    - titan-receipt
+  techniques_runtime_dependency: false
+relations:
+  primary-capability-parent: titan operator-visible control witnesses
+  requires:
+    - {target: guard.operations.approval, condition: an external operator decision is required before recording an approval witness}
+  produces:
+    - titan-console-result-v1
+    - titan-console-witness
+    - titan-approval-witness
+    - titan-unsent-appserver-plan
+    - titan-receipt-witness
+  composes-with:
+    - titan-appserver-bridge
+    - titan-memory-loom
+    - titan-summon
+  hands-off-to:
+    - {target: runtime owner, condition: execution or enforcement is requested}
+    - {target: aoa-agents, condition: summon execution is requested}
+    - {target: aoa-memo, condition: durable memory or retention is requested}
+  conflicts-with:
+    - implicit approval
+    - plan-as-execution
+    - receipt-as-runtime-proof
+failure_modes:
+  - a new console helper state labels ungated Titan roster entries active
+  - a console operator label or event actor is invented from the executing agent identity
+  - a human or operator identity is inferred for a receipt helper field
+  - helper default approved_by is mistaken for authenticated operator consent
+  - approval queue decision is accepted without an external operator decision ref
+  - receipt or bridge gate recording is silently dropped from approval-witness coverage
+  - a helper invents Forge mutation scope or Delta judgment evidence
+  - read-only approval queue inspection is treated as blocked because no decision ref was supplied
+  - app-server plan or emit artifact is reported as sent or executed
+  - titanctl summon receipt is reported as a launched child
+  - witness state replaces runtime, role, proof, or memory truth
+health:
+  state: active
+  evidence_posture: manual-evaluated-challenger
+  last_manual_trial: 2026-07-23
+  manual_cases:
+    - isolated console witness
+    - receipt witness
+    - unsent app-server plan
+    - approval witness missing-decision negative
+    - approval witness with artifact-preserved decision provenance
+    - approval queue read-only inspection
+    - approval queue decision with artifact-preserved provenance
+    - neighboring bridge-skill coexistence
+    - receipt-ledger approval witness
+    - bridge-ledger approval witness
+    - cross-skill bridge-to-approval task-local DAG
+    - receipt-to-memory task-local DAG
+  recheck_after:
+    - helper contract change
+    - Codex runtime change
+    - operator approval interface change

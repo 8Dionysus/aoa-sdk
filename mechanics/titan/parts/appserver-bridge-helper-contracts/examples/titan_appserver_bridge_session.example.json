@@ -2,23 +2,30 @@
   "version": 1,
   "session_id": "titan-bridge-example",
   "workspace_root": "/srv/AbyssOS",
+  "source_kind": "bridge-session",
+  "source_ref": "example:explicit-user-request",
+  "surface_role": "titan_appserver_bridge_witness",
+  "authority": "witness_only",
+  "runtime_execution_state": "not_run",
+  "transport_state": "not_sent",
+  "state_semantics": "helper_projection_only",
   "titans": [
     {
       "name": "Atlas",
       "role": "architect",
-      "state": "active",
+      "state": "declared",
       "lane": "structure"
     },
     {
       "name": "Sentinel",
       "role": "reviewer",
-      "state": "active",
+      "state": "declared",
       "lane": "risk"
     },
     {
       "name": "Mneme",
       "role": "memory-keeper",
-      "state": "active",
+      "state": "declared",
       "lane": "memory"
     },
     {

@@ -1,0 +1,138 @@
+schema_version: aoa-skill-contract-v1
+identity:
+  name: titan-appserver-bridge
+  owner: aoa-sdk
+  canonical_source: skills/titan-appserver-bridge
+  version: 0.1.0
+  lifecycle: admitted
+purpose: Shape, inspect, validate, and replay visible Titan app-server or session events without sending, steering, or inferring hidden state.
+applicability:
+  positive:
+    - explicit Titan app-server bridge or JSON-RPC inspection
+    - explicit bridge thread, turn, replay, or metrics question
+    - explicit replay of a visible Codex session export
+  negative:
+    - isolated approval queue status or decision request, which belongs to titan-console
+    - isolated Forge or Delta gate decision, which belongs to titan-console approval-witness
+    - command sending or live agent steering
+    - hidden transcript, hidden reasoning, or compacted replacement recovery
+    - unauthenticated approval
+    - runtime, proof, durable memory, or operator authority
+input_abi:
+  type: titan-bridge-request-v1
+  required:
+    - mode
+    - explicit_titan_intent
+    - source_kind
+    - bounded_source_refs
+  source_kinds:
+    - bridge-session
+    - bridge-event-file
+    - visible-codex-session-export
+output_abi:
+  type: titan-bridge-result-v1
+  required:
+    - mode
+    - source_return
+    - visible_sources
+    - helper_actions
+    - derived_artifacts
+    - transport_state
+    - execution_state
+    - actual_effects
+    - verification
+    - next_owner_route
+    - stop_line
+modes:
+  bridge:
+    procedure: references/bridge.md
+    effects: [bounded local bridge witness write]
+  event-replay:
+    procedure: references/event-replay.md
+    effects: [bounded local derived replay write]
+freedom_level: bounded-adaptation
+tool_requirements:
+  owner_root: aoa-sdk
+  bridge_helper: mechanics/titan/parts/appserver-bridge-helper-contracts/scripts/titan_appserver_bridge.py
+  visible_replay_helper: mechanics/titan/parts/session-praxis-replay-helper-contracts/scripts/titan_session_replay.py
+verification:
+  - validate bridge session after every write
+  - require explicit witness-only, not-run, not-sent, and helper-projection semantics on new local bridge sessions
+  - require new local ungated Titan roster entries to be declared rather than active
+  - preserve visible source refs and source kind
+  - report transport_state unsent for local emit artifacts
+  - report hidden_history_access false
+termination:
+  success: one validated bridge or replay result with explicit transport and authority limits
+  blocked: owner source, explicit Titan intent, visible source, or bounded path is missing
+effects:
+  allowed: bounded local bridge or replay artifact writes explicitly requested by the user
+  forbidden:
+    - network send
+    - process or agent spawn
+    - live session steering
+    - hidden-history inference
+    - approval authentication
+    - proof or durable memory promotion
+trust:
+  posture: owner-authored-procedure
+  helper_outputs: derived-witness-only
+  runtime_authority: false
+  proof_authority: false
+  memory_authority: false
+provenance:
+  source: skills/titan-appserver-bridge
+  owner_contracts:
+    - mechanics/titan/parts/appserver-bridge-helper-contracts
+    - mechanics/titan/parts/session-praxis-replay-helper-contracts
+  legacy_baselines:
+    - titan-appserver-bridge
+    - titan-event-replay
+  techniques_runtime_dependency: false
+relations:
+  primary-capability-parent: titan visible bridge and replay
+  consumes:
+    - visible app-server events
+    - visible Codex session exports
+  produces:
+    - titan-bridge-result-v1
+    - titan-bridge-witness
+    - titan-visible-replay
+  composes-with:
+    - titan-console
+    - titan-memory-loom
+  hands-off-to:
+    - {target: titan-console, condition: an isolated approval queue status or decision is requested}
+    - {target: titan-console, condition: an isolated Forge or Delta gate decision is requested}
+    - {target: Codex or app-server runtime owner, condition: send, spawn, or live steering is requested}
+    - {target: aoa-session-memory-global-route, condition: hidden or archived session evidence is required}
+    - {target: aoa-memo, condition: reviewed replay may become durable memory}
+  conflicts-with:
+    - local-emit-as-send
+    - replay-as-runtime-proof
+    - visible-replay-as-hidden-history
+failure_modes:
+  - an isolated approval queue request activates this bundle alongside titan-console
+  - an isolated bridge gate decision activates this bundle instead of titan-console approval-witness
+  - local emit artifact is reported as sent
+  - bridge approval helper is treated as operator authentication
+  - visible replay is reported as hidden or complete transcript recovery
+  - replay order gaps or provenance limits are dropped
+  - derived state replaces runtime, proof, or memory truth
+  - a new local bridge witness labels an ungated Titan active
+health:
+  state: active
+  evidence_posture: manual-evaluated-challenger
+  last_manual_trial: 2026-07-23
+  manual_cases:
+    - isolated bridge witness
+    - visible event replay
+    - witness-only roster and transport boundaries
+    - approval-queue-only negative routing
+    - neighboring console-skill coexistence
+    - bridge-to-console approval task-local DAG
+    - bridge gate round-trip with source and decision provenance
+  recheck_after:
+    - helper contract change
+    - Codex app-server protocol change
+    - visible-session export change

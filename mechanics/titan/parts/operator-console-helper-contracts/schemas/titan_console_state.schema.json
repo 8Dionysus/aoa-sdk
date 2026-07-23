@@ -7,6 +7,12 @@
     "session_id",
     "workspace",
     "operator",
+    "surface_role",
+    "authority",
+    "runtime_execution_state",
+    "transport_state",
+    "state_semantics",
+    "operator_field_authenticated",
     "status",
     "titans",
     "events",
@@ -25,6 +31,24 @@
     },
     "operator": {
       "type": "string"
+    },
+    "surface_role": {
+      "const": "titan_console_witness"
+    },
+    "authority": {
+      "const": "witness_only"
+    },
+    "runtime_execution_state": {
+      "const": "not_run"
+    },
+    "transport_state": {
+      "const": "not_sent"
+    },
+    "state_semantics": {
+      "const": "helper_projection_only"
+    },
+    "operator_field_authenticated": {
+      "const": false
     },
     "status": {
       "enum": [
