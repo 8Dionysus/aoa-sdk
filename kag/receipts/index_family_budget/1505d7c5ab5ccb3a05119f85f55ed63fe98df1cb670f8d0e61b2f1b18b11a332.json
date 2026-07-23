@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 2224676,
+  "allowed_tracked_bytes": 14316412,
+  "approved_by": "repository-owner",
+  "base_ref": "ab08192ce15f7b3cede502f41fec096b05fa8491",
+  "changed_generated_bytes": 2224676,
+  "changed_generated_files": 62,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "1505d7c5ab5ccb3a05119f85f55ed63fe98df1cb670f8d0e61b2f1b18b11a332",
+  "reason": "Refresh the derived repo-local KAG family for the evidence-only routing succession R0 baseline after rebasing onto the explicit Ruff-policy prerequisite; this digest-bound receipt accepts only the measured generated amplification without raising standing limits or changing authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta",
+  "tracked_bytes": 14316412,
+  "tracked_bytes_max": 15728640
+}
