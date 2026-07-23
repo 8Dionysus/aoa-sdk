@@ -3,7 +3,7 @@ identity:
   name: titan-memory-loom
   owner: aoa-sdk
   canonical_source: skills/titan-memory-loom
-  version: 0.1.1
+  version: 0.1.2
   lifecycle: admitted
 purpose: Ingest and recall local Titan memory candidates and hand retention decisions to aoa-memo without promoting helper state.
 applicability:

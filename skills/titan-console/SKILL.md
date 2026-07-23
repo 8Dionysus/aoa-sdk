@@ -17,11 +17,12 @@ Resolve the canonical `aoa-sdk` root before reading or running owner helpers:
 2. In one tool turn, inspect only
    `<bundle_dir>/.aoa-skill-source.json`. If it exists, require schema
    `aoa_skill_source_receipt_v1` or `aoa_skill_source_receipt_v2`, bundle
-   `titan-console`, owner `aoa-sdk`, version `0.1.1`, an existing absolute
+   `titan-console`, owner `aoa-sdk`, version `0.1.2`, an existing absolute
    `owner_root`, safe relative `source_path`, and a matching
    `<owner_root>/<source_path>/SKILL.md`. For v2 also require non-empty
    `digest`, `source_fingerprint`, `source_fingerprint_scope`, and
-   `prompt_description_sha256`; preserve `capability_graph_hash` when present.
+   `prompt_description_sha256`. When `capability_graph_hash` is present,
+   require it to be a non-empty string and preserve it.
    An invalid present handle is terminal.
 3. Only when the handle is absent, run exactly
    `git -C <bundle_dir> rev-parse --show-toplevel` and use that result as

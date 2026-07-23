@@ -7,7 +7,7 @@
     {
       "name": "titan-console",
       "path": "skills/titan-console",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "lifecycle": "admitted",
       "visibility": "advertised",
       "admission_ref": "docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md"
@@ -15,7 +15,7 @@
     {
       "name": "titan-appserver-bridge",
       "path": "skills/titan-appserver-bridge",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "lifecycle": "admitted",
       "visibility": "advertised",
       "admission_ref": "docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md"
@@ -23,7 +23,7 @@
     {
       "name": "titan-memory-loom",
       "path": "skills/titan-memory-loom",
-      "version": "0.1.1",
+      "version": "0.1.2",
       "lifecycle": "admitted",
       "visibility": "advertised",
       "admission_ref": "docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md"

@@ -3,7 +3,7 @@ identity:
   name: titan-console
   owner: aoa-sdk
   canonical_source: skills/titan-console
-  version: 0.1.1
+  version: 0.1.2
   lifecycle: admitted
 purpose: Operate visible Titan console, approval, plan, and receipt helper witnesses without claiming operator or runtime authority.
 applicability:
