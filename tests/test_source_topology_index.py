@@ -234,6 +234,7 @@ def test_source_topology_index_names_shared_contract_branches() -> None:
     assert "compatibility re-export" in modules["src/aoa_sdk/models.py"]["role"]
     assert "aoa_sdk/contracts branches" in modules["src/aoa_sdk/models.py"]["next_route"]
     contract_module_roles = {
+        "src/aoa_sdk/contracts/control_plane.py": "lifecycle",
         "src/aoa_sdk/contracts/routing.py": "surface compatibility",
         "src/aoa_sdk/contracts/skills.py": "owner skill catalog",
         "src/aoa_sdk/contracts/playbooks.py": "playbook registry",

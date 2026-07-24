@@ -31,6 +31,9 @@ This repository owns:
 - the accepted staged routing-producer succession model in
   `AOA-SDK-D-0071`, while live producer authority remains with `aoa-routing`
   until the explicit G5 owner-switch receipt
+- the strict R2 route, plan, approval, lifecycle, event, evidence, and runtime
+  adapter contract family, while `AoASDK.control_plane`, `AoASDK.runner`, and
+  runtime execution remain unimplemented at this stage
 
 It does not own:
 

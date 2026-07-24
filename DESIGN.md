@@ -192,7 +192,12 @@ the runtime owner.
 The checked authority matrix, compatibility exit conditions, repository
 succession states, and archive stop-line live in
 `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r1-target-operating-model.json`.
-This design section does not authorize producer code movement or G5.
+The runtime-neutral R2 types, lifecycle graph, replay rules, three golden
+scenarios, and threat controls live in
+`mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md`
+and `src/aoa_sdk/contracts/control_plane.py`. They define protocols, not active
+`AoASDK` behavior or a runtime body. This design section does not authorize
+producer code movement or G5.
 
 ## Design as Aim
 

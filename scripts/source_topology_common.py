@@ -140,6 +140,7 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/contracts/artifacts.py": "shared artifact trust, registry, drift, coverage, and update-lane contract owner",
     "src/aoa_sdk/contracts/checkpoints.py": "shared checkpoint lineage, note, capture, review, hook, boundary, and checkpoint-closeout bridge contract owner",
     "src/aoa_sdk/contracts/codex.py": "shared Codex projection live rollout status contract owner",
+    "src/aoa_sdk/contracts/control_plane.py": "shared route, plan, approval, lifecycle, event, evidence-reference, and runtime-adapter protocol contract owner",
     "src/aoa_sdk/contracts/evals.py": "shared eval card, capsule, section, comparison, and runtime candidate intake contract owner",
     "src/aoa_sdk/contracts/governed_runs.py": "shared governed run review packet, audit, and handoff contract owner",
     "src/aoa_sdk/contracts/kag.py": "shared KAG registry, federation, tiny bundle, regrounding, inspect, and query-mode contract owner",

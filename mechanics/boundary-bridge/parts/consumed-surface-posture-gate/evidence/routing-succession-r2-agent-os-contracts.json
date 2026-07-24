@@ -1,0 +1,315 @@
+{
+  "schema_version": "aoa_sdk_routing_succession_r2_contract_design_v1",
+  "status": "g2_contract_design",
+  "recorded_on": "2026-07-23",
+  "scope": {
+    "stage": "R2 Agent OS SDK contracts and lifecycle design",
+    "current_canonical_routing_producer": "aoa-routing",
+    "producer_migration_authorized": false,
+    "runtime_execution_authorized": false,
+    "behavioral_facades_active": false,
+    "next_authorized_stage": "R3 disposable migration rehearsal after G2 validation"
+  },
+  "contract_versions": {
+    "control_plane": "aoa_control_plane_v1",
+    "lifecycle": "aoa_run_lifecycle_v1",
+    "runtime_adapter": "aoa_runtime_adapter_v1",
+    "routing_abi_during_owner_succession": "aoa_routing_thin_router_v1"
+  },
+  "typed_source": "src/aoa_sdk/contracts/control_plane.py",
+  "public_compatibility_reexport": "src/aoa_sdk/models.py",
+  "public_api_posture": {
+    "control_plane_protocol_defined": true,
+    "runner_protocol_defined": true,
+    "runtime_adapter_protocol_defined": true,
+    "aoa_sdk_control_plane_facade_implemented": false,
+    "aoa_sdk_runner_facade_implemented": false,
+    "reason": "R2 fixes contract meaning before C1 control-plane behavior and C3 runner implementation."
+  },
+  "minimum_types": [
+    "AgentRef",
+    "ResolvedAgentProfile",
+    "CapabilityRef",
+    "RouteIntent",
+    "RouteCandidate",
+    "RouteDecision",
+    "RouteExplanation",
+    "ScenarioRef",
+    "ScenarioBinding",
+    "RuntimeProfile",
+    "RunPlan",
+    "ApprovalRequirement",
+    "ApprovalRequest",
+    "ApprovalDecision",
+    "SessionHandle",
+    "RunStatus",
+    "ExecutionEvent",
+    "RunOutcome",
+    "EvidenceBundleRef",
+    "EvalVerdictRef",
+    "MemoryReceiptRef",
+    "CloseoutBundleRef"
+  ],
+  "owner_boundaries": {
+    "agent_definition_owner": "aoa-agents",
+    "capability_contract_owner": "aoa-skills",
+    "scenario_meaning_owner": "aoa-playbooks",
+    "runtime_profile_and_execution_owner": "selected runtime owner",
+    "approval_owner": "owner named by ApprovalRequirement",
+    "eval_verdict_owner": "aoa-evals or stronger proof owner",
+    "durable_memory_owner": "aoa-memo or selected session-memory owner",
+    "route_plan_and_lifecycle_contract_owner": "aoa-sdk",
+    "sdk_executes_models_or_tools": false,
+    "runtime_success_is_eval_verdict": false
+  },
+  "run_plan_contract": {
+    "owner_qualified_source_refs": true,
+    "pinned_source_digests": true,
+    "pinned_abi_versions_and_digests": true,
+    "abstract_step_dag": true,
+    "approval_requirements": true,
+    "checkpoint_policy": true,
+    "retry_policy": true,
+    "rollback_policy": true,
+    "eval_requirements": true,
+    "retention_requirements": true,
+    "closeout_requirements": true,
+    "runtime_commands_allowed_in_plan": false,
+    "tool_arguments_allowed_in_plan": false,
+    "unknown_fields_allowed": false
+  },
+  "lifecycle": {
+    "states": [
+      "prepared",
+      "awaiting_approval",
+      "running",
+      "paused",
+      "recoverable_failure",
+      "failed",
+      "completed",
+      "cancelled",
+      "closed"
+    ],
+    "execution_terminal_states": [
+      "failed",
+      "completed",
+      "cancelled"
+    ],
+    "lifecycle_terminal_state": "closed",
+    "transitions": [
+      ["prepared", "start", "running"],
+      ["prepared", "approval_required", "awaiting_approval"],
+      ["awaiting_approval", "approval_granted", "running"],
+      ["awaiting_approval", "approval_rejected", "cancelled"],
+      ["awaiting_approval", "approval_expired", "paused"],
+      ["running", "pause", "paused"],
+      ["paused", "resume", "running"],
+      ["running", "runtime_interrupted", "recoverable_failure"],
+      ["paused", "runtime_interrupted", "recoverable_failure"],
+      ["awaiting_approval", "runtime_interrupted", "recoverable_failure"],
+      ["recoverable_failure", "recover", "paused"],
+      ["running", "runtime_failed", "failed"],
+      ["running", "runtime_completed", "completed"],
+      ["prepared", "cancel", "cancelled"],
+      ["awaiting_approval", "cancel", "cancelled"],
+      ["running", "cancel", "cancelled"],
+      ["paused", "cancel", "cancelled"],
+      ["recoverable_failure", "cancel", "cancelled"],
+      ["failed", "closeout", "closed"],
+      ["completed", "closeout", "closed"],
+      ["cancelled", "closeout", "closed"]
+    ],
+    "forbidden_shortcuts": [
+      ["prepared", "closeout", "closed"],
+      ["recoverable_failure", "resume", "running"],
+      ["running", "closeout", "closed"]
+    ],
+    "recovery_returns_to": "paused",
+    "closed_requires_closeout_bundle": true
+  },
+  "idempotency": {
+    "scope": ["session_id", "idempotency_key"],
+    "duplicate_requires_identical_command_digest": true,
+    "identical_duplicate_creates_new_effect": false,
+    "key_reuse_with_different_payload": "reject",
+    "adapter_outage_reconciliation": [
+      "command receipt",
+      "run status revision",
+      "event cursor"
+    ]
+  },
+  "event_chain": {
+    "append_only_meaning": true,
+    "identity_fields": [
+      "event_id",
+      "event_stream_id",
+      "session_id",
+      "correlation_id"
+    ],
+    "ordering_fields": [
+      "sequence",
+      "previous_event_digest",
+      "event_digest"
+    ],
+    "identical_redelivery": "deduplicate",
+    "event_id_content_substitution": "reject",
+    "gap_or_reorder": "reject",
+    "cross_session_or_stream": "reject",
+    "invalid_transition": "reject"
+  },
+  "closeout_guard": {
+    "exact_session_correlation_and_plan_scope": true,
+    "terminal_evidence_requirement_ids_must_be_satisfied": true,
+    "required_eval_verdict_ids_must_be_satisfied": true,
+    "required_memory_receipt_ids_must_be_satisfied": true,
+    "closeout_bundle_requirement_ids_must_be_satisfied": true,
+    "requirement_owner_must_match_ref_provenance": true,
+    "runtime_success_creates_missing_owner_refs": false
+  },
+  "golden_scenarios": [
+    {
+      "scenario_id": "bounded-repository-change",
+      "contract_types": [
+        "RouteIntent",
+        "RouteDecision",
+        "RouteExplanation",
+        "ScenarioBinding",
+        "RunPlan",
+        "ApprovalRequirement",
+        "SessionHandle",
+        "ExecutionEvent",
+        "RunOutcome",
+        "CloseoutBundleRef"
+      ],
+      "plan_operations": [
+        "inspect",
+        "mutate",
+        "validate",
+        "checkpoint",
+        "evaluate",
+        "retain",
+        "closeout"
+      ],
+      "hidden_instructions_required": false
+    },
+    {
+      "scenario_id": "multi-agent-summon-return",
+      "contract_types": [
+        "AgentRef",
+        "CapabilityRef",
+        "ScenarioBinding",
+        "RunPlan",
+        "SessionHandle",
+        "ExecutionEvent",
+        "RunOutcome",
+        "CloseoutBundleRef"
+      ],
+      "plan_operations": [
+        "summon",
+        "return",
+        "validate",
+        "closeout"
+      ],
+      "return_packet_is_proof": false,
+      "hidden_instructions_required": false
+    },
+    {
+      "scenario_id": "runtime-degradation",
+      "contract_types": [
+        "RunPlan",
+        "SessionHandle",
+        "RunStatus",
+        "PauseCommand",
+        "RecoverCommand",
+        "ResumeCommand",
+        "ExecutionEvent",
+        "RunOutcome",
+        "CloseoutBundleRef"
+      ],
+      "lifecycle_path": [
+        "running",
+        "recoverable_failure",
+        "paused",
+        "running",
+        "completed",
+        "closed"
+      ],
+      "bounded_retry": true,
+      "event_cursor_required": true,
+      "recovery_evidence_required": true,
+      "hidden_instructions_required": false
+    }
+  ],
+  "threat_controls": [
+    {
+      "threat": "ambiguous_intent",
+      "control": "degraded or blocked decision with ambiguity codes"
+    },
+    {
+      "threat": "route_conflict_or_missing_capability",
+      "control": "all candidates accounted for; no hidden fallback"
+    },
+    {
+      "threat": "stale_artifact_or_owner_provenance_drift",
+      "control": "exact source and ABI set, source ref, schema, and digest comparison"
+    },
+    {
+      "threat": "forbidden_activation_or_missing_approval",
+      "control": "forbidden candidate cannot be selected; approval is exact-plan and owner-bound"
+    },
+    {
+      "threat": "duplicate_execution_or_replay_mismatch",
+      "control": "idempotency scope plus full command digest"
+    },
+    {
+      "threat": "event_loss_reorder_or_substitution",
+      "control": "sequence, previous digest, self digest, and event-id content check"
+    },
+    {
+      "threat": "invalid_child_return_or_hidden_context",
+      "control": "return remains an artifact ref; only explicit context refs enter the plan"
+    },
+    {
+      "threat": "runtime_or_adapter_outage",
+      "control": "recoverable cursor plus receipt/status/event reconciliation and bounded retry"
+    },
+    {
+      "threat": "rollback_failure",
+      "control": "terminal failed outcome with owner evidence"
+    },
+    {
+      "threat": "partial_closeout",
+      "control": "closed requires CloseoutBundleRef and plan carries evidence/eval/memory requirements"
+    },
+    {
+      "threat": "early_predecessor_retirement",
+      "control": "R2 changes no producer authority; G5 and consumer-zero remain required"
+    }
+  ],
+  "validation_contract": {
+    "strict_json_round_trip": true,
+    "three_scenarios_one_contract_family": true,
+    "lifecycle_graph_covered": true,
+    "stale_source_failure_test": true,
+    "stale_abi_failure_test": true,
+    "approval_bypass_failure_test": true,
+    "idempotency_replay_mismatch_test": true,
+    "event_gap_reorder_substitution_tests": true,
+    "runtime_specific_plan_field_rejection_test": true,
+    "runtime_outcome_not_verdict_test": true
+  },
+  "gate_g2": {
+    "verdict": "pass_when_repository_validation_is_green",
+    "authorizes": [
+      "R3 disposable migration rehearsal"
+    ],
+    "does_not_authorize": [
+      "routing producer migration in canonical checkout",
+      "shadow publication",
+      "G5 owner switch",
+      "production runtime adapter",
+      "runtime mutation",
+      "aoa-routing retirement or archive"
+    ]
+  }
+}

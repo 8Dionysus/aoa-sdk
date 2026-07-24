@@ -29,6 +29,9 @@ repositories remain authoritative.
 - after G5, the canonical routing producer, routing ABI, deterministic route
   resolution, structured explanation, runtime-neutral plan compilation, and
   lifecycle client contracts
+- before G5, the versioned R2 route, plan, approval, lifecycle, event,
+  evidence-reference, and adapter protocol models used to prove the boundary;
+  the models do not activate an `AoASDK` runner or runtime
 - typed loaders over published surfaces
 - local workspace discovery and sibling-repo resolution
 - shared Python models for stable consumer use

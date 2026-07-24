@@ -17,3 +17,9 @@ tests.
 
 Stop line: compatibility input aliases may stay readable, but stale alias
 vocabulary should not become active SDK output names.
+
+The R2 Agent OS models are authored in
+`src/aoa_sdk/contracts/control_plane.py` and compatibility-reexported through
+`aoa_sdk.models`. They are strict owner-qualified references and
+runtime-neutral lifecycle contracts. Their presence does not make sibling
+objects SDK source truth or activate a runner.
