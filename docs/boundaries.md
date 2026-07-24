@@ -6,7 +6,12 @@ repositories remain authoritative.
 
 ## Source Ownership
 
-- `aoa-routing` owns navigation surfaces and the dispatch ABI.
+- `aoa-routing` currently owns navigation surfaces, the canonical routing
+  producer, and the dispatch ABI.
+- `AOA-SDK-D-0071` accepts transfer of that producer and ABI to `aoa-sdk`,
+  but the transfer is not live until shadow parity and the explicit G5
+  owner-switch receipt. Before G5, SDK routing output is consumer or
+  non-publishing shadow evidence only.
 - `aoa-skills` owns shared skill sources, capability families, install
   profiles, port grammar, and portable exports.
 - Each repository owns authored procedures and admission for its own skill
@@ -21,6 +26,9 @@ repositories remain authoritative.
 
 ## aoa-sdk Should Own
 
+- after G5, the canonical routing producer, routing ABI, deterministic route
+  resolution, structured explanation, runtime-neutral plan compilation, and
+  lifecycle client contracts
 - typed loaders over published surfaces
 - local workspace discovery and sibling-repo resolution
 - shared Python models for stable consumer use
@@ -43,6 +51,9 @@ repositories remain authoritative.
 
 ## aoa-sdk Should Not Absorb
 
+- activation or model/tool execution from the runtime owner
+- agent, skill, capability, scenario, eval, memo, KAG, stats, or runtime
+  source meaning during routing succession
 - authored markdown as the primary runtime API
 - copied catalogs from sibling repositories
 - decision notes that pretend to be active source truth

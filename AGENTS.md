@@ -28,10 +28,15 @@ This repository owns:
   validation homes
 - additive surface detection, passive skill-environment inspection, and
   reviewed checkpoint evidence handoff helpers that remain owner-subordinate
+- the accepted staged routing-producer succession model in
+  `AOA-SDK-D-0071`, while live producer authority remains with `aoa-routing`
+  until the explicit G5 owner-switch receipt
 
 It does not own:
 
-- routing, skill, eval, memo, playbook, agent, progression, quest, checkpoint, service runtime, or frontend RPG semantics as source truth
+- routing producer authority before G5, or skill, eval, memo, playbook, agent,
+  progression, quest, checkpoint, service runtime, or frontend RPG semantics
+  as source truth
 - hidden heuristics that are not documented and testable
 
 ## Start here

@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 10018118,
+  "allowed_tracked_bytes": 14391262,
+  "approved_by": "repository-owner",
+  "base_ref": "29de1b1f893c683e0923cbf0cf0ee13beaa86d0e",
+  "changed_generated_bytes": 10018118,
+  "changed_generated_files": 279,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "231a14a0df373f511984a11d9642180288a75cc4578e0b9fddba5f9a6cb6ede9",
+  "reason": "Deterministic re-sharding for the accepted staged routing-producer succession decision and R1 target operating model; authority boundaries and provider scope remain unchanged and tracked size stays within the standing cap.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta",
+  "tracked_bytes": 14391262,
+  "tracked_bytes_max": 15728640
+}

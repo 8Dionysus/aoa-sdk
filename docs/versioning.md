@@ -74,6 +74,30 @@ source-home derived export:
 `generated/root_entry_map.min.json` path is external history, not an active
 compatibility input.
 
+## Owner-Only Routing Succession
+
+`AOA-SDK-D-0071` separates routing producer ownership from routing ABI
+versioning.
+
+During the owner-only switch:
+
+- preserve all fourteen current public routing output paths;
+- preserve `aoa_routing_thin_router_v1`;
+- preserve supported schema identifiers and payload meaning;
+- require producer provenance to name the SDK source ref after G5;
+- do not hide a semantic or schema break inside the owner change.
+
+An incompatible routing change needs a separate versioned decision and release
+after succession. Before G5, `aoa-routing` remains canonical and SDK output may
+be used only for non-publishing parity. The compatibility window begins with
+the G5 receipt and cannot end until consumer-zero, clean
+install/upgrade/downgrade/rollback checks, two consecutive SDK validation
+cycles without predecessor generation, SDK-bound runtime/trust identity, and
+the absence of unresolved high-severity compatibility regressions.
+
+The full path list and exit conditions are checked in
+`mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r1-target-operating-model.json`.
+
 ## Operational Expectation
 
 - Loader functions for supported surfaces should go through the compatibility

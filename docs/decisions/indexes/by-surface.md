@@ -104,6 +104,7 @@
 - [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 - [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 - [AOA-SDK-D-0070 - Admit the Titan Helper Skill Family](../AOA-SDK-D-0070-titan-owner-skill-family.md) (`docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md`)
+- [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
 
 ## compatibility accounting
 
@@ -112,6 +113,10 @@
 ## compatibility input
 
 - [AOA-SDK-D-0040 - Sibling Fallback Field Input Alias Normalization](../AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md) (`docs/decisions/AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md`)
+
+## control-plane
+
+- [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
 
 ## design route
 
@@ -239,6 +244,10 @@
 
 - [AOA-SDK-D-0070 - Admit the Titan Helper Skill Family](../AOA-SDK-D-0070-titan-owner-skill-family.md) (`docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md`)
 
+## ownership
+
+- [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
+
 ## parent boundary
 
 - [AOA-SDK-D-0033 - Questbook Parent Withdrawal After Quest Localization](../AOA-SDK-D-0033-questbook-parent-withdrawal-after-quest-localization.md) (`docs/decisions/AOA-SDK-D-0033-questbook-parent-withdrawal-after-quest-localization.md`)
@@ -264,6 +273,10 @@
 ## release
 
 - [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) (`docs/decisions/AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md`)
+
+## repository succession
+
+- [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
 
 ## roadmap
 
@@ -297,6 +310,10 @@
 - [AOA-SDK-D-0048 - Root Roadmap Direction Surface](../AOA-SDK-D-0048-root-roadmap-direction-surface.md) (`docs/decisions/AOA-SDK-D-0048-root-roadmap-direction-surface.md`)
 - [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) (`docs/decisions/AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md`)
 - [AOA-SDK-D-0066 - Decision Index Read Model Symmetry](../AOA-SDK-D-0066-decision-index-read-model-symmetry.md) (`docs/decisions/AOA-SDK-D-0066-decision-index-read-model-symmetry.md`)
+
+## runtime boundary
+
+- [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
 
 ## runtime entrypoint
 
