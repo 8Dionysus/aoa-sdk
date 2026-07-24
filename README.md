@@ -89,6 +89,11 @@ The current landed surface includes:
   [R2 Agent OS contract family](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md)
   for route decisions, plans, approvals, lifecycle, events, evidence, and
   adapter protocols, without an active runner or producer switch;
+- the passed
+  [R3 disposable migration rehearsal](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r3-migration-rehearsal.md),
+  which proves 14/14 byte parity, installed-wheel construction without the
+  predecessor checkout, consumer compatibility, and rollback while leaving
+  `aoa-routing` canonical;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

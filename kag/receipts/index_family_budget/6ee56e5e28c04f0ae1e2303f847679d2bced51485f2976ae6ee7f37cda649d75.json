@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 4275711,
+  "allowed_tracked_bytes": 14612957,
+  "approved_by": "repository-owner",
+  "base_ref": "b9d5e3cea2c6caa070ac7d5e4d65570dbe34943f",
+  "changed_generated_bytes": 4275711,
+  "changed_generated_files": 115,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "6ee56e5e28c04f0ae1e2303f847679d2bced51485f2976ae6ee7f37cda649d75",
+  "reason": "R3 migration rehearsal evidence adds owner-reviewed parity, rollback, PR-order, and cleanup surfaces without landing producer code or switching authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta",
+  "tracked_bytes": 14612957,
+  "tracked_bytes_max": 15728640
+}

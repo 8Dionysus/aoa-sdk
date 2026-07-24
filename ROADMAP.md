@@ -79,11 +79,12 @@ land a local surface?
 control-plane contract hardening.
 
 The current repo-wide program is staged routing producer succession. The
-target is accepted in `AOA-SDK-D-0071`, and the R2 typed control-plane,
-lifecycle, approval, event, and adapter contracts are now explicit, but
-`aoa-routing` remains canonical until shadow parity and an explicit G5
-owner-switch receipt. R3 rehearsal and M1 shadow production must precede that
-switch. The program moves the producer function and ABI into the SDK; it does
+target is accepted in `AOA-SDK-D-0071`, the R2 typed control-plane, lifecycle,
+approval, event, and adapter contracts are explicit, and the disposable R3
+migration rehearsal passed with 14/14 byte parity, clean installed-wheel
+construction, consumer compatibility, and rollback. `aoa-routing` remains
+canonical until M1 shadow parity, G4 evidence, and an explicit G5 owner-switch
+receipt. The program moves the producer function and ABI into the SDK; it does
 not absorb source organs or runtime execution.
 
 The repo should now:
@@ -123,12 +124,13 @@ Roadmap drift is an SDK-layer risk because downstream agents use this file to
 choose whether a change belongs on the control plane. It still must not turn
 `aoa-sdk` into a source-owning runtime layer.
 
-The next honest move is R3 migration rehearsal in a disposable worktree. It
-must reproduce the predecessor build, move only the minimum producer function
-into the target SDK topology, prove output and schema parity, build without an
-`aoa-routing` checkout, and reproduce rollback. The R2 contract family is now
-the fixed boundary for later control-plane and runner behavior; rehearsal
-still may not publish SDK output or switch authority.
+The next honest move is M1 shadow production. It must recreate the proved
+minimal producer under `src/aoa_sdk/control_plane/routing/`, resolve the
+rehearsal's inherited typing debt, port and package schemas, validators,
+fixtures, and negative cases, and emit dual-producer sidecar provenance. Its
+outputs stay non-publishing and byte-identical while `aoa-routing` remains
+canonical. The exact release, cross-repo parity, conditional handoff, and G5
+PR order is fixed by the R3 evidence.
 
 ## Current Public Contour
 

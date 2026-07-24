@@ -1,0 +1,231 @@
+{
+  "schema_version": "aoa_sdk_routing_succession_r3_rehearsal_v1",
+  "observed_on": "2026-07-23",
+  "status": "rehearsal_passed_disposable_removed",
+  "scope": {
+    "program": "aoa-routing producer succession into aoa-sdk",
+    "stage": "R3 disposable migration rehearsal",
+    "canonical_producer_before_and_after": "aoa-routing",
+    "canonical_producer_ref": "7e2fe467ad26aa645b61849001a456dda4562ffc",
+    "sdk_rehearsal_base_ref": "b9d5e3cea2c6caa070ac7d5e4d65570dbe34943f",
+    "effect_stop_line": "The rehearsal did not land producer code, publish SDK routing output, change a consumer, mutate a runtime mirror, admit trust, trigger G5, or change repository hosting state."
+  },
+  "pinned_inputs": {
+    "aoa-techniques": "e842c0d0156c58cfb9020b636e81134e96fc8cfb",
+    "aoa-skills": "48598a9564c4621b15428831642b802dbc8d2a47",
+    "aoa-evals": "3412b47f9ee7bec9567f92e1c2d59596c4428a2c",
+    "aoa-memo": "7672add5e2bb4ff21c2581ca656998f0ca7c8a3e",
+    "aoa-stats": "504571995cc36905cc886259c0a19be6e8e35045",
+    "aoa-agents": "66f8bf22d03518b1e2367fd4f51dab80650f6d37",
+    "Agents-of-Abyss": "bfeb4bfb447b437f1360b814bbf4f1def5e62859",
+    "aoa-playbooks": "a15866ec867209288533850cc34939ad81829947",
+    "aoa-kag": "cdd2286c5ad4a345fe704ca065036945f6ba4353",
+    "Tree-of-Sophia": "8126cc379a759990358728bbcedadbd3b24a7b6d",
+    "Dionysus": "6c463f6b89a11e85b37e2606525afc7d45005fbd",
+    "8Dionysus": "39cdef104d54d570e7eb4f689ebcd48b2cc6a658",
+    "abyss-stack": "83d64234e719f74d6fd6a84a16c1a2af14754958"
+  },
+  "rehearsed_target_topology": {
+    "implementation_root": "src/aoa_sdk/control_plane/routing",
+    "modules": [
+      "src/aoa_sdk/control_plane/routing/core.py",
+      "src/aoa_sdk/control_plane/routing/producer.py"
+    ],
+    "compatibility_facade": "src/aoa_sdk/routing",
+    "compatibility_facade_changed": false,
+    "minimum_slice": {
+      "predecessor_source_lines": 5591,
+      "predecessor_files": [
+        "aoa-routing:scripts/router_core.py",
+        "aoa-routing:scripts/build_router.py"
+      ],
+      "candidate_differences": [
+        "package-relative import",
+        "SDK repository-root resolution",
+        "candidate-only module documentation"
+      ],
+      "repository_topology_copied": false
+    },
+    "runtime_dependency_discovered": "PyYAML>=6.0",
+    "runtime_or_model_client_imported": false
+  },
+  "preserved_contract": {
+    "abi_epoch": "aoa_routing_thin_router_v1",
+    "artifact_namespace": [
+      "generated/aoa_router.min.json",
+      "generated/cross_repo_registry.min.json",
+      "generated/task_to_surface_hints.json",
+      "generated/task_to_tier_hints.json",
+      "generated/quest_dispatch_hints.min.json",
+      "generated/federation_entrypoints.min.json",
+      "generated/return_navigation_hints.min.json",
+      "generated/recommended_paths.min.json",
+      "generated/kag_source_lift_relation_hints.min.json",
+      "generated/composite_stress_route_hints.min.json",
+      "generated/stats_regrounding_hints.min.json",
+      "generated/owner_layer_shortlist.min.json",
+      "generated/pairing_hints.min.json",
+      "generated/tiny_model_entrypoints.json"
+    ],
+    "output_sha256": {
+      "generated/aoa_router.min.json": "f01e3722d675c1776f20ad09e1ac43e5e646de8bdad2858a30d39ba7b7534cb7",
+      "generated/composite_stress_route_hints.min.json": "863199f4eed7a65482336d6cbc9ed6fad8b5c7e3a4eaaa3d0269eaa2909a1d66",
+      "generated/cross_repo_registry.min.json": "656963609433e73434b696c9a732b12bd0767db8a98d62ab008719bfea0c5865",
+      "generated/federation_entrypoints.min.json": "d4014f8d386397506077807391f18c5d7b50494050051257d0f2a6ced521f8f3",
+      "generated/kag_source_lift_relation_hints.min.json": "2bfbf6ce76f174e1fc08fab6e03cc085ddae9cc0b1118bfbb3fae6e062c89d8e",
+      "generated/owner_layer_shortlist.min.json": "8fa6fdeaa9994aa6f6237050ef3c64ad5e5c508de391fe7e25c2ee35decdd4d3",
+      "generated/pairing_hints.min.json": "c3d75abdd9709aeffdc3a00f43d98212e31a5aada5bb25f0a9d9fad43b767a2f",
+      "generated/quest_dispatch_hints.min.json": "e0e1f24922948a5dfbb425e6620f1c1df3cf45a4c17976ce8eb8f384f0ff4b86",
+      "generated/recommended_paths.min.json": "c31c89a9227b89ebf2afd390ecbeb332663475e4f3db0614abbb60ef55f6569c",
+      "generated/return_navigation_hints.min.json": "6281c665675a4a681bc9f10923e7c5f1356bdd4b559e6fcecc31177c142d2bab",
+      "generated/stats_regrounding_hints.min.json": "b146eba059fc84b1642e3614f8e45e42e11d6507db9030b5c85da41b9028908a",
+      "generated/task_to_surface_hints.json": "acd1a31132478f842f5d421711fa001ebecf24016f7679404506b8b6b066774d",
+      "generated/task_to_tier_hints.json": "f295c0b036c0d45c21569a0e20d99dbec12bb1b60fb39fb1e7ae8943cdfa5da6",
+      "generated/tiny_model_entrypoints.json": "b7f74cd42a2bf2ad71890e3ee01876c93bb2ecb1192ef530442fc0c601701989"
+    },
+    "route_counts": {
+      "aoa_router.entries": 170,
+      "cross_repo_registry.entries": 170,
+      "recommended_paths.entries": 170,
+      "pairing_hints.entries": 155,
+      "federation_entrypoints.entrypoints": 69,
+      "quest_dispatch_hints.hints": 16,
+      "owner_layer_shortlist.hints": 21,
+      "stats_regrounding_hints.hints": 22,
+      "task_to_surface_hints.hints": 4,
+      "task_to_tier_hints.hints": 7,
+      "kag_source_lift_relation_hints.entries": 5,
+      "composite_stress_route_hints.hints": 1,
+      "return_navigation_hints.thin_router_returns": 4,
+      "tiny_model_entrypoints.queries": 13
+    }
+  },
+  "parity_evidence": {
+    "predecessor_rebuild_matches_checked_in_outputs": "14/14 byte-identical",
+    "sdk_source_candidate_matches_predecessor_rebuild": "14/14 byte-identical",
+    "installed_sdk_wheel_matches_predecessor_rebuild": "14/14 byte-identical",
+    "schema_and_semantic_validation": "passed predecessor validate_router.py against SDK candidate output",
+    "predecessor_build_check_against_sdk_output": "14/14 passed",
+    "predecessor_tests": "167 passed",
+    "sdk_consumer_tests": "21 passed",
+    "sdk_candidate_ruff": "passed",
+    "clean_environment": {
+      "package_source": "installed aoa_sdk-0.5.1 wheel in a fresh venv",
+      "working_root_contains_aoa_routing_checkout": false,
+      "producer_module_loaded_from": "venv site-packages",
+      "result": "passed"
+    }
+  },
+  "provenance_posture": {
+    "embedded_owner_during_rehearsal": "aoa-routing",
+    "embedded_producer_during_rehearsal": "scripts/build_router.py",
+    "reason": "Byte parity and predecessor-canonical authority require embedded compatibility provenance to remain unchanged before G5.",
+    "actual_shadow_producer_evidence": "this R3 sidecar receipt",
+    "m1_requirement": "Emit a dual-producer shadow sidecar that identifies both exact source refs without changing the fourteen compatibility artifacts.",
+    "g5_requirement": "Change embedded producer and owner provenance only with the explicit owner-switch receipt."
+  },
+  "rollback": {
+    "strategy": "Discard the SDK candidate and invoke the pinned aoa-routing producer.",
+    "predecessor_rebuild_after_sdk_trial": "14/14 byte-identical",
+    "canonical_files_mutated": false,
+    "runtime_consumers_mutated": false,
+    "disposable_worktrees_removed": [
+      "/home/dionysus/.worktrees/aoa-sdk-routing-r3-rehearsal-20260723",
+      "/home/dionysus/.worktrees/aoa-routing-r3-source-20260723"
+    ],
+    "removal_verified": true,
+    "uncommitted_rehearsal_code_recoverable": "recreate deterministically from the two pinned predecessor modules and the three recorded candidate differences"
+  },
+  "m1_entry_conditions": {
+    "required_before_shadow_merge": [
+      "move the producer modules into the admitted SDK source and mechanics topology",
+      "port producer schemas, validators, fixtures, negative tests, and deterministic parity tests",
+      "declare PyYAML as a runtime dependency and types-PyYAML as a development dependency",
+      "resolve the 20 inherited code typing errors plus the missing PyYAML stub error",
+      "package every SDK-owned schema and verify installed-wheel validation",
+      "emit dual-producer shadow provenance outside the compatibility artifacts",
+      "keep root generated routing publication and runtime consumers unchanged"
+    ],
+    "observed_mypy_result": "21 errors: 20 inherited code typing errors and 1 missing PyYAML stub error",
+    "release_gate_claimed": false,
+    "why_g3_still_passes": "G3 proves migration feasibility, parity, clean build, consumer compatibility, provenance strategy, and rollback; M1 owns production integration and release gates."
+  },
+  "real_pr_order": [
+    {
+      "order": 1,
+      "id": "SDK_M1_SHADOW",
+      "repository": "8Dionysus/aoa-sdk",
+      "effect": "Land typed, packaged shadow producer, schemas, validators, fixtures, parity CI, and dual-producer sidecar without publishing canonical routing outputs."
+    },
+    {
+      "order": 2,
+      "id": "SDK_M1_SHADOW_RELEASE",
+      "repository": "8Dionysus/aoa-sdk",
+      "effect": "Release the exact shadow implementation so cross-repo CI and clean consumers can pin an immutable package."
+    },
+    {
+      "order": 3,
+      "id": "ROUTING_M1_PARITY_CONSUMER",
+      "repository": "8Dionysus/aoa-routing",
+      "effect": "Install the pinned SDK shadow release in CI and compare all fourteen outputs while aoa-routing remains canonical."
+    },
+    {
+      "order": 4,
+      "id": "SDK_G4_EVIDENCE",
+      "repository": "8Dionysus/aoa-sdk",
+      "effect": "Land clean-install, package, deterministic, runtime-mirror dry-run, trust, consumer, and parity evidence; do not switch authority on unexplained drift."
+    },
+    {
+      "order": 5,
+      "id": "ROUTING_M2_CONDITIONAL_HANDOFF",
+      "repository": "8Dionysus/aoa-routing",
+      "effect": "Freeze new routing features and prepare compatibility and rollback posture, but remain canonical until the named SDK G5 merge."
+    },
+    {
+      "order": 6,
+      "id": "SDK_M2_G5_SWITCH",
+      "repository": "8Dionysus/aoa-sdk",
+      "effect": "Land the explicit G5 receipt, canonical publication, and SDK source provenance after every G4 condition and the conditional predecessor handoff are green."
+    },
+    {
+      "order": 7,
+      "id": "ROUTING_M3_COMPATIBILITY",
+      "repository": "8Dionysus/aoa-routing",
+      "effect": "Remove duplicate active mechanics only after G5 while preserving the predecessor producer for the compatibility and rollback window."
+    }
+  ],
+  "ownership_audit": {
+    "hidden_semantic_owner_found": false,
+    "hidden_runtime_owner_found": false,
+    "runtime_execution_added": false,
+    "source_corpora_copied": false,
+    "routing_policy_character": "deterministic navigation projection over owner-qualified sibling inputs",
+    "stronger_owners_unchanged": [
+      "aoa-agents",
+      "aoa-skills",
+      "aoa-playbooks",
+      "aoa-evals",
+      "aoa-memo",
+      "aoa-kag",
+      "aoa-stats",
+      "abyss-stack"
+    ]
+  },
+  "gate_g3": {
+    "verdict": "pass",
+    "byte_parity": true,
+    "schema_parity": true,
+    "route_count_parity": true,
+    "canonical_provenance_preserved": true,
+    "actual_shadow_provenance_recorded": true,
+    "consumer_changes_required": false,
+    "sdk_independent_build": true,
+    "rollback_reproducible": true,
+    "hidden_semantic_or_runtime_ownership": false,
+    "disposable_rehearsal_removed": true,
+    "m1_shadow_authorized": true,
+    "canonical_producer_switch_authorized": false,
+    "runtime_mutation_authorized": false,
+    "repository_archive_authorized": false
+  }
+}

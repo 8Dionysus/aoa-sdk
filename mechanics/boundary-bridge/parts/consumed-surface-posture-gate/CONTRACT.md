@@ -22,6 +22,10 @@
   scope, idempotent command replay, and digest-chained runtime events.
 - Keeps `RunPlan` runtime-neutral and keeps runtime outcomes distinct from eval
   verdicts, memory receipts, and lifecycle closeout.
+- Records disposable migration parity and rollback without turning rehearsal
+  code into active source or treating an SDK wheel as canonical publication.
+- Requires dual-producer sidecar provenance during M1 shadow generation while
+  preserving the fourteen compatibility artifacts byte-for-byte.
 
 ## Non-Goals
 
@@ -34,6 +38,8 @@
   or archive authorization.
 - A protocol type is not an active `AoASDK` facade, runtime adapter, executor,
   or producer migration.
+- A passed G3 rehearsal is not a passed SDK release gate, G4 parity window, G5
+  owner switch, runtime mutation, or archive authorization.
 
 ## Active Test Home
 
@@ -50,3 +56,4 @@
 - `tests/test_routing_succession_r0_baseline.py`
 - `tests/test_routing_succession_r1_target_operating_model.py`
 - `tests/test_routing_succession_r2_control_plane_contracts.py`
+- `tests/test_routing_succession_r3_migration_rehearsal.py`

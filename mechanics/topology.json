@@ -327,6 +327,7 @@
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_memo_surface_reader.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_playbook_surface_reader.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_surface_actions.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_r3_migration_rehearsal.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py",
         "mechanics/boundary-bridge/parts/skill-environment-inspector",
