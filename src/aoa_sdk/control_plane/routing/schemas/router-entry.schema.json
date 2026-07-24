@@ -1,0 +1,58 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/routing/core/schemas/router-entry.schema.json",
+  "title": "aoa-routing common entry shape",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "kind",
+    "id",
+    "name",
+    "repo",
+    "path",
+    "status",
+    "summary"
+  ],
+  "properties": {
+    "kind": {
+      "type": "string",
+      "enum": [
+        "technique",
+        "skill",
+        "eval",
+        "memo"
+      ]
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "name": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repo": {
+      "type": "string",
+      "pattern": "^aoa-[a-z0-9-]+$"
+    },
+    "path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "status": {
+      "type": "string",
+      "minLength": 1
+    },
+    "summary": {
+      "type": "string",
+      "minLength": 1
+    },
+    "source_type": {
+      "type": "string",
+      "minLength": 1
+    },
+    "attributes": {
+      "type": "object"
+    }
+  }
+}

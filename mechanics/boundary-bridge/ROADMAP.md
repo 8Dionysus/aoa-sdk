@@ -16,6 +16,9 @@ mean.
   selection, and KAG retrieval/composition authority.
 - Keep owner-layer signal detection additive, inspectable, and weaker than
   owner acceptance.
+- Keep the M1 SDK routing compiler in non-publishing `sdk_shadow` posture,
+  byte-paired with the pinned predecessor, and separately proven through its
+  installed-wheel sidecar.
 
 ## Next Work
 
@@ -24,6 +27,9 @@ mean.
 - Keep bridge helpers paired with source owner, route card, and focused tests.
 - Move repeated cross-owner pressure into the nearest current part before
   considering a new bridge part.
+- Release the exact M1 wheel, let the predecessor consume that immutable
+  release for the G4 parity window, and keep any unexplained drift as a hard
+  stop before G5.
 
 ## When Time Comes
 
@@ -37,7 +43,7 @@ mean.
 ## Out Of Scope
 
 - Sibling source truth.
-- Routing policy authority.
+- Canonical routing policy authority before the explicit G5 owner switch.
 - Skill execution meaning.
 - Proof, memory, role, stats, KAG, playbook, or runtime ownership.
 - Owner acceptance without owner receipt.

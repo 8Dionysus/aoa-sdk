@@ -205,6 +205,7 @@
       "owner_surface": "sdk/facade-boundary/AGENTS.md",
       "implementation_routes": [
         "src/aoa_sdk/compatibility",
+        "src/aoa_sdk/control_plane/routing",
         "docs/versioning.md"
       ],
       "mechanic_routes": [
@@ -213,7 +214,9 @@
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
-        "aoa compatibility check /srv/AbyssOS/aoa-sdk"
+        "aoa compatibility check /srv/AbyssOS/aoa-sdk",
+        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests",
+        "python -m mypy src/aoa_sdk/control_plane/routing"
       ],
       "stop_lines": [
         "Do not turn missing source surfaces into silent pass conditions."
@@ -329,7 +332,8 @@
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
-        "python -m build"
+        "python -m build",
+        "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py"
       ],
       "stop_lines": [
         "Do not claim package publication before external publication proof exists."

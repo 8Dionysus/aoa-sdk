@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 10232963,
+  "allowed_tracked_bytes": 15330048,
+  "approved_by": "repository-owner",
+  "base_ref": "64e22f5b4fb16f1c282b5bedc23fd9f8fa22b428",
+  "changed_generated_bytes": 10232963,
+  "changed_generated_files": 290,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "113667703daec0253b548ff142fb3420c4c0d62846574152fdf663508b5f88a6",
+  "reason": "M1 adds the minimal typed routing shadow compiler, strict schemas and validator, dual-producer provenance, deterministic compact fixture archives, parity CI, and installed-wheel verification required by the accepted staged succession; duplicated predecessor repository topology and canonical publication remain excluded.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta",
+  "tracked_bytes": 15330048,
+  "tracked_bytes_max": 15728640
+}

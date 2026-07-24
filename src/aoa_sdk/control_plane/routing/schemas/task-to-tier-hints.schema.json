@@ -1,0 +1,85 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/routing/core/schemas/task-to-tier-hints.schema.json",
+  "title": "aoa-routing task to tier hints",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "source_of_truth",
+    "hints"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "source_of_truth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "tier_registry_repo",
+        "tier_registry_path"
+      ],
+      "properties": {
+        "tier_registry_repo": {
+          "const": "aoa-agents"
+        },
+        "tier_registry_path": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "hints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hint"
+      }
+    }
+  },
+  "$defs": {
+    "tierName": {
+      "type": "string",
+      "minLength": 2,
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "hint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "task_family",
+        "preferred_tier",
+        "fallback_tier",
+        "use_when",
+        "output_artifact"
+      ],
+      "properties": {
+        "task_family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "preferred_tier": {
+          "$ref": "#/$defs/tierName"
+        },
+        "fallback_tier": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/tierName"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "use_when": {
+          "type": "string",
+          "minLength": 1
+        },
+        "output_artifact": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,215 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/routing-shadow-provenance.schema.json",
+  "title": "AoA SDK routing shadow provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "state",
+    "publication_posture",
+    "canonical_producer",
+    "shadow_producer",
+    "abi_epoch",
+    "artifact_sha256",
+    "input_source_refs",
+    "observed_at",
+    "authority_stop_line"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_routing_shadow_provenance_v1"
+    },
+    "state": {
+      "const": "sdk_shadow"
+    },
+    "publication_posture": {
+      "const": "non_publishing"
+    },
+    "canonical_producer": {
+      "$ref": "#/$defs/producer"
+    },
+    "shadow_producer": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/producer"
+        },
+        {
+          "required": [
+            "implementation"
+          ]
+        }
+      ]
+    },
+    "abi_epoch": {
+      "const": "aoa_routing_thin_router_v1"
+    },
+    "artifact_sha256": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "aoa_router.min.json",
+        "composite_stress_route_hints.min.json",
+        "cross_repo_registry.min.json",
+        "federation_entrypoints.min.json",
+        "kag_source_lift_relation_hints.min.json",
+        "owner_layer_shortlist.min.json",
+        "pairing_hints.min.json",
+        "quest_dispatch_hints.min.json",
+        "recommended_paths.min.json",
+        "return_navigation_hints.min.json",
+        "stats_regrounding_hints.min.json",
+        "task_to_surface_hints.json",
+        "task_to_tier_hints.json",
+        "tiny_model_entrypoints.json"
+      ],
+      "properties": {
+        "aoa_router.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "composite_stress_route_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "cross_repo_registry.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "federation_entrypoints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "kag_source_lift_relation_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "owner_layer_shortlist.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "pairing_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "quest_dispatch_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "recommended_paths.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "return_navigation_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "stats_regrounding_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "task_to_surface_hints.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "task_to_tier_hints.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "tiny_model_entrypoints.json": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "input_source_refs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "8Dionysus",
+        "Agents-of-Abyss",
+        "Dionysus",
+        "Tree-of-Sophia",
+        "abyss-stack",
+        "aoa-agents",
+        "aoa-evals",
+        "aoa-kag",
+        "aoa-memo",
+        "aoa-playbooks",
+        "aoa-sdk",
+        "aoa-skills",
+        "aoa-stats",
+        "aoa-techniques"
+      ],
+      "properties": {
+        "8Dionysus": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "Agents-of-Abyss": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "Dionysus": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "Tree-of-Sophia": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "abyss-stack": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "aoa-agents": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "aoa-evals": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "aoa-kag": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "aoa-memo": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "aoa-playbooks": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "aoa-sdk": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "aoa-skills": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "aoa-stats": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "aoa-techniques": {
+          "$ref": "#/$defs/git_object_id"
+        }
+      }
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "authority_stop_line": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "git_object_id": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_repo",
+        "source_ref"
+      ],
+      "properties": {
+        "owner_repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ref": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "implementation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

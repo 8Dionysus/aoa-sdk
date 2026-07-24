@@ -1,0 +1,345 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/mechanics/antifragility/parts/composite-stress-routing/schemas/composite-stress-route-hints.schema.json",
+  "title": "aoa-routing composite stress route hints",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "source_inputs",
+    "hints"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_routing_composite_stress_route_hints_v1"
+    },
+    "source_inputs": {
+      "type": "array",
+      "minItems": 6,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "repo",
+          "surface_kind",
+          "ref"
+        ],
+        "properties": {
+          "repo": {
+            "type": "string",
+            "minLength": 1
+          },
+          "surface_kind": {
+            "type": "string",
+            "minLength": 1
+          },
+          "ref": {
+            "type": "string",
+            "minLength": 1
+          }
+        }
+      }
+    },
+    "hints": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/hint"
+      }
+    }
+  },
+  "$defs": {
+    "hint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "schema_version",
+        "hint_id",
+        "stressor_family",
+        "owner_surface",
+        "preferred_posture",
+        "input_refs",
+        "route_status",
+        "source_priority",
+        "next_hops",
+        "memo_context"
+      ],
+      "properties": {
+        "schema_version": {
+          "const": "composite_stress_route_hint_v1"
+        },
+        "hint_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "stressor_family": {
+          "type": "string",
+          "minLength": 1
+        },
+        "owner_surface": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "repo",
+            "surface",
+            "surface_family"
+          ],
+          "properties": {
+            "repo": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surface": {
+              "type": "string",
+              "minLength": 1
+            },
+            "surface_family": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        },
+        "preferred_posture": {
+          "enum": [
+            "source_first_until_pass",
+            "resume_degraded",
+            "reground_first",
+            "hold_until_review"
+          ]
+        },
+        "input_refs": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stats_summary_ref",
+            "playbook_lane_ref",
+            "reentry_gate_ref",
+            "projection_health_ref",
+            "regrounding_ticket_ref",
+            "memo_pattern_refs"
+          ],
+          "properties": {
+            "stats_summary_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "playbook_lane_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reentry_gate_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "projection_health_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "regrounding_ticket_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "memo_pattern_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "route_status": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "stats_suppression_status",
+            "projection_health_state",
+            "consumer_posture",
+            "reentry_decision",
+            "regrounding_status",
+            "route_discipline",
+            "reentry_quality",
+            "regrounding_effectiveness",
+            "trend_flags"
+          ],
+          "properties": {
+            "stats_suppression_status": {
+              "enum": [
+                "none",
+                "low_sample",
+                "insufficient_evidence"
+              ]
+            },
+            "projection_health_state": {
+              "type": "string",
+              "minLength": 1
+            },
+            "consumer_posture": {
+              "type": "string",
+              "minLength": 1
+            },
+            "reentry_decision": {
+              "type": "string",
+              "minLength": 1
+            },
+            "regrounding_status": {
+              "type": "string",
+              "minLength": 1
+            },
+            "route_discipline": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "reentry_quality": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "regrounding_effectiveness": {
+              "type": [
+                "number",
+                "null"
+              ]
+            },
+            "trend_flags": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            }
+          }
+        },
+        "source_priority": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "owner_receipt_refs",
+            "proof_refs",
+            "adjacent_source_refs",
+            "routing_is_advisory"
+          ],
+          "properties": {
+            "owner_receipt_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "proof_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "adjacent_source_refs": {
+              "type": "array",
+              "items": {
+                "type": "string",
+                "minLength": 1
+              }
+            },
+            "routing_is_advisory": {
+              "type": "boolean"
+            }
+          }
+        },
+        "next_hops": {
+          "type": "array",
+          "minItems": 5,
+          "items": {
+            "$ref": "#/$defs/nextHop"
+          }
+        },
+        "memo_context": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/memoContext"
+          }
+        },
+        "notes": {
+          "type": [
+            "string",
+            "null"
+          ]
+        }
+      }
+    },
+    "nextHop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "target_repo",
+        "target_surface",
+        "reason",
+        "bounded"
+      ],
+      "properties": {
+        "kind": {
+          "enum": [
+            "source_receipt",
+            "playbook_lane",
+            "reentry_gate",
+            "projection_health",
+            "regrounding_ticket",
+            "memo_pattern"
+          ]
+        },
+        "target_repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_surface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "reason": {
+          "type": "string",
+          "minLength": 1
+        },
+        "bounded": {
+          "type": "boolean"
+        }
+      }
+    },
+    "memoContext": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "memory_id",
+        "title",
+        "source_path",
+        "review_state",
+        "current_recall_status"
+      ],
+      "properties": {
+        "memory_id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "title": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_path": {
+          "type": "string",
+          "minLength": 1
+        },
+        "review_state": {
+          "type": "string",
+          "minLength": 1
+        },
+        "current_recall_status": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

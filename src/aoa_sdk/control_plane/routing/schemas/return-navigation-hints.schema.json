@@ -1,0 +1,350 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/mechanics/recurrence/parts/return-navigation/schemas/return-navigation-hints.schema.json",
+  "title": "aoa-routing return navigation hints",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "schema_ref",
+    "owner_repo",
+    "surface_kind",
+    "thin_router_returns",
+    "federation_root_returns",
+    "federation_kind_returns",
+    "federation_entry_returns"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_routing_return_navigation_hints_v2"
+    },
+    "schema_ref": {
+      "const": "mechanics/recurrence/parts/return-navigation/schemas/return-navigation-hints.schema.json"
+    },
+    "owner_repo": {
+      "const": "aoa-routing"
+    },
+    "surface_kind": {
+      "const": "return_navigation_hints"
+    },
+    "thin_router_returns": {
+      "type": "array",
+      "minItems": 4,
+      "items": {
+        "$ref": "#/$defs/thinRouterReturn"
+      }
+    },
+    "federation_root_returns": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/federationRootReturn"
+      }
+    },
+    "federation_kind_returns": {
+      "type": "array",
+      "minItems": 7,
+      "items": {
+        "$ref": "#/$defs/federationKindReturn"
+      }
+    },
+    "federation_entry_returns": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "aoa-sdk-control-plane",
+        "aoa-stats-summary-catalog",
+        "abyss-stack-diagnostic-spine",
+        "dionysus-source-route",
+        "8dionysus-public-route-map",
+        "AOA-P-0031"
+      ],
+      "properties": {
+        "AOA-P-0031": {
+          "$ref": "#/$defs/federationEntryReturn"
+        },
+        "aoa-sdk-control-plane": {
+          "$ref": "#/$defs/federationEntryReturn"
+        },
+        "aoa-stats-summary-catalog": {
+          "$ref": "#/$defs/federationEntryReturn"
+        },
+        "abyss-stack-diagnostic-spine": {
+          "$ref": "#/$defs/federationEntryReturn"
+        },
+        "dionysus-source-route": {
+          "$ref": "#/$defs/federationEntryReturn"
+        },
+        "8dionysus-public-route-map": {
+          "$ref": "#/$defs/federationEntryReturn"
+        }
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repoName": {
+      "type": "string",
+      "enum": [
+        "aoa-routing",
+        "aoa-techniques",
+        "aoa-skills",
+        "aoa-evals",
+        "aoa-memo",
+        "aoa-sdk",
+        "aoa-stats",
+        "aoa-agents",
+        "aoa-playbooks",
+        "aoa-kag",
+        "8Dionysus",
+        "Dionysus",
+        "abyss-stack",
+        "Agents-of-Abyss",
+        "Tree-of-Sophia"
+      ]
+    },
+    "returnReason": {
+      "type": "string",
+      "enum": [
+        "axis_lost",
+        "artifact_contract_lost",
+        "verification_lost",
+        "source_boundary_lost",
+        "authority_unclear",
+        "checkpoint_continuity_needed",
+        "reroute_required",
+        "split_route_needed",
+        "human_gate_required"
+      ]
+    },
+    "supportedReturnReasons": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/returnReason"
+      }
+    },
+    "routeAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verb",
+        "target_repo",
+        "target_surface"
+      ],
+      "properties": {
+        "verb": {
+          "type": "string",
+          "enum": [
+            "pick",
+            "inspect",
+            "expand",
+            "recall"
+          ]
+        },
+        "target_repo": {
+          "$ref": "#/$defs/repoName"
+        },
+        "target_surface": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "match_field": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "target_value": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "section_key_field": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "thinRouterReturn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "context_kind",
+        "source_repo",
+        "supported_return_reasons",
+        "primary_action",
+        "ownership_note"
+      ],
+      "properties": {
+        "context_kind": {
+          "type": "string",
+          "enum": [
+            "technique",
+            "skill",
+            "eval",
+            "memo"
+          ]
+        },
+        "source_repo": {
+          "type": "string",
+          "enum": [
+            "aoa-techniques",
+            "aoa-skills",
+            "aoa-evals",
+            "aoa-memo"
+          ]
+        },
+        "supported_return_reasons": {
+          "$ref": "#/$defs/supportedReturnReasons"
+        },
+        "primary_action": {
+          "$ref": "#/$defs/routeAction"
+        },
+        "secondary_action": {
+          "$ref": "#/$defs/routeAction"
+        },
+        "ownership_note": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "federationRootReturn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root_id",
+        "owner_repo",
+        "supported_return_reasons",
+        "primary_action",
+        "fallback_action",
+        "ownership_note"
+      ],
+      "properties": {
+        "root_id": {
+          "type": "string",
+          "enum": [
+            "aoa-root",
+            "tos-root"
+          ]
+        },
+        "owner_repo": {
+          "type": "string",
+          "enum": [
+            "Agents-of-Abyss",
+            "Tree-of-Sophia"
+          ]
+        },
+        "supported_return_reasons": {
+          "$ref": "#/$defs/supportedReturnReasons"
+        },
+        "primary_action": {
+          "$ref": "#/$defs/routeAction"
+        },
+        "secondary_action": {
+          "$ref": "#/$defs/routeAction"
+        },
+        "fallback_action": {
+          "$ref": "#/$defs/routeAction"
+        },
+        "ownership_note": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "federationKindReturn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry_kind",
+        "owner_repo",
+        "supported_return_reasons",
+        "primary_action",
+        "fallback_action",
+        "ownership_note"
+      ],
+      "properties": {
+        "entry_kind": {
+          "type": "string",
+          "enum": [
+            "agent",
+            "tier",
+            "playbook",
+            "kag_view",
+            "source_route",
+            "runtime_surface",
+            "orientation_surface"
+          ]
+        },
+        "owner_repo": {
+          "type": "string",
+          "enum": [
+            "aoa-sdk",
+            "aoa-stats",
+            "aoa-agents",
+            "aoa-playbooks",
+            "aoa-kag",
+            "8Dionysus",
+            "Dionysus",
+            "abyss-stack"
+          ]
+        },
+        "supported_return_reasons": {
+          "$ref": "#/$defs/supportedReturnReasons"
+        },
+        "primary_action": {
+          "$ref": "#/$defs/routeAction"
+        },
+        "fallback_action": {
+          "$ref": "#/$defs/routeAction"
+        },
+        "ownership_note": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "federationEntryReturn": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "entry_kind",
+        "owner_repo",
+        "supported_return_reasons",
+        "primary_action",
+        "fallback_action",
+        "ownership_note"
+      ],
+      "properties": {
+        "entry_kind": {
+          "type": "string",
+          "enum": [
+            "playbook",
+            "source_route",
+            "runtime_surface",
+            "orientation_surface"
+          ]
+        },
+        "owner_repo": {
+          "type": "string",
+          "enum": [
+            "aoa-sdk",
+            "aoa-stats",
+            "aoa-playbooks",
+            "8Dionysus",
+            "Dionysus",
+            "abyss-stack"
+          ]
+        },
+        "supported_return_reasons": {
+          "$ref": "#/$defs/supportedReturnReasons"
+        },
+        "primary_action": {
+          "$ref": "#/$defs/routeAction"
+        },
+        "fallback_action": {
+          "$ref": "#/$defs/routeAction"
+        },
+        "ownership_note": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    }
+  }
+}

@@ -81,7 +81,7 @@ The current landed surface includes:
 - the checked SDK source-home tree under [sdk](sdk/README.md);
 - the SDK-owned compatibility posture measurement under [stats](stats/README.md);
 - the admitted Titan helper procedure home under [skills](skills/README.md);
-- the accepted, not-yet-active staged routing producer succession in
+- the accepted staged routing producer succession in
   [AOA-SDK-D-0071](docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md)
   and its
   [target operating model](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r1-target-operating-model.md);
@@ -94,6 +94,10 @@ The current landed surface includes:
   which proves 14/14 byte parity, installed-wheel construction without the
   predecessor checkout, consumer compatibility, and rollback while leaving
   `aoa-routing` canonical;
+- the implemented
+  [M1 routing shadow producer](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-m1-shadow-producer.md),
+  which packages the typed compiler, schemas, validator, dual-producer
+  sidecar, parity CI, and installed-wheel gate while remaining non-publishing;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

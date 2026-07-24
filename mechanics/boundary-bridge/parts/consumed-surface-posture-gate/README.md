@@ -31,6 +31,8 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
 - the R3 disposable producer-migration rehearsal, including byte/schema/count
   parity, installed-wheel construction without an `aoa-routing` checkout,
   rollback, exact PR order, admitted M1 integration debt, and cleanup evidence
+- the M1 packaged, typed, non-publishing SDK shadow producer, strict validator,
+  dual-producer sidecar, pinned predecessor parity CI, and installed-wheel gate
 
 ## Owner
 
@@ -52,8 +54,11 @@ Then read the checked
 [`docs/routing-succession-r2-agent-os-contracts.md`](docs/routing-succession-r2-agent-os-contracts.md).
 Then read the completed
 [`docs/routing-succession-r3-migration-rehearsal.md`](docs/routing-succession-r3-migration-rehearsal.md).
-G3 authorizes M1 shadow implementation only. It does not authorize canonical
-publication, runtime mutation, an owner switch, or archival action.
+Then read the implemented
+[`docs/routing-succession-m1-shadow-producer.md`](docs/routing-succession-m1-shadow-producer.md).
+M1 makes the successor executable in non-publishing shadow posture. It does
+not pass G4, authorize canonical publication, mutate runtime, switch an owner,
+or authorize archival action.
 
 ## Validation
 

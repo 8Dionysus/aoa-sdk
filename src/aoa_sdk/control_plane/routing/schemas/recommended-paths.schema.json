@@ -1,0 +1,91 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/routing/core/schemas/recommended-paths.schema.json",
+  "title": "aoa-routing recommended paths",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "entries"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/pathEntry"
+      }
+    }
+  },
+  "$defs": {
+    "hop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "relation"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "technique",
+            "skill",
+            "eval"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relation": {
+          "type": "string",
+          "enum": [
+            "requires",
+            "required_by"
+          ]
+        }
+      }
+    },
+    "pathEntry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "upstream",
+        "downstream"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "technique",
+            "skill",
+            "eval",
+            "memo"
+          ]
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "upstream": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hop"
+          }
+        },
+        "downstream": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/hop"
+          }
+        }
+      }
+    }
+  }
+}

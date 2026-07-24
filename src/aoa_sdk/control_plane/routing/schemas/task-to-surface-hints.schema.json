@@ -1,0 +1,382 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/routing/core/schemas/task-to-surface-hints.schema.json",
+  "title": "aoa-routing task to surface hints",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "hints"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "hints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hint"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stringList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "disabledAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled"
+      ],
+      "properties": {
+        "enabled": {
+          "const": false
+        }
+      }
+    },
+    "pickAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled"
+      ],
+      "properties": {
+        "enabled": {
+          "type": "boolean"
+        }
+      }
+    },
+    "inspectAction": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/disabledAction"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "surface_file",
+            "match_field"
+          ],
+          "properties": {
+            "enabled": {
+              "const": true
+            },
+            "surface_file": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "match_field": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          }
+        }
+      ]
+    },
+    "expandAction": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/disabledAction"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "surface_file",
+            "match_field",
+            "section_key_field",
+            "default_sections",
+            "supported_sections"
+          ],
+          "properties": {
+            "enabled": {
+              "const": true
+            },
+            "surface_file": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "match_field": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "section_key_field": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "default_sections": {
+              "$ref": "#/$defs/stringList"
+            },
+            "supported_sections": {
+              "$ref": "#/$defs/stringList"
+            }
+          }
+        }
+      ]
+    },
+    "pairAction": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/disabledAction"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "surface_repo",
+            "surface_file",
+            "match_field"
+          ],
+          "properties": {
+            "enabled": {
+              "const": true
+            },
+            "surface_repo": {
+              "enum": [
+                "aoa-routing"
+              ]
+            },
+            "surface_file": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "match_field": {
+              "$ref": "#/$defs/nonEmptyString"
+            }
+          }
+        }
+      ]
+    },
+    "secondCutAction": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/disabledAction"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "surface_repo",
+            "surface_file",
+            "collection_key",
+            "match_field",
+            "selection_axis",
+            "prerequisite_axes"
+          ],
+          "properties": {
+            "enabled": {
+              "const": true
+            },
+            "surface_repo": {
+              "enum": [
+                "aoa-techniques"
+              ]
+            },
+            "surface_file": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "collection_key": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "match_field": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "selection_axis": {
+              "const": "kind"
+            },
+            "prerequisite_axes": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "domain"
+                ]
+              },
+              "minItems": 1,
+              "maxItems": 1,
+              "uniqueItems": true
+            }
+          }
+        }
+      ]
+    },
+    "contractsByMode": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z][a-z0-9_-]*$": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "surfacesByMode": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": false,
+      "patternProperties": {
+        "^[a-z][a-z0-9_-]*$": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "parallelRecallFamily": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "inspect_surface",
+        "expand_surface",
+        "default_mode",
+        "supported_modes",
+        "contracts_by_mode"
+      ],
+      "properties": {
+        "inspect_surface": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "expand_surface": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "default_mode": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "supported_modes": {
+          "$ref": "#/$defs/stringList"
+        },
+        "contracts_by_mode": {
+          "$ref": "#/$defs/contractsByMode"
+        },
+        "capsule_surfaces_by_mode": {
+          "$ref": "#/$defs/surfacesByMode"
+        }
+      }
+    },
+    "parallelRecallFamilies": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "memory_objects": {
+          "$ref": "#/$defs/parallelRecallFamily"
+        }
+      }
+    },
+    "recallAction": {
+      "oneOf": [
+        {
+          "$ref": "#/$defs/disabledAction"
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "enabled",
+            "default_mode",
+            "supported_modes",
+            "contracts_by_mode"
+          ],
+          "properties": {
+            "enabled": {
+              "const": true
+            },
+            "contract_file": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "default_mode": {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            "supported_modes": {
+              "$ref": "#/$defs/stringList"
+            },
+            "contracts_by_mode": {
+              "$ref": "#/$defs/contractsByMode"
+            },
+            "capsule_surfaces_by_mode": {
+              "$ref": "#/$defs/surfacesByMode"
+            },
+            "parallel_families": {
+              "$ref": "#/$defs/parallelRecallFamilies"
+            }
+          }
+        }
+      ]
+    },
+    "actions": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pick",
+        "inspect",
+        "expand",
+        "pair",
+        "recall"
+      ],
+      "properties": {
+        "pick": {
+          "$ref": "#/$defs/pickAction"
+        },
+        "inspect": {
+          "$ref": "#/$defs/inspectAction"
+        },
+        "expand": {
+          "$ref": "#/$defs/expandAction"
+        },
+        "pair": {
+          "$ref": "#/$defs/pairAction"
+        },
+        "second_cut": {
+          "$ref": "#/$defs/secondCutAction"
+        },
+        "recall": {
+          "$ref": "#/$defs/recallAction"
+        }
+      }
+    },
+    "hint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "enabled",
+        "source_repo",
+        "use_when",
+        "actions"
+      ],
+      "properties": {
+        "kind": {
+          "type": "string",
+          "enum": [
+            "technique",
+            "skill",
+            "eval",
+            "memo"
+          ]
+        },
+        "enabled": {
+          "type": "boolean"
+        },
+        "source_repo": {
+          "type": "string",
+          "enum": [
+            "aoa-techniques",
+            "aoa-skills",
+            "aoa-evals",
+            "aoa-memo"
+          ]
+        },
+        "use_when": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "actions": {
+          "$ref": "#/$defs/actions"
+        }
+      }
+    }
+  }
+}

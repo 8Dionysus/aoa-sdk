@@ -1,0 +1,136 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/routing/core/schemas/cross-repo-registry.schema.json",
+  "title": "aoa-routing cross-repo registry",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "registry_version",
+    "reserved_kinds",
+    "entries"
+  ],
+  "properties": {
+    "registry_version": {
+      "const": 1
+    },
+    "reserved_kinds": {
+      "type": "array",
+      "items": {
+        "const": "memo"
+      },
+      "minItems": 0,
+      "maxItems": 1,
+      "uniqueItems": true
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "oneOf": [
+          {
+            "$ref": "#/$defs/techniqueEntry"
+          },
+          {
+            "$ref": "#/$defs/skillEntry"
+          },
+          {
+            "$ref": "#/$defs/evalEntry"
+          },
+          {
+            "$ref": "#/$defs/memoEntry"
+          }
+        ]
+      }
+    }
+  },
+  "$defs": {
+    "generatedCatalogEntry": {
+      "allOf": [
+        {
+          "$ref": "https://aoa-routing/routing/core/schemas/router-entry.schema.json"
+        },
+        {
+          "required": [
+            "source_type",
+            "attributes"
+          ],
+          "properties": {
+            "source_type": {
+              "const": "generated-catalog"
+            },
+            "attributes": {
+              "type": "object"
+            }
+          }
+        }
+      ]
+    },
+    "techniqueEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/generatedCatalogEntry"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "technique"
+            },
+            "repo": {
+              "const": "aoa-techniques"
+            }
+          }
+        }
+      ]
+    },
+    "skillEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/generatedCatalogEntry"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "skill"
+            },
+            "repo": {
+              "const": "aoa-skills"
+            }
+          }
+        }
+      ]
+    },
+    "evalEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/generatedCatalogEntry"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "eval"
+            },
+            "repo": {
+              "const": "aoa-evals"
+            }
+          }
+        }
+      ]
+    },
+    "memoEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/generatedCatalogEntry"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "memo"
+            },
+            "repo": {
+              "const": "aoa-memo"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

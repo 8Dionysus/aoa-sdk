@@ -1,0 +1,121 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/mechanics/boundary-bridge/parts/owner-layer-shortlist/schemas/owner-layer-shortlist.schema.json",
+  "title": "aoa-routing owner layer shortlist",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "schema_ref",
+    "owner_repo",
+    "surface_kind",
+    "hints"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_routing_owner_layer_shortlist_v2"
+    },
+    "schema_ref": {
+      "const": "mechanics/boundary-bridge/parts/owner-layer-shortlist/schemas/owner-layer-shortlist.schema.json"
+    },
+    "owner_repo": {
+      "const": "aoa-routing"
+    },
+    "surface_kind": {
+      "const": "owner_layer_shortlist"
+    },
+    "hints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hint"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "hint": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "shortlist_id",
+        "signal",
+        "owner_repo",
+        "object_kind",
+        "target_surface",
+        "hint_reason",
+        "confidence",
+        "ambiguity"
+      ],
+      "properties": {
+        "shortlist_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "signal": {
+          "enum": [
+            "explicit-request",
+            "proof-need",
+            "recall-need",
+            "scenario-recurring",
+            "role-posture",
+            "repeated-pattern",
+            "risk-gate"
+          ]
+        },
+        "owner_repo": {
+          "enum": [
+            "aoa-techniques",
+            "aoa-skills",
+            "aoa-evals",
+            "aoa-memo",
+            "aoa-sdk",
+            "aoa-stats",
+            "aoa-playbooks",
+            "aoa-agents",
+            "8Dionysus",
+            "Dionysus",
+            "abyss-stack"
+          ]
+        },
+        "object_kind": {
+          "enum": [
+            "technique",
+            "skill",
+            "eval",
+            "memo",
+            "playbook",
+            "agent",
+            "guard",
+            "source_route",
+            "runtime_surface",
+            "orientation_surface"
+          ]
+        },
+        "target_surface": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "inspect_surface": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "hint_reason": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "confidence": {
+          "enum": [
+            "low",
+            "medium",
+            "high"
+          ]
+        },
+        "ambiguity": {
+          "enum": [
+            "clear",
+            "ambiguous"
+          ]
+        }
+      }
+    }
+  }
+}

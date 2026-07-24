@@ -46,3 +46,31 @@ jobs:
           ABYSS_MACHINE_REPO_ROOT: .abyss-machine-verifier
           AOA_STATS_ROOT: .aoa-stats-validator
         run: python scripts/release_check.py
+
+  routing_shadow_parity:
+    name: Routing Shadow Parity
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+
+      - name: Checkout pinned aoa-routing predecessor
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-routing
+          ref: 7e2fe467ad26aa645b61849001a456dda4562ffc
+          path: .routing-predecessor
+
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.12"
+
+      - name: Install SDK with development dependencies
+        run: python -m pip install -e '.[dev]'
+
+      - name: Compare predecessor and SDK shadow producers
+        run: >-
+          python
+          mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/compare_routing_shadow_producers.py
+          --predecessor-root .routing-predecessor

@@ -33,6 +33,14 @@ COMMANDS = [
     ("run mypy", [sys.executable, "-m", "mypy", "src"]),
     ("build package", [sys.executable, "-m", "build"]),
     (
+        "verify installed routing shadow wheel",
+        [
+            sys.executable,
+            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/"
+            "verify_routing_shadow_wheel.py",
+        ],
+    ),
+    (
         "validate OS Abyss package artifact bundle",
         [
             sys.executable,

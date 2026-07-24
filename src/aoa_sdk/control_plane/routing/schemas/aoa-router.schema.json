@@ -1,0 +1,208 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/routing/core/schemas/aoa-router.schema.json",
+  "title": "aoa-routing thin router projection",
+  "type": "object",
+    "additionalProperties": false,
+    "required": [
+        "artifact_identity",
+        "router_version",
+        "entries"
+    ],
+    "properties": {
+        "artifact_identity": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+                "artifact_class",
+                "surface_state",
+                "owner_repo",
+                "authority_ref",
+                "producer",
+                "consumer_expectation",
+                "privacy_boundary",
+                "content_identity",
+                "abi_epoch",
+                "contract_version",
+                "trust_layer",
+                "verification"
+            ],
+            "properties": {
+                "artifact_class": {
+                    "const": "thin_routing_readmodel_bundle"
+                },
+                "surface_state": {
+                    "const": "public_generated_routing_surfaces"
+                },
+                "owner_repo": {
+                    "const": "aoa-routing"
+                },
+                "authority_ref": {
+                    "const": "README.md#generated-outputs"
+                },
+                "producer": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "consumer_expectation": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "privacy_boundary": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "content_identity": {
+                    "type": "string",
+                    "minLength": 1
+                },
+                "abi_epoch": {
+                    "const": "aoa_routing_thin_router_v1"
+                },
+                "contract_version": {
+                    "const": "routing/core/schemas/aoa-router.schema.json@aoa_routing_thin_router_v1#artifact_identity"
+                },
+                "trust_layer": {
+                    "type": "array",
+                    "prefixItems": [
+                        {
+                            "const": "abi_contract_signature"
+                        },
+                        {
+                            "const": "sbom"
+                        },
+                        {
+                            "const": "slsa_in_toto"
+                        }
+                    ],
+                    "items": false,
+                    "minItems": 3,
+                    "maxItems": 3
+                },
+                "verification": {
+                    "type": "array",
+                    "items": {
+                        "type": "string",
+                        "minLength": 1
+                    },
+                    "minItems": 3
+                }
+            }
+        },
+        "router_version": {
+            "const": 1
+        },
+    "entries": {
+      "type": "array",
+        "items": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/techniqueEntry"
+            },
+            {
+              "$ref": "#/$defs/skillEntry"
+            },
+            {
+              "$ref": "#/$defs/evalEntry"
+            },
+            {
+              "$ref": "#/$defs/memoEntry"
+            }
+          ]
+        }
+      }
+  },
+  "$defs": {
+    "thinProjectionEntry": {
+      "allOf": [
+        {
+          "$ref": "https://aoa-routing/routing/core/schemas/router-entry.schema.json"
+        },
+        {
+          "not": {
+            "anyOf": [
+              {
+                "required": [
+                  "source_type"
+                ]
+              },
+              {
+                "required": [
+                  "attributes"
+                ]
+              }
+            ]
+          }
+        }
+      ]
+    },
+    "techniqueEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/thinProjectionEntry"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "technique"
+            },
+            "repo": {
+              "const": "aoa-techniques"
+            }
+          }
+        }
+      ]
+    },
+    "skillEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/thinProjectionEntry"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "skill"
+            },
+            "repo": {
+              "const": "aoa-skills"
+            }
+          }
+        }
+      ]
+    },
+    "evalEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/thinProjectionEntry"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "eval"
+            },
+            "repo": {
+              "const": "aoa-evals"
+            }
+          }
+        }
+      ]
+    },
+    "memoEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/thinProjectionEntry"
+        },
+        {
+          "properties": {
+            "kind": {
+              "const": "memo"
+            },
+            "repo": {
+              "const": "aoa-memo"
+            }
+          }
+        }
+      ]
+    }
+  }
+}

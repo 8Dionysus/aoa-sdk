@@ -1,0 +1,112 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/routing/core/schemas/pairing-hints.schema.json",
+  "title": "aoa-routing pairing hints",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "source_inputs",
+    "entries"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "source_inputs": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "registry_surface",
+        "kag_relation_source_repo",
+        "kag_relation_source_catalog"
+      ],
+      "properties": {
+        "registry_surface": {
+          "const": "generated/cross_repo_registry.min.json"
+        },
+        "kag_relation_source_repo": {
+          "const": "aoa-techniques"
+        },
+        "kag_relation_source_catalog": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    }
+  },
+  "$defs": {
+    "kindName": {
+      "type": "string",
+      "enum": [
+        "technique",
+        "skill",
+        "eval"
+      ]
+    },
+    "pairRelation": {
+      "type": "string",
+      "enum": [
+        "requires",
+        "required_by",
+        "complements",
+        "supersedes",
+        "conflicts_with",
+        "used_together_for",
+        "derived_from",
+        "shares_contract_with"
+      ]
+    },
+    "pair": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "relation"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/kindName"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relation": {
+          "$ref": "#/$defs/pairRelation"
+        }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "pairs"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/kindName"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "pairs": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/pair"
+          }
+        }
+      }
+    }
+  }
+}
