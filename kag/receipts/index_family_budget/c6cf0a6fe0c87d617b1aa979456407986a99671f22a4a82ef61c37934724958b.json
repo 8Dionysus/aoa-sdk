@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 2903241,
+  "allowed_tracked_bytes": 15340638,
+  "approved_by": "repository-owner",
+  "base_ref": "2eb6a3c153820edddf66d4740ede629ba08a7733",
+  "changed_generated_bytes": 2903241,
+  "changed_generated_files": 72,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "c6cf0a6fe0c87d617b1aa979456407986a99671f22a4a82ef61c37934724958b",
+  "reason": "v0.6.0 release preparation reconciles the exact v0.5.1..2eb6a3c first-parent range and synchronizes package, CLI, public release, roadmap, test, source-topology, and portable KAG companions; it adds no implementation or authority, and the tracked portable family remains below its standing cap.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta",
+  "tracked_bytes": 15340638,
+  "tracked_bytes_max": 15728640
+}
