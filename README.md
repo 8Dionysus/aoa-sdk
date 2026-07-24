@@ -98,6 +98,11 @@ The current landed surface includes:
   [M1 routing shadow producer](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-m1-shadow-producer.md),
   which packages the typed compiler, schemas, validator, dual-producer
   sidecar, parity CI, and installed-wheel gate while remaining non-publishing;
+- the passed shadow-only
+  [G4 evidence chain](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g4-evidence.md),
+  which proves the immutable release, predecessor consumer and rollback,
+  package trust, full 170-route canonical replay, and isolated runtime content
+  path while leaving `aoa-routing` canonical and the live runtime untouched;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

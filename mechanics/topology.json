@@ -312,7 +312,7 @@
     {
       "slug": "boundary-bridge",
       "name_type": "shared",
-      "operation": "Keep SDK typed facades, consumed-surface posture gates, the non-publishing routing shadow compiler, passive skill environment inspection, and owner-layer signal handoffs bounded while sibling repositories retain meaning and aoa-routing stays canonical before G5.",
+      "operation": "Keep SDK typed facades, consumed-surface posture gates, the non-publishing routing shadow compiler and passed shadow-only G4 evidence, passive skill environment inspection, and owner-layer signal handoffs bounded while sibling repositories retain meaning and aoa-routing stays canonical before G5.",
       "source_surfaces": [
         "docs/boundaries.md",
         "src/aoa_sdk/AGENTS.md",
@@ -334,7 +334,11 @@
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_shadow_producer.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_surface_actions.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_r3_migration_rehearsal.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g4-evidence.md",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-g4-evidence.json",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_g4_evidence.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/compare_routing_shadow_producers.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_succession_g4.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py",

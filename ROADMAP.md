@@ -84,10 +84,13 @@ approval, event, and adapter contracts are explicit, the disposable R3
 migration rehearsal passed, and the M1 typed shadow producer is now packaged
 with schemas, strict validation, dual-producer provenance, parity CI, and an
 installed-wheel gate. `v0.6.0` is the immutable M1 shadow release.
-`aoa-routing` remains canonical until the predecessor-side parity window, G4
-evidence, and an explicit G5 owner-switch receipt. The program moves the
-producer function and ABI into the SDK; it does not absorb source organs or
-runtime execution.
+The predecessor-side immutable-release consumer and G4 evidence are now
+passed: compact package parity, full 170-route canonical replay, package
+trust, predecessor rollback, and isolated runtime content/consumer readiness
+agree. `aoa-routing` remains canonical through the named conditional handoff
+and until an explicit G5 owner-switch receipt. The program moves the producer
+function and ABI into the SDK; it does not absorb source organs or runtime
+execution.
 
 The repo should now:
 
@@ -108,8 +111,9 @@ The repo should now:
 - keep compatibility checks explicit and source-subordinate;
 - preserve the fourteen routing output paths and
   `aoa_routing_thin_router_v1` during owner-only succession;
-- keep any SDK routing producer non-publishing until G4 parity and make
-  canonical ownership change only through G5;
+- keep the G4-passed SDK routing producer non-publishing through the
+  predecessor conditional handoff and make canonical ownership change only
+  through G5;
 - keep passive skill-environment inspection, `aoa surfaces detect`,
   checkpoint capture, review-note, and reviewed evidence materialization
   bounded and weaker than capability execution or owner truth;
@@ -126,18 +130,20 @@ Roadmap drift is an SDK-layer risk because downstream agents use this file to
 choose whether a change belongs on the control plane. It still must not turn
 `aoa-sdk` into a source-owning runtime layer.
 
-The next honest move is to pin `v0.6.0` from the predecessor's parity consumer
-and collect the G4 clean-install, deterministic, runtime-mirror, trust,
-rollback, and consumer evidence. The shadow outputs stay non-publishing and
-byte-identical while `aoa-routing` remains canonical. The exact cross-repo
-parity, conditional handoff, and G5 PR order is fixed by the R3 evidence.
+The next honest move is `ROUTING_M2_CONDITIONAL_HANDOFF`: freeze predecessor
+feature growth and bind the compatibility and rollback window to the passed
+G4 receipt without switching authority. The following SDK G5 PR alone may
+change canonical production and embedded owner provenance. The exact
+cross-repo handoff, G5, and compatibility PR order remains fixed by the R3
+evidence.
 
 ## Current Public Contour
 
 Current release marker: `v0.6.0`.
 
-Current unreleased contour: predecessor parity consumption and G4 evidence
-after `v0.6.0`. This is a directional contour, not a changelog replacement.
+Current unreleased contour: passed shadow-only G4 evidence and the pending
+predecessor conditional handoff after `v0.6.0`. This is a directional contour,
+not a changelog replacement.
 
 Current anchors:
 

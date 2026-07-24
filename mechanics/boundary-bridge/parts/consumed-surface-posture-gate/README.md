@@ -33,6 +33,10 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   rollback, exact PR order, admitted M1 integration debt, and cleanup evidence
 - the M1 packaged, typed, non-publishing SDK shadow producer, strict validator,
   dual-producer sidecar, pinned predecessor parity CI, and installed-wheel gate
+- the passed G4 evidence chain: immutable release and predecessor-consumer
+  pins, compact package proof, full 170-route canonical replay, package trust,
+  rollback, and isolated runtime-mirror content/consumer readiness without
+  live mutation or premature provenance closure
 
 ## Owner
 
@@ -56,9 +60,11 @@ Then read the completed
 [`docs/routing-succession-r3-migration-rehearsal.md`](docs/routing-succession-r3-migration-rehearsal.md).
 Then read the implemented
 [`docs/routing-succession-m1-shadow-producer.md`](docs/routing-succession-m1-shadow-producer.md).
-M1 makes the successor executable in non-publishing shadow posture. It does
-not pass G4, authorize canonical publication, mutate runtime, switch an owner,
-or authorize archival action.
+Then read the passed
+[`docs/routing-succession-g4-evidence.md`](docs/routing-succession-g4-evidence.md).
+G4 proves the released successor and isolated runtime content path while
+keeping it non-publishing. It does not authorize canonical publication, live
+runtime mutation, G5, or archival action.
 
 ## Validation
 
