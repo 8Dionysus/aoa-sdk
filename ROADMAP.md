@@ -75,7 +75,7 @@ land a local surface?
 
 ## Current Direction
 
-`aoa-sdk` is past seed bootstrap. The current post-`v0.5.1` direction is
+`aoa-sdk` is past seed bootstrap. The current post-`v0.6.0` direction is
 control-plane contract hardening.
 
 The current repo-wide program is staged routing producer succession. The
@@ -83,10 +83,11 @@ target is accepted in `AOA-SDK-D-0071`, the R2 typed control-plane, lifecycle,
 approval, event, and adapter contracts are explicit, the disposable R3
 migration rehearsal passed, and the M1 typed shadow producer is now packaged
 with schemas, strict validation, dual-producer provenance, parity CI, and an
-installed-wheel gate. `aoa-routing` remains canonical until the immutable M1
-release, predecessor-side parity window, G4 evidence, and an explicit G5
-owner-switch receipt. The program moves the producer function and ABI into the
-SDK; it does not absorb source organs or runtime execution.
+installed-wheel gate. `v0.6.0` is the immutable M1 shadow release.
+`aoa-routing` remains canonical until the predecessor-side parity window, G4
+evidence, and an explicit G5 owner-switch receipt. The program moves the
+producer function and ABI into the SDK; it does not absorb source organs or
+runtime execution.
 
 The repo should now:
 
@@ -125,19 +126,18 @@ Roadmap drift is an SDK-layer risk because downstream agents use this file to
 choose whether a change belongs on the control plane. It still must not turn
 `aoa-sdk` into a source-owning runtime layer.
 
-The next honest move is to release the exact M1 source as an immutable SDK
-version, pin that version from the predecessor's parity consumer, and collect
-the G4 clean-install, deterministic, runtime-mirror, trust, rollback, and
-consumer evidence. The shadow outputs stay non-publishing and byte-identical
-while `aoa-routing` remains canonical. The exact release, cross-repo parity,
-conditional handoff, and G5 PR order is fixed by the R3 evidence.
+The next honest move is to pin `v0.6.0` from the predecessor's parity consumer
+and collect the G4 clean-install, deterministic, runtime-mirror, trust,
+rollback, and consumer evidence. The shadow outputs stay non-publishing and
+byte-identical while `aoa-routing` remains canonical. The exact cross-repo
+parity, conditional handoff, and G5 PR order is fixed by the R3 evidence.
 
 ## Current Public Contour
 
-Current release marker: `v0.5.1`.
+Current release marker: `v0.6.0`.
 
-Current unreleased contour: control-plane contract hardening after `v0.5.1`.
-This is a directional contour, not a changelog replacement.
+Current unreleased contour: predecessor parity consumption and G4 evidence
+after `v0.6.0`. This is a directional contour, not a changelog replacement.
 
 Current anchors:
 

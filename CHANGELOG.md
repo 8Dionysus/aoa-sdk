@@ -10,24 +10,145 @@ Tracking starts with the community-docs baseline for this repository.
 ### Summary
 
 - Add future changes here after the release tag lands.
-- Workspace MCP orientation now routes statistical reads through the
-  project-level `aoa_stats` service while keeping `aoa-stats` catalogs and
-  source files as owner entrypoints.
-- SDK repo discovery no longer advertises or depends on the retired
-  `aoa-stats/scripts/aoa_stats_mcp_server.py` launcher.
-- Add three focused owner skill bundles for Titan console/approval witnesses,
-  visible app-server bridge/replay, and candidate memory-loom procedures.
-- Titan witness helpers now preserve explicit source and decision provenance,
-  distinguish helper projection from runtime state, and reject invented gate
-  payload defaults.
 
 ### Notes
 
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
-- This applies the existing SDK source-owner and transport-neutral facade
-  boundary; runtime implementation and registration remain with their stronger
-  owners, so no new SDK decision record is introduced.
+
+## [0.6.0] - 2026-07-23
+
+### Summary
+
+- Establish the staged `aoa-routing` succession through R0-R3 and M1: accepted
+  target ownership, strict Agent OS control-plane contracts, disposable
+  migration proof, and a packaged non-publishing SDK shadow producer that is
+  byte-identical across all fourteen routing artifacts.
+- Refocus SDK skill support on passive owner-scoped inspection, remove copied
+  shared-skill projections and activation claims, and admit three focused
+  Titan owner bundles whose outputs remain witness-only or candidate-only.
+- Replace tracked KAG v2 monoliths with the portable v3 manifest and
+  content-addressed shards while preserving deterministic v2 compatibility,
+  explicit migration receipts, and generated-size budgets.
+- Route derived statistics reads through the project `aoa_stats` MCP, accept
+  OS skill source receipt v2 safely, reject empty Titan graph identity, and
+  make the repository's Ruff policy explicit against upstream default drift.
+- Publish `v0.6.0` as the immutable M1 shadow surface only:
+  `aoa-routing` remains canonical, and G4, G5, runtime mutation,
+  `AoARunner`, consumer cutover, retirement, and archive authority remain
+  outside this release.
+
+### Reconciliation Basis
+
+- The release closes the complete first-parent range
+  `v0.5.1..2eb6a3c153820edddf66d4740ede629ba08a7733`: 12 landed commits,
+  1,184 changed paths, 48,656 insertions, and 65,865 deletions.
+- Path counts are dominated by the intentional projection migrations:
+  `kag/` 575 paths, retired `.agents/skills/` projections 211 paths,
+  `mechanics/` 194 paths, `src/` 109 paths, tests 31 paths, and the new
+  owner-authored `skills/` home 22 paths.
+- The large deletion count is primarily the removal of copied shared-skill
+  projections and KAG v2 monoliths. It is not removal of sibling-owner truth:
+  shared skill meaning remains in `aoa-skills`, and portable KAG v3 retains a
+  deterministic v2 compatibility view.
+- The routing slice preserves `aoa_routing_thin_router_v1`, all fourteen
+  compatibility paths, predecessor owner identity inside shadow artifacts,
+  and a separate exact dual-producer provenance sidecar.
+
+### First-Parent Inventory
+
+1. `be46faf` / PR #208 routes derived statistics reads through project MCP.
+2. `b735658` / PR #209 refactors SDK skills around owner-scoped inspection.
+3. `6364ecd` / PR #210 adopts the portable KAG index family.
+4. `67d7f7c` / PR #211 admits the Titan owner skill family.
+5. `8f868fa` / PR #212 accepts OS skill source receipt v2.
+6. `cdd3af4` / PR #213 rejects empty graph identity in Titan source returns.
+7. `ab08192` / PR #215 makes the Ruff lint policy explicit.
+8. `29de1b1` / PR #214 records the routing succession R0 baseline.
+9. `d6f73b0` / PR #216 accepts staged routing producer succession.
+10. `b9d5e3c` / PR #217 defines the Agent OS control-plane contracts.
+11. `64e22f5` / PR #218 records disposable routing migration rehearsal
+    evidence.
+12. `2eb6a3c` / PR #219 lands the typed non-publishing routing shadow
+    producer.
+
+### Changed
+
+#### Routing Succession And Agent OS Contracts
+
+- `AOA-SDK-D-0071` defines the staged producer succession, authority matrix,
+  stable ABI, compatibility window, and exact G0-G5 stop-lines.
+- Strict owner-qualified models now cover route intent, decision,
+  explanation, scenario binding, runtime-neutral `RunPlan`, approval,
+  lifecycle command/status, digest-chained events, outcomes, evidence refs,
+  and behavior-only future control-plane, runner, and adapter protocols.
+- `aoa_sdk.control_plane.routing` packages the minimal compiler, strict
+  validator, seventeen schemas, dual-producer sidecar, exact source refs, and
+  fail-closed fresh-bundle integrity checks.
+- Compact deterministic fixture archives, direct pinned-predecessor CI, and a
+  fresh installed-wheel probe prove 14/14 byte parity without requiring an
+  `aoa-routing` checkout inside the package.
+
+#### Owner-Scoped Skills And Titan Helpers
+
+- Passive inspection replaces SDK-owned dispatch, activation, skill-session,
+  and closeout-runtime claims; semantic selection routes to the stronger KAG
+  owner instead of executing capabilities.
+- The canonical SDK `skills/` home contains `titan-console`,
+  `titan-appserver-bridge`, and `titan-memory-loom`, preserving useful helper
+  modes while keeping runtime, operator, proof, memory, summon, and playbook
+  authority external.
+- Installed-copy returns preserve source/package identity and decision
+  provenance across v1/v2 receipts and reject malformed or empty graph
+  identity before owner use.
+
+#### KAG, Workspace Orientation, And CI
+
+- Portable KAG v3 uses a content-addressed manifest and JSONL shards with
+  schema, digest, compatibility, tracked-size, changed-byte, full-build, and
+  incremental-build checks.
+- Workspace MCP orientation keeps `aoa-stats` catalogs as owner entrypoints
+  but uses the project `aoa_stats` service for derived reads; the retired
+  repo-local launcher is no longer advertised.
+- Repo Validation pins intentional Ruff rules, verifies installed-wheel
+  routing behavior, and runs a separate exact predecessor parity job.
+
+### Release-Prep Reconciliation
+
+- Version and public release surfaces move together:
+  `pyproject.toml`, `src/aoa_sdk/cli/main.py`, `README.md`, `ROADMAP.md`,
+  `CHANGELOG.md`, the public-support test, and the regenerated source/KAG
+  companions.
+- No routing artifact is canonically generated or published by this prep
+  change. The release carrier is the SDK wheel and its non-publishing shadow
+  implementation.
+
+### Validation
+
+- Every commit in the reconciliation range landed through its owner-local
+  tests, full SDK release gate, GitHub Repo Validation, and post-main
+  verification; individual proof counts and generated-delta receipts remain
+  in PRs #208-#219.
+- The final M1 source passed 491 tests, 2 skips, and 537 subtests; Ruff and
+  mypy over 199 source files; sdist/wheel build; a clean installed-wheel
+  14/14 artifact and 17-schema probe; OS Abyss ABI/SBOM/SLSA artifact trust;
+  direct 14/14 predecessor parity; and post-main Repo Validation plus Routing
+  Shadow Parity.
+- Release preparation re-runs the same complete gate at version `0.6.0`,
+  checks full and incremental portable KAG fixed points, validates the KAG
+  family, and then requires strict federation preflight before publication.
+
+### Notes
+
+- This is a minor release because it adds substantial typed control-plane,
+  package, owner-skill, and portable-index surfaces while preserving existing
+  compatibility ABIs.
+- The release does not claim a healthy `/srv/AbyssOS` routing mirror: the
+  deployed `abyss-stack` mirror still lacks a pinned diagnostic input observed
+  during R0/R3. Runtime-mirror repair and evidence belong to G4.
+- `aoa-routing` remains the sole canonical routing producer. The next ordered
+  change is its parity consumer pinned to this exact SDK release; no G5 or
+  archive action is implied.
 
 ## [0.5.1] - 2026-07-13
 
