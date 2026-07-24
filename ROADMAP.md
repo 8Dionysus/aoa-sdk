@@ -78,6 +78,13 @@ land a local surface?
 `aoa-sdk` is past seed bootstrap. The current post-`v0.5.1` direction is
 control-plane contract hardening.
 
+The current repo-wide program is staged routing producer succession. The
+target is accepted in `AOA-SDK-D-0071`, but `aoa-routing` remains canonical
+until shadow parity and an explicit G5 owner-switch receipt. R2 contracts,
+R3 rehearsal, and M1 shadow production must precede that switch. The program
+moves the producer function and ABI into the SDK; it does not absorb source
+organs or runtime execution.
+
 The repo should now:
 
 - keep root entry surfaces compact enough to trust;
@@ -95,6 +102,10 @@ The repo should now:
 - keep workspace discovery explicit through `.aoa/workspace.toml`,
   `docs/workspace-layout.md`, and `generated/workspace_control_plane.min.json`;
 - keep compatibility checks explicit and source-subordinate;
+- preserve the fourteen routing output paths and
+  `aoa_routing_thin_router_v1` during owner-only succession;
+- keep any SDK routing producer non-publishing until G4 parity and make
+  canonical ownership change only through G5;
 - keep passive skill-environment inspection, `aoa surfaces detect`,
   checkpoint capture, review-note, and reviewed evidence materialization
   bounded and weaker than capability execution or owner truth;
@@ -111,9 +122,11 @@ Roadmap drift is an SDK-layer risk because downstream agents use this file to
 choose whether a change belongs on the control plane. It still must not turn
 `aoa-sdk` into a source-owning runtime layer.
 
-The next honest move is not to widen the SDK into a second owner layer.
-It is to keep the control plane small, explicit, testable, and source-
-subordinate while cross-repo growth becomes denser.
+The next honest move is R2 contract design: make route intent, decision,
+explanation, runtime-neutral plan, approval, lifecycle, event, outcome, and
+closeout references coherent before producer code moves. It must keep the
+control plane explicit, testable, source-subordinate, and separate from the
+runtime body.
 
 ## Current Public Contour
 

@@ -160,6 +160,40 @@ A healthy SDK operation follows a bounded route:
 
 Control-plane power is useful only while it remains inspectable and reversible.
 
+## Accepted Routing Succession Shape
+
+`AOA-SDK-D-0071` accepts a staged succession of the routing producer into the
+SDK control plane. Acceptance is not activation. Until the G5 owner-switch
+receipt, the live state remains:
+
+```text
+predecessor_canonical:
+  canonical producer: aoa-routing
+  SDK posture: typed consumer and accepted successor
+```
+
+The migration then permits one temporary `sdk_shadow` state in which the SDK
+can build non-publishing parity output while `aoa-routing` remains canonical.
+Only after parity, rollback, consumer, runtime-mirror, and trust evidence pass
+may the receipt establish:
+
+```text
+sdk_canonical:
+  canonical producer: aoa-sdk
+  predecessor posture: compatibility and rollback only
+```
+
+The function moves, not the predecessor repository form. Public routing paths
+and `aoa_routing_thin_router_v1` remain stable during the owner-only switch.
+Source organs retain authored meaning. `AoARunner` remains a lifecycle client
+of external runtime adapters; activation and model/tool execution remain with
+the runtime owner.
+
+The checked authority matrix, compatibility exit conditions, repository
+succession states, and archive stop-line live in
+`mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r1-target-operating-model.json`.
+This design section does not authorize producer code movement or G5.
+
 ## Design as Aim
 
 The long aim is an SDK that lets AoA agents, tools, and humans consume the
@@ -183,8 +217,10 @@ The repository should support:
 ### 1. Control plane before authority
 
 The SDK may load, validate, inspect, expose, and hand off. It should
-not become the source of truth for skills, evals, memo, agents, routing,
-playbooks, KAG, stats, runtime, or progression meaning.
+not become the source of truth for skills, evals, memo, agents, playbooks,
+KAG, stats, runtime, or progression meaning. Accepted routing succession
+transfers only routing producer and navigation ABI authority after G5; it does
+not transfer sibling-domain meaning.
 
 ### 2. Source owner before facade
 

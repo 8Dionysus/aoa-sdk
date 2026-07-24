@@ -1,0 +1,236 @@
+{
+  "schema_version": "aoa_sdk_routing_succession_r1_operating_model_v1",
+  "accepted_on": "2026-07-23",
+  "status": "accepted_target_not_active",
+  "scope": {
+    "program": "aoa-routing producer succession into aoa-sdk",
+    "current_stage": "R1 target operating model",
+    "current_canonical_producer": "aoa-routing",
+    "target_canonical_producer_after_g5": "aoa-sdk",
+    "runtime_owner": "selected external runtime owner",
+    "authority_posture": "The target is accepted, but aoa-routing remains canonical until shadow parity and an explicit G5 owner-switch receipt.",
+    "effect_stop_line": "This model does not move code, publish routing artifacts, mutate the runtime mirror, admit a trust record, switch a consumer, or archive a repository."
+  },
+  "evidence_refs": {
+    "r0_baseline": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json",
+    "sdk_decision": "docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md",
+    "paired_routing_decision": "aoa-routing:docs/decisions/AOA-RT-D-0004-stage-producer-succession-to-aoa-sdk.md"
+  },
+  "operating_states": [
+    {
+      "state": "predecessor_canonical",
+      "canonical_producer": "aoa-routing",
+      "runnable_producers": [
+        "aoa-routing"
+      ],
+      "sdk_posture": "typed consumer and accepted successor",
+      "entry_gate": "G1",
+      "exit_gate": "G3"
+    },
+    {
+      "state": "sdk_shadow",
+      "canonical_producer": "aoa-routing",
+      "runnable_producers": [
+        "aoa-routing",
+        "aoa-sdk shadow"
+      ],
+      "sdk_posture": "non-publishing parity producer",
+      "entry_gate": "G3",
+      "exit_gate": "G4"
+    },
+    {
+      "state": "sdk_canonical",
+      "canonical_producer": "aoa-sdk",
+      "runnable_producers": [
+        "aoa-sdk"
+      ],
+      "predecessor_posture": "compatibility, security, deprecation, and rollback maintenance only",
+      "entry_gate": "G5",
+      "exit_gate": "G6"
+    },
+    {
+      "state": "archive_ready",
+      "canonical_producer": "aoa-sdk",
+      "predecessor_posture": "historical repository with consumer-zero and no operational rollback dependency",
+      "entry_gate": "consumer-zero plus compatibility exit conditions",
+      "exit_gate": "exact operator approval"
+    },
+    {
+      "state": "archived",
+      "canonical_producer": "aoa-sdk",
+      "predecessor_posture": "archived hosting surface",
+      "entry_gate": "exact irreversible-action approval naming 8Dionysus/aoa-routing"
+    }
+  ],
+  "authority_roles": {
+    "source_owner": {
+      "agent_definitions": "aoa-agents",
+      "skill_and_capability_contracts": "aoa-skills",
+      "scenario_intent_and_composition": "aoa-playbooks",
+      "eval_verdicts": "aoa-evals or a stronger proof owner",
+      "durable_memory": "aoa-memo and session-memory owners",
+      "runtime_execution": "the selected runtime owner"
+    },
+    "projection_producer": {
+      "before_g5": "aoa-routing",
+      "shadow": "aoa-routing canonical plus non-publishing aoa-sdk parity output",
+      "after_g5": "aoa-sdk"
+    },
+    "route_resolver": {
+      "before_g5": "aoa-routing thin router",
+      "after_g5": "aoa-sdk control plane"
+    },
+    "policy_owner": {
+      "domain_constraints": "the source organ named by each owner-qualified reference",
+      "routing_resolution_policy_after_g5": "aoa-sdk",
+      "runtime_safety_policy": "the selected runtime owner",
+      "approval_decision": "the operator or policy authority named by ApprovalRequirement"
+    },
+    "approval_owner": "the operator or policy authority named by ApprovalRequirement",
+    "activation_owner": "the selected runtime owner",
+    "execution_owner": "the selected runtime owner",
+    "evidence_producer": {
+      "route_and_plan": "aoa-sdk after G5",
+      "runtime_events_and_outcome": "the selected runtime owner",
+      "eval_evidence_and_verdict": "aoa-evals or a stronger proof owner",
+      "memory_receipt": "aoa-memo or the selected session-memory owner"
+    },
+    "verdict_owner": "aoa-evals or a stronger proof owner",
+    "memory_owner": "aoa-memo and session-memory owners",
+    "closeout_owner": {
+      "lifecycle_transition_and_reference_bundle": "aoa-sdk",
+      "runtime_terminal_state": "the selected runtime owner",
+      "verdict_acceptance": "aoa-evals or a stronger proof owner",
+      "durable_retention": "aoa-memo and session-memory owners"
+    }
+  },
+  "operation_matrix": [
+    {
+      "operation": "discover",
+      "authority_owner": "the source organ named by the object reference",
+      "sdk_role": "load compatibility-checked projections and preserve owner-qualified provenance",
+      "stop_line": "presence is not selection, activation, or copied source meaning"
+    },
+    {
+      "operation": "choose_candidate",
+      "authority_owner": "aoa-sdk control plane after G5",
+      "sdk_role": "rank candidates under explicit owner constraints",
+      "stop_line": "candidate status is not authorization"
+    },
+    {
+      "operation": "resolve_candidate",
+      "authority_owner": "aoa-sdk control plane after G5",
+      "sdk_role": "produce deterministic RouteDecision and structured RouteExplanation",
+      "stop_line": "resolution does not activate or execute"
+    },
+    {
+      "operation": "authorize_candidate",
+      "authority_owner": "the operator or policy authority named by ApprovalRequirement",
+      "sdk_role": "carry ApprovalRequest and record ApprovalDecision",
+      "stop_line": "the SDK cannot invent, infer, or bypass approval"
+    },
+    {
+      "operation": "activate_candidate",
+      "authority_owner": "the selected runtime owner",
+      "sdk_role": "request activation through a negotiated runtime adapter",
+      "stop_line": "AoARunner is not an activation body"
+    },
+    {
+      "operation": "execute_candidate",
+      "authority_owner": "the selected runtime owner",
+      "sdk_role": "consume typed ExecutionEvent references and coordinate lifecycle commands",
+      "stop_line": "the SDK core executes no model or tool work"
+    },
+    {
+      "operation": "evaluate_result",
+      "authority_owner": "aoa-evals or a stronger proof owner",
+      "sdk_role": "correlate eval evidence and verdict references",
+      "stop_line": "runtime success is not an eval verdict"
+    },
+    {
+      "operation": "retain_result",
+      "authority_owner": "aoa-memo or the selected session-memory owner",
+      "sdk_role": "carry retention requests and owner receipts by reference",
+      "stop_line": "the SDK does not copy canonical durable memory"
+    },
+    {
+      "operation": "close_session",
+      "authority_owner": "aoa-sdk lifecycle control plane",
+      "sdk_role": "verify terminal prerequisites, transition to closed, and assemble CloseoutBundleRef",
+      "stop_line": "closing the SDK lifecycle does not replace runtime termination, proof acceptance, or durable retention"
+    }
+  ],
+  "compatibility_policy": {
+    "preserved_abi_epoch": "aoa_routing_thin_router_v1",
+    "preserved_artifact_namespace": [
+      "generated/aoa_router.min.json",
+      "generated/cross_repo_registry.min.json",
+      "generated/task_to_surface_hints.json",
+      "generated/task_to_tier_hints.json",
+      "generated/quest_dispatch_hints.min.json",
+      "generated/federation_entrypoints.min.json",
+      "generated/return_navigation_hints.min.json",
+      "generated/recommended_paths.min.json",
+      "generated/kag_source_lift_relation_hints.min.json",
+      "generated/composite_stress_route_hints.min.json",
+      "generated/stats_regrounding_hints.min.json",
+      "generated/owner_layer_shortlist.min.json",
+      "generated/pairing_hints.min.json",
+      "generated/tiny_model_entrypoints.json"
+    ],
+    "owner_only_switch": {
+      "schema_or_semantic_break_allowed": false,
+      "producer_provenance_change_required": true,
+      "artifact_path_change_allowed": false,
+      "separate_versioned_decision_required_for_break": true
+    },
+    "window": {
+      "starts": "the G5 owner-switch receipt",
+      "exit_conditions": [
+        "all registered active consumers are green on SDK-produced artifacts",
+        "consumer-zero is proved for direct aoa-routing checkout dependencies",
+        "clean install, upgrade, downgrade, and rollback rehearsals pass",
+        "two consecutive SDK main or release validation cycles pass without predecessor generation",
+        "the runtime mirror and artifact-trust records identify the SDK source ref",
+        "no unresolved high-severity compatibility regression remains"
+      ],
+      "calendar_duration": "No arbitrary duration is inferred at R1; a release-owner calendar floor may be added before G5 without weakening these exit conditions.",
+      "premature_end_forbidden": true
+    }
+  },
+  "repository_succession_policy": {
+    "function_not_form": true,
+    "new_routing_features_after_g5": "aoa-sdk only",
+    "allowed_predecessor_changes_after_g5": [
+      "compatibility",
+      "security",
+      "rollback",
+      "deprecation"
+    ],
+    "history_preservation": "Preserve Git history, releases, decisions, and public provenance; do not copy historical scaffolding into the SDK by default.",
+    "rollback_retirement": "Retire the predecessor producer only after the compatibility exit conditions and consumer-zero are proved.",
+    "archive_requirement": "Separate exact operator approval after archive-readiness evidence; this R1 decision does not authorize archive or deletion."
+  },
+  "non_goals": [
+    "absorb agent, skill, playbook, eval, memo, KAG, stats, or runtime source authority",
+    "build a second abyss-stack or hide model/tool execution in the SDK",
+    "change the routing ABI during the owner-only switch",
+    "copy the predecessor repository topology wholesale",
+    "keep two canonical routing producers",
+    "treat repository size reduction as cost proof",
+    "archive or delete aoa-routing before consumer-zero and exact operator approval"
+  ],
+  "gate_g1": {
+    "verdict": "pass",
+    "accepted_target_distinguished_from_live_authority": true,
+    "one_authority_owner_per_operation": true,
+    "source_organs_retain_semantic_authority": true,
+    "sdk_runtime_execution_claimed": false,
+    "runtime_owner_remains_external": true,
+    "proof_owner_remains_external": true,
+    "memory_owner_remains_external": true,
+    "abi_and_owner_switch_are_separated": true,
+    "paired_decisions_required_before_g5": true,
+    "archive_requires_separate_operator_approval": true
+  }
+}
