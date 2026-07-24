@@ -45,6 +45,14 @@
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r2-agent-os-contracts.json`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_r2_control_plane_contracts.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r3-migration-rehearsal.md`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r3-migration-rehearsal.json`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_r3_migration_rehearsal.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-m1-shadow-producer.md`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g4-evidence.md`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-g4-evidence.json`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_succession_g4.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_g4_evidence.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py`

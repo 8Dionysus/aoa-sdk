@@ -1,9 +1,11 @@
 # Routing Succession M1 Shadow Producer
 
 Status: the SDK shadow producer is implemented and package-gated.
-`aoa-routing` remains the only canonical producer. The M1 source landing does
-not pass G4, switch an owner, publish routing artifacts, mutate a runtime
-mirror, or authorize archival action.
+`aoa-routing` remains the only canonical producer. The M1 source landing did
+not itself pass G4, switch an owner, publish routing artifacts, mutate a
+runtime mirror, or authorize archival action. The later shadow-only G4 gate is
+recorded separately in
+[`routing-succession-g4-evidence.md`](routing-succession-g4-evidence.md).
 
 ## Implemented Slice
 
@@ -87,11 +89,11 @@ parent traversal, links, and unsupported tar members before extraction. This
 keeps the portable KAG family inside its tracked-size budget without weakening
 fixture coverage or admitting an archive extraction path into the SDK wheel.
 
-## Remaining Gate
+## Completed Follow-Up Gate
 
 M1 source landing is followed by an immutable SDK release and a predecessor
-consumer PR pinned to that release. G4 still requires the clean-install,
-determinism, parity-window, runtime-mirror dry-run, trust, consumer, rollback,
-and release evidence to agree. Any unexplained difference stops succession and
-must be fixed or become a separate versioned ABI change outside the owner
-switch.
+consumer PR pinned to that release. G4 later passed its clean-install,
+determinism, compact and full-corpus parity, runtime-mirror dry-run, trust,
+consumer, rollback, and release evidence. The successor remains
+non-publishing, and any new unexplained difference still stops succession or
+requires a separate versioned ABI change outside the owner switch.

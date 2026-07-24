@@ -19,6 +19,9 @@ mean.
 - Keep the M1 SDK routing compiler in non-publishing `sdk_shadow` posture,
   byte-paired with the pinned predecessor, and separately proven through its
   installed-wheel sidecar.
+- Preserve the passed G4 distinction between compact release-fixture proof and
+  full 170-route canonical-corpus proof; keep runtime content readiness
+  separate from native provenance and durable trust closure.
 
 ## Next Work
 
@@ -27,9 +30,9 @@ mean.
 - Keep bridge helpers paired with source owner, route card, and focused tests.
 - Move repeated cross-owner pressure into the nearest current part before
   considering a new bridge part.
-- Release the exact M1 wheel, let the predecessor consume that immutable
-  release for the G4 parity window, and keep any unexplained drift as a hard
-  stop before G5.
+- Carry the passed G4 evidence into the predecessor's conditional handoff,
+  keeping that handoff non-canonical until the named SDK G5 merge and treating
+  any new corpus, runtime, trust, or consumer drift as a hard stop.
 
 ## When Time Comes
 

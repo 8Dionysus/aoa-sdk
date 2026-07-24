@@ -1,0 +1,189 @@
+{
+  "schema_version": "aoa_sdk_routing_succession_g4_evidence_v1",
+  "observed_on": "2026-07-24",
+  "status": "g4_passed_shadow_only",
+  "scope": {
+    "program": "aoa-routing producer succession into aoa-sdk",
+    "stage": "SDK_G4_EVIDENCE",
+    "repository_state": "sdk_shadow",
+    "canonical_producer": "aoa-routing",
+    "publication_posture": "non_publishing",
+    "effect_stop_line": "G4 proves the released SDK shadow, predecessor consumer, package trust chain, rollback, and isolated runtime-mirror content path. It does not mutate the live mirror, repair live health provenance, switch canonical ownership, authorize G5, or authorize repository archival."
+  },
+  "pins": {
+    "sdk_release": {
+      "tag": "v0.6.0",
+      "tag_object_ref": "14e34a7eb5515dbb788c7fa1373dbcaf43d51163",
+      "source_ref": "f3e23b60ec483ce81f5abe9aafe7303c15df2102",
+      "version": "0.6.0",
+      "release_url": "https://github.com/8Dionysus/aoa-sdk/releases/tag/v0.6.0",
+      "release_artifacts_run_id": 30068905255,
+      "artifact_id": 8587247177,
+      "artifact_digest_sha256": "e492fdd8b8ebc675aaf3a48b4cce0679cfad6ac1aa43b05c0bc0e8dcc34ddb2a",
+      "wheel_sha256": "3733e9de789a82e61219c5474320897775aa5ee05e75dd94bdc5d3302b4575b0",
+      "sdist_sha256": "0d91a9e89e497aee328ee61e06b2018799a51f41b3bf92b01ad13482948e452b"
+    },
+    "predecessor": {
+      "implementation_baseline_ref": "7e2fe467ad26aa645b61849001a456dda4562ffc",
+      "parity_consumer_ref": "5c7c0e5784b1642fb2e9e5231609100dacdbf1e3",
+      "parity_consumer_pr": 155,
+      "parity_consumer_pr_run_id": 30070042419,
+      "parity_consumer_post_main_run_id": 30070166322,
+      "historical_runtime_docs_ref": "4d2b29d01588ed5e033afcf40ec41fc26a334a5b",
+      "release_pin_sha256": "ab7a195f510e3ffe58b022968e3ebe9a3da73bb3114af230236aadccddfb36c3"
+    },
+    "full_corpus": {
+      "canonical_predecessor_ref": "7e2fe467ad26aa645b61849001a456dda4562ffc",
+      "canonical_archive_path": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/fixtures/routing-shadow/canonical-generated.tar.gz",
+      "canonical_archive_sha256": "1a11d1d4a469c92cec16fa3373ca9f409c3b8111387b39e9289b8c789d865bda",
+      "input_source_refs": {
+        "aoa-techniques": "e842c0d0156c58cfb9020b636e81134e96fc8cfb",
+        "aoa-skills": "48598a9564c4621b15428831642b802dbc8d2a47",
+        "aoa-evals": "3412b47f9ee7bec9567f92e1c2d59596c4428a2c",
+        "aoa-memo": "7672add5e2bb4ff21c2581ca656998f0ca7c8a3e",
+        "aoa-stats": "504571995cc36905cc886259c0a19be6e8e35045",
+        "aoa-agents": "66f8bf22d03518b1e2367fd4f51dab80650f6d37",
+        "Agents-of-Abyss": "bfeb4bfb447b437f1360b814bbf4f1def5e62859",
+        "aoa-playbooks": "a15866ec867209288533850cc34939ad81829947",
+        "aoa-kag": "cdd2286c5ad4a345fe704ca065036945f6ba4353",
+        "Tree-of-Sophia": "8126cc379a759990358728bbcedadbd3b24a7b6d",
+        "aoa-sdk": "29de1b1f893c683e0923cbf0cf0ee13beaa86d0e",
+        "Dionysus": "6c463f6b89a11e85b37e2606525afc7d45005fbd",
+        "8Dionysus": "39cdef104d54d570e7eb4f689ebcd48b2cc6a658",
+        "abyss-stack": "83d64234e719f74d6fd6a84a16c1a2af14754958"
+      },
+      "output_sha256": {
+        "aoa_router.min.json": "f01e3722d675c1776f20ad09e1ac43e5e646de8bdad2858a30d39ba7b7534cb7",
+        "composite_stress_route_hints.min.json": "863199f4eed7a65482336d6cbc9ed6fad8b5c7e3a4eaaa3d0269eaa2909a1d66",
+        "cross_repo_registry.min.json": "656963609433e73434b696c9a732b12bd0767db8a98d62ab008719bfea0c5865",
+        "federation_entrypoints.min.json": "d4014f8d386397506077807391f18c5d7b50494050051257d0f2a6ced521f8f3",
+        "kag_source_lift_relation_hints.min.json": "2bfbf6ce76f174e1fc08fab6e03cc085ddae9cc0b1118bfbb3fae6e062c89d8e",
+        "owner_layer_shortlist.min.json": "8fa6fdeaa9994aa6f6237050ef3c64ad5e5c508de391fe7e25c2ee35decdd4d3",
+        "pairing_hints.min.json": "c3d75abdd9709aeffdc3a00f43d98212e31a5aada5bb25f0a9d9fad43b767a2f",
+        "quest_dispatch_hints.min.json": "e0e1f24922948a5dfbb425e6620f1c1df3cf45a4c17976ce8eb8f384f0ff4b86",
+        "recommended_paths.min.json": "c31c89a9227b89ebf2afd390ecbeb332663475e4f3db0614abbb60ef55f6569c",
+        "return_navigation_hints.min.json": "6281c665675a4a681bc9f10923e7c5f1356bdd4b559e6fcecc31177c142d2bab",
+        "stats_regrounding_hints.min.json": "b146eba059fc84b1642e3614f8e45e42e11d6507db9030b5c85da41b9028908a",
+        "task_to_surface_hints.json": "acd1a31132478f842f5d421711fa001ebecf24016f7679404506b8b6b066774d",
+        "task_to_tier_hints.json": "f295c0b036c0d45c21569a0e20d99dbec12bb1b60fb39fb1e7ae8943cdfa5da6",
+        "tiny_model_entrypoints.json": "b7f74cd42a2bf2ad71890e3ee01876c93bb2ecb1192ef530442fc0c601701989"
+      }
+    },
+    "runtime_owner": {
+      "repo": "abyss-stack",
+      "source_ref": "fad9f951d5df531692546e92e5bcaf882b1c4c57",
+      "pull_request": 321,
+      "post_main_run_id": 30072801490,
+      "routing_config_sha256": "f6897a31daafeb9ecdc649ddc5e8d4052c3b91983eb68656546456030c35dde9",
+      "sync_wrapper_sha256": "5e0ba6826eecfd652633d1c87d9ef4faa58782bfa466eda37b7b0a65bada5f85",
+      "route_api_sha256": "a33dc14f4ac07a6bb2fb27a4d296664bf60b147e34e05436ff87adc48a9d24f4"
+    },
+    "trust_owner": {
+      "repo": "abyss-machine",
+      "source_ref": "4a70f4b0d80a78d4a3269158ab23b5c32592a454",
+      "artifact_class": "aoa_sdk_python_distribution",
+      "required_controls": [
+        "abi_signature",
+        "sbom",
+        "slsa_in_toto"
+      ]
+    }
+  },
+  "runtime_mirror_contract": {
+    "layer": "aoa-routing",
+    "required_file_count": 23,
+    "required_files": [
+      "docs/FEDERATION_ENTRY_ABI.md",
+      "docs/RECURRENCE_NAVIGATION_BOUNDARY.md",
+      "generated/aoa_router.min.json",
+      "generated/cross_repo_registry.min.json",
+      "generated/task_to_surface_hints.json",
+      "generated/task_to_tier_hints.json",
+      "generated/recommended_paths.min.json",
+      "generated/pairing_hints.min.json",
+      "generated/kag_source_lift_relation_hints.min.json",
+      "generated/federation_entrypoints.min.json",
+      "generated/return_navigation_hints.min.json",
+      "generated/tiny_model_entrypoints.json",
+      "schemas/aoa-router.schema.json",
+      "schemas/cross-repo-registry.schema.json",
+      "schemas/task-to-surface-hints.schema.json",
+      "schemas/task-to-tier-hints.schema.json",
+      "schemas/recommended-paths.schema.json",
+      "schemas/pairing-hints.schema.json",
+      "schemas/kag-source-lift-relation-hints.schema.json",
+      "schemas/federation-entrypoints.schema.json",
+      "schemas/return-navigation-hints.schema.json",
+      "schemas/tiny-model-entrypoints.schema.json",
+      "schemas/router-entry.schema.json"
+    ],
+    "sdk_generated_artifact_count": 10,
+    "sdk_packaged_schema_count": 11,
+    "historical_compatibility_doc_count": 2,
+    "historical_compatibility_docs": {
+      "docs/FEDERATION_ENTRY_ABI.md": "6b54d3514288cc211371081ccffd57df14dd555bf69880276680d7fe86e2bb5d",
+      "docs/RECURRENCE_NAVIGATION_BOUNDARY.md": "5b04a547dfaea170e049a253e10daf4e4dae7a7457cb41c9b0ad1979f2f8a80b"
+    },
+    "assembly_posture": "ephemeral_hybrid_compatibility_fixture",
+    "assembly_reason": "The current abyss-stack sync contract still requires two documents retired from active aoa-routing. The dry run restores their exact last runtime-mirrored bytes as explicit historical fixtures while every loaded routing JSON comes from the installed SDK release and every schema comes from its installed package.",
+    "native_manifest_limit": "The repaired abyss-stack consumer verifies all candidate bytes but records no source_git_commit or durable trust admission for a non-checkout candidate assembly. G4 therefore requires mirror_ready and consumer_ready while requiring provenance_ready and closure_ready to remain false for the two named debts. The outer receipt binds the same bytes to exact SDK, predecessor, runtime-owner, and trust-owner refs; G5 still requires runtime-native SDK producer identity and live trust provenance."
+  },
+  "verification_matrix": {
+    "byte_parity": "compact release corpus 14/14 and full canonical corpus 14/14",
+    "schema_count": 17,
+    "deterministic_rebuilds": {
+      "compact_release_corpus": 2,
+      "full_canonical_corpus": 2
+    },
+    "route_count": 170,
+    "negative_fixture_suite": "covered by v0.6.0 release gate and source PR 219 post-main run 30068207252",
+    "clean_install": "exact v0.6.0 wheel installed in a fresh venv with PYTHONPATH removed",
+    "package_install": "routing module and 17 schemas loaded from fresh venv site-packages",
+    "runtime_mirror_dry_run": "The installed v0.6.0 wheel rebuilt the full pinned canonical corpus to 14/14 exact canonical hashes and 170 routes; 23/23 assembled files were then mirrored into a temporary AOA_STACK_ROOT and loaded by abyss-stack route-api routing-layer code. Content and consumer readiness pass while missing native source identity and durable trust admission keep provenance and closure fail-closed.",
+    "release_packaging": "exact annotated release pin plus observed wheel, sdist, workflow artifact, and source-contained parity fixtures",
+    "package_trust": "temporary abyss-machine build, sign, verify, release-check, registry, subject-store, trust-gate, and adversarial suite",
+    "consumer": "aoa-routing PR 155 and post-main run consume exact v0.6.0 release with 14/14 byte parity",
+    "rollback": "current predecessor producer remains unchanged from 7e2fe467 and rebuilds both the compact release corpus and the full 170-route canonical corpus at 14/14 byte parity"
+  },
+  "known_live_posture": {
+    "live_runtime_observed_on": "2026-07-24",
+    "live_runtime_mutated": false,
+    "live_mirror_current": false,
+    "live_mirror_router_sha256": "72bf60dc5cd2fe190e00e91c1e948fcf0c1a08f5884d51d23b120946c969e2c1",
+    "current_canonical_router_sha256": "f01e3722d675c1776f20ad09e1ac43e5e646de8bdad2858a30d39ba7b7534cb7",
+    "live_health_exposes_routing_source_ref": false,
+    "live_health_exposes_routing_digest": false,
+    "live_health_exposes_trust_verdict": false,
+    "classification": "known_false_green_runtime_debt_reserved_for_M2_G5"
+  },
+  "gate_g4": {
+    "verdict": "pass",
+    "byte_parity": true,
+    "semantic_parity": true,
+    "schema_parity": true,
+    "deterministic_generation": true,
+    "route_count_parity": true,
+    "negative_fixtures": true,
+    "clean_environment_build": true,
+    "package_install": true,
+    "runtime_mirror_content_dry_run": true,
+    "runtime_mirror_consumer_ready": true,
+    "runtime_mirror_provenance_ready": false,
+    "runtime_mirror_closure_ready": false,
+    "runtime_mirror_expected_provenance_debt": [
+      "routing mirror provenance source Git ref is unavailable",
+      "routing mirror trust verdict is unavailable"
+    ],
+    "release_packaging": true,
+    "package_trust_chain": true,
+    "predecessor_consumer": true,
+    "rollback_reproducible": true,
+    "unexplained_differences": [],
+    "runtime_native_sdk_identity": false,
+    "live_runtime_verified_current": false,
+    "canonical_producer_switch_authorized": false,
+    "runtime_publication_authorized": false,
+    "g5_owner_switch": false,
+    "repository_archive_authorized": false
+  }
+}

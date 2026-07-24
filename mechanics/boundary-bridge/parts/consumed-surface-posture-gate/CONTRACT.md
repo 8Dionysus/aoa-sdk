@@ -35,6 +35,15 @@
   without importing SDK source from the checkout.
 - Stores the pinned fixture corpora in compact deterministic archives and
   rejects traversal, links, and unsupported members before test extraction.
+- Keeps compact release-fixture parity distinct from full canonical-corpus
+  parity and requires the latter before any runtime-mirror readiness claim.
+- Requires exact Git refs for all fourteen full-corpus inputs, two installed
+  SDK rebuilds, the complete fourteen-artifact canonical hash set, 170-route
+  parity, and an unchanged predecessor rollback build.
+- Requires runtime-mirror content and consumer readiness to remain distinct
+  from native source provenance and durable trust closure.
+- Admits the current owner shortlist `guard` kind without removing the legacy
+  `seed` compatibility value or taking ownership of either meaning.
 
 ## Non-Goals
 
@@ -51,6 +60,9 @@
   owner switch, runtime mutation, or archive authorization.
 - A landed M1 shadow compiler is not canonical publication, runtime adoption,
   G4 evidence, G5 authority, or permission to retire the predecessor.
+- A passed G4 shadow and isolated content dry run is not G5, live runtime
+  publication, native SDK runtime identity, durable trust admission,
+  predecessor retirement, or archival authority.
 
 ## Active Test Home
 
@@ -68,5 +80,6 @@
 - `tests/test_routing_succession_r1_target_operating_model.py`
 - `tests/test_routing_succession_r2_control_plane_contracts.py`
 - `tests/test_routing_succession_r3_migration_rehearsal.py`
+- `tests/test_routing_succession_g4_evidence.py`
 - `tests/test_routing_shadow_producer.py`
 - `tests/test_routing_shadow_bundle.py`

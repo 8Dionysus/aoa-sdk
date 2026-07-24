@@ -60,6 +60,7 @@ class RoutingOwnerLayerShortlistHint(BaseModel):
         "memo",
         "playbook",
         "agent",
+        "guard",
         "seed",
         "source_route",
         "runtime_surface",

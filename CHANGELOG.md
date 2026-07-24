@@ -9,12 +9,42 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
+- Pass the shadow-only routing succession G4 chain for the exact v0.6.0
+  release: compact package parity and full 170-route canonical parity,
+  predecessor consumer and rollback, package trust, and isolated runtime
+  content/consumer readiness now agree while `aoa-routing` stays canonical.
 - Add future changes here after the release tag lands.
+
+### Changed
+
+- Add exact full-corpus Git input and fourteen-artifact hash pins, two clean
+  installed-wheel canonical rebuilds, and an environment-bound G4 verifier
+  that performs package trust, predecessor rollback, and a 23-file isolated
+  `abyss-stack` route-api dry run without mutating the live runtime.
+- Keep runtime mirror content and consumer readiness separate from native
+  source provenance and durable trust closure; the dry-run receipt requires
+  those latter axes to remain fail-closed.
+- Accept the current owner-shortlist `object_kind: guard` in the typed SDK
+  contract and regress it against the exact canonical routing fixture, while
+  retaining `seed` compatibility.
+
+### Validation
+
+- The exact v0.6.0 package rebuilt both the compact release corpus and the full
+  canonical corpus twice at 14/14 parity; the full router contains 170 entries
+  rooted at SHA-256 `f01e3722...`.
+- The unchanged predecessor rebuilt both corpora at 14/14 rollback parity.
+  Temporary ABI/SBOM/SLSA package trust passed, and the repaired
+  `abyss-stack@fad9f951` consumer mirrored 23/23 files and loaded all 170
+  routes with expected provenance debt only.
 
 ### Notes
 
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
+- G4 authorizes only the named predecessor conditional handoff. It does not
+  authorize G5, live runtime publication, native SDK runtime identity,
+  predecessor retirement, or archival action.
 
 ## [0.6.0] - 2026-07-23
 
