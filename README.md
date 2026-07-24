@@ -85,6 +85,10 @@ The current landed surface includes:
   [AOA-SDK-D-0071](docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md)
   and its
   [target operating model](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r1-target-operating-model.md);
+- the strict, runtime-neutral
+  [R2 Agent OS contract family](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md)
+  for route decisions, plans, approvals, lifecycle, events, evidence, and
+  adapter protocols, without an active runner or producer switch;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

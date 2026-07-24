@@ -17,6 +17,11 @@
   ABI paths during the owner-only switch.
 - Names one authority owner for each discover, candidate, authorization,
   activation, execution, evaluation, retention, and closeout operation.
+- Exposes strict owner-qualified R2 control-plane models with a closed
+  lifecycle graph, content-addressed source/ABI snapshots, exact approval
+  scope, idempotent command replay, and digest-chained runtime events.
+- Keeps `RunPlan` runtime-neutral and keeps runtime outcomes distinct from eval
+  verdicts, memory receipts, and lifecycle closeout.
 
 ## Non-Goals
 
@@ -27,6 +32,8 @@
 - A dependency or disposition audit is not an authority transfer.
 - A target operating model is not a producer switch, runtime trust admission,
   or archive authorization.
+- A protocol type is not an active `AoASDK` facade, runtime adapter, executor,
+  or producer migration.
 
 ## Active Test Home
 
@@ -42,3 +49,4 @@
 - `tests/test_workspace_control_plane_compatibility.py`
 - `tests/test_routing_succession_r0_baseline.py`
 - `tests/test_routing_succession_r1_target_operating_model.py`
+- `tests/test_routing_succession_r2_control_plane_contracts.py`

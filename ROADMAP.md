@@ -79,11 +79,12 @@ land a local surface?
 control-plane contract hardening.
 
 The current repo-wide program is staged routing producer succession. The
-target is accepted in `AOA-SDK-D-0071`, but `aoa-routing` remains canonical
-until shadow parity and an explicit G5 owner-switch receipt. R2 contracts,
-R3 rehearsal, and M1 shadow production must precede that switch. The program
-moves the producer function and ABI into the SDK; it does not absorb source
-organs or runtime execution.
+target is accepted in `AOA-SDK-D-0071`, and the R2 typed control-plane,
+lifecycle, approval, event, and adapter contracts are now explicit, but
+`aoa-routing` remains canonical until shadow parity and an explicit G5
+owner-switch receipt. R3 rehearsal and M1 shadow production must precede that
+switch. The program moves the producer function and ABI into the SDK; it does
+not absorb source organs or runtime execution.
 
 The repo should now:
 
@@ -122,11 +123,12 @@ Roadmap drift is an SDK-layer risk because downstream agents use this file to
 choose whether a change belongs on the control plane. It still must not turn
 `aoa-sdk` into a source-owning runtime layer.
 
-The next honest move is R2 contract design: make route intent, decision,
-explanation, runtime-neutral plan, approval, lifecycle, event, outcome, and
-closeout references coherent before producer code moves. It must keep the
-control plane explicit, testable, source-subordinate, and separate from the
-runtime body.
+The next honest move is R3 migration rehearsal in a disposable worktree. It
+must reproduce the predecessor build, move only the minimum producer function
+into the target SDK topology, prove output and schema parity, build without an
+`aoa-routing` checkout, and reproduce rollback. The R2 contract family is now
+the fixed boundary for later control-plane and runner behavior; rehearsal
+still may not publish SDK output or switch authority.
 
 ## Current Public Contour
 

@@ -25,6 +25,9 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
 - the accepted routing succession target model, authority matrix,
   compatibility policy, and repository state machine without moving producer
   code or switching live authority
+- the R2 strict route, plan, approval, lifecycle, event, evidence-reference,
+  and runtime-adapter contracts plus golden-scenario and threat-model evidence,
+  without implementing runtime execution
 
 ## Owner
 
@@ -42,8 +45,10 @@ For the proposed `aoa-routing` succession, start with
 [`docs/routing-succession-r0-baseline.md`](docs/routing-succession-r0-baseline.md).
 Then read the accepted
 [`docs/routing-succession-r1-target-operating-model.md`](docs/routing-succession-r1-target-operating-model.md).
-G0 and G1 authorize R2 contract work only. They do not authorize producer
-migration or an owner switch.
+Then read the checked
+[`docs/routing-succession-r2-agent-os-contracts.md`](docs/routing-succession-r2-agent-os-contracts.md).
+G0 through G2 authorize a disposable R3 rehearsal only. They do not authorize
+canonical producer migration, shadow publication, or an owner switch.
 
 ## Validation
 

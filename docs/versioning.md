@@ -98,6 +98,14 @@ the absence of unresolved high-severity compatibility regressions.
 The full path list and exit conditions are checked in
 `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r1-target-operating-model.json`.
 
+The new Agent OS control-plane family is independently versioned as
+`aoa_control_plane_v1`, its lifecycle graph as `aoa_run_lifecycle_v1`, and its
+adapter negotiation as `aoa_runtime_adapter_v1`. These identifiers do not
+change `aoa_routing_thin_router_v1`. A semantic change to lifecycle
+transitions, digest scope, approval scope, event ordering, runtime neutrality,
+or owner authority requires a versioned contract decision; adapters declare
+the plan and event versions they support.
+
 ## Operational Expectation
 
 - Loader functions for supported surfaces should go through the compatibility

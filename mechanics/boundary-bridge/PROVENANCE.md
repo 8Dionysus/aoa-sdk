@@ -8,6 +8,7 @@
 - `src/aoa_sdk/api.py`
 - `src/aoa_sdk/errors.py`
 - `src/aoa_sdk/models.py`
+- `src/aoa_sdk/contracts/control_plane.py`
 - `src/aoa_sdk/agents/`
 - `src/aoa_sdk/artifacts/`
 - `src/aoa_sdk/cli/`
@@ -38,6 +39,12 @@
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r0-baseline.md`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_r0_baseline.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r1-target-operating-model.md`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r1-target-operating-model.json`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_r1_target_operating_model.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r2-agent-os-contracts.json`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_r2_control_plane_contracts.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py`

@@ -23,3 +23,8 @@ artifact classification, bundle registries, artifact requirements, affected
 drift read-models, trust coverage, update-lane status, and update metadata
 verification reports. Host enforcement, policy authority, evidence promotion,
 and update client blocking decisions remain in `abyss-machine`.
+
+R2 also publishes typing protocols for the future control plane, AoARunner,
+and runtime adapters. `AoASDK.control_plane` and `AoASDK.runner` are not
+implemented public behavior yet; C1 and C3 must add implementation and API
+tests before those names are documented as callable facades.
