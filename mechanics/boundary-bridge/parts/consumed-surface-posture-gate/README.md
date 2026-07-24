@@ -28,6 +28,9 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
 - the R2 strict route, plan, approval, lifecycle, event, evidence-reference,
   and runtime-adapter contracts plus golden-scenario and threat-model evidence,
   without implementing runtime execution
+- the R3 disposable producer-migration rehearsal, including byte/schema/count
+  parity, installed-wheel construction without an `aoa-routing` checkout,
+  rollback, exact PR order, admitted M1 integration debt, and cleanup evidence
 
 ## Owner
 
@@ -47,8 +50,10 @@ Then read the accepted
 [`docs/routing-succession-r1-target-operating-model.md`](docs/routing-succession-r1-target-operating-model.md).
 Then read the checked
 [`docs/routing-succession-r2-agent-os-contracts.md`](docs/routing-succession-r2-agent-os-contracts.md).
-G0 through G2 authorize a disposable R3 rehearsal only. They do not authorize
-canonical producer migration, shadow publication, or an owner switch.
+Then read the completed
+[`docs/routing-succession-r3-migration-rehearsal.md`](docs/routing-succession-r3-migration-rehearsal.md).
+G3 authorizes M1 shadow implementation only. It does not authorize canonical
+publication, runtime mutation, an owner switch, or archival action.
 
 ## Validation
 

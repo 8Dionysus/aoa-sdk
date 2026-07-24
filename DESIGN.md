@@ -199,6 +199,15 @@ and `src/aoa_sdk/contracts/control_plane.py`. They define protocols, not active
 `AoASDK` behavior or a runtime body. This design section does not authorize
 producer code movement or G5.
 
+The disposable R3 migration result lives in
+`mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r3-migration-rehearsal.json`.
+It proves that a minimal `src/aoa_sdk/control_plane/routing/` producer can
+build the fourteen compatibility artifacts from an installed wheel without an
+`aoa-routing` checkout and can roll back to the predecessor. The candidate was
+removed. G3 authorizes M1 shadow implementation, where inherited typing debt,
+schemas, validators, package data, negative fixtures, and dual-producer
+provenance must be integrated before release. It does not authorize G5.
+
 ## Design as Aim
 
 The long aim is an SDK that lets AoA agents, tools, and humans consume the
