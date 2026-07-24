@@ -103,6 +103,11 @@ The current landed surface includes:
   which proves the immutable release, predecessor consumer and rollback,
   package trust, full 170-route canonical replay, and isolated runtime content
   path while leaving `aoa-routing` canonical and the live runtime untouched;
+- the explicit
+  [G5 candidate](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-candidate.md),
+  which lets an installed SDK build a complete SDK-identified,
+  Git-ref-bound artifact assembly for stronger-owner trust and runtime canary
+  review while every switch-authority flag remains false;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

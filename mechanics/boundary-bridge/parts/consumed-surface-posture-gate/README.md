@@ -37,6 +37,10 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   pins, compact package proof, full 170-route canonical replay, package trust,
   rollback, and isolated runtime-mirror content/consumer readiness without
   live mutation or premature provenance closure
+- the packaged, non-publishing G5 candidate posture: exact clean input refs,
+  SDK producer identity, complete artifact/runtime assembly, stronger-owner
+  trust handoff, and an installed-wheel gate while every switch-authority flag
+  remains false
 
 ## Owner
 
@@ -62,9 +66,12 @@ Then read the implemented
 [`docs/routing-succession-m1-shadow-producer.md`](docs/routing-succession-m1-shadow-producer.md).
 Then read the passed
 [`docs/routing-succession-g4-evidence.md`](docs/routing-succession-g4-evidence.md).
-G4 proves the released successor and isolated runtime content path while
-keeping it non-publishing. It does not authorize canonical publication, live
-runtime mutation, G5, or archival action.
+Then read the executable
+[`docs/routing-succession-g5-candidate.md`](docs/routing-succession-g5-candidate.md).
+G4 proves the released shadow successor and isolated runtime content path. The
+G5 candidate adds native SDK producer identity for trust and canary review.
+Neither authorizes canonical publication, live runtime mutation, G5, or
+archival action.
 
 ## Validation
 

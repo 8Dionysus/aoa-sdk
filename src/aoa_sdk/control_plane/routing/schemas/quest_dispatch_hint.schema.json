@@ -106,6 +106,7 @@
       "type": "string",
       "enum": [
         "aoa-routing",
+        "aoa-sdk",
         "aoa-techniques",
         "aoa-skills",
         "aoa-evals"

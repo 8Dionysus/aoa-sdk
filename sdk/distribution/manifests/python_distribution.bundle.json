@@ -65,6 +65,7 @@
   "consumer_command": [
     "python -m build",
     "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py",
+    "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py",
     "python mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py --json",
     "abyss-machine artifacts evidence-promote dist/abyss-artifact-bundle --registry-dir dist/abyss-artifact-registry --lifecycle-state release-ready --consumer-ref aoa-sdk:release-audit-publish-helper --evidence-ref dist/abyss-artifact-bundle/artifact.verify.json --source-repo aoa-sdk --source-ref sdk/distribution/manifests/python_distribution.bundle.json --producer aoa-sdk-release-audit-publish-helper --trust-root-mode host_managed --json",
     "abyss-machine artifacts materialize-subjects dist/abyss-artifact-bundle --store-root dist/abyss-artifact-subjects --registry-dir dist/abyss-artifact-registry --manifest sdk/distribution/manifests/python_distribution.bundle.json --consumer-intent agent --source-repo aoa-sdk --trust-root-mode host_managed --json",

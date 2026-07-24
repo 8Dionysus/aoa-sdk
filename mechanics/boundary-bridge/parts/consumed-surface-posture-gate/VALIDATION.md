@@ -9,6 +9,7 @@ python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/com
 ABYSS_MACHINE_TMP_ROOT=/srv/abyss-machine/tmp/ai python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_succession_g4.py --sdk-release-root /path/to/aoa-sdk-at-v0.6.0 --predecessor-root /path/to/aoa-routing-at-5c7c0e57 --abyss-stack-root /path/to/abyss-stack-at-fad9f951 --abyss-machine-root /path/to/abyss-machine-at-4a70f4b0 --input-workspace-root /path/to/federation-repositories --abyss-stack-input-root /path/to/abyss-stack-git-repository
 python -m build
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py
+python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
 python scripts/validate_mechanics_topology.py
 ```
 
@@ -52,6 +53,14 @@ fail-closed, and accepts the current canonical owner-shortlist `guard` kind.
 gate. It rebuilds and clean-installs v0.6.0, runs compact and full-corpus
 determinism/parity, verifies package trust and predecessor rollback, and loads
 an isolated 23-file runtime mirror without touching the live deployment.
+`test_routing_g5_candidate.py` proves the explicit producer posture changes
+only SDK producer/return-route identity, preserves payload and ABI shape,
+requires exact clean Git refs, binds all assembly subjects and hashes, rejects
+substitution or canonical-looking output roots, and keeps every G5 authority
+flag false. `verify_routing_g5_candidate_wheel.py` proves the installed wheel
+contains the candidate builder, eighteen routing schemas, two runtime boundary
+documents, the complete fourteen-artifact assembly, and the exact 23-file
+runtime-required subset.
 
 For full Boundary Bridge coverage, also run:
 

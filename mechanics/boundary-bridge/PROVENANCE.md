@@ -53,6 +53,9 @@
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-g4-evidence.json`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_succession_g4.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_g4_evidence.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-candidate.md`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_g5_candidate.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py`

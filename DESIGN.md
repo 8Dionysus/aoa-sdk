@@ -210,8 +210,13 @@ removed. The resulting M1 implementation now lives under
 packages schemas and a strict validator, preserves the fourteen predecessor
 bytes, emits dual-producer provenance, rejects canonical-looking publication
 targets, and is checked from an installed wheel. `aoa-routing` still remains
-canonical. M1 must be released and consumed through the G4 parity window
-before any explicit G5 switch.
+canonical. The passed G4 chain and predecessor conditional handoff now permit
+one explicit next posture: the installed SDK can build a non-publishing
+`sdk_g5_candidate` assembly carrying SDK producer identity, exact clean input
+refs, complete artifact subjects, and no switch authority. That candidate is
+input to stronger-owner artifact trust and runtime canary review, not the G5
+receipt. There remains exactly one canonical producer until exact trust,
+runtime, rollback, and consumer evidence authorize the separate G5 switch.
 
 ## Design as Aim
 

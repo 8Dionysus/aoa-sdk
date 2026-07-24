@@ -22,6 +22,9 @@ mean.
 - Preserve the passed G4 distinction between compact release-fixture proof and
   full 170-route canonical-corpus proof; keep runtime content readiness
   separate from native provenance and durable trust closure.
+- Keep the SDK-identified G5 candidate non-publishing and non-canonical while
+  its exact source ref, artifact subjects, durable trust admission, runtime
+  canary, and rollback evidence move through their stronger owners.
 
 ## Next Work
 
@@ -30,9 +33,10 @@ mean.
 - Keep bridge helpers paired with source owner, route card, and focused tests.
 - Move repeated cross-owner pressure into the nearest current part before
   considering a new bridge part.
-- Carry the passed G4 evidence into the predecessor's conditional handoff,
-  keeping that handoff non-canonical until the named SDK G5 merge and treating
-  any new corpus, runtime, trust, or consumer drift as a hard stop.
+- Carry the landed predecessor conditional handoff and SDK G5 candidate
+  through `abyss-machine` artifact admission and `abyss-stack` isolated/canary
+  proof, keeping one canonical producer and treating any source, corpus,
+  runtime, trust, rollback, or consumer drift as a hard stop.
 
 ## When Time Comes
 

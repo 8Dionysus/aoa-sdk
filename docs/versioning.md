@@ -84,13 +84,17 @@ During the owner-only switch:
 - preserve all fourteen current public routing output paths;
 - preserve `aoa_routing_thin_router_v1`;
 - preserve supported schema identifiers and payload meaning;
-- require producer provenance to name the SDK source ref after G5;
+- require candidate producer provenance to name the exact SDK source ref
+  before trust/canary review and canonical provenance to name it after G5;
 - do not hide a semantic or schema break inside the owner change.
 
 An incompatible routing change needs a separate versioned decision and release
 after succession. Before G5, `aoa-routing` remains canonical and SDK output may
-be used only for non-publishing parity. The compatibility window begins with
-the G5 receipt and cannot end until consumer-zero, clean
+be used only for non-publishing shadow or explicit candidate review. Candidate
+schemas admit both known producer owners, while the selected producer posture
+validator requires exactly one and preserves all ABI identifiers. The
+compatibility window begins with the G5 receipt and cannot end until
+consumer-zero, clean
 install/upgrade/downgrade/rollback checks, two consecutive SDK validation
 cycles without predecessor generation, SDK-bound runtime/trust identity, and
 the absence of unresolved high-severity compatibility regressions.

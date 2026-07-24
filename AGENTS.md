@@ -31,6 +31,9 @@ This repository owns:
 - the accepted staged routing-producer succession model in
   `AOA-SDK-D-0071`, while live producer authority remains with `aoa-routing`
   until the explicit G5 owner-switch receipt
+- the explicit non-publishing SDK G5 candidate builder and validator used to
+  request stronger-owner artifact trust and runtime canary evidence without
+  acquiring canonical producer authority
 - the strict R2 route, plan, approval, lifecycle, event, evidence, and runtime
   adapter contract family, while `AoASDK.control_plane`, `AoASDK.runner`, and
   runtime execution remain unimplemented at this stage

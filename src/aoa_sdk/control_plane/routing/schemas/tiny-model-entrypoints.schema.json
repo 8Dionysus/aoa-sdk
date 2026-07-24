@@ -22,7 +22,10 @@
       "const": "routing/core/schemas/tiny-model-entrypoints.schema.json"
     },
     "owner_repo": {
-      "const": "aoa-routing"
+      "enum": [
+        "aoa-routing",
+        "aoa-sdk"
+      ]
     },
     "surface_kind": {
       "const": "tiny_model_entrypoints"
@@ -80,6 +83,7 @@
       "type": "string",
       "enum": [
         "aoa-routing",
+        "aoa-sdk",
         "aoa-techniques",
         "aoa-skills",
         "aoa-evals",
@@ -190,7 +194,10 @@
       ]
     },
     "federationSourceRepo": {
-      "const": "aoa-routing"
+      "enum": [
+        "aoa-routing",
+        "aoa-sdk"
+      ]
     },
     "federationSurface": {
       "const": "generated/federation_entrypoints.min.json"

@@ -333,10 +333,12 @@
       "validators": [
         "scripts/validate_sdk_source_home.py",
         "python -m build",
-        "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py"
+        "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py",
+        "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py"
       ],
       "stop_lines": [
-        "Do not claim package publication before external publication proof exists."
+        "Do not claim package publication before external publication proof exists.",
+        "Do not treat an installed non-publishing G5 candidate as canonical routing authority."
       ]
     },
     {

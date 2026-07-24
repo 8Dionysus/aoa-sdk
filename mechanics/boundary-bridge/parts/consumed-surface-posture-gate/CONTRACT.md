@@ -42,6 +42,22 @@
   parity, and an unchanged predecessor rollback build.
 - Requires runtime-mirror content and consumer readiness to remain distinct
   from native source provenance and durable trust closure.
+- Exposes SDK producer identity only through the explicit
+  `sdk_g5_candidate` posture while the default predecessor-compatible posture
+  remains byte preserving.
+- Limits candidate payload changes to producer artifact identity and exact
+  owner-qualified routing-return fields; preserves all fourteen filenames,
+  schema identifiers, ABI epochs, route content, and source-owner meaning.
+- Requires all fourteen candidate inputs to be clean Git worktrees at the
+  exact recorded refs and binds the candidate SDK ref to the `aoa-sdk` input.
+- Builds the candidate only into a fresh standalone root and binds all
+  fourteen artifacts, eleven runtime schemas, two runtime documents, and
+  provenance into one artifact manifest.
+- Requires the installed wheel to build and validate the SDK-identified
+  candidate without a checkout import and with every G5 authority flag false.
+- Keeps candidate construction weaker than stronger-owner artifact admission,
+  runtime canary evidence, the exact G5 receipt, and the one-canonical-producer
+  switch.
 - Admits the current owner shortlist `guard` kind without removing the legacy
   `seed` compatibility value or taking ownership of either meaning.
 
@@ -63,6 +79,9 @@
 - A passed G4 shadow and isolated content dry run is not G5, live runtime
   publication, native SDK runtime identity, durable trust admission,
   predecessor retirement, or archival authority.
+- A valid SDK G5 candidate is not a durable trust verdict, live canary,
+  canonical producer switch, compatibility-window start, consumer-zero result,
+  or archive authorization.
 
 ## Active Test Home
 
@@ -83,3 +102,4 @@
 - `tests/test_routing_succession_g4_evidence.py`
 - `tests/test_routing_shadow_producer.py`
 - `tests/test_routing_shadow_bundle.py`
+- `tests/test_routing_g5_candidate.py`

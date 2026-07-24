@@ -1,0 +1,326 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/routing-g5-candidate-provenance.schema.json",
+  "title": "AoA SDK routing G5 candidate provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "state",
+    "publication_posture",
+    "current_canonical_producer",
+    "candidate_producer",
+    "candidate_artifact_identity",
+    "abi_epoch",
+    "artifact_sha256",
+    "assembly_file_sha256",
+    "input_source_refs",
+    "observed_at",
+    "trust_posture",
+    "g5_authority",
+    "authority_stop_line"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_routing_g5_candidate_provenance_v1"
+    },
+    "state": {
+      "const": "sdk_g5_candidate"
+    },
+    "publication_posture": {
+      "const": "non_publishing_canary"
+    },
+    "current_canonical_producer": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/producer"
+        },
+        {
+          "properties": {
+            "owner_repo": {
+              "const": "aoa-routing"
+            }
+          }
+        }
+      ]
+    },
+    "candidate_producer": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/producer"
+        },
+        {
+          "required": [
+            "implementation"
+          ],
+          "properties": {
+            "owner_repo": {
+              "const": "aoa-sdk"
+            },
+            "implementation": {
+              "const": "aoa_sdk.control_plane.routing"
+            }
+          }
+        }
+      ]
+    },
+    "candidate_artifact_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_class",
+        "owner_repo",
+        "abi_epoch"
+      ],
+      "properties": {
+        "artifact_class": {
+          "const": "thin_routing_readmodel_bundle"
+        },
+        "owner_repo": {
+          "const": "aoa-sdk"
+        },
+        "abi_epoch": {
+          "const": "aoa_routing_thin_router_v1"
+        }
+      }
+    },
+    "abi_epoch": {
+      "const": "aoa_routing_thin_router_v1"
+    },
+    "artifact_sha256": {
+      "$ref": "https://aoa-sdk/schemas/routing-shadow-provenance.schema.json#/properties/artifact_sha256"
+    },
+    "assembly_file_sha256": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "docs/FEDERATION_ENTRY_ABI.md",
+        "docs/RECURRENCE_NAVIGATION_BOUNDARY.md",
+        "generated/aoa_router.min.json",
+        "generated/composite_stress_route_hints.min.json",
+        "generated/cross_repo_registry.min.json",
+        "generated/federation_entrypoints.min.json",
+        "generated/kag_source_lift_relation_hints.min.json",
+        "generated/owner_layer_shortlist.min.json",
+        "generated/pairing_hints.min.json",
+        "generated/quest_dispatch_hints.min.json",
+        "generated/recommended_paths.min.json",
+        "generated/return_navigation_hints.min.json",
+        "generated/stats_regrounding_hints.min.json",
+        "generated/task_to_surface_hints.json",
+        "generated/task_to_tier_hints.json",
+        "generated/tiny_model_entrypoints.json",
+        "schemas/aoa-router.schema.json",
+        "schemas/cross-repo-registry.schema.json",
+        "schemas/federation-entrypoints.schema.json",
+        "schemas/kag-source-lift-relation-hints.schema.json",
+        "schemas/pairing-hints.schema.json",
+        "schemas/recommended-paths.schema.json",
+        "schemas/return-navigation-hints.schema.json",
+        "schemas/router-entry.schema.json",
+        "schemas/task-to-surface-hints.schema.json",
+        "schemas/task-to-tier-hints.schema.json",
+        "schemas/tiny-model-entrypoints.schema.json"
+      ],
+      "properties": {
+        "docs/FEDERATION_ENTRY_ABI.md": {
+          "$ref": "#/$defs/sha256"
+        },
+        "docs/RECURRENCE_NAVIGATION_BOUNDARY.md": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/aoa_router.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/composite_stress_route_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/cross_repo_registry.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/federation_entrypoints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/kag_source_lift_relation_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/owner_layer_shortlist.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/pairing_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/quest_dispatch_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/recommended_paths.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/return_navigation_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/stats_regrounding_hints.min.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/task_to_surface_hints.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/task_to_tier_hints.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "generated/tiny_model_entrypoints.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/aoa-router.schema.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/cross-repo-registry.schema.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/federation-entrypoints.schema.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/kag-source-lift-relation-hints.schema.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/pairing-hints.schema.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/recommended-paths.schema.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/return-navigation-hints.schema.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/router-entry.schema.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/task-to-surface-hints.schema.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/task-to-tier-hints.schema.json": {
+          "$ref": "#/$defs/sha256"
+        },
+        "schemas/tiny-model-entrypoints.schema.json": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "input_source_refs": {
+      "$ref": "https://aoa-sdk/schemas/routing-shadow-provenance.schema.json#/properties/input_source_refs"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trust_posture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_class",
+        "required_controls",
+        "stronger_owner",
+        "admission_status",
+        "runtime_consumer"
+      ],
+      "properties": {
+        "artifact_class": {
+          "const": "thin_routing_readmodel_bundle"
+        },
+        "required_controls": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "abi_signature"
+            },
+            {
+              "const": "sbom"
+            },
+            {
+              "const": "slsa_in_toto"
+            }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "stronger_owner": {
+          "const": "abyss-machine"
+        },
+        "admission_status": {
+          "const": "pending_stronger_owner"
+        },
+        "runtime_consumer": {
+          "const": "abyss-stack"
+        }
+      }
+    },
+    "g5_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_producer_switch_authorized",
+        "sdk_canonical",
+        "live_runtime_mutation_authorized",
+        "predecessor_maintenance_only",
+        "compatibility_window_started",
+        "archive_authorized"
+      ],
+      "properties": {
+        "canonical_producer_switch_authorized": {
+          "const": false
+        },
+        "sdk_canonical": {
+          "const": false
+        },
+        "live_runtime_mutation_authorized": {
+          "const": false
+        },
+        "predecessor_maintenance_only": {
+          "const": false
+        },
+        "compatibility_window_started": {
+          "const": false
+        },
+        "archive_authorized": {
+          "const": false
+        }
+      }
+    },
+    "authority_stop_line": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    },
+    "git_object_id": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_repo",
+        "source_ref"
+      ],
+      "properties": {
+        "owner_repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ref": {
+          "$ref": "#/$defs/git_object_id"
+        },
+        "implementation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}
