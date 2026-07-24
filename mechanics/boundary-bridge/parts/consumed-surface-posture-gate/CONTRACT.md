@@ -26,6 +26,15 @@
   code into active source or treating an SDK wheel as canonical publication.
 - Requires dual-producer sidecar provenance during M1 shadow generation while
   preserving the fourteen compatibility artifacts byte-for-byte.
+- Rejects canonical-looking `generated` destinations from the SDK shadow
+  compiler before G5.
+- Requires a fresh empty shadow destination and rejects extra, linked, or
+  non-regular bundle entries.
+- Packages the complete routing schema family and requires an installed wheel
+  to reproduce and validate the fourteen artifacts plus the shadow sidecar
+  without importing SDK source from the checkout.
+- Stores the pinned fixture corpora in compact deterministic archives and
+  rejects traversal, links, and unsupported members before test extraction.
 
 ## Non-Goals
 
@@ -40,6 +49,8 @@
   or producer migration.
 - A passed G3 rehearsal is not a passed SDK release gate, G4 parity window, G5
   owner switch, runtime mutation, or archive authorization.
+- A landed M1 shadow compiler is not canonical publication, runtime adoption,
+  G4 evidence, G5 authority, or permission to retire the predecessor.
 
 ## Active Test Home
 
@@ -57,3 +68,5 @@
 - `tests/test_routing_succession_r1_target_operating_model.py`
 - `tests/test_routing_succession_r2_control_plane_contracts.py`
 - `tests/test_routing_succession_r3_migration_rehearsal.py`
+- `tests/test_routing_shadow_producer.py`
+- `tests/test_routing_shadow_bundle.py`

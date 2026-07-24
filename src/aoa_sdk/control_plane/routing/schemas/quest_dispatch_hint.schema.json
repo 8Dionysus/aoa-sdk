@@ -1,0 +1,151 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/mechanics/questbook/parts/quest-routing-seam/schemas/quest_dispatch_hint.schema.json",
+  "title": "quest_dispatch_hint_v2",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "id",
+    "repo",
+    "state",
+    "band",
+    "difficulty",
+    "risk",
+    "delegate_tier",
+    "source_path",
+    "public_safe",
+    "next_actions",
+    "fallback"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "quest_dispatch_hint_v2"
+    },
+    "id": {
+      "type": "string",
+      "minLength": 1
+    },
+    "repo": {
+      "$ref": "#/$defs/sourceRepo"
+    },
+    "state": {
+      "type": "string",
+      "minLength": 1
+    },
+    "band": {
+      "type": "string",
+      "enum": [
+        "frontier",
+        "near",
+        "latent",
+        "parked"
+      ]
+    },
+    "difficulty": {
+      "type": "string",
+      "enum": [
+        "d0_probe",
+        "d1_patch",
+        "d2_slice",
+        "d3_seam",
+        "d4_architecture",
+        "d5_doctrine"
+      ]
+    },
+    "risk": {
+      "type": "string",
+      "enum": [
+        "r0_readonly",
+        "r1_repo_local",
+        "r2_contract",
+        "r3_side_effect"
+      ]
+    },
+    "delegate_tier": {
+      "type": "string",
+      "enum": [
+        "router",
+        "planner",
+        "executor",
+        "verifier",
+        "conductor",
+        "deep",
+        "archivist"
+      ]
+    },
+    "source_path": {
+      "type": "string",
+      "minLength": 1
+    },
+    "public_safe": {
+      "type": "boolean"
+    },
+    "next_actions": {
+      "type": "array",
+      "minItems": 3,
+      "maxItems": 3,
+      "items": {
+        "$ref": "#/$defs/actionObject"
+      }
+    },
+    "fallback": {
+      "$ref": "#/$defs/actionObject"
+    }
+  },
+  "$defs": {
+    "sourceRepo": {
+      "type": "string",
+      "enum": [
+        "aoa-techniques",
+        "aoa-skills",
+        "aoa-evals"
+      ]
+    },
+    "targetRepo": {
+      "type": "string",
+      "enum": [
+        "aoa-routing",
+        "aoa-techniques",
+        "aoa-skills",
+        "aoa-evals"
+      ]
+    },
+    "actionObject": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verb",
+        "target_repo",
+        "target_surface",
+        "match_key",
+        "target_value"
+      ],
+      "properties": {
+        "verb": {
+          "type": "string",
+          "enum": [
+            "inspect",
+            "expand",
+            "handoff"
+          ]
+        },
+        "target_repo": {
+          "$ref": "#/$defs/targetRepo"
+        },
+        "target_surface": {
+          "type": "string",
+          "minLength": 1
+        },
+        "match_key": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_value": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  }
+}

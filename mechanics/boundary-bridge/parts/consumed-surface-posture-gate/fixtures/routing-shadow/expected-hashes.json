@@ -1,0 +1,21 @@
+{
+  "schema_version": "aoa_sdk_routing_shadow_expected_hashes_v1",
+  "predecessor_ref": "7e2fe467ad26aa645b61849001a456dda4562ffc",
+  "fixture_corpus": "inputs",
+  "output_sha256": {
+    "aoa_router.min.json": "410c39910aef648b00741579d332e5c79c4a293d77d1d1f149692d26bcee16a4",
+    "composite_stress_route_hints.min.json": "478919fa9df4bb4629f46bb926ffcbbe2a01fe77c439d6ab626e2195f67c63f8",
+    "cross_repo_registry.min.json": "03fbbd44e0c174d46a1565b8cd7031dfd20bb289531bb832f5b8f9f426809968",
+    "federation_entrypoints.min.json": "605c195927acc33b7df045e88733706c67d1f9578d37f40dfe2657e0511ff109",
+    "kag_source_lift_relation_hints.min.json": "bd39d002abe7990081488667db4ad27d27fda135f4167a315078146d5135aa4a",
+    "owner_layer_shortlist.min.json": "8fa6fdeaa9994aa6f6237050ef3c64ad5e5c508de391fe7e25c2ee35decdd4d3",
+    "pairing_hints.min.json": "85db3466e4882258b034accef1484c253258be8a9eb54d5c30a3a9e0e81e5d85",
+    "quest_dispatch_hints.min.json": "bc0bfbe747fd74b3253be6f174e12d61c8edb407aad5fa92fc1f93bf38c020d7",
+    "recommended_paths.min.json": "c97f444dcdc1eed5befb5631a74f88ddd99795e9693e9c89aba9e66675ed04bc",
+    "return_navigation_hints.min.json": "6281c665675a4a681bc9f10923e7c5f1356bdd4b559e6fcecc31177c142d2bab",
+    "stats_regrounding_hints.min.json": "29c641a783b1e0cfb4da524fbd54089c2534f83b2557c5cb9b399d57823c8d58",
+    "task_to_surface_hints.json": "a43557b9eee1ed0716b5aed06ad7f8683874d3aff4748f2164694bcc6ff53dfa",
+    "task_to_tier_hints.json": "f295c0b036c0d45c21569a0e20d99dbec12bb1b60fb39fb1e7ae8943cdfa5da6",
+    "tiny_model_entrypoints.json": "06a235443ad30bf099acbafcb19e7fb958cc2d5250899bef3f16ca0ad07b69c1"
+  }
+}

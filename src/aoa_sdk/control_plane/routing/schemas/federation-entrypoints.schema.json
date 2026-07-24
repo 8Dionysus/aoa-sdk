@@ -1,0 +1,360 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/mechanics/boundary-bridge/parts/federation-entry/schemas/federation-entrypoints.schema.json",
+  "title": "aoa-routing federation entrypoints",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "schema_ref",
+    "owner_repo",
+    "surface_kind",
+    "artifact_identity",
+    "source_inputs",
+    "root_entries",
+    "active_entry_kinds",
+    "declared_entry_kinds",
+    "entrypoints"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_routing_federation_entrypoints_v2"
+    },
+    "schema_ref": {
+      "const": "mechanics/boundary-bridge/parts/federation-entry/schemas/federation-entrypoints.schema.json"
+    },
+    "owner_repo": {
+      "const": "aoa-routing"
+    },
+    "surface_kind": {
+      "const": "federation_entrypoints"
+    },
+    "artifact_identity": {
+      "$ref": "#/$defs/artifactIdentity"
+    },
+    "source_inputs": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/sourceInput"
+      }
+    },
+    "root_entries": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "items": {
+        "$ref": "#/$defs/rootEntry"
+      }
+    },
+    "active_entry_kinds": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/activeEntryKind"
+      }
+    },
+    "declared_entry_kinds": {
+      "type": "array",
+      "uniqueItems": true,
+      "items": {
+        "$ref": "#/$defs/declaredEntryKind"
+      }
+    },
+    "entrypoints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entrypoint"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "artifactIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_class",
+        "surface_state",
+        "owner_repo",
+        "authority_ref",
+        "producer",
+        "consumer_expectation",
+        "privacy_boundary",
+        "content_identity",
+        "abi_epoch",
+        "contract_version",
+        "trust_layer",
+        "verification",
+        "action"
+      ],
+      "properties": {
+        "artifact_class": {
+          "const": "generated_readmodel"
+        },
+        "surface_state": {
+          "const": "public_generated_navigation_surface"
+        },
+        "owner_repo": {
+          "const": "aoa-routing"
+        },
+        "authority_ref": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "producer": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "consumer_expectation": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "privacy_boundary": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "content_identity": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "abi_epoch": {
+          "const": "aoa_routing_federation_entrypoints_v2"
+        },
+        "contract_version": {
+          "const": "federation-entrypoints.schema.json@aoa_routing_federation_entrypoints_v2#artifact_identity"
+        },
+        "trust_layer": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "enum": [
+              "abi_contract_signature"
+            ]
+          }
+        },
+        "verification": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": {
+            "$ref": "#/$defs/nonEmptyString"
+          }
+        },
+        "action": {
+          "const": "ADD_CONSUMER_EXPECTATION"
+        }
+      }
+    },
+    "repoName": {
+      "type": "string",
+      "enum": [
+        "aoa-routing",
+        "aoa-techniques",
+        "aoa-skills",
+        "aoa-evals",
+        "aoa-memo",
+        "aoa-sdk",
+        "aoa-stats",
+        "aoa-agents",
+        "aoa-playbooks",
+        "aoa-kag",
+        "8Dionysus",
+        "Dionysus",
+        "abyss-stack",
+        "Agents-of-Abyss",
+        "Tree-of-Sophia"
+      ]
+    },
+    "ownerRepo": {
+      "type": "string",
+      "enum": [
+        "aoa-sdk",
+        "aoa-stats",
+        "aoa-agents",
+        "aoa-playbooks",
+        "aoa-kag",
+        "8Dionysus",
+        "Dionysus",
+        "abyss-stack",
+        "Agents-of-Abyss",
+        "Tree-of-Sophia"
+      ]
+    },
+    "surfaceRef": {
+      "type": "string",
+      "pattern": "^(aoa-routing|aoa-techniques|aoa-skills|aoa-evals|aoa-memo|aoa-sdk|aoa-stats|aoa-agents|aoa-playbooks|aoa-kag|8Dionysus|Dionysus|abyss-stack|Agents-of-Abyss|Tree-of-Sophia):.+$"
+    },
+    "activeEntryKind": {
+      "type": "string",
+      "enum": [
+        "agent",
+        "tier",
+        "playbook",
+        "kag_view",
+        "source_route",
+        "runtime_surface",
+        "orientation_surface"
+      ]
+    },
+    "declaredEntryKind": {
+      "type": "string",
+      "enum": [
+        "tos_node"
+      ]
+    },
+    "nextHop": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id"
+      ],
+      "properties": {
+        "kind": {
+          "$ref": "#/$defs/activeEntryKind"
+        },
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "nextAction": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "verb",
+        "target_repo",
+        "target_surface",
+        "match_key",
+        "target_value"
+      ],
+      "properties": {
+        "verb": {
+          "type": "string",
+          "enum": [
+            "pick",
+            "inspect"
+          ]
+        },
+        "target_repo": {
+          "$ref": "#/$defs/repoName"
+        },
+        "target_surface": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "match_key": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "target_value": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "entryBase": {
+      "type": "object",
+      "required": [
+        "id",
+        "owner_repo",
+        "title",
+        "capsule_surface",
+        "authority_surface",
+        "next_actions",
+        "fallback",
+        "risk",
+        "next_hops"
+      ],
+      "properties": {
+        "id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "owner_repo": {
+          "$ref": "#/$defs/ownerRepo"
+        },
+        "title": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "capsule_surface": {
+          "$ref": "#/$defs/surfaceRef"
+        },
+        "authority_surface": {
+          "$ref": "#/$defs/surfaceRef"
+        },
+        "next_actions": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/nextAction"
+          }
+        },
+        "fallback": {
+          "$ref": "#/$defs/nextAction"
+        },
+        "risk": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "next_hops": {
+          "type": "array",
+          "minItems": 1,
+          "maxItems": 3,
+          "items": {
+            "$ref": "#/$defs/nextHop"
+          }
+        }
+      }
+    },
+    "rootEntry": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entryBase"
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "entrypoint": {
+      "allOf": [
+        {
+          "$ref": "#/$defs/entryBase"
+        },
+        {
+          "type": "object",
+          "required": [
+            "kind"
+          ],
+          "properties": {
+            "kind": {
+              "$ref": "#/$defs/activeEntryKind"
+            }
+          }
+        }
+      ],
+      "unevaluatedProperties": false
+    },
+    "sourceInput": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "name",
+        "repo",
+        "role",
+        "ref"
+      ],
+      "properties": {
+        "name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "repo": {
+          "$ref": "#/$defs/repoName"
+        },
+        "role": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "ref": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    }
+  }
+}

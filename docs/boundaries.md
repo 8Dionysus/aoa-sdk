@@ -32,6 +32,9 @@ repositories remain authoritative.
 - before G5, the versioned R2 route, plan, approval, lifecycle, event,
   evidence-reference, and adapter protocol models used to prove the boundary;
   the models do not activate an `AoASDK` runner or runtime
+- before G5, the packaged M1 routing compiler, strict validator, and
+  dual-producer sidecar in non-publishing shadow posture; embedded
+  compatibility provenance remains `aoa-routing` until the owner switch
 - typed loaders over published surfaces
 - local workspace discovery and sibling-repo resolution
 - shared Python models for stable consumer use

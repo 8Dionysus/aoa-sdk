@@ -1,0 +1,161 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/mechanics/boundary-bridge/parts/stats-regrounding/schemas/stats-regrounding-hints.schema.json",
+  "title": "aoa_routing_stats_regrounding_hints_v1",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "schema_ref",
+    "owner_repo",
+    "surface_kind",
+    "source_inputs",
+    "coverage_thin_signal_flags",
+    "hints",
+    "boundary_notes"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_routing_stats_regrounding_hints_v1"
+    },
+    "schema_ref": {
+      "const": "mechanics/boundary-bridge/parts/stats-regrounding/schemas/stats-regrounding-hints.schema.json"
+    },
+    "owner_repo": {
+      "const": "aoa-routing"
+    },
+    "surface_kind": {
+      "const": "stats_regrounding_hints"
+    },
+    "source_inputs": {
+      "type": "array",
+      "minItems": 2,
+      "items": {
+        "$ref": "#/$defs/source_input"
+      }
+    },
+    "coverage_thin_signal_flags": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    },
+    "hints": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/hint"
+      }
+    },
+    "boundary_notes": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "type": "string",
+        "minLength": 1
+      }
+    }
+  },
+  "$defs": {
+    "source_input": {
+      "type": "object",
+      "required": ["repo", "surface_kind", "ref"],
+      "properties": {
+        "repo": {
+          "const": "aoa-stats"
+        },
+        "surface_kind": {
+          "enum": ["summary_surface_catalog", "source_coverage_summary"]
+        },
+        "ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "action": {
+      "type": "object",
+      "required": ["verb", "target_repo", "target_ref"],
+      "properties": {
+        "verb": {
+          "const": "inspect"
+        },
+        "target_repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "target_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    },
+    "hint": {
+      "type": "object",
+      "required": [
+        "hint_id",
+        "surface_name",
+        "surface_ref",
+        "recommended_action",
+        "reason_codes",
+        "owner_truth_inputs",
+        "primary_action",
+        "fallback_actions",
+        "advisory_only",
+        "authority_note"
+      ],
+      "properties": {
+        "hint_id": {
+          "type": "string",
+          "pattern": "^stats-reground:[a-z0-9_\\-.]+$"
+        },
+        "surface_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "surface_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "recommended_action": {
+          "const": "reground_before_using_stats"
+        },
+        "reason_codes": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "owner_truth_inputs": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          }
+        },
+        "primary_action": {
+          "$ref": "#/$defs/action"
+        },
+        "fallback_actions": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/action"
+          }
+        },
+        "advisory_only": {
+          "const": true
+        },
+        "authority_note": {
+          "type": "string",
+          "minLength": 1
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -196,17 +196,22 @@ The runtime-neutral R2 types, lifecycle graph, replay rules, three golden
 scenarios, and threat controls live in
 `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md`
 and `src/aoa_sdk/contracts/control_plane.py`. They define protocols, not active
-`AoASDK` behavior or a runtime body. This design section does not authorize
-producer code movement or G5.
+`AoASDK` behavior or a runtime body. The R2 contracts alone did not authorize
+producer movement; the G3-authorized M1 slice below is shadow-only and does not
+authorize G5.
 
 The disposable R3 migration result lives in
 `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r3-migration-rehearsal.json`.
 It proves that a minimal `src/aoa_sdk/control_plane/routing/` producer can
 build the fourteen compatibility artifacts from an installed wheel without an
 `aoa-routing` checkout and can roll back to the predecessor. The candidate was
-removed. G3 authorizes M1 shadow implementation, where inherited typing debt,
-schemas, validators, package data, negative fixtures, and dual-producer
-provenance must be integrated before release. It does not authorize G5.
+removed. The resulting M1 implementation now lives under
+`src/aoa_sdk/control_plane/routing/`: it resolves the inherited typing debt,
+packages schemas and a strict validator, preserves the fourteen predecessor
+bytes, emits dual-producer provenance, rejects canonical-looking publication
+targets, and is checked from an installed wheel. `aoa-routing` still remains
+canonical. M1 must be released and consumed through the G4 parity window
+before any explicit G5 switch.
 
 ## Design as Aim
 

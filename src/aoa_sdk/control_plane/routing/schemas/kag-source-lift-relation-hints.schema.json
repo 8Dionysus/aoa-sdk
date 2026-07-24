@@ -1,0 +1,109 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-routing/mechanics/boundary-bridge/parts/tos-kag-boundary/schemas/kag-source-lift-relation-hints.schema.json",
+  "title": "aoa-routing KAG source-lift relation hints",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "scope",
+    "source_repo",
+    "source_catalog",
+    "family_ids",
+    "entries"
+  ],
+  "properties": {
+    "version": {
+      "const": 1
+    },
+    "scope": {
+      "const": "kag_source_lift_family"
+    },
+    "source_repo": {
+      "const": "aoa-techniques"
+    },
+    "source_catalog": {
+      "type": "string",
+      "minLength": 1
+    },
+    "family_ids": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "minLength": 1
+      },
+      "uniqueItems": true
+    },
+    "entries": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/entry"
+      }
+    }
+  },
+  "$defs": {
+    "relationType": {
+      "type": "string",
+      "enum": [
+        "requires",
+        "complements",
+        "supersedes",
+        "conflicts_with",
+        "used_together_for",
+        "derived_from",
+        "shares_contract_with"
+      ]
+    },
+    "relation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "type",
+        "target"
+      ],
+      "properties": {
+        "type": {
+          "$ref": "#/$defs/relationType"
+        },
+        "target": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "entry": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "id",
+        "name",
+        "summary",
+        "relations"
+      ],
+      "properties": {
+        "kind": {
+          "const": "technique"
+        },
+        "id": {
+          "type": "string",
+          "minLength": 1
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "summary": {
+          "type": "string",
+          "minLength": 1
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/relation"
+          }
+        }
+      }
+    }
+  }
+}
