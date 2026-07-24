@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 7538210,
+  "allowed_tracked_bytes": 15624026,
+  "approved_by": "repository-owner",
+  "base_ref": "5cab5840c03b66c22bb07a6d0863bef9e95c7b23",
+  "changed_generated_bytes": 7538210,
+  "changed_generated_files": 203,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "9dd69cadd9d0e36d920be8002e744947f71ab32b766fabafda3a37782ce3a8bb",
+  "reason": "The G5 candidate adds source modules, schemas, tests, packaged runtime boundaries, and owner-route updates; portable v3 content-addressed shard churn exceeds the per-change delta while the complete tracked family remains below its standing cap, with source meaning and KAG authority unchanged.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta",
+  "tracked_bytes": 15624026,
+  "tracked_bytes_max": 15728640
+}
