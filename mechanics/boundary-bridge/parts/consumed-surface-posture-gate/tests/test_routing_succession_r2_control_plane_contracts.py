@@ -51,10 +51,12 @@ from aoa_sdk.contracts.control_plane import (
     StartCommand,
     assert_approvals_satisfied,
     assert_closeout_ready,
+    assert_decision_matches_intent,
     assert_execution_event_chain,
     assert_explanation_matches_decision,
     assert_idempotent_replay,
     assert_plan_snapshot_digest,
+    assert_route_plan_chain,
     assert_run_plan_digest,
     assert_snapshot_current,
     assert_transition_allowed,
@@ -91,12 +93,17 @@ def _provenance(
     )
 
 
-def _content(object_id: str) -> ContentRef:
+def _content(
+    object_id: str,
+    *,
+    owner_repo: str = "aoa-sdk",
+    digest: str | None = None,
+) -> ContentRef:
     return ContentRef(
         object_id=object_id,
-        owner_repo="aoa-sdk",
+        owner_repo=owner_repo,
         schema_version="aoa_control_plane_v1",
-        digest=_digest(object_id),
+        digest=digest or _digest(object_id),
     )
 
 
@@ -448,32 +455,39 @@ def _event(
 
 def test_core_contracts_round_trip_as_strict_json() -> None:
     plan = _run_plan()
-    session = _session(plan)
     intent = RouteIntent(
         intent_id="intent:bounded",
         correlation_id=plan.correlation_id,
         objective="Make one bounded repository change and prove it",
         requested_by=_agent(),
-        scenario=_scenario(),
+        scenario=_scenario("bounded"),
         requested_capability_kinds=("workflow",),
-        context_refs=(_scenario().provenance,),
+        context_refs=(_scenario("bounded").provenance,),
         authored_at=NOW,
+        provenance=_provenance(
+            "agent-session",
+            "intents/intent-bounded.json",
+        ),
     )
     candidate = RouteCandidate(
         candidate_id="candidate:bounded",
-        capability=_capability(),
+        capability=_capability("bounded"),
         agent=_agent(),
-        scenario=_scenario(),
+        scenario=_scenario("bounded"),
         rank=0,
         compatibility="compatible",
         policy_posture="approval_required",
         reason_codes=("exact-capability-match",),
-        evidence_refs=(_capability().provenance,),
+        evidence_refs=(_capability("bounded").provenance,),
     )
     decision = RouteDecision(
         decision_id="decision:bounded",
         correlation_id=plan.correlation_id,
-        intent_ref=_content(intent.intent_id),
+        intent_ref=_content(
+            intent.intent_id,
+            owner_repo=intent.provenance.owner_repo,
+            digest=canonical_digest(intent),
+        ),
         status="resolved",
         candidates=(candidate,),
         selected_candidate_id=candidate.candidate_id,
@@ -486,7 +500,11 @@ def test_core_contracts_round_trip_as_strict_json() -> None:
     explanation = RouteExplanation(
         explanation_id="explanation:bounded",
         correlation_id=plan.correlation_id,
-        decision_ref=_content(decision.decision_id),
+        decision_ref=_content(
+            decision.decision_id,
+            owner_repo=decision.provenance.owner_repo,
+            digest=canonical_digest(decision),
+        ),
         decision_status=decision.status,
         candidate_explanations=(
             CandidateExplanation(
@@ -499,6 +517,20 @@ def test_core_contracts_round_trip_as_strict_json() -> None:
         selected_candidate_id=candidate.candidate_id,
         provenance=_provenance("aoa-sdk", "route-explanations/explanation-bounded.json"),
     )
+    decision_ref = explanation.decision_ref
+    plan = plan.model_copy(
+        update={
+            "decision_ref": decision_ref,
+            "scenario_binding": plan.scenario_binding.model_copy(
+                update={"decision_ref": decision_ref}
+            ),
+            "plan_digest": _digest("placeholder"),
+        }
+    )
+    plan = plan.model_copy(
+        update={"plan_digest": canonical_digest(plan, exclude={"plan_digest"})}
+    )
+    session = _session(plan)
     profile = ResolvedAgentProfile(
         profile_id="resolved-agent:bounded",
         agent=_agent(),
@@ -539,19 +571,30 @@ def test_core_contracts_round_trip_as_strict_json() -> None:
         assert restored == model
     assert_run_plan_digest(plan)
     assert_plan_snapshot_digest(plan.snapshot)
+    assert_decision_matches_intent(intent, decision)
     assert_explanation_matches_decision(decision, explanation)
+    assert_route_plan_chain(intent, decision, explanation, plan)
 
+    expanded_decision = decision.model_copy(
+        update={
+            "candidates": (
+                *decision.candidates,
+                candidate.model_copy(update={"candidate_id": "candidate:other"}),
+            )
+        }
+    )
     with pytest.raises(ControlPlaneContractError, match="does not account"):
         assert_explanation_matches_decision(
-            decision.model_copy(
+            expanded_decision,
+            explanation.model_copy(
                 update={
-                    "candidates": (
-                        *decision.candidates,
-                        candidate.model_copy(update={"candidate_id": "candidate:other"}),
+                    "decision_ref": _content(
+                        expanded_decision.decision_id,
+                        owner_repo=expanded_decision.provenance.owner_repo,
+                        digest=canonical_digest(expanded_decision),
                     )
                 }
             ),
-            explanation,
         )
 
     with pytest.raises(ValidationError, match="Extra inputs are not permitted"):
@@ -988,6 +1031,14 @@ def test_r2_machine_design_matches_typed_contract_and_stop_lines() -> None:
     )
     assert evidence["owner_boundaries"]["sdk_executes_models_or_tools"] is False
     assert evidence["owner_boundaries"]["runtime_success_is_eval_verdict"] is False
+    assert evidence["run_plan_contract"]["intent_to_plan_owner_digest_chain"]
+    assert evidence["run_plan_contract"]["selected_candidate_must_match_scenario_binding"]
+    assert (
+        evidence["run_plan_contract"][
+            "route_approval_requirements_may_be_dropped_by_compiler"
+        ]
+        is False
+    )
     assert evidence["run_plan_contract"]["runtime_commands_allowed_in_plan"] is False
     assert evidence["closeout_guard"] == {
         "exact_session_correlation_and_plan_scope": True,

@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 7215389,
+  "allowed_tracked_bytes": 14577618,
+  "approved_by": "repository-owner",
+  "base_ref": "d6f73b0954f83eb2588bfd21e49b849b2232886d",
+  "changed_generated_bytes": 7215389,
+  "changed_generated_files": 204,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "795d42a49981a0d01e885d2eff57bc6d310e95202164fd0c96cdde410c036da3",
+  "reason": "R2 adds strict runtime-neutral Agent OS contract models, exact intent-to-plan digest chaining, lifecycle guards, golden scenarios, and checked threat controls without moving routing producer authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta",
+  "tracked_bytes": 14577618,
+  "tracked_bytes_max": 15728640
+}

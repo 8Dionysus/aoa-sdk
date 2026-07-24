@@ -144,6 +144,7 @@ class RouteIntent(StrictControlPlaneModel):
     constraints: tuple[RouteConstraint, ...] = ()
     context_refs: tuple[ProvenanceRef, ...] = ()
     authored_at: datetime
+    provenance: ProvenanceRef
 
     @field_validator("authored_at")
     @classmethod
@@ -832,6 +833,7 @@ def canonical_digest(
 
 
 def assert_run_plan_digest(plan: RunPlan) -> None:
+    assert_plan_snapshot_digest(plan.snapshot)
     expected = canonical_digest(plan, exclude={"plan_digest"})
     if plan.plan_digest != expected:
         raise ControlPlaneContractError(
@@ -887,6 +889,8 @@ def assert_explanation_matches_decision(
     if (
         explanation.correlation_id != decision.correlation_id
         or explanation.decision_ref.object_id != decision.decision_id
+        or explanation.decision_ref.owner_repo != decision.provenance.owner_repo
+        or explanation.decision_ref.digest != canonical_digest(decision)
         or explanation.decision_status != decision.status
         or explanation.selected_candidate_id != decision.selected_candidate_id
     ):
@@ -900,6 +904,85 @@ def assert_explanation_matches_decision(
     if decision_candidate_ids != explanation_candidate_ids:
         raise ControlPlaneContractError(
             "route explanation does not account for every decision candidate"
+        )
+
+
+def assert_decision_matches_intent(
+    intent: RouteIntent,
+    decision: RouteDecision,
+) -> None:
+    """Require a decision to address the exact owner-qualified intent."""
+
+    if (
+        decision.correlation_id != intent.correlation_id
+        or decision.intent_ref.object_id != intent.intent_id
+        or decision.intent_ref.owner_repo != intent.provenance.owner_repo
+        or decision.intent_ref.digest != canonical_digest(intent)
+    ):
+        raise ControlPlaneContractError(
+            "route decision does not reference the exact route intent"
+        )
+
+
+def assert_route_plan_chain(
+    intent: RouteIntent,
+    decision: RouteDecision,
+    explanation: RouteExplanation,
+    plan: RunPlan,
+) -> None:
+    """Validate the content-addressed intent-to-plan control-plane chain."""
+
+    assert_decision_matches_intent(intent, decision)
+    assert_explanation_matches_decision(decision, explanation)
+    assert_run_plan_digest(plan)
+    expected_decision_digest = canonical_digest(decision)
+    for decision_ref in (plan.decision_ref, plan.scenario_binding.decision_ref):
+        if (
+            decision_ref.object_id != decision.decision_id
+            or decision_ref.owner_repo != decision.provenance.owner_repo
+            or decision_ref.digest != expected_decision_digest
+        ):
+            raise ControlPlaneContractError(
+                "scenario binding or run plan does not reference the exact decision"
+            )
+    if plan.correlation_id != intent.correlation_id:
+        raise ControlPlaneContractError(
+            "run plan correlation id does not match the route intent"
+        )
+    decision_requirements = {
+        requirement.requirement_id: requirement
+        for requirement in decision.approval_requirements
+    }
+    plan_requirements = {
+        requirement.requirement_id: requirement
+        for requirement in plan.approval_requirements
+    }
+    for requirement_id, requirement in decision_requirements.items():
+        if plan_requirements.get(requirement_id) != requirement:
+            raise ControlPlaneContractError(
+                f"run plan dropped or changed route approval {requirement_id}"
+            )
+    if decision.selected_candidate_id is None:
+        raise ControlPlaneContractError(
+            "a blocked decision cannot compile into a run plan"
+        )
+    selected = next(
+        candidate
+        for candidate in decision.candidates
+        if candidate.candidate_id == decision.selected_candidate_id
+    )
+    binding = plan.scenario_binding
+    if selected.capability not in binding.capability_refs:
+        raise ControlPlaneContractError(
+            "scenario binding does not include the selected capability"
+        )
+    if selected.agent is not None and selected.agent not in binding.agent_refs:
+        raise ControlPlaneContractError(
+            "scenario binding does not include the selected agent"
+        )
+    if selected.scenario is not None and selected.scenario != binding.scenario:
+        raise ControlPlaneContractError(
+            "scenario binding does not match the selected scenario"
         )
 
 
@@ -923,6 +1006,7 @@ def assert_approvals_satisfied(
 ) -> None:
     """Require one exact, current approval for every plan requirement."""
 
+    assert_run_plan_digest(plan)
     at = _require_aware(at, "at")
     decisions_by_requirement: dict[str, ApprovalDecision] = {}
     for supplied_decision in decisions:
@@ -1058,6 +1142,7 @@ def assert_closeout_ready(
 ) -> None:
     """Prove required evidence refs exist before lifecycle closure."""
 
+    assert_run_plan_digest(plan)
     if (
         outcome.session_id != session.session_id
         or outcome.correlation_id != session.correlation_id

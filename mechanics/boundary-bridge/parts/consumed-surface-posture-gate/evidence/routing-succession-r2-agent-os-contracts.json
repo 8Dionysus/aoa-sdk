@@ -63,6 +63,9 @@
     "runtime_success_is_eval_verdict": false
   },
   "run_plan_contract": {
+    "intent_to_plan_owner_digest_chain": true,
+    "selected_candidate_must_match_scenario_binding": true,
+    "route_approval_requirements_may_be_dropped_by_compiler": false,
     "owner_qualified_source_refs": true,
     "pinned_source_digests": true,
     "pinned_abi_versions_and_digests": true,
@@ -288,6 +291,7 @@
   ],
   "validation_contract": {
     "strict_json_round_trip": true,
+    "intent_decision_explanation_plan_chain_test": true,
     "three_scenarios_one_contract_family": true,
     "lifecycle_graph_covered": true,
     "stale_source_failure_test": true,

@@ -82,7 +82,7 @@ The SDK may correlate these objects. It may not author their domain meaning.
 ### Routing objects
 
 - `RouteIntent` records the caller, objective, scenario, owner constraints,
-  and correlation identity.
+  correlation identity, and exact caller-side provenance.
 - `RouteCandidate` records compatibility, policy posture, rank, reasons, and
   evidence. Candidate status is not approval.
 - `RouteDecision` is `resolved`, `degraded`, or `blocked`. A selected candidate
@@ -93,6 +93,12 @@ The SDK may correlate these objects. It may not author their domain meaning.
 
 The resolver implementation and producer ownership do not move until the later
 succession gates.
+
+`assert_route_plan_chain` proves the whole intent-to-plan handoff is
+content-addressed: decision points to the exact intent; explanation and both
+plan/binding refs point to the exact decision; all correlation IDs agree; the
+selected capability, agent, and scenario occur in the binding; and route-level
+approval requirements cannot be dropped or changed by compilation.
 
 ### Planning objects
 
@@ -361,6 +367,8 @@ green:
 - the three golden scenarios use the same models;
 - lifecycle coverage and forbidden shortcuts are tested;
 - plan and event content digests are checked;
+- the intent, decision, explanation, binding, and plan form one exact
+  owner-qualified digest chain;
 - stale source and ABI observations fail;
 - missing, mismatched, future, or expired approval fails;
 - duplicate command and event redelivery is safe while substitution fails;
