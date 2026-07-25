@@ -361,9 +361,23 @@ def test_g5_candidate_manifest_and_provenance_are_artifact_bound(
         "path": "generated/aoa_router.min.json",
         "artifact_identity_pointer": "/artifact_identity",
     }
+    assert manifest["lifecycle"] == {
+        "initial_state": "candidate",
+        "promotion_path": [
+            "candidate",
+            "built-local",
+            "manually-verified",
+            "superseded",
+            "revoked",
+        ],
+        "latest_eligible_states": ["manually-verified"],
+    }
     joined_commands = "\n".join(manifest["consumer_command"])
     assert "--source-repo aoa-sdk" in joined_commands
-    assert "--consumer-intent runtime" in joined_commands
+    assert "--lifecycle-state manually-verified" in joined_commands
+    assert "--consumer-intent runtime_canary" in joined_commands
+    assert "--lifecycle-state release-ready" not in joined_commands
+    assert "--consumer-intent runtime " not in joined_commands
     assert "--trust-root-mode host_managed" in joined_commands
     assert "materialize-subjects" in joined_commands
     assert "trust-gate" in joined_commands

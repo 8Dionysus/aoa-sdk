@@ -102,6 +102,11 @@ manifest. Its required controls remain:
 `abyss-machine` is the stronger artifact-trust owner. It must admit the exact
 SDK producer/source combination, produce durable evidence, materialize the
 verified subjects, and return a consumer-intent-specific trust verdict.
+The candidate manifest requests only the non-publishing
+`manually-verified` active lifecycle state and the distinct
+`runtime_canary` intent. It carries `superseded` and `revoked` only as
+terminal exits; it does not request `release-ready`, `published`, or the
+normal production `runtime` intent.
 
 `abyss-stack` is the runtime consumer. It must consume the materialized subject
 set and durable trust record, preserve the exact SDK source ref and subject
