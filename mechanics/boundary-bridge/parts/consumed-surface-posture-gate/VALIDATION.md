@@ -57,7 +57,9 @@ an isolated 23-file runtime mirror without touching the live deployment.
 only SDK producer/return-route identity, preserves payload and ABI shape,
 requires exact clean Git refs, binds all assembly subjects and hashes, rejects
 substitution or canonical-looking output roots, and keeps every G5 authority
-flag false. `verify_routing_g5_candidate_wheel.py` proves the installed wheel
+flag false. It also proves the manifest exposes only `manually-verified` as
+an active registry state and uses the distinct `runtime_canary` intent, while
+keeping superseded and revoked terminal exits. `verify_routing_g5_candidate_wheel.py` proves the installed wheel
 contains the candidate builder, eighteen routing schemas, two runtime boundary
 documents, the complete fourteen-artifact assembly, and the exact 23-file
 runtime-required subset.

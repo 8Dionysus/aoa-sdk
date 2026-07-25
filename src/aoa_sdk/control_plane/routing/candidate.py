@@ -306,16 +306,10 @@ def _candidate_manifest(sdk_source_ref: str) -> dict[str, Any]:
                 "candidate",
                 "built-local",
                 "manually-verified",
-                "release-ready",
-                "published",
                 "superseded",
                 "revoked",
             ],
-            "latest_eligible_states": [
-                "manually-verified",
-                "release-ready",
-                "published",
-            ],
+            "latest_eligible_states": ["manually-verified"],
         },
         "consumer_contract": {
             "stable_interface": (
@@ -342,7 +336,7 @@ def _candidate_manifest(sdk_source_ref: str) -> dict[str, Any]:
             "abyss-machine artifacts release-check BUNDLE_DIR",
             (
                 "abyss-machine artifacts evidence-promote BUNDLE_DIR "
-                "--registry-dir REGISTRY_DIR --lifecycle-state release-ready "
+                "--registry-dir REGISTRY_DIR --lifecycle-state manually-verified "
                 "--consumer-ref abyss-stack:routing-canary --evidence-ref "
                 "BUNDLE_DIR/artifact.verify.json --source-repo aoa-sdk "
                 f"--source-ref {sdk_source_ref} "
@@ -353,20 +347,20 @@ def _candidate_manifest(sdk_source_ref: str) -> dict[str, Any]:
                 "abyss-machine artifacts materialize-subjects BUNDLE_DIR "
                 "--store-root SUBJECT_STORE_ROOT --registry-dir REGISTRY_DIR "
                 "--manifest CANDIDATE_ROOT/artifact.bundle.json "
-                "--consumer-intent runtime --source-repo aoa-sdk "
+                "--consumer-intent runtime_canary --source-repo aoa-sdk "
                 "--trust-root-mode host_managed --json"
             ),
             (
                 "abyss-machine artifacts trust-gate --registry-dir REGISTRY_DIR "
                 "--artifact-class thin_routing_readmodel_bundle "
-                "--consumer-intent runtime --source-repo aoa-sdk "
+                "--consumer-intent runtime_canary --source-repo aoa-sdk "
                 "--trust-root-mode host_managed --subject-digest SUBJECT_DIGEST "
                 "--json"
             ),
             (
                 "abyss-machine artifacts registry-latest --registry-dir "
                 "REGISTRY_DIR --artifact-class thin_routing_readmodel_bundle "
-                "--consumer-intent runtime --source-repo aoa-sdk "
+                "--consumer-intent runtime_canary --source-repo aoa-sdk "
                 "--trust-root-mode host_managed --json"
             ),
         ],

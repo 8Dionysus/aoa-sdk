@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 1067511,
+  "allowed_tracked_bytes": 15627408,
+  "approved_by": "repository-owner",
+  "base_ref": "8d3ef9d32c34f58ea771fd7ee674dd5c1b81392f",
+  "changed_generated_bytes": 1067511,
+  "changed_generated_files": 22,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "bcc05844d2c32353faeef0265e5c23ca8a1095d2bb3ebb409bd8232f83945988",
+  "reason": "The G5 candidate lifecycle hardening removes release and production-consumer routes, adds terminal revocation proof, and refreshes the derived source topology; portable v3 shard churn narrowly exceeds the per-change delta while the complete tracked family remains below its standing cap, with source meaning and KAG authority unchanged.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta",
+  "tracked_bytes": 15627408,
+  "tracked_bytes_max": 15728640
+}
