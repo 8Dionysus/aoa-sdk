@@ -26,6 +26,8 @@ without leaving tracked drift.
 
 - Do not invent versions, changelog prose, tags, or release notes.
 - Do not treat dry runs as publication.
+- Do not move or recreate an existing release tag to repair failed release
+  evidence; replay from the exact tag through a reviewed workflow revision.
 - Do not claim sibling releases happened until their owner repos, tags, and
   GitHub Releases verify.
 - Do not bypass protected branch, CI, or package publication checks.

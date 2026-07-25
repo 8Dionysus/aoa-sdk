@@ -46,3 +46,8 @@ source and verifier commits, builds a deterministic public archive, and checks
 the release envelope with all 29 subjects byte-resolved through an explicit
 runtime subject root, without promoting canonical routing authority. Public
 release and stronger-owner records remain external truth.
+
+Release-evidence replay is a bounded recovery route: the repaired workflow may
+run from newer `main`, but package and producer source must be checked out from
+the named existing immutable tag. Replay never authorizes a tag move or source
+substitution.

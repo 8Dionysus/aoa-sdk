@@ -12,6 +12,9 @@ Tracking starts with the community-docs baseline for this repository.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
+- Allow OIDC release-evidence replay from an existing immutable tag when the
+  original tag workflow fails before attestation, without moving the tag or
+  rebuilding from newer source.
 
 ## [0.7.0] - 2026-07-25
 

@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 11043477,
+  "allowed_tracked_bytes": 15904362,
+  "approved_by": "repository-owner",
+  "base_ref": "15f8239c6467ee99da0f6f9615bcb9a44270b574",
+  "changed_generated_bytes": 11043477,
+  "changed_generated_files": 273,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "29be58e527c0c12bd54dead598507b5049154393b02c40231a7e9a6e3a0d816c",
+  "reason": "Add immutable-tag OIDC evidence replay after a pre-attestation workflow integration failure.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 15904362,
+  "tracked_bytes_max": 15728640
+}
