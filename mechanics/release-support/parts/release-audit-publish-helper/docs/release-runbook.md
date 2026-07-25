@@ -64,6 +64,22 @@ Postpublish is red if any of these are false:
   - `## Full Release Notes`
 - `origin/main:README.md` still shows the same current-release banner
 
+## Routing G5 candidate validation
+
+The non-publishing routing-owner candidate extends the release battery with
+focused source, typing, package, and installed-wheel checks:
+
+```bash
+python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_g5_candidate.py
+python -m mypy src/aoa_sdk/control_plane/routing
+python -m build
+python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
+```
+
+These commands prove candidate construction and installed-package behavior.
+They do not grant durable artifact admission, runtime cutover, G5, predecessor
+retirement, compatibility-window start, or archival authority.
+
 ## Notes
 
 - `aoa release publish` may create or update the annotated tag and the GitHub Release, but it must not invent versions or prose.

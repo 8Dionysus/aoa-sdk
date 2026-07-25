@@ -55,8 +55,8 @@ candidate or vice versa.
 
 ## Candidate Assembly
 
-`python -m aoa_sdk.control_plane.routing.candidate` builds a fresh standalone
-assembly outside the SDK repository:
+The importable `aoa_sdk.control_plane.routing.candidate` module builds a fresh
+standalone assembly outside the SDK repository:
 
 ```text
 artifact.bundle.json
@@ -139,9 +139,7 @@ all separate exit conditions pass.
 
 ## Validation
 
-```bash
-python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_g5_candidate.py
-python -m mypy src/aoa_sdk/control_plane/routing
-python -m build
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
-```
+The executable candidate checks are owned by
+`mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md#routing-g5-candidate-validation`.
+This document defines the boundary and stop-line; it is not a second command
+authority.
