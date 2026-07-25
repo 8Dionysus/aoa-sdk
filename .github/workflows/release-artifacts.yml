@@ -212,6 +212,7 @@ jobs:
           abyss-machine artifacts build-sidecars \
             --manifest "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate/artifact.bundle.json" \
             --bundle-dir "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate-verification" \
+            --subject-root "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate" \
             --mode github_release \
             --json
           abyss-machine artifacts sign \
@@ -219,9 +220,11 @@ jobs:
             --json
           abyss-machine artifacts verify \
             "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate-verification" \
+            --subject-root "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate" \
             --json
           abyss-machine artifacts release-check \
             "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate-verification" \
+            --subject-root "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate" \
             --json
 
       - name: Attest routing G5 release candidate

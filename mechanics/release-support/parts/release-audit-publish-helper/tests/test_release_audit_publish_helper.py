@@ -375,6 +375,9 @@ def test_routing_g5_release_candidate_lock_and_builder_stay_non_authoritative() 
         in workflow
     )
     assert "attestations: write" in workflow
+    assert workflow.count(
+        '--subject-root "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate"'
+    ) == 3
 
 
 def test_package_artifact_bundle_validator_reports_external_paths(tmp_path: Path) -> None:

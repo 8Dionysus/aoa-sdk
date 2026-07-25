@@ -8,7 +8,8 @@
 - Preflight and postpublish checks over existing release surfaces.
 - GitHub-native release artifact and cadence audit workflow contracts.
 - Exact routing G5 release-candidate archives, checksums, and verification
-  handoff metadata with every owner-switch authority flag false.
+  handoff metadata with every owner-switch authority flag false and every
+  manifest subject byte-resolved by the stronger owner.
 
 ## Repo-local verifier discovery
 

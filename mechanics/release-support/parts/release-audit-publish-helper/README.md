@@ -43,5 +43,6 @@ before a package carrier is trusted.
 
 The routing release-candidate helper is a different route. It binds exact
 source and verifier commits, builds a deterministic public archive, and checks
-the release envelope without promoting canonical routing authority. Public
+the release envelope with all 29 subjects byte-resolved through an explicit
+runtime subject root, without promoting canonical routing authority. Public
 release and stronger-owner records remain external truth.

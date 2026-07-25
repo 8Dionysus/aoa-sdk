@@ -98,8 +98,11 @@ python mechanics/release-support/parts/release-audit-publish-helper/scripts/buil
 The matching tag workflow checks out every input and the stronger-owner
 verifier at the exact refs in
 `sdk/distribution/manifests/routing_g5_release_candidate.input-lock.json`,
-repeats package and envelope validation, attests the archive digest through
-GitHub OIDC, and exports the archive, checksum, and verification sidecars.
+repeats package and envelope validation, resolves and hashes all 29 manifest
+subjects through an explicit runtime `--subject-root`, attests the archive
+digest through GitHub OIDC, and exports the archive, checksum, and verification
+sidecars. The subject root is runtime-only and is not embedded as an absolute
+public reference.
 
 Publication is not complete until the exact archive is attached to the
 matching GitHub Release and its public attestation verifies. Stronger-owner
