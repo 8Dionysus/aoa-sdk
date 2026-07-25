@@ -14,4 +14,6 @@ Owner: `sdk/distribution/AGENTS.md` and
 Next route: `CHANGELOG.md`, `docs/RELEASING.md`, `src/aoa_sdk/release/`,
 and `mechanics/release-support/parts/release-audit-publish-helper/`.
 
-Stop line: do not treat dry-run output as a GitHub Release or package upload.
+Stop line: do not treat dry-run output as a GitHub Release or package upload,
+and do not treat a published routing release candidate as the G5 owner-switch
+receipt or normal runtime admission.

@@ -10,6 +10,7 @@ ABYSS_MACHINE_TMP_ROOT=/srv/abyss-machine/tmp/ai python mechanics/boundary-bridg
 python -m build
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
+python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py
 python scripts/validate_mechanics_topology.py
 ```
 
@@ -60,9 +61,14 @@ substitution or canonical-looking output roots, and keeps every G5 authority
 flag false. It also proves the manifest exposes only `manually-verified` as
 an active registry state and uses the distinct `runtime_canary` intent, while
 keeping superseded and revoked terminal exits. `verify_routing_g5_candidate_wheel.py` proves the installed wheel
-contains the candidate builder, eighteen routing schemas, two runtime boundary
+contains the candidate builder, nineteen routing schemas, two runtime boundary
 documents, the complete fourteen-artifact assembly, and the exact 23-file
 runtime-required subset.
+`test_routing_g5_release_candidate.py` proves the release envelope binds the
+exact nested candidate, 29 release subjects, deterministic archive, public
+release lifecycle, explicit admission profile, and all-false G5 authority.
+The installed release-candidate wheel probe proves the same package data and
+archive behavior without checkout-local imports.
 
 For full Boundary Bridge coverage, also run:
 

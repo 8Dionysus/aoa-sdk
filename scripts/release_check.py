@@ -49,6 +49,14 @@ COMMANDS = [
         ],
     ),
     (
+        "verify installed routing G5 release-candidate wheel",
+        [
+            sys.executable,
+            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/"
+            "verify_routing_g5_release_candidate_wheel.py",
+        ],
+    ),
+    (
         "validate OS Abyss package artifact bundle",
         [
             sys.executable,

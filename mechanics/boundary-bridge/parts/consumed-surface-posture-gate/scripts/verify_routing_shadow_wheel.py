@@ -121,9 +121,9 @@ def _installed_probe(output_dir: Path) -> int:
     if REPO_ROOT.resolve() in module_path.parents:
         raise SystemExit(f"probe imported routing source from checkout: {module_path}")
     packaged_schemas = sorted(SCHEMA_ROOT.glob("*.json"))
-    if len(packaged_schemas) != 18:
+    if len(packaged_schemas) != 19:
         raise SystemExit(
-            f"expected 18 packaged routing schemas, found {len(packaged_schemas)}"
+            f"expected 19 packaged routing schemas, found {len(packaged_schemas)}"
         )
     print(
         json.dumps(

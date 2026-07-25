@@ -58,6 +58,14 @@
 - Keeps candidate construction weaker than stronger-owner artifact admission,
   runtime canary evidence, the exact G5 receipt, and the one-canonical-producer
   switch.
+- Wraps the independently valid candidate in an exact public release envelope
+  with a separate admission profile, provenance schema, release lifecycle, and
+  deterministic archive.
+- Binds 29 release subjects, the exact predecessor and producer-input refs,
+  the SDK release commit, and the exact stronger-owner verifier commit.
+- Admits public release trust only for release consumption and canary review;
+  normal runtime and all six G5 authority flags remain denied until the
+  separate canonical policy switch.
 - Admits the current owner shortlist `guard` kind without removing the legacy
   `seed` compatibility value or taking ownership of either meaning.
 
@@ -82,6 +90,9 @@
 - A valid SDK G5 candidate is not a durable trust verdict, live canary,
   canonical producer switch, compatibility-window start, consumer-zero result,
   or archive authorization.
+- A published and attested SDK G5 release candidate is not the G5 receipt,
+  normal runtime admission, predecessor maintenance-only authority, or archive
+  authorization.
 
 ## Active Test Home
 
@@ -103,3 +114,4 @@
 - `tests/test_routing_shadow_producer.py`
 - `tests/test_routing_shadow_bundle.py`
 - `tests/test_routing_g5_candidate.py`
+- `tests/test_routing_g5_release_candidate.py`

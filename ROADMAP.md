@@ -75,8 +75,8 @@ land a local surface?
 
 ## Current Direction
 
-`aoa-sdk` is past seed bootstrap. The current post-`v0.6.0` direction is
-control-plane contract hardening.
+`aoa-sdk` is past seed bootstrap. The current post-`v0.7.0` direction is the
+atomic routing owner switch followed by bounded compatibility proof.
 
 The current repo-wide program is staged routing producer succession. The
 target is accepted in `AOA-SDK-D-0071`, the R2 typed control-plane, lifecycle,
@@ -87,10 +87,13 @@ installed-wheel gate. `v0.6.0` is the immutable M1 shadow release.
 The predecessor-side immutable-release consumer and G4 evidence are now
 passed: compact package parity, full 170-route canonical replay, package
 trust, predecessor rollback, and isolated runtime content/consumer readiness
-agree. `aoa-routing` remains canonical through the named conditional handoff
-and until an explicit G5 owner-switch receipt. The program moves the producer
-function and ABI into the SDK; it does not absorb source organs or runtime
-execution.
+agree. The SDK G5 candidate also passed stronger-owner admission, authorized
+canary consumption, and exact rollback. `v0.7.0` adds the separately profiled,
+deterministic public release candidate and attestation route, establishing
+release trust while normal runtime remains denied. `aoa-routing` remains
+canonical through the named conditional handoff and until an explicit G5
+owner-switch receipt. The program moves the producer function and ABI into the
+SDK; it does not absorb source organs or runtime execution.
 
 The repo should now:
 
@@ -111,9 +114,9 @@ The repo should now:
 - keep compatibility checks explicit and source-subordinate;
 - preserve the fourteen routing output paths and
   `aoa_routing_thin_router_v1` during owner-only succession;
-- keep the G4-passed SDK routing producer non-publishing through the
-  predecessor conditional handoff and make canonical ownership change only
-  through G5;
+- keep public release trust distinct from normal runtime and canonical owner
+  authority, and make canonical ownership change only through the separate G5
+  receipt;
 - keep passive skill-environment inspection, `aoa surfaces detect`,
   checkpoint capture, review-note, and reviewed evidence materialization
   bounded and weaker than capability execution or owner truth;
@@ -130,20 +133,22 @@ Roadmap drift is an SDK-layer risk because downstream agents use this file to
 choose whether a change belongs on the control plane. It still must not turn
 `aoa-sdk` into a source-owning runtime layer.
 
-The predecessor `ROUTING_M2_CONDITIONAL_HANDOFF` is landed without switching
-authority. The next honest move is to carry the non-publishing SDK G5
-candidate through exact `abyss-machine` artifact admission and `abyss-stack`
-isolated/canary proof. Only the later exact SDK G5 receipt may change canonical
-production. The cross-repo handoff, G5, and compatibility PR order remains
-fixed by the R3 evidence.
+The predecessor `ROUTING_M2_CONDITIONAL_HANDOFF`, stronger-owner candidate
+admission, `abyss-stack` canary intake, authorized live canary, and exact
+rollback are complete without switching authority. The next honest move is to
+publish and admit the exact `v0.7.0` release candidate, prove
+`release_consumer` allow plus normal `runtime` deny, and then land the separate
+cross-repo G5 owner switch. The compatibility PR order remains fixed by the R3
+evidence.
 
 ## Current Public Contour
 
-Current release marker: `v0.6.0`.
+Current release marker: `v0.7.0`.
 
-Current unreleased contour: passed shadow-only G4 evidence, landed predecessor
-conditional handoff, and a non-canonical SDK G5 candidate after `v0.6.0`.
-This is a directional contour, not a changelog replacement.
+Current unreleased contour: exact public release admission followed by the
+separate G5 canonical switch, predecessor maintenance-only posture, and
+compatibility-window evidence after `v0.7.0`. This is a directional contour,
+not a changelog replacement.
 
 Current anchors:
 

@@ -11,7 +11,8 @@ repositories remain authoritative.
 - `AOA-SDK-D-0071` accepts transfer of that producer and ABI to `aoa-sdk`,
   but the transfer is not live until shadow parity and the explicit G5
   owner-switch receipt. Before G5, SDK routing output is consumer or
-  non-publishing shadow/candidate evidence only.
+  explicitly profiled shadow, candidate, or public release-candidate evidence
+  only.
 - `aoa-skills` owns shared skill sources, capability families, install
   profiles, port grammar, and portable exports.
 - Each repository owns authored procedures and admission for its own skill
@@ -38,6 +39,9 @@ repositories remain authoritative.
 - before G5, an explicit SDK-identified, non-publishing candidate assembly
   bound to exact clean source refs, artifact subjects, and false authority
   flags for stronger-owner trust and isolated/canary review
+- before G5, a deterministic public release envelope and exact input/verifier
+  lock that establish release trust while normal runtime, canonical ownership,
+  and all six switch-authority flags remain denied
 - typed loaders over published surfaces
 - local workspace discovery and sibling-repo resolution
 - shared Python models for stable consumer use
@@ -61,8 +65,9 @@ repositories remain authoritative.
 ## aoa-sdk Should Not Absorb
 
 - activation or model/tool execution from the runtime owner
-- canonical producer authority from a candidate build, trust sidecar, copied
-  runtime mirror, or schema-valid canary without the exact G5 receipt
+- canonical producer authority from a candidate build, release archive,
+  attestation, trust record, copied runtime mirror, or schema-valid canary
+  without the exact G5 receipt
 - agent, skill, capability, scenario, eval, memo, KAG, stats, or runtime
   source meaning during routing succession
 - authored markdown as the primary runtime API

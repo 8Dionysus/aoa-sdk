@@ -1,0 +1,192 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/routing-g5-release-candidate-provenance.schema.json",
+  "title": "AoA SDK routing G5 release candidate provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "state",
+    "publication_posture",
+    "current_canonical_producer",
+    "candidate_producer",
+    "candidate_artifact_identity",
+    "abi_epoch",
+    "candidate_bundle",
+    "input_source_refs",
+    "observed_at",
+    "trust_posture",
+    "g5_authority",
+    "authority_stop_line",
+    "wrapped_candidate_stop_line"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_routing_g5_release_candidate_provenance_v1"
+    },
+    "state": {
+      "const": "sdk_g5_release_candidate"
+    },
+    "publication_posture": {
+      "const": "public_release_candidate"
+    },
+    "current_canonical_producer": {
+      "allOf": [
+        {
+          "$ref": "https://aoa-sdk/schemas/routing-g5-candidate-provenance.schema.json#/$defs/producer"
+        },
+        {
+          "properties": {
+            "owner_repo": {
+              "const": "aoa-routing"
+            }
+          }
+        }
+      ]
+    },
+    "candidate_producer": {
+      "allOf": [
+        {
+          "$ref": "https://aoa-sdk/schemas/routing-g5-candidate-provenance.schema.json#/$defs/producer"
+        },
+        {
+          "required": [
+            "implementation"
+          ],
+          "properties": {
+            "owner_repo": {
+              "const": "aoa-sdk"
+            },
+            "implementation": {
+              "const": "aoa_sdk.control_plane.routing"
+            }
+          }
+        }
+      ]
+    },
+    "candidate_artifact_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_class",
+        "owner_repo",
+        "abi_epoch"
+      ],
+      "properties": {
+        "artifact_class": {
+          "const": "thin_routing_readmodel_bundle"
+        },
+        "owner_repo": {
+          "const": "aoa-sdk"
+        },
+        "abi_epoch": {
+          "const": "aoa_routing_thin_router_v1"
+        }
+      }
+    },
+    "abi_epoch": {
+      "const": "aoa_routing_thin_router_v1"
+    },
+    "candidate_bundle": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "root",
+        "manifest_ref",
+        "provenance_ref",
+        "artifact_sha256",
+        "assembly_file_sha256",
+        "candidate_manifest_sha256",
+        "candidate_provenance_sha256",
+        "content_digest"
+      ],
+      "properties": {
+        "root": {
+          "const": "candidate"
+        },
+        "manifest_ref": {
+          "const": "candidate/artifact.bundle.json"
+        },
+        "provenance_ref": {
+          "const": "candidate/succession/routing-g5-candidate-provenance.json"
+        },
+        "artifact_sha256": {
+          "$ref": "https://aoa-sdk/schemas/routing-shadow-provenance.schema.json#/properties/artifact_sha256"
+        },
+        "assembly_file_sha256": {
+          "type": "object",
+          "minProperties": 27,
+          "maxProperties": 27,
+          "additionalProperties": {
+            "$ref": "#/$defs/sha256"
+          }
+        },
+        "candidate_manifest_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "candidate_provenance_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "content_digest": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "input_source_refs": {
+      "$ref": "https://aoa-sdk/schemas/routing-shadow-provenance.schema.json#/properties/input_source_refs"
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "trust_posture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_class",
+        "required_controls",
+        "stronger_owner",
+        "admission_status",
+        "runtime_consumer"
+      ],
+      "properties": {
+        "artifact_class": {
+          "const": "thin_routing_readmodel_bundle"
+        },
+        "required_controls": {
+          "const": [
+            "abi_signature",
+            "sbom",
+            "slsa_in_toto"
+          ]
+        },
+        "stronger_owner": {
+          "const": "abyss-machine"
+        },
+        "admission_status": {
+          "const": "pending_public_release_verification"
+        },
+        "runtime_consumer": {
+          "const": "abyss-stack"
+        }
+      }
+    },
+    "g5_authority": {
+      "$ref": "https://aoa-sdk/schemas/routing-g5-candidate-provenance.schema.json#/properties/g5_authority"
+    },
+    "authority_stop_line": {
+      "type": "string",
+      "minLength": 1
+    },
+    "wrapped_candidate_stop_line": {
+      "type": "string",
+      "minLength": 1
+    }
+  },
+  "$defs": {
+    "sha256": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{64}$"
+    }
+  }
+}
