@@ -301,6 +301,82 @@ def test_package_artifact_manifest_keeps_consumer_trust_gate_contract() -> None:
     assert "unverified latest" in helper_readme
 
 
+def test_routing_g5_release_candidate_lock_and_builder_stay_non_authoritative() -> None:
+    repo_root = _repo_root()
+    lock = json.loads(
+        (
+            repo_root
+            / "sdk"
+            / "distribution"
+            / "manifests"
+            / "routing_g5_release_candidate.input-lock.json"
+        ).read_text(encoding="utf-8")
+    )
+    builder = (
+        repo_root
+        / "mechanics"
+        / "release-support"
+        / "parts"
+        / "release-audit-publish-helper"
+        / "scripts"
+        / "build_routing_g5_release_candidate.py"
+    ).read_text(encoding="utf-8")
+    workflow = (
+        repo_root / ".github" / "workflows" / "release-artifacts.yml"
+    ).read_text(encoding="utf-8")
+
+    assert lock["schema_version"] == (
+        "aoa_sdk_routing_g5_release_candidate_input_lock_v1"
+    )
+    assert lock["sdk_source_ref"] == "SELF"
+    assert lock["predecessor"] == {
+        "repo": "aoa-routing",
+        "source_ref": "97f60de1b5992ef6bf5ff0f051bd452d940d9a85",
+    }
+    assert set(lock["input_source_refs"]) == {
+        "aoa-techniques",
+        "aoa-skills",
+        "aoa-evals",
+        "aoa-memo",
+        "aoa-stats",
+        "aoa-agents",
+        "Agents-of-Abyss",
+        "aoa-playbooks",
+        "aoa-kag",
+        "Tree-of-Sophia",
+        "aoa-sdk",
+        "Dionysus",
+        "8Dionysus",
+        "abyss-stack",
+    }
+    assert lock["authority"]["g5_authority_flags"] is False
+    assert lock["authority"]["production_runtime_allowed"] is False
+    assert lock["artifact_verifier"] == {
+        "repo": "abyss-machine",
+        "source_ref": "7f1b9fcf6f5beca7203f49ffb7ec53d765d1db86",
+    }
+    assert "build_g5_release_candidate_bundle" in builder
+    assert "write_deterministic_release_archive" in builder
+    assert '"g5_authority": False' in builder
+    assert '"production_runtime_allowed": False' in builder
+    exact_refs = {
+        value
+        for value in lock["input_source_refs"].values()
+        if value != "SELF"
+    } | {
+        lock["predecessor"]["source_ref"],
+        lock["artifact_verifier"]["source_ref"],
+    }
+    assert all(source_ref in workflow for source_ref in exact_refs)
+    assert "build_routing_g5_release_candidate.py" in workflow
+    assert "verify_routing_g5_release_candidate_wheel.py" in workflow
+    assert (
+        "actions/attest@36051bcae73b7c2a8a6945a48cbf80953c6baa35"
+        in workflow
+    )
+    assert "attestations: write" in workflow
+
+
 def test_package_artifact_bundle_validator_reports_external_paths(tmp_path: Path) -> None:
     validator = _artifact_bundle_validator_module()
 

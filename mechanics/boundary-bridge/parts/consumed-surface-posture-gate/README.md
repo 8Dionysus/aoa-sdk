@@ -41,6 +41,10 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   SDK producer identity, complete artifact/runtime assembly, stronger-owner
   trust handoff, and an installed-wheel gate while every switch-authority flag
   remains false
+- the exact public G5 release-candidate envelope: separately profiled release
+  lifecycle and trust, deterministic archive, exact verifier/input lock, and
+  installed-wheel proof while `aoa-routing` remains canonical and normal
+  runtime stays denied
 
 ## Owner
 
@@ -68,10 +72,13 @@ Then read the passed
 [`docs/routing-succession-g4-evidence.md`](docs/routing-succession-g4-evidence.md).
 Then read the executable
 [`docs/routing-succession-g5-candidate.md`](docs/routing-succession-g5-candidate.md).
+Then read the public-trust-only
+[`docs/routing-succession-g5-release-candidate.md`](docs/routing-succession-g5-release-candidate.md).
 G4 proves the released shadow successor and isolated runtime content path. The
 G5 candidate adds native SDK producer identity for trust and canary review.
-Neither authorizes canonical publication, live runtime mutation, G5, or
-archival action.
+The release candidate adds exact public release trust. None authorizes the
+canonical owner switch, normal runtime, predecessor retirement, or archival
+action.
 
 ## Validation
 

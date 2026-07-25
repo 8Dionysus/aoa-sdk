@@ -6,6 +6,11 @@ on:
       - "v*"
   workflow_dispatch:
 
+permissions:
+  contents: read
+  id-token: write
+  attestations: write
+
 jobs:
   build:
     runs-on: ubuntu-latest
@@ -33,20 +38,214 @@ jobs:
       - name: Build package
         run: python -m build
 
+      - name: Verify installed routing shadow wheel
+        run: python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py
+
+      - name: Verify installed routing G5 candidate wheel
+        run: python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
+
+      - name: Verify installed routing G5 release-candidate wheel
+        run: python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py
+
       - name: Checkout abyss-machine verifier
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: 8Dionysus/abyss-machine
-          path: .abyss-machine-verifier
+          ref: 7f1b9fcf6f5beca7203f49ffb7ec53d765d1db86
+          path: .routing-inputs/abyss-machine
 
       - name: Validate OS Abyss artifact bundle
         env:
-          ABYSS_MACHINE_REPO_ROOT: .abyss-machine-verifier
+          ABYSS_MACHINE_REPO_ROOT: .routing-inputs/abyss-machine
         run: python mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py
+
+      - name: Checkout exact 8Dionysus input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/8Dionysus
+          ref: 39cdef104d54d570e7eb4f689ebcd48b2cc6a658
+          path: .routing-inputs/8Dionysus
+
+      - name: Checkout exact Agents-of-Abyss input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/Agents-of-Abyss
+          ref: bfeb4bfb447b437f1360b814bbf4f1def5e62859
+          path: .routing-inputs/Agents-of-Abyss
+
+      - name: Checkout exact Dionysus input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/Dionysus
+          ref: 6c463f6b89a11e85b37e2606525afc7d45005fbd
+          path: .routing-inputs/Dionysus
+
+      - name: Checkout exact Tree-of-Sophia input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/Tree-of-Sophia
+          ref: 54be6f25a2272d02f119a16b1c75e8756decf900
+          path: .routing-inputs/Tree-of-Sophia
+
+      - name: Checkout exact abyss-stack input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/abyss-stack
+          ref: 8d9d4309302d90b79fdc3d68da99bb2ace511446
+          path: .routing-inputs/abyss-stack
+
+      - name: Checkout exact aoa-agents input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-agents
+          ref: 66f8bf22d03518b1e2367fd4f51dab80650f6d37
+          path: .routing-inputs/aoa-agents
+
+      - name: Checkout exact aoa-evals input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-evals
+          ref: 3412b47f9ee7bec9567f92e1c2d59596c4428a2c
+          path: .routing-inputs/aoa-evals
+
+      - name: Checkout exact aoa-kag input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-kag
+          ref: cdd2286c5ad4a345fe704ca065036945f6ba4353
+          path: .routing-inputs/aoa-kag
+
+      - name: Checkout exact aoa-memo input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-memo
+          ref: 7672add5e2bb4ff21c2581ca656998f0ca7c8a3e
+          path: .routing-inputs/aoa-memo
+
+      - name: Checkout exact aoa-playbooks input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-playbooks
+          ref: a15866ec867209288533850cc34939ad81829947
+          path: .routing-inputs/aoa-playbooks
+
+      - name: Checkout exact aoa-sdk release source
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-sdk
+          ref: ${{ github.sha }}
+          path: .routing-inputs/aoa-sdk
+
+      - name: Checkout exact aoa-skills input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-skills
+          ref: 48598a9564c4621b15428831642b802dbc8d2a47
+          path: .routing-inputs/aoa-skills
+
+      - name: Checkout exact aoa-stats input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-stats
+          ref: 504571995cc36905cc886259c0a19be6e8e35045
+          path: .routing-inputs/aoa-stats
+
+      - name: Checkout exact aoa-techniques input
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-techniques
+          ref: e842c0d0156c58cfb9020b636e81134e96fc8cfb
+          path: .routing-inputs/aoa-techniques
+
+      - name: Checkout exact aoa-routing predecessor
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-routing
+          ref: 97f60de1b5992ef6bf5ff0f051bd452d940d9a85
+          path: .routing-inputs/aoa-routing
+
+      - name: Install exact stronger-owner verifier
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: python -m pip install -e '.routing-inputs/abyss-machine[dev]'
+
+      - name: Build exact routing G5 release candidate
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          python mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_release_candidate.py \
+            --workspace-root .routing-inputs \
+            --sdk-root .routing-inputs/aoa-sdk \
+            --predecessor-root .routing-inputs/aoa-routing \
+            --output-dir dist/routing-g5-release-candidate \
+            --archive-output "dist/aoa-sdk-routing-g5-release-candidate-${{ github.ref_name }}.tar.gz" \
+            --checksum-output "dist/aoa-sdk-routing-g5-release-candidate-${{ github.ref_name }}.tar.gz.sha256"
+          python mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_release_candidate.py \
+            --workspace-root .routing-inputs \
+            --sdk-root .routing-inputs/aoa-sdk \
+            --predecessor-root .routing-inputs/aoa-routing \
+            --output-dir dist/routing-g5-release-candidate \
+            --archive-output "dist/aoa-sdk-routing-g5-release-candidate-${{ github.ref_name }}.tar.gz" \
+            --checksum-output "dist/aoa-sdk-routing-g5-release-candidate-${{ github.ref_name }}.tar.gz.sha256" \
+            --check
+          (
+            cd dist
+            sha256sum -c "aoa-sdk-routing-g5-release-candidate-${{ github.ref_name }}.tar.gz.sha256"
+          )
+
+      - name: Verify release candidate with exact stronger owner
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: |
+          abyss-machine artifacts build-sidecars \
+            --manifest "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate/artifact.bundle.json" \
+            --bundle-dir "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate-verification" \
+            --mode github_release \
+            --json
+          abyss-machine artifacts sign \
+            "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate-verification" \
+            --json
+          abyss-machine artifacts verify \
+            "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate-verification" \
+            --json
+          abyss-machine artifacts release-check \
+            "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate-verification" \
+            --json
+
+      - name: Attest routing G5 release candidate
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/attest@36051bcae73b7c2a8a6945a48cbf80953c6baa35
+        with:
+          subject-path: dist/aoa-sdk-routing-g5-release-candidate-${{ github.ref_name }}.tar.gz
+
+      - name: Upload routing G5 release-candidate evidence
+        if: startsWith(github.ref, 'refs/tags/v')
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aoa-sdk-routing-g5-release-candidate-${{ github.ref_name }}
+          path: |
+            dist/aoa-sdk-routing-g5-release-candidate-${{ github.ref_name }}.tar.gz
+            dist/aoa-sdk-routing-g5-release-candidate-${{ github.ref_name }}.tar.gz.sha256
+            dist/routing-g5-release-candidate-verification/*
+          if-no-files-found: error
 
       - name: Upload distribution artifacts
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: aoa-sdk-dist-${{ github.ref_name }}
-          path: dist/*
+          path: |
+            dist/*.whl
+            dist/aoa_sdk-*.tar.gz
           if-no-files-found: error

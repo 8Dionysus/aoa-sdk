@@ -31,6 +31,7 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           repository: 8Dionysus/abyss-machine
+          ref: 7f1b9fcf6f5beca7203f49ffb7ec53d765d1db86
           path: .abyss-machine-verifier
 
       - name: Setup Python

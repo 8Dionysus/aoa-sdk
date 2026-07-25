@@ -334,11 +334,12 @@
         "scripts/validate_sdk_source_home.py",
         "python -m build",
         "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py",
-        "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py"
+        "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py",
+        "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py"
       ],
       "stop_lines": [
         "Do not claim package publication before external publication proof exists.",
-        "Do not treat an installed non-publishing G5 candidate as canonical routing authority."
+        "Do not treat an installed non-publishing or public release G5 candidate as canonical routing authority."
       ]
     },
     {
@@ -346,11 +347,13 @@
       "branch": "distribution",
       "path": "sdk/distribution/release-posture",
       "source_kind": "release_posture",
-      "meaning": "Route contract for release audit, changelog, and publish helper posture.",
+      "meaning": "Route contract for release audit, changelog, public routing release-candidate trust, and publish helper posture.",
       "owner_surface": "sdk/distribution/AGENTS.md",
       "implementation_routes": [
         "CHANGELOG.md",
         "docs/RELEASING.md",
+        ".github/workflows/release-artifacts.yml",
+        "sdk/distribution/manifests/routing_g5_release_candidate.input-lock.json",
         "src/aoa_sdk/release"
       ],
       "mechanic_routes": [
@@ -361,7 +364,8 @@
         "python scripts/release_check.py"
       ],
       "stop_lines": [
-        "Do not treat dry-run output as a GitHub Release or package upload."
+        "Do not treat dry-run output as a GitHub Release or package upload.",
+        "Do not treat public release trust as the G5 owner-switch receipt or normal runtime admission."
       ]
     },
     {

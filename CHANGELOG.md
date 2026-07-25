@@ -9,59 +9,81 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
-- Add the non-publishing SDK G5 candidate surface: the installed package can
-  emit SDK producer identity for stronger-owner trust and runtime canary
-  review without switching canonical authority.
-- Pass the shadow-only routing succession G4 chain for the exact v0.6.0
-  release: compact package parity and full 170-route canonical parity,
-  predecessor consumer and rollback, package trust, and isolated runtime
-  content/consumer readiness now agree while `aoa-routing` stays canonical.
 - Add future changes here after the release tag lands.
+- Dated release sections own exact reconciliation spans, complete commit
+  inventories, and validation evidence.
+
+## [0.7.0] - 2026-07-25
+
+### Summary
+
+- Pass the complete shadow-only G4 chain for the immutable `v0.6.0` release:
+  compact and full 170-route canonical parity, predecessor consumer and
+  rollback, package trust, and isolated runtime content readiness agree.
+- Add and harden the non-publishing SDK G5 candidate, then carry one exact
+  candidate through stronger-owner admission, isolated/live canary evidence,
+  and exact rollback while `aoa-routing` remains canonical.
+- Add the separately profiled public G5 release candidate: an installed SDK
+  can build a deterministic 29-subject archive bound to exact source and
+  verifier commits, and the release workflow can verify and attest it without
+  granting normal runtime or owner-switch authority.
+
+### Reconciliation Basis
+
+- The landed first-parent range before this release prep is
+  `v0.6.0..bd9992f`: three commits, PRs #221-#223, covering G4 evidence, the
+  native SDK candidate, and fail-closed non-publishing hardening.
+- This release-prep slice adds `AOA-SDK-D-0072`, the release envelope and
+  provenance schema, exact input lock, full-corpus builder, installed-wheel
+  probe, stronger-owner-pinned workflow, and aligned route contracts.
+- `aoa-routing` remains the sole canonical producer throughout the range.
+  The public archive establishes a release trust root; it is not the G5
+  owner-switch receipt.
 
 ### Changed
 
-- Add explicit predecessor-compatible and `sdk_g5_candidate` producer
-  postures, temporary dual-owner schema compatibility with strict
-  posture-specific validation, exact clean Git-ref binding, a 27-subject
-  candidate assembly with a 23-file runtime subset, and an OS Abyss artifact
-  manifest.
-- Package two runtime-boundary documents and the candidate provenance schema,
-  and add a clean installed-wheel probe that builds and validates all fourteen
-  SDK-identified outputs while every G5 authority flag remains false.
-- Add exact full-corpus Git input and fourteen-artifact hash pins, two clean
-  installed-wheel canonical rebuilds, and an environment-bound G4 verifier
-  that performs package trust, predecessor rollback, and a 23-file isolated
-  `abyss-stack` route-api dry run without mutating the live runtime.
-- Keep runtime mirror content and consumer readiness separate from native
-  source provenance and durable trust closure; the dry-run receipt requires
-  those latter axes to remain fail-closed.
-- Accept the current owner-shortlist `object_kind: guard` in the typed SDK
-  contract and regress it against the exact canonical routing fixture, while
-  retaining `seed` compatibility.
+- Preserve the predecessor-compatible M1 producer, explicit
+  `sdk_g5_candidate` posture, fourteen routing output paths,
+  `aoa_routing_thin_router_v1`, and the exact 23-file runtime-required subset.
+- Package nineteen routing schemas, including the public release-candidate
+  provenance contract, plus the two runtime-boundary documents.
+- Nest the independently valid 27-file non-publishing candidate inside a
+  release envelope that binds 29 subjects, uses `github_release` and
+  `release-ready`, and requests only `release_consumer` or `runtime_canary`.
+- Pin fourteen producer inputs, the predecessor, and the accepted
+  `abyss-machine` release-admission commit. Bind the SDK source through the
+  exact clean release commit and reject dirty, substituted, linked, extra, or
+  path-dependent output.
+- Extend Release Artifacts to check out every exact input, build and validate
+  the full-corpus archive, generate ABI/SBOM/SLSA sidecars with the pinned
+  stronger owner, require release-check, attest the archive digest through
+  GitHub OIDC, and export its checksum and verification evidence.
 
 ### Validation
 
-- Candidate and shadow tests pass together; Ruff and mypy pass for the routing
-  package; clean wheel probes validate 14 artifacts, 18 packaged schemas,
-  27 candidate assembly files, and the 23-file runtime-required subset.
-- The exact v0.6.0 package rebuilt both the compact release corpus and the full
-  canonical corpus twice at 14/14 parity; the full router contains 170 entries
-  rooted at SHA-256 `f01e3722...`.
-- The unchanged predecessor rebuilt both corpora at 14/14 rollback parity.
-  Temporary ABI/SBOM/SLSA package trust passed, and the repaired
-  `abyss-stack@fad9f951` consumer mirrored 23/23 files and loaded all 170
-  routes with expected provenance debt only.
+- Focused source tests prove exact nesting, 29-subject binding, deterministic
+  archives, substitution denial, public release lifecycle, runtime denial,
+  and all six G5 authority flags false.
+- Clean installed-wheel probes validate fourteen artifacts, nineteen packaged
+  schemas, 27 nested candidate files, 29 release subjects, two runtime
+  documents, and the exact 23-file runtime-required subset.
+- The full SDK release gate covers decision indexes, source-home and mechanics
+  topology, generated companions, tests, Ruff, mypy, wheel/sdist build,
+  installed-wheel probes, and OS Abyss package artifact validation.
+- The exact full-corpus release envelope is independently accepted by
+  `abyss-machine@7f1b9fcf` for release consumption while normal runtime remains
+  denied before G5.
 
 ### Notes
 
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
-- G4 authorizes only the named predecessor conditional handoff. It does not
-  authorize G5, live runtime publication, native SDK runtime identity,
-  predecessor retirement, or archival action.
-- The SDK G5 candidate is likewise non-canonical: artifact trust, live canary,
-  the exact G5 receipt, compatibility-window start, consumer-zero, and archive
-  authority remain separate.
+- `AOA-SDK-D-0072` makes release trust explicitly weaker than owner-switch
+  authority. Neither the archive, checksum, GitHub attestation, nor durable
+  release-consumer allow verdict is the G5 receipt.
+- Normal runtime, canonical SDK production, predecessor maintenance-only
+  posture, compatibility-window start, consumer-zero, and archive execution
+  remain separate later gates.
 
 ## [0.6.0] - 2026-07-23
 

@@ -74,11 +74,37 @@ python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gat
 python -m mypy src/aoa_sdk/control_plane/routing
 python -m build
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
+python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py
 ```
 
 These commands prove candidate construction and installed-package behavior.
 They do not grant durable artifact admission, runtime cutover, G5, predecessor
 retirement, compatibility-window start, or archival authority.
+
+## Routing G5 release-candidate publication
+
+The public release candidate is a separate trust stage, not the G5 switch:
+
+```bash
+python mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_release_candidate.py \
+  --workspace-root /path/to/exact-input-worktrees \
+  --sdk-root /path/to/exact-aoa-sdk-worktree \
+  --predecessor-root /path/to/exact-aoa-routing-worktree \
+  --output-dir /path/to/fresh/release-candidate \
+  --archive-output /path/to/aoa-sdk-routing-g5-release-candidate-v0.7.0.tar.gz \
+  --checksum-output /path/to/aoa-sdk-routing-g5-release-candidate-v0.7.0.tar.gz.sha256
+```
+
+The matching tag workflow checks out every input and the stronger-owner
+verifier at the exact refs in
+`sdk/distribution/manifests/routing_g5_release_candidate.input-lock.json`,
+repeats package and envelope validation, attests the archive digest through
+GitHub OIDC, and exports the archive, checksum, and verification sidecars.
+
+Publication is not complete until the exact archive is attached to the
+matching GitHub Release and its public attestation verifies. Stronger-owner
+promotion must then allow `release_consumer` and deny normal `runtime`.
+Only the later separate G5 receipt may change canonical ownership.
 
 ## Notes
 

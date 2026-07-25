@@ -11,7 +11,7 @@ This README is the public front door. When work becomes operational,
 source-authored, generated, mechanic-local, release-facing, or agent-facing,
 follow the linked owner surface instead of expanding this page.
 
-> Current release: `v0.6.0`. See [CHANGELOG](CHANGELOG.md) for release notes.
+> Current release: `v0.7.0`. See [CHANGELOG](CHANGELOG.md) for release notes.
 
 ## What This Repository Does
 
@@ -108,6 +108,10 @@ The current landed surface includes:
   which lets an installed SDK build a complete SDK-identified,
   Git-ref-bound artifact assembly for stronger-owner trust and runtime canary
   review while every switch-authority flag remains false;
+- the separately profiled
+  [G5 release candidate](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-release-candidate.md),
+  which binds the exact public archive, release provenance, and stronger-owner
+  verifier before the owner switch while normal runtime remains denied;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

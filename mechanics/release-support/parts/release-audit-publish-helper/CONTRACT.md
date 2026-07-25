@@ -7,6 +7,8 @@
 - Changelog-derived GitHub Release bodies.
 - Preflight and postpublish checks over existing release surfaces.
 - GitHub-native release artifact and cadence audit workflow contracts.
+- Exact routing G5 release-candidate archives, checksums, and verification
+  handoff metadata with every owner-switch authority flag false.
 
 ## Repo-local verifier discovery
 
@@ -26,6 +28,8 @@ without leaving tracked drift.
 - Do not claim sibling releases happened until their owner repos, tags, and
   GitHub Releases verify.
 - Do not bypass protected branch, CI, or package publication checks.
+- Do not treat a release-candidate archive, checksum, attestation, or public
+  trust record as the G5 owner-switch receipt or normal runtime admission.
 
 ## Owner Split
 

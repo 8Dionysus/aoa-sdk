@@ -34,6 +34,9 @@ This repository owns:
 - the explicit non-publishing SDK G5 candidate builder and validator used to
   request stronger-owner artifact trust and runtime canary evidence without
   acquiring canonical producer authority
+- the exact public SDK G5 release-candidate envelope, input lock, and
+  deterministic archive used to establish release trust while normal runtime
+  and every owner-switch authority flag remain denied
 - the strict R2 route, plan, approval, lifecycle, event, evidence, and runtime
   adapter contract family, while `AoASDK.control_plane`, `AoASDK.runner`, and
   runtime execution remain unimplemented at this stage

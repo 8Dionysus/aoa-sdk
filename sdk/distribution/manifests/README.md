@@ -1,7 +1,8 @@
 # Distribution Manifests
 
 This directory holds OS Abyss artifact bundle manifests for built SDK
-distribution outputs.
+distribution outputs and the exact source lock for the public routing G5
+release candidate.
 
 The manifests are source inputs for `abyss-machine` artifact verification. They
 identify the repo-local ABI identity, the built artifact subjects under
@@ -18,3 +19,10 @@ These are ignored build outputs, not source truth. The helper promotes durable
 evidence with source and host-managed trust-root metadata, materializes the
 package subject store, and checks the consumer `trust-gate` before treating the
 bundle as release-ready.
+
+`routing_g5_release_candidate.input-lock.json` is source-authored release
+control, not generated evidence. It binds every producer input, the
+predecessor, and the stronger-owner verifier to exact Git objects while the SDK
+release ref resolves through `SELF`. Its authority block must keep G5 and
+normal runtime false. Public archive, attestation, and registry records remain
+external publication and trust evidence.

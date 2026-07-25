@@ -69,7 +69,7 @@
     },
     "control_plane": {
       "primary_mechanic": "boundary-bridge",
-      "reason": "the runtime-neutral control-plane contract family, non-publishing routing shadow compiler, and explicit SDK G5 candidate bridge owner-qualified inputs without taking runtime execution or pre-G5 canonical authority"
+      "reason": "the runtime-neutral control-plane contract family, non-publishing routing shadow compiler, SDK G5 candidate, and public-trust-only release envelope bridge owner-qualified inputs without taking runtime execution or pre-G5 canonical authority"
     },
     "evals": {
       "primary_mechanic": "boundary-bridge",
@@ -312,7 +312,7 @@
     {
       "slug": "boundary-bridge",
       "name_type": "shared",
-      "operation": "Keep SDK typed facades, consumed-surface posture gates, the non-publishing routing shadow compiler, passed shadow-only G4 evidence, explicit non-canonical SDK G5 candidate, passive skill environment inspection, and owner-layer signal handoffs bounded while sibling repositories retain meaning and aoa-routing stays canonical before G5.",
+      "operation": "Keep SDK typed facades, consumed-surface posture gates, the non-publishing routing shadow compiler, passed shadow-only G4 evidence, explicit non-canonical SDK G5 candidate, public-trust-only G5 release candidate, passive skill environment inspection, and owner-layer signal handoffs bounded while sibling repositories retain meaning and aoa-routing stays canonical before G5.",
       "source_surfaces": [
         "docs/boundaries.md",
         "src/aoa_sdk/AGENTS.md",
@@ -343,6 +343,9 @@
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-candidate.md",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_g5_candidate.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-release-candidate.md",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_g5_release_candidate.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py",
         "mechanics/boundary-bridge/parts/skill-environment-inspector",
@@ -385,7 +388,7 @@
       "validation": [
         "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py",
         "python -m mypy src/aoa_sdk/control_plane/routing",
-        "python -m build && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py"
+        "python -m build && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py"
       ]
     },
     {
@@ -568,7 +571,7 @@
     {
       "slug": "release-support",
       "name_type": "shared",
-      "operation": "Keep changelog, release audit, CI posture, build, and publication support bounded and reproducible.",
+      "operation": "Keep changelog, release audit, CI posture, build, public routing release-candidate trust, and publication support bounded and reproducible without owner-switch claims.",
       "source_surfaces": [
         "CHANGELOG.md",
         "docs/RELEASING.md",
@@ -576,8 +579,10 @@
         "mechanics/release-support/parts/release-audit-publish-helper",
         "mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md",
         "mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py",
+        "mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_release_candidate.py",
         "mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py",
         "sdk/distribution/manifests/python_distribution.bundle.json",
+        "sdk/distribution/manifests/routing_g5_release_candidate.input-lock.json",
         ".github/workflows/release-artifacts.yml",
         ".github/workflows/release-cadence-audit.yml",
         "mechanics/release-support/parts/public-support-ci-posture",

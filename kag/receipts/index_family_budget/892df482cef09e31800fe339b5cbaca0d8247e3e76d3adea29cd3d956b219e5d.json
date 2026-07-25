@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 11770873,
+  "allowed_tracked_bytes": 15867734,
+  "approved_by": "repository-owner",
+  "base_ref": "bd9992f45e76e33c42d286af33344e5f3d18d736",
+  "changed_generated_bytes": 11770873,
+  "changed_generated_files": 309,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "892df482cef09e31800fe339b5cbaca0d8247e3e76d3adea29cd3d956b219e5d",
+  "reason": "G5 release candidate and v0.7.0 add exact routing succession provenance, installed-package probes, and pinned verification workflows.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 15867734,
+  "tracked_bytes_max": 15728640
+}

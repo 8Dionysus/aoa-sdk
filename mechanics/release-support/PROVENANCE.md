@@ -13,7 +13,9 @@
 - `.github/workflows/release-cadence-audit.yml`
 - `scripts/release_check.py`
 - `sdk/distribution/manifests/python_distribution.bundle.json`
+- `sdk/distribution/manifests/routing_g5_release_candidate.input-lock.json`
 - `mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py`
+- `mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_release_candidate.py`
 - `src/aoa_sdk/release/`
 - `mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py`
 - `mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py`

@@ -90,10 +90,12 @@ During the owner-only switch:
 
 An incompatible routing change needs a separate versioned decision and release
 after succession. Before G5, `aoa-routing` remains canonical and SDK output may
-be used only for non-publishing shadow or explicit candidate review. Candidate
-schemas admit both known producer owners, while the selected producer posture
-validator requires exactly one and preserves all ABI identifiers. The
-compatibility window begins with the G5 receipt and cannot end until
+be used only for non-publishing shadow, explicit candidate review, or the
+separately profiled public release-candidate trust route. Candidate schemas
+admit both known producer owners, while the selected producer posture
+validator requires exactly one and preserves all ABI identifiers. Public
+release trust does not start the compatibility window; that window begins
+with the G5 receipt and cannot end until
 consumer-zero, clean
 install/upgrade/downgrade/rollback checks, two consecutive SDK validation
 cycles without predecessor generation, SDK-bound runtime/trust identity, and

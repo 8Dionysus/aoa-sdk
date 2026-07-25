@@ -215,8 +215,13 @@ one explicit next posture: the installed SDK can build a non-publishing
 `sdk_g5_candidate` assembly carrying SDK producer identity, exact clean input
 refs, complete artifact subjects, and no switch authority. That candidate is
 input to stronger-owner artifact trust and runtime canary review, not the G5
-receipt. There remains exactly one canonical producer until exact trust,
-runtime, rollback, and consumer evidence authorize the separate G5 switch.
+receipt. After that canary and rollback evidence passed,
+`AOA-SDK-D-0072` added a separately profiled public release envelope around
+the exact candidate. It binds release bytes, source refs, and the
+stronger-owner verifier while normal runtime and every switch-authority flag
+remain denied. There remains exactly one canonical producer until exact
+public trust, runtime, rollback, and consumer evidence authorize the separate
+G5 switch.
 
 ## Design as Aim
 
