@@ -9,6 +9,9 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
+- Add the non-publishing SDK G5 candidate surface: the installed package can
+  emit SDK producer identity for stronger-owner trust and runtime canary
+  review without switching canonical authority.
 - Pass the shadow-only routing succession G4 chain for the exact v0.6.0
   release: compact package parity and full 170-route canonical parity,
   predecessor consumer and rollback, package trust, and isolated runtime
@@ -17,6 +20,14 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Changed
 
+- Add explicit predecessor-compatible and `sdk_g5_candidate` producer
+  postures, temporary dual-owner schema compatibility with strict
+  posture-specific validation, exact clean Git-ref binding, a 27-subject
+  candidate assembly with a 23-file runtime subset, and an OS Abyss artifact
+  manifest.
+- Package two runtime-boundary documents and the candidate provenance schema,
+  and add a clean installed-wheel probe that builds and validates all fourteen
+  SDK-identified outputs while every G5 authority flag remains false.
 - Add exact full-corpus Git input and fourteen-artifact hash pins, two clean
   installed-wheel canonical rebuilds, and an environment-bound G4 verifier
   that performs package trust, predecessor rollback, and a 23-file isolated
@@ -30,6 +41,9 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Validation
 
+- Candidate and shadow tests pass together; Ruff and mypy pass for the routing
+  package; clean wheel probes validate 14 artifacts, 18 packaged schemas,
+  27 candidate assembly files, and the 23-file runtime-required subset.
 - The exact v0.6.0 package rebuilt both the compact release corpus and the full
   canonical corpus twice at 14/14 parity; the full router contains 170 entries
   rooted at SHA-256 `f01e3722...`.
@@ -45,6 +59,9 @@ Tracking starts with the community-docs baseline for this repository.
 - G4 authorizes only the named predecessor conditional handoff. It does not
   authorize G5, live runtime publication, native SDK runtime identity,
   predecessor retirement, or archival action.
+- The SDK G5 candidate is likewise non-canonical: artifact trust, live canary,
+  the exact G5 receipt, compatibility-window start, consumer-zero, and archive
+  authority remain separate.
 
 ## [0.6.0] - 2026-07-23
 

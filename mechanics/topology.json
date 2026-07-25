@@ -69,7 +69,7 @@
     },
     "control_plane": {
       "primary_mechanic": "boundary-bridge",
-      "reason": "the runtime-neutral control-plane contract family and non-publishing routing shadow compiler bridge owner-qualified inputs without taking runtime execution or pre-G5 canonical authority"
+      "reason": "the runtime-neutral control-plane contract family, non-publishing routing shadow compiler, and explicit SDK G5 candidate bridge owner-qualified inputs without taking runtime execution or pre-G5 canonical authority"
     },
     "evals": {
       "primary_mechanic": "boundary-bridge",
@@ -312,7 +312,7 @@
     {
       "slug": "boundary-bridge",
       "name_type": "shared",
-      "operation": "Keep SDK typed facades, consumed-surface posture gates, the non-publishing routing shadow compiler and passed shadow-only G4 evidence, passive skill environment inspection, and owner-layer signal handoffs bounded while sibling repositories retain meaning and aoa-routing stays canonical before G5.",
+      "operation": "Keep SDK typed facades, consumed-surface posture gates, the non-publishing routing shadow compiler, passed shadow-only G4 evidence, explicit non-canonical SDK G5 candidate, passive skill environment inspection, and owner-layer signal handoffs bounded while sibling repositories retain meaning and aoa-routing stays canonical before G5.",
       "source_surfaces": [
         "docs/boundaries.md",
         "src/aoa_sdk/AGENTS.md",
@@ -340,6 +340,9 @@
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/compare_routing_shadow_producers.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_succession_g4.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-candidate.md",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_g5_candidate.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py",
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py",
         "mechanics/boundary-bridge/parts/skill-environment-inspector",
@@ -382,7 +385,7 @@
       "validation": [
         "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py",
         "python -m mypy src/aoa_sdk/control_plane/routing",
-        "python -m build && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py"
+        "python -m build && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py"
       ]
     },
     {

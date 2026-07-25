@@ -35,10 +35,16 @@
                     "const": "public_generated_routing_surfaces"
                 },
                 "owner_repo": {
-                    "const": "aoa-routing"
+                    "enum": [
+                        "aoa-routing",
+                        "aoa-sdk"
+                    ]
                 },
                 "authority_ref": {
-                    "const": "README.md#generated-outputs"
+                    "enum": [
+                        "README.md#generated-outputs",
+                        "docs/boundaries.md#owner-only-routing-succession"
+                    ]
                 },
                 "producer": {
                     "type": "string",

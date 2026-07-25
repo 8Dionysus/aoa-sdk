@@ -268,6 +268,7 @@ def test_packaged_schema_family_covers_every_output_and_sidecar() -> None:
     assert "router-entry.schema.json" in packaged
     assert "quest_dispatch_hint.schema.json" in packaged
     assert "routing-shadow-provenance.schema.json" in packaged
+    assert "routing-g5-candidate-provenance.schema.json" in packaged
 
 
 @pytest.mark.parametrize("unsafe_kind", ["parent_traversal", "symlink"])

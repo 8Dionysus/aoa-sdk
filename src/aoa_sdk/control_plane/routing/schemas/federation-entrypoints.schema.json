@@ -24,7 +24,10 @@
       "const": "mechanics/boundary-bridge/parts/federation-entry/schemas/federation-entrypoints.schema.json"
     },
     "owner_repo": {
-      "const": "aoa-routing"
+      "enum": [
+        "aoa-routing",
+        "aoa-sdk"
+      ]
     },
     "surface_kind": {
       "const": "federation_entrypoints"
@@ -100,7 +103,10 @@
           "const": "public_generated_navigation_surface"
         },
         "owner_repo": {
-          "const": "aoa-routing"
+          "enum": [
+            "aoa-routing",
+            "aoa-sdk"
+          ]
         },
         "authority_ref": {
           "$ref": "#/$defs/nonEmptyString"

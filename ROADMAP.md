@@ -130,20 +130,20 @@ Roadmap drift is an SDK-layer risk because downstream agents use this file to
 choose whether a change belongs on the control plane. It still must not turn
 `aoa-sdk` into a source-owning runtime layer.
 
-The next honest move is `ROUTING_M2_CONDITIONAL_HANDOFF`: freeze predecessor
-feature growth and bind the compatibility and rollback window to the passed
-G4 receipt without switching authority. The following SDK G5 PR alone may
-change canonical production and embedded owner provenance. The exact
-cross-repo handoff, G5, and compatibility PR order remains fixed by the R3
-evidence.
+The predecessor `ROUTING_M2_CONDITIONAL_HANDOFF` is landed without switching
+authority. The next honest move is to carry the non-publishing SDK G5
+candidate through exact `abyss-machine` artifact admission and `abyss-stack`
+isolated/canary proof. Only the later exact SDK G5 receipt may change canonical
+production. The cross-repo handoff, G5, and compatibility PR order remains
+fixed by the R3 evidence.
 
 ## Current Public Contour
 
 Current release marker: `v0.6.0`.
 
-Current unreleased contour: passed shadow-only G4 evidence and the pending
-predecessor conditional handoff after `v0.6.0`. This is a directional contour,
-not a changelog replacement.
+Current unreleased contour: passed shadow-only G4 evidence, landed predecessor
+conditional handoff, and a non-canonical SDK G5 candidate after `v0.6.0`.
+This is a directional contour, not a changelog replacement.
 
 Current anchors:
 

@@ -13,6 +13,14 @@ from jsonschema import Draft202012Validator, FormatChecker
 from referencing import Registry, Resource
 
 from .core import REPO_ROOT, RouterError, default_dependency_root
+from .identity import (
+    PREDECESSOR_COMPATIBLE,
+    PREDECESSOR_OWNER_REPO,
+    SDK_G5_CANDIDATE,
+    SDK_OWNER_REPO,
+    RoutingProducerPosture,
+    apply_routing_producer_posture,
+)
 from .producer import build_outputs
 
 
@@ -184,28 +192,33 @@ def validate_generated_outputs(
     profile_root: Path,
     abyss_stack_root: Path,
     routing_root: Path | None = None,
+    *,
+    producer_posture: RoutingProducerPosture = PREDECESSOR_COMPATIBLE,
 ) -> list[ValidationIssue]:
     """Validate schema, exact rebuild parity, projection safety, and ABI identity."""
 
     issues: list[ValidationIssue] = []
     outputs = _load_outputs(generated_dir.resolve(), issues)
     try:
-        expected_outputs = build_outputs(
-            techniques_root.resolve(),
-            skills_root.resolve(),
-            evals_root.resolve(),
-            memo_root.resolve(),
-            stats_root.resolve(),
-            agents_root.resolve(),
-            aoa_root.resolve(),
-            playbooks_root.resolve(),
-            kag_root.resolve(),
-            tos_root.resolve(),
-            sdk_root.resolve(),
-            source_route_root.resolve(),
-            profile_root.resolve(),
-            abyss_stack_root.resolve(),
-            (routing_root or REPO_ROOT).resolve(),
+        expected_outputs = apply_routing_producer_posture(
+            build_outputs(
+                techniques_root.resolve(),
+                skills_root.resolve(),
+                evals_root.resolve(),
+                memo_root.resolve(),
+                stats_root.resolve(),
+                agents_root.resolve(),
+                aoa_root.resolve(),
+                playbooks_root.resolve(),
+                kag_root.resolve(),
+                tos_root.resolve(),
+                sdk_root.resolve(),
+                source_route_root.resolve(),
+                profile_root.resolve(),
+                abyss_stack_root.resolve(),
+                (routing_root or REPO_ROOT).resolve(),
+            ),
+            producer_posture,
         )
     except RouterError as exc:
         issues.append(ValidationIssue("generated", f"rebuild failed: {exc}"))
@@ -247,16 +260,24 @@ def validate_generated_outputs(
             )
     if router is not None:
         identity = router.get("artifact_identity")
+        expected_owner = (
+            PREDECESSOR_OWNER_REPO
+            if producer_posture == PREDECESSOR_COMPATIBLE
+            else SDK_OWNER_REPO
+        )
         if not isinstance(identity, dict):
             issues.append(
                 ValidationIssue("aoa_router.min.json", "artifact_identity must be an object")
             )
         else:
-            if identity.get("owner_repo") != "aoa-routing":
+            if identity.get("owner_repo") != expected_owner:
                 issues.append(
                     ValidationIssue(
                         "aoa_router.min.json",
-                        "shadow embedded owner must stay aoa-routing before G5",
+                        (
+                            "routing artifact identity owner does not match "
+                            f"{producer_posture}"
+                        ),
                     )
                 )
             if identity.get("abi_epoch") != "aoa_routing_thin_router_v1":
@@ -294,6 +315,11 @@ def parse_args() -> argparse.Namespace:
             default=default_dependency_root(repo_name),
         )
     parser.add_argument("--generated-dir", type=Path, required=True)
+    parser.add_argument(
+        "--producer-posture",
+        choices=(PREDECESSOR_COMPATIBLE, SDK_G5_CANDIDATE),
+        default=PREDECESSOR_COMPATIBLE,
+    )
     return parser.parse_args()
 
 
@@ -315,6 +341,7 @@ def main() -> int:
         args.source_route_root,
         args.profile_root,
         args.abyss_stack_root,
+        producer_posture=args.producer_posture,
     )
     if issues:
         for issue in issues:

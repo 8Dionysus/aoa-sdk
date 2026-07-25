@@ -141,7 +141,8 @@
             },
             "surface_repo": {
               "enum": [
-                "aoa-routing"
+                "aoa-routing",
+                "aoa-sdk"
               ]
             },
             "surface_file": {
