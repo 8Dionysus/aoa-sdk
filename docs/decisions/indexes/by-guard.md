@@ -191,6 +191,10 @@
 
 - [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 
+## fail closed
+
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
+
 ## fallback removal
 
 - [AOA-SDK-D-0037 - Workspace MCP Surface Crosswalk Secondary Route Naming](../AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md) (`docs/decisions/AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md`)
@@ -233,6 +237,10 @@
 ## index parity
 
 - [AOA-SDK-D-0001 - Decision Rationale Lane Before Mechanics](../AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md) (`docs/decisions/AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md`)
+
+## lifecycle health
+
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 
 ## lifecycle integrity
 
@@ -386,6 +394,7 @@
 
 - [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 - [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 
 ## owner scope
 
@@ -650,6 +659,10 @@
 ## validator authority
 
 - [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) (`docs/decisions/AOA-SDK-D-0036-root-technical-district-allowlist-validation.md`)
+
+## versioned behavior
+
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 
 ## workspace control plane
 

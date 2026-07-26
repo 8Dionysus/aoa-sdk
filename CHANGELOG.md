@@ -14,6 +14,10 @@ Tracking starts with the community-docs baseline for this repository.
 - Bind deterministic skill candidate selection to the exact SDK-canonical G5
   runtime snapshot and pinned `aoa-skills` owner projection, blocking trust
   drift, mixed projections, unsupported constraints, and top-rank ambiguity.
+- Version the resolver as `aoa_control_plane_route_resolver_v2` after the T1
+  live smoke exposed v1 rejecting the owner-defined `challenger` health enum.
+  V2 keeps challenger routes explicitly degraded and preserves fail-closed
+  handling for missing, unknown, unavailable, or retired health.
 - Add C2 Agent OS plan compilation:
   `AoASDK.control_plane.compile()` and `aoa route compile`, with exact reviewed
   scenario bindings, deterministic guarded-branch pruning, content-addressed

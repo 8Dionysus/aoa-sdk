@@ -197,6 +197,7 @@
 - [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
 - [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 - [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 
 ## control-plane routing
 
@@ -251,6 +252,7 @@
 - [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
 - [AOA-SDK-D-0077 - Resolve Agent OS Routes from Receipt-bound Owner Projections](../AOA-SDK-D-0077-route-resolution-from-owner-projections.md) (`docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md`)
 - [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 
 ## generated navigation
 
@@ -393,6 +395,7 @@
 - [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
 - [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 - [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 
 ## public support
 

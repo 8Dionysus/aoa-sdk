@@ -33,6 +33,10 @@
 
 - [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) (`docs/decisions/AOA-SDK-D-0043-sdk-source-home-tree.md`)
 
+## agent trial
+
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
+
 ## agent-route
 
 - [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) (`docs/decisions/AOA-SDK-D-0051-implementation-source-topology-index.md`)
@@ -129,6 +133,7 @@
 - [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 - [AOA-SDK-D-0070 - Admit the Titan Helper Skill Family](../AOA-SDK-D-0070-titan-owner-skill-family.md) (`docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md`)
 - [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 
 ## compatibility accounting
 
@@ -314,6 +319,7 @@
 
 - [AOA-SDK-D-0077 - Resolve Agent OS Routes from Receipt-bound Owner Projections](../AOA-SDK-D-0077-route-resolution-from-owner-projections.md) (`docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md`)
 - [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 
 ## owner skill home
 
@@ -427,6 +433,7 @@
 ## route law
 
 - [AOA-SDK-D-0077 - Resolve Agent OS Routes from Receipt-bound Owner Projections](../AOA-SDK-D-0077-route-resolution-from-owner-projections.md) (`docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md`)
+- [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 
 ## route-law
 

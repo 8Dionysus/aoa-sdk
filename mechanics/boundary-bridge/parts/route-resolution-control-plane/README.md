@@ -30,7 +30,7 @@ eligible.
 
 ## Selection law
 
-Version `aoa_control_plane_route_resolver_v1` uses only owner-authored
+Version `aoa_control_plane_route_resolver_v2` uses only owner-authored
 retrieval fields from the pinned capability graph:
 
 | Signal | Score |
@@ -50,6 +50,12 @@ Missing, duplicate, or inconsistent owner projections also block.
 Only `skill` capabilities are resolvable in C1. Candidate-only, deferred, or
 suggest-only capabilities require an exact `required_capability` constraint.
 Unsupported policy constraints block instead of being guessed.
+
+Owner health follows the complete `aoa-skills` enum. `healthy` is compatible,
+`challenger` and `degraded` remain explicit degraded candidates, and missing,
+unrecognized, unavailable, or retired health stays incompatible. Accepting an
+advertised challenger does not promote it to healthy or turn selection into a
+proof verdict.
 
 ## Public routes
 
