@@ -12,6 +12,7 @@ from .agents.phase_bindings import AgentsAPI
 from .governed_runs import GovernedRunsAPI
 from .kag import KagAPI
 from .memo import MemoAPI
+from .organs import OrgansAPI
 from .playbooks import PlaybooksAPI
 from .recurrence import RecurrenceAPI
 from .release import ReleaseAPI
@@ -39,6 +40,7 @@ class AoASDK:
         self.playbooks = PlaybooksAPI(workspace)
         self.recurrence = RecurrenceAPI(workspace)
         self.memo = MemoAPI(workspace)
+        self.organs = OrgansAPI(workspace)
         self.techniques = TechniquesAPI(workspace)
         self.evals = EvalsAPI(workspace)
         self.stats = StatsAPI(workspace)

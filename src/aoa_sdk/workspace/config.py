@@ -8,6 +8,7 @@ from pathlib import Path
 WORKSPACE_CONFIG_ENV = "AOA_SDK_WORKSPACE_CONFIG"
 FEDERATION_ROOT_ENV = "AOA_SDK_FEDERATION_ROOT"
 EXTERNAL_ROOTS_ENV = "AOA_SDK_EXTERNAL_ROOTS"
+ORGAN_REGISTRY_ENV = "AOA_SDK_ORGAN_REGISTRY"
 REPO_PATH_ENV_PREFIX = "AOA_SDK_REPO_PATH_"
 DEFAULT_WORKSPACE_MANIFEST = ".aoa/workspace.toml"
 SUPPORTED_SCHEMA_VERSION = 1
@@ -28,6 +29,7 @@ class WorkspaceConfig:
     federation_root_patterns: tuple[str, ...] = ()
     external_root_patterns: tuple[str, ...] = ()
     repo_configs: dict[str, RepoConfig] = field(default_factory=dict)
+    organ_registry_pattern: str | None = None
 
 
 def load_workspace_config(root: str | Path) -> WorkspaceConfig:
@@ -39,6 +41,7 @@ def load_workspace_config(root: str | Path) -> WorkspaceConfig:
     layout = manifest.get("layout", {})
     roots = manifest.get("roots", {})
     repos = manifest.get("repos", {})
+    organ_access = manifest.get("organ_access", {})
 
     repo_configs = {
         repo: RepoConfig(
@@ -57,6 +60,12 @@ def load_workspace_config(root: str | Path) -> WorkspaceConfig:
         federation_root_patterns=_as_tuple(layout.get("federation_roots")),
         external_root_patterns=_as_tuple(roots.get("external")),
         repo_configs=repo_configs,
+        organ_registry_pattern=(
+            organ_access.get("registry_source")
+            if isinstance(organ_access, dict)
+            and isinstance(organ_access.get("registry_source"), str)
+            else None
+        ),
     )
 
 

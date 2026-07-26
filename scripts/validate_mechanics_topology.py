@@ -56,6 +56,14 @@ ROOT_TECHNICAL_DISTRICT_FILES = {
         {
             "schemas/AGENTS.md",
             "schemas/workspace-control-plane.schema.json",
+            "schemas/organ-access/organ-activation-plan.schema.json",
+            "schemas/organ-access/organ-activation-request.schema.json",
+            "schemas/organ-access/organ-compatibility-observation.schema.json",
+            "schemas/organ-access/organ-contract.schema.json",
+            "schemas/organ-access/organ-registry-projection.schema.json",
+            "schemas/organ-access/organ-registry-source.schema.json",
+            "schemas/organ-access/organ-result-envelope.schema.json",
+            "schemas/organ-access/organ-result-metadata.schema.json",
         }
     ),
     "scripts": frozenset(

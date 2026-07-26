@@ -28,3 +28,9 @@ R2 also publishes typing protocols for the future control plane, AoARunner,
 and runtime adapters. `AoASDK.control_plane` and `AoASDK.runner` are not
 implemented public behavior yet; C1 and C3 must add implementation and API
 tests before those names are documented as callable facades.
+
+`AoASDK.organs` is a lazy facade over one explicitly configured private
+registry source. It exposes deterministic projection, bounded catalog,
+organ/capability inspection, compatibility comparison, and candidate-only
+activation-plan compilation. Construction does not read the registry, scan
+the workspace, connect to MCP, or execute an organ.

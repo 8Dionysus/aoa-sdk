@@ -91,6 +91,13 @@
       "primary_mechanic": "boundary-bridge",
       "reason": "memo readers expose aoa-memo memory surfaces without owning memory truth"
     },
+    "organs": {
+      "primary_mechanic": "boundary-bridge",
+      "secondary_mechanics": [
+        "runtime-seam"
+      ],
+      "reason": "organ registry projection and progressive discovery bridge owner contracts to explicit runtime handoff without taking owner meaning or execution authority"
+    },
     "playbooks": {
       "primary_mechanic": "boundary-bridge",
       "reason": "playbook readers expose aoa-playbooks activation and governance surfaces"
@@ -147,7 +154,8 @@
       "consumed-surface-posture-gate",
       "skill-environment-inspector",
       "technique-promotion-readiness-reader",
-      "owner-layer-signal-handoff"
+      "owner-layer-signal-handoff",
+      "organ-access-control-plane"
     ],
     "antifragility": [
       "stress-posture-dispatch-gate",
@@ -354,6 +362,8 @@
         "mechanics/boundary-bridge/parts/technique-promotion-readiness-reader",
         "mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff",
+        "mechanics/boundary-bridge/parts/organ-access-control-plane",
+        "schemas/organ-access",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/initial-surface-detection-boundary.md",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-heuristics.md",
@@ -369,6 +379,7 @@
         "src/aoa_sdk/kag",
         "src/aoa_sdk/loaders",
         "src/aoa_sdk/memo",
+        "src/aoa_sdk/organs",
         "src/aoa_sdk/playbooks",
         "src/aoa_sdk/routing",
         "src/aoa_sdk/skills",
@@ -383,10 +394,13 @@
         "consumed-surface-posture-gate",
         "skill-environment-inspector",
         "technique-promotion-readiness-reader",
-        "owner-layer-signal-handoff"
+        "owner-layer-signal-handoff",
+        "organ-access-control-plane"
       ],
       "validation": [
-        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py",
+        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py mechanics/boundary-bridge/parts/organ-access-control-plane/tests",
+        "python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_schemas.py --check && python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_example.py --check",
+        "python -m mypy src/aoa_sdk/contracts/organs.py src/aoa_sdk/organs src/aoa_sdk/cli/organs.py",
         "python -m mypy src/aoa_sdk/control_plane/routing",
         "python -m build && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py"
       ]

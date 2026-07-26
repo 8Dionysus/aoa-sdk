@@ -1,0 +1,175 @@
+{
+  "$defs": {
+    "QualifiedEvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "title": "Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "evidence_ref",
+        "revision",
+        "observed_at"
+      ],
+      "title": "QualifiedEvidenceRef",
+      "type": "object"
+    }
+  },
+  "additionalProperties": false,
+  "properties": {
+    "approval_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/QualifiedEvidenceRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "authorized_policy_families": {
+      "items": {
+        "enum": [
+          "read",
+          "candidate",
+          "internal_effect",
+          "external_effect"
+        ],
+        "type": "string"
+      },
+      "title": "Authorized Policy Families",
+      "type": "array"
+    },
+    "capability_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Capability Id",
+      "type": "string"
+    },
+    "consumer_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Consumer Id",
+      "type": "string"
+    },
+    "credential_class": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Credential Class",
+      "type": "string"
+    },
+    "exact_effect_target": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Exact Effect Target"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "observed_consumer_schema_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Observed Consumer Schema Digest",
+      "type": "string"
+    },
+    "observed_server_schema_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Observed Server Schema Digest",
+      "type": "string"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "precondition_evidence": {
+      "items": {
+        "$ref": "#/$defs/QualifiedEvidenceRef"
+      },
+      "title": "Precondition Evidence",
+      "type": "array"
+    },
+    "primitive_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Primitive Id",
+      "type": "string"
+    },
+    "request_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "requested_at": {
+      "format": "date-time",
+      "title": "Requested At",
+      "type": "string"
+    },
+    "requested_policy_family": {
+      "enum": [
+        "read",
+        "candidate",
+        "internal_effect",
+        "external_effect"
+      ],
+      "title": "Requested Policy Family",
+      "type": "string"
+    }
+  },
+  "required": [
+    "request_id",
+    "organ_id",
+    "capability_id",
+    "primitive_id",
+    "consumer_id",
+    "requested_policy_family",
+    "authorized_policy_families",
+    "credential_class",
+    "observed_server_schema_digest",
+    "observed_consumer_schema_digest",
+    "requested_at",
+    "expires_at",
+    "precondition_evidence"
+  ],
+  "title": "ActivationRequest",
+  "type": "object"
+}

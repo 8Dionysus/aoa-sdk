@@ -8,6 +8,7 @@ from ..errors import RepoNotFound
 from .config import (
     EXTERNAL_ROOTS_ENV,
     FEDERATION_ROOT_ENV,
+    ORGAN_REGISTRY_ENV,
     WorkspaceConfig,
     load_workspace_config,
     repo_env_var_name,
@@ -29,6 +30,8 @@ class Workspace:
     manifest_path: Path | None
     repo_roots: dict[str, Path]
     repo_origins: dict[str, str]
+    organ_registry_path: Path | None = None
+    organ_registry_source: str | None = None
 
     @classmethod
     def discover(cls, root: str | Path) -> "Workspace":
@@ -37,6 +40,7 @@ class Workspace:
 
         config = load_workspace_config(start)
         federation_root, federation_root_source = _discover_federation_root(start=start, config=config)
+        organ_registry_path, organ_registry_source = _resolve_organ_registry(config)
 
         repo_roots = {}
         repo_origins = {}
@@ -53,6 +57,8 @@ class Workspace:
             manifest_path=config.manifest_path,
             repo_roots=repo_roots,
             repo_origins=repo_origins,
+            organ_registry_path=organ_registry_path,
+            organ_registry_source=organ_registry_source,
         )
 
     def has_repo(self, repo: str) -> bool:
@@ -90,6 +96,23 @@ def _discover_federation_root(*, start: Path, config: WorkspaceConfig) -> tuple[
             return candidate, "auto:ancestor-scan"
 
     return start, "auto:start"
+
+
+def _resolve_organ_registry(
+    config: WorkspaceConfig,
+) -> tuple[Path | None, str | None]:
+    env_path = os.environ.get(ORGAN_REGISTRY_ENV)
+    if env_path:
+        return (
+            Path(env_path).expanduser().resolve(strict=False),
+            f"env:{ORGAN_REGISTRY_ENV}",
+        )
+    if config.organ_registry_pattern is not None:
+        return (
+            resolve_pattern(config.organ_registry_pattern, config),
+            "manifest:organ_access.registry_source",
+        )
+    return None, None
 
 
 def _discover_repo_path(
