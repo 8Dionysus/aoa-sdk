@@ -1,0 +1,61 @@
+{
+  "schema_version": "local_eval_suite_execution_v1",
+  "suite_id": "aoa-agent-os-control-plane-g11",
+  "owner_repo": "aoa-sdk",
+  "suite_note_ref": "evals/suites/aoa-agent-os-control-plane-g11.suite.md",
+  "runner": {
+    "kind": "python_pytest",
+    "argv": [
+      "python",
+      "-B",
+      "-m",
+      "pytest",
+      "-q",
+      "-p",
+      "no:cacheprovider",
+      "evals/suites/test_agent_os_control_plane_g11.py"
+    ],
+    "cwd": "."
+  },
+  "entrypoint_ref": "evals/suites/test_agent_os_control_plane_g11.py",
+  "timeout_seconds": 900,
+  "success_exit_codes": [
+    0
+  ],
+  "tracked_sources": [
+    {
+      "path": "evals/suites/test_agent_os_control_plane_g11.py",
+      "kind": "file",
+      "sha256": "e3587f23a41b1d343160823c923b2e7f96cd54c6a1e10d69bfeb1b0d3da019ba"
+    },
+    {
+      "path": "mechanics/boundary-bridge/parts/route-resolution-control-plane/tests/test_route_resolution_control_plane.py",
+      "kind": "file",
+      "sha256": "33b0bdc55d717a98a549602bdd4d8d2a9b30ab97a74e6f981d7931f6a1b7aa12"
+    },
+    {
+      "path": "mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests/test_plan_compilation_control_plane.py",
+      "kind": "file",
+      "sha256": "be91a7fd0b33a8ec8e82d389d85bb0ab147c468dc3cde336e46b6e7b1e919eb6"
+    },
+    {
+      "path": "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests/test_runner_lifecycle_control_plane.py",
+      "kind": "file",
+      "sha256": "5705745a5753fa622a3091bb9cca02e7538409a10ebe911bdf42aeb2c60eaaba"
+    },
+    {
+      "path": "src/aoa_sdk/control_plane/runner/core.py",
+      "kind": "file",
+      "sha256": "68d3851b5a677004b5f7292a55b228929c9c483b2fb643c58e3d8ad820fb857e"
+    }
+  ],
+  "auto_run_allowed": false,
+  "proof_authority": false,
+  "promotion_allowed": false,
+  "readiness_scope": "source-contract-ready",
+  "runtime_reproducibility_proven": false,
+  "jit_revalidation_required": true,
+  "execution_receipt_required": true,
+  "environment_capture_required": true,
+  "authority_boundary": "owner-local execution support only; no verdict, scoring, regression, proof doctrine, proof acceptance, or promotion authority"
+}

@@ -1,6 +1,6 @@
 # Intake
 
-Future SDK eval pressure will live here as `*.eval_need.json`.
+SDK eval pressure lives here as `*.eval_need.json`.
 
-Do not place fake bundles in this skeleton port. Verdict, scoring, regression,
+Do not place fake bundles in this local port. Verdict, scoring, regression,
 and proof doctrine authority stays in `aoa-evals`.

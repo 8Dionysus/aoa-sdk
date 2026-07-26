@@ -1,0 +1,40 @@
+{
+  "schema_version": "eval_need_v1",
+  "name": "aoa-agent-os-control-plane-g11",
+  "proof_question": "Does the public aoa-sdk Agent OS control plane remain usable in fresh context and fail closed across the bounded G11 golden and adversarial corpus?",
+  "origin_need": "The aoa-routing succession requires agent-in-the-loop evidence that is stronger than unit tests but does not let agent traces or runtime success become an eval verdict.",
+  "summary": "Bind fresh-context black-box observations to exact deterministic SDK checks for routing, compilation, approvals, lifecycle recovery, and event integrity.",
+  "object_under_evaluation": "aoa-sdk Agent OS control-plane workflow",
+  "category": "workflow",
+  "claim_type": "bounded",
+  "baseline_mode": "none",
+  "report_format": "summary-with-breakdown",
+  "verdict_shape": "mixed",
+  "authoring_route": "candidate_evidence_packet",
+  "expected_use_when": [
+    "Reviewing the aoa-routing succession before owner switch landing",
+    "Checking a public SDK wheel from a fresh consumer context",
+    "Replaying fail-closed control-plane lifecycle boundaries"
+  ],
+  "blind_spot_notes": [
+    "The local suite does not grant verdict, scoring, regression, or proof doctrine authority.",
+    "Passing deterministic cases does not prove fresh-context usability without the separately retained agent observation.",
+    "A compiled plan or successful runtime outcome is not an eval verdict or evidence of task benefit.",
+    "Cross-repository runtime and summon-return cases require their owner-local evidence in addition to this SDK suite."
+  ],
+  "related_eval_refs": [
+    "aoa-bounded-change-quality",
+    "aoa-verification-honesty"
+  ],
+  "candidate_evidence_refs": [
+    "evals/suites/aoa-agent-os-control-plane-g11.suite.md",
+    "mechanics/boundary-bridge/parts/plan-compilation-control-plane/trials/fresh-context-full-chain-bounded-v1.json",
+    "mechanics/boundary-bridge/parts/plan-compilation-control-plane/trials/installed-wheel-golden-scenario-chain-v2.json"
+  ],
+  "source_refs": [
+    "mechanics/boundary-bridge/parts/route-resolution-control-plane/tests/test_route_resolution_control_plane.py",
+    "mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests/test_plan_compilation_control_plane.py",
+    "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests/test_runner_lifecycle_control_plane.py"
+  ],
+  "comparison_surface": null
+}

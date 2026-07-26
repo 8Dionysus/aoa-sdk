@@ -378,6 +378,30 @@ def test_runtime_profile_approval_projection_is_bound_without_rewriting_route() 
     assert runtime_requirement.approval_owner in plan.snapshot.source_refs
 
 
+def test_runtime_profile_rejects_an_approval_from_another_owner() -> None:
+    decision, _, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    foreign_requirement = decision.approval_requirements[0].model_copy(
+        update={
+            "approval_owner": runtime.provenance.model_copy(
+                update={"owner_repo": "foreign-runtime-owner"}
+            )
+        }
+    )
+    payload = runtime.model_dump(mode="python")
+    payload["runtime_approval_requirements"] = [
+        foreign_requirement.model_dump(mode="python")
+    ]
+
+    with pytest.raises(
+        ValueError,
+        match="must retain runtime-owner provenance",
+    ):
+        RuntimeProfile.model_validate(payload)
+
+
 def test_runtime_profile_cannot_shadow_a_route_approval_id() -> None:
     decision, binding, runtime = _inputs(
         "bounded_change_safe",
