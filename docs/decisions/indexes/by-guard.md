@@ -52,6 +52,7 @@
 
 - [AOA-SDK-D-0072 - Separate G5 Release Trust From Owner-Switch Authority](../AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md) (`docs/decisions/AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md`)
 - [AOA-SDK-D-0073 - Replay Release Evidence From an Immutable Tag](../AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md) (`docs/decisions/AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md`)
+- [AOA-SDK-D-0074 - Use a Cross-zlib Canonical Release Carrier](../AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md) (`docs/decisions/AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md`)
 
 ## canonical path
 
@@ -371,10 +372,15 @@
 
 - [AOA-SDK-D-0072 - Separate G5 Release Trust From Owner-Switch Authority](../AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md) (`docs/decisions/AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md`)
 - [AOA-SDK-D-0073 - Replay Release Evidence From an Immutable Tag](../AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md) (`docs/decisions/AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md`)
+- [AOA-SDK-D-0074 - Use a Cross-zlib Canonical Release Carrier](../AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md) (`docs/decisions/AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md`)
 
 ## release readiness
 
 - [AOA-SDK-D-0046 - Changelog Unreleased Volatility Boundary](../AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md) (`docs/decisions/AOA-SDK-D-0046-changelog-unreleased-volatility-boundary.md`)
+
+## reproducibility
+
+- [AOA-SDK-D-0074 - Use a Cross-zlib Canonical Release Carrier](../AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md) (`docs/decisions/AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md`)
 
 ## review gate
 

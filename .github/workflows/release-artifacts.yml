@@ -200,6 +200,14 @@ jobs:
           ref: 97f60de1b5992ef6bf5ff0f051bd452d940d9a85
           path: .routing-inputs/aoa-routing
 
+      - name: Checkout reviewed release replay tooling
+        if: inputs.release_tag != ''
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-sdk
+          ref: ${{ github.sha }}
+          path: .release-tooling/aoa-sdk
+
       - name: Install exact stronger-owner verifier
         if: env.ROUTING_RELEASE_TAG != ''
         run: python -m pip install -e '.routing-inputs/abyss-machine[dev]'
@@ -215,6 +223,25 @@ jobs:
             --archive-output "dist/aoa-sdk-routing-g5-release-candidate-$ROUTING_RELEASE_TAG.tar.gz" \
             --checksum-output "dist/aoa-sdk-routing-g5-release-candidate-$ROUTING_RELEASE_TAG.tar.gz.sha256"
           python mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_release_candidate.py \
+            --workspace-root .routing-inputs \
+            --sdk-root .routing-inputs/aoa-sdk \
+            --predecessor-root .routing-inputs/aoa-routing \
+            --output-dir dist/routing-g5-release-candidate \
+            --archive-output "dist/aoa-sdk-routing-g5-release-candidate-$ROUTING_RELEASE_TAG.tar.gz" \
+            --checksum-output "dist/aoa-sdk-routing-g5-release-candidate-$ROUTING_RELEASE_TAG.tar.gz.sha256" \
+            --check
+          (
+            cd dist
+            sha256sum -c "aoa-sdk-routing-g5-release-candidate-$ROUTING_RELEASE_TAG.tar.gz.sha256"
+          )
+
+      - name: Canonicalize replay archive with reviewed tooling
+        if: inputs.release_tag != ''
+        env:
+          PYTHONPATH: ${{ github.workspace }}/.release-tooling/aoa-sdk/src
+        run: |
+          python .release-tooling/aoa-sdk/mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_release_candidate.py \
+            --input-lock .routing-inputs/aoa-sdk/sdk/distribution/manifests/routing_g5_release_candidate.input-lock.json \
             --workspace-root .routing-inputs \
             --sdk-root .routing-inputs/aoa-sdk \
             --predecessor-root .routing-inputs/aoa-routing \

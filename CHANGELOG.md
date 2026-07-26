@@ -15,6 +15,9 @@ Tracking starts with the community-docs baseline for this repository.
 - Allow OIDC release-evidence replay from an existing immutable tag when the
   original tag workflow fails before attestation, without moving the tag or
   rebuilding from newer source.
+- Make routing release archives byte-stable across zlib versions with a
+  canonical stored-block gzip carrier, and keep newer replay tooling separate
+  from immutable release source and subject bytes.
 
 ## [0.7.0] - 2026-07-25
 

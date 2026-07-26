@@ -1,5 +1,8 @@
 from __future__ import annotations
 
+import gzip
+import hashlib
+import io
 import json
 import os
 from datetime import datetime, timezone
@@ -13,6 +16,7 @@ from aoa_sdk.control_plane.routing.core import RouterError
 from aoa_sdk.control_plane.routing.release_candidate import (
     G5_FALSE_AUTHORITY,
     RELEASE_CANDIDATE_PROFILE_ID,
+    _write_canonical_gzip,
     build_g5_release_candidate_bundle,
     load_g5_release_candidate_bundle,
     validate_g5_release_candidate_bundle,
@@ -155,6 +159,22 @@ def test_release_candidate_archive_is_path_independent_and_deterministic(
 
     assert first_digest == second_digest
     assert first_archive.read_bytes() == second_archive.read_bytes()
+
+
+def test_canonical_gzip_is_stable_across_block_boundaries() -> None:
+    payload = b"canonical-gzip-" * 10000
+    encoded = io.BytesIO()
+
+    _write_canonical_gzip(io.BytesIO(payload), encoded)
+
+    archive_bytes = encoded.getvalue()
+    assert archive_bytes.startswith(
+        b"\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff"
+    )
+    assert gzip.decompress(archive_bytes) == payload
+    assert hashlib.sha256(archive_bytes).hexdigest() == (
+        "eebbdf1d894d3f341ee9ad50c917aaffb2c4504b9d42856af8e349e4d6c279d9"
+    )
 
 
 def test_release_candidate_rejects_release_envelope_substitution(
