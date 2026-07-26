@@ -68,6 +68,10 @@ jobs:
       - name: Verify installed routing G5 release-candidate wheel
         run: python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py
 
+      - name: Verify installed routing G5 canonical wheel
+        if: env.ROUTING_RELEASE_TAG != 'v0.7.0'
+        run: python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
+
       - name: Checkout abyss-machine verifier
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
@@ -200,6 +204,14 @@ jobs:
           ref: 97f60de1b5992ef6bf5ff0f051bd452d940d9a85
           path: .routing-inputs/aoa-routing
 
+      - name: Checkout exact G5 runtime consumer contract
+        if: env.ROUTING_RELEASE_TAG == 'v0.8.0'
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/abyss-stack
+          ref: fac82c75d860dd2433cfc1e391f4b6ba117425d7
+          path: .routing-runtime/abyss-stack
+
       - name: Checkout reviewed release replay tooling
         if: inputs.release_tag != ''
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
@@ -213,7 +225,7 @@ jobs:
         run: python -m pip install -e '.routing-inputs/abyss-machine[dev]'
 
       - name: Build exact routing G5 release candidate
-        if: env.ROUTING_RELEASE_TAG != ''
+        if: env.ROUTING_RELEASE_TAG == 'v0.7.0'
         run: |
           python mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_release_candidate.py \
             --workspace-root .routing-inputs \
@@ -236,7 +248,7 @@ jobs:
           )
 
       - name: Canonicalize replay archive with reviewed tooling
-        if: inputs.release_tag != ''
+        if: inputs.release_tag == 'v0.7.0'
         env:
           PYTHONPATH: ${{ github.workspace }}/.release-tooling/aoa-sdk/src
         run: |
@@ -255,7 +267,7 @@ jobs:
           )
 
       - name: Verify release candidate with exact stronger owner
-        if: env.ROUTING_RELEASE_TAG != ''
+        if: env.ROUTING_RELEASE_TAG == 'v0.7.0'
         run: |
           python -m abyss_machine.cli artifacts build-sidecars \
             --manifest "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate/artifact.bundle.json" \
@@ -276,13 +288,13 @@ jobs:
             --json
 
       - name: Attest routing G5 release candidate
-        if: env.ROUTING_RELEASE_TAG != ''
+        if: env.ROUTING_RELEASE_TAG == 'v0.7.0'
         uses: actions/attest@36051bcae73b7c2a8a6945a48cbf80953c6baa35
         with:
           subject-path: dist/aoa-sdk-routing-g5-release-candidate-${{ env.ROUTING_RELEASE_TAG }}.tar.gz
 
       - name: Upload routing G5 release-candidate evidence
-        if: env.ROUTING_RELEASE_TAG != ''
+        if: env.ROUTING_RELEASE_TAG == 'v0.7.0'
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: aoa-sdk-routing-g5-release-candidate-${{ env.ROUTING_RELEASE_TAG }}
@@ -290,6 +302,64 @@ jobs:
             dist/aoa-sdk-routing-g5-release-candidate-${{ env.ROUTING_RELEASE_TAG }}.tar.gz
             dist/aoa-sdk-routing-g5-release-candidate-${{ env.ROUTING_RELEASE_TAG }}.tar.gz.sha256
             dist/routing-g5-release-candidate-verification/*
+          if-no-files-found: error
+
+      - name: Download immutable public G5 release trust root
+        if: env.ROUTING_RELEASE_TAG == 'v0.8.0'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p .routing-public-release
+          gh release download v0.7.0 \
+            --repo 8Dionysus/aoa-sdk \
+            --pattern aoa-sdk-routing-g5-release-candidate-v0.7.0.tar.gz \
+            --dir .routing-public-release
+          echo "adf38173306baef7fc47595fc7f44b46bb107fbc48b493adf4b665a22520bee2  .routing-public-release/aoa-sdk-routing-g5-release-candidate-v0.7.0.tar.gz" \
+            | sha256sum -c -
+
+      - name: Build exact receipt-bound routing G5 canonical artifact
+        if: env.ROUTING_RELEASE_TAG == 'v0.8.0'
+        run: |
+          python mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_canonical.py \
+            --workspace-root .routing-inputs \
+            --sdk-root .routing-inputs/aoa-sdk \
+            --predecessor-root .routing-inputs/aoa-routing \
+            --public-release-archive .routing-public-release/aoa-sdk-routing-g5-release-candidate-v0.7.0.tar.gz \
+            --runtime-consumer-root .routing-runtime/abyss-stack \
+            --output-dir dist/routing-g5-canonical \
+            --archive-output "dist/aoa-sdk-routing-g5-canonical-$ROUTING_RELEASE_TAG.tar.gz" \
+            --checksum-output "dist/aoa-sdk-routing-g5-canonical-$ROUTING_RELEASE_TAG.tar.gz.sha256"
+          python mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_canonical.py \
+            --workspace-root .routing-inputs \
+            --sdk-root .routing-inputs/aoa-sdk \
+            --predecessor-root .routing-inputs/aoa-routing \
+            --public-release-archive .routing-public-release/aoa-sdk-routing-g5-release-candidate-v0.7.0.tar.gz \
+            --runtime-consumer-root .routing-runtime/abyss-stack \
+            --output-dir dist/routing-g5-canonical \
+            --archive-output "dist/aoa-sdk-routing-g5-canonical-$ROUTING_RELEASE_TAG.tar.gz" \
+            --checksum-output "dist/aoa-sdk-routing-g5-canonical-$ROUTING_RELEASE_TAG.tar.gz.sha256" \
+            --check
+          (
+            cd dist
+            sha256sum -c "aoa-sdk-routing-g5-canonical-$ROUTING_RELEASE_TAG.tar.gz.sha256"
+          )
+
+      - name: Attest receipt-bound routing G5 canonical artifact
+        if: env.ROUTING_RELEASE_TAG == 'v0.8.0'
+        uses: actions/attest@36051bcae73b7c2a8a6945a48cbf80953c6baa35
+        with:
+          subject-path: dist/aoa-sdk-routing-g5-canonical-${{ env.ROUTING_RELEASE_TAG }}.tar.gz
+
+      - name: Upload receipt-bound routing G5 canonical evidence
+        if: env.ROUTING_RELEASE_TAG == 'v0.8.0'
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: aoa-sdk-routing-g5-canonical-${{ env.ROUTING_RELEASE_TAG }}
+          path: |
+            dist/aoa-sdk-routing-g5-canonical-${{ env.ROUTING_RELEASE_TAG }}.tar.gz
+            dist/aoa-sdk-routing-g5-canonical-${{ env.ROUTING_RELEASE_TAG }}.tar.gz.sha256
+            dist/routing-g5-canonical/artifact.bundle.json
+            dist/routing-g5-canonical/succession/*
           if-no-files-found: error
 
       - name: Upload distribution artifacts

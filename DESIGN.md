@@ -163,8 +163,7 @@ Control-plane power is useful only while it remains inspectable and reversible.
 ## Accepted Routing Succession Shape
 
 `AOA-SDK-D-0071` accepts a staged succession of the routing producer into the
-SDK control plane. Acceptance is not activation. Until the G5 owner-switch
-receipt, the live state remains:
+SDK control plane. The completed pre-G5 state was:
 
 ```text
 predecessor_canonical:
@@ -219,9 +218,14 @@ receipt. After that canary and rollback evidence passed,
 `AOA-SDK-D-0072` added a separately profiled public release envelope around
 the exact candidate. It binds release bytes, source refs, and the
 stronger-owner verifier while normal runtime and every switch-authority flag
-remain denied. There remains exactly one canonical producer until exact
-public trust, runtime, rollback, and consumer evidence authorize the separate
-G5 switch.
+remain denied. `AOA-SDK-D-0075` now closes the owner-only transition with a
+receipt-bound canonical envelope. It reconstructs the exact `v0.7.0` routing
+assembly, requires byte parity with the immutable public asset, binds the
+exact `abyss-stack` cutover contract, and makes `aoa-sdk` the single canonical
+producer. The release authorizes but does not execute live runtime mutation;
+`abyss-machine` admission, the runtime receipt, the paired predecessor M3
+record, compatibility exit, consumer-zero, and archival authority remain
+separate later gates.
 
 ## Design as Aim
 

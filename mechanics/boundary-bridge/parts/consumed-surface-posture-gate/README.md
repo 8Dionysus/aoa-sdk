@@ -45,6 +45,10 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   lifecycle and trust, deterministic archive, exact verifier/input lock, and
   installed-wheel proof while `aoa-routing` remains canonical and normal
   runtime stays denied
+- the receipt-bound G5 canonical envelope: exact public-release byte parity,
+  owner-switch receipt, SDK canonical producer authority, compatibility-window
+  start, runtime-contract handoff, retained predecessor rollback, and explicit
+  denial of archive authority
 
 ## Owner
 
@@ -74,11 +78,14 @@ Then read the executable
 [`docs/routing-succession-g5-candidate.md`](docs/routing-succession-g5-candidate.md).
 Then read the public-trust-only
 [`docs/routing-succession-g5-release-candidate.md`](docs/routing-succession-g5-release-candidate.md).
+Then read the receipt-bound
+[`docs/routing-succession-g5-owner-switch.md`](docs/routing-succession-g5-owner-switch.md).
 G4 proves the released shadow successor and isolated runtime content path. The
 G5 candidate adds native SDK producer identity for trust and canary review.
-The release candidate adds exact public release trust. None authorizes the
-canonical owner switch, normal runtime, predecessor retirement, or archival
-action.
+The release candidate adds exact public release trust without switch
+authority. The G5 receipt makes the SDK canonical and starts the compatibility
+window, but stronger-owner admission, live cutover execution, consumer-zero,
+and archival action remain separate.
 
 ## Validation
 

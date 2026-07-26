@@ -29,23 +29,27 @@ This repository owns:
 - additive surface detection, passive skill-environment inspection, and
   reviewed checkpoint evidence handoff helpers that remain owner-subordinate
 - the accepted staged routing-producer succession model in
-  `AOA-SDK-D-0071`, while live producer authority remains with `aoa-routing`
-  until the explicit G5 owner-switch receipt
+  `AOA-SDK-D-0071` and the receipt-bound G5 owner switch in
+  `AOA-SDK-D-0075`, which makes `aoa-sdk` the canonical routing producer
+  while live runtime execution remains with the runtime owner
 - the explicit non-publishing SDK G5 candidate builder and validator used to
   request stronger-owner artifact trust and runtime canary evidence without
   acquiring canonical producer authority
 - the exact public SDK G5 release-candidate envelope, input lock, and
   deterministic archive used to establish release trust while normal runtime
   and every owner-switch authority flag remain denied
+- the canonical G5 envelope, owner-switch receipt, exact public-release parity
+  proof, compatibility-window start, and retained predecessor rollback posture
+  while archival authority remains false
 - the strict R2 route, plan, approval, lifecycle, event, evidence, and runtime
   adapter contract family, while `AoASDK.control_plane`, `AoASDK.runner`, and
   runtime execution remain unimplemented at this stage
 
 It does not own:
 
-- routing producer authority before G5, or skill, eval, memo, playbook, agent,
-  progression, quest, checkpoint, service runtime, or frontend RPG semantics
-  as source truth
+- live runtime execution, or skill, eval, memo, playbook, agent, progression,
+  quest, checkpoint, service runtime, or frontend RPG semantics as source
+  truth
 - hidden heuristics that are not documented and testable
 
 ## Start here

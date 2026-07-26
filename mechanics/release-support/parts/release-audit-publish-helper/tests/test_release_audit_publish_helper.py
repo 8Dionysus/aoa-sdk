@@ -405,6 +405,80 @@ def test_routing_g5_release_candidate_lock_and_builder_stay_non_authoritative() 
     assert "\n          abyss-machine artifacts" not in workflow
 
 
+def test_routing_g5_canonical_lock_and_workflow_bind_owner_switch() -> None:
+    repo_root = _repo_root()
+    lock = json.loads(
+        (
+            repo_root
+            / "sdk"
+            / "distribution"
+            / "manifests"
+            / "routing_g5_canonical.input-lock.json"
+        ).read_text(encoding="utf-8")
+    )
+    builder = (
+        repo_root
+        / "mechanics"
+        / "release-support"
+        / "parts"
+        / "release-audit-publish-helper"
+        / "scripts"
+        / "build_routing_g5_canonical.py"
+    ).read_text(encoding="utf-8")
+    workflow = (
+        repo_root / ".github" / "workflows" / "release-artifacts.yml"
+    ).read_text(encoding="utf-8")
+
+    assert lock["schema_version"] == (
+        "aoa_sdk_routing_g5_canonical_input_lock_v1"
+    )
+    assert lock["sdk_source_ref"] == "SELF"
+    assert lock["sdk_version"] == "0.8.0"
+    assert lock["predecessor"]["rollback_posture"] == "retained"
+    assert lock["public_release_trust_root"] == {
+        "repo": "aoa-sdk",
+        "release_ref": (
+            "https://github.com/8Dionysus/aoa-sdk/releases/tag/v0.7.0"
+        ),
+        "source_ref": "15f8239c6467ee99da0f6f9615bcb9a44270b574",
+        "asset_name": (
+            "aoa-sdk-routing-g5-release-candidate-v0.7.0.tar.gz"
+        ),
+        "asset_digest": (
+            "sha256:"
+            "adf38173306baef7fc47595fc7f44b46bb107fbc48b493adf4b665a22520bee2"
+        ),
+    }
+    assert lock["runtime_consumer_contract"] == {
+        "repo": "abyss-stack",
+        "source_ref": "fac82c75d860dd2433cfc1e391f4b6ba117425d7",
+        "decision_id": "ABYSS-STACK-D-0086",
+    }
+    assert lock["authority"] == {
+        "archive_authorized": False,
+        "canonical_owner_repo": "aoa-sdk",
+        "canonical_producer_switch_authorized": True,
+        "compatibility_window_started": True,
+        "live_runtime_mutation_authorized": True,
+        "predecessor_maintenance_only": True,
+        "sdk_canonical": True,
+    }
+    assert "build_g5_canonical_bundle" in builder
+    assert "validate_g5_canonical_bundle" in builder
+    assert "write_deterministic_canonical_archive" in builder
+    assert '"archive_authorized": False' in builder
+    assert '"live_cutover_executed": False' in builder
+    assert "verify_routing_g5_canonical_wheel.py" in workflow
+    assert "Build exact receipt-bound routing G5 canonical artifact" in workflow
+    assert "env.ROUTING_RELEASE_TAG == 'v0.8.0'" in workflow
+    assert "env.ROUTING_RELEASE_TAG == 'v0.7.0'" in workflow
+    assert lock["runtime_consumer_contract"]["source_ref"] in workflow
+    assert lock["public_release_trust_root"]["asset_digest"].removeprefix(
+        "sha256:"
+    ) in workflow
+    assert "aoa-sdk-routing-g5-canonical-$ROUTING_RELEASE_TAG.tar.gz" in workflow
+
+
 def test_package_artifact_bundle_validator_reports_external_paths(tmp_path: Path) -> None:
     validator = _artifact_bundle_validator_module()
 

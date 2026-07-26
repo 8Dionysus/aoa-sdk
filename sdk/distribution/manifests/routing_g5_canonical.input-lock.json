@@ -1,0 +1,53 @@
+{
+  "schema_version": "aoa_sdk_routing_g5_canonical_input_lock_v1",
+  "purpose": "Exact source, public-release parity, runtime-contract, and authority lock for the v0.8.0 SDK routing G5 owner switch.",
+  "sdk_source_ref": "SELF",
+  "sdk_version": "0.8.0",
+  "predecessor": {
+    "repo": "aoa-routing",
+    "source_ref": "97f60de1b5992ef6bf5ff0f051bd452d940d9a85",
+    "rollback_posture": "retained"
+  },
+  "public_release_trust_root": {
+    "repo": "aoa-sdk",
+    "release_ref": "https://github.com/8Dionysus/aoa-sdk/releases/tag/v0.7.0",
+    "source_ref": "15f8239c6467ee99da0f6f9615bcb9a44270b574",
+    "asset_name": "aoa-sdk-routing-g5-release-candidate-v0.7.0.tar.gz",
+    "asset_digest": "sha256:adf38173306baef7fc47595fc7f44b46bb107fbc48b493adf4b665a22520bee2"
+  },
+  "runtime_consumer_contract": {
+    "repo": "abyss-stack",
+    "source_ref": "fac82c75d860dd2433cfc1e391f4b6ba117425d7",
+    "decision_id": "ABYSS-STACK-D-0086"
+  },
+  "input_source_refs": {
+    "8Dionysus": "39cdef104d54d570e7eb4f689ebcd48b2cc6a658",
+    "Agents-of-Abyss": "bfeb4bfb447b437f1360b814bbf4f1def5e62859",
+    "Dionysus": "6c463f6b89a11e85b37e2606525afc7d45005fbd",
+    "Tree-of-Sophia": "54be6f25a2272d02f119a16b1c75e8756decf900",
+    "abyss-stack": "8d9d4309302d90b79fdc3d68da99bb2ace511446",
+    "aoa-agents": "66f8bf22d03518b1e2367fd4f51dab80650f6d37",
+    "aoa-evals": "3412b47f9ee7bec9567f92e1c2d59596c4428a2c",
+    "aoa-kag": "cdd2286c5ad4a345fe704ca065036945f6ba4353",
+    "aoa-memo": "7672add5e2bb4ff21c2581ca656998f0ca7c8a3e",
+    "aoa-playbooks": "a15866ec867209288533850cc34939ad81829947",
+    "aoa-sdk": "SELF",
+    "aoa-skills": "48598a9564c4621b15428831642b802dbc8d2a47",
+    "aoa-stats": "504571995cc36905cc886259c0a19be6e8e35045",
+    "aoa-techniques": "e842c0d0156c58cfb9020b636e81134e96fc8cfb"
+  },
+  "compatibility_window": {
+    "state": "started",
+    "started_on": "2026-07-26",
+    "started_by_sdk_version": "0.8.0"
+  },
+  "authority": {
+    "archive_authorized": false,
+    "canonical_owner_repo": "aoa-sdk",
+    "canonical_producer_switch_authorized": true,
+    "compatibility_window_started": true,
+    "live_runtime_mutation_authorized": true,
+    "predecessor_maintenance_only": true,
+    "sdk_canonical": true
+  }
+}
