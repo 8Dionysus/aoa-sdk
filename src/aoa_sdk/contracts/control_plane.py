@@ -517,6 +517,10 @@ class RunPlan(StrictControlPlaneModel):
     def validate_plan_graph(self) -> RunPlan:
         if self.correlation_id != self.scenario_binding.correlation_id:
             raise ValueError("plan and scenario binding correlation ids must match")
+        if self.decision_ref != self.scenario_binding.decision_ref:
+            raise ValueError(
+                "plan and scenario binding decision refs must match"
+            )
         if (
             self.schema_version
             not in self.runtime_profile.supported_plan_schema_versions
@@ -533,8 +537,14 @@ class RunPlan(StrictControlPlaneModel):
         if len(step_ids) != len(set(step_ids)):
             raise ValueError("run plan step ids must be unique")
         known_steps = set(step_ids)
-        approval_ids = {
+        approval_id_list = [
             requirement.requirement_id for requirement in self.approval_requirements
+        ]
+        if len(approval_id_list) != len(set(approval_id_list)):
+            raise ValueError("run plan approval requirement ids must be unique")
+        approval_ids = set(approval_id_list)
+        approval_step_bindings: dict[str, set[str]] = {
+            requirement_id: set() for requirement_id in approval_ids
         }
         bound_agents = set(self.scenario_binding.agent_refs)
         bound_capabilities = set(self.scenario_binding.capability_refs)
@@ -551,6 +561,8 @@ class RunPlan(StrictControlPlaneModel):
                     f"step {step.step_id!r} has unknown approval requirements: "
                     f"{sorted(unknown_approvals)}"
                 )
+            for requirement_id in step.approval_requirement_ids:
+                approval_step_bindings[requirement_id].add(step.step_id)
             if not set(step.agent_refs).issubset(bound_agents):
                 raise ValueError(
                     f"step {step.step_id!r} uses an agent outside ScenarioBinding"
@@ -581,6 +593,19 @@ class RunPlan(StrictControlPlaneModel):
             raise ValueError(
                 f"plan policies reference unknown steps: {sorted(unknown_step_refs)}"
             )
+        for requirement in self.approval_requirements:
+            actual_steps = approval_step_bindings[requirement.requirement_id]
+            if not actual_steps:
+                raise ValueError(
+                    f"approval requirement {requirement.requirement_id!r} "
+                    "must bind at least one plan step"
+                )
+            expected_steps = set(requirement.applies_to_step_ids)
+            if expected_steps and actual_steps != expected_steps:
+                raise ValueError(
+                    f"approval requirement {requirement.requirement_id!r} "
+                    "must preserve its explicit step bindings"
+                )
         return self
 
 

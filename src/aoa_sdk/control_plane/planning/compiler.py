@@ -107,14 +107,31 @@ def compile_run_plan(
                 bindings,
             ),
             expected_output_kinds=step.expected_output_kinds,
-            approval_requirement_ids=(
-                approval_ids
-                if step.approval_binding == "all_route_requirements"
-                else ()
+            approval_requirement_ids=tuple(
+                requirement.requirement_id
+                for requirement in decision.approval_requirements
+                if (
+                    step.step_id in requirement.applies_to_step_ids
+                    or (
+                        not requirement.applies_to_step_ids
+                        and step.approval_binding == "all_route_requirements"
+                    )
+                )
             ),
         )
         for step in active_steps
     )
+    bound_approval_ids = {
+        requirement_id
+        for step in plan_steps
+        for requirement_id in step.approval_requirement_ids
+    }
+    unbound_approval_ids = set(approval_ids) - bound_approval_ids
+    if unbound_approval_ids:
+        raise PlanCompilationError(
+            "route approvals have no active contour step binding: "
+            f"{sorted(unbound_approval_ids)}"
+        )
     evidence_requirements = tuple(
         _compile_evidence(requirement, bindings, runtime_profile)
         for requirement in contour.evidence_requirements

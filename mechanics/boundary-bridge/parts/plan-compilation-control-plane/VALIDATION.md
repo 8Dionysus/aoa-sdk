@@ -22,8 +22,10 @@ bounded golden without importing the source checkout or requiring an
 exact trust/source pins,
 generic versus kind-selected inputs, no positional guessing, missing/extra
 conditions, exact requirement refs, owner identity order, route parent
-binding, runtime effect compatibility, tampering, public API construction,
-CLI compilation, and plan validation.
+binding, explicit versus contour-default approval step bindings, standalone
+RunPlan parent-ref integrity, contour-to-ABI digest identity, runtime effect
+compatibility, tampering, public API construction, CLI compilation, and plan
+validation.
 
 These checks do not invoke a capability, instantiate a runner, dispatch a
 runtime command, observe an execution event, prove task quality, or establish

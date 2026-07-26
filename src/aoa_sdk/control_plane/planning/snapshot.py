@@ -435,6 +435,8 @@ def load_plan_compilation_snapshot(
         document.abi.model_dump()
         != source_lock.abi.model_dump(exclude={"source_ref", "artifact_digest"})
         or source_lock.owner_source_ref != source_lock.abi.source_ref
+        or source_lock.abi.artifact_digest
+        != source_lock.contours.artifact_digest
         or source_lock.contours.schema_ref != document.abi.schema_ref
         or source_lock.schema_resource.owner_artifact_ref != document.abi.schema_ref
         or source_lock.contours.schema_version != document.schema_version

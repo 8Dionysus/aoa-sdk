@@ -275,6 +275,54 @@ def test_public_api_compiles_without_loading_the_routing_snapshot() -> None:
     ]
 
 
+def test_explicit_route_approval_step_bindings_are_preserved() -> None:
+    decision, binding, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    unscoped = decision.approval_requirements[0]
+    explicit = unscoped.model_copy(
+        update={
+            "requirement_id": "approval:fixture:verify",
+            "operation": "verify",
+            "applies_to_step_ids": ("verify",),
+        }
+    )
+    decision = decision.model_copy(
+        update={"approval_requirements": (unscoped, explicit)}
+    )
+    binding = binding.model_copy(
+        update={
+            "decision_ref": binding.decision_ref.model_copy(
+                update={"digest": canonical_digest(decision)}
+            )
+        }
+    )
+
+    plan = compile_run_plan(
+        decision,
+        binding,
+        runtime,
+        load_plan_compilation_snapshot(),
+        compiler_provenance=_compiler_provenance(),
+    )
+
+    steps = {step.step_id: step for step in plan.steps}
+    assert steps["mutate"].approval_requirement_ids == (
+        unscoped.requirement_id,
+    )
+    assert steps["verify"].approval_requirement_ids == (
+        explicit.requirement_id,
+    )
+
+    contradictory = plan.model_dump(mode="json")
+    contradictory["steps"][1]["approval_requirement_ids"].append(
+        explicit.requirement_id
+    )
+    with pytest.raises(ValueError, match="explicit step bindings"):
+        RunPlan.model_validate(contradictory)
+
+
 @pytest.mark.parametrize(
     ("scenario_id", "conditions"),
     (
@@ -598,6 +646,21 @@ def test_packaged_contour_or_lock_tampering_fails_closed(
 
     shutil.rmtree(resource_root)
     shutil.copytree(DATA_ROOT, resource_root)
+    lock_path = resource_root / "playbook-plan-contours-source-lock.v1.json"
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    lock["abi"]["artifact_digest"] = ZERO_DIGEST
+    lock_path.write_text(
+        json.dumps(lock, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    with pytest.raises(
+        PlanCompilationSnapshotError,
+        match="ABI identity",
+    ):
+        load_plan_compilation_snapshot(resource_root=resource_root)
+
+    shutil.rmtree(resource_root)
+    shutil.copytree(DATA_ROOT, resource_root)
     contour_path = resource_root / "playbook-plan-contours.v1.json"
     contour = json.loads(contour_path.read_text(encoding="utf-8"))
     contour["contours"][0]["steps"][0]["agent_ids"][0] = "unknown-agent"
@@ -673,3 +736,40 @@ def test_route_cli_compile_and_validate_run_plan(tmp_path: Path) -> None:
     payload = json.loads(validated.output)
     assert payload["kind"] == "RunPlan"
     assert payload["execution_authorized"] is False
+
+    mismatched_binding = plan.scenario_binding.model_copy(
+        update={
+            "decision_ref": plan.scenario_binding.decision_ref.model_copy(
+                update={"object_id": "decision:other"}
+            )
+        }
+    )
+    mismatched = plan.model_copy(
+        update={
+            "scenario_binding": mismatched_binding,
+            "plan_digest": ZERO_DIGEST,
+        }
+    )
+    mismatched = mismatched.model_copy(
+        update={
+            "plan_digest": canonical_digest(
+                mismatched,
+                exclude={"plan_digest"},
+            )
+        }
+    )
+    mismatched_path = tmp_path / "mismatched-plan.json"
+    mismatched_path.write_text(
+        mismatched.model_dump_json(indent=2),
+        encoding="utf-8",
+    )
+    rejected = runner.invoke(
+        app,
+        [
+            "route",
+            "validate",
+            str(mismatched_path),
+        ],
+    )
+    assert rejected.exit_code == 1
+    assert "decision refs must match" in rejected.output
