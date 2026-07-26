@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 9562922,
+  "allowed_tracked_bytes": 16521611,
+  "approved_by": "repository-owner",
+  "base_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+  "changed_generated_bytes": 9562922,
+  "changed_generated_files": 245,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "ffcc3126dff5929a5061851137d87e231470132a256dea4dee5b9bacacdc85ff",
+  "reason": "Refresh the derived repo-local KAG family for the owner-bounded organ access control plane; this digest-bound receipt accepts only the measured generated projection and tracked-size delta without raising standing limits or changing owner, runtime, proof, or acceptance authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16521611,
+  "tracked_bytes_max": 15728640
+}
