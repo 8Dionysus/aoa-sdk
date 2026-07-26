@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 12479415,
+  "allowed_tracked_bytes": 16835452,
+  "approved_by": "repository-owner",
+  "base_ref": "ceeb1de77a35ddeead886b2c815ec3dd149df6f8",
+  "changed_generated_bytes": 12479415,
+  "changed_generated_files": 308,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "4ec66653773b031de449657193f216e84831a06e2741934109fa96a3bf0168b6",
+  "reason": "Refresh the reviewed C1 source index after adding pre-resolution projection revalidation, content-digest binding, detached resolution copies, and mutation regressions; this records source evidence only and does not claim rollout, cost reduction, consumer-zero, or completion.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16835452,
+  "tracked_bytes_max": 15728640
+}
