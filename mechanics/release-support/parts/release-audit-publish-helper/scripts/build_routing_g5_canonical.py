@@ -149,6 +149,114 @@ def _require_exact_checkout(
         raise RouterError(f"{label} checkout must be clean")
 
 
+def _read_json_object(path: Path, label: str) -> dict[str, Any]:
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError) as exc:
+        raise RouterError(f"could not load {label}: {exc}") from exc
+    if not isinstance(payload, dict):
+        raise RouterError(f"{label} must contain an object")
+    return payload
+
+
+def _require_canonical_lock_bindings(
+    *,
+    bundle: Any,
+    receipt: dict[str, Any],
+    provenance: dict[str, Any],
+    lock: dict[str, Any],
+    sdk_ref: str,
+    source_refs: dict[str, str],
+) -> None:
+    predecessor = lock["predecessor"]
+    public_release = lock["public_release_trust_root"]
+    runtime_consumer = lock["runtime_consumer_contract"]
+    authority = dict(lock["authority"])
+    if authority.pop("canonical_owner_repo", None) != "aoa-sdk":
+        raise RouterError("G5 canonical owner lock drifted")
+
+    expected_receipt_bindings = {
+        "sdk": {
+            "owner_repo": "aoa-sdk",
+            "source_ref": sdk_ref,
+            "version": lock["sdk_version"],
+        },
+        "predecessor": {
+            "owner_repo": predecessor["repo"],
+            "source_ref": predecessor["source_ref"],
+            "rollback_posture": predecessor["rollback_posture"],
+        },
+        "public_release": {
+            "release_ref": public_release["release_ref"],
+            "source_ref": public_release["source_ref"],
+            "asset_name": public_release["asset_name"],
+            "asset_digest": public_release["asset_digest"],
+        },
+        "runtime_consumer": {
+            "owner_repo": runtime_consumer["repo"],
+            "source_ref": runtime_consumer["source_ref"],
+            "contract_ref": (
+                "docs/decisions/"
+                f"{runtime_consumer['decision_id']}"
+                "-receipt-bound-sdk-routing-cutover.md"
+            ),
+        },
+        "compatibility_window": lock["compatibility_window"],
+        "g5_authority": authority,
+    }
+    for field, expected in expected_receipt_bindings.items():
+        actual = receipt.get(field)
+        if field == "sdk" and isinstance(actual, dict):
+            actual = {
+                key: actual.get(key)
+                for key in ("owner_repo", "source_ref", "version")
+            }
+        if actual != expected:
+            raise RouterError(
+                f"G5 canonical receipt {field} differs from input lock"
+            )
+
+    expected_provenance_bindings = {
+        "canonical_producer": {
+            "owner_repo": "aoa-sdk",
+            "source_ref": sdk_ref,
+            "implementation": "aoa_sdk.control_plane.routing",
+        },
+        "canonical_predecessor": {
+            "owner_repo": predecessor["repo"],
+            "source_ref": predecessor["source_ref"],
+            "posture": "compatibility_security_rollback_deprecation_only",
+        },
+        "public_release_trust_root": {
+            "release_ref": public_release["release_ref"],
+            "source_ref": public_release["source_ref"],
+            "asset_name": public_release["asset_name"],
+            "asset_digest": public_release["asset_digest"],
+            "byte_parity": True,
+        },
+        "runtime_consumer_contract": {
+            "owner_repo": runtime_consumer["repo"],
+            "source_ref": runtime_consumer["source_ref"],
+            "decision_id": runtime_consumer["decision_id"],
+            "live_cutover_executed": False,
+        },
+        "input_source_refs": source_refs,
+        "g5_authority": authority,
+    }
+    for field, expected in expected_provenance_bindings.items():
+        if provenance.get(field) != expected:
+            raise RouterError(
+                f"G5 canonical provenance {field} differs from input lock"
+            )
+
+    if (
+        bundle.sdk_source_ref != sdk_ref
+        or bundle.predecessor_source_ref != predecessor["source_ref"]
+        or dict(bundle.input_source_refs) != source_refs
+    ):
+        raise RouterError("G5 canonical bundle refs differ from input lock")
+
+
 def _inputs(
     workspace_root: Path,
     sdk_root: Path,
@@ -214,6 +322,11 @@ def main() -> int:
     public_release = lock["public_release_trust_root"]
     runtime_consumer = lock["runtime_consumer_contract"]
     runtime_consumer_root = args.runtime_consumer_root.resolve()
+    _require_exact_checkout(
+        runtime_consumer_root,
+        str(runtime_consumer["source_ref"]),
+        "abyss-stack runtime consumer",
+    )
 
     if args.check:
         bundle = load_g5_canonical_bundle(args.output_dir)
@@ -222,6 +335,20 @@ def main() -> int:
             inputs,
             public_release_archive=args.public_release_archive,
             runtime_consumer_root=runtime_consumer_root,
+        )
+        _require_canonical_lock_bindings(
+            bundle=bundle,
+            receipt=_read_json_object(
+                bundle.receipt_path,
+                "G5 owner-switch receipt",
+            ),
+            provenance=_read_json_object(
+                bundle.provenance_path,
+                "G5 canonical provenance",
+            ),
+            lock=lock,
+            sdk_ref=sdk_ref,
+            source_refs=source_refs,
         )
     else:
         observed_at_text = _git_output(

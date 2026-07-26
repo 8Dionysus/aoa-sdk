@@ -1,11 +1,13 @@
 from __future__ import annotations
 
+from copy import deepcopy
 import importlib.util
 import json
 import os
 import subprocess
 from datetime import UTC, datetime
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 
 import pytest
@@ -42,6 +44,27 @@ def _artifact_bundle_validator_module():
         / "validate_abyss_machine_package_artifact_bundle.py"
     )
     spec = importlib.util.spec_from_file_location("aoa_sdk_artifact_bundle_validator", script)
+    assert spec is not None
+    assert spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _routing_g5_canonical_builder_module():
+    script = (
+        _repo_root()
+        / "mechanics"
+        / "release-support"
+        / "parts"
+        / "release-audit-publish-helper"
+        / "scripts"
+        / "build_routing_g5_canonical.py"
+    )
+    spec = importlib.util.spec_from_file_location(
+        "aoa_sdk_routing_g5_canonical_builder",
+        script,
+    )
     assert spec is not None
     assert spec.loader is not None
     module = importlib.util.module_from_spec(spec)
@@ -477,6 +500,134 @@ def test_routing_g5_canonical_lock_and_workflow_bind_owner_switch() -> None:
         "sha256:"
     ) in workflow
     assert "aoa-sdk-routing-g5-canonical-$ROUTING_RELEASE_TAG.tar.gz" in workflow
+
+
+def test_routing_g5_canonical_check_rejects_input_lock_substitutions() -> None:
+    repo_root = _repo_root()
+    builder = _routing_g5_canonical_builder_module()
+    lock = json.loads(
+        (
+            repo_root
+            / "sdk"
+            / "distribution"
+            / "manifests"
+            / "routing_g5_canonical.input-lock.json"
+        ).read_text(encoding="utf-8")
+    )
+    sdk_ref = "a" * 40
+    source_refs = dict(lock["input_source_refs"])
+    source_refs["aoa-sdk"] = sdk_ref
+    authority = dict(lock["authority"])
+    authority.pop("canonical_owner_repo")
+    predecessor = lock["predecessor"]
+    public_release = lock["public_release_trust_root"]
+    runtime_consumer = lock["runtime_consumer_contract"]
+    receipt = {
+        "sdk": {
+            "owner_repo": "aoa-sdk",
+            "source_ref": sdk_ref,
+            "version": lock["sdk_version"],
+            "abi_epoch": "aoa_routing_thin_router_v1",
+        },
+        "predecessor": {
+            "owner_repo": predecessor["repo"],
+            "source_ref": predecessor["source_ref"],
+            "rollback_posture": predecessor["rollback_posture"],
+        },
+        "public_release": {
+            "release_ref": public_release["release_ref"],
+            "source_ref": public_release["source_ref"],
+            "asset_name": public_release["asset_name"],
+            "asset_digest": public_release["asset_digest"],
+        },
+        "runtime_consumer": {
+            "owner_repo": runtime_consumer["repo"],
+            "source_ref": runtime_consumer["source_ref"],
+            "contract_ref": (
+                "docs/decisions/"
+                f"{runtime_consumer['decision_id']}"
+                "-receipt-bound-sdk-routing-cutover.md"
+            ),
+        },
+        "compatibility_window": lock["compatibility_window"],
+        "g5_authority": authority,
+    }
+    provenance = {
+        "canonical_producer": {
+            "owner_repo": "aoa-sdk",
+            "source_ref": sdk_ref,
+            "implementation": "aoa_sdk.control_plane.routing",
+        },
+        "canonical_predecessor": {
+            "owner_repo": predecessor["repo"],
+            "source_ref": predecessor["source_ref"],
+            "posture": "compatibility_security_rollback_deprecation_only",
+        },
+        "public_release_trust_root": {
+            "release_ref": public_release["release_ref"],
+            "source_ref": public_release["source_ref"],
+            "asset_name": public_release["asset_name"],
+            "asset_digest": public_release["asset_digest"],
+            "byte_parity": True,
+        },
+        "runtime_consumer_contract": {
+            "owner_repo": runtime_consumer["repo"],
+            "source_ref": runtime_consumer["source_ref"],
+            "decision_id": runtime_consumer["decision_id"],
+            "live_cutover_executed": False,
+        },
+        "input_source_refs": source_refs,
+        "g5_authority": authority,
+    }
+
+    def bundle():
+        return SimpleNamespace(
+            sdk_source_ref=sdk_ref,
+            predecessor_source_ref=predecessor["source_ref"],
+            input_source_refs=source_refs,
+        )
+
+    builder._require_canonical_lock_bindings(
+        bundle=bundle(),
+        receipt=receipt,
+        provenance=provenance,
+        lock=lock,
+        sdk_ref=sdk_ref,
+        source_refs=source_refs,
+    )
+
+    substitutions: list[tuple[dict[str, Any], dict[str, Any], Any]] = []
+    substituted_receipt = deepcopy(receipt)
+    substituted_receipt["public_release"]["asset_digest"] = (
+        "sha256:" + "f" * 64
+    )
+    substitutions.append((substituted_receipt, provenance, bundle()))
+    substituted_provenance = deepcopy(provenance)
+    substituted_provenance["runtime_consumer_contract"]["source_ref"] = "b" * 40
+    substitutions.append((receipt, substituted_provenance, bundle()))
+    substituted_receipt = deepcopy(receipt)
+    substituted_receipt["compatibility_window"]["started_on"] = "2026-07-27"
+    substitutions.append((substituted_receipt, provenance, bundle()))
+    substituted_provenance = deepcopy(provenance)
+    substituted_provenance["input_source_refs"]["aoa-sdk"] = "c" * 40
+    substitutions.append((receipt, substituted_provenance, bundle()))
+    substituted_bundle = bundle()
+    substituted_bundle.sdk_source_ref = "d" * 40
+    substitutions.append((receipt, provenance, substituted_bundle))
+
+    for candidate_receipt, candidate_provenance, candidate_bundle in substitutions:
+        with pytest.raises(
+            builder.RouterError,
+            match="input lock",
+        ):
+            builder._require_canonical_lock_bindings(
+                bundle=candidate_bundle,
+                receipt=candidate_receipt,
+                provenance=candidate_provenance,
+                lock=lock,
+                sdk_ref=sdk_ref,
+                source_refs=source_refs,
+            )
 
 
 def test_package_artifact_bundle_validator_reports_external_paths(tmp_path: Path) -> None:

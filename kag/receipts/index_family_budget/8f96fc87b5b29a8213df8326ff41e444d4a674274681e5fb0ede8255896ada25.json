@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 11860201,
+  "allowed_tracked_bytes": 16227284,
+  "approved_by": "repository-owner",
+  "base_ref": "dda6d98623eb1eb4fb90431e5fb57522008b2117",
+  "changed_generated_bytes": 11860201,
+  "changed_generated_files": 304,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "8f96fc87b5b29a8213df8326ff41e444d4a674274681e5fb0ede8255896ada25",
+  "reason": "Harden the routing G5 canonical check against self-consistent substitutions by binding every receipt and provenance authority field to the exact v0.8.0 input lock under the PR-base history contract.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16227284,
+  "tracked_bytes_max": 15728640
+}
