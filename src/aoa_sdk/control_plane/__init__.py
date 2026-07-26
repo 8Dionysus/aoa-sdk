@@ -5,5 +5,6 @@ stays behind external adapter boundaries.
 """
 
 from .api import ControlPlaneAPI
+from .runner import AoARunner
 
-__all__ = ["ControlPlaneAPI"]
+__all__ = ["AoARunner", "ControlPlaneAPI"]

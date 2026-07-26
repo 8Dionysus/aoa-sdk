@@ -71,6 +71,9 @@
 - `mechanics/boundary-bridge/parts/route-resolution-control-plane/`
 - `src/aoa_sdk/control_plane/planning/`
 - `mechanics/boundary-bridge/parts/plan-compilation-control-plane/`
+- `src/aoa_sdk/control_plane/runner/`
+- `mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/`
+- `sdk/runtime-entry/runner-entrypoints/`
 - `src/aoa_sdk/control_plane/routing/schemas/routing-g5-owner-switch-receipt.schema.json`
 - `src/aoa_sdk/control_plane/routing/schemas/routing-g5-canonical-provenance.schema.json`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py`
@@ -92,6 +95,8 @@ surface, keep ownership outside.
 Former parent-name candidates for this package live only in
 `legacy/INDEX.md`. Active Boundary Bridge routes name the operation: consumed
 surface posture gate, skill environment inspector, and owner-layer signal handoff.
+The C3 Runner lifecycle is an active bridge part; its reference adapter is a
+protocol witness and not a runtime-seam or production-execution owner.
 
 The former skill runtime bridge was retired by AOA-SDK-D-0067 after owner
 profiles and the typed capability graph replaced SDK dispatch and session

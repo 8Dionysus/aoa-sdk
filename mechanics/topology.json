@@ -69,7 +69,7 @@
     },
     "control_plane": {
       "primary_mechanic": "boundary-bridge",
-      "reason": "runtime-neutral control-plane contracts, C1 receipt-bound route resolution, and C2 exact owner-contour plan compilation bridge owner projections without taking activation or runtime authority"
+      "reason": "runtime-neutral contracts, C1 receipt-bound route resolution, C2 exact owner-contour plan compilation, and C3 explicit-adapter lifecycle coordination bridge owner projections without taking activation or runtime execution authority"
     },
     "evals": {
       "primary_mechanic": "boundary-bridge",
@@ -157,7 +157,8 @@
       "owner-layer-signal-handoff",
       "organ-access-control-plane",
       "route-resolution-control-plane",
-      "plan-compilation-control-plane"
+      "plan-compilation-control-plane",
+      "runner-lifecycle-control-plane"
     ],
     "antifragility": [
       "stress-posture-dispatch-gate",
@@ -322,7 +323,7 @@
     {
       "slug": "boundary-bridge",
       "name_type": "shared",
-      "operation": "Keep SDK typed facades, consumed-surface posture gates, canonical routing succession evidence, receipt-bound C1 route resolution, exact-contour C2 plan compilation, passive skill environment inspection, organ access, and owner-layer signal handoffs bounded while sibling repositories retain meaning and runtime owners retain execution.",
+      "operation": "Keep SDK typed facades, consumed-surface posture gates, canonical routing succession evidence, receipt-bound C1 route resolution, exact-contour C2 plan compilation, explicit-adapter C3 lifecycle coordination, passive skill environment inspection, organ access, and owner-layer signal handoffs bounded while sibling repositories retain meaning and runtime owners retain execution.",
       "source_surfaces": [
         "docs/boundaries.md",
         "src/aoa_sdk/AGENTS.md",
@@ -367,6 +368,7 @@
         "mechanics/boundary-bridge/parts/organ-access-control-plane",
         "mechanics/boundary-bridge/parts/route-resolution-control-plane",
         "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
+        "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane",
         "schemas/organ-access",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/initial-surface-detection-boundary.md",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md",
@@ -401,12 +403,14 @@
         "owner-layer-signal-handoff",
         "organ-access-control-plane",
         "route-resolution-control-plane",
-        "plan-compilation-control-plane"
+        "plan-compilation-control-plane",
+        "runner-lifecycle-control-plane"
       ],
       "validation": [
-        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py mechanics/boundary-bridge/parts/organ-access-control-plane/tests mechanics/boundary-bridge/parts/route-resolution-control-plane/tests mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests",
+        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py mechanics/boundary-bridge/parts/organ-access-control-plane/tests mechanics/boundary-bridge/parts/route-resolution-control-plane/tests mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests",
         "python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/generate_plan_compilation_examples.py --check",
         "python -m build && python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py",
+        "python -m build && python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py",
         "python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_schemas.py --check && python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_example.py --check",
         "python -m mypy src/aoa_sdk/contracts/organs.py src/aoa_sdk/organs src/aoa_sdk/cli/organs.py",
         "python -m mypy src/aoa_sdk/control_plane src/aoa_sdk/cli/route.py",

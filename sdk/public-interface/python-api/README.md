@@ -24,8 +24,8 @@ drift read-models, trust coverage, update-lane status, and update metadata
 verification reports. Host enforcement, policy authority, evidence promotion,
 and update client blocking decisions remain in `abyss-machine`.
 
-R2 also publishes typing protocols for the control plane, future AoARunner,
-and runtime adapters. C1 implements `AoASDK.control_plane.resolve()` and
+R2 also publishes typing protocols for the control plane, AoARunner, and
+runtime adapters. C1 implements `AoASDK.control_plane.resolve()` and
 `.explain()` over an explicitly configured, receipt-bound canonical routing
 snapshot. Construction remains lazy: it does not read the snapshot until
 resolution. A selected route is candidate metadata only.
@@ -34,8 +34,14 @@ resolution. A selected route is candidate metadata only.
 exact packaged `aoa-playbooks` contour/schema/trust pin and compiles an exact
 `ScenarioBinding` plus runtime compatibility profile into a content-addressed
 `RunPlan`. Construction remains lazy and compilation does not read the C1
-routing snapshot. `AoASDK.runner` remains unimplemented; C3 must add its
-implementation and API tests before it becomes a callable facade.
+routing snapshot.
+
+`AoASDK.runner` is implemented C3 behavior. It prepares immutable sessions,
+binds only a caller-supplied exact adapter profile, verifies runtime snapshot
+observations before effectful transitions, and reconciles approvals, bounded
+recovery, receipts, append-only events, status, outcomes, restore, and
+closeout. The packaged reference adapter executes no plan steps. A production
+adapter and all model/tool execution remain outside the SDK.
 
 `AoASDK.organs` is a lazy facade over one explicitly configured private
 registry source. It exposes deterministic projection, bounded catalog,

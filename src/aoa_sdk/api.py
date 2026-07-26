@@ -8,6 +8,7 @@ from .compatibility import CompatibilityAPI
 from .checkpoints import CheckpointsAPI
 from .codex import CodexAPI
 from .control_plane import ControlPlaneAPI
+from .control_plane.runner import AoARunner
 from .evals import EvalsAPI
 from .agents.phase_bindings import AgentsAPI
 from .governed_runs import GovernedRunsAPI
@@ -35,6 +36,7 @@ class AoASDK:
         self.checkpoints = CheckpointsAPI(workspace)
         self.codex = CodexAPI(workspace)
         self.control_plane = ControlPlaneAPI(workspace)
+        self.runner = AoARunner()
         self.routing = RoutingAPI(workspace)
         self.skills = SkillsAPI(workspace)
         self.surfaces = SurfacesAPI(workspace)

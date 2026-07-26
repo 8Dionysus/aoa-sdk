@@ -40,9 +40,10 @@ activate a capability, or execute a step.
 
 ## Next route
 
-C3 may implement `AoARunner.prepare()` over a validated plan. Dispatch,
-lifecycle commands, event consumption, and effects remain unimplemented until
-the runtime-adapter slice lands.
+C3 implements `AoARunner.prepare()` and the verified lifecycle client over a
+caller-supplied adapter. The SDK reference adapter executes no steps. C4 must
+land a production adapter in the runtime owner's authority before any runtime
+invocation claim.
 
 ## Validation
 

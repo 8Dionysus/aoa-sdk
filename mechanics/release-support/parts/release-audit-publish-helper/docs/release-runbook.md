@@ -77,11 +77,13 @@ python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/ver
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
 python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py
+python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py
 ```
 
 These commands prove routing candidate construction and installed-package
-behavior, including packaged C2 owner contours and deterministic plan
-compilation. They do not grant runtime execution, durable artifact admission,
+behavior, including packaged C2 owner contours, deterministic plan
+compilation, and C3 lifecycle coordination through a non-executing reference
+adapter. They do not grant runtime execution, durable artifact admission,
 runtime cutover, G5, predecessor retirement, compatibility-window start, or
 archival authority.
 
