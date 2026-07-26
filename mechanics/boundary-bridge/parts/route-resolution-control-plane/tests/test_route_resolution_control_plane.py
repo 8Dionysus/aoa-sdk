@@ -31,11 +31,21 @@ ZERO_DIGEST = "sha256:" + "0" * 64
 SDK_PRODUCER_REF = "a" * 40
 RUNTIME_CONSUMER_REF = "b" * 40
 ROUTING_SUBJECT_DIGEST = "sha256:" + "c" * 64
-OWNER_SWITCH_RECEIPT_DIGEST = "sha256:" + "d" * 64
 
 
 def _sha256(raw: bytes) -> str:
     return f"sha256:{hashlib.sha256(raw).hexdigest()}"
+
+
+def _canonical_digest(payload: object) -> str:
+    return _sha256(
+        json.dumps(
+            payload,
+            ensure_ascii=True,
+            sort_keys=True,
+            separators=(",", ":"),
+        ).encode()
+    )
 
 
 def _write_json(path: Path, payload: dict) -> bytes:
@@ -290,6 +300,25 @@ def _routing_inputs(
         shutil.copyfile(ROUTING_SCHEMAS / name, target)
         schema_artifacts[name] = target.read_bytes()
 
+    authority = {
+        "archive_authorized": False,
+        "canonical_producer_switch_authorized": True,
+        "compatibility_window_started": True,
+        "live_runtime_mutation_authorized": True,
+        "predecessor_maintenance_only": True,
+        "sdk_canonical": True,
+    }
+    owner_switch_receipt = {
+        "schema": "aoa_sdk_routing_g5_owner_switch_receipt_v1",
+        "status": "g5_switch_authorized",
+        "g5_authority": authority,
+        "sdk": {"source_ref": SDK_PRODUCER_REF},
+        "runtime_consumer": {
+            "owner_repo": "abyss-stack",
+            "source_ref": RUNTIME_CONSUMER_REF,
+        },
+    }
+    owner_switch_receipt_digest = _canonical_digest(owner_switch_receipt)
     source_lock = {
         "schema_version": "aoa_control_plane_routing_source_lock_v1",
         "routing_abi": {
@@ -301,7 +330,7 @@ def _routing_inputs(
             "artifact_digest": ZERO_DIGEST,
         },
         "routing_bundle_subject_digest": ROUTING_SUBJECT_DIGEST,
-        "owner_switch_receipt_digest": OWNER_SWITCH_RECEIPT_DIGEST,
+        "owner_switch_receipt_digest": owner_switch_receipt_digest,
         "runtime_consumer_source_ref": RUNTIME_CONSUMER_REF,
         "runtime_manifest_schema_ref": (
             "abyss-stack:schemas/federation-mirror-manifest.schema.json"
@@ -367,14 +396,6 @@ def _routing_inputs(
     }
     source_lock_path = workspace_root / "routing-source-lock.json"
     _write_json(source_lock_path, source_lock)
-    authority = {
-        "archive_authorized": False,
-        "canonical_producer_switch_authorized": True,
-        "compatibility_window_started": True,
-        "live_runtime_mutation_authorized": True,
-        "predecessor_maintenance_only": True,
-        "sdk_canonical": True,
-    }
     _write_json(
         bundle_root / "manifest" / "federation_mirror_manifest.json",
         {
@@ -385,22 +406,13 @@ def _routing_inputs(
             "cutover_activation_mode": "authorized_live_cutover",
             "mirror_is_authority": False,
             "artifact_subject_digest": ROUTING_SUBJECT_DIGEST,
-            "owner_switch_receipt_digest": OWNER_SWITCH_RECEIPT_DIGEST,
+            "owner_switch_receipt_digest": owner_switch_receipt_digest,
             "g5_authority": authority,
             "canonical_producer": {
                 "owner_repo": "aoa-sdk",
                 "source_ref": SDK_PRODUCER_REF,
             },
-            "owner_switch_receipt": {
-                "schema": "aoa_sdk_routing_g5_owner_switch_receipt_v1",
-                "status": "g5_switch_authorized",
-                "g5_authority": authority,
-                "sdk": {"source_ref": SDK_PRODUCER_REF},
-                "runtime_consumer": {
-                    "owner_repo": "abyss-stack",
-                    "source_ref": RUNTIME_CONSUMER_REF,
-                },
-            },
+            "owner_switch_receipt": owner_switch_receipt,
             "trust_verdict": {
                 "ok": True,
                 "verdict": "allow",
@@ -415,7 +427,7 @@ def _routing_inputs(
                         "status": "canonical_producer",
                         "g5_authority": authority,
                         "owner_switch_receipt": {
-                            "digest": OWNER_SWITCH_RECEIPT_DIGEST,
+                            "digest": owner_switch_receipt_digest,
                         },
                     }
                 },
@@ -639,6 +651,21 @@ def test_snapshot_tampering_fails_closed(
 
     with pytest.raises(RoutingSnapshotError, match="digest mismatch"):
         api.resolve(_intent())
+
+
+def test_embedded_owner_switch_receipt_tampering_fails_closed(
+    workspace_root: Path,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(workspace_root)
+    manifest_path = (
+        bundle_root / "manifest" / "federation_mirror_manifest.json"
+    )
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    manifest["owner_switch_receipt"]["authorized_at"] = "tampered"
+    _write_json(manifest_path, manifest)
+
+    with pytest.raises(RoutingSnapshotError, match="locked digest"):
+        _api(workspace_root, bundle_root, lock_path).resolve(_intent())
 
 
 def test_source_lock_owner_binding_fails_closed(

@@ -50,3 +50,28 @@ def test_workspace_inspect_can_emit_json(workspace_root: Path) -> None:
     assert payload["control_plane"]["routing_source_lock_source"] == (
         "package:canonical-routing-source-lock"
     )
+
+
+def test_workspace_inspect_default_root_anchors_manifest_patterns(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    nested = workspace_root / "aoa-sdk" / "src" / "aoa_sdk" / "control_plane"
+    nested.mkdir(parents=True, exist_ok=True)
+    monkeypatch.chdir(nested)
+
+    result = CliRunner().invoke(app, ["workspace", "inspect", "--json"])
+
+    assert result.exit_code == 0, result.output
+    payload = json.loads(result.stdout)
+    assert payload["root"] == str(nested.resolve())
+    assert payload["federation_root"] == str(workspace_root.resolve())
+    assert payload["control_plane"]["routing_bundle_root"] == str(
+        (
+            workspace_root
+            / "abyss-stack"
+            / "Knowledge"
+            / "federation"
+            / "aoa-routing"
+        ).resolve()
+    )

@@ -399,12 +399,23 @@ def _validate_runtime_manifest(
         )
     receipt = manifest.get("owner_switch_receipt", {})
     if (
+        not isinstance(receipt, dict)
+        or _canonical_digest(receipt) != lock.owner_switch_receipt_digest
+    ):
+        raise RoutingSnapshotError(
+            "routing owner-switch receipt does not match the locked digest"
+        )
+    receipt_sdk = receipt.get("sdk")
+    receipt_runtime_consumer = receipt.get("runtime_consumer")
+    if (
         receipt.get("schema") != "aoa_sdk_routing_g5_owner_switch_receipt_v1"
         or receipt.get("status") != "g5_switch_authorized"
         or receipt.get("g5_authority") != expected_authority
-        or receipt.get("sdk", {}).get("source_ref") != lock.routing_abi.source_ref
-        or receipt.get("runtime_consumer", {}).get("owner_repo") != "abyss-stack"
-        or receipt.get("runtime_consumer", {}).get("source_ref")
+        or not isinstance(receipt_sdk, dict)
+        or receipt_sdk.get("source_ref") != lock.routing_abi.source_ref
+        or not isinstance(receipt_runtime_consumer, dict)
+        or receipt_runtime_consumer.get("owner_repo") != "abyss-stack"
+        or receipt_runtime_consumer.get("source_ref")
         != lock.runtime_consumer_source_ref
     ):
         raise RoutingSnapshotError(

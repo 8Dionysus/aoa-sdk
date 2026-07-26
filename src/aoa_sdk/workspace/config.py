@@ -99,15 +99,23 @@ def find_workspace_manifest(start: Path) -> Path | None:
 
 
 def resolve_pattern(pattern: str, config: WorkspaceConfig) -> Path:
+    workspace_root = _pattern_workspace_root(config)
     rendered = pattern.format(
-        workspace_root=str(config.start),
-        workspace_parent=str(config.start.parent),
+        workspace_root=str(workspace_root),
+        workspace_parent=str(workspace_root.parent),
         home=str(Path.home()),
     )
     path = Path(rendered).expanduser()
     if not path.is_absolute() and config.manifest_path is not None:
         path = config.manifest_path.parent / path
     return path.resolve(strict=False)
+
+
+def _pattern_workspace_root(config: WorkspaceConfig) -> Path:
+    manifest_path = config.manifest_path
+    if manifest_path is not None and manifest_path.parent.name == ".aoa":
+        return manifest_path.parent.parent
+    return config.start
 
 
 def repo_env_var_name(repo: str) -> str:

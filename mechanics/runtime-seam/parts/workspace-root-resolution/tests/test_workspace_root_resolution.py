@@ -31,6 +31,28 @@ def test_from_workspace_resolves_root(workspace_root: Path) -> None:
     ).exists()
 
 
+def test_manifest_patterns_stay_anchored_when_started_below_checkout(
+    workspace_root: Path,
+) -> None:
+    nested = workspace_root / "aoa-sdk" / "src" / "aoa_sdk" / "control_plane"
+    nested.mkdir(parents=True, exist_ok=True)
+
+    sdk = AoASDK.from_workspace(nested)
+
+    assert sdk.workspace.root == nested.resolve()
+    assert sdk.workspace.manifest_path == (
+        workspace_root / "aoa-sdk" / ".aoa" / "workspace.toml"
+    ).resolve()
+    assert sdk.workspace.federation_root == workspace_root.resolve()
+    assert sdk.workspace.routing_bundle_root == (
+        workspace_root
+        / "abyss-stack"
+        / "Knowledge"
+        / "federation"
+        / "aoa-routing"
+    ).resolve()
+
+
 def test_prefers_abyss_stack_source_checkout_over_runtime_mirror(
     workspace_root: Path,
 ) -> None:
