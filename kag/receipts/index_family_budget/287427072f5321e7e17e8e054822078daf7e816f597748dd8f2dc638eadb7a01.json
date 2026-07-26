@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 11848544,
+  "allowed_tracked_bytes": 16215433,
+  "approved_by": "repository-owner",
+  "base_ref": "dda6d98623eb1eb4fb90431e5fb57522008b2117",
+  "changed_generated_bytes": 11848544,
+  "changed_generated_files": 304,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "287427072f5321e7e17e8e054822078daf7e816f597748dd8f2dc638eadb7a01",
+  "reason": "Integrate the landed owner-bounded organ access decision with the receipt-bound routing G5 owner switch, exact public-release parity, runtime-owner execution boundaries, retained predecessor rollback, and the archive stop line under the exact PR-base history and event-history contract.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16215433,
+  "tracked_bytes_max": 15728640
+}
