@@ -378,6 +378,12 @@ def test_routing_g5_release_candidate_lock_and_builder_stay_non_authoritative() 
     assert workflow.count(
         '--subject-root "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate"'
     ) == 3
+    assert "release_tag:" in workflow
+    assert "Validate immutable release evidence ref" in workflow
+    assert "ref: ${{ inputs.release_tag || github.sha }}" in workflow
+    assert "ref: ${{ env.ROUTING_RELEASE_SOURCE_REF }}" in workflow
+    assert workflow.count("python -m abyss_machine.cli artifacts") == 4
+    assert "\n          abyss-machine artifacts" not in workflow
 
 
 def test_package_artifact_bundle_validator_reports_external_paths(tmp_path: Path) -> None:

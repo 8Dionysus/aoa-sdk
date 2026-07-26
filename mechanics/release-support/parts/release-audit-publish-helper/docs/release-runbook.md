@@ -109,6 +109,16 @@ matching GitHub Release and its public attestation verifies. Stronger-owner
 promotion must then allow `release_consumer` and deny normal `runtime`.
 Only the later separate G5 receipt may change canonical ownership.
 
+If the original tag workflow fails before attestation because of a workflow or
+runner integration defect, do not move or recreate the public tag. Land the
+bounded orchestration repair on `main`, then dispatch `Release Artifacts` from
+that repaired workflow with `release_tag` set to the existing exact tag. The
+workflow checks out that immutable tag for the repository package and nested
+SDK producer input, rebuilds the same subject bytes, and records the replaying
+workflow revision separately through GitHub attestation provenance. A replay
+must reject non-semantic tag names and must not substitute current `main` as
+the release source.
+
 ## Notes
 
 - `aoa release publish` may create or update the annotated tag and the GitHub Release, but it must not invent versions or prose.
