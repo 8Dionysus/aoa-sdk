@@ -1,0 +1,113 @@
+{
+  "schema_version": "aoa_sdk_route_resolution_trial_v1",
+  "trial_family": "fresh_context_black_box",
+  "resolver_version": "aoa_control_plane_route_resolver_v2",
+  "cases": [
+    {
+      "case_id": "T1-1",
+      "request_ref": "aoa-sdk:T1:summon-request:fresh-context-live-resolver-v2:1",
+      "terminal_state": "returned",
+      "aggregate_acceptance": "rejected",
+      "reported_status": "blocked",
+      "reported_selected_candidate_id": null,
+      "reported_candidate_count": 9,
+      "reported_fallback_used": false,
+      "reported_snapshot_digest": "sha256:b6379fc0a9bf1a9d0a5382ff37b53adddc323169f69636841abf7e62ba09a2a3",
+      "rejection_reasons": [
+        "complete_route_intent_missing",
+        "canonical_input_digest_missing",
+        "parent_replay_mismatch_not_attributable"
+      ],
+      "claim_limit": "A terminal child return without the exact input is not an accepted resolver observation."
+    },
+    {
+      "case_id": "T1-2",
+      "request_ref": "aoa-sdk:T1:summon-request:fresh-context-live-resolver-v2:2",
+      "request_digest": "sha256:ab6208975caffc61437aca0244c668b59735920c6c8beaefb5902fefbcefa416",
+      "terminal_state": "returned",
+      "aggregate_acceptance": "accepted",
+      "route_intent": {
+        "schema_version": "aoa_control_plane_v1",
+        "intent_id": "intent:T1-2:fresh-context",
+        "correlation_id": "correlation:T1-2:fresh-context",
+        "objective": "find a durable repository decision and rationale",
+        "requested_by": {
+          "agent_id": "fresh-context-trial",
+          "provenance": {
+            "owner_repo": "aoa-sdk",
+            "artifact_ref": "trial/T1-2",
+            "source_ref": "aoa-sdk:T1-2:input:1",
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "schema_ref": "aoa_control_plane_v1",
+            "schema_version": "aoa_control_plane_v1"
+          }
+        },
+        "scenario": null,
+        "requested_capability_kinds": [
+          "skill"
+        ],
+        "constraints": [],
+        "context_refs": [],
+        "authored_at": "2026-07-26T00:00:00Z",
+        "provenance": {
+          "owner_repo": "aoa-sdk",
+          "artifact_ref": "trial/T1-2",
+          "source_ref": "aoa-sdk:T1-2:input:1",
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "schema_ref": "aoa_control_plane_v1",
+          "schema_version": "aoa_control_plane_v1"
+        }
+      },
+      "route_intent_digest": "sha256:6721ef190965dd4f594d54328599da07545eddc28449099df050ab65eee8461f",
+      "child_observation": {
+        "status": "degraded",
+        "decision_id": "route-decision:13b46520132271e9d2ccc6308db26f6da61e3e4352e069e044319cfbef3db0b1",
+        "selected_candidate_id": "aoa-skills:skill:aoa-decision",
+        "selected_compatibility": "degraded",
+        "candidate_count": 9,
+        "fallback_used": false,
+        "snapshot_digest": "sha256:b6379fc0a9bf1a9d0a5382ff37b53adddc323169f69636841abf7e62ba09a2a3",
+        "model_equal": true,
+        "byte_equal": true,
+        "capability_invocations": 0
+      },
+      "parent_replay": {
+        "status": "degraded",
+        "decision_id": "route-decision:13b46520132271e9d2ccc6308db26f6da61e3e4352e069e044319cfbef3db0b1",
+        "selected_candidate_id": "aoa-skills:skill:aoa-decision",
+        "selected_compatibility": "degraded",
+        "candidate_count": 9,
+        "fallback_used": false,
+        "snapshot_digest": "sha256:b6379fc0a9bf1a9d0a5382ff37b53adddc323169f69636841abf7e62ba09a2a3",
+        "model_equal": true,
+        "byte_equal": true
+      },
+      "acceptance_checks": {
+        "request_identity_matches": true,
+        "exact_output_key_matches": true,
+        "canonical_input_digest_matches": true,
+        "terminal_return_observed": true,
+        "stop_line_observed": true,
+        "parent_replay_matches": true
+      },
+      "claim_limit": "This case proves deterministic public-facade resolution for one exact intent and snapshot only; it does not prove invocation or outcome benefit."
+    }
+  ],
+  "constraint_reproduction": [
+    {
+      "compatibility_requirement": null,
+      "status": "degraded",
+      "selected_candidate_id": "aoa-skills:skill:aoa-decision"
+    },
+    {
+      "compatibility_requirement": "compatible",
+      "status": "blocked",
+      "selected_candidate_id": null
+    },
+    {
+      "compatibility_requirement": "degraded_allowed",
+      "status": "degraded",
+      "selected_candidate_id": "aoa-skills:skill:aoa-decision"
+    }
+  ]
+}

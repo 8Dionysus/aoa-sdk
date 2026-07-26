@@ -30,6 +30,64 @@ runtime adapters. C1 implements `AoASDK.control_plane.resolve()` and
 snapshot. Construction remains lazy: it does not read the snapshot until
 resolution. A selected route is candidate metadata only.
 
+Configure the canonical bundle either with
+`AOA_SDK_ROUTING_BUNDLE_ROOT` or with the workspace manifest:
+
+```toml
+[control_plane]
+routing_bundle_root = "{workspace_parent}/abyss-stack/Knowledge/federation/aoa-routing"
+```
+
+The packaged canonical source lock is used unless
+`AOA_SDK_ROUTING_SOURCE_LOCK` or
+`control_plane.routing_source_lock` supplies an explicit rehearsal override.
+The public control-plane models are exported from `aoa_sdk.models`:
+
+```python
+from datetime import datetime, timezone
+import hashlib
+
+from aoa_sdk import AoASDK
+from aoa_sdk.models import AgentRef, ProvenanceRef, RouteIntent
+
+objective = "find a durable repository decision and rationale"
+objective_digest = "sha256:" + hashlib.sha256(objective.encode()).hexdigest()
+caller_provenance = ProvenanceRef(
+    owner_repo="agent-session",
+    artifact_ref="intents/example-route-intent.json",
+    source_ref="local-example",
+    artifact_digest=objective_digest,
+    schema_ref="aoa_control_plane_v1",
+    schema_version="aoa_control_plane_v1",
+)
+intent = RouteIntent(
+    intent_id="intent:example",
+    correlation_id="correlation:example",
+    objective=objective,
+    requested_by=AgentRef(
+        agent_id="example-caller",
+        provenance=caller_provenance,
+    ),
+    requested_capability_kinds=("skill",),
+    authored_at=datetime.now(timezone.utc),
+    provenance=caller_provenance,
+)
+
+sdk = AoASDK.from_workspace("/path/to/federation/aoa-sdk")
+decision = sdk.control_plane.resolve(intent)
+explanation = sdk.control_plane.explain(decision)
+
+print(decision.status, decision.selected_candidate_id)
+print(explanation.fallback_used)
+```
+
+The caller must inspect `status`, selected-candidate compatibility, reason
+codes, and approval requirements before any separate activation route. A
+`degraded` decision is not silently promoted to `resolved`. Adding
+`compatibility_requirement=compatible` can intentionally turn a
+challenger-only result into `blocked`; use `degraded_allowed` only when the
+caller is prepared to preserve that weaker posture.
+
 `AoASDK.control_plane.compile()` is implemented C2 behavior. It validates the
 exact packaged `aoa-playbooks` contour/schema/trust pin and compiles an exact
 `ScenarioBinding` plus runtime compatibility profile into a content-addressed

@@ -75,3 +75,9 @@ may reinterpret a C1 decision as activation authority.
 Use [VALIDATION.md](VALIDATION.md). Green C1 checks prove deterministic SDK
 resolution over the tested snapshot; they do not prove capability invocation,
 task success, cost reduction, runtime admission, or Agent OS benefit.
+
+The bounded fresh-context T1 record lives in
+[`trials/fresh-context-resolver-v2.json`](trials/fresh-context-resolver-v2.json).
+Its first return is intentionally retained as terminal but unaccepted because
+it omitted the complete `RouteIntent`; the corrected return includes the
+canonical input and is independently replayable.
