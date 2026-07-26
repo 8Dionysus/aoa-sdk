@@ -95,10 +95,15 @@ class RoutingResolutionSnapshot:
     runtime_mirror_provenance: ProvenanceRef
     routing_abi: ABIRef
     _validated_projection_digest: str = dataclass_field(repr=False)
+    _loaded_input_snapshot_digest: str = dataclass_field(repr=False)
 
     def validated_for_resolution(self) -> RoutingResolutionSnapshot:
         """Return a detached, revalidated copy or reject post-load mutation."""
 
+        if self.input_snapshot_digest != self._loaded_input_snapshot_digest:
+            raise RoutingSnapshotError(
+                "routing snapshot input identity mutated after content addressing"
+            )
         try:
             source_lock = RoutingResolutionSourceLock.model_validate(
                 self.source_lock.model_dump(mode="python")
@@ -166,6 +171,7 @@ class RoutingResolutionSnapshot:
             runtime_mirror_provenance=mirror_provenance,
             routing_abi=routing_abi,
             _validated_projection_digest=projection_digest,
+            _loaded_input_snapshot_digest=self._loaded_input_snapshot_digest,
         )
 
 
@@ -306,17 +312,19 @@ def load_routing_resolution_snapshot(
         "owner_switch_receipt_digest": source_lock.owner_switch_receipt_digest,
         "validated_projection_digest": projection_digest,
     }
+    input_snapshot_digest = _canonical_digest(snapshot_identity)
     return RoutingResolutionSnapshot(
         source_lock=source_lock,
         registry_entries=entries,
         routing_hints=hints,
         capability_graph=capability_graph,
-        input_snapshot_digest=_canonical_digest(snapshot_identity),
+        input_snapshot_digest=input_snapshot_digest,
         routing_registry_provenance=registry_provenance,
         capability_graph_provenance=graph_provenance,
         runtime_mirror_provenance=mirror_provenance,
         routing_abi=routing_abi,
         _validated_projection_digest=projection_digest,
+        _loaded_input_snapshot_digest=input_snapshot_digest,
     )
 
 

@@ -4,6 +4,7 @@ import hashlib
 import json
 import shutil
 import subprocess
+from dataclasses import replace
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -913,6 +914,20 @@ def test_reused_snapshot_projection_mutation_fails_closed(
         match="mutated after content addressing",
     ):
         resolve_route_intent(intent, snapshot)
+
+
+def test_replaced_snapshot_input_identity_fails_closed(
+    workspace_root: Path,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(workspace_root)
+    snapshot = _api(workspace_root, bundle_root, lock_path).snapshot()
+    replaced = replace(snapshot, input_snapshot_digest=ZERO_DIGEST)
+
+    with pytest.raises(
+        RoutingSnapshotError,
+        match="input identity mutated after content addressing",
+    ):
+        resolve_route_intent(_intent(), replaced)
 
 
 def test_deployed_router_tampering_fails_closed(
