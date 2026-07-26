@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 12440206,
+  "allowed_tracked_bytes": 16779338,
+  "approved_by": "repository-owner",
+  "base_ref": "ceeb1de77a35ddeead886b2c815ec3dd149df6f8",
+  "changed_generated_bytes": 12440206,
+  "changed_generated_files": 307,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "0d46b1c4eafc9c0901e794dc96aeb628ce73bdcca4bf85e235fb5246446b4364",
+  "reason": "Refresh the derived repo-local KAG family after Codex review aligned RouteExplanation eligibility with the resolver's positive-score gate and made missing, malformed, or nonpositive score evidence reject rather than overclaim eligibility; this receipt accepts only the measured generated delta and tracked-size exceedance without raising standing budgets or widening activation, cost, consumer-zero, or archival claims.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16779338,
+  "tracked_bytes_max": 15728640
+}
