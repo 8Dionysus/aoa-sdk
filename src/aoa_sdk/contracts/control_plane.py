@@ -231,6 +231,11 @@ class RouteExplanation(StrictControlPlaneModel):
 
     @model_validator(mode="after")
     def validate_explanation(self) -> RouteExplanation:
+        candidate_ids = [
+            item.candidate_id for item in self.candidate_explanations
+        ]
+        if len(candidate_ids) != len(set(candidate_ids)):
+            raise ValueError("candidate explanation ids must be unique")
         selected = [
             item.candidate_id
             for item in self.candidate_explanations
@@ -899,13 +904,49 @@ def assert_explanation_matches_decision(
             "route explanation scope does not match the route decision"
         )
     decision_candidate_ids = {candidate.candidate_id for candidate in decision.candidates}
-    explanation_candidate_ids = {
-        candidate.candidate_id for candidate in explanation.candidate_explanations
-    }
+    explanation_ids = [
+        candidate.candidate_id
+        for candidate in explanation.candidate_explanations
+    ]
+    if len(explanation_ids) != len(set(explanation_ids)):
+        raise ControlPlaneContractError(
+            "route explanation candidate ids must be unique"
+        )
+    explanation_candidate_ids = set(explanation_ids)
     if decision_candidate_ids != explanation_candidate_ids:
         raise ControlPlaneContractError(
             "route explanation does not account for every decision candidate"
         )
+    decision_by_id = {
+        candidate.candidate_id: candidate for candidate in decision.candidates
+    }
+    for item in explanation.candidate_explanations:
+        candidate = decision_by_id[item.candidate_id]
+        if (
+            item.reason_codes != candidate.reason_codes
+            or item.evidence_refs != candidate.evidence_refs
+        ):
+            raise ControlPlaneContractError(
+                "route explanation does not preserve candidate reasons and evidence"
+            )
+        if candidate.candidate_id == decision.selected_candidate_id:
+            allowed_dispositions = {"selected"}
+        elif (
+            candidate.compatibility == "incompatible"
+            or candidate.policy_posture == "forbidden"
+        ):
+            allowed_dispositions = {"rejected"}
+        elif (
+            candidate.compatibility == "degraded"
+            or candidate.policy_posture == "approval_required"
+        ):
+            allowed_dispositions = {"degraded", "rejected"}
+        else:
+            allowed_dispositions = {"eligible", "rejected"}
+        if item.disposition not in allowed_dispositions:
+            raise ControlPlaneContractError(
+                "route explanation disposition contradicts the decision candidate"
+            )
 
 
 def assert_decision_matches_intent(

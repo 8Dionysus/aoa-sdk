@@ -1028,6 +1028,40 @@ def test_route_cli_resolve_explain_and_validate(
     )
     assert rejected_explanation.exit_code == 1
     assert "scope does not match the route decision" in rejected_explanation.output
+    nonselected = next(
+        candidate
+        for candidate in explanation_payload["candidate_explanations"]
+        if candidate["candidate_id"] != decision_payload["selected_candidate_id"]
+    )
+    duplicate_explanation_path = (
+        workspace_root / "explanation-duplicate-candidate.json"
+    )
+    _write_json(
+        duplicate_explanation_path,
+        {
+            **explanation_payload,
+            "candidate_explanations": [
+                *explanation_payload["candidate_explanations"],
+                {
+                    **nonselected,
+                    "disposition": "eligible",
+                    "reason_codes": ["contradictory-accounting"],
+                },
+            ],
+        },
+    )
+    rejected_duplicate = runner.invoke(
+        app,
+        [
+            "route",
+            "validate",
+            str(duplicate_explanation_path),
+            "--against",
+            str(decision_path),
+        ],
+    )
+    assert rejected_duplicate.exit_code == 1
+    assert "candidate explanation ids must be unique" in rejected_duplicate.output
 
 
 def test_aoasdk_constructs_control_plane_without_reading_snapshot(
