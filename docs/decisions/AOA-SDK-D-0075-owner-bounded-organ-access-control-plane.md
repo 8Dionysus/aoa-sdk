@@ -10,7 +10,7 @@ Accepted.
 - Original date: 2026-07-25
 - Surface classes: control-plane contract, private registry, discovery, activation plan
 - SDK facets: control-plane, workspace discovery, compatibility, MCP projection
-- Mechanic parents: codex-projection, compatibility
+- Mechanic parents: codex-projection, boundary-bridge
 - Guard families: deny-by-default admission, owner boundary, generated parity, rollback
 - Posture: accepted target and transition architecture
 
@@ -24,11 +24,14 @@ successful list or call says nothing about provenance, freshness, effects, or
 owner acceptance.
 
 The center organ contract now requires deny-by-default admission and explicit
-source, access, control-plane, runtime, proof, and acceptance owners. The SDK
-already owns runtime-neutral control-plane models, workspace discovery,
-compatibility helpers, and the accepted routing succession. It is therefore
-the narrowest owner for a typed organ registry and progressive discovery, but
-not for runtime execution or owner meaning.
+source, access, control-plane, runtime, proof, and acceptance owners. The
+stronger-owner evidence is the landed `Agents-of-Abyss` organ contract and
+decision `AOA-CENTER-D-0032` at revision
+`d7b1e46d6fa240416f9253f099a516da9fc5a53b`. The SDK already owns
+runtime-neutral control-plane models, workspace discovery, compatibility
+helpers, and the accepted routing succession. It is therefore the narrowest
+owner for a typed organ registry and progressive discovery, but not for
+runtime execution or owner meaning.
 
 ## Options Considered
 
@@ -137,6 +140,8 @@ the authority and confused-deputy risks of a mega-gateway.
 - `DESIGN.md`
 - `docs/boundaries.md`
 - `src/aoa_sdk/contracts/control_plane.py`
+- `8Dionysus/Agents-of-Abyss@d7b1e46d6fa240416f9253f099a516da9fc5a53b:docs/organ-contract/ORGAN_CONTRACT.md`
+- `8Dionysus/Agents-of-Abyss@d7b1e46d6fa240416f9253f099a516da9fc5a53b:docs/decisions/AOA-CENTER-D-0032-organ-access-admission-law.md`
 
 ## Follow-Up Route
 
