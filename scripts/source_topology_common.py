@@ -38,6 +38,7 @@ SOURCE_INPUT_REFS = (
     "docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md",
     "docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md",
     "docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md",
+    "docs/decisions/AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md",
 )
 VALIDATION_REFS = (
     "scripts/build_source_topology_index.py",
@@ -54,8 +55,9 @@ TOP_LEVEL_ROLES = {
     "codex": "Codex workspace and rollout-facing helpers",
     "compatibility": "consumed-surface compatibility checks",
     "control_plane": (
-        "routing producer, deterministic route resolution, and runtime-neutral "
-        "plan compilation without runtime execution"
+        "routing producer, deterministic route resolution, runtime-neutral "
+        "plan compilation, and explicit-adapter lifecycle coordination without "
+        "runtime execution"
     ),
     "contracts": "shared SDK typed contract route-role branches",
     "evals": "eval-surface readers and bounded helper posture",
@@ -90,8 +92,9 @@ PACKAGE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/topology": "checkpoint topology branch for path naming and static routing helpers",
     "src/aoa_sdk/cli": "CLI app assembly and command-family route modules",
     "src/aoa_sdk/contracts": "shared SDK typed contract route-role branches with models.py compatibility re-export",
-    "src/aoa_sdk/control_plane": "Agent OS control-plane facade over separately bounded routing and planning branches",
+    "src/aoa_sdk/control_plane": "Agent OS control-plane facade over separately bounded routing, planning, and Runner branches",
     "src/aoa_sdk/control_plane/planning": "deterministic runtime-neutral plan compiler over an exact admitted owner contour snapshot",
+    "src/aoa_sdk/control_plane/runner": "explicit-adapter lifecycle client and deterministic no-execution reference witness",
     "src/aoa_sdk/control_plane/routing": "canonical routing producer and receipt-bound deterministic route resolver",
     "src/aoa_sdk/recurrence/contracts": "recurrence typed contract route-role branches",
     "src/aoa_sdk/recurrence/live": "recurrence live observation producer route-role branches",
@@ -160,9 +163,11 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/contracts/surfaces.py": "shared surface opportunity, surface detection, and surface closeout handoff contract owner",
     "src/aoa_sdk/contracts/techniques.py": "shared technique promotion readiness contract owner",
     "src/aoa_sdk/contracts/workspace.py": "exact owner-profile bootstrap report contract owner",
-    "src/aoa_sdk/control_plane/api.py": "public lazy control-plane resolver and plan-compiler facade",
+    "src/aoa_sdk/control_plane/api.py": "public lazy route resolver and plan-compiler facade",
     "src/aoa_sdk/control_plane/planning/compiler.py": "deterministic exact-binding RunPlan compiler without adapter selection or execution",
     "src/aoa_sdk/control_plane/planning/snapshot.py": "packaged owner plan-contour lock, schema, admission, and typed snapshot validator",
+    "src/aoa_sdk/control_plane/runner/core.py": "verified lifecycle client over one exact caller-supplied runtime adapter",
+    "src/aoa_sdk/control_plane/runner/reference.py": "deterministic SDK-owned lifecycle witness with no plan-step execution",
     "src/aoa_sdk/recurrence/cli.py": "recurrence CLI exported app assembly facade",
     "src/aoa_sdk/recurrence/cli_core.py": "recurrence root command family owner",
     "src/aoa_sdk/recurrence/cli_graph.py": "recurrence graph CLI command family owner",
@@ -328,9 +333,13 @@ def _module_next_route(path: Path, line_count: int) -> str:
     if rel == "src/aoa_sdk/control_plane/api.py":
         return "keep public control-plane orchestration here; route C1 mechanics to routing and C2 mechanics to planning"
     if rel == "src/aoa_sdk/control_plane/planning/compiler.py":
-        return "keep compilation runtime-neutral; route adapter selection and lifecycle effects to the future AoARunner branch"
+        return "keep compilation runtime-neutral; route lifecycle coordination to AoARunner and execution to runtime owners"
     if rel == "src/aoa_sdk/control_plane/planning/snapshot.py":
         return "refresh packaged contours only through the C2 pin mechanic and exact owner trust admission"
+    if rel == "src/aoa_sdk/control_plane/runner/core.py":
+        return "keep adapter choice caller-explicit and lifecycle state runtime-owned; route execution to the C4 runtime owner"
+    if rel == "src/aoa_sdk/control_plane/runner/reference.py":
+        return "keep the reference adapter deterministic and non-executing; never add model, tool, shell, MCP, skill, or plan-step invocation"
     if rel == "src/aoa_sdk/recurrence/cli.py":
         return "keep exported recur_app assembly here; add command behavior in the owning recurrence cli_* module"
     if rel == "src/aoa_sdk/recurrence/live_observations.py":
@@ -394,9 +403,11 @@ def _package_next_route(path: Path, line_count: int, module_count: int) -> str:
     if rel == "src/aoa_sdk/surfaces":
         return "route behavior to the named surface branch that owns it; add a new branch only when a new owner role appears"
     if rel == "src/aoa_sdk/control_plane":
-        return "route decision mechanics to routing, plan mechanics to planning, and runtime effects outside the control-plane core"
+        return "route decisions to routing, plans to planning, lifecycle verification to Runner, and execution to runtime owners"
     if rel == "src/aoa_sdk/control_plane/planning":
-        return "keep plan compilation deterministic and runtime-neutral; add lifecycle behavior only in a separately contracted AoARunner branch"
+        return "keep plan compilation deterministic and runtime-neutral; route lifecycle coordination to the separately contracted AoARunner branch"
+    if rel == "src/aoa_sdk/control_plane/runner":
+        return "keep lifecycle admission and reconciliation here; land production adapter behavior only in the runtime owner"
     if rel == "src/aoa_sdk/control_plane/routing":
         return "keep routing producer and resolver roles explicit; do not add plan compilation or runtime execution here"
     if path.name == "topology":

@@ -166,6 +166,10 @@
 
 - [AOA-SDK-D-0058 - Recurrence Route-Role Branches](../AOA-SDK-D-0058-recurrence-route-role-branches.md) (`docs/decisions/AOA-SDK-D-0058-recurrence-route-role-branches.md`)
 
+## event chain
+
+- [AOA-SDK-D-0079 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md`)
+
 ## fallback removal
 
 - [AOA-SDK-D-0037 - Workspace MCP Surface Crosswalk Secondary Route Naming](../AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md) (`docs/decisions/AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md`)
@@ -193,9 +197,17 @@
 
 - [AOA-SDK-D-0009 - Agon and Experience Part Localization](../AOA-SDK-D-0009-agon-experience-part-localization.md) (`docs/decisions/AOA-SDK-D-0009-agon-experience-part-localization.md`)
 
+## idempotency
+
+- [AOA-SDK-D-0079 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md`)
+
 ## index parity
 
 - [AOA-SDK-D-0001 - Decision Rationale Lane Before Mechanics](../AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md) (`docs/decisions/AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md`)
+
+## lifecycle integrity
+
+- [AOA-SDK-D-0079 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md`)
 
 ## lifecycle posture
 
@@ -281,6 +293,7 @@
 ## no execution
 
 - [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
+- [AOA-SDK-D-0079 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md`)
 
 ## no hidden automation
 
@@ -535,6 +548,10 @@
 ## skipped-session recovery
 
 - [AOA-SDK-D-0055 - Checkpoint Skipped Session Recovery Branch](../AOA-SDK-D-0055-checkpoint-skipped-session-recovery-branch.md) (`docs/decisions/AOA-SDK-D-0055-checkpoint-skipped-session-recovery-branch.md`)
+
+## snapshot freshness
+
+- [AOA-SDK-D-0079 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0079-delegate-run-lifecycle-through-explicit-adapters.md`)
 
 ## snapshot trust
 

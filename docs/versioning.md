@@ -130,6 +130,16 @@ The consumed owner ABI is separately pinned as
 new versioned decision and fixture migration, not an in-place reinterpretation
 of packaged data.
 
+C3 lifecycle coordination is independently named
+`aoa_control_plane_runner_v1`. Its version covers immutable session binding,
+explicit adapter binding, runtime snapshot observation, command and approval
+replay, bounded recovery, event/status/receipt reconciliation, restoration,
+runtime-owned outcome correlation, and closeout admission. The SDK reference
+adapter is independently named `aoa_reference_runtime_adapter_v1` and is
+strictly non-executing. A production adapter may implement
+`aoa_runtime_adapter_v1`, but runtime deployment and execution evidence do not
+become SDK release evidence.
+
 ## Operational Expectation
 
 - Loader functions for supported surfaces should go through the compatibility

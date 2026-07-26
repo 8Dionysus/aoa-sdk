@@ -115,6 +115,14 @@ COMMANDS = [
         ],
     ),
     (
+        "verify installed C3 Runner wheel",
+        [
+            sys.executable,
+            "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/"
+            "scripts/verify_runner_wheel.py",
+        ],
+    ),
+    (
         "validate OS Abyss package artifact bundle",
         [
             sys.executable,

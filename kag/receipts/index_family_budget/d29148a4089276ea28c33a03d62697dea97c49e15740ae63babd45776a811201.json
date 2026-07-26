@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 13112138,
+  "allowed_tracked_bytes": 17522500,
+  "approved_by": "repository-owner",
+  "base_ref": "5de159e449cc8d5ae93475db6b56a7b7279bc67b",
+  "changed_generated_bytes": 13112138,
+  "changed_generated_files": 303,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "d29148a4089276ea28c33a03d62697dea97c49e15740ae63babd45776a811201",
+  "reason": "Refresh aoa-sdk KAG projection after C3 explicit-adapter Runner lifecycle and reference witness landing",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 17522500,
+  "tracked_bytes_max": 15728640
+}

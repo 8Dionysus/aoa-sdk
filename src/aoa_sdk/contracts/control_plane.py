@@ -672,6 +672,50 @@ class SessionHandle(StrictControlPlaneModel):
         return _require_aware(value, "prepared_at")
 
 
+class ObservedSourceRef(StrictControlPlaneModel):
+    """Runtime observation of one exact source pinned by a plan."""
+
+    owner_repo: NonEmptyStr
+    artifact_ref: NonEmptyStr
+    artifact_digest: Digest
+
+
+class ObservedABIRef(StrictControlPlaneModel):
+    """Runtime observation of one exact ABI pinned by a plan."""
+
+    owner_repo: NonEmptyStr
+    abi_id: NonEmptyStr
+    abi_version: NonEmptyStr
+    artifact_digest: Digest
+
+
+class RuntimeSnapshotObservation(StrictControlPlaneModel):
+    """Runtime-owner observation used before dispatch, resume, or recovery."""
+
+    schema_version: Literal["aoa_control_plane_v1"] = CONTROL_PLANE_SCHEMA_VERSION
+    observation_id: NonEmptyStr
+    session_id: NonEmptyStr
+    correlation_id: NonEmptyStr
+    plan_digest: Digest
+    source_refs: tuple[ObservedSourceRef, ...]
+    abi_refs: tuple[ObservedABIRef, ...]
+    observed_at: datetime
+    observed_by: ProvenanceRef
+
+    @model_validator(mode="after")
+    def validate_observation(self) -> RuntimeSnapshotObservation:
+        _require_aware(self.observed_at, "observed_at")
+        source_keys = [
+            (source.owner_repo, source.artifact_ref) for source in self.source_refs
+        ]
+        abi_keys = [(abi.owner_repo, abi.abi_id) for abi in self.abi_refs]
+        if len(source_keys) != len(set(source_keys)):
+            raise ValueError("runtime snapshot observation source refs must be unique")
+        if len(abi_keys) != len(set(abi_keys)):
+            raise ValueError("runtime snapshot observation ABI refs must be unique")
+        return self
+
+
 class OwnedArtifactRef(StrictControlPlaneModel):
     ref_id: NonEmptyStr
     artifact_kind: NonEmptyStr
@@ -821,6 +865,7 @@ class ExecutionEvent(StrictControlPlaneModel):
         "command_ack",
         "progress",
         "approval_requested",
+        "approval_decision",
         "evidence_emitted",
         "outcome",
         "heartbeat",
@@ -833,6 +878,8 @@ class ExecutionEvent(StrictControlPlaneModel):
     command_id: str | None = None
     idempotency_key: str | None = None
     payload_ref: ProvenanceRef | None = None
+    approval_request_ref: ContentRef | None = None
+    approval_decision_ref: ContentRef | None = None
     evidence_refs: tuple[EvidenceBundleRef, ...] = ()
     outcome_ref: ContentRef | None = None
 
@@ -871,6 +918,24 @@ class ExecutionEvent(StrictControlPlaneModel):
                 )
         elif self.command_id is not None or self.idempotency_key is not None:
             raise ValueError("command fields are only valid on command_ack events")
+        if self.event_kind == "approval_requested":
+            if self.approval_request_ref is None:
+                raise ValueError(
+                    "approval_requested events require an approval request ref"
+                )
+        elif self.approval_request_ref is not None:
+            raise ValueError(
+                "approval request refs are only valid on approval_requested events"
+            )
+        if self.event_kind == "approval_decision":
+            if self.approval_decision_ref is None:
+                raise ValueError(
+                    "approval_decision events require an approval decision ref"
+                )
+        elif self.approval_decision_ref is not None:
+            raise ValueError(
+                "approval decision refs are only valid on approval_decision events"
+            )
         if self.event_kind == "evidence_emitted" and not self.evidence_refs:
             raise ValueError("evidence_emitted events require evidence refs")
         if self.event_kind == "outcome" and self.outcome_ref is None:
@@ -1004,6 +1069,89 @@ def assert_snapshot_current(
             raise ControlPlaneContractError(
                 f"stale or incompatible ABI for {abi.owner_repo}:{abi.abi_id}"
             )
+
+
+def assert_runtime_snapshot_observation(
+    plan: RunPlan,
+    session: SessionHandle,
+    observation: RuntimeSnapshotObservation,
+) -> None:
+    """Require an exact runtime-owner observation of the pinned plan snapshot."""
+
+    assert_run_plan_digest(plan)
+    if (
+        observation.session_id != session.session_id
+        or observation.correlation_id != session.correlation_id
+        or observation.plan_digest != plan.plan_digest
+    ):
+        raise ControlPlaneContractError(
+            "runtime snapshot observation is outside the session and plan scope"
+        )
+    if observation.observed_by.owner_repo != plan.runtime_profile.runtime_owner:
+        raise ControlPlaneContractError(
+            "runtime snapshot observation does not come from the runtime owner"
+        )
+    assert_snapshot_current(
+        plan.snapshot,
+        observed_sources={
+            (source.owner_repo, source.artifact_ref): source.artifact_digest
+            for source in observation.source_refs
+        },
+        observed_abis={
+            (abi.owner_repo, abi.abi_id): (
+                abi.abi_version,
+                abi.artifact_digest,
+            )
+            for abi in observation.abi_refs
+        },
+    )
+
+
+def assert_approval_decision_matches_request(
+    requirement: ApprovalRequirement,
+    request: ApprovalRequest,
+    decision: ApprovalDecision,
+) -> None:
+    """Bind an approval decision to the exact current request and requirement."""
+
+    if (
+        request.requirement_id != requirement.requirement_id
+        or request.approval_authority != requirement.approval_owner
+    ):
+        raise ControlPlaneContractError(
+            f"approval request does not match requirement {requirement.requirement_id}"
+        )
+    if (
+        decision.request_id != request.request_id
+        or decision.requirement_id != request.requirement_id
+        or decision.session_id != request.session_id
+        or decision.correlation_id != request.correlation_id
+        or decision.plan_digest != request.plan_digest
+        or decision.snapshot_digest != request.snapshot_digest
+        or decision.approval_authority != request.approval_authority
+    ):
+        raise ControlPlaneContractError(
+            f"approval decision scope mismatch for {requirement.requirement_id}"
+        )
+    if decision.decided_at < request.requested_at:
+        raise ControlPlaneContractError(
+            f"approval decision predates request {request.request_id}"
+        )
+    if decision.verdict == "expired":
+        if (
+            request.expires_at is None
+            or decision.decided_at < request.expires_at
+        ):
+            raise ControlPlaneContractError(
+                f"approval expiry is outside request window for {request.request_id}"
+            )
+    elif (
+        request.expires_at is not None
+        and decision.decided_at >= request.expires_at
+    ):
+        raise ControlPlaneContractError(
+            f"approval decision exceeded request window for {request.request_id}"
+        )
 
 
 def assert_explanation_matches_decision(
@@ -1311,6 +1459,13 @@ def assert_closeout_ready(
         or outcome.plan_digest != plan.plan_digest
     ):
         raise ControlPlaneContractError("run outcome is outside closeout scope")
+    if (
+        outcome.closeout_bundle_ref is not None
+        and outcome.closeout_bundle_ref != bundle
+    ):
+        raise ControlPlaneContractError(
+            "run outcome names a different closeout bundle"
+        )
     missing_evidence = {
         requirement.requirement_id
         for requirement in plan.evidence_requirements
@@ -1383,10 +1538,16 @@ class ControlPlaneProtocol(Protocol):
 
 @runtime_checkable
 class RuntimeAdapterProtocol(Protocol):
-    """Runtime-owned execution bridge consumed by the future AoARunner."""
+    """Runtime-owned lifecycle and execution bridge consumed by AoARunner."""
 
     @property
     def profile(self) -> RuntimeProfile: ...
+
+    def observe_snapshot(
+        self,
+        plan: RunPlan,
+        session: SessionHandle,
+    ) -> RuntimeSnapshotObservation: ...
 
     def dispatch(
         self,
@@ -1394,6 +1555,36 @@ class RuntimeAdapterProtocol(Protocol):
         session: SessionHandle,
         command: RuntimeCommand,
     ) -> CommandReceipt: ...
+
+    def approval_requests(
+        self,
+        session: SessionHandle,
+    ) -> Iterable[ApprovalRequest]: ...
+
+    def approval_decisions(
+        self,
+        session: SessionHandle,
+    ) -> Iterable[ApprovalDecision]: ...
+
+    def command_receipts(
+        self,
+        session: SessionHandle,
+    ) -> Iterable[CommandReceipt]: ...
+
+    def renew_approvals(
+        self,
+        plan: RunPlan,
+        session: SessionHandle,
+        *,
+        requested_at: datetime,
+    ) -> Iterable[ApprovalRequest]: ...
+
+    def apply_approval(
+        self,
+        plan: RunPlan,
+        session: SessionHandle,
+        approval: ApprovalDecision,
+    ) -> RunStatus: ...
 
     def status(self, session: SessionHandle) -> RunStatus: ...
 
@@ -1404,12 +1595,29 @@ class RuntimeAdapterProtocol(Protocol):
         after_sequence: int,
     ) -> Iterable[ExecutionEvent]: ...
 
+    def outcome(self, session: SessionHandle) -> RunOutcome | None: ...
+
+    def closeout(
+        self,
+        plan: RunPlan,
+        session: SessionHandle,
+        outcome: RunOutcome,
+        bundle: CloseoutBundleRef,
+    ) -> RunStatus: ...
+
 
 @runtime_checkable
 class AoARunnerProtocol(Protocol):
     """Lifecycle client contract; implementations must delegate execution."""
 
     def prepare(self, plan: RunPlan) -> SessionHandle: ...
+
+    def restore(
+        self,
+        plan: RunPlan,
+        session: SessionHandle,
+        adapter: RuntimeAdapterProtocol,
+    ) -> RunStatus: ...
 
     def start(
         self,
@@ -1431,6 +1639,13 @@ class AoARunnerProtocol(Protocol):
         approval: ApprovalDecision,
     ) -> RunStatus: ...
 
+    def renew_approvals(
+        self,
+        session: SessionHandle,
+        *,
+        requested_at: datetime,
+    ) -> tuple[ApprovalRequest, ...]: ...
+
     def resume(
         self,
         session: SessionHandle,
@@ -1451,6 +1666,36 @@ class AoARunnerProtocol(Protocol):
         adapter: RuntimeAdapterProtocol,
         command: RecoverCommand,
     ) -> RunStatus: ...
+
+    def sync(
+        self,
+        session: SessionHandle,
+        adapter: RuntimeAdapterProtocol,
+    ) -> RunStatus: ...
+
+    def status(self, session: SessionHandle) -> RunStatus: ...
+
+    def approval_requests(
+        self,
+        session: SessionHandle,
+    ) -> tuple[ApprovalRequest, ...]: ...
+
+    def approval_decisions(
+        self,
+        session: SessionHandle,
+    ) -> tuple[ApprovalDecision, ...]: ...
+
+    def events(
+        self,
+        session: SessionHandle,
+    ) -> tuple[ExecutionEvent, ...]: ...
+
+    def command_receipts(
+        self,
+        session: SessionHandle,
+    ) -> tuple[CommandReceipt, ...]: ...
+
+    def outcome(self, session: SessionHandle) -> RunOutcome | None: ...
 
     def closeout(
         self,
