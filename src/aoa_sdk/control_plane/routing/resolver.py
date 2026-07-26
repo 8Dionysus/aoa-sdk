@@ -81,6 +81,7 @@ def resolve_route_intent(
 ) -> RouteDecision:
     """Resolve one intent against the exact canonical routing snapshot."""
 
+    snapshot = snapshot.validated_for_resolution()
     provenance = resolver_provenance or default_resolver_provenance()
     intent_digest = canonical_digest(intent)
     blockers = _intent_blockers(intent)

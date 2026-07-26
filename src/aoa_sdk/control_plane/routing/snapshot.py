@@ -6,7 +6,7 @@ import hashlib
 import json
 import re
 import subprocess
-from dataclasses import dataclass
+from dataclasses import dataclass, field as dataclass_field
 from importlib import resources
 from pathlib import Path
 from typing import Literal
@@ -94,6 +94,79 @@ class RoutingResolutionSnapshot:
     capability_graph_provenance: ProvenanceRef
     runtime_mirror_provenance: ProvenanceRef
     routing_abi: ABIRef
+    _validated_projection_digest: str = dataclass_field(repr=False)
+
+    def validated_for_resolution(self) -> RoutingResolutionSnapshot:
+        """Return a detached, revalidated copy or reject post-load mutation."""
+
+        try:
+            source_lock = RoutingResolutionSourceLock.model_validate(
+                self.source_lock.model_dump(mode="python")
+            )
+            entries = tuple(
+                RegistryEntry.model_validate(entry.model_dump(mode="python"))
+                for entry in self.registry_entries
+            )
+            if not all(
+                isinstance(kind, str) and isinstance(hint, RoutingHint)
+                for kind, hint in self.routing_hints.items()
+            ):
+                raise TypeError("routing hint map contains an invalid entry")
+            hints = {
+                kind: RoutingHint.model_validate(hint.model_dump(mode="python"))
+                for kind, hint in self.routing_hints.items()
+            }
+            capability_graph = CapabilityGraph.model_validate(
+                self.capability_graph.model_dump(mode="python")
+            )
+            registry_provenance = ProvenanceRef.model_validate(
+                self.routing_registry_provenance.model_dump(mode="python")
+            )
+            graph_provenance = ProvenanceRef.model_validate(
+                self.capability_graph_provenance.model_dump(mode="python")
+            )
+            mirror_provenance = ProvenanceRef.model_validate(
+                self.runtime_mirror_provenance.model_dump(mode="python")
+            )
+            routing_abi = ABIRef.model_validate(
+                self.routing_abi.model_dump(mode="python")
+            )
+        except (AttributeError, TypeError, ValidationError, ValueError) as exc:
+            raise RoutingSnapshotError(
+                "routing snapshot projection failed pre-resolution revalidation"
+            ) from exc
+        _validate_typed_projection_identities(entries, hints)
+        try:
+            projection_digest = _routing_projection_digest(
+                source_lock=source_lock,
+                registry_entries=entries,
+                routing_hints=hints,
+                capability_graph=capability_graph,
+                routing_registry_provenance=registry_provenance,
+                capability_graph_provenance=graph_provenance,
+                runtime_mirror_provenance=mirror_provenance,
+                routing_abi=routing_abi,
+            )
+        except (TypeError, ValueError) as exc:
+            raise RoutingSnapshotError(
+                "routing snapshot projection is not canonically serializable"
+            ) from exc
+        if projection_digest != self._validated_projection_digest:
+            raise RoutingSnapshotError(
+                "routing snapshot projection mutated after content addressing"
+            )
+        return RoutingResolutionSnapshot(
+            source_lock=source_lock,
+            registry_entries=entries,
+            routing_hints=hints,
+            capability_graph=capability_graph,
+            input_snapshot_digest=self.input_snapshot_digest,
+            routing_registry_provenance=registry_provenance,
+            capability_graph_provenance=graph_provenance,
+            runtime_mirror_provenance=mirror_provenance,
+            routing_abi=routing_abi,
+            _validated_projection_digest=projection_digest,
+        )
 
 
 def load_routing_resolution_snapshot(
@@ -180,13 +253,11 @@ def load_routing_resolution_snapshot(
         raise RoutingSnapshotError(
             f"routing snapshot contains an invalid typed record: {exc}"
         ) from exc
-    if not entries:
-        raise RoutingSnapshotError("routing registry contains no entries")
-    entry_keys = [(entry.repo, entry.kind, entry.id) for entry in entries]
-    if len(entry_keys) != len(set(entry_keys)):
-        raise RoutingSnapshotError("routing registry entry identities must be unique")
-    if len(hints) != len(hints_payload.get("hints", ())):
-        raise RoutingSnapshotError("routing hint kinds must be unique")
+    _validate_typed_projection_identities(
+        entries,
+        hints,
+        expected_hint_count=len(hints_payload.get("hints", ())),
+    )
 
     capability_graph_bytes = _read_locked_git_artifact(
         workspace, source_lock.capability_graph
@@ -213,6 +284,17 @@ def load_routing_resolution_snapshot(
         schema_ref=source_lock.runtime_manifest_schema_ref,
         schema_version=str(manifest.get("schema", "unknown")),
     )
+    routing_abi = ABIRef.model_validate(source_lock.routing_abi.model_dump())
+    projection_digest = _routing_projection_digest(
+        source_lock=source_lock,
+        registry_entries=entries,
+        routing_hints=hints,
+        capability_graph=capability_graph,
+        routing_registry_provenance=registry_provenance,
+        capability_graph_provenance=graph_provenance,
+        runtime_mirror_provenance=mirror_provenance,
+        routing_abi=routing_abi,
+    )
     snapshot_identity = {
         "source_lock_digest": _sha256(source_lock_bytes),
         "runtime_manifest_digest": manifest_digest,
@@ -222,6 +304,7 @@ def load_routing_resolution_snapshot(
         "capability_graph_digest": _sha256(capability_graph_bytes),
         "routing_bundle_subject_digest": source_lock.routing_bundle_subject_digest,
         "owner_switch_receipt_digest": source_lock.owner_switch_receipt_digest,
+        "validated_projection_digest": projection_digest,
     }
     return RoutingResolutionSnapshot(
         source_lock=source_lock,
@@ -232,7 +315,63 @@ def load_routing_resolution_snapshot(
         routing_registry_provenance=registry_provenance,
         capability_graph_provenance=graph_provenance,
         runtime_mirror_provenance=mirror_provenance,
-        routing_abi=ABIRef.model_validate(source_lock.routing_abi.model_dump()),
+        routing_abi=routing_abi,
+        _validated_projection_digest=projection_digest,
+    )
+
+
+def _validate_typed_projection_identities(
+    entries: tuple[RegistryEntry, ...],
+    hints: dict[str, RoutingHint],
+    *,
+    expected_hint_count: int | None = None,
+) -> None:
+    if not entries:
+        raise RoutingSnapshotError("routing registry contains no entries")
+    entry_keys = [(entry.repo, entry.kind, entry.id) for entry in entries]
+    if len(entry_keys) != len(set(entry_keys)):
+        raise RoutingSnapshotError("routing registry entry identities must be unique")
+    if any(kind != hint.kind for kind, hint in hints.items()):
+        raise RoutingSnapshotError(
+            "routing hint map keys must match typed hint identities"
+        )
+    if expected_hint_count is not None and len(hints) != expected_hint_count:
+        raise RoutingSnapshotError("routing hint kinds must be unique")
+
+
+def _routing_projection_digest(
+    *,
+    source_lock: RoutingResolutionSourceLock,
+    registry_entries: tuple[RegistryEntry, ...],
+    routing_hints: dict[str, RoutingHint],
+    capability_graph: CapabilityGraph,
+    routing_registry_provenance: ProvenanceRef,
+    capability_graph_provenance: ProvenanceRef,
+    runtime_mirror_provenance: ProvenanceRef,
+    routing_abi: ABIRef,
+) -> str:
+    return _canonical_digest(
+        {
+            "source_lock": source_lock.model_dump(mode="python"),
+            "registry_entries": [
+                entry.model_dump(mode="python") for entry in registry_entries
+            ],
+            "routing_hints": {
+                kind: hint.model_dump(mode="python")
+                for kind, hint in sorted(routing_hints.items())
+            },
+            "capability_graph": capability_graph.model_dump(mode="python"),
+            "routing_registry_provenance": (
+                routing_registry_provenance.model_dump(mode="python")
+            ),
+            "capability_graph_provenance": (
+                capability_graph_provenance.model_dump(mode="python")
+            ),
+            "runtime_mirror_provenance": (
+                runtime_mirror_provenance.model_dump(mode="python")
+            ),
+            "routing_abi": routing_abi.model_dump(mode="python"),
+        }
     )
 
 

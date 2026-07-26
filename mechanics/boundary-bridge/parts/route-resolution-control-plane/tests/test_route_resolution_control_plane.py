@@ -22,6 +22,7 @@ from aoa_sdk.contracts.control_plane import (
     assert_explanation_matches_decision,
 )
 from aoa_sdk.control_plane import ControlPlaneAPI
+from aoa_sdk.control_plane.routing.resolver import resolve_route_intent
 from aoa_sdk.control_plane.routing.snapshot import RoutingSnapshotError
 from aoa_sdk.workspace.discovery import Workspace
 
@@ -879,6 +880,39 @@ def test_snapshot_tampering_fails_closed(
 
     with pytest.raises(RoutingSnapshotError, match="digest mismatch"):
         api.resolve(_intent())
+
+
+@pytest.mark.parametrize(
+    "projection",
+    ("registry_entry", "routing_hint", "capability_graph"),
+)
+def test_reused_snapshot_projection_mutation_fails_closed(
+    workspace_root: Path,
+    projection: str,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(workspace_root)
+    snapshot = _api(workspace_root, bundle_root, lock_path).snapshot()
+    intent = _intent()
+    baseline = resolve_route_intent(intent, snapshot)
+
+    if projection == "registry_entry":
+        snapshot.registry_entries[0].attributes["target_owner"] = "tampered"
+    elif projection == "routing_hint":
+        snapshot.routing_hints["skill"].enabled = False
+    else:
+        node = next(
+            item
+            for item in snapshot.capability_graph.nodes
+            if item.id == "skill.aoa-decision"
+        )
+        node.binding["ref"] = "skills/tampered/SKILL.md"
+
+    assert snapshot.input_snapshot_digest == baseline.input_snapshot_digest
+    with pytest.raises(
+        RoutingSnapshotError,
+        match="mutated after content addressing",
+    ):
+        resolve_route_intent(intent, snapshot)
 
 
 def test_deployed_router_tampering_fails_closed(
