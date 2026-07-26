@@ -575,6 +575,53 @@ def test_core_contracts_round_trip_as_strict_json() -> None:
     assert_explanation_matches_decision(decision, explanation)
     assert_route_plan_chain(intent, decision, explanation, plan)
 
+    wrong_schema_version = "aoa_control_plane_wrong_parent_v1"
+    with pytest.raises(ControlPlaneContractError, match="exact route intent"):
+        assert_decision_matches_intent(
+            intent,
+            decision.model_copy(
+                update={
+                    "intent_ref": decision.intent_ref.model_copy(
+                        update={"schema_version": wrong_schema_version}
+                    )
+                }
+            ),
+        )
+    with pytest.raises(ControlPlaneContractError, match="scope does not match"):
+        assert_explanation_matches_decision(
+            decision,
+            explanation.model_copy(
+                update={
+                    "decision_ref": explanation.decision_ref.model_copy(
+                        update={"schema_version": wrong_schema_version}
+                    )
+                }
+            ),
+        )
+    wrong_plan_parent = plan.model_copy(
+        update={
+            "decision_ref": plan.decision_ref.model_copy(
+                update={"schema_version": wrong_schema_version}
+            ),
+            "plan_digest": _digest("placeholder"),
+        }
+    )
+    wrong_plan_parent = wrong_plan_parent.model_copy(
+        update={
+            "plan_digest": canonical_digest(
+                wrong_plan_parent,
+                exclude={"plan_digest"},
+            )
+        }
+    )
+    with pytest.raises(ControlPlaneContractError, match="exact decision"):
+        assert_route_plan_chain(
+            intent,
+            decision,
+            explanation,
+            wrong_plan_parent,
+        )
+
     expanded_decision = decision.model_copy(
         update={
             "candidates": (

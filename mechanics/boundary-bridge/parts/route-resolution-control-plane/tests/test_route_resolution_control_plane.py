@@ -942,6 +942,41 @@ def test_route_cli_resolve_explain_and_validate(
 
     decision_path = workspace_root / "decision.json"
     _write_json(decision_path, decision_payload)
+    validated_decision = runner.invoke(
+        app,
+        [
+            "route",
+            "validate",
+            str(decision_path),
+            "--against",
+            str(intent_path),
+        ],
+    )
+    assert validated_decision.exit_code == 0, validated_decision.output
+    tampered_decision_path = workspace_root / "decision-wrong-parent-schema.json"
+    _write_json(
+        tampered_decision_path,
+        {
+            **decision_payload,
+            "intent_ref": {
+                **decision_payload["intent_ref"],
+                "schema_version": "aoa_control_plane_wrong_parent_v1",
+            },
+        },
+    )
+    rejected_decision = runner.invoke(
+        app,
+        [
+            "route",
+            "validate",
+            str(tampered_decision_path),
+            "--against",
+            str(intent_path),
+        ],
+    )
+    assert rejected_decision.exit_code == 1
+    assert "does not reference the exact route intent" in rejected_decision.output
+
     explained = runner.invoke(
         app,
         [
@@ -968,6 +1003,31 @@ def test_route_cli_resolve_explain_and_validate(
     )
     assert validated.exit_code == 0, validated.output
     assert json.loads(validated.output)["execution_authorized"] is False
+    tampered_explanation_path = (
+        workspace_root / "explanation-wrong-parent-schema.json"
+    )
+    _write_json(
+        tampered_explanation_path,
+        {
+            **explanation_payload,
+            "decision_ref": {
+                **explanation_payload["decision_ref"],
+                "schema_version": "aoa_control_plane_wrong_parent_v1",
+            },
+        },
+    )
+    rejected_explanation = runner.invoke(
+        app,
+        [
+            "route",
+            "validate",
+            str(tampered_explanation_path),
+            "--against",
+            str(decision_path),
+        ],
+    )
+    assert rejected_explanation.exit_code == 1
+    assert "scope does not match the route decision" in rejected_explanation.output
 
 
 def test_aoasdk_constructs_control_plane_without_reading_snapshot(

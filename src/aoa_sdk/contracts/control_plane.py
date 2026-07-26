@@ -890,6 +890,7 @@ def assert_explanation_matches_decision(
         explanation.correlation_id != decision.correlation_id
         or explanation.decision_ref.object_id != decision.decision_id
         or explanation.decision_ref.owner_repo != decision.provenance.owner_repo
+        or explanation.decision_ref.schema_version != decision.schema_version
         or explanation.decision_ref.digest != canonical_digest(decision)
         or explanation.decision_status != decision.status
         or explanation.selected_candidate_id != decision.selected_candidate_id
@@ -917,6 +918,7 @@ def assert_decision_matches_intent(
         decision.correlation_id != intent.correlation_id
         or decision.intent_ref.object_id != intent.intent_id
         or decision.intent_ref.owner_repo != intent.provenance.owner_repo
+        or decision.intent_ref.schema_version != intent.schema_version
         or decision.intent_ref.digest != canonical_digest(intent)
     ):
         raise ControlPlaneContractError(
@@ -940,6 +942,7 @@ def assert_route_plan_chain(
         if (
             decision_ref.object_id != decision.decision_id
             or decision_ref.owner_repo != decision.provenance.owner_repo
+            or decision_ref.schema_version != decision.schema_version
             or decision_ref.digest != expected_decision_digest
         ):
             raise ControlPlaneContractError(
