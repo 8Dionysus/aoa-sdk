@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 12443300,
+  "allowed_tracked_bytes": 16782442,
+  "approved_by": "repository-owner",
+  "base_ref": "ceeb1de77a35ddeead886b2c815ec3dd149df6f8",
+  "changed_generated_bytes": 12443300,
+  "changed_generated_files": 307,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "cf6548c47949382748f677fac06f7bceb13d6f22c5c53150c7c638146b16cc7e",
+  "reason": "Refresh the C1 repository-local KAG family after failing closed on missing or unrecognized owner health while preserving explicit degraded posture, without claiming activation, cost benefit, consumer-zero, succession completion, or archival authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16782442,
+  "tracked_bytes_max": 15728640
+}
