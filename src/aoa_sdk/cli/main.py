@@ -6,6 +6,7 @@ from ..recurrence.cli import recur_app
 from .checkpoint import checkpoint_app
 from .common import _resolve_checkpoint_hook_repos as _resolve_checkpoint_hook_repos
 from .compatibility import compatibility_app
+from .organs import organs_app
 from .release import release_app
 from .skills import skills_app
 from .surfaces import surfaces_app
@@ -23,6 +24,7 @@ app.add_typer(recur_app, name="recur")
 app.add_typer(surfaces_app, name="surfaces")
 app.add_typer(checkpoint_app, name="checkpoint")
 app.add_typer(release_app, name="release")
+app.add_typer(organs_app, name="organs")
 
 
 @app.command()

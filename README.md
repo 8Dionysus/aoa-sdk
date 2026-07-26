@@ -57,6 +57,7 @@ follow the linked owner surface instead of expanding this page.
 | Sibling facades, compatibility, skill bridges, technique readers, surface hints, and owner-layer handoff | [mechanics/boundary-bridge](mechanics/boundary-bridge/README.md) |
 | Checkpoint capture, review gates, closeout handoff, child-task re-entry, and reviewed carry | [mechanics/checkpoint](mechanics/checkpoint/README.md) |
 | Codex workspace MCP, live rollout status, portability boundary, and rollout refs | [mechanics/codex-projection](mechanics/codex-projection/README.md) |
+| OS Abyss organ discovery, registry projection, and candidate activation contracts | [mechanics/boundary-bridge/parts/organ-access-control-plane](mechanics/boundary-bridge/parts/organ-access-control-plane/README.md) |
 | Release audit, publication helpers, CI posture, and sibling canaries | [mechanics/release-support](mechanics/release-support/README.md) |
 | RPG typed consumer reads and surface-path transport | [mechanics/rpg](mechanics/rpg/README.md) |
 | Workspace roots, mirrors, bootstrap, and generated control-plane capsule | [mechanics/runtime-seam](mechanics/runtime-seam/README.md) |

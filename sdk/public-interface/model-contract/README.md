@@ -23,3 +23,11 @@ The R2 Agent OS models are authored in
 `aoa_sdk.models`. They are strict owner-qualified references and
 runtime-neutral lifecycle contracts. Their presence does not make sibling
 objects SDK source truth or activate a runner.
+
+The organ-access model family is authored in
+`src/aoa_sdk/contracts/organs.py`, published as deterministic JSON Schema in
+`schemas/organ-access/`, and re-exported through `aoa_sdk.models`. It keeps
+owner payloads generic and typed while strictly normalizing access metadata,
+effects, policy, credential classes, revisions, freshness, compatibility, and
+the independent maturity axes. These models authorize neither runtime
+execution nor owner-truth acceptance.

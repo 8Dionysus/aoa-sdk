@@ -11,6 +11,24 @@ REPO_ROOT = Path(__file__).resolve().parents[1]
 COMMANDS = [
     ("generate decision indexes", [sys.executable, "scripts/generate_decision_indexes.py", "--check"]),
     ("validate SDK source home", [sys.executable, "scripts/validate_sdk_source_home.py"]),
+    (
+        "generate organ access schemas",
+        [
+            sys.executable,
+            "mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/"
+            "generate_organ_access_schemas.py",
+            "--check",
+        ],
+    ),
+    (
+        "generate organ access examples",
+        [
+            sys.executable,
+            "mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/"
+            "generate_organ_access_example.py",
+            "--check",
+        ],
+    ),
     ("validate owner-local stats port", [sys.executable, "scripts/validate_local_stats_port.py"]),
     ("validate mechanics topology", [sys.executable, "scripts/validate_mechanics_topology.py"]),
     ("build source topology index", [sys.executable, "scripts/build_source_topology_index.py", "--check"]),

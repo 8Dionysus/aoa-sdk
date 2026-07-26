@@ -1,0 +1,559 @@
+{
+  "compiled_at": "2026-07-25T12:00:00Z",
+  "contains_secrets": false,
+  "default_admission": "deny",
+  "entries": [
+    {
+      "activation_preconditions": [],
+      "authentication_requirements": [
+        "owner-bearer"
+      ],
+      "authority_ceiling": "read",
+      "capabilities": [
+        {
+          "capability_id": "decision-retrieval",
+          "credential_class": "decisions-read",
+          "eval_refs": [
+            "eval://aoa-organ-access-admission-integrity"
+          ],
+          "owner_payload_schema_ref": "owner://aoa-decisions/schema/payload",
+          "policy_family": "read",
+          "primitives": [
+            {
+              "annotations_are_security_enforcement": false,
+              "approval_owner": null,
+              "approval_required": false,
+              "effect_class": "observe",
+              "idempotency": "read_only",
+              "input_schema_ref": "owner://aoa-decisions/schema/input",
+              "kind": "tool",
+              "maximum_blast_radius": "read-only owner response",
+              "output_schema_ref": "owner://aoa-decisions/schema/output",
+              "policy_family": "read",
+              "primitive_id": "retrieve-decision",
+              "rollback_route": null
+            }
+          ],
+          "summary": "Owner-qualified durable decision lookup and rationale retrieval.",
+          "task_intent_terms": [
+            "decision",
+            "rationale",
+            "history"
+          ]
+        }
+      ],
+      "consumer_compatibility": [],
+      "credential_classes": [
+        "decisions-read"
+      ],
+      "description": "Owner-qualified durable decision lookup and rationale retrieval.",
+      "discoverable": true,
+      "display_name": "aoa-decisions",
+      "endpoint": null,
+      "eval_evidence": null,
+      "eval_refs": [
+        "eval://aoa-organ-access-admission-integrity"
+      ],
+      "eval_status": "candidate",
+      "freshness_evidence": null,
+      "freshness_policy": {
+        "cache_scope": "task",
+        "max_age_seconds": 300,
+        "policy_id": "decisions-owner-freshness",
+        "provider_watermark_required": true,
+        "stale_readable_seconds": 0
+      },
+      "freshness_state": "unknown",
+      "handoff": {
+        "hidden_server_chaining_allowed": false,
+        "input_ref_kind": "task-intent-ref",
+        "next_owner": "requesting-consumer",
+        "output_ref_kind": "owner-result-ref",
+        "stop_states": [
+          "owner-review-required",
+          "freshness-blocked"
+        ]
+      },
+      "maturity": {
+        "call_succeeded": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "consumer_registered": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "cross_organ_proven": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "declared": {
+          "evidence": {
+            "evidence_ref": "owner://aoa-decisions/decision/shadow-review",
+            "expires_at": "2027-01-01T00:00:00Z",
+            "observed_at": "2026-07-25T12:00:00Z",
+            "owner": "aoa-decisions",
+            "revision": "example-shadow-v1"
+          },
+          "freshness_policy": "example-owner-review-v1",
+          "state": "asserted"
+        },
+        "deployed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "endpoint_ready": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "exported": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "freshness_satisfied": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "owner_accepted": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "owner_reviewed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "packaged": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "process_alive": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "registry_indexed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "result_grounded": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "rollback_proven": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "schema_observed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        }
+      },
+      "organ_id": "aoa-decisions",
+      "owners": {
+        "acceptance_owner": "aoa-decisions",
+        "access_owner": "aoa-decisions",
+        "control_owner": "aoa-sdk",
+        "proof_owner": "aoa-evals",
+        "runtime_owner": "abyss-stack",
+        "source_owner": "aoa-decisions"
+      },
+      "registry_state": "shadow",
+      "revisions": {
+        "consumer_schema": null,
+        "deploy": null,
+        "package": null,
+        "source": {
+          "digest": "sha256:cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+          "revision": "example-shadow-v1",
+          "schema_digest": null
+        }
+      },
+      "rollback_route": "owner://aoa-decisions/rollback/shadow",
+      "support_route": "owner://aoa-decisions/support"
+    },
+    {
+      "activation_preconditions": [],
+      "authentication_requirements": [
+        "owner-bearer"
+      ],
+      "authority_ceiling": "read",
+      "capabilities": [
+        {
+          "capability_id": "knowledge-retrieval",
+          "credential_class": "kag-read",
+          "eval_refs": [
+            "eval://aoa-organ-access-admission-integrity"
+          ],
+          "owner_payload_schema_ref": "owner://aoa-kag/schema/payload",
+          "policy_family": "read",
+          "primitives": [
+            {
+              "annotations_are_security_enforcement": false,
+              "approval_owner": null,
+              "approval_required": false,
+              "effect_class": "observe",
+              "idempotency": "read_only",
+              "input_schema_ref": "owner://aoa-kag/schema/input",
+              "kind": "tool",
+              "maximum_blast_radius": "read-only owner response",
+              "output_schema_ref": "owner://aoa-kag/schema/output",
+              "policy_family": "read",
+              "primitive_id": "retrieve-knowledge",
+              "rollback_route": null
+            }
+          ],
+          "summary": "Owner-qualified knowledge retrieval with source-preserving handoff.",
+          "task_intent_terms": [
+            "knowledge",
+            "provenance",
+            "relations"
+          ]
+        }
+      ],
+      "consumer_compatibility": [],
+      "credential_classes": [
+        "kag-read"
+      ],
+      "description": "Owner-qualified knowledge retrieval with source-preserving handoff.",
+      "discoverable": true,
+      "display_name": "aoa-kag",
+      "endpoint": null,
+      "eval_evidence": null,
+      "eval_refs": [
+        "eval://aoa-organ-access-admission-integrity"
+      ],
+      "eval_status": "candidate",
+      "freshness_evidence": null,
+      "freshness_policy": {
+        "cache_scope": "task",
+        "max_age_seconds": 300,
+        "policy_id": "kag-owner-freshness",
+        "provider_watermark_required": true,
+        "stale_readable_seconds": 0
+      },
+      "freshness_state": "unknown",
+      "handoff": {
+        "hidden_server_chaining_allowed": false,
+        "input_ref_kind": "task-intent-ref",
+        "next_owner": "requesting-consumer",
+        "output_ref_kind": "owner-result-ref",
+        "stop_states": [
+          "owner-review-required",
+          "freshness-blocked"
+        ]
+      },
+      "maturity": {
+        "call_succeeded": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "consumer_registered": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "cross_organ_proven": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "declared": {
+          "evidence": {
+            "evidence_ref": "owner://aoa-kag/decision/shadow-review",
+            "expires_at": "2027-01-01T00:00:00Z",
+            "observed_at": "2026-07-25T12:00:00Z",
+            "owner": "aoa-kag",
+            "revision": "example-shadow-v1"
+          },
+          "freshness_policy": "example-owner-review-v1",
+          "state": "asserted"
+        },
+        "deployed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "endpoint_ready": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "exported": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "freshness_satisfied": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "owner_accepted": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "owner_reviewed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "packaged": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "process_alive": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "registry_indexed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "result_grounded": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "rollback_proven": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "schema_observed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        }
+      },
+      "organ_id": "aoa-kag",
+      "owners": {
+        "acceptance_owner": "aoa-kag",
+        "access_owner": "aoa-kag",
+        "control_owner": "aoa-sdk",
+        "proof_owner": "aoa-evals",
+        "runtime_owner": "abyss-stack",
+        "source_owner": "aoa-kag"
+      },
+      "registry_state": "shadow",
+      "revisions": {
+        "consumer_schema": null,
+        "deploy": null,
+        "package": null,
+        "source": {
+          "digest": "sha256:aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+          "revision": "example-shadow-v1",
+          "schema_digest": null
+        }
+      },
+      "rollback_route": "owner://aoa-kag/rollback/shadow",
+      "support_route": "owner://aoa-kag/support"
+    },
+    {
+      "activation_preconditions": [],
+      "authentication_requirements": [
+        "owner-bearer"
+      ],
+      "authority_ceiling": "read",
+      "capabilities": [
+        {
+          "capability_id": "measurement-read",
+          "credential_class": "stats-read",
+          "eval_refs": [
+            "eval://aoa-organ-access-admission-integrity"
+          ],
+          "owner_payload_schema_ref": "owner://aoa-stats/schema/payload",
+          "policy_family": "read",
+          "primitives": [
+            {
+              "annotations_are_security_enforcement": false,
+              "approval_owner": null,
+              "approval_required": false,
+              "effect_class": "observe",
+              "idempotency": "read_only",
+              "input_schema_ref": "owner://aoa-stats/schema/input",
+              "kind": "tool",
+              "maximum_blast_radius": "read-only owner response",
+              "output_schema_ref": "owner://aoa-stats/schema/output",
+              "policy_family": "read",
+              "primitive_id": "inspect-measurement",
+              "rollback_route": null
+            }
+          ],
+          "summary": "Owner-qualified operational measurement and bounded summaries.",
+          "task_intent_terms": [
+            "metrics",
+            "measurement",
+            "coverage"
+          ]
+        }
+      ],
+      "consumer_compatibility": [],
+      "credential_classes": [
+        "stats-read"
+      ],
+      "description": "Owner-qualified operational measurement and bounded summaries.",
+      "discoverable": true,
+      "display_name": "aoa-stats",
+      "endpoint": null,
+      "eval_evidence": null,
+      "eval_refs": [
+        "eval://aoa-organ-access-admission-integrity"
+      ],
+      "eval_status": "candidate",
+      "freshness_evidence": null,
+      "freshness_policy": {
+        "cache_scope": "task",
+        "max_age_seconds": 300,
+        "policy_id": "stats-owner-freshness",
+        "provider_watermark_required": true,
+        "stale_readable_seconds": 0
+      },
+      "freshness_state": "unknown",
+      "handoff": {
+        "hidden_server_chaining_allowed": false,
+        "input_ref_kind": "task-intent-ref",
+        "next_owner": "requesting-consumer",
+        "output_ref_kind": "owner-result-ref",
+        "stop_states": [
+          "owner-review-required",
+          "freshness-blocked"
+        ]
+      },
+      "maturity": {
+        "call_succeeded": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "consumer_registered": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "cross_organ_proven": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "declared": {
+          "evidence": {
+            "evidence_ref": "owner://aoa-stats/decision/shadow-review",
+            "expires_at": "2027-01-01T00:00:00Z",
+            "observed_at": "2026-07-25T12:00:00Z",
+            "owner": "aoa-stats",
+            "revision": "example-shadow-v1"
+          },
+          "freshness_policy": "example-owner-review-v1",
+          "state": "asserted"
+        },
+        "deployed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "endpoint_ready": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "exported": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "freshness_satisfied": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "owner_accepted": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "owner_reviewed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "packaged": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "process_alive": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "registry_indexed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "result_grounded": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "rollback_proven": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        },
+        "schema_observed": {
+          "evidence": null,
+          "freshness_policy": null,
+          "state": "not_asserted"
+        }
+      },
+      "organ_id": "aoa-stats",
+      "owners": {
+        "acceptance_owner": "aoa-stats",
+        "access_owner": "aoa-stats",
+        "control_owner": "aoa-sdk",
+        "proof_owner": "aoa-evals",
+        "runtime_owner": "abyss-stack",
+        "source_owner": "aoa-stats"
+      },
+      "registry_state": "shadow",
+      "revisions": {
+        "consumer_schema": null,
+        "deploy": null,
+        "package": null,
+        "source": {
+          "digest": "sha256:bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+          "revision": "example-shadow-v1",
+          "schema_digest": null
+        }
+      },
+      "rollback_route": "owner://aoa-stats/rollback/shadow",
+      "support_route": "owner://aoa-stats/support"
+    }
+  ],
+  "expires_at": "2027-01-01T00:00:00Z",
+  "projection_digest": "sha256:a3d73ce68508eadeae47dc4f2a9ab02af156dea48ed95c30686f69eac8759a29",
+  "registry_id": "abyss-wave1-example",
+  "schema_version": "aoa_organ_registry_projection_v1",
+  "source_digest": "sha256:f5793502694b5269fa63aed01fc1c47f8b3a57580707fdd9c6fffec985ec70c7",
+  "workspace_owner": "os-abyss"
+}

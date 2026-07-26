@@ -1,0 +1,965 @@
+{
+  "$defs": {
+    "CapabilityContract": {
+      "additionalProperties": false,
+      "properties": {
+        "capability_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Capability Id",
+          "type": "string"
+        },
+        "credential_class": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Credential Class",
+          "type": "string"
+        },
+        "eval_refs": {
+          "default": [],
+          "items": {
+            "maxLength": 512,
+            "minLength": 3,
+            "type": "string"
+          },
+          "title": "Eval Refs",
+          "type": "array"
+        },
+        "owner_payload_schema_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Owner Payload Schema Ref",
+          "type": "string"
+        },
+        "policy_family": {
+          "enum": [
+            "read",
+            "candidate",
+            "internal_effect",
+            "external_effect"
+          ],
+          "title": "Policy Family",
+          "type": "string"
+        },
+        "primitives": {
+          "items": {
+            "$ref": "#/$defs/PrimitiveContract"
+          },
+          "title": "Primitives",
+          "type": "array"
+        },
+        "summary": {
+          "maxLength": 512,
+          "minLength": 12,
+          "title": "Summary",
+          "type": "string"
+        },
+        "task_intent_terms": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+            "type": "string"
+          },
+          "title": "Task Intent Terms",
+          "type": "array"
+        }
+      },
+      "required": [
+        "capability_id",
+        "summary",
+        "policy_family",
+        "credential_class",
+        "primitives",
+        "owner_payload_schema_ref"
+      ],
+      "title": "CapabilityContract",
+      "type": "object"
+    },
+    "ConsumerCompatibility": {
+      "additionalProperties": false,
+      "properties": {
+        "consumer_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Consumer Id",
+          "type": "string"
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QualifiedEvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "observed_schema_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Schema Digest"
+        },
+        "protocol_versions": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Protocol Versions",
+          "type": "array"
+        },
+        "support_state": {
+          "enum": [
+            "supported",
+            "shadow",
+            "blocked",
+            "unknown"
+          ],
+          "title": "Support State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "consumer_id",
+        "support_state"
+      ],
+      "title": "ConsumerCompatibility",
+      "type": "object"
+    },
+    "CredentialContours": {
+      "additionalProperties": false,
+      "properties": {
+        "candidate": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Candidate"
+        },
+        "external_effect": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "External Effect"
+        },
+        "internal_effect": {
+          "anyOf": [
+            {
+              "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Internal Effect"
+        },
+        "read": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Read",
+          "type": "string"
+        }
+      },
+      "required": [
+        "read"
+      ],
+      "title": "CredentialContours",
+      "type": "object"
+    },
+    "EndpointContract": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Adapter Id",
+          "type": "string"
+        },
+        "adapter_protocol_version": {
+          "const": "aoa_organ_adapter_v1",
+          "default": "aoa_organ_adapter_v1",
+          "title": "Adapter Protocol Version",
+          "type": "string"
+        },
+        "connection_mode": {
+          "const": "direct_owner",
+          "default": "direct_owner",
+          "title": "Connection Mode",
+          "type": "string"
+        },
+        "endpoint_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Endpoint Ref",
+          "type": "string"
+        },
+        "protocol_versions": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Protocol Versions",
+          "type": "array"
+        },
+        "server_schema_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Server Schema Digest"
+        },
+        "transport": {
+          "enum": [
+            "stdio",
+            "streamable-http",
+            "owner-api",
+            "none"
+          ],
+          "title": "Transport",
+          "type": "string"
+        }
+      },
+      "required": [
+        "adapter_id",
+        "transport",
+        "endpoint_ref",
+        "protocol_versions"
+      ],
+      "title": "EndpointContract",
+      "type": "object"
+    },
+    "FreshnessPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "cache_scope": {
+          "enum": [
+            "none",
+            "request",
+            "task",
+            "agent",
+            "workspace"
+          ],
+          "title": "Cache Scope",
+          "type": "string"
+        },
+        "max_age_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Max Age Seconds",
+          "type": "integer"
+        },
+        "policy_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "provider_watermark_required": {
+          "default": true,
+          "title": "Provider Watermark Required",
+          "type": "boolean"
+        },
+        "stale_readable_seconds": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Stale Readable Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "policy_id",
+        "max_age_seconds",
+        "cache_scope"
+      ],
+      "title": "FreshnessPolicy",
+      "type": "object"
+    },
+    "HandoffContract": {
+      "additionalProperties": false,
+      "properties": {
+        "hidden_server_chaining_allowed": {
+          "const": false,
+          "default": false,
+          "title": "Hidden Server Chaining Allowed",
+          "type": "boolean"
+        },
+        "input_ref_kind": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Input Ref Kind",
+          "type": "string"
+        },
+        "next_owner": {
+          "minLength": 1,
+          "title": "Next Owner",
+          "type": "string"
+        },
+        "output_ref_kind": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Output Ref Kind",
+          "type": "string"
+        },
+        "stop_states": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+            "type": "string"
+          },
+          "title": "Stop States",
+          "type": "array"
+        }
+      },
+      "required": [
+        "input_ref_kind",
+        "output_ref_kind",
+        "next_owner",
+        "stop_states"
+      ],
+      "title": "HandoffContract",
+      "type": "object"
+    },
+    "MaturityEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QualifiedEvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "freshness_policy": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Freshness Policy"
+        },
+        "state": {
+          "enum": [
+            "asserted",
+            "not_asserted",
+            "not_applicable"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "title": "MaturityEvidence",
+      "type": "object"
+    },
+    "OrganMaturityVector": {
+      "additionalProperties": false,
+      "properties": {
+        "call_succeeded": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "consumer_registered": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "cross_organ_proven": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "declared": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "deployed": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "endpoint_ready": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "exported": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "freshness_satisfied": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "owner_accepted": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "owner_reviewed": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "packaged": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "process_alive": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "registry_indexed": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "result_grounded": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "rollback_proven": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "schema_observed": {
+          "$ref": "#/$defs/MaturityEvidence"
+        }
+      },
+      "required": [
+        "declared",
+        "owner_reviewed",
+        "packaged",
+        "exported",
+        "deployed",
+        "process_alive",
+        "endpoint_ready",
+        "registry_indexed",
+        "consumer_registered",
+        "schema_observed",
+        "call_succeeded",
+        "result_grounded",
+        "freshness_satisfied",
+        "owner_accepted",
+        "cross_organ_proven",
+        "rollback_proven"
+      ],
+      "title": "OrganMaturityVector",
+      "type": "object"
+    },
+    "OrganOwners": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptance_owner": {
+          "minLength": 1,
+          "title": "Acceptance Owner",
+          "type": "string"
+        },
+        "access_owner": {
+          "minLength": 1,
+          "title": "Access Owner",
+          "type": "string"
+        },
+        "control_owner": {
+          "const": "aoa-sdk",
+          "default": "aoa-sdk",
+          "title": "Control Owner",
+          "type": "string"
+        },
+        "proof_owner": {
+          "minLength": 1,
+          "title": "Proof Owner",
+          "type": "string"
+        },
+        "runtime_owner": {
+          "minLength": 1,
+          "title": "Runtime Owner",
+          "type": "string"
+        },
+        "source_owner": {
+          "minLength": 1,
+          "title": "Source Owner",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_owner",
+        "access_owner",
+        "runtime_owner",
+        "proof_owner",
+        "acceptance_owner"
+      ],
+      "title": "OrganOwners",
+      "type": "object"
+    },
+    "OrganRevisions": {
+      "additionalProperties": false,
+      "properties": {
+        "consumer_schema": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RevisionIdentity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "deploy": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RevisionIdentity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "package": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/RevisionIdentity"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "source": {
+          "$ref": "#/$defs/RevisionIdentity"
+        }
+      },
+      "required": [
+        "source"
+      ],
+      "title": "OrganRevisions",
+      "type": "object"
+    },
+    "PrimitiveContract": {
+      "additionalProperties": false,
+      "properties": {
+        "annotations_are_security_enforcement": {
+          "const": false,
+          "default": false,
+          "title": "Annotations Are Security Enforcement",
+          "type": "boolean"
+        },
+        "approval_owner": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Approval Owner"
+        },
+        "approval_required": {
+          "default": false,
+          "title": "Approval Required",
+          "type": "boolean"
+        },
+        "effect_class": {
+          "enum": [
+            "observe",
+            "derive",
+            "validate",
+            "prepare_candidate",
+            "apply_runtime",
+            "accept_source",
+            "external_emit",
+            "external_change"
+          ],
+          "title": "Effect Class",
+          "type": "string"
+        },
+        "idempotency": {
+          "enum": [
+            "read_only",
+            "idempotent",
+            "idempotency_key_required",
+            "non_idempotent"
+          ],
+          "title": "Idempotency",
+          "type": "string"
+        },
+        "input_schema_ref": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Input Schema Ref"
+        },
+        "kind": {
+          "enum": [
+            "tool",
+            "resource",
+            "resource_template",
+            "prompt"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "maximum_blast_radius": {
+          "minLength": 1,
+          "title": "Maximum Blast Radius",
+          "type": "string"
+        },
+        "output_schema_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Output Schema Ref",
+          "type": "string"
+        },
+        "policy_family": {
+          "enum": [
+            "read",
+            "candidate",
+            "internal_effect",
+            "external_effect"
+          ],
+          "title": "Policy Family",
+          "type": "string"
+        },
+        "primitive_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Primitive Id",
+          "type": "string"
+        },
+        "rollback_route": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Rollback Route"
+        }
+      },
+      "required": [
+        "primitive_id",
+        "kind",
+        "effect_class",
+        "policy_family",
+        "output_schema_ref",
+        "idempotency",
+        "maximum_blast_radius"
+      ],
+      "title": "PrimitiveContract",
+      "type": "object"
+    },
+    "QualifiedEvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "title": "Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "evidence_ref",
+        "revision",
+        "observed_at"
+      ],
+      "title": "QualifiedEvidenceRef",
+      "type": "object"
+    },
+    "RevisionIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Digest"
+        },
+        "revision": {
+          "minLength": 1,
+          "title": "Revision",
+          "type": "string"
+        },
+        "schema_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Schema Digest"
+        }
+      },
+      "required": [
+        "revision"
+      ],
+      "title": "RevisionIdentity",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:organ-contract.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "activation_preconditions": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/QualifiedEvidenceRef"
+      },
+      "title": "Activation Preconditions",
+      "type": "array"
+    },
+    "authentication_requirements": {
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+        "type": "string"
+      },
+      "title": "Authentication Requirements",
+      "type": "array"
+    },
+    "authority_ceiling": {
+      "enum": [
+        "read",
+        "candidate",
+        "internal_effect",
+        "external_effect"
+      ],
+      "title": "Authority Ceiling",
+      "type": "string"
+    },
+    "capabilities": {
+      "items": {
+        "$ref": "#/$defs/CapabilityContract"
+      },
+      "title": "Capabilities",
+      "type": "array"
+    },
+    "consumer_compatibility": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ConsumerCompatibility"
+      },
+      "title": "Consumer Compatibility",
+      "type": "array"
+    },
+    "contract_version": {
+      "const": "aoa_organ_contract_v1",
+      "default": "aoa_organ_contract_v1",
+      "title": "Contract Version",
+      "type": "string"
+    },
+    "credential_contours": {
+      "$ref": "#/$defs/CredentialContours"
+    },
+    "description": {
+      "maxLength": 1024,
+      "minLength": 12,
+      "title": "Description",
+      "type": "string"
+    },
+    "display_name": {
+      "minLength": 1,
+      "title": "Display Name",
+      "type": "string"
+    },
+    "endpoint": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/EndpointContract"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "eval_evidence": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/QualifiedEvidenceRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "eval_refs": {
+      "default": [],
+      "items": {
+        "maxLength": 512,
+        "minLength": 3,
+        "type": "string"
+      },
+      "title": "Eval Refs",
+      "type": "array"
+    },
+    "eval_status": {
+      "default": "not_run",
+      "enum": [
+        "not_run",
+        "candidate",
+        "passed",
+        "failed",
+        "expired"
+      ],
+      "title": "Eval Status",
+      "type": "string"
+    },
+    "freshness_evidence": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/QualifiedEvidenceRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
+    },
+    "freshness_policy": {
+      "$ref": "#/$defs/FreshnessPolicy"
+    },
+    "freshness_state": {
+      "default": "unknown",
+      "enum": [
+        "exact",
+        "compatible_drift",
+        "stale_readable",
+        "blocked",
+        "unknown",
+        "rollback_required"
+      ],
+      "title": "Freshness State",
+      "type": "string"
+    },
+    "handoff": {
+      "$ref": "#/$defs/HandoffContract"
+    },
+    "maturity": {
+      "$ref": "#/$defs/OrganMaturityVector"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "owners": {
+      "$ref": "#/$defs/OrganOwners"
+    },
+    "registry_state": {
+      "enum": [
+        "declared",
+        "package_candidate",
+        "deploy_candidate",
+        "shadow",
+        "admitted",
+        "suspended",
+        "deprecated",
+        "retired"
+      ],
+      "title": "Registry State",
+      "type": "string"
+    },
+    "revisions": {
+      "$ref": "#/$defs/OrganRevisions"
+    },
+    "rollback_route": {
+      "maxLength": 512,
+      "minLength": 3,
+      "title": "Rollback Route",
+      "type": "string"
+    },
+    "support_route": {
+      "maxLength": 512,
+      "minLength": 3,
+      "title": "Support Route",
+      "type": "string"
+    }
+  },
+  "required": [
+    "organ_id",
+    "display_name",
+    "description",
+    "owners",
+    "registry_state",
+    "authority_ceiling",
+    "authentication_requirements",
+    "credential_contours",
+    "revisions",
+    "freshness_policy",
+    "capabilities",
+    "maturity",
+    "rollback_route",
+    "support_route",
+    "handoff"
+  ],
+  "title": "OrganRecord",
+  "type": "object"
+}

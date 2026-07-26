@@ -15,3 +15,10 @@ Next route: `src/aoa_sdk/cli/`, `mechanics/runtime-seam/`,
 
 Stop line: do not let CLI convenience bypass owner review, compatibility
 checks, or release gates.
+
+`aoa organs validate|compile|catalog|inspect|capability|plan` exposes the
+organ-access contract without runtime mutation. `compile --output` is the only
+projection write and requires an explicit destination. `plan` always emits
+candidate intent with `execution_authorized=false`; no CLI command provisions
+credentials, starts a process, calls an owner tool, or promotes registry
+maturity.

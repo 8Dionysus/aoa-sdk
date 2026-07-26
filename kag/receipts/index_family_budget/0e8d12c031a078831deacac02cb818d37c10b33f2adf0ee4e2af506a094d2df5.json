@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 9614995,
+  "allowed_tracked_bytes": 16543260,
+  "approved_by": "repository-owner",
+  "base_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+  "changed_generated_bytes": 9614995,
+  "changed_generated_files": 246,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "0e8d12c031a078831deacac02cb818d37c10b33f2adf0ee4e2af506a094d2df5",
+  "reason": "Refresh the committed owner-bounded organ access projection after fail-closed review fixes at 6c68d701546d4983971ff760f94c8594bb31235c.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16543260,
+  "tracked_bytes_max": 15728640
+}
