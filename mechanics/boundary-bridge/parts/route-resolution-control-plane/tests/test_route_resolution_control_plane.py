@@ -808,11 +808,12 @@ def test_inconsistent_registry_and_owner_projection_blocks(
         ("candidate_only", "true"),
         ("allow_implicit_invocation", "false"),
         ("requires_human_approval", "false"),
+        ("requires_human_approval", True),
         ("invocation_mode", ["invoke"]),
         ("capability_id", "skill.aoa-eval"),
     ),
 )
-def test_malformed_registry_invocation_posture_blocks(
+def test_invalid_registry_invocation_posture_blocks(
     workspace_root: Path,
     field: str,
     value: object,

@@ -134,6 +134,12 @@ def resolve_route_intent(
             != snapshot.source_lock.capability_graph.relative_path
             or entry.attributes.get("capability_source_path") != node.source_path
             or entry.attributes.get("target_owner") != node.owner.repo
+            or not isinstance(
+                node.trust.get("requires_human_approval"),
+                bool,
+            )
+            or node.trust.get("requires_human_approval")
+            != invocation_posture.requires_human_approval
         ):
             inconsistent_owner_projections.append(entry.id)
             continue
@@ -526,13 +532,7 @@ def _candidate_posture(
         policy = "forbidden"
         reasons.append("explicit_capability_constraint_required")
 
-    node_approval = node.trust.get("requires_human_approval", False)
-    if not isinstance(node_approval, bool):
-        policy = "forbidden"
-        reasons.append("owner_approval_posture_invalid")
-    human_approval = (
-        node_approval is True or invocation_posture.requires_human_approval
-    )
+    human_approval = invocation_posture.requires_human_approval
     approval_constraints = _constraint_values(
         intent.constraints, "approval_requirement"
     )
