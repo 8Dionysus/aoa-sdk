@@ -25,6 +25,7 @@ from .validator import get_schema_validator
 
 SOURCE_LOCK_RESOURCE = "data/canonical-routing-source-lock.v1.json"
 RUNTIME_MANIFEST_PATH = "manifest/federation_mirror_manifest.json"
+ROUTER_ARTIFACT_PATH = "generated/aoa_router.min.json"
 PACKAGED_SCHEMA_ROOT = Path(__file__).resolve().parent / "schemas"
 _OID_RE = re.compile(r"^[0-9a-f]{40}$")
 _CANONICAL_LOCKED_PATHS = {
@@ -105,6 +106,7 @@ def load_routing_resolution_snapshot(
         source_lock_path or workspace.routing_source_lock_path
     )
 
+    router_bytes = _read_locked_routing_abi_artifact(bundle_root, source_lock)
     registry_bytes = _read_locked_bundle_artifact(
         bundle_root, source_lock.cross_repo_registry
     )
@@ -151,7 +153,13 @@ def load_routing_resolution_snapshot(
         source_lock.task_to_surface_hints.schema_ref,
         "routing hints",
     )
-    _validate_runtime_manifest(manifest, source_lock, registry_bytes, hints_bytes)
+    _validate_runtime_manifest(
+        manifest,
+        source_lock,
+        router_bytes,
+        registry_bytes,
+        hints_bytes,
+    )
 
     try:
         entries = tuple(
@@ -205,6 +213,7 @@ def load_routing_resolution_snapshot(
     snapshot_identity = {
         "source_lock_digest": _sha256(source_lock_bytes),
         "runtime_manifest_digest": manifest_digest,
+        "routing_abi_artifact_digest": _sha256(router_bytes),
         "routing_registry_digest": _sha256(registry_bytes),
         "routing_hints_digest": _sha256(hints_bytes),
         "capability_graph_digest": _sha256(capability_graph_bytes),
@@ -321,6 +330,24 @@ def _read_locked_bundle_artifact(
     return raw
 
 
+def _read_locked_routing_abi_artifact(
+    root: Path,
+    lock: RoutingResolutionSourceLock,
+) -> bytes:
+    raw = _read_bytes(
+        root / ROUTER_ARTIFACT_PATH,
+        "deployed routing ABI artifact",
+    )
+    actual = _sha256(raw)
+    if actual != lock.routing_abi.artifact_digest:
+        raise RoutingSnapshotError(
+            "digest mismatch for "
+            f"aoa-sdk:{ROUTER_ARTIFACT_PATH}; "
+            f"expected {lock.routing_abi.artifact_digest}, got {actual}"
+        )
+    return raw
+
+
 def _read_locked_git_artifact(
     workspace: Workspace,
     artifact: LockedArtifact,
@@ -359,6 +386,7 @@ def _read_locked_git_artifact(
 def _validate_runtime_manifest(
     manifest: dict,
     lock: RoutingResolutionSourceLock,
+    router_bytes: bytes,
     registry_bytes: bytes,
     hints_bytes: bytes,
 ) -> None:
@@ -467,9 +495,7 @@ def _validate_runtime_manifest(
         "routing runtime manifest file hashes",
     )
     expected_hashes = {
-        "generated/aoa_router.min.json": (
-            lock.routing_abi.artifact_digest.removeprefix("sha256:")
-        ),
+        ROUTER_ARTIFACT_PATH: _sha256(router_bytes).removeprefix("sha256:"),
         lock.cross_repo_registry.relative_path: _sha256(registry_bytes).removeprefix(
             "sha256:"
         ),

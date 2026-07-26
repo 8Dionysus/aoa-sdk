@@ -131,7 +131,10 @@ def _git_capability_graph(
                     "availability": "available",
                     "kind": "skill",
                     "operation": "route-one-mode",
-                    "ref": f"aoa-skills:{spec['id']}",
+                    "ref": (
+                        "skills/"
+                        f"{spec['id'].removeprefix('skill.')}/SKILL.md"
+                    ),
                 },
                 "trust": {
                     "posture": "authored-procedure",
@@ -207,6 +210,7 @@ def _routing_inputs(
     deferred: bool = False,
     negative_phrase: str | None = None,
     owner_mismatch: bool = False,
+    malformed_registry_attribute: tuple[str, object] | None = None,
 ) -> tuple[Path, Path]:
     shutil.rmtree(workspace_root / "aoa-routing")
     bundle_root = (
@@ -223,8 +227,33 @@ def _routing_inputs(
         negative_phrase=negative_phrase,
         owner_mismatch=owner_mismatch,
     )
+    router_raw = _write_json(
+        bundle_root / "generated" / "aoa_router.min.json",
+        {
+            "schema_version": "fixture-router-v1",
+            "owner_repo": "aoa-sdk",
+        },
+    )
     entries = []
     for name in ("aoa-decision", "aoa-eval"):
+        attributes = {
+            "scope": "fixture",
+            "invocation_mode": (
+                "suggest" if deferred and name == "aoa-decision" else "invoke"
+            ),
+            "allow_implicit_invocation": not (
+                deferred and name == "aoa-decision"
+            ),
+            "candidate_only": deferred and name == "aoa-decision",
+            "capability_id": f"skill.{name}",
+            "capability_graph_ref": "generated/capability_graph.json",
+            "capability_source_path": "capabilities/families/fixture.yaml",
+            "target_owner": "aoa-skills",
+            "requires_human_approval": False,
+        }
+        if malformed_registry_attribute is not None and name == "aoa-decision":
+            field, value = malformed_registry_attribute
+            attributes[field] = value
         entries.append(
             {
                 "kind": "skill",
@@ -235,18 +264,7 @@ def _routing_inputs(
                 "status": "candidate",
                 "summary": f"{name} fixture route",
                 "source_type": "generated-catalog",
-                "attributes": {
-                    "scope": "fixture",
-                    "invocation_mode": (
-                        "suggest" if deferred and name == "aoa-decision" else "invoke"
-                    ),
-                    "allow_implicit_invocation": not (
-                        deferred and name == "aoa-decision"
-                    ),
-                    "candidate_only": deferred and name == "aoa-decision",
-                    "capability_id": f"skill.{name}",
-                    "requires_human_approval": False,
-                },
+                "attributes": attributes,
             }
         )
     registry_raw = _write_json(
@@ -327,7 +345,7 @@ def _routing_inputs(
             "owner_repo": "aoa-sdk",
             "schema_ref": "schemas/aoa-router.schema.json",
             "source_ref": SDK_PRODUCER_REF,
-            "artifact_digest": ZERO_DIGEST,
+            "artifact_digest": _sha256(router_raw),
         },
         "routing_bundle_subject_digest": ROUTING_SUBJECT_DIGEST,
         "owner_switch_receipt_digest": owner_switch_receipt_digest,
@@ -433,7 +451,7 @@ def _routing_inputs(
                 },
             },
             "file_sha256": {
-                "generated/aoa_router.min.json": ZERO_DIGEST.removeprefix(
+                "generated/aoa_router.min.json": _sha256(router_raw).removeprefix(
                     "sha256:"
                 ),
                 "generated/cross_repo_registry.min.json": _sha256(
@@ -653,6 +671,20 @@ def test_snapshot_tampering_fails_closed(
         api.resolve(_intent())
 
 
+def test_deployed_router_tampering_fails_closed(
+    workspace_root: Path,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(workspace_root)
+    router = bundle_root / "generated" / "aoa_router.min.json"
+    router.write_bytes(router.read_bytes() + b" ")
+
+    with pytest.raises(
+        RoutingSnapshotError,
+        match="digest mismatch.*aoa_router",
+    ):
+        _api(workspace_root, bundle_root, lock_path).resolve(_intent())
+
+
 def test_embedded_owner_switch_receipt_tampering_fails_closed(
     workspace_root: Path,
 ) -> None:
@@ -735,6 +767,36 @@ def test_inconsistent_registry_and_owner_projection_blocks(
         workspace_root,
         owner_mismatch=True,
     )
+    decision = _api(workspace_root, bundle_root, lock_path).resolve(_intent())
+
+    assert decision.status == "blocked"
+    assert decision.selected_candidate_id is None
+    assert (
+        "routing_candidates_inconsistent_owner_projection:aoa-decision"
+        in decision.reason_codes
+    )
+
+
+@pytest.mark.parametrize(
+    ("field", "value"),
+    (
+        ("candidate_only", "true"),
+        ("allow_implicit_invocation", "false"),
+        ("requires_human_approval", "false"),
+        ("invocation_mode", ["invoke"]),
+        ("capability_id", "skill.aoa-eval"),
+    ),
+)
+def test_malformed_registry_invocation_posture_blocks(
+    workspace_root: Path,
+    field: str,
+    value: object,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(
+        workspace_root,
+        malformed_registry_attribute=(field, value),
+    )
+
     decision = _api(workspace_root, bundle_root, lock_path).resolve(_intent())
 
     assert decision.status == "blocked"

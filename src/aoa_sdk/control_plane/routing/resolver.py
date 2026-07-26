@@ -63,6 +63,15 @@ class _ScoredCandidate:
     score: int
 
 
+@dataclass(frozen=True, slots=True)
+class _RegistryInvocationPosture:
+    capability_id: str
+    invocation_mode: Literal["invoke", "suggest"]
+    allow_implicit_invocation: bool
+    candidate_only: bool
+    requires_human_approval: bool
+
+
 def resolve_route_intent(
     intent: RouteIntent,
     snapshot: RoutingResolutionSnapshot,
@@ -101,19 +110,30 @@ def resolve_route_intent(
         (item for item in snapshot.registry_entries if item.kind == "skill"),
         key=lambda item: (item.repo, item.id),
     ):
-        capability_id = str(entry.attributes.get("capability_id", "")).strip()
-        node = nodes.get(capability_id)
-        document = retrieval.get(capability_id)
-        if not capability_id or node is None or document is None:
+        invocation_posture = _registry_invocation_posture(entry)
+        if invocation_posture is None:
+            inconsistent_owner_projections.append(entry.id)
+            continue
+        node = nodes.get(invocation_posture.capability_id)
+        document = retrieval.get(invocation_posture.capability_id)
+        if node is None or document is None:
             missing_owner_projections.append(entry.id)
             continue
         if (
             entry.status not in _SELECTABLE_LIFECYCLE_STATES
+            or entry.name != entry.id
+            or entry.path != node.binding.get("ref")
+            or entry.status != node.lifecycle.state
             or node.kind != "skill"
             or node.contract_level != "executable"
             or node.owner.repo != entry.repo
+            or node.binding.get("kind") != "skill"
             or document.kind != "skill"
             or document.visibility != node.lifecycle.visibility
+            or entry.attributes.get("capability_graph_ref")
+            != snapshot.source_lock.capability_graph.relative_path
+            or entry.attributes.get("capability_source_path") != node.source_path
+            or entry.attributes.get("target_owner") != node.owner.repo
         ):
             inconsistent_owner_projections.append(entry.id)
             continue
@@ -134,6 +154,7 @@ def resolve_route_intent(
             explicitly_required=_matches_capability(
                 entry, node, explicit_required
             ),
+            invocation_posture=invocation_posture,
             required_capabilities=explicit_required,
             forbidden_capabilities=forbidden_capabilities,
             required_owners=required_owners,
@@ -444,6 +465,7 @@ def _candidate_posture(
     node: CapabilityNode,
     negative_match: bool,
     explicitly_required: bool,
+    invocation_posture: _RegistryInvocationPosture,
     required_capabilities: set[str],
     forbidden_capabilities: set[str],
     required_owners: set[str],
@@ -489,15 +511,12 @@ def _candidate_posture(
         policy = "forbidden"
         reasons.append("forbidden_owner_constraint")
 
-    allow_implicit = entry.attributes.get("allow_implicit_invocation")
-    candidate_only = entry.attributes.get("candidate_only")
-    invocation_mode = str(entry.attributes.get("invocation_mode", "")).casefold()
     if (
         not explicitly_required
         and (
-            allow_implicit is False
-            or candidate_only is True
-            or invocation_mode == "suggest"
+            not invocation_posture.allow_implicit_invocation
+            or invocation_posture.candidate_only
+            or invocation_posture.invocation_mode == "suggest"
             or node.lifecycle.visibility.casefold() == "deferred"
         )
     ):
@@ -505,11 +524,12 @@ def _candidate_posture(
         reasons.append("explicit_capability_constraint_required")
 
     node_approval = node.trust.get("requires_human_approval", False)
-    entry_approval = entry.attributes.get("requires_human_approval", False)
-    if not isinstance(node_approval, bool) or not isinstance(entry_approval, bool):
+    if not isinstance(node_approval, bool):
         policy = "forbidden"
         reasons.append("owner_approval_posture_invalid")
-    human_approval = node_approval is True or entry_approval is True
+    human_approval = (
+        node_approval is True or invocation_posture.requires_human_approval
+    )
     approval_constraints = _constraint_values(
         intent.constraints, "approval_requirement"
     )
@@ -555,6 +575,36 @@ def _candidate_posture(
     if not reasons:
         reasons.append("owner_projection_eligible")
     return compatibility, policy, tuple(reasons)
+
+
+def _registry_invocation_posture(
+    entry: RegistryEntry,
+) -> _RegistryInvocationPosture | None:
+    capability_id = entry.attributes.get("capability_id")
+    invocation_mode = entry.attributes.get("invocation_mode")
+    allow_implicit = entry.attributes.get("allow_implicit_invocation")
+    candidate_only = entry.attributes.get("candidate_only")
+    approval_required = entry.attributes.get("requires_human_approval")
+    if (
+        not isinstance(capability_id, str)
+        or capability_id != f"skill.{entry.id}"
+        or not isinstance(invocation_mode, str)
+        or invocation_mode not in {"invoke", "suggest"}
+        or not isinstance(allow_implicit, bool)
+        or not isinstance(candidate_only, bool)
+        or not isinstance(approval_required, bool)
+    ):
+        return None
+    typed_invocation_mode: Literal["invoke", "suggest"] = (
+        "invoke" if invocation_mode == "invoke" else "suggest"
+    )
+    return _RegistryInvocationPosture(
+        capability_id=capability_id,
+        invocation_mode=typed_invocation_mode,
+        allow_implicit_invocation=allow_implicit,
+        candidate_only=candidate_only,
+        requires_human_approval=approval_required,
+    )
 
 
 def _score_candidate(
