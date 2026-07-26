@@ -8,6 +8,7 @@
 | `owner-layer-signal-handoff` | Detect owner-layer signals, preserve them through reviewed handoff, and keep them non-executable until an owner route accepts them. | docs, tests, and `src/aoa_sdk/surfaces/` route references |
 | `organ-access-control-plane` | Project an explicit OS-private organ registry into bounded discovery and candidate-only plans without absorbing owner meaning or runtime authority. | contracts, schemas, generator, examples, tests, and `src/aoa_sdk/organs/` |
 | `route-resolution-control-plane` | Resolve and explain one route deterministically from an exact trusted routing snapshot and pinned owner projection without activation. | contract, source lock, implementation, CLI, and focused tests |
+| `plan-compilation-control-plane` | Compile one resolved route and exact reviewed scenario binding from an admitted owner contour into a runtime-neutral plan. | contract, exact contour/schema/trust pin, compiler, generated branch fixtures, installed-wheel probe, CLI, and focused tests |
 
 Candidate-only boundary bridge parts stay listed in
 `mechanics/boundary-bridge/PARTS.md` until they have part-local payload.

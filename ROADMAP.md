@@ -143,19 +143,21 @@ admission, `abyss-stack` canary intake, authorized live canary, exact rollback,
 public `v0.7.0` release trust, and the SDK-side G5 owner switch are complete.
 Exact `v0.8.0` admission, the receipt-gated `abyss-stack` cutover, deployed
 SDK-canonical route surface, and predecessor rollback posture are also
-complete. The next honest move is C1 deterministic route resolution from the
-trusted runtime snapshot and pinned owner projection, followed by separate C2
-plan compilation and C3-C5 Runner/lifecycle slices. Compatibility evidence
-continues in parallel; consumer-zero and archival remain unproved.
+complete. The C1 deterministic route resolver and separately landed C2
+runtime-neutral plan compiler now form the callable
+`RouteIntent -> RouteDecision -> RunPlan` control-plane chain. The next honest
+move is the separate C3-C5 Runner/lifecycle, adapter, evidence, resume, and
+closeout slices. Compatibility evidence continues in parallel; consumer-zero
+and archival remain unproved.
 
 ## Current Public Contour
 
 Current release marker: `v0.8.0`.
 
-Current unreleased contour: C1 deterministic route resolution,
-compatibility-window evidence, then separate C2-C5 Agent OS control-plane and
-Runner slices after `v0.8.0`. This is a directional contour, not a changelog
-replacement.
+Current unreleased contour: C1 deterministic route resolution plus C2
+runtime-neutral plan compilation, followed by compatibility-window evidence
+and separate C3-C5 Runner slices after `v0.8.0`. This is a directional contour,
+not a changelog replacement.
 
 Current anchors:
 

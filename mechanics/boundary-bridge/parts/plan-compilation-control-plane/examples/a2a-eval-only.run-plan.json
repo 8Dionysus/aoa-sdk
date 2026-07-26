@@ -1,0 +1,1096 @@
+{
+  "approval_requirements": [
+    {
+      "applies_to_step_ids": [],
+      "approval_owner": {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "runtime/agent-os/profile.json",
+        "owner_repo": "abyss-stack",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      "expires_after_seconds": null,
+      "operation": "reviewed-effect-boundary",
+      "renewable": false,
+      "required_evidence_refs": [],
+      "requirement_id": "approval:fixture:reviewed-effect",
+      "risk_class": "fixture"
+    }
+  ],
+  "checkpoint_policy": {
+    "owner": {
+      "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "artifact_ref": "playbooks/continuity/checkpoint/a2a-summon-return-checkpoint/PLAYBOOK.md",
+      "owner_repo": "aoa-playbooks",
+      "schema_ref": "schemas/fixture.schema.json",
+      "schema_version": "fixture-v1",
+      "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+    },
+    "required_after_step_ids": [
+      "review-return",
+      "checkpoint-return"
+    ],
+    "required_on_pause": true,
+    "required_on_recoverable_failure": true
+  },
+  "closeout_requirements": [
+    {
+      "owner_ref": {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "runtime/agent-os/profile.json",
+        "owner_repo": "abyss-stack",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      "required_ref_kinds": [
+        "child_task_result",
+        "checkpoint_bridge_plan",
+        "runtime_closeout_dry_run_receipt"
+      ],
+      "requirement_id": "closeout:a2a:return"
+    }
+  ],
+  "correlation_id": "correlation:fixture:a2a_summon_return_checkpoint",
+  "decision_ref": {
+    "digest": "sha256:b682936b4e464208507c05851e7586ad45cc8899b751cf9dad60a450bab60495",
+    "object_id": "route-decision:fixture:a2a_summon_return_checkpoint",
+    "owner_repo": "aoa-sdk",
+    "schema_version": "aoa_control_plane_v1"
+  },
+  "eval_requirements": [
+    {
+      "eval_anchor": "aoa-a2a-summon-return-checkpoint",
+      "eval_contract_ref": {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/eval_catalog.min.json",
+        "owner_repo": "aoa-evals",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      "eval_owner_ref": {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/eval_catalog.min.json",
+        "owner_repo": "aoa-evals",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      "required_evidence_ids": [
+        "evidence:a2a:summon-request",
+        "evidence:a2a:summon-decision",
+        "evidence:a2a:child-result",
+        "evidence:a2a:checkpoint",
+        "evidence:a2a:dry-run-receipt"
+      ],
+      "requirement_id": "eval:a2a:summon-return",
+      "verdict_required_for_closeout": true
+    },
+    {
+      "eval_anchor": "aoa-return-anchor-integrity",
+      "eval_contract_ref": {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/eval_catalog.min.json",
+        "owner_repo": "aoa-evals",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      "eval_owner_ref": {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/eval_catalog.min.json",
+        "owner_repo": "aoa-evals",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      "required_evidence_ids": [
+        "evidence:a2a:return-plan",
+        "evidence:a2a:checkpoint"
+      ],
+      "requirement_id": "eval:a2a:return-anchor",
+      "verdict_required_for_closeout": true
+    }
+  ],
+  "evidence_requirements": [
+    {
+      "artifact_binding": "scenario_input",
+      "artifact_kind": "summon_request",
+      "producer_owner": "fixture-scenario-inputs",
+      "required_after_step_id": "inspect-parent-anchor",
+      "requirement_id": "evidence:a2a:summon-request",
+      "terminal_required": true
+    },
+    {
+      "artifact_binding": "scenario_input",
+      "artifact_kind": "summon_decision",
+      "producer_owner": "fixture-scenario-inputs",
+      "required_after_step_id": "inspect-parent-anchor",
+      "requirement_id": "evidence:a2a:summon-decision",
+      "terminal_required": true
+    },
+    {
+      "artifact_binding": "step_output",
+      "artifact_kind": "codex_local_target",
+      "producer_owner": "abyss-stack",
+      "required_after_step_id": "inspect-child-target",
+      "requirement_id": "evidence:a2a:target",
+      "terminal_required": true
+    },
+    {
+      "artifact_binding": "scenario_input",
+      "artifact_kind": "child_task_result",
+      "producer_owner": "fixture-scenario-inputs",
+      "required_after_step_id": "review-return",
+      "requirement_id": "evidence:a2a:child-result",
+      "terminal_required": true
+    },
+    {
+      "artifact_binding": "step_output",
+      "artifact_kind": "return_plan",
+      "producer_owner": "abyss-stack",
+      "required_after_step_id": "review-return",
+      "requirement_id": "evidence:a2a:return-plan",
+      "terminal_required": true
+    },
+    {
+      "artifact_binding": "step_output",
+      "artifact_kind": "checkpoint_bridge_plan",
+      "producer_owner": "abyss-stack",
+      "required_after_step_id": "checkpoint-return",
+      "requirement_id": "evidence:a2a:checkpoint",
+      "terminal_required": true
+    },
+    {
+      "artifact_binding": "step_output",
+      "artifact_kind": "a2a_return_eval_packet",
+      "producer_owner": "abyss-stack",
+      "required_after_step_id": "evaluate-return",
+      "requirement_id": "evidence:a2a:eval-packet",
+      "terminal_required": false
+    },
+    {
+      "artifact_binding": "step_output",
+      "artifact_kind": "runtime_closeout_dry_run_receipt",
+      "producer_owner": "abyss-stack",
+      "required_after_step_id": "closeout-dry-run",
+      "requirement_id": "evidence:a2a:dry-run-receipt",
+      "terminal_required": true
+    }
+  ],
+  "plan_digest": "sha256:0bafd8613a472434b53031c2892766ea260965acfa0f24df81d99480ac51dc7a",
+  "plan_id": "run-plan:abb3c1858b4be81fcd3dae673ab550b88aa19acac82bcdb39467e1229b33e789",
+  "provenance": {
+    "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+    "artifact_ref": "src/aoa_sdk/control_plane/planning/compiler.py",
+    "owner_repo": "aoa-sdk",
+    "schema_ref": "schemas/fixture.schema.json",
+    "schema_version": "fixture-v1",
+    "source_ref": "fixture-source-ref"
+  },
+  "retention_requirements": [],
+  "retry_policy": {
+    "duplicate_effect_strategy": "same_idempotency_key_no_new_effect",
+    "max_attempts": 1,
+    "replay_strategy": "verify_snapshot_and_event_cursor_before_retry",
+    "retryable_failure_codes": []
+  },
+  "rollback_policy": {
+    "owner": {
+      "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "artifact_ref": "playbooks/continuity/checkpoint/a2a-summon-return-checkpoint/PLAYBOOK.md",
+      "owner_repo": "aoa-playbooks",
+      "schema_ref": "schemas/fixture.schema.json",
+      "schema_version": "fixture-v1",
+      "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+    },
+    "required": false,
+    "rollback_artifact_ref": null,
+    "rollback_failure_is_terminal": true,
+    "trigger_codes": [
+      "split_required",
+      "human_gate_required",
+      "safe_stop"
+    ]
+  },
+  "runtime_profile": {
+    "adapter_id": "fixture-non-executing-adapter",
+    "adapter_protocol_version": "aoa_runtime_adapter_v1",
+    "constraint_refs": [],
+    "profile_id": "runtime-profile:fixture",
+    "provenance": {
+      "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "artifact_ref": "runtime/agent-os/profile.json",
+      "owner_repo": "abyss-stack",
+      "schema_ref": "schemas/fixture.schema.json",
+      "schema_version": "fixture-v1",
+      "source_ref": "fixture-source-ref"
+    },
+    "runtime_owner": "abyss-stack",
+    "schema_version": "aoa_control_plane_v1",
+    "supported_effect_classes": [
+      "read_only",
+      "repo_mutation",
+      "runtime_mutation",
+      "external"
+    ],
+    "supported_event_schema_versions": [
+      "aoa_control_plane_v1"
+    ],
+    "supported_plan_schema_versions": [
+      "aoa_control_plane_v1"
+    ]
+  },
+  "scenario_binding": {
+    "agent_refs": [
+      {
+        "agent_id": "architect",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/agent_catalog.min.json#agents/architect",
+          "owner_repo": "aoa-agents",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "agent_id": "coder",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/agent_catalog.min.json#agents/coder",
+          "owner_repo": "aoa-agents",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "agent_id": "reviewer",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/agent_catalog.min.json#agents/reviewer",
+          "owner_repo": "aoa-agents",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "agent_id": "evaluator",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/agent_catalog.min.json#agents/evaluator",
+          "owner_repo": "aoa-agents",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "agent_id": "memory-keeper",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/agent_catalog.min.json#agents/memory-keeper",
+          "owner_repo": "aoa-agents",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      }
+    ],
+    "binding_id": "scenario-binding:fixture:a2a_summon_return_checkpoint",
+    "capability_refs": [
+      {
+        "capability_id": "aoa-source-of-truth-check",
+        "capability_kind": "skill",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/capability_graph.json#nodes/aoa-source-of-truth-check",
+          "owner_repo": "aoa-skills",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "capability_id": "aoa-bounded-context-map",
+        "capability_kind": "skill",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/capability_graph.json#nodes/aoa-bounded-context-map",
+          "owner_repo": "aoa-skills",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "capability_id": "aoa-approval-gate-check",
+        "capability_kind": "skill",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/capability_graph.json#nodes/aoa-approval-gate-check",
+          "owner_repo": "aoa-skills",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "capability_id": "aoa-dry-run-first",
+        "capability_kind": "skill",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/capability_graph.json#nodes/aoa-dry-run-first",
+          "owner_repo": "aoa-skills",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "capability_id": "aoa-change-protocol",
+        "capability_kind": "skill",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/capability_graph.json#nodes/aoa-change-protocol",
+          "owner_repo": "aoa-skills",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "capability_id": "aoa-contract-test",
+        "capability_kind": "skill",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/capability_graph.json#nodes/aoa-contract-test",
+          "owner_repo": "aoa-skills",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "capability_id": "aoa-checkpoint-closeout-bridge",
+        "capability_kind": "skill",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "generated/capability_graph.json#nodes/aoa-checkpoint-closeout-bridge",
+          "owner_repo": "aoa-skills",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      }
+    ],
+    "condition_bindings": [
+      {
+        "condition_id": "a2a_eval_packet_earned",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "reviews/a2a_summon_return_checkpoint/a2a_eval_packet_earned.json",
+          "owner_repo": "fixture-reviewer",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        },
+        "value": true
+      },
+      {
+        "condition_id": "memo_writeback_earned",
+        "provenance": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "reviews/a2a_summon_return_checkpoint/memo_writeback_earned.json",
+          "owner_repo": "fixture-reviewer",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        },
+        "value": false
+      }
+    ],
+    "correlation_id": "correlation:fixture:a2a_summon_return_checkpoint",
+    "decision_ref": {
+      "digest": "sha256:b682936b4e464208507c05851e7586ad45cc8899b751cf9dad60a450bab60495",
+      "object_id": "route-decision:fixture:a2a_summon_return_checkpoint",
+      "owner_repo": "aoa-sdk",
+      "schema_version": "aoa_control_plane_v1"
+    },
+    "expected_artifact_kinds": [
+      "summon_request",
+      "summon_decision",
+      "codex_local_target",
+      "child_task_result",
+      "return_plan",
+      "checkpoint_bridge_plan",
+      "a2a_return_eval_packet",
+      "memo_writeback_ref",
+      "runtime_closeout_dry_run_receipt"
+    ],
+    "input_artifact_bindings": [
+      {
+        "artifact_kind": "summon_request",
+        "artifact_ref": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "artifacts/summon_request.json",
+          "owner_repo": "fixture-scenario-inputs",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "artifact_kind": "summon_decision",
+        "artifact_ref": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "artifacts/summon_decision.json",
+          "owner_repo": "fixture-scenario-inputs",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      },
+      {
+        "artifact_kind": "child_task_result",
+        "artifact_ref": {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "artifacts/child_task_result.json",
+          "owner_repo": "fixture-scenario-inputs",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      }
+    ],
+    "input_refs": [],
+    "provenance": {
+      "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "artifact_ref": "bindings/a2a_summon_return_checkpoint.json",
+      "owner_repo": "fixture-requester",
+      "schema_ref": "schemas/fixture.schema.json",
+      "schema_version": "fixture-v1",
+      "source_ref": "fixture-source-ref"
+    },
+    "requirement_refs": [
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/eval_catalog.min.json",
+        "owner_repo": "aoa-evals",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "mechanics/checkpoint/parts/checkpoint-to-memory-mapping/examples/checkpoint_to_memory_contract.example.json",
+        "owner_repo": "aoa-memo",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      }
+    ],
+    "scenario": {
+      "provenance": {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "playbooks/continuity/checkpoint/a2a-summon-return-checkpoint/PLAYBOOK.md",
+        "owner_repo": "aoa-playbooks",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+      },
+      "scenario_id": "a2a_summon_return_checkpoint"
+    },
+    "schema_version": "aoa_control_plane_v1"
+  },
+  "schema_version": "aoa_control_plane_v1",
+  "snapshot": {
+    "abi_refs": [
+      {
+        "abi_id": "aoa_playbook_plan_contour_v1",
+        "abi_version": "aoa_playbook_plan_contour_v1",
+        "artifact_digest": "sha256:1effef6739136e3634f787572526926eb5731b978c03e15d6c21c8a047bdd7eb",
+        "owner_repo": "aoa-playbooks",
+        "schema_ref": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json",
+        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+      }
+    ],
+    "snapshot_digest": "sha256:20930b69aef70668fb1a03cb3a8a2dd2c8c558b389ea7f75fd5edb0589513696",
+    "snapshot_id": "plan-snapshot:65859e3593367193243fa79debd956c70085635fd99714c053c40c44cae489d6",
+    "source_refs": [
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "runtime/agent-os/profile.json",
+        "owner_repo": "abyss-stack",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/agent_catalog.min.json#agents/architect",
+        "owner_repo": "aoa-agents",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/agent_catalog.min.json#agents/coder",
+        "owner_repo": "aoa-agents",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/agent_catalog.min.json#agents/evaluator",
+        "owner_repo": "aoa-agents",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/agent_catalog.min.json#agents/memory-keeper",
+        "owner_repo": "aoa-agents",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/agent_catalog.min.json#agents/reviewer",
+        "owner_repo": "aoa-agents",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/eval_catalog.min.json",
+        "owner_repo": "aoa-evals",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "mechanics/checkpoint/parts/checkpoint-to-memory-mapping/examples/checkpoint_to_memory_contract.example.json",
+        "owner_repo": "aoa-memo",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e",
+        "artifact_ref": "dist/abyss-artifact-registry/aoa-playbooks-playbook-registry/records/698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e.json",
+        "owner_repo": "aoa-playbooks",
+        "schema_ref": "abyss-machine:artifact-bundle-registry-record",
+        "schema_version": "abyss_machine_artifact_bundle_registry_record_v1",
+        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+      },
+      {
+        "artifact_digest": "sha256:1effef6739136e3634f787572526926eb5731b978c03e15d6c21c8a047bdd7eb",
+        "artifact_ref": "generated/playbook_plan_contours.min.json",
+        "owner_repo": "aoa-playbooks",
+        "schema_ref": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json",
+        "schema_version": "aoa_playbook_plan_contours_v1",
+        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+      },
+      {
+        "artifact_digest": "sha256:29d6260b80691a46c005d91bd72c3305c167a953b7a6a5d42e2c98d1a38d4673",
+        "artifact_ref": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json",
+        "owner_repo": "aoa-playbooks",
+        "schema_ref": "https://agents-of-abyss.example/schemas/aoa-playbook-plan-contours-v1.json",
+        "schema_version": "https://json-schema.org/draft/2020-12/schema",
+        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "playbooks/continuity/checkpoint/a2a-summon-return-checkpoint/PLAYBOOK.md",
+        "owner_repo": "aoa-playbooks",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "src/aoa_sdk/control_plane/planning/compiler.py",
+        "owner_repo": "aoa-sdk",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "src/aoa_sdk/control_plane/routing/resolver.py",
+        "owner_repo": "aoa-sdk",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/capability_graph.json#nodes/aoa-approval-gate-check",
+        "owner_repo": "aoa-skills",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/capability_graph.json#nodes/aoa-bounded-context-map",
+        "owner_repo": "aoa-skills",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/capability_graph.json#nodes/aoa-change-protocol",
+        "owner_repo": "aoa-skills",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/capability_graph.json#nodes/aoa-checkpoint-closeout-bridge",
+        "owner_repo": "aoa-skills",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/capability_graph.json#nodes/aoa-contract-test",
+        "owner_repo": "aoa-skills",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/capability_graph.json#nodes/aoa-dry-run-first",
+        "owner_repo": "aoa-skills",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "generated/capability_graph.json#nodes/aoa-source-of-truth-check",
+        "owner_repo": "aoa-skills",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "bindings/a2a_summon_return_checkpoint.json",
+        "owner_repo": "fixture-requester",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "reviews/a2a_summon_return_checkpoint/a2a_eval_packet_earned.json",
+        "owner_repo": "fixture-reviewer",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "reviews/a2a_summon_return_checkpoint/memo_writeback_earned.json",
+        "owner_repo": "fixture-reviewer",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "artifacts/child_task_result.json",
+        "owner_repo": "fixture-scenario-inputs",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "artifacts/summon_decision.json",
+        "owner_repo": "fixture-scenario-inputs",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+        "artifact_ref": "artifacts/summon_request.json",
+        "owner_repo": "fixture-scenario-inputs",
+        "schema_ref": "schemas/fixture.schema.json",
+        "schema_version": "fixture-v1",
+        "source_ref": "fixture-source-ref"
+      }
+    ]
+  },
+  "steps": [
+    {
+      "agent_refs": [
+        {
+          "agent_id": "architect",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/agent_catalog.min.json#agents/architect",
+            "owner_repo": "aoa-agents",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        },
+        {
+          "agent_id": "reviewer",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/agent_catalog.min.json#agents/reviewer",
+            "owner_repo": "aoa-agents",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "approval_requirement_ids": [],
+      "capability_refs": [
+        {
+          "capability_id": "aoa-source-of-truth-check",
+          "capability_kind": "skill",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/capability_graph.json#nodes/aoa-source-of-truth-check",
+            "owner_repo": "aoa-skills",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        },
+        {
+          "capability_id": "aoa-bounded-context-map",
+          "capability_kind": "skill",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/capability_graph.json#nodes/aoa-bounded-context-map",
+            "owner_repo": "aoa-skills",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        },
+        {
+          "capability_id": "aoa-approval-gate-check",
+          "capability_kind": "skill",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/capability_graph.json#nodes/aoa-approval-gate-check",
+            "owner_repo": "aoa-skills",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "depends_on": [],
+      "effect_class": "read_only",
+      "expected_output_kinds": [],
+      "input_refs": [
+        {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "artifacts/summon_request.json",
+          "owner_repo": "fixture-scenario-inputs",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        },
+        {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "artifacts/summon_decision.json",
+          "owner_repo": "fixture-scenario-inputs",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      ],
+      "operation_kind": "inspect",
+      "step_id": "inspect-parent-anchor"
+    },
+    {
+      "agent_refs": [
+        {
+          "agent_id": "architect",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/agent_catalog.min.json#agents/architect",
+            "owner_repo": "aoa-agents",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        },
+        {
+          "agent_id": "coder",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/agent_catalog.min.json#agents/coder",
+            "owner_repo": "aoa-agents",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "approval_requirement_ids": [
+        "approval:fixture:reviewed-effect"
+      ],
+      "capability_refs": [
+        {
+          "capability_id": "aoa-dry-run-first",
+          "capability_kind": "skill",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/capability_graph.json#nodes/aoa-dry-run-first",
+            "owner_repo": "aoa-skills",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        },
+        {
+          "capability_id": "aoa-change-protocol",
+          "capability_kind": "skill",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/capability_graph.json#nodes/aoa-change-protocol",
+            "owner_repo": "aoa-skills",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "depends_on": [
+        "inspect-parent-anchor"
+      ],
+      "effect_class": "read_only",
+      "expected_output_kinds": [
+        "codex_local_target"
+      ],
+      "input_refs": [
+        {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "artifacts/summon_request.json",
+          "owner_repo": "fixture-scenario-inputs",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        },
+        {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "artifacts/summon_decision.json",
+          "owner_repo": "fixture-scenario-inputs",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      ],
+      "operation_kind": "inspect",
+      "step_id": "inspect-child-target"
+    },
+    {
+      "agent_refs": [
+        {
+          "agent_id": "reviewer",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/agent_catalog.min.json#agents/reviewer",
+            "owner_repo": "aoa-agents",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "approval_requirement_ids": [],
+      "capability_refs": [
+        {
+          "capability_id": "aoa-contract-test",
+          "capability_kind": "skill",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/capability_graph.json#nodes/aoa-contract-test",
+            "owner_repo": "aoa-skills",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "depends_on": [
+        "inspect-child-target"
+      ],
+      "effect_class": "read_only",
+      "expected_output_kinds": [
+        "return_plan"
+      ],
+      "input_refs": [
+        {
+          "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+          "artifact_ref": "artifacts/child_task_result.json",
+          "owner_repo": "fixture-scenario-inputs",
+          "schema_ref": "schemas/fixture.schema.json",
+          "schema_version": "fixture-v1",
+          "source_ref": "fixture-source-ref"
+        }
+      ],
+      "operation_kind": "return",
+      "step_id": "review-return"
+    },
+    {
+      "agent_refs": [
+        {
+          "agent_id": "reviewer",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/agent_catalog.min.json#agents/reviewer",
+            "owner_repo": "aoa-agents",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "approval_requirement_ids": [],
+      "capability_refs": [
+        {
+          "capability_id": "aoa-checkpoint-closeout-bridge",
+          "capability_kind": "skill",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/capability_graph.json#nodes/aoa-checkpoint-closeout-bridge",
+            "owner_repo": "aoa-skills",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "depends_on": [
+        "review-return"
+      ],
+      "effect_class": "read_only",
+      "expected_output_kinds": [
+        "checkpoint_bridge_plan"
+      ],
+      "input_refs": [],
+      "operation_kind": "checkpoint",
+      "step_id": "checkpoint-return"
+    },
+    {
+      "agent_refs": [
+        {
+          "agent_id": "evaluator",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/agent_catalog.min.json#agents/evaluator",
+            "owner_repo": "aoa-agents",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "approval_requirement_ids": [],
+      "capability_refs": [
+        {
+          "capability_id": "aoa-contract-test",
+          "capability_kind": "skill",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/capability_graph.json#nodes/aoa-contract-test",
+            "owner_repo": "aoa-skills",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "depends_on": [
+        "checkpoint-return"
+      ],
+      "effect_class": "read_only",
+      "expected_output_kinds": [
+        "a2a_return_eval_packet"
+      ],
+      "input_refs": [],
+      "operation_kind": "evaluate",
+      "step_id": "evaluate-return"
+    },
+    {
+      "agent_refs": [
+        {
+          "agent_id": "coder",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/agent_catalog.min.json#agents/coder",
+            "owner_repo": "aoa-agents",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        },
+        {
+          "agent_id": "reviewer",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/agent_catalog.min.json#agents/reviewer",
+            "owner_repo": "aoa-agents",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "approval_requirement_ids": [],
+      "capability_refs": [
+        {
+          "capability_id": "aoa-dry-run-first",
+          "capability_kind": "skill",
+          "provenance": {
+            "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+            "artifact_ref": "generated/capability_graph.json#nodes/aoa-dry-run-first",
+            "owner_repo": "aoa-skills",
+            "schema_ref": "schemas/fixture.schema.json",
+            "schema_version": "fixture-v1",
+            "source_ref": "fixture-source-ref"
+          }
+        }
+      ],
+      "depends_on": [
+        "checkpoint-return",
+        "evaluate-return"
+      ],
+      "effect_class": "read_only",
+      "expected_output_kinds": [
+        "runtime_closeout_dry_run_receipt"
+      ],
+      "input_refs": [],
+      "operation_kind": "closeout",
+      "step_id": "closeout-dry-run"
+    }
+  ]
+}

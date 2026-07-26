@@ -20,9 +20,7 @@ from pydantic import BaseModel, ConfigDict, Field, field_validator, model_valida
 from ..errors import AoASDKError
 
 
-CONTROL_PLANE_SCHEMA_VERSION: Literal["aoa_control_plane_v1"] = (
-    "aoa_control_plane_v1"
-)
+CONTROL_PLANE_SCHEMA_VERSION: Literal["aoa_control_plane_v1"] = "aoa_control_plane_v1"
 CONTROL_PLANE_LIFECYCLE_VERSION: Literal["aoa_run_lifecycle_v1"] = (
     "aoa_run_lifecycle_v1"
 )
@@ -103,6 +101,21 @@ class CapabilityRef(StrictControlPlaneModel):
 
 class ScenarioRef(StrictControlPlaneModel):
     scenario_id: NonEmptyStr
+    provenance: ProvenanceRef
+
+
+class ScenarioArtifactBinding(StrictControlPlaneModel):
+    """Owner-qualified scenario input selected by its reviewed artifact kind."""
+
+    artifact_kind: NonEmptyStr
+    artifact_ref: ProvenanceRef
+
+
+class ScenarioConditionBinding(StrictControlPlaneModel):
+    """Exact reviewed boolean used to select a guarded plan contour."""
+
+    condition_id: NonEmptyStr
+    value: bool
     provenance: ProvenanceRef
 
 
@@ -197,7 +210,9 @@ class RouteDecision(StrictControlPlaneModel):
             raise ValueError("route candidate ids must be unique")
         if self.status in {"resolved", "degraded"}:
             if self.selected_candidate_id not in candidate_ids:
-                raise ValueError("resolved or degraded decisions must select a listed candidate")
+                raise ValueError(
+                    "resolved or degraded decisions must select a listed candidate"
+                )
         elif self.selected_candidate_id is not None:
             raise ValueError("blocked decisions cannot select a candidate")
         if self.selected_candidate_id is not None:
@@ -206,8 +221,13 @@ class RouteDecision(StrictControlPlaneModel):
                 for candidate in self.candidates
                 if candidate.candidate_id == self.selected_candidate_id
             )
-            if selected.compatibility == "incompatible" or selected.policy_posture == "forbidden":
-                raise ValueError("an incompatible or forbidden candidate cannot be selected")
+            if (
+                selected.compatibility == "incompatible"
+                or selected.policy_posture == "forbidden"
+            ):
+                raise ValueError(
+                    "an incompatible or forbidden candidate cannot be selected"
+                )
         return self
 
 
@@ -266,9 +286,7 @@ class RouteExplanation(StrictControlPlaneModel):
 
     @model_validator(mode="after")
     def validate_explanation(self) -> RouteExplanation:
-        candidate_ids = [
-            item.candidate_id for item in self.candidate_explanations
-        ]
+        candidate_ids = [item.candidate_id for item in self.candidate_explanations]
         if len(candidate_ids) != len(set(candidate_ids)):
             raise ValueError("candidate explanation ids must be unique")
         selected = [
@@ -278,9 +296,13 @@ class RouteExplanation(StrictControlPlaneModel):
         ]
         if self.decision_status == "blocked":
             if selected or self.selected_candidate_id is not None:
-                raise ValueError("a blocked explanation cannot contain a selected candidate")
+                raise ValueError(
+                    "a blocked explanation cannot contain a selected candidate"
+                )
         elif selected != [self.selected_candidate_id]:
-            raise ValueError("explanation selection must identify exactly the decision selection")
+            raise ValueError(
+                "explanation selection must identify exactly the decision selection"
+            )
         return self
 
 
@@ -293,8 +315,40 @@ class ScenarioBinding(StrictControlPlaneModel):
     agent_refs: tuple[AgentRef, ...]
     capability_refs: tuple[CapabilityRef, ...]
     input_refs: tuple[ProvenanceRef, ...] = ()
+    input_artifact_bindings: tuple[ScenarioArtifactBinding, ...] = ()
+    condition_bindings: tuple[ScenarioConditionBinding, ...] = ()
+    requirement_refs: tuple[ProvenanceRef, ...] = ()
     expected_artifact_kinds: tuple[NonEmptyStr, ...] = ()
     provenance: ProvenanceRef
+
+    @model_validator(mode="after")
+    def validate_binding_identities(self) -> ScenarioBinding:
+        identities = (
+            ("agent", [item.agent_id for item in self.agent_refs]),
+            (
+                "capability",
+                [item.capability_id for item in self.capability_refs],
+            ),
+            (
+                "input artifact",
+                [item.artifact_kind for item in self.input_artifact_bindings],
+            ),
+            (
+                "condition",
+                [item.condition_id for item in self.condition_bindings],
+            ),
+        )
+        for label, values in identities:
+            if len(values) != len(set(values)):
+                raise ValueError(f"scenario binding {label} ids must be unique")
+        requirement_keys = [
+            (item.owner_repo, item.artifact_ref) for item in self.requirement_refs
+        ]
+        if len(requirement_keys) != len(set(requirement_keys)):
+            raise ValueError(
+                "scenario binding requirement refs must be owner-path unique"
+            )
+        return self
 
 
 class RuntimeProfile(StrictControlPlaneModel):
@@ -411,6 +465,7 @@ class RollbackPolicy(StrictControlPlaneModel):
 class EvidenceRequirement(StrictControlPlaneModel):
     requirement_id: NonEmptyStr
     artifact_kind: NonEmptyStr
+    artifact_binding: Literal["scenario_input", "step_output"] = "step_output"
     producer_owner: NonEmptyStr
     required_after_step_id: str | None = None
     terminal_required: bool = False
@@ -418,6 +473,7 @@ class EvidenceRequirement(StrictControlPlaneModel):
 
 class EvalRequirement(StrictControlPlaneModel):
     requirement_id: NonEmptyStr
+    eval_anchor: NonEmptyStr | None = None
     eval_owner_ref: ProvenanceRef
     eval_contract_ref: ProvenanceRef
     required_evidence_ids: tuple[NonEmptyStr, ...] = ()
@@ -461,7 +517,10 @@ class RunPlan(StrictControlPlaneModel):
     def validate_plan_graph(self) -> RunPlan:
         if self.correlation_id != self.scenario_binding.correlation_id:
             raise ValueError("plan and scenario binding correlation ids must match")
-        if self.schema_version not in self.runtime_profile.supported_plan_schema_versions:
+        if (
+            self.schema_version
+            not in self.runtime_profile.supported_plan_schema_versions
+        ):
             raise ValueError("runtime profile does not support the run plan schema")
         if (
             CONTROL_PLANE_SCHEMA_VERSION
@@ -638,9 +697,7 @@ class RunStatus(StrictControlPlaneModel):
                     "recoverable_failure must name a failure code and recovery cursor"
                 )
         elif self.recover_from_event_sequence is not None:
-            raise ValueError(
-                "a recovery cursor is only valid for recoverable_failure"
-            )
+            raise ValueError("a recovery cursor is only valid for recoverable_failure")
         if self.state == "failed" and self.failure_code is None:
             raise ValueError("failed status must name a failure code")
         if self.state not in {"failed", "recoverable_failure"} and self.failure_code:
@@ -719,7 +776,9 @@ class CommandReceipt(StrictControlPlaneModel):
         if self.status == "rejected" and self.rejection_code is None:
             raise ValueError("a rejected command receipt must include rejection_code")
         if self.status != "rejected" and self.rejection_code is not None:
-            raise ValueError("only a rejected command receipt may include rejection_code")
+            raise ValueError(
+                "only a rejected command receipt may include rejection_code"
+            )
         return self
 
 
@@ -903,7 +962,9 @@ def assert_snapshot_current(
     }
     expected_abi_keys = {(abi.owner_repo, abi.abi_id) for abi in snapshot.abi_refs}
     if set(observed_sources) != expected_source_keys:
-        raise ControlPlaneContractError("observed source set does not match plan snapshot")
+        raise ControlPlaneContractError(
+            "observed source set does not match plan snapshot"
+        )
     if set(observed_abis) != expected_abi_keys:
         raise ControlPlaneContractError("observed ABI set does not match plan snapshot")
     for source in snapshot.source_refs:
@@ -942,8 +1003,7 @@ def assert_explanation_matches_decision(
         candidate.candidate_id for candidate in decision.candidates
     ]
     explanation_ids = [
-        candidate.candidate_id
-        for candidate in explanation.candidate_explanations
+        candidate.candidate_id for candidate in explanation.candidate_explanations
     ]
     if len(explanation_ids) != len(set(explanation_ids)):
         raise ControlPlaneContractError(
@@ -974,9 +1034,7 @@ def assert_explanation_matches_decision(
                 "route explanation disposition contradicts the decision candidate"
             )
     expected_ambiguity_codes = tuple(
-        reason
-        for reason in decision.reason_codes
-        if reason.startswith("ambiguous_")
+        reason for reason in decision.reason_codes if reason.startswith("ambiguous_")
     )
     if explanation.ambiguity_codes != expected_ambiguity_codes:
         raise ControlPlaneContractError(

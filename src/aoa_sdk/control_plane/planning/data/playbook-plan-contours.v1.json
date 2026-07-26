@@ -1,0 +1,948 @@
+{
+  "schema_version": "aoa_playbook_plan_contours_v1",
+  "layer": "aoa-playbooks",
+  "abi": {
+    "abi_id": "aoa_playbook_plan_contour_v1",
+    "abi_version": "aoa_playbook_plan_contour_v1",
+    "owner_repo": "aoa-playbooks",
+    "schema_ref": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json"
+  },
+  "source_of_truth": {
+    "config": "mechanics/scenario-composition/parts/plan-contours/config/playbook_plan_contours.json",
+    "playbooks": "playbooks/*/*/*/PLAYBOOK.md",
+    "schema": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json"
+  },
+  "contours": [
+    {
+      "playbook_id": "AOA-P-0011",
+      "playbook_name": "bounded-change-safe",
+      "scenario": "bounded_change_safe",
+      "source_playbook_ref": "playbooks/operations/change/bounded-change-safe/PLAYBOOK.md",
+      "required_agent_ids": [
+        "architect",
+        "coder",
+        "reviewer",
+        "memory-keeper"
+      ],
+      "required_capability_ids": [
+        "aoa-approval-gate-check",
+        "aoa-source-of-truth-check",
+        "aoa-bounded-context-map",
+        "aoa-dry-run-first",
+        "aoa-change-protocol",
+        "aoa-contract-test",
+        "aoa-tdd-slice",
+        "aoa-adr-write",
+        "aoa-sanitized-share"
+      ],
+      "expected_artifact_kinds": [
+        "approval_record",
+        "source_map",
+        "scoped_change_set",
+        "verification_pack",
+        "shareable_summary"
+      ],
+      "input_artifact_kinds": [],
+      "scenario_conditions": [
+        {
+          "condition_id": "preview_required",
+          "binding": "reviewed_boolean"
+        }
+      ],
+      "steps": [
+        {
+          "step_id": "orient",
+          "operation_kind": "inspect",
+          "effect_class": "read_only",
+          "depends_on": [],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "architect"
+          ],
+          "capability_ids": [
+            "aoa-approval-gate-check",
+            "aoa-source-of-truth-check",
+            "aoa-bounded-context-map"
+          ],
+          "input_binding": "all_scenario_inputs",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "approval_record",
+            "source_map"
+          ],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "preview",
+          "operation_kind": "validate",
+          "effect_class": "read_only",
+          "depends_on": [
+            "orient"
+          ],
+          "guard_condition_id": "preview_required",
+          "agent_ids": [
+            "architect",
+            "coder"
+          ],
+          "capability_ids": [
+            "aoa-dry-run-first"
+          ],
+          "input_binding": "all_scenario_inputs",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "mutate",
+          "operation_kind": "mutate",
+          "effect_class": "repo_mutation",
+          "depends_on": [
+            "preview"
+          ],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "coder"
+          ],
+          "capability_ids": [
+            "aoa-change-protocol"
+          ],
+          "input_binding": "all_scenario_inputs",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "scoped_change_set"
+          ],
+          "approval_binding": "all_route_requirements"
+        },
+        {
+          "step_id": "verify",
+          "operation_kind": "validate",
+          "effect_class": "read_only",
+          "depends_on": [
+            "mutate"
+          ],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "reviewer"
+          ],
+          "capability_ids": [
+            "aoa-contract-test",
+            "aoa-tdd-slice"
+          ],
+          "input_binding": "none",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "verification_pack"
+          ],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "closeout",
+          "operation_kind": "closeout",
+          "effect_class": "read_only",
+          "depends_on": [
+            "verify"
+          ],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "reviewer",
+            "memory-keeper"
+          ],
+          "capability_ids": [
+            "aoa-adr-write",
+            "aoa-sanitized-share"
+          ],
+          "input_binding": "none",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "shareable_summary"
+          ],
+          "approval_binding": "none"
+        }
+      ],
+      "checkpoint_policy": {
+        "owner_binding": "scenario_owner",
+        "required_after_step_ids": [
+          "mutate",
+          "verify"
+        ],
+        "required_on_pause": true,
+        "required_on_recoverable_failure": true
+      },
+      "retry_policy": {
+        "max_attempts": 1,
+        "retryable_failure_codes": []
+      },
+      "rollback_policy": {
+        "required": false,
+        "owner_binding": "scenario_owner",
+        "trigger_codes": [
+          "scope_lost",
+          "verification_failed",
+          "safe_stop"
+        ],
+        "rollback_artifact_input_ref": null
+      },
+      "evidence_requirements": [
+        {
+          "requirement_id": "evidence:bounded-change:approval",
+          "artifact_kind": "approval_record",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "orient",
+          "guard_condition_id": null,
+          "terminal_required": false
+        },
+        {
+          "requirement_id": "evidence:bounded-change:source-map",
+          "artifact_kind": "source_map",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "orient",
+          "guard_condition_id": null,
+          "terminal_required": false
+        },
+        {
+          "requirement_id": "evidence:bounded-change:change-set",
+          "artifact_kind": "scoped_change_set",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "mutate",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:bounded-change:verification",
+          "artifact_kind": "verification_pack",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "verify",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:bounded-change:summary",
+          "artifact_kind": "shareable_summary",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "closeout",
+          "guard_condition_id": null,
+          "terminal_required": true
+        }
+      ],
+      "eval_requirements": [
+        {
+          "requirement_id": "eval:bounded-change:approval-boundary",
+          "eval_anchor": "aoa-approval-boundary-adherence",
+          "input_ref": {
+            "owner_repo": "aoa-evals",
+            "artifact_ref": "generated/eval_catalog.min.json"
+          },
+          "required_evidence_ids": [
+            "evidence:bounded-change:approval",
+            "evidence:bounded-change:source-map"
+          ],
+          "guard_condition_id": null,
+          "verdict_required_for_closeout": true
+        },
+        {
+          "requirement_id": "eval:bounded-change:quality",
+          "eval_anchor": "aoa-bounded-change-quality",
+          "input_ref": {
+            "owner_repo": "aoa-evals",
+            "artifact_ref": "generated/eval_catalog.min.json"
+          },
+          "required_evidence_ids": [
+            "evidence:bounded-change:change-set",
+            "evidence:bounded-change:verification"
+          ],
+          "guard_condition_id": null,
+          "verdict_required_for_closeout": true
+        }
+      ],
+      "retention_requirements": [
+        {
+          "requirement_id": "retain:bounded-change:checkpoint",
+          "input_ref": {
+            "owner_repo": "aoa-memo",
+            "artifact_ref": "mechanics/checkpoint/parts/checkpoint-to-memory-mapping/examples/checkpoint_to_memory_contract.example.json"
+          },
+          "guard_condition_id": null,
+          "receipt_required_for_closeout": true
+        }
+      ],
+      "closeout_requirements": [
+        {
+          "requirement_id": "closeout:bounded-change",
+          "owner_binding": "runtime_owner",
+          "required_ref_kinds": [
+            "verification_pack",
+            "shareable_summary"
+          ]
+        }
+      ]
+    },
+    {
+      "playbook_id": "AOA-P-0031",
+      "playbook_name": "a2a-summon-return-checkpoint",
+      "scenario": "a2a_summon_return_checkpoint",
+      "source_playbook_ref": "playbooks/continuity/checkpoint/a2a-summon-return-checkpoint/PLAYBOOK.md",
+      "required_agent_ids": [
+        "architect",
+        "coder",
+        "reviewer",
+        "evaluator",
+        "memory-keeper"
+      ],
+      "required_capability_ids": [
+        "aoa-source-of-truth-check",
+        "aoa-bounded-context-map",
+        "aoa-approval-gate-check",
+        "aoa-dry-run-first",
+        "aoa-change-protocol",
+        "aoa-contract-test",
+        "aoa-checkpoint-closeout-bridge"
+      ],
+      "expected_artifact_kinds": [
+        "summon_request",
+        "summon_decision",
+        "codex_local_target",
+        "child_task_result",
+        "return_plan",
+        "checkpoint_bridge_plan",
+        "a2a_return_eval_packet",
+        "memo_writeback_ref",
+        "runtime_closeout_dry_run_receipt"
+      ],
+      "input_artifact_kinds": [
+        "summon_request",
+        "summon_decision",
+        "child_task_result"
+      ],
+      "scenario_conditions": [
+        {
+          "condition_id": "a2a_eval_packet_earned",
+          "binding": "reviewed_boolean"
+        },
+        {
+          "condition_id": "memo_writeback_earned",
+          "binding": "reviewed_boolean"
+        }
+      ],
+      "steps": [
+        {
+          "step_id": "inspect-parent-anchor",
+          "operation_kind": "inspect",
+          "effect_class": "read_only",
+          "depends_on": [],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "architect",
+            "reviewer"
+          ],
+          "capability_ids": [
+            "aoa-source-of-truth-check",
+            "aoa-bounded-context-map",
+            "aoa-approval-gate-check"
+          ],
+          "input_binding": "selected_scenario_inputs",
+          "input_artifact_kinds": [
+            "summon_request",
+            "summon_decision"
+          ],
+          "expected_output_kinds": [],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "inspect-child-target",
+          "operation_kind": "inspect",
+          "effect_class": "read_only",
+          "depends_on": [
+            "inspect-parent-anchor"
+          ],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "architect",
+            "coder"
+          ],
+          "capability_ids": [
+            "aoa-dry-run-first",
+            "aoa-change-protocol"
+          ],
+          "input_binding": "selected_scenario_inputs",
+          "input_artifact_kinds": [
+            "summon_request",
+            "summon_decision"
+          ],
+          "expected_output_kinds": [
+            "codex_local_target"
+          ],
+          "approval_binding": "all_route_requirements"
+        },
+        {
+          "step_id": "review-return",
+          "operation_kind": "return",
+          "effect_class": "read_only",
+          "depends_on": [
+            "inspect-child-target"
+          ],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "reviewer"
+          ],
+          "capability_ids": [
+            "aoa-contract-test"
+          ],
+          "input_binding": "selected_scenario_inputs",
+          "input_artifact_kinds": [
+            "child_task_result"
+          ],
+          "expected_output_kinds": [
+            "return_plan"
+          ],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "checkpoint-return",
+          "operation_kind": "checkpoint",
+          "effect_class": "read_only",
+          "depends_on": [
+            "review-return"
+          ],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "reviewer"
+          ],
+          "capability_ids": [
+            "aoa-checkpoint-closeout-bridge"
+          ],
+          "input_binding": "none",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "checkpoint_bridge_plan"
+          ],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "evaluate-return",
+          "operation_kind": "evaluate",
+          "effect_class": "read_only",
+          "depends_on": [
+            "checkpoint-return"
+          ],
+          "guard_condition_id": "a2a_eval_packet_earned",
+          "agent_ids": [
+            "evaluator"
+          ],
+          "capability_ids": [
+            "aoa-contract-test"
+          ],
+          "input_binding": "none",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "a2a_return_eval_packet"
+          ],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "retain-return",
+          "operation_kind": "retain",
+          "effect_class": "read_only",
+          "depends_on": [
+            "checkpoint-return"
+          ],
+          "guard_condition_id": "memo_writeback_earned",
+          "agent_ids": [
+            "memory-keeper"
+          ],
+          "capability_ids": [],
+          "input_binding": "none",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "memo_writeback_ref"
+          ],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "closeout-dry-run",
+          "operation_kind": "closeout",
+          "effect_class": "read_only",
+          "depends_on": [
+            "checkpoint-return",
+            "evaluate-return",
+            "retain-return"
+          ],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "coder",
+            "reviewer"
+          ],
+          "capability_ids": [
+            "aoa-dry-run-first"
+          ],
+          "input_binding": "none",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "runtime_closeout_dry_run_receipt"
+          ],
+          "approval_binding": "none"
+        }
+      ],
+      "checkpoint_policy": {
+        "owner_binding": "scenario_owner",
+        "required_after_step_ids": [
+          "review-return",
+          "checkpoint-return"
+        ],
+        "required_on_pause": true,
+        "required_on_recoverable_failure": true
+      },
+      "retry_policy": {
+        "max_attempts": 1,
+        "retryable_failure_codes": []
+      },
+      "rollback_policy": {
+        "required": false,
+        "owner_binding": "scenario_owner",
+        "trigger_codes": [
+          "split_required",
+          "human_gate_required",
+          "safe_stop"
+        ],
+        "rollback_artifact_input_ref": null
+      },
+      "evidence_requirements": [
+        {
+          "requirement_id": "evidence:a2a:summon-request",
+          "artifact_kind": "summon_request",
+          "artifact_binding": "scenario_input",
+          "required_after_step_id": "inspect-parent-anchor",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:a2a:summon-decision",
+          "artifact_kind": "summon_decision",
+          "artifact_binding": "scenario_input",
+          "required_after_step_id": "inspect-parent-anchor",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:a2a:target",
+          "artifact_kind": "codex_local_target",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "inspect-child-target",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:a2a:child-result",
+          "artifact_kind": "child_task_result",
+          "artifact_binding": "scenario_input",
+          "required_after_step_id": "review-return",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:a2a:return-plan",
+          "artifact_kind": "return_plan",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "review-return",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:a2a:checkpoint",
+          "artifact_kind": "checkpoint_bridge_plan",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "checkpoint-return",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:a2a:eval-packet",
+          "artifact_kind": "a2a_return_eval_packet",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "evaluate-return",
+          "guard_condition_id": "a2a_eval_packet_earned",
+          "terminal_required": false
+        },
+        {
+          "requirement_id": "evidence:a2a:memo-ref",
+          "artifact_kind": "memo_writeback_ref",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "retain-return",
+          "guard_condition_id": "memo_writeback_earned",
+          "terminal_required": false
+        },
+        {
+          "requirement_id": "evidence:a2a:dry-run-receipt",
+          "artifact_kind": "runtime_closeout_dry_run_receipt",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "closeout-dry-run",
+          "guard_condition_id": null,
+          "terminal_required": true
+        }
+      ],
+      "eval_requirements": [
+        {
+          "requirement_id": "eval:a2a:summon-return",
+          "eval_anchor": "aoa-a2a-summon-return-checkpoint",
+          "input_ref": {
+            "owner_repo": "aoa-evals",
+            "artifact_ref": "generated/eval_catalog.min.json"
+          },
+          "required_evidence_ids": [
+            "evidence:a2a:summon-request",
+            "evidence:a2a:summon-decision",
+            "evidence:a2a:child-result",
+            "evidence:a2a:checkpoint",
+            "evidence:a2a:dry-run-receipt"
+          ],
+          "guard_condition_id": null,
+          "verdict_required_for_closeout": true
+        },
+        {
+          "requirement_id": "eval:a2a:return-anchor",
+          "eval_anchor": "aoa-return-anchor-integrity",
+          "input_ref": {
+            "owner_repo": "aoa-evals",
+            "artifact_ref": "generated/eval_catalog.min.json"
+          },
+          "required_evidence_ids": [
+            "evidence:a2a:return-plan",
+            "evidence:a2a:checkpoint"
+          ],
+          "guard_condition_id": null,
+          "verdict_required_for_closeout": true
+        }
+      ],
+      "retention_requirements": [
+        {
+          "requirement_id": "retain:a2a:checkpoint",
+          "input_ref": {
+            "owner_repo": "aoa-memo",
+            "artifact_ref": "mechanics/checkpoint/parts/checkpoint-to-memory-mapping/examples/checkpoint_to_memory_contract.example.json"
+          },
+          "guard_condition_id": "memo_writeback_earned",
+          "receipt_required_for_closeout": true
+        }
+      ],
+      "closeout_requirements": [
+        {
+          "requirement_id": "closeout:a2a:return",
+          "owner_binding": "runtime_owner",
+          "required_ref_kinds": [
+            "child_task_result",
+            "checkpoint_bridge_plan",
+            "runtime_closeout_dry_run_receipt"
+          ]
+        }
+      ]
+    },
+    {
+      "playbook_id": "AOA-P-0032",
+      "playbook_name": "runtime-chaos-recovery",
+      "scenario": "runtime_chaos_recovery",
+      "source_playbook_ref": "playbooks/operations/recovery/runtime-chaos-recovery/PLAYBOOK.md",
+      "required_agent_ids": [
+        "architect",
+        "coder",
+        "reviewer",
+        "evaluator",
+        "memory-keeper"
+      ],
+      "required_capability_ids": [
+        "aoa-source-of-truth-check",
+        "aoa-bounded-context-map",
+        "aoa-approval-gate-check",
+        "aoa-dry-run-first",
+        "aoa-change-protocol",
+        "aoa-contract-test"
+      ],
+      "expected_artifact_kinds": [
+        "runtime_stress_lane",
+        "runtime_reentry_gate",
+        "owner_runtime_receipt",
+        "runtime_closeout_receipt",
+        "regrounding_ticket_ref",
+        "proof_handoff_candidate"
+      ],
+      "input_artifact_kinds": [
+        "owner_runtime_receipt"
+      ],
+      "scenario_conditions": [
+        {
+          "condition_id": "derived_surface_recovery_required",
+          "binding": "reviewed_boolean"
+        },
+        {
+          "condition_id": "proof_handoff_earned",
+          "binding": "reviewed_boolean"
+        }
+      ],
+      "steps": [
+        {
+          "step_id": "inspect-runtime-receipt",
+          "operation_kind": "inspect",
+          "effect_class": "read_only",
+          "depends_on": [],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "architect",
+            "reviewer"
+          ],
+          "capability_ids": [
+            "aoa-source-of-truth-check",
+            "aoa-bounded-context-map",
+            "aoa-approval-gate-check"
+          ],
+          "input_binding": "selected_scenario_inputs",
+          "input_artifact_kinds": [
+            "owner_runtime_receipt"
+          ],
+          "expected_output_kinds": [],
+          "approval_binding": "all_route_requirements"
+        },
+        {
+          "step_id": "validate-degraded-lane",
+          "operation_kind": "validate",
+          "effect_class": "read_only",
+          "depends_on": [
+            "inspect-runtime-receipt"
+          ],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "architect",
+            "coder",
+            "reviewer"
+          ],
+          "capability_ids": [
+            "aoa-dry-run-first",
+            "aoa-change-protocol",
+            "aoa-contract-test"
+          ],
+          "input_binding": "selected_scenario_inputs",
+          "input_artifact_kinds": [
+            "owner_runtime_receipt"
+          ],
+          "expected_output_kinds": [
+            "runtime_stress_lane",
+            "runtime_reentry_gate"
+          ],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "reground-source",
+          "operation_kind": "inspect",
+          "effect_class": "read_only",
+          "depends_on": [
+            "validate-degraded-lane"
+          ],
+          "guard_condition_id": "derived_surface_recovery_required",
+          "agent_ids": [
+            "architect"
+          ],
+          "capability_ids": [
+            "aoa-source-of-truth-check"
+          ],
+          "input_binding": "none",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "regrounding_ticket_ref"
+          ],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "evaluate-reentry",
+          "operation_kind": "evaluate",
+          "effect_class": "read_only",
+          "depends_on": [
+            "validate-degraded-lane",
+            "reground-source"
+          ],
+          "guard_condition_id": "proof_handoff_earned",
+          "agent_ids": [
+            "evaluator",
+            "reviewer"
+          ],
+          "capability_ids": [
+            "aoa-contract-test"
+          ],
+          "input_binding": "none",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "proof_handoff_candidate"
+          ],
+          "approval_binding": "none"
+        },
+        {
+          "step_id": "closeout-recovery",
+          "operation_kind": "closeout",
+          "effect_class": "read_only",
+          "depends_on": [
+            "validate-degraded-lane",
+            "reground-source",
+            "evaluate-reentry"
+          ],
+          "guard_condition_id": null,
+          "agent_ids": [
+            "reviewer",
+            "memory-keeper"
+          ],
+          "capability_ids": [],
+          "input_binding": "none",
+          "input_artifact_kinds": [],
+          "expected_output_kinds": [
+            "runtime_closeout_receipt"
+          ],
+          "approval_binding": "none"
+        }
+      ],
+      "checkpoint_policy": {
+        "owner_binding": "scenario_owner",
+        "required_after_step_ids": [
+          "validate-degraded-lane",
+          "evaluate-reentry"
+        ],
+        "required_on_pause": true,
+        "required_on_recoverable_failure": true
+      },
+      "retry_policy": {
+        "max_attempts": 1,
+        "retryable_failure_codes": []
+      },
+      "rollback_policy": {
+        "required": false,
+        "owner_binding": "scenario_owner",
+        "trigger_codes": [
+          "hold",
+          "retire_route",
+          "safe_stop"
+        ],
+        "rollback_artifact_input_ref": null
+      },
+      "evidence_requirements": [
+        {
+          "requirement_id": "evidence:runtime-chaos:owner-receipt",
+          "artifact_kind": "owner_runtime_receipt",
+          "artifact_binding": "scenario_input",
+          "required_after_step_id": "inspect-runtime-receipt",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:runtime-chaos:stress-lane",
+          "artifact_kind": "runtime_stress_lane",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "validate-degraded-lane",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:runtime-chaos:reentry-gate",
+          "artifact_kind": "runtime_reentry_gate",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "validate-degraded-lane",
+          "guard_condition_id": null,
+          "terminal_required": true
+        },
+        {
+          "requirement_id": "evidence:runtime-chaos:regrounding",
+          "artifact_kind": "regrounding_ticket_ref",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "reground-source",
+          "guard_condition_id": "derived_surface_recovery_required",
+          "terminal_required": false
+        },
+        {
+          "requirement_id": "evidence:runtime-chaos:proof-handoff",
+          "artifact_kind": "proof_handoff_candidate",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "evaluate-reentry",
+          "guard_condition_id": "proof_handoff_earned",
+          "terminal_required": false
+        },
+        {
+          "requirement_id": "evidence:runtime-chaos:closeout",
+          "artifact_kind": "runtime_closeout_receipt",
+          "artifact_binding": "step_output",
+          "required_after_step_id": "closeout-recovery",
+          "guard_condition_id": null,
+          "terminal_required": true
+        }
+      ],
+      "eval_requirements": [
+        {
+          "requirement_id": "eval:runtime-chaos:diagnosis",
+          "eval_anchor": "aoa-diagnosis-cause-discipline",
+          "input_ref": {
+            "owner_repo": "aoa-evals",
+            "artifact_ref": "generated/eval_catalog.min.json"
+          },
+          "required_evidence_ids": [
+            "evidence:runtime-chaos:owner-receipt"
+          ],
+          "guard_condition_id": null,
+          "verdict_required_for_closeout": true
+        },
+        {
+          "requirement_id": "eval:runtime-chaos:boundedness",
+          "eval_anchor": "aoa-repair-boundedness",
+          "input_ref": {
+            "owner_repo": "aoa-evals",
+            "artifact_ref": "generated/eval_catalog.min.json"
+          },
+          "required_evidence_ids": [
+            "evidence:runtime-chaos:stress-lane"
+          ],
+          "guard_condition_id": null,
+          "verdict_required_for_closeout": true
+        },
+        {
+          "requirement_id": "eval:runtime-chaos:window",
+          "eval_anchor": "aoa-stress-recovery-window",
+          "input_ref": {
+            "owner_repo": "aoa-evals",
+            "artifact_ref": "generated/eval_catalog.min.json"
+          },
+          "required_evidence_ids": [
+            "evidence:runtime-chaos:reentry-gate"
+          ],
+          "guard_condition_id": null,
+          "verdict_required_for_closeout": true
+        },
+        {
+          "requirement_id": "eval:runtime-chaos:witness",
+          "eval_anchor": "aoa-witness-trace-integrity",
+          "input_ref": {
+            "owner_repo": "aoa-evals",
+            "artifact_ref": "generated/eval_catalog.min.json"
+          },
+          "required_evidence_ids": [
+            "evidence:runtime-chaos:proof-handoff"
+          ],
+          "guard_condition_id": "proof_handoff_earned",
+          "verdict_required_for_closeout": false
+        }
+      ],
+      "retention_requirements": [
+        {
+          "requirement_id": "retain:runtime-chaos:recall",
+          "input_ref": {
+            "owner_repo": "aoa-memo",
+            "artifact_ref": "examples/recall/recall_contract.router.semantic.json"
+          },
+          "guard_condition_id": null,
+          "receipt_required_for_closeout": false
+        }
+      ],
+      "closeout_requirements": [
+        {
+          "requirement_id": "closeout:runtime-chaos",
+          "owner_binding": "runtime_owner",
+          "required_ref_kinds": [
+            "owner_runtime_receipt",
+            "runtime_reentry_gate",
+            "runtime_closeout_receipt"
+          ]
+        }
+      ]
+    }
+  ]
+}

@@ -100,6 +100,7 @@
 
 - [AOA-SDK-D-0028 - CLI Surface Test Localization](../AOA-SDK-D-0028-cli-surface-test-localization.md) (`docs/decisions/AOA-SDK-D-0028-cli-surface-test-localization.md`)
 - [AOA-SDK-D-0077 - Resolve Agent OS Routes from Receipt-bound Owner Projections](../AOA-SDK-D-0077-route-resolution-from-owner-projections.md) (`docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md`)
+- [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
 
 ## cli
 
@@ -277,6 +278,7 @@
 ## owner projection
 
 - [AOA-SDK-D-0077 - Resolve Agent OS Routes from Receipt-bound Owner Projections](../AOA-SDK-D-0077-route-resolution-from-owner-projections.md) (`docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md`)
+- [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
 
 ## owner skill home
 
@@ -288,9 +290,17 @@
 - [AOA-SDK-D-0072 - Separate G5 Release Trust From Owner-Switch Authority](../AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md) (`docs/decisions/AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md`)
 - [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
 
+## package data
+
+- [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
+
 ## parent boundary
 
 - [AOA-SDK-D-0033 - Questbook Parent Withdrawal After Quest Localization](../AOA-SDK-D-0033-questbook-parent-withdrawal-after-quest-localization.md) (`docs/decisions/AOA-SDK-D-0033-questbook-parent-withdrawal-after-quest-localization.md`)
+
+## plan ABI
+
+- [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
 
 ## private registry
 
@@ -305,6 +315,7 @@
 - [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 - [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 - [AOA-SDK-D-0077 - Resolve Agent OS Routes from Receipt-bound Owner Projections](../AOA-SDK-D-0077-route-resolution-from-owner-projections.md) (`docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md`)
+- [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
 
 ## public API naming
 

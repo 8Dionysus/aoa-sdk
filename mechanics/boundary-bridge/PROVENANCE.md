@@ -69,6 +69,8 @@
 - `src/aoa_sdk/control_plane/routing/data/canonical-routing-source-lock.v1.json`
 - `src/aoa_sdk/cli/route.py`
 - `mechanics/boundary-bridge/parts/route-resolution-control-plane/`
+- `src/aoa_sdk/control_plane/planning/`
+- `mechanics/boundary-bridge/parts/plan-compilation-control-plane/`
 - `src/aoa_sdk/control_plane/routing/schemas/routing-g5-owner-switch-receipt.schema.json`
 - `src/aoa_sdk/control_plane/routing/schemas/routing-g5-canonical-provenance.schema.json`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py`

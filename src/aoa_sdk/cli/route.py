@@ -1,4 +1,4 @@
-"""CLI for C1 route resolution and explanation."""
+"""CLI for receipt-bound route resolution and runtime-neutral compilation."""
 
 from __future__ import annotations
 
@@ -14,18 +14,29 @@ from ..contracts.control_plane import (
     RouteDecision,
     RouteExplanation,
     RouteIntent,
+    RunPlan,
+    RuntimeProfile,
+    ScenarioBinding,
     assert_decision_matches_intent,
     assert_explanation_matches_decision,
+    assert_run_plan_digest,
     canonical_digest,
 )
 from ..control_plane import ControlPlaneAPI
+from ..control_plane.planning import (
+    PlanCompilationError,
+    PlanCompilationSnapshotError,
+)
 from ..control_plane.routing.resolver import explain_route_decision
 from ..control_plane.routing.snapshot import RoutingSnapshotError
 from ..workspace.discovery import Workspace
 
 
 route_app = typer.Typer(
-    help="Resolve, explain, and validate receipt-bound Agent OS route decisions"
+    help=(
+        "Resolve, explain, compile, and validate receipt-bound "
+        "Agent OS control-plane objects"
+    )
 )
 
 
@@ -33,11 +44,13 @@ def _api(
     root: str,
     routing_bundle: str | None,
     source_lock: str | None,
+    plan_contour_root: str | None = None,
 ) -> ControlPlaneAPI:
     return ControlPlaneAPI(
         Workspace.discover(root),
         routing_bundle_root=routing_bundle,
         routing_source_lock=source_lock,
+        plan_contour_resource_root=plan_contour_root,
     )
 
 
@@ -102,11 +115,51 @@ def route_explain(
     _emit(explanation)
 
 
+@route_app.command("compile")
+def route_compile(
+    decision: str = typer.Argument(..., help="RouteDecision JSON path."),
+    scenario: str = typer.Argument(..., help="ScenarioBinding JSON path."),
+    runtime_profile: str = typer.Argument(..., help="RuntimeProfile JSON path."),
+    root: str = typer.Option(".", "--root"),
+    plan_contour_root: str | None = typer.Option(
+        None,
+        "--plan-contour-root",
+        help="Explicit packaged-resource override for isolated verification.",
+    ),
+) -> None:
+    try:
+        typed_decision = RouteDecision.model_validate(_load(decision))
+        typed_scenario = ScenarioBinding.model_validate(_load(scenario))
+        typed_runtime_profile = RuntimeProfile.model_validate(_load(runtime_profile))
+        plan = _api(
+            root,
+            None,
+            None,
+            plan_contour_root,
+        ).compile(
+            typed_decision,
+            typed_scenario,
+            typed_runtime_profile,
+        )
+        assert_run_plan_digest(plan)
+    except (
+        OSError,
+        json.JSONDecodeError,
+        ValidationError,
+        ValueError,
+        PlanCompilationError,
+        PlanCompilationSnapshotError,
+        ControlPlaneContractError,
+    ) as exc:
+        _fail(exc)
+    _emit(plan)
+
+
 @route_app.command("validate")
 def route_validate(
     document: str = typer.Argument(
         ...,
-        help="RouteIntent, RouteDecision, or RouteExplanation JSON path.",
+        help=("RouteIntent, RouteDecision, RouteExplanation, or RunPlan JSON path."),
     ),
     against: str | None = typer.Option(
         None,
@@ -141,6 +194,28 @@ def route_validate(
                 )
             schema_version = typed_explanation.schema_version
             digest = canonical_digest(typed_explanation)
+        elif "plan_id" in payload and "scenario_binding" in payload:
+            typed_plan = RunPlan.model_validate(payload)
+            assert_run_plan_digest(typed_plan)
+            if against is not None:
+                typed_decision = RouteDecision.model_validate(_load(against))
+                expected_ref = {
+                    "object_id": typed_decision.decision_id,
+                    "owner_repo": typed_decision.provenance.owner_repo,
+                    "schema_version": typed_decision.schema_version,
+                    "digest": canonical_digest(typed_decision),
+                }
+                if (
+                    typed_plan.decision_ref.model_dump(mode="json") != expected_ref
+                    or typed_plan.scenario_binding.decision_ref.model_dump(mode="json")
+                    != expected_ref
+                ):
+                    raise ControlPlaneContractError(
+                        "run plan does not reference the exact route decision"
+                    )
+            kind = "RunPlan"
+            schema_version = typed_plan.schema_version
+            digest = typed_plan.plan_digest
         else:
             raise ValueError("unrecognized route document shape")
     except (

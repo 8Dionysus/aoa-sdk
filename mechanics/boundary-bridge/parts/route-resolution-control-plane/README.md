@@ -59,9 +59,10 @@ Unsupported policy constraints block instead of being guessed.
 
 ## Next route
 
-C2 may compile a resolved decision into a runtime-neutral candidate plan.
-C3 may add `AoARunner` only behind runtime-adapter and lifecycle contracts.
-Neither future slice may reinterpret a C1 decision as activation authority.
+C2 compilation now routes through
+`mechanics/boundary-bridge/parts/plan-compilation-control-plane/`. C3 may add
+`AoARunner` only behind runtime-adapter and lifecycle contracts. Neither slice
+may reinterpret a C1 decision as activation authority.
 
 ## Validation
 

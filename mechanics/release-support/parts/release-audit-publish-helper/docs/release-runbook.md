@@ -76,11 +76,14 @@ python -m build
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
+python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py
 ```
 
-These commands prove candidate construction and installed-package behavior.
-They do not grant durable artifact admission, runtime cutover, G5, predecessor
-retirement, compatibility-window start, or archival authority.
+These commands prove routing candidate construction and installed-package
+behavior, including packaged C2 owner contours and deterministic plan
+compilation. They do not grant runtime execution, durable artifact admission,
+runtime cutover, G5, predecessor retirement, compatibility-window start, or
+archival authority.
 
 ## Routing G5 release-candidate publication
 

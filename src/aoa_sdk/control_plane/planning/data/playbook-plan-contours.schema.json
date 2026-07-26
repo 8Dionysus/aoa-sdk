@@ -1,0 +1,503 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://agents-of-abyss.example/schemas/aoa-playbook-plan-contours-v1.json",
+  "title": "AoA Playbook Plan Contours v1",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "layer",
+    "abi",
+    "source_of_truth",
+    "contours"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_playbook_plan_contours_v1"
+    },
+    "layer": {
+      "const": "aoa-playbooks"
+    },
+    "abi": {
+      "$ref": "#/$defs/abi"
+    },
+    "source_of_truth": {
+      "$ref": "#/$defs/sourceOfTruth"
+    },
+    "contours": {
+      "type": "array",
+      "minItems": 1,
+      "items": {
+        "$ref": "#/$defs/contour"
+      }
+    }
+  },
+  "$defs": {
+    "nonEmptyString": {
+      "type": "string",
+      "minLength": 1
+    },
+    "stringList": {
+      "type": "array",
+      "items": {
+        "$ref": "#/$defs/nonEmptyString"
+      },
+      "uniqueItems": true
+    },
+    "guardConditionId": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        {
+          "type": "null"
+        }
+      ]
+    },
+    "scenarioCondition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "condition_id",
+        "binding"
+      ],
+      "properties": {
+        "condition_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "binding": {
+          "const": "reviewed_boolean"
+        }
+      }
+    },
+    "inputRef": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_repo",
+        "artifact_ref"
+      ],
+      "properties": {
+        "owner_repo": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "artifact_ref": {
+          "$ref": "#/$defs/nonEmptyString"
+        }
+      }
+    },
+    "abi": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "abi_id",
+        "abi_version",
+        "owner_repo",
+        "schema_ref"
+      ],
+      "properties": {
+        "abi_id": {
+          "const": "aoa_playbook_plan_contour_v1"
+        },
+        "abi_version": {
+          "const": "aoa_playbook_plan_contour_v1"
+        },
+        "owner_repo": {
+          "const": "aoa-playbooks"
+        },
+        "schema_ref": {
+          "const": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json"
+        }
+      }
+    },
+    "sourceOfTruth": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "config",
+        "playbooks",
+        "schema"
+      ],
+      "properties": {
+        "config": {
+          "const": "mechanics/scenario-composition/parts/plan-contours/config/playbook_plan_contours.json"
+        },
+        "playbooks": {
+          "const": "playbooks/*/*/*/PLAYBOOK.md"
+        },
+        "schema": {
+          "const": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json"
+        }
+      }
+    },
+    "step": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "step_id",
+        "operation_kind",
+        "effect_class",
+        "depends_on",
+        "guard_condition_id",
+        "agent_ids",
+        "capability_ids",
+        "input_binding",
+        "input_artifact_kinds",
+        "expected_output_kinds",
+        "approval_binding"
+      ],
+      "properties": {
+        "step_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "operation_kind": {
+          "enum": [
+            "inspect",
+            "mutate",
+            "summon",
+            "return",
+            "validate",
+            "evaluate",
+            "checkpoint",
+            "retain",
+            "closeout"
+          ]
+        },
+        "effect_class": {
+          "enum": [
+            "read_only",
+            "repo_mutation",
+            "runtime_mutation",
+            "external"
+          ]
+        },
+        "depends_on": {
+          "$ref": "#/$defs/stringList"
+        },
+        "guard_condition_id": {
+          "$ref": "#/$defs/guardConditionId"
+        },
+        "agent_ids": {
+          "$ref": "#/$defs/stringList"
+        },
+        "capability_ids": {
+          "$ref": "#/$defs/stringList"
+        },
+        "input_binding": {
+          "enum": [
+            "none",
+            "all_scenario_inputs",
+            "selected_scenario_inputs"
+          ]
+        },
+        "input_artifact_kinds": {
+          "$ref": "#/$defs/stringList"
+        },
+        "expected_output_kinds": {
+          "$ref": "#/$defs/stringList"
+        },
+        "approval_binding": {
+          "enum": [
+            "none",
+            "all_route_requirements"
+          ]
+        }
+      }
+    },
+    "checkpointPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_binding",
+        "required_after_step_ids",
+        "required_on_pause",
+        "required_on_recoverable_failure"
+      ],
+      "properties": {
+        "owner_binding": {
+          "const": "scenario_owner"
+        },
+        "required_after_step_ids": {
+          "$ref": "#/$defs/stringList"
+        },
+        "required_on_pause": {
+          "type": "boolean"
+        },
+        "required_on_recoverable_failure": {
+          "type": "boolean"
+        }
+      }
+    },
+    "retryPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "max_attempts",
+        "retryable_failure_codes"
+      ],
+      "properties": {
+        "max_attempts": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "retryable_failure_codes": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "rollbackPolicy": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "required",
+        "owner_binding",
+        "trigger_codes",
+        "rollback_artifact_input_ref"
+      ],
+      "properties": {
+        "required": {
+          "type": "boolean"
+        },
+        "owner_binding": {
+          "enum": [
+            "scenario_owner",
+            "runtime_owner"
+          ]
+        },
+        "trigger_codes": {
+          "$ref": "#/$defs/stringList"
+        },
+        "rollback_artifact_input_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/inputRef"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        }
+      }
+    },
+    "evidenceRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "artifact_kind",
+        "artifact_binding",
+        "required_after_step_id",
+        "guard_condition_id",
+        "terminal_required"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "artifact_kind": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "artifact_binding": {
+          "enum": [
+            "scenario_input",
+            "step_output"
+          ]
+        },
+        "required_after_step_id": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/nonEmptyString"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "guard_condition_id": {
+          "$ref": "#/$defs/guardConditionId"
+        },
+        "terminal_required": {
+          "type": "boolean"
+        }
+      }
+    },
+    "evalRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "eval_anchor",
+        "input_ref",
+        "required_evidence_ids",
+        "guard_condition_id",
+        "verdict_required_for_closeout"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "eval_anchor": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "input_ref": {
+          "$ref": "#/$defs/inputRef"
+        },
+        "required_evidence_ids": {
+          "$ref": "#/$defs/stringList"
+        },
+        "guard_condition_id": {
+          "$ref": "#/$defs/guardConditionId"
+        },
+        "verdict_required_for_closeout": {
+          "type": "boolean"
+        }
+      }
+    },
+    "retentionRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "input_ref",
+        "guard_condition_id",
+        "receipt_required_for_closeout"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "input_ref": {
+          "$ref": "#/$defs/inputRef"
+        },
+        "guard_condition_id": {
+          "$ref": "#/$defs/guardConditionId"
+        },
+        "receipt_required_for_closeout": {
+          "type": "boolean"
+        }
+      }
+    },
+    "closeoutRequirement": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "requirement_id",
+        "owner_binding",
+        "required_ref_kinds"
+      ],
+      "properties": {
+        "requirement_id": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "owner_binding": {
+          "enum": [
+            "scenario_owner",
+            "runtime_owner"
+          ]
+        },
+        "required_ref_kinds": {
+          "$ref": "#/$defs/stringList"
+        }
+      }
+    },
+    "contour": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "playbook_id",
+        "playbook_name",
+        "scenario",
+        "source_playbook_ref",
+        "required_agent_ids",
+        "required_capability_ids",
+        "expected_artifact_kinds",
+        "input_artifact_kinds",
+        "scenario_conditions",
+        "steps",
+        "checkpoint_policy",
+        "retry_policy",
+        "rollback_policy",
+        "evidence_requirements",
+        "eval_requirements",
+        "retention_requirements",
+        "closeout_requirements"
+      ],
+      "properties": {
+        "playbook_id": {
+          "type": "string",
+          "pattern": "^AOA-P-[0-9]{4}$"
+        },
+        "playbook_name": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "scenario": {
+          "$ref": "#/$defs/nonEmptyString"
+        },
+        "source_playbook_ref": {
+          "type": "string",
+          "pattern": "^playbooks/.+/PLAYBOOK\\.md$"
+        },
+        "required_agent_ids": {
+          "$ref": "#/$defs/stringList"
+        },
+        "required_capability_ids": {
+          "$ref": "#/$defs/stringList"
+        },
+        "expected_artifact_kinds": {
+          "$ref": "#/$defs/stringList"
+        },
+        "input_artifact_kinds": {
+          "$ref": "#/$defs/stringList"
+        },
+        "scenario_conditions": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/scenarioCondition"
+          }
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/step"
+          }
+        },
+        "checkpoint_policy": {
+          "$ref": "#/$defs/checkpointPolicy"
+        },
+        "retry_policy": {
+          "$ref": "#/$defs/retryPolicy"
+        },
+        "rollback_policy": {
+          "$ref": "#/$defs/rollbackPolicy"
+        },
+        "evidence_requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/evidenceRequirement"
+          }
+        },
+        "eval_requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/evalRequirement"
+          }
+        },
+        "retention_requirements": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/retentionRequirement"
+          }
+        },
+        "closeout_requirements": {
+          "type": "array",
+          "minItems": 1,
+          "items": {
+            "$ref": "#/$defs/closeoutRequirement"
+          }
+        }
+      }
+    }
+  }
+}

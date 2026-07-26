@@ -30,9 +30,12 @@ and runtime adapters. C1 implements `AoASDK.control_plane.resolve()` and
 snapshot. Construction remains lazy: it does not read the snapshot until
 resolution. A selected route is candidate metadata only.
 
-`AoASDK.control_plane.compile()` and `AoASDK.runner` are not implemented public
-behavior. C2 and C3 must add their implementations and API tests before those
-names are documented as callable facades.
+`AoASDK.control_plane.compile()` is implemented C2 behavior. It validates the
+exact packaged `aoa-playbooks` contour/schema/trust pin and compiles an exact
+`ScenarioBinding` plus runtime compatibility profile into a content-addressed
+`RunPlan`. Construction remains lazy and compilation does not read the C1
+routing snapshot. `AoASDK.runner` remains unimplemented; C3 must add its
+implementation and API tests before it becomes a callable facade.
 
 `AoASDK.organs` is a lazy facade over one explicitly configured private
 registry source. It exposes deterministic projection, bounded catalog,
