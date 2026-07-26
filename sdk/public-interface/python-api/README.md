@@ -24,10 +24,15 @@ drift read-models, trust coverage, update-lane status, and update metadata
 verification reports. Host enforcement, policy authority, evidence promotion,
 and update client blocking decisions remain in `abyss-machine`.
 
-R2 also publishes typing protocols for the future control plane, AoARunner,
-and runtime adapters. `AoASDK.control_plane` and `AoASDK.runner` are not
-implemented public behavior yet; C1 and C3 must add implementation and API
-tests before those names are documented as callable facades.
+R2 also publishes typing protocols for the control plane, future AoARunner,
+and runtime adapters. C1 implements `AoASDK.control_plane.resolve()` and
+`.explain()` over an explicitly configured, receipt-bound canonical routing
+snapshot. Construction remains lazy: it does not read the snapshot until
+resolution. A selected route is candidate metadata only.
+
+`AoASDK.control_plane.compile()` and `AoASDK.runner` are not implemented public
+behavior. C2 and C3 must add their implementations and API tests before those
+names are documented as callable facades.
 
 `AoASDK.organs` is a lazy facade over one explicitly configured private
 registry source. It exposes deterministic projection, bounded catalog,

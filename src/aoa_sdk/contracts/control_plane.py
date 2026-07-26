@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Iterable, Mapping
 from datetime import datetime, timezone
 from typing import Annotated, Literal, Protocol, TypeAlias, runtime_checkable
@@ -217,6 +218,40 @@ class CandidateExplanation(StrictControlPlaneModel):
     evidence_refs: tuple[ProvenanceRef, ...]
 
 
+def candidate_explanation_disposition(
+    candidate: RouteCandidate,
+    *,
+    selected_candidate_id: str | None,
+) -> Literal["selected", "eligible", "degraded", "rejected"]:
+    """Derive one exact explanation disposition from a route candidate."""
+
+    if candidate.candidate_id == selected_candidate_id:
+        return "selected"
+    score_codes = tuple(
+        reason
+        for reason in candidate.reason_codes
+        if reason.startswith("resolver_score:")
+    )
+    score: int | None = None
+    if len(score_codes) == 1:
+        raw_score = score_codes[0].removeprefix("resolver_score:")
+        if re.fullmatch(r"-?\d+", raw_score) is not None:
+            score = int(raw_score)
+    if score is None or score <= 0:
+        return "rejected"
+    if (
+        candidate.compatibility == "incompatible"
+        or candidate.policy_posture == "forbidden"
+    ):
+        return "rejected"
+    if (
+        candidate.compatibility == "degraded"
+        or candidate.policy_posture == "approval_required"
+    ):
+        return "degraded"
+    return "eligible"
+
+
 class RouteExplanation(StrictControlPlaneModel):
     schema_version: Literal["aoa_control_plane_v1"] = CONTROL_PLANE_SCHEMA_VERSION
     explanation_id: NonEmptyStr
@@ -231,6 +266,11 @@ class RouteExplanation(StrictControlPlaneModel):
 
     @model_validator(mode="after")
     def validate_explanation(self) -> RouteExplanation:
+        candidate_ids = [
+            item.candidate_id for item in self.candidate_explanations
+        ]
+        if len(candidate_ids) != len(set(candidate_ids)):
+            raise ValueError("candidate explanation ids must be unique")
         selected = [
             item.candidate_id
             for item in self.candidate_explanations
@@ -890,6 +930,7 @@ def assert_explanation_matches_decision(
         explanation.correlation_id != decision.correlation_id
         or explanation.decision_ref.object_id != decision.decision_id
         or explanation.decision_ref.owner_repo != decision.provenance.owner_repo
+        or explanation.decision_ref.schema_version != decision.schema_version
         or explanation.decision_ref.digest != canonical_digest(decision)
         or explanation.decision_status != decision.status
         or explanation.selected_candidate_id != decision.selected_candidate_id
@@ -897,13 +938,49 @@ def assert_explanation_matches_decision(
         raise ControlPlaneContractError(
             "route explanation scope does not match the route decision"
         )
-    decision_candidate_ids = {candidate.candidate_id for candidate in decision.candidates}
-    explanation_candidate_ids = {
-        candidate.candidate_id for candidate in explanation.candidate_explanations
-    }
-    if decision_candidate_ids != explanation_candidate_ids:
+    decision_candidate_ids = [
+        candidate.candidate_id for candidate in decision.candidates
+    ]
+    explanation_ids = [
+        candidate.candidate_id
+        for candidate in explanation.candidate_explanations
+    ]
+    if len(explanation_ids) != len(set(explanation_ids)):
         raise ControlPlaneContractError(
-            "route explanation does not account for every decision candidate"
+            "route explanation candidate ids must be unique"
+        )
+    if decision_candidate_ids != explanation_ids:
+        raise ControlPlaneContractError(
+            "route explanation does not account for candidates in decision order"
+        )
+    decision_by_id = {
+        candidate.candidate_id: candidate for candidate in decision.candidates
+    }
+    for item in explanation.candidate_explanations:
+        candidate = decision_by_id[item.candidate_id]
+        if (
+            item.reason_codes != candidate.reason_codes
+            or item.evidence_refs != candidate.evidence_refs
+        ):
+            raise ControlPlaneContractError(
+                "route explanation does not preserve candidate reasons and evidence"
+            )
+        expected_disposition = candidate_explanation_disposition(
+            candidate,
+            selected_candidate_id=decision.selected_candidate_id,
+        )
+        if item.disposition != expected_disposition:
+            raise ControlPlaneContractError(
+                "route explanation disposition contradicts the decision candidate"
+            )
+    expected_ambiguity_codes = tuple(
+        reason
+        for reason in decision.reason_codes
+        if reason.startswith("ambiguous_")
+    )
+    if explanation.ambiguity_codes != expected_ambiguity_codes:
+        raise ControlPlaneContractError(
+            "route explanation ambiguity codes do not match the decision"
         )
 
 
@@ -917,6 +994,7 @@ def assert_decision_matches_intent(
         decision.correlation_id != intent.correlation_id
         or decision.intent_ref.object_id != intent.intent_id
         or decision.intent_ref.owner_repo != intent.provenance.owner_repo
+        or decision.intent_ref.schema_version != intent.schema_version
         or decision.intent_ref.digest != canonical_digest(intent)
     ):
         raise ControlPlaneContractError(
@@ -940,6 +1018,7 @@ def assert_route_plan_chain(
         if (
             decision_ref.object_id != decision.decision_id
             or decision_ref.owner_repo != decision.provenance.owner_repo
+            or decision_ref.schema_version != decision.schema_version
             or decision_ref.digest != expected_decision_digest
         ):
             raise ControlPlaneContractError(

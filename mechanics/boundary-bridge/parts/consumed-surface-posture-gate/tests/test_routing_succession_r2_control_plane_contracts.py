@@ -510,7 +510,7 @@ def test_core_contracts_round_trip_as_strict_json() -> None:
             CandidateExplanation(
                 candidate_id=candidate.candidate_id,
                 disposition="selected",
-                reason_codes=("single-compatible-candidate",),
+                reason_codes=candidate.reason_codes,
                 evidence_refs=candidate.evidence_refs,
             ),
         ),
@@ -574,6 +574,91 @@ def test_core_contracts_round_trip_as_strict_json() -> None:
     assert_decision_matches_intent(intent, decision)
     assert_explanation_matches_decision(decision, explanation)
     assert_route_plan_chain(intent, decision, explanation, plan)
+
+    wrong_schema_version = "aoa_control_plane_wrong_parent_v1"
+    with pytest.raises(ControlPlaneContractError, match="exact route intent"):
+        assert_decision_matches_intent(
+            intent,
+            decision.model_copy(
+                update={
+                    "intent_ref": decision.intent_ref.model_copy(
+                        update={"schema_version": wrong_schema_version}
+                    )
+                }
+            ),
+        )
+    with pytest.raises(ControlPlaneContractError, match="scope does not match"):
+        assert_explanation_matches_decision(
+            decision,
+            explanation.model_copy(
+                update={
+                    "decision_ref": explanation.decision_ref.model_copy(
+                        update={"schema_version": wrong_schema_version}
+                    )
+                }
+            ),
+        )
+    wrong_plan_parent = plan.model_copy(
+        update={
+            "decision_ref": plan.decision_ref.model_copy(
+                update={"schema_version": wrong_schema_version}
+            ),
+            "plan_digest": _digest("placeholder"),
+        }
+    )
+    wrong_plan_parent = wrong_plan_parent.model_copy(
+        update={
+            "plan_digest": canonical_digest(
+                wrong_plan_parent,
+                exclude={"plan_digest"},
+            )
+        }
+    )
+    with pytest.raises(ControlPlaneContractError, match="exact decision"):
+        assert_route_plan_chain(
+            intent,
+            decision,
+            explanation,
+            wrong_plan_parent,
+        )
+
+    duplicate_explanation = explanation.model_copy(
+        update={
+            "candidate_explanations": (
+                *explanation.candidate_explanations,
+                explanation.candidate_explanations[0].model_copy(
+                    update={"disposition": "rejected"}
+                ),
+            )
+        }
+    )
+    with pytest.raises(ControlPlaneContractError, match="ids must be unique"):
+        assert_explanation_matches_decision(decision, duplicate_explanation)
+
+    changed_evidence_explanation = explanation.model_copy(
+        update={
+            "candidate_explanations": (
+                explanation.candidate_explanations[0].model_copy(
+                    update={
+                        "evidence_refs": (
+                            _provenance(
+                                "aoa-sdk",
+                                "evidence/contradictory.json",
+                            ),
+                        )
+                    }
+                ),
+            )
+        }
+    )
+    with pytest.raises(
+        ControlPlaneContractError,
+        match="does not preserve candidate reasons and evidence",
+    ):
+        assert_explanation_matches_decision(
+            decision,
+            changed_evidence_explanation,
+        )
 
     expanded_decision = decision.model_copy(
         update={

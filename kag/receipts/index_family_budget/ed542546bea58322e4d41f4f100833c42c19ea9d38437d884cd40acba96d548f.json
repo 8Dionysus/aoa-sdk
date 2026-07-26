@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 12434770,
+  "allowed_tracked_bytes": 16768678,
+  "approved_by": "repository-owner",
+  "base_ref": "ceeb1de77a35ddeead886b2c815ec3dd149df6f8",
+  "changed_generated_bytes": 12434770,
+  "changed_generated_files": 307,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "ed542546bea58322e4d41f4f100833c42c19ea9d38437d884cd40acba96d548f",
+  "reason": "Refresh the derived repo-local KAG family after Codex review required fail-closed mapping validation for the runtime trust verdict, decision, record, producer admission, receipt summary, and file hashes; this receipt accepts only the measured generated delta and tracked-size exceedance without raising standing budgets or widening activation, cost, consumer-zero, or archival claims.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16768678,
+  "tracked_bytes_max": 15728640
+}

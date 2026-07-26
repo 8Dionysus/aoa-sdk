@@ -112,7 +112,8 @@
         "src/aoa_sdk/api.py"
       ],
       "mechanic_routes": [
-        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate"
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
+        "mechanics/boundary-bridge/parts/route-resolution-control-plane"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
@@ -135,11 +136,13 @@
       "mechanic_routes": [
         "mechanics/runtime-seam/parts/workspace-root-resolution",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle",
-        "mechanics/release-support/parts/release-audit-publish-helper"
+        "mechanics/release-support/parts/release-audit-publish-helper",
+        "mechanics/boundary-bridge/parts/route-resolution-control-plane"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
-        "python -m pytest -q"
+        "python -m pytest -q",
+        "python -m pytest -q mechanics/boundary-bridge/parts/route-resolution-control-plane/tests"
       ],
       "stop_lines": [
         "Do not let CLI convenience bypass owner review or validation gates."
@@ -259,7 +262,8 @@
       ],
       "mechanic_routes": [
         "mechanics/runtime-seam/parts/workspace-root-resolution",
-        "mechanics/runtime-seam/parts/runtime-mirror-boundary"
+        "mechanics/runtime-seam/parts/runtime-mirror-boundary",
+        "mechanics/boundary-bridge/parts/route-resolution-control-plane"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",

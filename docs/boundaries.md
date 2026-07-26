@@ -35,12 +35,14 @@ repositories remain authoritative.
 - the canonical routing producer, routing ABI, deterministic route
   resolution, structured explanation, runtime-neutral plan compilation, and
   lifecycle client contracts
+- the C1 receipt-bound route resolver, which intersects the canonical routing
+  registry with a pinned `aoa-skills` owner projection and blocks ambiguity
+  without activation
 - the versioned R2 route, plan, approval, lifecycle, event,
   evidence-reference, and adapter protocol models used to prove the boundary;
   the models do not activate an `AoASDK` runner or runtime
-- the packaged routing compiler, strict validator, and
-  dual-producer sidecar in non-publishing shadow posture; embedded
-  compatibility provenance remains `aoa-routing` in the default posture
+- the historical packaged routing shadow compiler, strict validator, and
+  dual-producer sidecar that proved predecessor parity before the G5 switch
 - the historical SDK-identified, non-publishing candidate assembly
   bound to exact clean source refs, artifact subjects, and false authority
   flags for stronger-owner trust and isolated/canary review
@@ -49,8 +51,8 @@ repositories remain authoritative.
   and all six switch-authority flags remain denied
 - the receipt-bound canonical envelope that proves public-release byte parity,
   names the exact runtime contract, starts the compatibility window, and
-  authorizes the producer switch while recording live cutover as unexecuted
-  and archive authority as false
+  authorizes the producer switch while recording archive authority as false;
+  the separate runtime owner has since executed the receipt-bound live cutover
 - typed loaders over published surfaces
 - local workspace discovery and sibling-repo resolution
 - shared Python models for stable consumer use

@@ -13,7 +13,8 @@ sibling repositories retain meaning.
 
 Use this mechanic when a typed facade, registry, consumed-surface posture gate,
 skill environment inspector, technique promotion readiness reader, owner-layer signal
-handoff, route hint, stats read, or sibling-owned generated reader changes.
+handoff, route hint, deterministic route resolution, stats read, or
+sibling-owned generated reader changes.
 
 ### SDK owns
 
@@ -25,6 +26,8 @@ handoff, route hint, stats read, or sibling-owned generated reader changes.
 - technique promotion readiness reader behavior below `aoa-techniques`
 - additive owner-layer signal review and handoff
 - owner return path after stronger claims appear
+- deterministic receipt-bound route-candidate resolution and explanation
+  without activation
 
 ### Stronger owner split
 
@@ -51,10 +54,12 @@ retain their domain meaning.
 - `src/aoa_sdk/playbooks/`
 - `src/aoa_sdk/routing/`
 - `src/aoa_sdk/compatibility/`
+- `src/aoa_sdk/control_plane/`
 - `src/aoa_sdk/skills/`
 - `src/aoa_sdk/stats/`
 - `src/aoa_sdk/surfaces/`
 - `src/aoa_sdk/techniques/`
+- `mechanics/boundary-bridge/parts/route-resolution-control-plane/`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`
 - `mechanics/boundary-bridge/parts/skill-environment-inspector/`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/`
@@ -68,6 +73,8 @@ retain their domain meaning.
 - skill-environment-inspector
 - technique-promotion-readiness-reader
 - owner-layer-signal-handoff
+- organ-access-control-plane
+- route-resolution-control-plane
 
 ### Must not claim
 

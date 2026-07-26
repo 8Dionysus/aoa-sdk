@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 12424061,
+  "allowed_tracked_bytes": 16755900,
+  "approved_by": "repository-owner",
+  "base_ref": "ceeb1de77a35ddeead886b2c815ec3dd149df6f8",
+  "changed_generated_bytes": 12424061,
+  "changed_generated_files": 307,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "00e169868bf4c3e640be73982bfb549d7bbfeae96ad69adc6efbb8853d248eb1",
+  "reason": "Refresh the derived repo-local KAG family for C1 deterministic, non-activating route resolution from the exact G5 runtime snapshot and pinned aoa-skills graph; this receipt accepts only the measured generated delta and tracked-size exceedance without raising standing budgets or claiming activation, cost reduction, consumer-zero, or archival authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16755900,
+  "tracked_bytes_max": 15728640
+}

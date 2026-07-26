@@ -18,6 +18,8 @@ The current manifest expresses three things:
 - the expected federation root is the parent of the `aoa-sdk` checkout
 - additional source checkouts may exist under `~/src`
 - `abyss-stack` should prefer `~/src/abyss-stack`
+- C1 route resolution reads the explicit deployed SDK-canonical routing bundle
+  under the `abyss-stack` runtime mirror
 
 ## Overrides
 
@@ -32,6 +34,12 @@ For a different machine layout, prefer overrides over code changes.
 - `AOA_SDK_REPO_PATH_<REPO>`
   Force a specific repository path.
   Example: `AOA_SDK_REPO_PATH_ABYSS_STACK=/worktrees/abyss-stack`
+- `AOA_SDK_ROUTING_BUNDLE_ROOT`
+  Force the explicit SDK-canonical routing runtime bundle used by C1.
+- `AOA_SDK_ROUTING_SOURCE_LOCK`
+  Replace the packaged canonical source lock for an explicit bounded test or
+  rehearsal. The override is still subject to canonical path, owner, ref,
+  digest, receipt, and trust checks.
 
 Repo names in env vars are normalized to uppercase with non-alphanumeric characters replaced by `_`.
 
@@ -48,4 +56,9 @@ and `8Dionysus/docs/CODEX_PLANE_REGENERATION.md`.
 Use the workspace inspection route owned by the SDK CLI and listed in root
 `AGENTS.md#verify` to confirm what the SDK will actually resolve.
 
-This prints the workspace root, federation root, manifest path, and every resolved repository path.
+This prints the workspace root, federation root, manifest path, every resolved
+repository path, and the selected routing bundle/source-lock origins.
+
+C1 remains fail closed when no routing bundle is configured. It does not scan
+for `aoa-routing`, and the packaged source lock pins the exact `aoa-skills`
+capability graph ref consumed during resolution.

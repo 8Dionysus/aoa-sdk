@@ -8,6 +8,7 @@ from .common import _resolve_checkpoint_hook_repos as _resolve_checkpoint_hook_r
 from .compatibility import compatibility_app
 from .organs import organs_app
 from .release import release_app
+from .route import route_app
 from .skills import skills_app
 from .surfaces import surfaces_app
 from .workspace import workspace_app
@@ -25,6 +26,7 @@ app.add_typer(surfaces_app, name="surfaces")
 app.add_typer(checkpoint_app, name="checkpoint")
 app.add_typer(release_app, name="release")
 app.add_typer(organs_app, name="organs")
+app.add_typer(route_app, name="route")
 
 
 @app.command()

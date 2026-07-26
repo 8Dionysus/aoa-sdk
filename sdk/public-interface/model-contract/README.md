@@ -22,7 +22,10 @@ The R2 Agent OS models are authored in
 `src/aoa_sdk/contracts/control_plane.py` and compatibility-reexported through
 `aoa_sdk.models`. They are strict owner-qualified references and
 runtime-neutral lifecycle contracts. Their presence does not make sibling
-objects SDK source truth or activate a runner.
+objects SDK source truth or activate a runner. C1 now emits the existing
+`RouteDecision` and `RouteExplanation` contracts from a versioned
+deterministic resolver; it does not widen the model family or make a selected
+candidate executable.
 
 The organ-access model family is authored in
 `src/aoa_sdk/contracts/organs.py`, published as deterministic JSON Schema in

@@ -42,8 +42,10 @@ This repository owns:
   proof, compatibility-window start, and retained predecessor rollback posture
   while archival authority remains false
 - the strict R2 route, plan, approval, lifecycle, event, evidence, and runtime
-  adapter contract family, while `AoASDK.control_plane`, `AoASDK.runner`, and
-  runtime execution remain unimplemented at this stage
+  adapter contract family, plus the C1 receipt-bound deterministic
+  `AoASDK.control_plane.resolve()` and `.explain()` facade; C2 plan
+  compilation, `AoASDK.runner`, and runtime execution remain unimplemented
+  at this stage
 
 It does not own:
 

@@ -9,6 +9,8 @@ from .config import (
     EXTERNAL_ROOTS_ENV,
     FEDERATION_ROOT_ENV,
     ORGAN_REGISTRY_ENV,
+    ROUTING_BUNDLE_ROOT_ENV,
+    ROUTING_SOURCE_LOCK_ENV,
     WorkspaceConfig,
     load_workspace_config,
     repo_env_var_name,
@@ -32,6 +34,10 @@ class Workspace:
     repo_origins: dict[str, str]
     organ_registry_path: Path | None = None
     organ_registry_source: str | None = None
+    routing_bundle_root: Path | None = None
+    routing_bundle_root_source: str | None = None
+    routing_source_lock_path: Path | None = None
+    routing_source_lock_source: str | None = None
 
     @classmethod
     def discover(cls, root: str | Path) -> "Workspace":
@@ -41,6 +47,12 @@ class Workspace:
         config = load_workspace_config(start)
         federation_root, federation_root_source = _discover_federation_root(start=start, config=config)
         organ_registry_path, organ_registry_source = _resolve_organ_registry(config)
+        (
+            routing_bundle_root,
+            routing_bundle_root_source,
+            routing_source_lock_path,
+            routing_source_lock_source,
+        ) = _resolve_control_plane_inputs(config)
 
         repo_roots = {}
         repo_origins = {}
@@ -59,6 +71,10 @@ class Workspace:
             repo_origins=repo_origins,
             organ_registry_path=organ_registry_path,
             organ_registry_source=organ_registry_source,
+            routing_bundle_root=routing_bundle_root,
+            routing_bundle_root_source=routing_bundle_root_source,
+            routing_source_lock_path=routing_source_lock_path,
+            routing_source_lock_source=routing_source_lock_source,
         )
 
     def has_repo(self, repo: str) -> bool:
@@ -113,6 +129,33 @@ def _resolve_organ_registry(
             "manifest:organ_access.registry_source",
         )
     return None, None
+
+
+def _resolve_control_plane_inputs(
+    config: WorkspaceConfig,
+) -> tuple[Path | None, str | None, Path | None, str | None]:
+    bundle_env = os.environ.get(ROUTING_BUNDLE_ROOT_ENV)
+    if bundle_env:
+        bundle_root = Path(bundle_env).expanduser().resolve(strict=False)
+        bundle_source = f"env:{ROUTING_BUNDLE_ROOT_ENV}"
+    elif config.routing_bundle_root_pattern is not None:
+        bundle_root = resolve_pattern(config.routing_bundle_root_pattern, config)
+        bundle_source = "manifest:control_plane.routing_bundle_root"
+    else:
+        bundle_root = None
+        bundle_source = None
+
+    lock_env = os.environ.get(ROUTING_SOURCE_LOCK_ENV)
+    if lock_env:
+        lock_path = Path(lock_env).expanduser().resolve(strict=False)
+        lock_source = f"env:{ROUTING_SOURCE_LOCK_ENV}"
+    elif config.routing_source_lock_pattern is not None:
+        lock_path = resolve_pattern(config.routing_source_lock_pattern, config)
+        lock_source = "manifest:control_plane.routing_source_lock"
+    else:
+        lock_path = None
+        lock_source = "package:canonical-routing-source-lock"
+    return bundle_root, bundle_source, lock_path, lock_source
 
 
 def _discover_repo_path(

@@ -1,0 +1,79 @@
+{
+  "schema_version": "aoa_control_plane_routing_source_lock_v1",
+  "routing_abi": {
+    "abi_id": "aoa_routing_thin_router_v1",
+    "abi_version": "aoa_routing_thin_router_v1",
+    "owner_repo": "aoa-sdk",
+    "schema_ref": "schemas/aoa-router.schema.json",
+    "source_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+    "artifact_digest": "sha256:355dfd987c3f6fe32d9feaae0c2f2d8799fafe89651b2870a5806e299db0fe88"
+  },
+  "routing_bundle_subject_digest": "sha256:4b18aa61850afe3859ca2e3a221a6710a34dc45ea47d9321126abb1ebbe1671b",
+  "owner_switch_receipt_digest": "sha256:d2b9272dacd1cd04d3bf200c4e9b8c7bce301c1b0a2bcb36e0c8a16064ea6645",
+  "runtime_consumer_source_ref": "fac82c75d860dd2433cfc1e391f4b6ba117425d7",
+  "runtime_manifest_schema_ref": "abyss-stack:schemas/federation-mirror-manifest.schema.json",
+  "cross_repo_registry": {
+    "owner_repo": "aoa-sdk",
+    "relative_path": "generated/cross_repo_registry.min.json",
+    "source_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+    "artifact_digest": "sha256:656963609433e73434b696c9a732b12bd0767db8a98d62ab008719bfea0c5865",
+    "schema_ref": "schemas/cross-repo-registry.schema.json",
+    "schema_version": "1"
+  },
+  "cross_repo_registry_schema": {
+    "owner_repo": "aoa-sdk",
+    "relative_path": "schemas/cross-repo-registry.schema.json",
+    "source_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+    "artifact_digest": "sha256:c8abf7ba4a52fb4ba976b8cd098558e8cce9b9b50b8a78611657997c0d8f2da4",
+    "schema_ref": "schemas/cross-repo-registry.schema.json",
+    "schema_version": "1"
+  },
+  "router_entry_schema": {
+    "owner_repo": "aoa-sdk",
+    "relative_path": "schemas/router-entry.schema.json",
+    "source_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+    "artifact_digest": "sha256:454ff9852c98a45d99d1149dfa731f1f29168752bb0ff7a6357c1ae173c82990",
+    "schema_ref": "schemas/router-entry.schema.json",
+    "schema_version": "1"
+  },
+  "task_to_surface_hints": {
+    "owner_repo": "aoa-sdk",
+    "relative_path": "generated/task_to_surface_hints.json",
+    "source_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+    "artifact_digest": "sha256:402aecaea487f53d7e556a67f9d8b68168af397a84e32f12978e52b2a2242c81",
+    "schema_ref": "schemas/task-to-surface-hints.schema.json",
+    "schema_version": "1"
+  },
+  "task_to_surface_hints_schema": {
+    "owner_repo": "aoa-sdk",
+    "relative_path": "schemas/task-to-surface-hints.schema.json",
+    "source_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+    "artifact_digest": "sha256:2dc2b50f656ca8ac8103083646bae69508a6ca4278e18edb292dcc21cfe74add",
+    "schema_ref": "schemas/task-to-surface-hints.schema.json",
+    "schema_version": "1"
+  },
+  "capability_graph": {
+    "owner_repo": "aoa-skills",
+    "relative_path": "generated/capability_graph.json",
+    "source_ref": "48598a9564c4621b15428831642b802dbc8d2a47",
+    "artifact_digest": "sha256:0b5e73b2efcede17b60c28f39230a9af539e86775311c2c52e38b619a229affb",
+    "schema_ref": "schemas/capability_graph.schema.json",
+    "schema_version": "aoa-capability-graph-v1"
+  },
+  "owner_source_refs": {
+    "8Dionysus": "39cdef104d54d570e7eb4f689ebcd48b2cc6a658",
+    "Agents-of-Abyss": "bfeb4bfb447b437f1360b814bbf4f1def5e62859",
+    "Dionysus": "6c463f6b89a11e85b37e2606525afc7d45005fbd",
+    "Tree-of-Sophia": "54be6f25a2272d02f119a16b1c75e8756decf900",
+    "abyss-stack": "8d9d4309302d90b79fdc3d68da99bb2ace511446",
+    "aoa-agents": "66f8bf22d03518b1e2367fd4f51dab80650f6d37",
+    "aoa-evals": "3412b47f9ee7bec9567f92e1c2d59596c4428a2c",
+    "aoa-kag": "cdd2286c5ad4a345fe704ca065036945f6ba4353",
+    "aoa-memo": "7672add5e2bb4ff21c2581ca656998f0ca7c8a3e",
+    "aoa-playbooks": "a15866ec867209288533850cc34939ad81829947",
+    "aoa-sdk": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+    "aoa-skills": "48598a9564c4621b15428831642b802dbc8d2a47",
+    "aoa-stats": "504571995cc36905cc886259c0a19be6e8e35045",
+    "aoa-techniques": "e842c0d0156c58cfb9020b636e81134e96fc8cfb"
+  }
+}

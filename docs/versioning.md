@@ -113,6 +113,14 @@ transitions, digest scope, approval scope, event ordering, runtime neutrality,
 or owner authority requires a versioned contract decision; adapters declare
 the plan and event versions they support.
 
+C1 route selection is independently named
+`aoa_control_plane_route_resolver_v1`. Its version covers candidate
+intersection, score weights, negative applicability, constraint handling,
+eligibility rules, ambiguity behavior, decision identity, and fallback
+posture. Changing any of those semantics requires a new resolver version and
+old-vs-new evaluation; it must not be hidden behind the stable
+`aoa_control_plane_v1` envelope.
+
 ## Operational Expectation
 
 - Loader functions for supported surfaces should go through the compatibility

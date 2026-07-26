@@ -16,18 +16,21 @@ mean.
   selection, and KAG retrieval/composition authority.
 - Keep owner-layer signal detection additive, inspectable, and weaker than
   owner acceptance.
-- Keep the M1 SDK routing compiler in non-publishing `sdk_shadow` posture,
-  byte-paired with the pinned predecessor, and separately proven through its
-  installed-wheel sidecar.
+- Preserve the historical M1 shadow and G4 evidence as the proof chain behind
+  the live SDK-canonical producer; do not reuse shadow posture as current
+  authority.
 - Preserve the passed G4 distinction between compact release-fixture proof and
   full 170-route canonical-corpus proof; keep runtime content readiness
   separate from native provenance and durable trust closure.
 - Keep the passed non-publishing SDK G5 candidate distinct from its public
   release envelope. Release trust may become durable before G5, but normal
   runtime and canonical ownership remain denied.
-- Keep the landed G5 canonical receipt distinct from stronger-owner admission,
-  executed runtime cutover, compatibility exit, consumer-zero, Runner
-  delivery, and repository archival.
+- Keep the landed G5 canonical receipt, completed stronger-owner admission,
+  and executed runtime cutover as distinct evidence from compatibility exit,
+  consumer-zero, Runner delivery, and repository archival.
+- Keep C1 route resolution receipt-bound, deterministic, explainable, and
+  non-activating. C2 plan compilation and C3-C5 Runner behavior remain
+  separate parts and landings.
 
 ## Next Work
 
@@ -36,10 +39,11 @@ mean.
 - Keep bridge helpers paired with source owner, route card, and focused tests.
 - Move repeated cross-owner pressure into the nearest current part before
   considering a new bridge part.
-- Admit the exact `v0.8.0` canonical artifact through `abyss-machine`, execute
-  the receipt-gated `abyss-stack` cutover, land the paired `aoa-routing` M3
-  receipt, and measure the compatibility window. Treat any source, corpus,
-  runtime, trust, rollback, or consumer drift as a hard stop.
+- Land C1 route resolution from the exact G5 runtime snapshot and pinned
+  `aoa-skills` graph, then land C2 plan compilation separately.
+- Measure the compatibility window and preserve the exact predecessor rollback
+  route. Treat any source, corpus, runtime, trust, rollback, or consumer drift
+  as a hard stop.
 
 ## When Time Comes
 

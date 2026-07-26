@@ -9,6 +9,13 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
+- Add C1 Agent OS route resolution: `AoASDK.control_plane.resolve()` and
+  `.explain()`, plus `aoa route resolve|explain|validate`.
+- Bind deterministic skill candidate selection to the exact SDK-canonical G5
+  runtime snapshot and pinned `aoa-skills` owner projection, blocking trust
+  drift, mixed projections, unsupported constraints, and top-rank ambiguity.
+- Keep plan compilation, `AoARunner`, activation, runtime execution, measured
+  benefit, consumer-zero, and archival outside this slice.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
