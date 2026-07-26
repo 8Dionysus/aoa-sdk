@@ -25,5 +25,11 @@ pinned `abyss-machine` source, and attests its digest. This establishes release
 trust only: `aoa-routing` remains canonical and normal runtime remains denied
 until the separate G5 receipt.
 
+For `v0.8.0`, the battery reconstructs those exact public routing bytes,
+requires byte-for-byte parity, adds the G5 owner-switch receipt and canonical
+provenance, and attests a separate canonical archive. This authorizes
+`aoa-sdk` as producer but records live runtime cutover as unexecuted and keeps
+archive authority false.
+
 Use that part when changing release audit, publish helper behavior, changelog
 publication shape, or release validation.

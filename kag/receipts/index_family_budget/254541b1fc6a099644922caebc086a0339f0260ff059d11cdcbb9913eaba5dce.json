@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 11890840,
+  "allowed_tracked_bytes": 16182374,
+  "approved_by": "repository-owner",
+  "base_ref": "a3fba51b545a16b1cb79d93d1943918a49101bfa",
+  "changed_generated_bytes": 11890840,
+  "changed_generated_files": 304,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "254541b1fc6a099644922caebc086a0339f0260ff059d11cdcbb9913eaba5dce",
+  "reason": "Authorize the receipt-bound routing G5 owner switch while preserving exact public-release parity, runtime-owner execution boundaries, retained predecessor rollback, and the archive stop line.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16182374,
+  "tracked_bytes_max": 15728640
+}

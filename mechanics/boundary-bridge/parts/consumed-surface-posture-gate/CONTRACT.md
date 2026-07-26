@@ -66,6 +66,14 @@
 - Admits public release trust only for release consumption and canary review;
   normal runtime and all six G5 authority flags remain denied until the
   separate canonical policy switch.
+- Requires the canonical G5 envelope to reconstruct the exact public release
+  assembly byte for byte before adding a separately hashed owner-switch
+  receipt and canonical provenance.
+- Binds the SDK source/version/ABI, retained predecessor, immutable public
+  release, exact runtime contract, compatibility-window start, and six exact
+  authority flags.
+- Makes SDK producer authority explicit while recording live runtime cutover
+  as unexecuted and archive authority as false.
 - Admits the current owner shortlist `guard` kind without removing the legacy
   `seed` compatibility value or taking ownership of either meaning.
 
@@ -93,6 +101,9 @@
 - A published and attested SDK G5 release candidate is not the G5 receipt,
   normal runtime admission, predecessor maintenance-only authority, or archive
   authorization.
+- A valid G5 owner-switch receipt is not stronger-owner admission, executed
+  runtime cutover, consumer-zero, compatibility exit, Runner implementation,
+  or archive authorization.
 
 ## Active Test Home
 
@@ -115,3 +126,4 @@
 - `tests/test_routing_shadow_bundle.py`
 - `tests/test_routing_g5_candidate.py`
 - `tests/test_routing_g5_release_candidate.py`
+- `tests/test_routing_g5_canonical.py`

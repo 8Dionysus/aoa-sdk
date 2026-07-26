@@ -25,6 +25,9 @@ mean.
 - Keep the passed non-publishing SDK G5 candidate distinct from its public
   release envelope. Release trust may become durable before G5, but normal
   runtime and canonical ownership remain denied.
+- Keep the landed G5 canonical receipt distinct from stronger-owner admission,
+  executed runtime cutover, compatibility exit, consumer-zero, Runner
+  delivery, and repository archival.
 
 ## Next Work
 
@@ -33,11 +36,10 @@ mean.
 - Keep bridge helpers paired with source owner, route card, and focused tests.
 - Move repeated cross-owner pressure into the nearest current part before
   considering a new bridge part.
-- Publish and admit the exact `v0.7.0` release candidate, prove
-  `release_consumer` allow and normal `runtime` deny, then carry the separate
-  G5 owner switch through `aoa-sdk`, `aoa-routing`, `abyss-machine`, and
-  `abyss-stack`. Treat any source, corpus, runtime, trust, rollback, or
-  consumer drift as a hard stop.
+- Admit the exact `v0.8.0` canonical artifact through `abyss-machine`, execute
+  the receipt-gated `abyss-stack` cutover, land the paired `aoa-routing` M3
+  receipt, and measure the compatibility window. Treat any source, corpus,
+  runtime, trust, rollback, or consumer drift as a hard stop.
 
 ## When Time Comes
 
@@ -51,7 +53,7 @@ mean.
 ## Out Of Scope
 
 - Sibling source truth.
-- Canonical routing policy authority before the explicit G5 owner switch.
+- Live runtime execution and archival authority from SDK producer ownership.
 - Skill execution meaning.
 - Proof, memory, role, stats, KAG, playbook, or runtime ownership.
 - Owner acceptance without owner receipt.

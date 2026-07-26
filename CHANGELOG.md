@@ -12,12 +12,76 @@ Tracking starts with the community-docs baseline for this repository.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
+
+## [0.8.0] - 2026-07-26
+
+### Summary
+
 - Allow OIDC release-evidence replay from an existing immutable tag when the
   original tag workflow fails before attestation, without moving the tag or
   rebuilding from newer source.
 - Make routing release archives byte-stable across zlib versions with a
   canonical stored-block gzip carrier, and keep newer replay tooling separate
   from immutable release source and subject bytes.
+- Complete the receipt-bound routing G5 owner switch: reproduce the exact
+  public `v0.7.0` assembly byte for byte, make `aoa-sdk` the canonical
+  producer, start the compatibility window, and retain `aoa-routing` for
+  rollback without authorizing archive execution.
+
+### Reconciliation Basis
+
+- The landed first-parent range before this release prep is
+  `v0.7.0..a3fba51`: two commits, PRs #225-#226, covering immutable-tag
+  evidence replay and cross-zlib deterministic release archives.
+- This release-prep slice adds `AOA-SDK-D-0076`, the canonical builder,
+  owner-switch receipt and provenance schemas, exact public-release/runtime
+  input lock, installed-wheel probe, and `v0.8.0` tag workflow.
+- The routing assembly remains the exact public `v0.7.0` corpus. G5 changes
+  producer authority and provenance, not the routing ABI, paths, or payload
+  meaning.
+
+### Changed
+
+- Add `aoa_sdk.control_plane.routing.canonical`, which safely reads the
+  immutable public archive, rebuilds from the same fourteen exact producer
+  inputs, rejects any byte drift, and emits a deterministic canonical
+  envelope.
+- Add `aoa_sdk_routing_g5_owner_switch_receipt_v1` and
+  `aoa_sdk_routing_g5_canonical_provenance_v1`, bringing the packaged routing
+  schema family to twenty-one.
+- Bind SDK version/source/ABI, predecessor rollback ref, public release
+  ref/source/asset/digest, `ABYSS-STACK-D-0086`, compatibility start, and the
+  six exact authority flags in one reviewable receipt.
+- Extend the release gate and installed-wheel tests to prove canonical
+  construction without checkout-local imports.
+- Preserve immutable `v0.7.0` replay while adding a distinct `v0.8.0` workflow
+  that downloads and verifies the public trust root, rebuilds the canonical
+  envelope twice, verifies its checksum, and creates a GitHub attestation.
+
+### Validation
+
+- Focused canonical tests prove positive receipt/schema binding, exact
+  public-release byte parity, deterministic archives, digest substitution
+  denial, archive-authority substitution denial, and output-root safety.
+- Clean installed-wheel probes validate twenty-one schemas, the complete
+  27-file assembly, the 29 canonical subjects, G5 authority, and explicit
+  `live_cutover_executed=false` plus `archive_authorized=false`.
+- The full SDK release gate covers decision indexes, source-home and mechanics
+  topology, generated companions, tests, Ruff, mypy, wheel/sdist build, all
+  routing wheel probes, and OS Abyss package artifact validation.
+
+### Notes
+
+- `AOA-SDK-D-0076` makes `aoa-sdk` the canonical routing producer. It does not
+  claim that `abyss-machine` has admitted the exact release or that
+  `abyss-stack` has executed the live cutover.
+- `aoa-routing` is retained for compatibility, security, rollback, and
+  deprecation support. Consumer-zero and compatibility exit remain measured
+  future conditions.
+- Archive execution remains forbidden without those conditions and separate
+  exact operator approval.
+- The Agent OS Runner is a separate post-G5 release and is not bundled into
+  this owner switch.
 
 ## [0.7.0] - 2026-07-25
 

@@ -1,0 +1,239 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/routing-g5-canonical-provenance.schema.json",
+  "title": "AoA SDK routing G5 canonical provenance",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "state",
+    "publication_posture",
+    "canonical_producer",
+    "canonical_predecessor",
+    "public_release_trust_root",
+    "runtime_consumer_contract",
+    "artifact_identity",
+    "assembly_file_sha256",
+    "input_source_refs",
+    "owner_switch_receipt",
+    "observed_at",
+    "g5_authority",
+    "archive_stop_line"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_routing_g5_canonical_provenance_v1"
+    },
+    "state": {
+      "const": "sdk_canonical"
+    },
+    "publication_posture": {
+      "const": "public_release_canonical"
+    },
+    "canonical_producer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_repo",
+        "source_ref",
+        "implementation"
+      ],
+      "properties": {
+        "owner_repo": {
+          "const": "aoa-sdk"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/git_ref"
+        },
+        "implementation": {
+          "const": "aoa_sdk.control_plane.routing"
+        }
+      }
+    },
+    "canonical_predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_repo",
+        "source_ref",
+        "posture"
+      ],
+      "properties": {
+        "owner_repo": {
+          "const": "aoa-routing"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/git_ref"
+        },
+        "posture": {
+          "const": "compatibility_security_rollback_deprecation_only"
+        }
+      }
+    },
+    "public_release_trust_root": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "release_ref",
+        "source_ref",
+        "asset_name",
+        "asset_digest",
+        "byte_parity"
+      ],
+      "properties": {
+        "release_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ref": {
+          "$ref": "#/$defs/git_ref"
+        },
+        "asset_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "byte_parity": {
+          "const": true
+        }
+      }
+    },
+    "runtime_consumer_contract": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_repo",
+        "source_ref",
+        "decision_id",
+        "live_cutover_executed"
+      ],
+      "properties": {
+        "owner_repo": {
+          "const": "abyss-stack"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/git_ref"
+        },
+        "decision_id": {
+          "const": "ABYSS-STACK-D-0086"
+        },
+        "live_cutover_executed": {
+          "const": false
+        }
+      }
+    },
+    "artifact_identity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "artifact_class",
+        "owner_repo",
+        "abi_epoch"
+      ],
+      "properties": {
+        "artifact_class": {
+          "const": "thin_routing_readmodel_bundle"
+        },
+        "owner_repo": {
+          "const": "aoa-sdk"
+        },
+        "abi_epoch": {
+          "const": "aoa_routing_thin_router_v1"
+        }
+      }
+    },
+    "assembly_file_sha256": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "type": "string",
+        "pattern": "^[0-9a-f]{64}$"
+      }
+    },
+    "input_source_refs": {
+      "type": "object",
+      "minProperties": 1,
+      "additionalProperties": {
+        "$ref": "#/$defs/git_ref"
+      }
+    },
+    "owner_switch_receipt": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "path",
+        "schema",
+        "status",
+        "digest"
+      ],
+      "properties": {
+        "path": {
+          "const": "succession/routing-g5-owner-switch.json"
+        },
+        "schema": {
+          "const": "aoa_sdk_routing_g5_owner_switch_receipt_v1"
+        },
+        "status": {
+          "const": "g5_switch_authorized"
+        },
+        "digest": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "observed_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "g5_authority": {
+      "$ref": "#/$defs/g5_authority"
+    },
+    "archive_stop_line": {
+      "const": "Repository archival remains forbidden without consumer-zero, compatibility exit, and separate exact operator approval."
+    }
+  },
+  "$defs": {
+    "git_ref": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "g5_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "archive_authorized",
+        "canonical_producer_switch_authorized",
+        "compatibility_window_started",
+        "live_runtime_mutation_authorized",
+        "predecessor_maintenance_only",
+        "sdk_canonical"
+      ],
+      "properties": {
+        "archive_authorized": {
+          "const": false
+        },
+        "canonical_producer_switch_authorized": {
+          "const": true
+        },
+        "compatibility_window_started": {
+          "const": true
+        },
+        "live_runtime_mutation_authorized": {
+          "const": true
+        },
+        "predecessor_maintenance_only": {
+          "const": true
+        },
+        "sdk_canonical": {
+          "const": true
+        }
+      }
+    }
+  }
+}

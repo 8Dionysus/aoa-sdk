@@ -11,7 +11,7 @@ This README is the public front door. When work becomes operational,
 source-authored, generated, mechanic-local, release-facing, or agent-facing,
 follow the linked owner surface instead of expanding this page.
 
-> Current release: `v0.7.0`. See [CHANGELOG](CHANGELOG.md) for release notes.
+> Current release: `v0.8.0`. See [CHANGELOG](CHANGELOG.md) for release notes.
 
 ## What This Repository Does
 
@@ -112,6 +112,12 @@ The current landed surface includes:
   [G5 release candidate](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-release-candidate.md),
   which binds the exact public archive, release provenance, and stronger-owner
   verifier before the owner switch while normal runtime remains denied;
+- the receipt-bound
+  [G5 owner switch](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-owner-switch.md),
+  which makes `aoa-sdk` the single canonical routing producer by proving exact
+  byte parity with the public `v0.7.0` asset, starts the compatibility window,
+  retains `aoa-routing` for rollback, and keeps live-cutover execution and
+  archival authority separate;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

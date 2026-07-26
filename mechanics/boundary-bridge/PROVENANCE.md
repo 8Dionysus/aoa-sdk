@@ -59,6 +59,12 @@
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-release-candidate.md`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_g5_release_candidate.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-owner-switch.md`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py`
+- `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_g5_canonical.py`
+- `src/aoa_sdk/control_plane/routing/canonical.py`
+- `src/aoa_sdk/control_plane/routing/schemas/routing-g5-owner-switch-receipt.schema.json`
+- `src/aoa_sdk/control_plane/routing/schemas/routing-g5-canonical-provenance.schema.json`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_stats_surface_reader.py`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_workspace_control_plane_compatibility.py`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py`

@@ -6,13 +6,14 @@ repositories remain authoritative.
 
 ## Source Ownership
 
-- `aoa-routing` currently owns navigation surfaces, the canonical routing
-  producer, and the dispatch ABI.
-- `AOA-SDK-D-0071` accepts transfer of that producer and ABI to `aoa-sdk`,
-  but the transfer is not live until shadow parity and the explicit G5
-  owner-switch receipt. Before G5, SDK routing output is consumer or
-  explicitly profiled shadow, candidate, or public release-candidate evidence
-  only.
+- `aoa-sdk` owns the canonical routing producer and dispatch ABI after the
+  receipt-bound G5 switch in `AOA-SDK-D-0076`; this advances, rather than
+  erases, the accepted-target/predecessor posture established by
+  `AOA-SDK-D-0071`.
+- `aoa-routing` retains the exact predecessor implementation for
+  compatibility, security, rollback, and deprecation support. Its repository
+  lifecycle remains separate from producer ownership and archival is not
+  authorized.
 - `aoa-skills` owns shared skill sources, capability families, install
   profiles, port grammar, and portable exports.
 - Each repository owns authored procedures and admission for its own skill
@@ -31,21 +32,25 @@ repositories remain authoritative.
 
 ## aoa-sdk Should Own
 
-- after G5, the canonical routing producer, routing ABI, deterministic route
+- the canonical routing producer, routing ABI, deterministic route
   resolution, structured explanation, runtime-neutral plan compilation, and
   lifecycle client contracts
-- before G5, the versioned R2 route, plan, approval, lifecycle, event,
+- the versioned R2 route, plan, approval, lifecycle, event,
   evidence-reference, and adapter protocol models used to prove the boundary;
   the models do not activate an `AoASDK` runner or runtime
-- before G5, the packaged M1 routing compiler, strict validator, and
+- the packaged routing compiler, strict validator, and
   dual-producer sidecar in non-publishing shadow posture; embedded
   compatibility provenance remains `aoa-routing` in the default posture
-- before G5, an explicit SDK-identified, non-publishing candidate assembly
+- the historical SDK-identified, non-publishing candidate assembly
   bound to exact clean source refs, artifact subjects, and false authority
   flags for stronger-owner trust and isolated/canary review
-- before G5, a deterministic public release envelope and exact input/verifier
+- the deterministic public release envelope and exact input/verifier
   lock that establish release trust while normal runtime, canonical ownership,
   and all six switch-authority flags remain denied
+- the receipt-bound canonical envelope that proves public-release byte parity,
+  names the exact runtime contract, starts the compatibility window, and
+  authorizes the producer switch while recording live cutover as unexecuted
+  and archive authority as false
 - typed loaders over published surfaces
 - local workspace discovery and sibling-repo resolution
 - shared Python models for stable consumer use
@@ -77,9 +82,9 @@ repositories remain authoritative.
 ## aoa-sdk Should Not Absorb
 
 - activation or model/tool execution from the runtime owner
-- canonical producer authority from a candidate build, release archive,
+- live runtime execution from the canonical receipt, release archive,
   attestation, trust record, copied runtime mirror, or schema-valid canary
-  without the exact G5 receipt
+  without the runtime owner's separate cutover receipt
 - agent, skill, capability, scenario, eval, memo, KAG, stats, or runtime
   source meaning during routing succession
 - authored markdown as the primary runtime API

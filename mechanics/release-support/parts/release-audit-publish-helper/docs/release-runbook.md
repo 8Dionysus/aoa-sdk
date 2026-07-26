@@ -75,6 +75,7 @@ python -m mypy src/aoa_sdk/control_plane/routing
 python -m build
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py
+python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
 ```
 
 These commands prove candidate construction and installed-package behavior.
@@ -120,6 +121,37 @@ orchestration and canonical archive encoding. GitHub attestation provenance
 records that tooling revision separately. A replay must reject non-semantic
 tag names and must not substitute current `main` as the release source or
 input lock.
+
+## Routing G5 canonical publication
+
+`v0.8.0` is the separate owner-switch release. It consumes the immutable
+`v0.7.0` release candidate as a byte-parity trust root and adds the
+owner-switch receipt without changing any of its 27 routing assembly members:
+
+```bash
+python mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_canonical.py \
+  --workspace-root /path/to/exact-input-worktrees \
+  --sdk-root /path/to/exact-aoa-sdk-worktree \
+  --predecessor-root /path/to/exact-aoa-routing-worktree \
+  --public-release-archive /path/to/aoa-sdk-routing-g5-release-candidate-v0.7.0.tar.gz \
+  --runtime-consumer-root /path/to/abyss-stack-at-fac82c75 \
+  --output-dir /path/to/fresh/canonical \
+  --archive-output /path/to/aoa-sdk-routing-g5-canonical-v0.8.0.tar.gz \
+  --checksum-output /path/to/aoa-sdk-routing-g5-canonical-v0.8.0.tar.gz.sha256
+```
+
+The exact inputs, public asset digest, runtime contract, compatibility start,
+and authority flags are pinned in
+`sdk/distribution/manifests/routing_g5_canonical.input-lock.json`. The tag
+workflow downloads and verifies the public asset, rebuilds the canonical
+envelope twice, verifies its checksum, and attests the new archive.
+
+This release makes `aoa-sdk` the canonical routing producer. It does not
+pretend the downstream steps already ran: canonical provenance keeps
+`live_cutover_executed=false`, and the receipt keeps
+`archive_authorized=false`. `abyss-machine` admission, the separate
+`abyss-stack` cutover receipt, the paired predecessor M3 record, compatibility
+exit, consumer-zero, and archive approval remain ordered follow-ups.
 
 ## Notes
 

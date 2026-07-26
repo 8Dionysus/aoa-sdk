@@ -19,3 +19,5 @@ and public support claims.
   external package-index or GitHub Release publication.
 - Dry-run release output is not a GitHub Release.
 - Support claims must stay tied to tested public surfaces.
+- A canonical producer receipt is not stronger-owner admission, executed live
+  cutover, consumer-zero, compatibility exit, or repository archive approval.

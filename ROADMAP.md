@@ -75,8 +75,9 @@ land a local surface?
 
 ## Current Direction
 
-`aoa-sdk` is past seed bootstrap. The current post-`v0.7.0` direction is the
-atomic routing owner switch followed by bounded compatibility proof.
+`aoa-sdk` is past seed bootstrap. The current post-`v0.8.0` direction is
+owner-routed artifact admission and live cutover, followed by bounded
+compatibility proof and a separately released Agent OS Runner.
 
 The current repo-wide program is staged routing producer succession. The
 target is accepted in `AOA-SDK-D-0071`, the R2 typed control-plane, lifecycle,
@@ -90,10 +91,11 @@ trust, predecessor rollback, and isolated runtime content/consumer readiness
 agree. The SDK G5 candidate also passed stronger-owner admission, authorized
 canary consumption, and exact rollback. `v0.7.0` adds the separately profiled,
 deterministic public release candidate and attestation route, establishing
-release trust while normal runtime remains denied. `aoa-routing` remains
-canonical through the named conditional handoff and until an explicit G5
-owner-switch receipt. The program moves the producer function and ABI into the
-SDK; it does not absorb source organs or runtime execution.
+release trust while normal runtime remains denied. `v0.8.0` adds the explicit
+G5 receipt, proves byte parity with that immutable asset, and makes `aoa-sdk`
+the canonical routing producer while retaining `aoa-routing` for compatibility
+and rollback. The program moves the producer function and ABI into the SDK; it
+does not absorb source organs or runtime execution.
 
 The repo should now:
 
@@ -115,8 +117,8 @@ The repo should now:
 - preserve the fourteen routing output paths and
   `aoa_routing_thin_router_v1` during owner-only succession;
 - keep public release trust distinct from normal runtime and canonical owner
-  authority, and make canonical ownership change only through the separate G5
-  receipt;
+  authority; the G5 receipt changes producer ownership but does not claim that
+  stronger-owner admission or live runtime cutover has executed;
 - keep passive skill-environment inspection, `aoa surfaces detect`,
   checkpoint capture, review-note, and reviewed evidence materialization
   bounded and weaker than capability execution or owner truth;
@@ -134,21 +136,21 @@ choose whether a change belongs on the control plane. It still must not turn
 `aoa-sdk` into a source-owning runtime layer.
 
 The predecessor `ROUTING_M2_CONDITIONAL_HANDOFF`, stronger-owner candidate
-admission, `abyss-stack` canary intake, authorized live canary, and exact
-rollback are complete without switching authority. The next honest move is to
-publish and admit the exact `v0.7.0` release candidate, prove
-`release_consumer` allow plus normal `runtime` deny, and then land the separate
-cross-repo G5 owner switch. The compatibility PR order remains fixed by the R3
-evidence.
+admission, `abyss-stack` canary intake, authorized live canary, exact rollback,
+public `v0.7.0` release trust, and the SDK-side G5 owner switch are complete.
+The next honest move is to admit the exact `v0.8.0` canonical artifact through
+`abyss-machine`, execute the receipt-gated `abyss-stack` cutover, land the
+paired predecessor M3 maintenance receipt, and begin measured compatibility
+evidence. The compatibility PR order remains fixed by the R3 evidence.
 
 ## Current Public Contour
 
-Current release marker: `v0.7.0`.
+Current release marker: `v0.8.0`.
 
-Current unreleased contour: exact public release admission followed by the
-separate G5 canonical switch, predecessor maintenance-only posture, and
-compatibility-window evidence after `v0.7.0`. This is a directional contour,
-not a changelog replacement.
+Current unreleased contour: canonical artifact admission, live runtime cutover,
+paired predecessor M3 posture, compatibility-window evidence, and the
+separately released Agent OS Runner after `v0.8.0`. This is a directional
+contour, not a changelog replacement.
 
 Current anchors:
 

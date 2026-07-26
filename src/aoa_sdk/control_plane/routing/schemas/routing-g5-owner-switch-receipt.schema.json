@@ -1,0 +1,217 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/routing-g5-owner-switch-receipt.schema.json",
+  "title": "AoA SDK routing G5 owner-switch receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema",
+    "status",
+    "transition",
+    "sdk",
+    "predecessor",
+    "public_release",
+    "runtime_consumer",
+    "compatibility_window",
+    "authorized_at",
+    "g5_authority",
+    "archive_stop_line"
+  ],
+  "properties": {
+    "schema": {
+      "const": "aoa_sdk_routing_g5_owner_switch_receipt_v1"
+    },
+    "status": {
+      "const": "g5_switch_authorized"
+    },
+    "transition": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "from_state",
+        "to_state",
+        "canonical_owner_before",
+        "canonical_owner_after"
+      ],
+      "properties": {
+        "from_state": {
+          "const": "predecessor_canonical"
+        },
+        "to_state": {
+          "const": "sdk_canonical"
+        },
+        "canonical_owner_before": {
+          "const": "aoa-routing"
+        },
+        "canonical_owner_after": {
+          "const": "aoa-sdk"
+        }
+      }
+    },
+    "sdk": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_repo",
+        "source_ref",
+        "version",
+        "abi_epoch"
+      ],
+      "properties": {
+        "owner_repo": {
+          "const": "aoa-sdk"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/git_ref"
+        },
+        "version": {
+          "type": "string",
+          "minLength": 1
+        },
+        "abi_epoch": {
+          "const": "aoa_routing_thin_router_v1"
+        }
+      }
+    },
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_repo",
+        "source_ref",
+        "rollback_posture"
+      ],
+      "properties": {
+        "owner_repo": {
+          "const": "aoa-routing"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/git_ref"
+        },
+        "rollback_posture": {
+          "const": "retained"
+        }
+      }
+    },
+    "public_release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "release_ref",
+        "source_ref",
+        "asset_name",
+        "asset_digest"
+      ],
+      "properties": {
+        "release_ref": {
+          "type": "string",
+          "minLength": 1
+        },
+        "source_ref": {
+          "$ref": "#/$defs/git_ref"
+        },
+        "asset_name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "asset_digest": {
+          "$ref": "#/$defs/sha256"
+        }
+      }
+    },
+    "runtime_consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "owner_repo",
+        "source_ref",
+        "contract_ref"
+      ],
+      "properties": {
+        "owner_repo": {
+          "const": "abyss-stack"
+        },
+        "source_ref": {
+          "$ref": "#/$defs/git_ref"
+        },
+        "contract_ref": {
+          "const": "docs/decisions/ABYSS-STACK-D-0086-receipt-bound-sdk-routing-cutover.md"
+        }
+      }
+    },
+    "compatibility_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "state",
+        "started_on",
+        "started_by_sdk_version"
+      ],
+      "properties": {
+        "state": {
+          "const": "started"
+        },
+        "started_on": {
+          "type": "string",
+          "format": "date"
+        },
+        "started_by_sdk_version": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "authorized_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "g5_authority": {
+      "$ref": "#/$defs/g5_authority"
+    },
+    "archive_stop_line": {
+      "const": "Repository archival remains forbidden without consumer-zero, compatibility exit, and separate exact operator approval."
+    }
+  },
+  "$defs": {
+    "git_ref": {
+      "type": "string",
+      "pattern": "^(?:[0-9a-f]{40}|[0-9a-f]{64})$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "g5_authority": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "archive_authorized",
+        "canonical_producer_switch_authorized",
+        "compatibility_window_started",
+        "live_runtime_mutation_authorized",
+        "predecessor_maintenance_only",
+        "sdk_canonical"
+      ],
+      "properties": {
+        "archive_authorized": {
+          "const": false
+        },
+        "canonical_producer_switch_authorized": {
+          "const": true
+        },
+        "compatibility_window_started": {
+          "const": true
+        },
+        "live_runtime_mutation_authorized": {
+          "const": true
+        },
+        "predecessor_maintenance_only": {
+          "const": true
+        },
+        "sdk_canonical": {
+          "const": true
+        }
+      }
+    }
+  }
+}
