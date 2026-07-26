@@ -534,9 +534,34 @@ def test_resolve_is_deterministic_explainable_and_needs_no_predecessor_checkout(
     assert len(first.candidates) == 2
     assert explanation.fallback_used is False
     assert len(explanation.candidate_explanations) == len(first.candidates)
+    dispositions = {
+        candidate.candidate_id: candidate.disposition
+        for candidate in explanation.candidate_explanations
+    }
+    assert dispositions["aoa-skills:skill:aoa-decision"] == "selected"
+    assert dispositions["aoa-skills:skill:aoa-eval"] == "rejected"
     assert not (workspace_root / "aoa-routing").exists()
     assert_decision_matches_intent(intent, first)
     assert_explanation_matches_decision(first, explanation)
+
+
+def test_nonpositive_scores_are_rejected_in_blocked_explanation(
+    workspace_root: Path,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(workspace_root)
+    api = _api(workspace_root, bundle_root, lock_path)
+
+    decision = api.resolve(
+        _intent(objective="weather forecast tomorrow")
+    )
+    explanation = api.explain(decision)
+
+    assert decision.status == "blocked"
+    assert "no_eligible_capability" in decision.reason_codes
+    assert all(
+        candidate.disposition == "rejected"
+        for candidate in explanation.candidate_explanations
+    )
 
 
 def test_equal_top_scores_block_without_lexical_fallback(
