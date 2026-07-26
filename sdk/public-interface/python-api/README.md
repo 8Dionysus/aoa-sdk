@@ -41,7 +41,10 @@ binds only a caller-supplied exact adapter profile, verifies runtime snapshot
 observations before effectful transitions, and reconciles approvals, bounded
 recovery, receipts, append-only events, status, outcomes, restore, and
 closeout. The packaged reference adapter executes no plan steps. A production
-adapter and all model/tool execution remain outside the SDK.
+runtime implementation and all model/tool execution remain outside the SDK.
+The optional C4 `AbyssStackRuntimeAdapter` is a transport-only production
+client: it materializes an exact owner profile from explicit artifacts and
+uses one caller-supplied no-shell transport into the external runtime owner.
 
 `AoASDK.organs` is a lazy facade over one explicitly configured private
 registry source. It exposes deterministic projection, bounded catalog,

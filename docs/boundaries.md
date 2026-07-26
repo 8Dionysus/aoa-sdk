@@ -45,10 +45,14 @@ repositories remain authoritative.
 - the C3 `AoARunner` lifecycle client, which binds a caller-supplied adapter,
   validates exact runtime observations, approvals, bounded retries, receipts,
   event continuity, outcomes, restore, and closeout without executing a step
+- the C4 `abyss-stack` runtime adapter client, which loads an explicitly
+  delivered owner profile and constraints, validates exact delivery
+  coordinates, and transports lifecycle calls without owning the external
+  bridge, runtime policy, effects, or execution evidence
 - the deterministic SDK-owned reference adapter as a no-effect protocol
   witness, never as production runtime or invocation proof
 - the versioned R2 route, plan, approval, lifecycle, event,
-  evidence-reference, and adapter protocol models used by C1-C3; the models
+  evidence-reference, and adapter protocol models used by C1-C4; the models
   and Runner do not activate or implement a production runtime
 - the historical packaged routing shadow compiler, strict validator, and
   dual-producer sidecar that proved predecessor parity before the G5 switch

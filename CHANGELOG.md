@@ -29,8 +29,6 @@ Tracking starts with the community-docs baseline for this repository.
   updates, typed outcomes, restoration, and gated closeout.
 - Add the SDK-owned `aoa_reference_runtime_adapter_v1` as an installed-wheel
   lifecycle witness with `executes_plan_steps=false`.
-- Keep production adapter selection, activation, runtime execution, measured
-  benefit, consumer-zero, and archival outside this slice.
 - Project the existing typed organ registry through four bounded read-only
   `aoa_workspace` MCP tools and four resources, while keeping activation-plan
   compilation, connection, lifecycle, and execution outside the MCP surface.
@@ -40,6 +38,13 @@ Tracking starts with the community-docs baseline for this repository.
   memo candidate, eval request/result, and explicit owner acceptance, with
   pinned owner schemas, per-stage receipts, stale-stop behavior, and no SDK
   owner-tool execution.
+- Add the C4 `abyss_stack_agent_os_adapter_v1` transport client, owner-exact
+  runtime-profile loader, exact source/ABI binding, and no-shell subprocess
+  transport. The paired runtime-owner test proves one real governed
+  `AOA-P-0011` execution, durable restore, replay safety, approval enforcement,
+  and source drift closure.
+- Keep adapter selection, runtime implementation, eval/memory verdicts,
+  measured benefit, consumer-zero, and archival outside the SDK client.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.

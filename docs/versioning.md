@@ -140,6 +140,15 @@ strictly non-executing. A production adapter may implement
 `aoa_runtime_adapter_v1`, but runtime deployment and execution evidence do not
 become SDK release evidence.
 
+The first production transport client is independently named
+`abyss_stack_agent_os_adapter_v1`, with binding schema
+`abyss_stack_agent_os_binding_v1` and bridge response
+`abyss_stack_agent_os_bridge_response_v1`. These versions cover exact profile
+materialization, source/ABI delivery binding, operation envelopes, and typed
+response handling. The runtime-owner profile independently controls admitted
+scenario/phase mappings; changing that meaning does not silently widen the SDK
+transport ABI.
+
 ## Operational Expectation
 
 - Loader functions for supported surfaces should go through the compatibility

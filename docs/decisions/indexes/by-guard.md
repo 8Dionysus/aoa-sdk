@@ -52,6 +52,10 @@
 
 - [AOA-SDK-D-0013 - Boundary Bridge And Checkpoint Active Part Localization](../AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md) (`docs/decisions/AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md`)
 
+## approval integrity
+
+- [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
+
 ## archive stop line
 
 - [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
@@ -178,6 +182,10 @@
 ## event chain
 
 - [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
+
+## explicit adapter
+
+- [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 
 ## fallback removal
 
@@ -309,6 +317,7 @@
 - [AOA-SDK-D-0079 - Expose Organ Discovery Through Workspace MCP](../AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md) (`docs/decisions/AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md`)
 - [AOA-SDK-D-0080 - Host-Visible Cross-Organ Orchestration](../AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md) (`docs/decisions/AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md`)
 - [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
+- [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 
 ## no hidden automation
 
@@ -364,6 +373,10 @@
 ## owner follow-through
 
 - [AOA-SDK-D-0057 - Closeout API Route-Role Branches](../AOA-SDK-D-0057-closeout-api-route-role-branches.md) (`docs/decisions/AOA-SDK-D-0057-closeout-api-route-role-branches.md`)
+
+## owner provenance
+
+- [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 
 ## owner scope
 

@@ -144,6 +144,12 @@ The current landed surface includes:
   validates fresh runtime observations, approvals, bounded recovery, receipts,
   event chains, outcomes, restoration, and closeout, and ships a deterministic
   reference adapter that executes no plan steps;
+- the explicit
+  [C4 abyss-stack runtime adapter client](mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/README.md),
+  which hashes an owner-delivered runtime profile and constraints, binds exact
+  plan source/ABI coordinates, and invokes one absolute runtime-owner
+  executable through a no-shell JSON transport without moving execution,
+  policy, or adapter selection into the SDK;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

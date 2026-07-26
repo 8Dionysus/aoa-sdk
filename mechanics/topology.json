@@ -69,7 +69,7 @@
     },
     "control_plane": {
       "primary_mechanic": "boundary-bridge",
-      "reason": "runtime-neutral contracts, C1 receipt-bound route resolution, C2 exact owner-contour plan compilation, and C3 explicit-adapter lifecycle coordination bridge owner projections without taking activation or runtime execution authority"
+      "reason": "runtime-neutral contracts, C1 receipt-bound route resolution, C2 exact owner-contour plan compilation, C3 explicit-adapter lifecycle coordination, and the C4 transport boundary bridge owner projections without taking activation or runtime execution authority"
     },
     "evals": {
       "primary_mechanic": "boundary-bridge",
@@ -118,6 +118,13 @@
       "primary_mechanic": "rpg",
       "reason": "RPG typed consumer helpers form the RPG parent operation"
     },
+    "runtime_adapters": {
+      "primary_mechanic": "runtime-seam",
+      "secondary_mechanics": [
+        "boundary-bridge"
+      ],
+      "reason": "explicit transport clients bind SDK lifecycle contracts to runtime-owner bridges without moving execution, policy, or adapter selection into the SDK"
+    },
     "skills": {
       "primary_mechanic": "boundary-bridge",
       "reason": "skill owner contracts and distinct installation scopes are exposed through passive inspection below aoa-skills ownership"
@@ -148,7 +155,8 @@
       "workspace-root-resolution",
       "portable-workspace-bootstrap",
       "control-plane-capsule",
-      "runtime-mirror-boundary"
+      "runtime-mirror-boundary",
+      "abyss-stack-runtime-adapter"
     ],
     "boundary-bridge": [
       "consumed-surface-posture-gate",
@@ -660,7 +668,7 @@
     {
       "slug": "runtime-seam",
       "name_type": "shared",
-      "operation": "Keep SDK workspace roots, source/runtime mirror boundaries, control-plane capsule, portable bootstrap, and local automation seams explicit.",
+      "operation": "Keep SDK workspace roots, source/runtime mirror boundaries, control-plane capsule, portable bootstrap, explicit runtime-owner transports, and local automation seams explicit.",
       "source_surfaces": [
         ".aoa/workspace.toml",
         "docs/workspace-layout.md",
@@ -676,18 +684,25 @@
         "mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py",
         "mechanics/runtime-seam/parts/runtime-mirror-boundary",
         "mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py",
-        "src/aoa_sdk/workspace"
+        "mechanics/runtime-seam/parts/abyss-stack-runtime-adapter",
+        "mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/tests/test_abyss_stack_runtime_adapter.py",
+        "mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/scripts/verify_abyss_stack_adapter_wheel.py",
+        "src/aoa_sdk/workspace",
+        "src/aoa_sdk/runtime_adapters"
       ],
       "candidate_parts": [
         "workspace-root-resolution",
         "control-plane-capsule",
         "portable-workspace-bootstrap",
-        "runtime-mirror-boundary"
+        "runtime-mirror-boundary",
+        "abyss-stack-runtime-adapter"
       ],
       "validation": [
         "python scripts/build_workspace_control_plane.py --check",
         "python scripts/validate_workspace_control_plane.py",
-        "python -m pytest -q mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution_cli.py mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py"
+        "python -m pytest -q mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution_cli.py mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/tests/test_abyss_stack_runtime_adapter.py",
+        "python -m mypy src/aoa_sdk/runtime_adapters",
+        "python mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/scripts/verify_abyss_stack_adapter_wheel.py"
       ]
     },
     {

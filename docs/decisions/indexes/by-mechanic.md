@@ -61,6 +61,7 @@
 - [AOA-SDK-D-0079 - Expose Organ Discovery Through Workspace MCP](../AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md) (`docs/decisions/AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md`)
 - [AOA-SDK-D-0080 - Host-Visible Cross-Organ Orchestration](../AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md) (`docs/decisions/AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md`)
 - [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
+- [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 
 ## checkpoint
 
@@ -190,6 +191,7 @@
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
 - [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 - [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
+- [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 
 ## titan
 

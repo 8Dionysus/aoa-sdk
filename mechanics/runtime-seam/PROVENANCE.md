@@ -12,6 +12,8 @@
 - `mechanics/runtime-seam/parts/portable-workspace-bootstrap/`
 - `mechanics/runtime-seam/parts/control-plane-capsule/`
 - `mechanics/runtime-seam/parts/runtime-mirror-boundary/`
+- `mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/`
+- `src/aoa_sdk/runtime_adapters/`
 - `mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py`
 - `mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution_cli.py`
 - `mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py`
@@ -21,7 +23,8 @@
 ## Stronger Owners
 
 The host owns actual mount layout and runtime deployment. Sibling repos own
-their source content. SDK Runtime Seam owns only the typed control-plane seam.
+their source content. `abyss-stack` owns the production bridge and execution.
+SDK Runtime Seam owns only the typed transport client and exact binding checks.
 
 ## Notes
 

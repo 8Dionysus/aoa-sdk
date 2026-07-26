@@ -147,20 +147,22 @@ complete. The C1 deterministic route resolver and separately landed C2
 runtime-neutral plan compiler now form the callable
 `RouteIntent -> RouteDecision -> RunPlan` control-plane chain. C3 adds the
 explicit-adapter `AoARunner`, deterministic no-execution reference adapter,
-bounded recovery, event reconciliation, restore, and closeout. The next honest
-move is the separate C4 production runtime adapter and C5 unified evidence
-chain. Compatibility evidence continues in parallel; consumer-zero and
-archival remain unproved.
+bounded recovery, event reconciliation, restore, and closeout. C4 now adds an
+explicit no-shell `abyss-stack` transport client, owner-exact profile loader,
+and paired proof of one real governed contour while leaving execution with the
+runtime owner. The next honest move is C5 unified evidence and reviewed
+closeout composition. Compatibility evidence continues in parallel;
+consumer-zero and archival remain unproved.
 
 ## Current Public Contour
 
 Current release marker: `v0.8.0`.
 
 Current unreleased contour: C1 deterministic route resolution, C2
-runtime-neutral plan compilation, and C3 explicit-adapter lifecycle
-coordination, followed by compatibility-window evidence and separate C4-C5
-runtime/evidence slices after `v0.8.0`. This is a directional contour, not a
-changelog replacement.
+runtime-neutral plan compilation, C3 explicit-adapter lifecycle coordination,
+and the C4 `abyss-stack` transport client and paired governed-runtime proof.
+C5 evidence/closeout composition and compatibility-window evidence remain
+after `v0.8.0`. This is a directional contour, not a changelog replacement.
 
 Current anchors:
 

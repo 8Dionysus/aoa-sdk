@@ -14,6 +14,9 @@ Active part homes:
 - `control-plane-capsule/` builds and validates the compact routing capsule.
 - `runtime-mirror-boundary/` keeps source checkout and runtime mirror reads
   explicit.
+- `abyss-stack-runtime-adapter/` owns the explicit SDK transport client for
+  one runtime-owner Agent OS bridge without selecting an adapter or executing
+  plan steps inside the SDK.
 
 Do not hide path guessing or make runtime mirrors stronger than source-owned
 repositories.

@@ -254,9 +254,10 @@ The runtime-neutral R2 types, lifecycle graph, replay rules, three golden
 scenarios, and threat controls live in
 `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md`
 and `src/aoa_sdk/contracts/control_plane.py`. They define protocols, not active
-`AoASDK` behavior or a runtime body by themselves. C1-C3 now implement bounded
-control-plane behavior over those contracts, while runtime execution remains
-external. The R2 contracts alone did not authorize producer movement; the
+`AoASDK` behavior or a runtime body by themselves. C1-C4 now implement bounded
+control-plane behavior and one explicit runtime transport client over those
+contracts, while runtime execution remains external. The R2 contracts alone
+did not authorize producer movement; the
 G3-authorized M1 slice below was shadow-only and did not authorize G5.
 
 The disposable R3 migration result lives in
@@ -315,7 +316,7 @@ A selected route is not activation. C1 does not compile a `RunPlan`, select a
 runtime adapter, invoke a skill, or execute an effect. C2 compilation and C3
 lifecycle coordination are separately bounded surfaces.
 
-## C2 Plan Compilation and C3 Lifecycle Shape
+## C2 Plan Compilation, C3 Lifecycle, and C4 Transport Shape
 
 `AOA-SDK-D-0078` keeps C2 compilation deterministic and runtime-neutral.
 `AOA-SDK-D-0081` makes `AoARunner` a lifecycle client over one explicit
@@ -334,8 +335,20 @@ RouteDecision + ScenarioBinding + RuntimeProfile
 The Runner owns admission and reconciliation, not execution. It never discovers
 an adapter, invokes a plan step, or creates eval, memo, checkpoint, or evidence
 truth. The SDK-owned reference adapter is a deterministic lifecycle witness
-with `executes_plan_steps=false`; a production adapter remains a C4
-runtime-owner landing.
+with `executes_plan_steps=false`. `AOA-SDK-D-0082` adds the C4
+`AbyssStackRuntimeAdapter` as a transport-only production client:
+
+```text
+absolute owner profile + exact constraint locations
+  -> hashed RuntimeProfile
+  + exact RunPlan source/ABI delivery binding
+  + explicit no-shell subprocess transport
+  -> abyss-stack-owned durable runtime bridge
+```
+
+The client can cause execution only through that external bridge. It neither
+executes a plan step nor discovers a runtime, policy, executable, or adapter.
+Installed-client proof is package proof, not runtime invocation proof.
 
 ## Design as Aim
 
