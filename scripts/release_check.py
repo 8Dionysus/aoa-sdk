@@ -9,8 +9,14 @@ from pathlib import Path
 REPO_ROOT = Path(__file__).resolve().parents[1]
 
 COMMANDS = [
-    ("generate decision indexes", [sys.executable, "scripts/generate_decision_indexes.py", "--check"]),
-    ("validate SDK source home", [sys.executable, "scripts/validate_sdk_source_home.py"]),
+    (
+        "generate decision indexes",
+        [sys.executable, "scripts/generate_decision_indexes.py", "--check"],
+    ),
+    (
+        "validate SDK source home",
+        [sys.executable, "scripts/validate_sdk_source_home.py"],
+    ),
     (
         "generate organ access schemas",
         [
@@ -29,12 +35,30 @@ COMMANDS = [
             "--check",
         ],
     ),
-    ("validate owner-local stats port", [sys.executable, "scripts/validate_local_stats_port.py"]),
-    ("validate mechanics topology", [sys.executable, "scripts/validate_mechanics_topology.py"]),
-    ("build source topology index", [sys.executable, "scripts/build_source_topology_index.py", "--check"]),
-    ("validate source topology index", [sys.executable, "scripts/validate_source_topology_index.py"]),
-    ("build workspace control plane", [sys.executable, "scripts/build_workspace_control_plane.py", "--check"]),
-    ("validate workspace control plane", [sys.executable, "scripts/validate_workspace_control_plane.py"]),
+    (
+        "validate owner-local stats port",
+        [sys.executable, "scripts/validate_local_stats_port.py"],
+    ),
+    (
+        "validate mechanics topology",
+        [sys.executable, "scripts/validate_mechanics_topology.py"],
+    ),
+    (
+        "build source topology index",
+        [sys.executable, "scripts/build_source_topology_index.py", "--check"],
+    ),
+    (
+        "validate source topology index",
+        [sys.executable, "scripts/validate_source_topology_index.py"],
+    ),
+    (
+        "build workspace control plane",
+        [sys.executable, "scripts/build_workspace_control_plane.py", "--check"],
+    ),
+    (
+        "validate workspace control plane",
+        [sys.executable, "scripts/validate_workspace_control_plane.py"],
+    ),
     ("run tests", [sys.executable, "-m", "pytest", "-q"]),
     (
         "run Ruff",
@@ -83,6 +107,14 @@ COMMANDS = [
         ],
     ),
     (
+        "verify installed C2 plan compilation wheel",
+        [
+            sys.executable,
+            "mechanics/boundary-bridge/parts/plan-compilation-control-plane/"
+            "scripts/verify_plan_compilation_wheel.py",
+        ],
+    ),
+    (
         "validate OS Abyss package artifact bundle",
         [
             sys.executable,
@@ -101,7 +133,9 @@ def run_step(label: str, command: list[str]) -> int:
         check=False,
     )
     if completed.returncode != 0:
-        print(f"[error] {label} failed with exit code {completed.returncode}", flush=True)
+        print(
+            f"[error] {label} failed with exit code {completed.returncode}", flush=True
+        )
         return completed.returncode
     print(f"[ok] {label}", flush=True)
     return 0

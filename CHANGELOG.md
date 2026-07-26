@@ -14,7 +14,15 @@ Tracking starts with the community-docs baseline for this repository.
 - Bind deterministic skill candidate selection to the exact SDK-canonical G5
   runtime snapshot and pinned `aoa-skills` owner projection, blocking trust
   drift, mixed projections, unsupported constraints, and top-rank ambiguity.
-- Keep plan compilation, `AoARunner`, activation, runtime execution, measured
+- Add C2 Agent OS plan compilation:
+  `AoASDK.control_plane.compile()` and `aoa route compile`, with exact reviewed
+  scenario bindings, deterministic guarded-branch pruning, content-addressed
+  `PlanSnapshot` and `RunPlan`, and decision-bound validation.
+- Pin the exact trust-admitted `aoa_playbook_plan_contour_v1` owner projection
+  and schema from `aoa-playbooks`, fail closed on source, digest, ABI, schema,
+  or admission drift, and verify the installed wheel reproduces the golden
+  plan without a sibling checkout.
+- Keep `AoARunner`, adapter selection, activation, runtime execution, measured
   benefit, consumer-zero, and archival outside this slice.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit

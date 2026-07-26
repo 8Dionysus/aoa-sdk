@@ -53,6 +53,10 @@ TOP_LEVEL_ROLES = {
     "cli": "Typer CLI app assembly, command-family modules, shared CLI rendering, and CLI plumbing",
     "codex": "Codex workspace and rollout-facing helpers",
     "compatibility": "consumed-surface compatibility checks",
+    "control_plane": (
+        "routing producer, deterministic route resolution, and runtime-neutral "
+        "plan compilation without runtime execution"
+    ),
     "contracts": "shared SDK typed contract route-role branches",
     "evals": "eval-surface readers and bounded helper posture",
     "governed_runs": "governed run metadata and helper surface",
@@ -86,6 +90,9 @@ PACKAGE_ROLE_OVERRIDES = {
     "src/aoa_sdk/checkpoints/topology": "checkpoint topology branch for path naming and static routing helpers",
     "src/aoa_sdk/cli": "CLI app assembly and command-family route modules",
     "src/aoa_sdk/contracts": "shared SDK typed contract route-role branches with models.py compatibility re-export",
+    "src/aoa_sdk/control_plane": "Agent OS control-plane facade over separately bounded routing and planning branches",
+    "src/aoa_sdk/control_plane/planning": "deterministic runtime-neutral plan compiler over an exact admitted owner contour snapshot",
+    "src/aoa_sdk/control_plane/routing": "canonical routing producer and receipt-bound deterministic route resolver",
     "src/aoa_sdk/recurrence/contracts": "recurrence typed contract route-role branches",
     "src/aoa_sdk/recurrence/live": "recurrence live observation producer route-role branches",
     "src/aoa_sdk/surfaces": "surface detection owner-layer signal handoff route-role branches",
@@ -130,6 +137,7 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/cli/common.py": "CLI shared path resolution, persistence, host-skill, and checkpoint hook argument owner",
     "src/aoa_sdk/cli/compatibility.py": "CLI consumed-surface compatibility check command family owner",
     "src/aoa_sdk/cli/main.py": "CLI root Typer app assembly and legacy test re-export surface",
+    "src/aoa_sdk/cli/route.py": "CLI route document validation, C1 resolution, and C2 plan compilation command family owner",
     "src/aoa_sdk/cli/release.py": "CLI release audit and publish command family owner",
     "src/aoa_sdk/cli/rendering.py": "CLI human-readable report rendering owner",
     "src/aoa_sdk/cli/skills.py": "CLI passive skill-environment inspection and exact capability lookup command family owner",
@@ -152,6 +160,9 @@ MODULE_ROLE_OVERRIDES = {
     "src/aoa_sdk/contracts/surfaces.py": "shared surface opportunity, surface detection, and surface closeout handoff contract owner",
     "src/aoa_sdk/contracts/techniques.py": "shared technique promotion readiness contract owner",
     "src/aoa_sdk/contracts/workspace.py": "exact owner-profile bootstrap report contract owner",
+    "src/aoa_sdk/control_plane/api.py": "public lazy control-plane resolver and plan-compiler facade",
+    "src/aoa_sdk/control_plane/planning/compiler.py": "deterministic exact-binding RunPlan compiler without adapter selection or execution",
+    "src/aoa_sdk/control_plane/planning/snapshot.py": "packaged owner plan-contour lock, schema, admission, and typed snapshot validator",
     "src/aoa_sdk/recurrence/cli.py": "recurrence CLI exported app assembly facade",
     "src/aoa_sdk/recurrence/cli_core.py": "recurrence root command family owner",
     "src/aoa_sdk/recurrence/cli_graph.py": "recurrence graph CLI command family owner",
@@ -274,7 +285,9 @@ def _package_dirs(path: Path) -> list[Path]:
 
 
 def _package_modules(path: Path) -> list[Path]:
-    return sorted(child for child in path.iterdir() if child.is_file() and child.suffix == ".py")
+    return sorted(
+        child for child in path.iterdir() if child.is_file() and child.suffix == ".py"
+    )
 
 
 def _module_payload(path: Path) -> dict[str, Any]:
@@ -312,6 +325,12 @@ def _module_next_route(path: Path, line_count: int) -> str:
         return "keep shared CLI plumbing here; route command behavior to a command-family module and domain behavior to SDK owners"
     if rel == "src/aoa_sdk/cli/rendering.py":
         return "keep human-readable output formatting here; route command behavior to a command-family module"
+    if rel == "src/aoa_sdk/control_plane/api.py":
+        return "keep public control-plane orchestration here; route C1 mechanics to routing and C2 mechanics to planning"
+    if rel == "src/aoa_sdk/control_plane/planning/compiler.py":
+        return "keep compilation runtime-neutral; route adapter selection and lifecycle effects to the future AoARunner branch"
+    if rel == "src/aoa_sdk/control_plane/planning/snapshot.py":
+        return "refresh packaged contours only through the C2 pin mechanic and exact owner trust admission"
     if rel == "src/aoa_sdk/recurrence/cli.py":
         return "keep exported recur_app assembly here; add command behavior in the owning recurrence cli_* module"
     if rel == "src/aoa_sdk/recurrence/live_observations.py":
@@ -344,7 +363,9 @@ def _package_payload(path: Path) -> dict[str, Any]:
     line_count = sum(module["line_count"] for module in module_payloads) + sum(
         child["line_count"] for child in child_payloads
     )
-    module_count = len(module_payloads) + sum(child["module_count"] for child in child_payloads)
+    module_count = len(module_payloads) + sum(
+        child["module_count"] for child in child_payloads
+    )
     return {
         "path": rel,
         "route_key": _package_route_key(path),
@@ -372,10 +393,18 @@ def _package_next_route(path: Path, line_count: int, module_count: int) -> str:
         return "route live observation behavior to the producer branch that owns the source family"
     if rel == "src/aoa_sdk/surfaces":
         return "route behavior to the named surface branch that owns it; add a new branch only when a new owner role appears"
+    if rel == "src/aoa_sdk/control_plane":
+        return "route decision mechanics to routing, plan mechanics to planning, and runtime effects outside the control-plane core"
+    if rel == "src/aoa_sdk/control_plane/planning":
+        return "keep plan compilation deterministic and runtime-neutral; add lifecycle behavior only in a separately contracted AoARunner branch"
+    if rel == "src/aoa_sdk/control_plane/routing":
+        return "keep routing producer and resolver roles explicit; do not add plan compilation or runtime execution here"
     if path.name == "topology":
         return "keep topology branches static and behavior-free unless a new route role is named"
     if line_count >= 2000 or module_count >= 10:
-        return "use this index to choose a route-role split before adding broad behavior"
+        return (
+            "use this index to choose a route-role split before adding broad behavior"
+        )
     return "open package modules, tests, and owning mechanic route before editing"
 
 
@@ -391,7 +420,9 @@ def build_payload() -> dict[str, Any]:
         raise ValueError("src/aoa_sdk is missing")
     root_package = _package_payload(SOURCE_ROOT)
     modules = _walk_modules(root_package)
-    largest_modules = sorted(modules, key=lambda module: module["line_count"], reverse=True)[:12]
+    largest_modules = sorted(
+        modules, key=lambda module: module["line_count"], reverse=True
+    )[:12]
     payload = {
         "schema_version": SCHEMA_VERSION,
         "artifact_type": ARTIFACT_TYPE,
@@ -426,7 +457,11 @@ def _count_packages(package: dict[str, Any]) -> int:
 
 
 def _validate_refs(payload: dict[str, Any]) -> None:
-    refs = [payload["authority_ref"], *payload["source_inputs"], *payload["validation_refs"]]
+    refs = [
+        payload["authority_ref"],
+        *payload["source_inputs"],
+        *payload["validation_refs"],
+    ]
     for ref in refs:
         if not (REPO_ROOT / ref).exists():
             raise ValueError(f"missing source topology ref: {ref}")

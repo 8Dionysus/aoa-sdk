@@ -123,6 +123,12 @@ The current landed surface includes:
   which validates the exact live G5 snapshot, intersects routing entries with
   the pinned `aoa-skills` owner projection, and emits deterministic
   `RouteDecision` and `RouteExplanation` objects without activation;
+- the callable
+  [C2 plan compilation control plane](mechanics/boundary-bridge/parts/plan-compilation-control-plane/README.md),
+  which validates an exact admitted `aoa-playbooks` contour/schema pin,
+  requires owner-qualified scenario inputs and reviewed conditions, prunes
+  guarded branches deterministically, and emits a content-addressed
+  runtime-neutral `RunPlan` without adapter selection or execution;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

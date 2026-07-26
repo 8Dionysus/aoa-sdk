@@ -121,6 +121,15 @@ posture. Changing any of those semantics requires a new resolver version and
 old-vs-new evaluation; it must not be hidden behind the stable
 `aoa_control_plane_v1` envelope.
 
+C2 plan compilation is independently named
+`aoa_control_plane_plan_compiler_v1`. Its version covers exact scenario
+binding, owner-contour interpretation, guarded pruning, plan snapshot scope,
+content identity, and preservation of approvals and lifecycle requirements.
+The consumed owner ABI is separately pinned as
+`aoa_playbook_plan_contour_v1`; changing either semantic contract requires a
+new versioned decision and fixture migration, not an in-place reinterpretation
+of packaged data.
+
 ## Operational Expectation
 
 - Loader functions for supported surfaces should go through the compatibility

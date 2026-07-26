@@ -29,8 +29,9 @@ mean.
   and executed runtime cutover as distinct evidence from compatibility exit,
   consumer-zero, Runner delivery, and repository archival.
 - Keep C1 route resolution receipt-bound, deterministic, explainable, and
-  non-activating. C2 plan compilation and C3-C5 Runner behavior remain
-  separate parts and landings.
+  non-activating. Keep C2 plan compilation pinned to an admitted owner contour,
+  reviewed inputs, and explicit conditions. C3-C5 Runner behavior remains a
+  separate part and landing.
 
 ## Next Work
 
@@ -39,8 +40,8 @@ mean.
 - Keep bridge helpers paired with source owner, route card, and focused tests.
 - Move repeated cross-owner pressure into the nearest current part before
   considering a new bridge part.
-- Land C1 route resolution from the exact G5 runtime snapshot and pinned
-  `aoa-skills` graph, then land C2 plan compilation separately.
+- Build C3-C5 Runner lifecycle only over exact C2 plans and runtime-adapter
+  contracts; do not collapse compilation success into execution evidence.
 - Measure the compatibility window and preserve the exact predecessor rollback
   route. Treat any source, corpus, runtime, trust, rollback, or consumer drift
   as a hard stop.

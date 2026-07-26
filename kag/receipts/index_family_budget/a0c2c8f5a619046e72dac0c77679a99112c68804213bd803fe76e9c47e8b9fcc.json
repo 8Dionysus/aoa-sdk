@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 12959055,
+  "allowed_tracked_bytes": 17164570,
+  "approved_by": "repository-owner",
+  "base_ref": "0a5a12c45ab3cad41e39e8ca975fd5d0b84efbd9",
+  "changed_generated_bytes": 12959055,
+  "changed_generated_files": 313,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "a0c2c8f5a619046e72dac0c77679a99112c68804213bd803fe76e9c47e8b9fcc",
+  "reason": "Refresh the derived aoa-sdk repo-local KAG family after aligning Repo Validation to the exact aoa-kag builder that supports aoa_skill_home_port_v2 and preserves SKILL.md classification; this receipt accepts only the measured C2 generated delta and tracked-size exceedance without claiming execution, rollout, cost reduction, consumer-zero, aoa-routing archival authority, or completion.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 17164570,
+  "tracked_bytes_max": 15728640
+}

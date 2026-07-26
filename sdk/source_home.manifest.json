@@ -109,15 +109,19 @@
       "owner_surface": "sdk/public-interface/AGENTS.md",
       "implementation_routes": [
         "src/aoa_sdk/__init__.py",
-        "src/aoa_sdk/api.py"
+        "src/aoa_sdk/api.py",
+        "src/aoa_sdk/control_plane/api.py",
+        "src/aoa_sdk/control_plane/planning"
       ],
       "mechanic_routes": [
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
-        "mechanics/boundary-bridge/parts/route-resolution-control-plane"
+        "mechanics/boundary-bridge/parts/route-resolution-control-plane",
+        "mechanics/boundary-bridge/parts/plan-compilation-control-plane"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
-        "python -m pytest -q"
+        "python -m pytest -q",
+        "python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests"
       ],
       "stop_lines": [
         "Do not document an API promise that is not implemented and tested."
@@ -137,12 +141,14 @@
         "mechanics/runtime-seam/parts/workspace-root-resolution",
         "mechanics/checkpoint/parts/session-growth-checkpoint-cycle",
         "mechanics/release-support/parts/release-audit-publish-helper",
-        "mechanics/boundary-bridge/parts/route-resolution-control-plane"
+        "mechanics/boundary-bridge/parts/route-resolution-control-plane",
+        "mechanics/boundary-bridge/parts/plan-compilation-control-plane"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
         "python -m pytest -q",
-        "python -m pytest -q mechanics/boundary-bridge/parts/route-resolution-control-plane/tests"
+        "python -m pytest -q mechanics/boundary-bridge/parts/route-resolution-control-plane/tests",
+        "python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests"
       ],
       "stop_lines": [
         "Do not let CLI convenience bypass owner review or validation gates."
@@ -157,14 +163,17 @@
       "owner_surface": "sdk/public-interface/AGENTS.md",
       "implementation_routes": [
         "src/aoa_sdk/models.py",
+        "src/aoa_sdk/contracts/control_plane.py",
         "schemas"
       ],
       "mechanic_routes": [
-        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate"
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
+        "mechanics/boundary-bridge/parts/plan-compilation-control-plane"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
-        "python -m pytest -q"
+        "python -m pytest -q",
+        "python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests"
       ],
       "stop_lines": [
         "Do not make compatibility input aliases active output names."
@@ -209,17 +218,20 @@
       "implementation_routes": [
         "src/aoa_sdk/compatibility",
         "src/aoa_sdk/control_plane/routing",
+        "src/aoa_sdk/control_plane/planning",
         "docs/versioning.md"
       ],
       "mechanic_routes": [
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
+        "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
         "mechanics/release-support/parts/public-support-ci-posture"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
         "aoa compatibility check /srv/AbyssOS/aoa-sdk",
         "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests",
-        "python -m mypy src/aoa_sdk/control_plane/routing"
+        "python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests",
+        "python -m mypy src/aoa_sdk/control_plane"
       ],
       "stop_lines": [
         "Do not turn missing source surfaces into silent pass conditions."
@@ -332,6 +344,7 @@
         "src/aoa_sdk"
       ],
       "mechanic_routes": [
+        "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
         "mechanics/release-support/parts/release-audit-publish-helper"
       ],
       "validators": [
@@ -339,11 +352,14 @@
         "python -m build",
         "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py",
         "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py",
-        "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py"
+        "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py",
+        "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py",
+        "python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py"
       ],
       "stop_lines": [
         "Do not claim package publication before external publication proof exists.",
-        "Do not treat an installed non-publishing or public release G5 candidate as canonical routing authority."
+        "Do not treat an installed non-publishing or public release G5 candidate as canonical routing authority.",
+        "Do not treat an installed plan compiler as runtime execution proof."
       ]
     },
     {

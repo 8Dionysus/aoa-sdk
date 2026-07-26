@@ -21,7 +21,10 @@ checks, or release gates.
 projection before producing a decision. `explain` accounts for the existing
 decision without rerouting. `validate` checks typed shape and, when supplied,
 exact parent binding. All three remain non-executing and report no fallback.
-There is no `aoa route compile` command until C2.
+`aoa route compile DECISION SCENARIO RUNTIME_PROFILE` exposes C2 deterministic
+runtime-neutral compilation from the exact admitted owner contour pin.
+`aoa route validate RUN_PLAN --against DECISION` checks plan digest and exact
+decision binding. Neither command selects an adapter or executes a step.
 
 `aoa organs validate|compile|catalog|inspect|capability|plan` exposes the
 organ-access contract without runtime mutation. `compile --output` is the only

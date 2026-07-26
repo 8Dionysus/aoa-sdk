@@ -38,6 +38,10 @@ repositories remain authoritative.
 - the C1 receipt-bound route resolver, which intersects the canonical routing
   registry with a pinned `aoa-skills` owner projection and blocks ambiguity
   without activation
+- the C2 deterministic plan compiler, which consumes an exact admitted
+  `aoa-playbooks` contour/schema pin, preserves reviewed input and condition
+  provenance, and emits a runtime-neutral `RunPlan` without adapter selection
+  or execution
 - the versioned R2 route, plan, approval, lifecycle, event,
   evidence-reference, and adapter protocol models used to prove the boundary;
   the models do not activate an `AoASDK` runner or runtime

@@ -1,0 +1,47 @@
+{
+  "abi": {
+    "abi_id": "aoa_playbook_plan_contour_v1",
+    "abi_version": "aoa_playbook_plan_contour_v1",
+    "artifact_digest": "sha256:1effef6739136e3634f787572526926eb5731b978c03e15d6c21c8a047bdd7eb",
+    "owner_repo": "aoa-playbooks",
+    "schema_ref": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json",
+    "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+  },
+  "artifact_class": "playbook_registry_bundle",
+  "contours": {
+    "artifact_digest": "sha256:1effef6739136e3634f787572526926eb5731b978c03e15d6c21c8a047bdd7eb",
+    "owner_artifact_ref": "generated/playbook_plan_contours.min.json",
+    "packaged_resource": "playbook-plan-contours.v1.json",
+    "schema_ref": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json",
+    "schema_version": "aoa_playbook_plan_contours_v1"
+  },
+  "owner_repo": "aoa-playbooks",
+  "owner_source_ref": "056cac249a353ae94abedbd4048e6730f70c064d",
+  "schema": {
+    "artifact_digest": "sha256:29d6260b80691a46c005d91bd72c3305c167a953b7a6a5d42e2c98d1a38d4673",
+    "owner_artifact_ref": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json",
+    "packaged_resource": "playbook-plan-contours.schema.json",
+    "schema_ref": "https://agents-of-abyss.example/schemas/aoa-playbook-plan-contours-v1.json",
+    "schema_version": "https://json-schema.org/draft/2020-12/schema"
+  },
+  "schema_version": "aoa_control_plane_plan_contour_source_lock_v1",
+  "trust_admission": {
+    "consumer_intent": "agent",
+    "latest_record_id": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e",
+    "latest_required": true,
+    "record_id": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e",
+    "required_controls": [
+      "abi_signature",
+      "slsa_in_toto"
+    ],
+    "schema_version": "abyss_machine_artifact_trust_gate_v1",
+    "subject_store_aggregate_digest": "sha256:868966ebfefe5eae88e445c269a05fefa2a6d996e5e6289a35675b5c4ca47d44",
+    "subject_store_ok": true,
+    "subject_store_required": true,
+    "verdict": "allow",
+    "verified_controls": [
+      "abi_signature",
+      "slsa_in_toto"
+    ]
+  }
+}

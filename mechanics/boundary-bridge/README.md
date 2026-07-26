@@ -28,6 +28,8 @@ sibling-owned generated reader changes.
 - owner return path after stronger claims appear
 - deterministic receipt-bound route-candidate resolution and explanation
   without activation
+- deterministic compilation of an exact reviewed scenario binding from an
+  admitted owner contour into a runtime-neutral plan without execution
 
 ### Stronger owner split
 
@@ -60,6 +62,7 @@ retain their domain meaning.
 - `src/aoa_sdk/surfaces/`
 - `src/aoa_sdk/techniques/`
 - `mechanics/boundary-bridge/parts/route-resolution-control-plane/`
+- `mechanics/boundary-bridge/parts/plan-compilation-control-plane/`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`
 - `mechanics/boundary-bridge/parts/skill-environment-inspector/`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/`
@@ -75,6 +78,7 @@ retain their domain meaning.
 - owner-layer-signal-handoff
 - organ-access-control-plane
 - route-resolution-control-plane
+- plan-compilation-control-plane
 
 ### Must not claim
 

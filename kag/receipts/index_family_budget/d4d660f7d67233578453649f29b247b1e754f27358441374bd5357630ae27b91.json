@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 12909842,
+  "allowed_tracked_bytes": 17164283,
+  "approved_by": "repository-owner",
+  "base_ref": "0a5a12c45ab3cad41e39e8ca975fd5d0b84efbd9",
+  "changed_generated_bytes": 12909842,
+  "changed_generated_files": 312,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "d4d660f7d67233578453649f29b247b1e754f27358441374bd5357630ae27b91",
+  "reason": "Refresh the derived aoa-sdk repo-local KAG family for C2 deterministic compilation of the exact admitted aoa-playbooks contour into runtime-neutral RunPlan artifacts; this receipt accepts only the measured generated delta and tracked-size exceedance without claiming adapter selection, execution, rollout, cost reduction, consumer-zero, aoa-routing archival authority, or completion.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 17164283,
+  "tracked_bytes_max": 15728640
+}
