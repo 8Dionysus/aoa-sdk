@@ -28,6 +28,9 @@ RUNTIME_MANIFEST_PATH = "manifest/federation_mirror_manifest.json"
 ROUTER_ARTIFACT_PATH = "generated/aoa_router.min.json"
 PACKAGED_SCHEMA_ROOT = Path(__file__).resolve().parent / "schemas"
 _OID_RE = re.compile(r"^[0-9a-f]{40}$")
+_ROUTING_REQUIRED_TRUST_CONTROLS = frozenset(
+    {"abi_signature", "sbom", "slsa_in_toto"}
+)
 _CANONICAL_LOCKED_PATHS = {
     "cross_repo_registry": "generated/cross_repo_registry.min.json",
     "cross_repo_registry_schema": "schemas/cross-repo-registry.schema.json",
@@ -434,6 +437,7 @@ def _validate_runtime_manifest(
             "routing owner-switch receipt does not match the locked digest"
         )
     receipt_sdk = receipt.get("sdk")
+    receipt_predecessor = receipt.get("predecessor")
     receipt_runtime_consumer = receipt.get("runtime_consumer")
     if (
         receipt.get("schema") != "aoa_sdk_routing_g5_owner_switch_receipt_v1"
@@ -441,6 +445,10 @@ def _validate_runtime_manifest(
         or receipt.get("g5_authority") != expected_authority
         or not isinstance(receipt_sdk, dict)
         or receipt_sdk.get("source_ref") != lock.routing_abi.source_ref
+        or not isinstance(receipt_predecessor, dict)
+        or receipt_predecessor.get("owner_repo") != "aoa-routing"
+        or not isinstance(receipt_predecessor.get("source_ref"), str)
+        or not _OID_RE.fullmatch(receipt_predecessor["source_ref"])
         or not isinstance(receipt_runtime_consumer, dict)
         or receipt_runtime_consumer.get("owner_repo") != "abyss-stack"
         or receipt_runtime_consumer.get("source_ref")
@@ -449,47 +457,13 @@ def _validate_runtime_manifest(
         raise RoutingSnapshotError(
             "routing owner-switch receipt is missing or outside the locked scope"
         )
-    trust = _require_manifest_object(
+    _validate_runtime_trust_verdict(
         manifest.get("trust_verdict"),
-        "routing runtime trust verdict",
+        lock=lock,
+        expected_authority=expected_authority,
+        predecessor_source_ref=receipt_predecessor["source_ref"],
+        receipt_status=receipt["status"],
     )
-    trust_decision = _require_manifest_object(
-        trust.get("decision"),
-        "routing runtime trust decision",
-    )
-    if (
-        trust.get("ok") is not True
-        or trust.get("verdict") != "allow"
-        or trust.get("subject_digest") != lock.routing_bundle_subject_digest
-        or trust_decision.get("allow") is not True
-    ):
-        raise RoutingSnapshotError(
-            "routing runtime trust verdict is not an exact allow for the locked subject"
-        )
-    trust_record = _require_manifest_object(
-        trust.get("record"),
-        "routing runtime trust record",
-    )
-    producer_admission = _require_manifest_object(
-        trust_record.get("producer_admission"),
-        "routing runtime canonical producer admission",
-    )
-    receipt_summary = _require_manifest_object(
-        producer_admission.get("owner_switch_receipt"),
-        "routing runtime canonical producer receipt summary",
-    )
-    if (
-        producer_admission.get("profile_id") != "aoa-sdk-g5-canonical"
-        or producer_admission.get("owner_repo") != "aoa-sdk"
-        or producer_admission.get("canonical_owner_repo") != "aoa-sdk"
-        or producer_admission.get("source_ref") != lock.routing_abi.source_ref
-        or producer_admission.get("status") != "canonical_producer"
-        or producer_admission.get("g5_authority") != expected_authority
-        or receipt_summary.get("digest") != lock.owner_switch_receipt_digest
-    ):
-        raise RoutingSnapshotError(
-            "routing runtime trust verdict lacks the exact canonical producer admission"
-        )
     file_hashes = _require_manifest_object(
         manifest.get("file_sha256"),
         "routing runtime manifest file hashes",
@@ -517,6 +491,332 @@ def _validate_runtime_manifest(
             raise RoutingSnapshotError(
                 f"routing runtime manifest hash mismatch for {relative_path}"
             )
+
+
+def _validate_runtime_trust_verdict(
+    value: object,
+    *,
+    lock: RoutingResolutionSourceLock,
+    expected_authority: dict[str, bool],
+    predecessor_source_ref: str,
+    receipt_status: object,
+) -> None:
+    trust = _require_manifest_object(value, "routing runtime trust verdict")
+    trust_decision = _require_manifest_object(
+        trust.get("decision"),
+        "routing runtime trust decision",
+    )
+    expected_trust_fields = {
+        "schema": "abyss_machine_artifact_trust_gate_v1",
+        "ok": True,
+        "verdict": "allow",
+        "artifact_class": "thin_routing_readmodel_bundle",
+        "consumer_intent": "runtime",
+        "subject_digest": lock.routing_bundle_subject_digest,
+        "require_latest": True,
+    }
+    if any(
+        trust.get(field) != expected
+        for field, expected in expected_trust_fields.items()
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime trust verdict is not an exact allow for the locked subject"
+        )
+    if any(
+        trust.get(field) != []
+        for field in ("reasons", "blockers", "manual_review", "warnings")
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime trust verdict contains reasons, blockers, or review"
+        )
+    record_id = trust.get("record_id")
+    if (
+        not isinstance(record_id, str)
+        or not record_id
+        or trust.get("latest_record_id") != record_id
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime trust verdict latest-record binding drifted"
+        )
+    if trust_decision != {
+        "model": "fail_closed_consumer_admission",
+        "allowed_verdicts": ["allow", "warn"],
+        "verdict": "allow",
+        "allow": True,
+        "consumer_intent": "runtime",
+        "blocks_on_unknown": True,
+        "blockers": [],
+        "manual_review": [],
+        "warnings": [],
+    }:
+        raise RoutingSnapshotError(
+            "routing runtime trust decision is not the exact fail-closed allow posture"
+        )
+    trust_record = _require_manifest_object(
+        trust.get("record"),
+        "routing runtime trust record",
+    )
+    expected_record_fields = {
+        "record_id": record_id,
+        "artifact_class": "thin_routing_readmodel_bundle",
+        "source_repo": "aoa-sdk",
+        "source_ref": lock.routing_abi.source_ref,
+        "artifact_subjects_digest": lock.routing_bundle_subject_digest,
+        "latest_eligible": True,
+        "terminal_state": False,
+        "verification_ok": True,
+        "trust_root_mode": "public_release",
+    }
+    if any(
+        trust_record.get(field) != expected
+        for field, expected in expected_record_fields.items()
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime trust record drifted outside canonical admission"
+        )
+    if trust_record.get("lifecycle_state") not in {"release-ready", "published"}:
+        raise RoutingSnapshotError(
+            "routing runtime trust record is not release-ready"
+        )
+    if not _string_list_contains(
+        trust_record.get("consumer_refs"),
+        "abyss-stack:routing-canonical",
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime trust record lacks canonical consumer admission"
+        )
+    if not _is_exact_trust_control_list(
+        trust_record.get("required_controls")
+    ) or not _is_exact_trust_control_list(trust_record.get("verified_controls")):
+        raise RoutingSnapshotError(
+            "routing runtime trust record controls drifted"
+        )
+    subject_store = _require_manifest_object(
+        trust_record.get("artifact_subject_store"),
+        "routing runtime trust subject store",
+    )
+    if (
+        subject_store.get("required") is not True
+        or subject_store.get("ok") is not True
+        or subject_store.get("aggregate_digest")
+        != lock.routing_bundle_subject_digest
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime trust subject store is not an exact verified subject"
+        )
+    producer_admission = _require_manifest_object(
+        trust_record.get("producer_admission"),
+        "routing runtime canonical producer admission",
+    )
+    receipt_summary = _require_manifest_object(
+        producer_admission.get("owner_switch_receipt"),
+        "routing runtime canonical producer receipt summary",
+    )
+    if (
+        producer_admission.get("profile_id") != "aoa-sdk-g5-canonical"
+        or producer_admission.get("schema")
+        != "abyss_machine_artifact_producer_admission_v1"
+        or producer_admission.get("owner_repo") != "aoa-sdk"
+        or producer_admission.get("canonical_owner_repo") != "aoa-sdk"
+        or producer_admission.get("canonical_predecessor_source_ref")
+        != predecessor_source_ref
+        or producer_admission.get("source_ref") != lock.routing_abi.source_ref
+        or producer_admission.get("status") != "canonical_producer"
+        or producer_admission.get("runtime_consumer") != "abyss-stack"
+        or producer_admission.get("stronger_owner") != "abyss-machine"
+        or producer_admission.get("provenance_state") != "sdk_canonical"
+        or producer_admission.get("publication_posture")
+        != "public_release_canonical"
+        or producer_admission.get("single_canonical_owner") is not True
+        or producer_admission.get("canonical_switch_authorized") is not True
+        or producer_admission.get("g5_authority") != expected_authority
+        or not _string_list_contains(
+            producer_admission.get("allowed_consumer_intents"),
+            "runtime",
+        )
+        or not _is_exact_trust_control_list(
+            producer_admission.get("required_controls")
+        )
+        or receipt_summary.get("schema")
+        != "aoa_sdk_routing_g5_owner_switch_receipt_v1"
+        or receipt_summary.get("digest") != lock.owner_switch_receipt_digest
+        or receipt_summary.get("status") != receipt_status
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime trust verdict lacks the exact canonical producer admission"
+        )
+
+    inspected = _require_manifest_object(
+        trust.get("inspected_claims"),
+        "routing runtime inspected trust claims",
+    )
+    inspected_subject = _require_manifest_object(
+        inspected.get("subject_identity"),
+        "routing runtime inspected subject identity",
+    )
+    inspected_registry = _require_manifest_object(
+        inspected.get("registry_latest"),
+        "routing runtime inspected latest-record claim",
+    )
+    inspected_record = _require_manifest_object(
+        inspected.get("record_identity"),
+        "routing runtime inspected record identity",
+    )
+    inspected_lifecycle = _require_manifest_object(
+        inspected.get("lifecycle"),
+        "routing runtime inspected lifecycle",
+    )
+    inspected_verification = _require_manifest_object(
+        inspected.get("verification"),
+        "routing runtime inspected verification",
+    )
+    inspected_controls = _require_manifest_object(
+        inspected.get("controls"),
+        "routing runtime inspected controls",
+    )
+    inspected_source = _require_manifest_object(
+        inspected.get("source"),
+        "routing runtime inspected source",
+    )
+    inspected_trust_root = _require_manifest_object(
+        inspected.get("trust_root"),
+        "routing runtime inspected trust root",
+    )
+    inspected_trust_evidence = _require_manifest_object(
+        inspected.get("trust_root_evidence"),
+        "routing runtime inspected trust-root evidence",
+    )
+    inspected_evidence_refs = _require_manifest_object(
+        inspected.get("evidence_refs"),
+        "routing runtime inspected evidence refs",
+    )
+    inspected_privacy = _require_manifest_object(
+        inspected.get("privacy_boundary"),
+        "routing runtime inspected privacy boundary",
+    )
+    inspected_store = _require_manifest_object(
+        inspected.get("artifact_subject_store"),
+        "routing runtime inspected subject store",
+    )
+    if (
+        inspected_subject.get("subject_digest_expected")
+        != lock.routing_bundle_subject_digest
+        or inspected_subject.get("subject_digest_matched") is not True
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected subject identity drifted"
+        )
+    if (
+        inspected_registry.get("required") is not True
+        or inspected_registry.get("latest_record_id") != record_id
+        or inspected_registry.get("selected_record_id") != record_id
+        or inspected_registry.get("selected_record_is_latest") is not True
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected latest-record claim drifted"
+        )
+    if (
+        inspected_record.get("artifact_class_actual")
+        != "thin_routing_readmodel_bundle"
+        or inspected_record.get("record_id_actual") != record_id
+        or inspected_record.get("record_id_matched") is not True
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected record identity drifted"
+        )
+    if (
+        inspected_lifecycle.get("state") != trust_record.get("lifecycle_state")
+        or inspected_lifecycle.get("latest_eligible") is not True
+        or inspected_lifecycle.get("terminal_state") is not False
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected lifecycle drifted"
+        )
+    if (
+        inspected_verification.get("ok") is not True
+        or inspected_verification.get("errors") != []
+        or inspected_verification.get("missing") != []
+        or inspected_verification.get("warnings") != []
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected verification is not clean"
+        )
+    if (
+        not _is_exact_trust_control_list(inspected_controls.get("required"))
+        or not _is_exact_trust_control_list(inspected_controls.get("verified"))
+        or not _is_exact_trust_control_list(inspected_controls.get("present"))
+        or inspected_controls.get("required_controls_missing") != []
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected controls are not complete"
+        )
+    if (
+        inspected_source.get("source_repo_matched") is not True
+        or inspected_source.get("source_ref_matched") is not True
+        or inspected_source.get("source_repo_actual") != "aoa-sdk"
+        or inspected_source.get("source_ref_actual")
+        != lock.routing_abi.source_ref
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected source claim drifted"
+        )
+    if (
+        inspected_trust_root.get("trust_root_mode_actual") != "public_release"
+        or inspected_trust_root.get("trust_root_mode_matched") is not True
+        or inspected_trust_root.get("production_trust_root_ready") is not True
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected public-release root drifted"
+        )
+    if (
+        inspected_trust_evidence.get("required") is not True
+        or inspected_trust_evidence.get("ok") is not True
+        or inspected_trust_evidence.get("trust_root_mode") != "public_release"
+        or inspected_trust_evidence.get("errors") != []
+        or inspected_trust_evidence.get("warnings") != []
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected public-release evidence is not clean"
+        )
+    if (
+        inspected_evidence_refs.get("ok") is not True
+        or inspected_evidence_refs.get("ephemeral_ref_count") != 0
+        or inspected_privacy.get("production_public_ready") is not True
+        or inspected_privacy.get("production_review_reason") is not None
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected evidence posture is not production-safe"
+        )
+    if (
+        inspected_store.get("required") is not True
+        or inspected_store.get("ok") is not True
+        or inspected_store.get("aggregate_digest")
+        != lock.routing_bundle_subject_digest
+    ):
+        raise RoutingSnapshotError(
+            "routing runtime inspected subject store drifted"
+        )
+    if inspected.get("producer_admission") != producer_admission:
+        raise RoutingSnapshotError(
+            "routing runtime inspected producer admission drifted"
+        )
+
+
+def _is_exact_trust_control_list(value: object) -> bool:
+    return (
+        isinstance(value, list)
+        and all(isinstance(item, str) for item in value)
+        and len(value) == len(_ROUTING_REQUIRED_TRUST_CONTROLS)
+        and set(value) == _ROUTING_REQUIRED_TRUST_CONTROLS
+    )
+
+
+def _string_list_contains(value: object, expected: str) -> bool:
+    return (
+        isinstance(value, list)
+        and all(isinstance(item, str) for item in value)
+        and expected in value
+    )
 
 
 def _require_manifest_object(

@@ -31,7 +31,9 @@ ROUTING_SCHEMAS = REPO_ROOT / "src" / "aoa_sdk" / "control_plane" / "routing" / 
 ZERO_DIGEST = "sha256:" + "0" * 64
 SDK_PRODUCER_REF = "a" * 40
 RUNTIME_CONSUMER_REF = "b" * 40
+PREDECESSOR_REF = "d" * 40
 ROUTING_SUBJECT_DIGEST = "sha256:" + "c" * 64
+TRUST_RECORD_ID = "sha256:" + "e" * 64
 
 
 def _sha256(raw: bytes) -> str:
@@ -334,6 +336,11 @@ def _routing_inputs(
         "schema": "aoa_sdk_routing_g5_owner_switch_receipt_v1",
         "status": "g5_switch_authorized",
         "g5_authority": authority,
+        "predecessor": {
+            "owner_repo": "aoa-routing",
+            "source_ref": PREDECESSOR_REF,
+            "rollback_posture": "retained",
+        },
         "sdk": {"source_ref": SDK_PRODUCER_REF},
         "runtime_consumer": {
             "owner_repo": "abyss-stack",
@@ -341,6 +348,146 @@ def _routing_inputs(
         },
     }
     owner_switch_receipt_digest = _canonical_digest(owner_switch_receipt)
+    required_controls = ["abi_signature", "sbom", "slsa_in_toto"]
+    subject_store = {
+        "required": True,
+        "ok": True,
+        "aggregate_digest": ROUTING_SUBJECT_DIGEST,
+    }
+    producer_admission = {
+        "schema": "abyss_machine_artifact_producer_admission_v1",
+        "status": "canonical_producer",
+        "profile_id": "aoa-sdk-g5-canonical",
+        "owner_repo": "aoa-sdk",
+        "source_ref": SDK_PRODUCER_REF,
+        "canonical_owner_repo": "aoa-sdk",
+        "canonical_predecessor_source_ref": PREDECESSOR_REF,
+        "runtime_consumer": "abyss-stack",
+        "stronger_owner": "abyss-machine",
+        "provenance_state": "sdk_canonical",
+        "publication_posture": "public_release_canonical",
+        "single_canonical_owner": True,
+        "canonical_switch_authorized": True,
+        "allowed_consumer_intents": [
+            "release_consumer",
+            "runtime_canary",
+            "runtime",
+        ],
+        "required_controls": required_controls,
+        "g5_authority": authority,
+        "owner_switch_receipt": {
+            "schema": "aoa_sdk_routing_g5_owner_switch_receipt_v1",
+            "digest": owner_switch_receipt_digest,
+            "status": "g5_switch_authorized",
+        },
+    }
+    trust_record = {
+        "record_id": TRUST_RECORD_ID,
+        "artifact_class": "thin_routing_readmodel_bundle",
+        "source_repo": "aoa-sdk",
+        "source_ref": SDK_PRODUCER_REF,
+        "artifact_subjects_digest": ROUTING_SUBJECT_DIGEST,
+        "lifecycle_state": "release-ready",
+        "latest_eligible": True,
+        "terminal_state": False,
+        "verification_ok": True,
+        "trust_root_mode": "public_release",
+        "consumer_refs": ["abyss-stack:routing-canonical"],
+        "required_controls": required_controls,
+        "verified_controls": required_controls,
+        "artifact_subject_store": subject_store,
+        "producer_admission": producer_admission,
+    }
+    inspected_claims = {
+        "registry_latest": {
+            "required": True,
+            "latest_record_id": TRUST_RECORD_ID,
+            "selected_record_id": TRUST_RECORD_ID,
+            "selected_record_is_latest": True,
+        },
+        "record_identity": {
+            "artifact_class_actual": "thin_routing_readmodel_bundle",
+            "record_id_actual": TRUST_RECORD_ID,
+            "record_id_matched": True,
+        },
+        "subject_identity": {
+            "subject_digest_expected": ROUTING_SUBJECT_DIGEST,
+            "subject_digest_matched": True,
+        },
+        "lifecycle": {
+            "state": "release-ready",
+            "latest_eligible": True,
+            "terminal_state": False,
+        },
+        "verification": {
+            "ok": True,
+            "errors": [],
+            "missing": [],
+            "warnings": [],
+        },
+        "controls": {
+            "required": required_controls,
+            "verified": required_controls,
+            "present": required_controls,
+            "required_controls_missing": [],
+        },
+        "source": {
+            "source_repo_actual": "aoa-sdk",
+            "source_repo_matched": True,
+            "source_ref_actual": SDK_PRODUCER_REF,
+            "source_ref_matched": True,
+        },
+        "trust_root": {
+            "trust_root_mode_actual": "public_release",
+            "trust_root_mode_matched": True,
+            "production_trust_root_ready": True,
+        },
+        "trust_root_evidence": {
+            "required": True,
+            "ok": True,
+            "trust_root_mode": "public_release",
+            "errors": [],
+            "warnings": [],
+        },
+        "evidence_refs": {
+            "ok": True,
+            "ephemeral_ref_count": 0,
+        },
+        "privacy_boundary": {
+            "production_public_ready": True,
+            "production_review_reason": None,
+        },
+        "artifact_subject_store": subject_store,
+        "producer_admission": producer_admission,
+    }
+    trust_verdict = {
+        "schema": "abyss_machine_artifact_trust_gate_v1",
+        "ok": True,
+        "verdict": "allow",
+        "artifact_class": "thin_routing_readmodel_bundle",
+        "consumer_intent": "runtime",
+        "subject_digest": ROUTING_SUBJECT_DIGEST,
+        "record_id": TRUST_RECORD_ID,
+        "require_latest": True,
+        "latest_record_id": TRUST_RECORD_ID,
+        "reasons": [],
+        "blockers": [],
+        "manual_review": [],
+        "warnings": [],
+        "decision": {
+            "model": "fail_closed_consumer_admission",
+            "allowed_verdicts": ["allow", "warn"],
+            "verdict": "allow",
+            "allow": True,
+            "consumer_intent": "runtime",
+            "blocks_on_unknown": True,
+            "blockers": [],
+            "manual_review": [],
+            "warnings": [],
+        },
+        "record": trust_record,
+        "inspected_claims": inspected_claims,
+    }
     source_lock = {
         "schema_version": "aoa_control_plane_routing_source_lock_v1",
         "routing_abi": {
@@ -435,25 +582,7 @@ def _routing_inputs(
                 "source_ref": SDK_PRODUCER_REF,
             },
             "owner_switch_receipt": owner_switch_receipt,
-            "trust_verdict": {
-                "ok": True,
-                "verdict": "allow",
-                "subject_digest": ROUTING_SUBJECT_DIGEST,
-                "decision": {"allow": True},
-                "record": {
-                    "producer_admission": {
-                        "profile_id": "aoa-sdk-g5-canonical",
-                        "owner_repo": "aoa-sdk",
-                        "canonical_owner_repo": "aoa-sdk",
-                        "source_ref": SDK_PRODUCER_REF,
-                        "status": "canonical_producer",
-                        "g5_authority": authority,
-                        "owner_switch_receipt": {
-                            "digest": owner_switch_receipt_digest,
-                        },
-                    }
-                },
-            },
+            "trust_verdict": trust_verdict,
             "file_sha256": {
                 "generated/aoa_router.min.json": _sha256(router_raw).removeprefix(
                     "sha256:"
@@ -794,6 +923,10 @@ def test_embedded_owner_switch_receipt_tampering_fails_closed(
             "trust record must be a JSON object",
         ),
         (
+            ("trust_verdict", "record", "artifact_subject_store"),
+            "trust subject store must be a JSON object",
+        ),
+        (
             ("trust_verdict", "record", "producer_admission"),
             "producer admission must be a JSON object",
         ),
@@ -805,6 +938,10 @@ def test_embedded_owner_switch_receipt_tampering_fails_closed(
                 "owner_switch_receipt",
             ),
             "producer receipt summary must be a JSON object",
+        ),
+        (
+            ("trust_verdict", "inspected_claims"),
+            "inspected trust claims must be a JSON object",
         ),
         (("file_sha256",), "manifest file hashes must be a JSON object"),
     ),
@@ -823,6 +960,57 @@ def test_malformed_runtime_manifest_objects_fail_closed(
     for field in field_path[:-1]:
         parent = parent[field]
     parent[field_path[-1]] = []
+    _write_json(manifest_path, manifest)
+
+    with pytest.raises(RoutingSnapshotError, match=match):
+        _api(workspace_root, bundle_root, lock_path).resolve(_intent())
+
+
+@pytest.mark.parametrize(
+    ("field_path", "tampered_value", "match"),
+    (
+        (
+            ("trust_verdict", "decision", "model"),
+            "allow_on_boolean",
+            "exact fail-closed allow posture",
+        ),
+        (
+            ("trust_verdict", "decision", "blockers"),
+            ["required_controls_not_verified:sbom"],
+            "exact fail-closed allow posture",
+        ),
+        (
+            ("trust_verdict", "blockers"),
+            ["required_controls_not_verified:sbom"],
+            "contains reasons, blockers, or review",
+        ),
+        (
+            (
+                "trust_verdict",
+                "inspected_claims",
+                "controls",
+                "required_controls_missing",
+            ),
+            ["sbom"],
+            "inspected controls are not complete",
+        ),
+    ),
+)
+def test_contradictory_runtime_trust_posture_fails_closed(
+    workspace_root: Path,
+    field_path: tuple[str, ...],
+    tampered_value: object,
+    match: str,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(workspace_root)
+    manifest_path = (
+        bundle_root / "manifest" / "federation_mirror_manifest.json"
+    )
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    parent = manifest
+    for field in field_path[:-1]:
+        parent = parent[field]
+    parent[field_path[-1]] = tampered_value
     _write_json(manifest_path, manifest)
 
     with pytest.raises(RoutingSnapshotError, match=match):
