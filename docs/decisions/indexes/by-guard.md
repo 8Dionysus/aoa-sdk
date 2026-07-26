@@ -183,6 +183,10 @@
 
 - [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
 
+## exact recovery
+
+- [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
+
 ## explicit adapter
 
 - [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
@@ -221,6 +225,10 @@
 ## idempotency
 
 - [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
+
+## immutable outcome
+
+- [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
 
 ## index parity
 
@@ -377,6 +385,7 @@
 ## owner provenance
 
 - [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
+- [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
 
 ## owner scope
 
@@ -422,6 +431,10 @@
 - [AOA-SDK-D-0039 - A2A Quest Passport Secondary Tier Naming](../AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md) (`docs/decisions/AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md`)
 - [AOA-SDK-D-0040 - Sibling Fallback Field Input Alias Normalization](../AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md) (`docs/decisions/AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md`)
 - [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) (`docs/decisions/AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md`)
+
+## partial closeout
+
+- [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
 
 ## pending review
 

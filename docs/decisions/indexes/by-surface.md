@@ -179,6 +179,10 @@
 
 - [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md`)
 
+## evidence chain
+
+- [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
+
 ## external source ref
 
 - [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) (`docs/decisions/AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md`)
@@ -230,6 +234,7 @@
 - [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) (`docs/decisions/AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md`)
 - [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) (`docs/decisions/AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md`)
 - [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) (`docs/decisions/AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md`)
+- [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
 
 ## lifecycle contract
 
@@ -286,6 +291,10 @@
 - [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) (`docs/decisions/AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md`)
 - [AOA-SDK-D-0050 - Checkpoint Path Topology Tree](../AOA-SDK-D-0050-checkpoint-path-topology-tree.md) (`docs/decisions/AOA-SDK-D-0050-checkpoint-path-topology-tree.md`)
 - [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+
+## model contract
+
+- [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
 
 ## models
 
@@ -348,6 +357,7 @@
 - [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
 - [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
 - [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
+- [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
 
 ## public API naming
 
@@ -364,6 +374,7 @@
 ## recovery
 
 - [AOA-SDK-D-0073 - Replay Release Evidence From an Immutable Tag](../AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md) (`docs/decisions/AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md`)
+- [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
 
 ## recurrence
 

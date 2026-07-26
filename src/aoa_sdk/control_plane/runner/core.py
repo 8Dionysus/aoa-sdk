@@ -39,6 +39,11 @@ from ...contracts.control_plane import (
     command_digest,
     deduplicate_execution_events,
 )
+from ...contracts.evidence_chain import EvidenceChain
+from ..evidence_chain import (
+    EvidenceChainError,
+    assert_evidence_chain_complete,
+)
 
 
 AOA_RUNNER_VERSION = "aoa_control_plane_runner_v1"
@@ -339,7 +344,7 @@ class AoARunner:
         self,
         session: SessionHandle,
         outcome: RunOutcome,
-        bundle: CloseoutBundleRef,
+        bundle: CloseoutBundleRef | EvidenceChain,
     ) -> RunStatus:
         record = self._record(session)
         adapter = self._bound_adapter(record)
@@ -348,29 +353,27 @@ class AoARunner:
             raise AoARunnerError(
                 "closeout outcome does not match the runtime-owned outcome"
             )
+        closeout_bundle = self._admitted_closeout_bundle(
+            record,
+            outcome,
+            bundle,
+        )
         if record.status.state == "closed":
-            if record.status.closeout_ref != bundle:
+            if record.status.closeout_ref != closeout_bundle:
                 raise AoARunnerError(
                     "session is already closed with a different bundle"
                 )
-            assert_closeout_ready(
-                record.plan,
-                record.session,
-                outcome,
-                bundle,
-            )
             return record.status
         if record.status.state != outcome.terminal_state:
             raise AoARunnerError(
                 "closeout outcome does not match the current terminal state"
             )
-        assert_closeout_ready(record.plan, record.session, outcome, bundle)
         with _verified_read_model_update(record):
             adapter.closeout(
                 record.plan,
                 record.session,
                 outcome,
-                bundle,
+                closeout_bundle,
             )
             status = self._reconcile(record, adapter)
             self._reconcile_receipts(record, adapter)
@@ -380,9 +383,48 @@ class AoARunner:
                 raise AoARunnerError(
                     "adapter changed the runtime-owned outcome during closeout"
                 )
-            if status.state != "closed" or status.closeout_ref != bundle:
+            if status.state != "closed" or status.closeout_ref != closeout_bundle:
                 raise AoARunnerError("adapter did not close with the admitted bundle")
         return status
+
+    @staticmethod
+    def _admitted_closeout_bundle(
+        record: _SessionRecord,
+        outcome: RunOutcome,
+        bundle: CloseoutBundleRef | EvidenceChain,
+    ) -> CloseoutBundleRef:
+        if isinstance(bundle, CloseoutBundleRef):
+            assert_closeout_ready(
+                record.plan,
+                record.session,
+                outcome,
+                bundle,
+            )
+            return bundle
+        try:
+            closeout_bundle = assert_evidence_chain_complete(bundle)
+        except EvidenceChainError as exc:
+            raise AoARunnerError(str(exc)) from exc
+        verified_events = tuple(record.events)
+        events_match = bundle.events == verified_events
+        if record.status.state == "closed":
+            events_match = (
+                verified_events[: len(bundle.events)] == bundle.events
+                and len(verified_events) == len(bundle.events) + 1
+                and verified_events[-1].event_kind == "state_transition"
+                and verified_events[-1].trigger == "closeout"
+                and verified_events[-1].state_after == "closed"
+            )
+        if (
+            bundle.plan != record.plan
+            or bundle.session != record.session
+            or not events_match
+            or bundle.runtime_outcome != outcome
+        ):
+            raise AoARunnerError(
+                "evidence chain differs from the verified Runner read model"
+            )
+        return closeout_bundle
 
     def _record(self, session: SessionHandle) -> _SessionRecord:
         record = self._sessions.get(session.session_id)
@@ -673,8 +715,7 @@ class AoARunner:
             ]
             if len(matching_events) != 1:
                 raise AoARunnerError(
-                    f"approval decision {decision.decision_id!r} "
-                    "lacks one exact event"
+                    f"approval decision {decision.decision_id!r} lacks one exact event"
                 )
         if at is not None and record.plan.approval_requirements:
             from ...contracts.control_plane import assert_approvals_satisfied
@@ -1021,8 +1062,7 @@ def _assert_status_and_events(
         current.state != previous.state
         or current.pending_approval_ids != previous.pending_approval_ids
         or current.failure_code != previous.failure_code
-        or current.recover_from_event_sequence
-        != previous.recover_from_event_sequence
+        or current.recover_from_event_sequence != previous.recover_from_event_sequence
         or current.closeout_ref != previous.closeout_ref
     )
     if not events:

@@ -43,6 +43,14 @@ Tracking starts with the community-docs baseline for this repository.
   transport. The paired runtime-owner test proves one real governed
   `AOA-P-0011` execution, durable restore, replay safety, approval enforcement,
   and source drift closure.
+- Add C5 `aoa_evidence_chain_v1`: immutable partial-to-complete composition of
+  the exact SDK route/run objects, runtime events and outcome, plus
+  owner-qualified eval, memo, checkpoint, and closeout refs. Add
+  content-addressed durable revisions, exact session/receipt lookup, tamper
+  rejection, and complete-chain-gated Runner closeout.
+- Keep runtime outcomes immutable and reject any adapter attempt to synthesize
+  eval, memo, or closeout authority. The SDK validates cross-owner coverage
+  while canonical owner payloads remain outside the chain.
 - Keep adapter selection, runtime implementation, eval/memory verdicts,
   measured benefit, consumer-zero, and archival outside the SDK client.
 - Add future changes here after the release tag lands.

@@ -150,6 +150,12 @@ The current landed surface includes:
   plan source/ABI coordinates, and invokes one absolute runtime-owner
   executable through a no-shell JSON transport without moving execution,
   policy, or adapter selection into the SDK;
+- the callable
+  [C5 unified evidence and closeout chain](mechanics/boundary-bridge/parts/evidence-closeout-chain/README.md),
+  which records immutable partial-to-complete audit projections, resolves
+  them by exact session or closeout-receipt identity, and requires external
+  owner-qualified eval, memo, checkpoint, and closeout refs without copying
+  their canonical truth into the SDK;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

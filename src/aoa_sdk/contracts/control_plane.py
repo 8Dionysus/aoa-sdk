@@ -1452,20 +1452,7 @@ def assert_closeout_ready(
 ) -> None:
     """Prove required evidence refs exist before lifecycle closure."""
 
-    assert_run_plan_digest(plan)
-    if (
-        outcome.session_id != session.session_id
-        or outcome.correlation_id != session.correlation_id
-        or outcome.plan_digest != plan.plan_digest
-    ):
-        raise ControlPlaneContractError("run outcome is outside closeout scope")
-    if (
-        outcome.closeout_bundle_ref is not None
-        and outcome.closeout_bundle_ref != bundle
-    ):
-        raise ControlPlaneContractError(
-            "run outcome names a different closeout bundle"
-        )
+    assert_closeout_bundle_scope(plan, session, outcome, bundle)
     missing_evidence = {
         requirement.requirement_id
         for requirement in plan.evidence_requirements
@@ -1507,6 +1494,30 @@ def assert_closeout_ready(
     if missing_retention:
         raise ControlPlaneContractError(
             f"closeout is missing memory receipt refs: {sorted(missing_retention)}"
+        )
+
+
+def assert_closeout_bundle_scope(
+    plan: RunPlan,
+    session: SessionHandle,
+    outcome: RunOutcome,
+    bundle: CloseoutBundleRef,
+) -> None:
+    """Validate runtime scope and the exact owner closeout receipt only."""
+
+    assert_run_plan_digest(plan)
+    if (
+        outcome.session_id != session.session_id
+        or outcome.correlation_id != session.correlation_id
+        or outcome.plan_digest != plan.plan_digest
+    ):
+        raise ControlPlaneContractError("run outcome is outside closeout scope")
+    if (
+        outcome.closeout_bundle_ref is not None
+        and outcome.closeout_bundle_ref != bundle
+    ):
+        raise ControlPlaneContractError(
+            "run outcome names a different closeout bundle"
         )
     missing_closeout = {
         requirement.requirement_id

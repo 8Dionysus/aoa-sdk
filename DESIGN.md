@@ -316,7 +316,7 @@ A selected route is not activation. C1 does not compile a `RunPlan`, select a
 runtime adapter, invoke a skill, or execute an effect. C2 compilation and C3
 lifecycle coordination are separately bounded surfaces.
 
-## C2 Plan Compilation, C3 Lifecycle, and C4 Transport Shape
+## C2 Plan Compilation, C3 Lifecycle, C4 Transport, and C5 Evidence Shape
 
 `AOA-SDK-D-0078` keeps C2 compilation deterministic and runtime-neutral.
 `AOA-SDK-D-0081` makes `AoARunner` a lifecycle client over one explicit
@@ -349,6 +349,25 @@ absolute owner profile + exact constraint locations
 The client can cause execution only through that external bridge. It neither
 executes a plan step nor discovers a runtime, policy, executable, or adapter.
 Installed-client proof is package proof, not runtime invocation proof.
+
+`AOA-SDK-D-0083` adds C5 only after the runtime-owned outcome is immutable:
+
+```text
+RouteIntent + RouteDecision + RouteExplanation + RunPlan
+  + SessionHandle + append-only RuntimeEvents + RunOutcome
+  + owner-qualified eval, memo, and checkpoint refs
+  -> immutable partial EvidenceChain revisions
+  + final owner-qualified CloseoutBundleRef
+  -> complete EvidenceChain
+  -> Runner closeout
+```
+
+The SDK validates identity, ordering, required-owner coverage, and
+partial-to-complete monotonicity. It embeds only SDK control-plane objects and
+runtime events needed to audit one run. Eval verdicts, memo contents,
+checkpoint receipts, and closeout payloads remain external owner truth. A
+partial chain cannot close a Runner session; a complete chain is immutable
+and is resolvable only by exact session or closeout-receipt identity.
 
 ## Design as Aim
 

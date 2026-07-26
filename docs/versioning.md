@@ -149,6 +149,19 @@ response handling. The runtime-owner profile independently controls admitted
 scenario/phase mappings; changing that meaning does not silently widen the SDK
 transport ABI.
 
+C5 evidence composition is independently named `aoa_evidence_chain_v1`.
+Its version covers embedded SDK/run objects, owner-qualified reference kinds,
+partial-versus-complete derivation, exact owner coverage, and monotonic
+revision rules. The checked repository index is
+`aoa_evidence_chain_index_v1`. External eval, memo, checkpoint, and closeout
+payload schemas remain independently versioned by their owners.
+
+The legacy Runner closeout form that reads eval, memo, and closeout refs from
+`RunOutcome` remains a compatibility-only input during the C3-C5 convergence
+window. New composition rejects those fields in runtime outcomes and closes
+only from a complete `EvidenceChain`. Removing the legacy form requires an
+explicit compatibility decision and consumer evidence.
+
 ## Operational Expectation
 
 - Loader functions for supported surfaces should go through the compatibility

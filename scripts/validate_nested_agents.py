@@ -123,7 +123,7 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'python scripts/validate_sdk_source_home.py',
     ),
     'sdk/runtime-entry/AGENTS.md': (
-        'Workspace, Codex, and reviewed closeout entry posture',
+        'Workspace, Codex, explicit Runner, and reviewed',
         'below runtime authority',
         'Do not make path guessing stronger than `.aoa/workspace.toml`',
         'python scripts/validate_sdk_source_home.py',

@@ -93,6 +93,12 @@ from .contracts.control_plane import (
     SessionHandle,
     StartCommand,
 )
+from .contracts.evidence_chain import (
+    CheckpointReceiptRef,
+    EvidenceChain,
+    EvidenceChainIndex,
+    EvidenceChainIndexEntry,
+)
 from .contracts.artifacts import (
     ArtifactAffectedReport,
     ArtifactAffectedRow,
@@ -340,6 +346,7 @@ __all__ = [
     "CandidateExplanation",
     "CapabilityRef",
     "CheckpointPolicy",
+    "CheckpointReceiptRef",
     "CloseoutBundleRef",
     "CloseoutRequirement",
     "CommandReceipt",
@@ -348,6 +355,9 @@ __all__ = [
     "EvalRequirement",
     "EvalVerdictRef",
     "EvidenceBundleRef",
+    "EvidenceChain",
+    "EvidenceChainIndex",
+    "EvidenceChainIndexEntry",
     "EvidenceRequirement",
     "ExecutionEvent",
     "LifecycleCommand",

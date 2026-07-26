@@ -10,6 +10,7 @@
 - `src/aoa_sdk/models.py`
 - `src/aoa_sdk/contracts/control_plane.py`
 - `src/aoa_sdk/contracts/organ_orchestration.py`
+- `src/aoa_sdk/contracts/evidence_chain.py`
 - `src/aoa_sdk/agents/`
 - `src/aoa_sdk/artifacts/`
 - `src/aoa_sdk/cli/`
@@ -76,6 +77,8 @@
 - `mechanics/boundary-bridge/parts/plan-compilation-control-plane/`
 - `src/aoa_sdk/control_plane/runner/`
 - `mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/`
+- `src/aoa_sdk/control_plane/evidence_chain.py`
+- `mechanics/boundary-bridge/parts/evidence-closeout-chain/`
 - `sdk/runtime-entry/runner-entrypoints/`
 - `src/aoa_sdk/control_plane/routing/schemas/routing-g5-owner-switch-receipt.schema.json`
 - `src/aoa_sdk/control_plane/routing/schemas/routing-g5-canonical-provenance.schema.json`
@@ -100,6 +103,9 @@ Former parent-name candidates for this package live only in
 surface posture gate, skill environment inspector, and owner-layer signal handoff.
 The C3 Runner lifecycle is an active bridge part; its reference adapter is a
 protocol witness and not a runtime-seam or production-execution owner.
+The C5 evidence chain is an SDK-owned audit projection. Eval verdicts, memo
+receipts, checkpoint receipts, and closeout payloads remain owned by their
+source organs and enter the chain only as exact owner-qualified references.
 
 The former skill runtime bridge was retired by AOA-SDK-D-0067 after owner
 profiles and the typed capability graph replaced SDK dispatch and session

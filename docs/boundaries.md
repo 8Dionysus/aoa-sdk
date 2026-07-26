@@ -49,10 +49,14 @@ repositories remain authoritative.
   delivered owner profile and constraints, validates exact delivery
   coordinates, and transports lifecycle calls without owning the external
   bridge, runtime policy, effects, or execution evidence
+- the C5 evidence-chain composer and repository, which validate exact
+  cross-owner identity and completeness across immutable partial revisions
+  while keeping eval verdicts, memo contents, checkpoint receipts, and
+  closeout payloads in their owner repositories
 - the deterministic SDK-owned reference adapter as a no-effect protocol
   witness, never as production runtime or invocation proof
 - the versioned R2 route, plan, approval, lifecycle, event,
-  evidence-reference, and adapter protocol models used by C1-C4; the models
+  evidence-reference, and adapter protocol models used by C1-C5; the models
   and Runner do not activate or implement a production runtime
 - the historical packaged routing shadow compiler, strict validator, and
   dual-producer sidecar that proved predecessor parity before the G5 switch
@@ -93,6 +97,8 @@ repositories remain authoritative.
 - deterministic validation of a host-visible, one-stage-at-a-time KAG,
   memo-candidate, eval, and explicit owner-acceptance receipt chain without
   owner invocation
+- exact composition and lookup of owner-qualified evidence refs without
+  copying, reinterpreting, or superseding their canonical payloads
 - passive skill-environment inspection and exact owner-profile user bootstrap
 - reviewed-session closeout helpers that call owner-owned publisher scripts and
   refresh derived stats without taking over workflow or proof meaning

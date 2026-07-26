@@ -46,6 +46,13 @@ The optional C4 `AbyssStackRuntimeAdapter` is a transport-only production
 client: it materializes an exact owner profile from explicit artifacts and
 uses one caller-supplied no-shell transport into the external runtime owner.
 
+C5 adds `EvidenceChain` composition after the runtime outcome is immutable.
+`assemble_evidence_chain()` accepts exact SDK control-plane objects and
+external owner-qualified refs; `EvidenceChainRepository` stores immutable
+content-addressed revisions and resolves only by exact session or final
+closeout-receipt identity. Only a complete chain may close `AoARunner`.
+Canonical eval, memo, checkpoint, and closeout payloads remain outside the SDK.
+
 `AoASDK.organs` is a lazy facade over one explicitly configured private
 registry source. It exposes deterministic projection, bounded catalog,
 organ/capability inspection, compatibility comparison, and candidate-only

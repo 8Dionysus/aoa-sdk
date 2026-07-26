@@ -69,7 +69,7 @@
     },
     "control_plane": {
       "primary_mechanic": "boundary-bridge",
-      "reason": "runtime-neutral contracts, C1 receipt-bound route resolution, C2 exact owner-contour plan compilation, C3 explicit-adapter lifecycle coordination, and the C4 transport boundary bridge owner projections without taking activation or runtime execution authority"
+      "reason": "runtime-neutral contracts, C1 receipt-bound route resolution, C2 exact owner-contour plan compilation, C3 explicit-adapter lifecycle coordination, C4 transport, and C5 immutable cross-owner evidence composition bridge owner projections without taking activation, runtime execution, proof, memory, checkpoint, or closeout authority"
     },
     "evals": {
       "primary_mechanic": "boundary-bridge",
@@ -167,7 +167,8 @@
       "cross-organ-orchestration",
       "route-resolution-control-plane",
       "plan-compilation-control-plane",
-      "runner-lifecycle-control-plane"
+      "runner-lifecycle-control-plane",
+      "evidence-closeout-chain"
     ],
     "antifragility": [
       "stress-posture-dispatch-gate",
@@ -332,7 +333,7 @@
     {
       "slug": "boundary-bridge",
       "name_type": "shared",
-      "operation": "Keep SDK typed facades, consumed-surface posture gates, canonical routing succession evidence, receipt-bound C1 route resolution, exact-contour C2 plan compilation, explicit-adapter C3 lifecycle coordination, passive skill environment inspection, organ access, host-visible cross-organ receipt chains, and owner-layer signal handoffs bounded while sibling repositories retain meaning and runtime owners retain execution.",
+      "operation": "Keep SDK typed facades, consumed-surface posture gates, canonical routing succession evidence, receipt-bound C1 route resolution, exact-contour C2 plan compilation, explicit-adapter C3 lifecycle coordination, immutable C5 evidence composition, passive skill environment inspection, organ access, host-visible cross-organ receipt chains, and owner-layer signal handoffs bounded while sibling repositories retain meaning and runtime owners retain execution.",
       "source_surfaces": [
         "docs/boundaries.md",
         "src/aoa_sdk/AGENTS.md",
@@ -379,6 +380,7 @@
         "mechanics/boundary-bridge/parts/route-resolution-control-plane",
         "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
         "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane",
+        "mechanics/boundary-bridge/parts/evidence-closeout-chain",
         "schemas/organ-access",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/initial-surface-detection-boundary.md",
         "mechanics/boundary-bridge/parts/owner-layer-signal-handoff/docs/surface-detection-enrichment.md",
@@ -415,13 +417,15 @@
         "cross-organ-orchestration",
         "route-resolution-control-plane",
         "plan-compilation-control-plane",
-        "runner-lifecycle-control-plane"
+        "runner-lifecycle-control-plane",
+        "evidence-closeout-chain"
       ],
       "validation": [
-        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py mechanics/boundary-bridge/parts/organ-access-control-plane/tests mechanics/boundary-bridge/parts/cross-organ-orchestration/tests mechanics/boundary-bridge/parts/route-resolution-control-plane/tests mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests",
+        "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py mechanics/boundary-bridge/parts/organ-access-control-plane/tests mechanics/boundary-bridge/parts/cross-organ-orchestration/tests mechanics/boundary-bridge/parts/route-resolution-control-plane/tests mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests mechanics/boundary-bridge/parts/evidence-closeout-chain/tests",
         "python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/generate_plan_compilation_examples.py --check",
         "python -m build && python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py",
         "python -m build && python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py",
+        "python -m build && python mechanics/boundary-bridge/parts/evidence-closeout-chain/scripts/verify_evidence_chain_wheel.py",
         "python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_schemas.py --check && python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_example.py --check",
         "python mechanics/boundary-bridge/parts/cross-organ-orchestration/scripts/generate_cross_organ_schemas.py --check && python mechanics/boundary-bridge/parts/cross-organ-orchestration/scripts/generate_cross_organ_examples.py --check",
         "python -m mypy src/aoa_sdk/contracts/organs.py src/aoa_sdk/contracts/organ_orchestration.py src/aoa_sdk/organs src/aoa_sdk/cli/organs.py",

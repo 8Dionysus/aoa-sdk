@@ -40,7 +40,7 @@ from ...contracts.control_plane import (
     StartCommand,
     assert_approval_decision_matches_request,
     assert_approvals_satisfied,
-    assert_closeout_ready,
+    assert_closeout_bundle_scope,
     assert_run_plan_digest,
     canonical_digest,
     command_digest,
@@ -102,8 +102,7 @@ class DeterministicReferenceAdapter:
         profile: RuntimeProfile | None = None,
         clock: Callable[[], datetime] | None = None,
         observed_source_overrides: Mapping[tuple[str, str], str] | None = None,
-        observed_abi_overrides: Mapping[tuple[str, str], tuple[str, str]]
-        | None = None,
+        observed_abi_overrides: Mapping[tuple[str, str], tuple[str, str]] | None = None,
     ) -> None:
         self._profile = profile or reference_runtime_profile()
         self._clock = clock or (lambda: datetime.now(timezone.utc))
@@ -136,10 +135,7 @@ class DeterministicReferenceAdapter:
         if observed_at < freshness_floor:
             observed_at = freshness_floor
         observation_token = hashlib.sha256(
-            (
-                f"{plan.snapshot.snapshot_digest}:"
-                f"{observed_at.isoformat()}"
-            ).encode()
+            (f"{plan.snapshot.snapshot_digest}:{observed_at.isoformat()}").encode()
         ).hexdigest()
         source_refs = tuple(
             ObservedSourceRef(
@@ -161,8 +157,7 @@ class DeterministicReferenceAdapter:
         )
         observation = RuntimeSnapshotObservation(
             observation_id=(
-                f"reference-observation:{session.session_id}:"
-                f"{observation_token}"
+                f"reference-observation:{session.session_id}:{observation_token}"
             ),
             session_id=session.session_id,
             correlation_id=session.correlation_id,
@@ -432,9 +427,7 @@ class DeterministicReferenceAdapter:
     ) -> Iterable[ExecutionEvent]:
         self._require_available()
         state = self._state(session)
-        return tuple(
-            event for event in state.events if event.sequence > after_sequence
-        )
+        return tuple(event for event in state.events if event.sequence > after_sequence)
 
     def outcome(self, session: SessionHandle) -> RunOutcome | None:
         self._require_available()
@@ -459,7 +452,7 @@ class DeterministicReferenceAdapter:
             return state.status
         if state.status.state not in {"failed", "completed", "cancelled"}:
             raise ReferenceAdapterError("closeout requires an execution-terminal state")
-        assert_closeout_ready(plan, session, outcome, bundle)
+        assert_closeout_bundle_scope(plan, session, outcome, bundle)
         self._transition(
             state,
             state_after="closed",
@@ -605,8 +598,7 @@ class DeterministicReferenceAdapter:
                     trigger="approval_required",
                     at=at,
                     pending_approval_ids=tuple(
-                        item.requirement_id
-                        for item in state.plan.approval_requirements
+                        item.requirement_id for item in state.plan.approval_requirements
                     ),
                 )
             else:
@@ -726,8 +718,7 @@ class DeterministicReferenceAdapter:
                 snapshot_digest=state.plan.snapshot.snapshot_digest,
                 requested_at=requested_at,
                 expires_at=(
-                    requested_at
-                    + timedelta(seconds=requirement.expires_after_seconds)
+                    requested_at + timedelta(seconds=requirement.expires_after_seconds)
                     if requirement.expires_after_seconds is not None
                     else None
                 ),
