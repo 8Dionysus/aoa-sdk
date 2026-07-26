@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 12966570,
+  "allowed_tracked_bytes": 17172396,
+  "approved_by": "repository-owner",
+  "base_ref": "0a5a12c45ab3cad41e39e8ca975fd5d0b84efbd9",
+  "changed_generated_bytes": 12966570,
+  "changed_generated_files": 313,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "ca054138b8f1d7c328dde6b6d012ef8ebc6279c7083f658997c8917255e1fb0d",
+  "reason": "Refresh aoa-sdk KAG projection after review hardening of C2 plan binding integrity",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 17172396,
+  "tracked_bytes_max": 15728640
+}
