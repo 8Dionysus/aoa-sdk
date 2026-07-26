@@ -11,13 +11,14 @@ python scripts/validate_mechanics_topology.py
 python scripts/validate_sdk_source_home.py
 python -m build
 python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py
+PATH_TO_WHEEL_VENV/bin/python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_isolated_runtime_lifecycle.py --chain PATH_TO_TYPED_ROUTE_PLAN_CHAIN.json --output PATH_TO_SESSION_LOCAL_RECEIPT.json
 ```
 
 The focused suite covers:
 
 - all three C2 golden plans through one Runner/reference-adapter contract;
 - normal completion and owner-complete closeout;
-- rejected and expired approvals plus renewal;
+- sequential multiple approvals, rejected and expired approvals, plus renewal;
 - pause/resume;
 - duplicate start, command, and approval;
 - repeat of a rejected command with no new event or receipt;
@@ -45,6 +46,14 @@ The installed-wheel probe compiles a plan from packaged C2 resources, runs the
 non-executing C3 lifecycle, reconciles a typed outcome, and restores a fresh
 Runner without importing the source checkout or requiring an
 `aoa-playbooks` checkout.
+
+The isolated-runtime verifier accepts a separately validated typed
+route-to-plan chain, derives an explicitly labelled retry-policy test
+variation, and exercises duplicate commands, multiple approvals, pause/resume,
+disconnect, interruption, bounded recovery, 64 progress events,
+`SessionHandle` restoration, terminal outcome, and closeout. Its JSON receipt
+retains the base and test plan digests and never claims the test variation was
+compiler output.
 
 These checks do not select a production adapter, execute a plan step, call a
 model or tool, produce an eval verdict, retain memory, prove task benefit,

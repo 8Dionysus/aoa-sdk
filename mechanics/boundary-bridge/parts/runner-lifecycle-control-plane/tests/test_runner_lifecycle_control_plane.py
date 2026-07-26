@@ -335,9 +335,15 @@ def _approve(
     session,
     *,
     verdict: str = "approved",
+    requirement_id: str | None = None,
     at: datetime,
 ) -> ApprovalDecision:
-    request = runner.approval_requests(session)[0]
+    requests = runner.approval_requests(session)
+    request = (
+        next(item for item in requests if item.requirement_id == requirement_id)
+        if requirement_id is not None
+        else requests[0]
+    )
     return ApprovalDecision(
         decision_id=f"decision:{request.request_id}:{verdict}",
         request_id=request.request_id,
@@ -593,6 +599,64 @@ def test_rejected_approval_cancels_before_running() -> None:
     )
     assert status.state == "cancelled"
     assert runner.outcome(session).execution_status == "cancelled"
+
+
+def test_multiple_approvals_reconcile_one_decision_at_a_time() -> None:
+    clock = MutableClock(NOW)
+    base_plan = _plan()
+    second_requirement = base_plan.approval_requirements[0].model_copy(
+        update={
+            "requirement_id": "approval:fixture:second-reviewed-effect",
+            "operation": "fixture:second-reviewed-effect",
+        }
+    )
+    candidate = base_plan.model_copy(
+        update={
+            "approval_requirements": (
+                *base_plan.approval_requirements,
+                second_requirement,
+            ),
+            "plan_digest": _digest("pending-multiple-approval-plan"),
+        }
+    )
+    plan = candidate.model_copy(
+        update={
+            "plan_digest": canonical_digest(
+                candidate,
+                exclude={"plan_digest"},
+            )
+        }
+    )
+    runner = _runner(clock)
+    adapter = DeterministicReferenceAdapter(
+        profile=plan.runtime_profile,
+        clock=clock,
+    )
+    session = runner.prepare(plan)
+    runner.start(
+        session,
+        adapter,
+        _start(runner, session, at=NOW + timedelta(seconds=1)),
+    )
+    assert set(runner.status(session).pending_approval_ids) == {
+        requirement.requirement_id
+        for requirement in plan.approval_requirements
+    }
+
+    first = _approve(runner, session, at=NOW + timedelta(seconds=2))
+    assert runner.approve(session, first).state == "awaiting_approval"
+    assert runner.status(session).pending_approval_ids == (
+        second_requirement.requirement_id,
+    )
+
+    second = _approve(
+        runner,
+        session,
+        requirement_id=second_requirement.requirement_id,
+        at=NOW + timedelta(seconds=3),
+    )
+    assert runner.approve(session, second).state == "running"
+    assert runner.status(session).pending_approval_ids == ()
 
 
 def test_explicit_cancel_returns_a_typed_terminal_outcome() -> None:

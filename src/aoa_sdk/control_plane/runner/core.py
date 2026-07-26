@@ -666,9 +666,9 @@ class AoARunner:
                     f"approval request {request.request_id!r} lacks one exact event"
                 )
         if record.status.state == "awaiting_approval":
-            if set(record.status.pending_approval_ids) != set(seen):
+            if not set(record.status.pending_approval_ids).issubset(seen):
                 raise AoARunnerError(
-                    "pending approval status does not match current requests"
+                    "pending approval status names a non-current request"
                 )
         return requests
 
@@ -716,6 +716,17 @@ class AoARunner:
             if len(matching_events) != 1:
                 raise AoARunnerError(
                     f"approval decision {decision.decision_id!r} lacks one exact event"
+                )
+        if record.status.state == "awaiting_approval":
+            approved = {
+                decision.requirement_id
+                for decision in decisions
+                if decision.verdict == "approved"
+            }
+            expected_pending = set(requests).difference(approved)
+            if set(record.status.pending_approval_ids) != expected_pending:
+                raise AoARunnerError(
+                    "pending approval status does not match undecided requests"
                 )
         if at is not None and record.plan.approval_requirements:
             from ...contracts.control_plane import assert_approvals_satisfied
