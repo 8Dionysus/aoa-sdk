@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 12439652,
+  "allowed_tracked_bytes": 16794568,
+  "approved_by": "repository-owner",
+  "base_ref": "ceeb1de77a35ddeead886b2c815ec3dd149df6f8",
+  "changed_generated_bytes": 12439652,
+  "changed_generated_files": 308,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "a977fa69fdc67e8affd737f1e6c25ed9bbf23e330f86275cde3e6febff4e1523",
+  "reason": "Refresh the C1 repository-local KAG family after unifying exact explanation disposition derivation and binding candidate order plus ambiguity codes, without claiming activation, cost benefit, consumer-zero, succession completion, or archival authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 16794568,
+  "tracked_bytes_max": 15728640
+}
