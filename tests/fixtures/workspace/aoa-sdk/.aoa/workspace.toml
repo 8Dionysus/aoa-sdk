@@ -11,3 +11,6 @@ role = "source_checkout"
 preferred = ["~/src/abyss-stack"]
 runtime_mirror = "{workspace_parent}/abyss-stack"
 notes = "Use the git checkout for source work. The /srv path is a deployed runtime mirror."
+
+[control_plane]
+routing_bundle_root = "{workspace_parent}/abyss-stack/Knowledge/federation/aoa-routing"

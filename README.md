@@ -89,7 +89,7 @@ The current landed surface includes:
 - the strict, runtime-neutral
   [R2 Agent OS contract family](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md)
   for route decisions, plans, approvals, lifecycle, events, evidence, and
-  adapter protocols, without an active runner or producer switch;
+  adapter protocols, without an active runner;
 - the passed
   [R3 disposable migration rehearsal](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r3-migration-rehearsal.md),
   which proves 14/14 byte parity, installed-wheel construction without the
@@ -117,8 +117,12 @@ The current landed surface includes:
   [G5 owner switch](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-g5-owner-switch.md),
   which makes `aoa-sdk` the single canonical routing producer by proving exact
   byte parity with the public `v0.7.0` asset, starts the compatibility window,
-  retains `aoa-routing` for rollback, and keeps live-cutover execution and
-  archival authority separate;
+  retains `aoa-routing` for rollback, and keeps archival authority separate;
+- the callable
+  [C1 route resolution control plane](mechanics/boundary-bridge/parts/route-resolution-control-plane/README.md),
+  which validates the exact live G5 snapshot, intersects routing entries with
+  the pinned `aoa-skills` owner projection, and emits deterministic
+  `RouteDecision` and `RouteExplanation` objects without activation;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

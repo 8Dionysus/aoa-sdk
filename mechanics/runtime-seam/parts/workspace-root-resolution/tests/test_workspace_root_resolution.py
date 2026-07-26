@@ -11,6 +11,20 @@ def test_from_workspace_resolves_root(workspace_root: Path) -> None:
     assert sdk.workspace.federation_root_source == "manifest:layout.federation_roots"
     assert sdk.workspace.manifest_path == (workspace_root / "aoa-sdk" / ".aoa" / "workspace.toml").resolve()
     assert sdk.workspace.has_repo("aoa-skills")
+    assert sdk.workspace.routing_bundle_root == (
+        workspace_root
+        / "abyss-stack"
+        / "Knowledge"
+        / "federation"
+        / "aoa-routing"
+    ).resolve()
+    assert sdk.workspace.routing_bundle_root_source == (
+        "manifest:control_plane.routing_bundle_root"
+    )
+    assert sdk.workspace.routing_source_lock_path is None
+    assert sdk.workspace.routing_source_lock_source == (
+        "package:canonical-routing-source-lock"
+    )
     assert sdk.workspace.surface_path(
         "aoa-skills",
         "generated/agent_skill_catalog.json",

@@ -29,6 +29,17 @@ def workspace_inspect(
     typer.echo(f"federation_root: {payload['federation_root']}")
     typer.echo(f"federation_root_source: {payload['federation_root_source']}")
     typer.echo(f"manifest: {payload['manifest'] or 'none'}")
+    control_plane = payload["control_plane"]
+    typer.echo(
+        "routing_bundle_root: "
+        f"{control_plane['routing_bundle_root'] or 'none'} "
+        f"[{control_plane['routing_bundle_root_source'] or 'unconfigured'}]"
+    )
+    typer.echo(
+        "routing_source_lock: "
+        f"{control_plane['routing_source_lock'] or 'package default'} "
+        f"[{control_plane['routing_source_lock_source']}]"
+    )
 
     for repo in KNOWN_REPOS:
         repo_payload = payload["repos"][repo]

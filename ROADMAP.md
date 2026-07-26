@@ -75,9 +75,10 @@ land a local surface?
 
 ## Current Direction
 
-`aoa-sdk` is past seed bootstrap. The current post-`v0.8.0` direction is
-owner-routed artifact admission and live cutover, followed by bounded
-compatibility proof and a separately released Agent OS Runner.
+`aoa-sdk` is past seed bootstrap. The exact `v0.8.0` artifact is admitted and
+the receipt-gated live cutover has executed. The current direction is bounded
+compatibility proof plus separately landable C1-C5 Agent OS control-plane
+slices, followed by an independently released Runner.
 
 The current repo-wide program is staged routing producer succession. The
 target is accepted in `AOA-SDK-D-0071`, the R2 typed control-plane, lifecycle,
@@ -95,7 +96,8 @@ release trust while normal runtime remains denied. `v0.8.0` adds the explicit
 G5 receipt, proves byte parity with that immutable asset, and makes `aoa-sdk`
 the canonical routing producer while retaining `aoa-routing` for compatibility
 and rollback. The program moves the producer function and ABI into the SDK; it
-does not absorb source organs or runtime execution.
+does not absorb source organs or runtime execution. Stronger-owner admission
+and the runtime-owner cutover have since completed from the exact G5 receipt.
 
 The repo should now:
 
@@ -116,9 +118,10 @@ The repo should now:
 - keep compatibility checks explicit and source-subordinate;
 - preserve the fourteen routing output paths and
   `aoa_routing_thin_router_v1` during owner-only succession;
-- keep public release trust distinct from normal runtime and canonical owner
-  authority; the G5 receipt changes producer ownership but does not claim that
-  stronger-owner admission or live runtime cutover has executed;
+- keep public release trust, stronger-owner admission, and live runtime cutover
+  as distinct evidence even though all three G5 stages have now completed;
+- land deterministic route resolution, plan compilation, Runner lifecycle,
+  evidence, and closeout as separate testable slices;
 - keep passive skill-environment inspection, `aoa surfaces detect`,
   checkpoint capture, review-note, and reviewed evidence materialization
   bounded and weaker than capability execution or owner truth;
@@ -138,19 +141,21 @@ choose whether a change belongs on the control plane. It still must not turn
 The predecessor `ROUTING_M2_CONDITIONAL_HANDOFF`, stronger-owner candidate
 admission, `abyss-stack` canary intake, authorized live canary, exact rollback,
 public `v0.7.0` release trust, and the SDK-side G5 owner switch are complete.
-The next honest move is to admit the exact `v0.8.0` canonical artifact through
-`abyss-machine`, execute the receipt-gated `abyss-stack` cutover, land the
-paired predecessor M3 maintenance receipt, and begin measured compatibility
-evidence. The compatibility PR order remains fixed by the R3 evidence.
+Exact `v0.8.0` admission, the receipt-gated `abyss-stack` cutover, deployed
+SDK-canonical route surface, and predecessor rollback posture are also
+complete. The next honest move is C1 deterministic route resolution from the
+trusted runtime snapshot and pinned owner projection, followed by separate C2
+plan compilation and C3-C5 Runner/lifecycle slices. Compatibility evidence
+continues in parallel; consumer-zero and archival remain unproved.
 
 ## Current Public Contour
 
 Current release marker: `v0.8.0`.
 
-Current unreleased contour: canonical artifact admission, live runtime cutover,
-paired predecessor M3 posture, compatibility-window evidence, and the
-separately released Agent OS Runner after `v0.8.0`. This is a directional
-contour, not a changelog replacement.
+Current unreleased contour: C1 deterministic route resolution,
+compatibility-window evidence, then separate C2-C5 Agent OS control-plane and
+Runner slices after `v0.8.0`. This is a directional contour, not a changelog
+replacement.
 
 Current anchors:
 

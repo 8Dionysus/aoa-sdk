@@ -9,6 +9,8 @@ WORKSPACE_CONFIG_ENV = "AOA_SDK_WORKSPACE_CONFIG"
 FEDERATION_ROOT_ENV = "AOA_SDK_FEDERATION_ROOT"
 EXTERNAL_ROOTS_ENV = "AOA_SDK_EXTERNAL_ROOTS"
 ORGAN_REGISTRY_ENV = "AOA_SDK_ORGAN_REGISTRY"
+ROUTING_BUNDLE_ROOT_ENV = "AOA_SDK_ROUTING_BUNDLE_ROOT"
+ROUTING_SOURCE_LOCK_ENV = "AOA_SDK_ROUTING_SOURCE_LOCK"
 REPO_PATH_ENV_PREFIX = "AOA_SDK_REPO_PATH_"
 DEFAULT_WORKSPACE_MANIFEST = ".aoa/workspace.toml"
 SUPPORTED_SCHEMA_VERSION = 1
@@ -30,6 +32,8 @@ class WorkspaceConfig:
     external_root_patterns: tuple[str, ...] = ()
     repo_configs: dict[str, RepoConfig] = field(default_factory=dict)
     organ_registry_pattern: str | None = None
+    routing_bundle_root_pattern: str | None = None
+    routing_source_lock_pattern: str | None = None
 
 
 def load_workspace_config(root: str | Path) -> WorkspaceConfig:
@@ -42,6 +46,7 @@ def load_workspace_config(root: str | Path) -> WorkspaceConfig:
     roots = manifest.get("roots", {})
     repos = manifest.get("repos", {})
     organ_access = manifest.get("organ_access", {})
+    control_plane = manifest.get("control_plane", {})
 
     repo_configs = {
         repo: RepoConfig(
@@ -64,6 +69,18 @@ def load_workspace_config(root: str | Path) -> WorkspaceConfig:
             organ_access.get("registry_source")
             if isinstance(organ_access, dict)
             and isinstance(organ_access.get("registry_source"), str)
+            else None
+        ),
+        routing_bundle_root_pattern=(
+            control_plane.get("routing_bundle_root")
+            if isinstance(control_plane, dict)
+            and isinstance(control_plane.get("routing_bundle_root"), str)
+            else None
+        ),
+        routing_source_lock_pattern=(
+            control_plane.get("routing_source_lock")
+            if isinstance(control_plane, dict)
+            and isinstance(control_plane.get("routing_source_lock"), str)
             else None
         ),
     )

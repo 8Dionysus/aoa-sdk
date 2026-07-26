@@ -255,10 +255,38 @@ remain denied. `AOA-SDK-D-0076` now closes the owner-only transition with a
 receipt-bound canonical envelope. It reconstructs the exact `v0.7.0` routing
 assembly, requires byte parity with the immutable public asset, binds the
 exact `abyss-stack` cutover contract, and makes `aoa-sdk` the single canonical
-producer. The release authorizes but does not execute live runtime mutation;
-`abyss-machine` admission, the runtime receipt, the paired predecessor M3
-record, compatibility exit, consumer-zero, and archival authority remain
-separate later gates.
+producer. The release itself authorized but did not execute live runtime
+mutation. Stronger-owner admission and the separate `abyss-stack` cutover have
+since executed from that exact receipt; the predecessor remains retained for
+compatibility and rollback. Compatibility exit, consumer-zero, and archival
+authority remain separate later gates.
+
+## C1 Route Resolution Shape
+
+`AOA-SDK-D-0077` implements the first callable Agent OS control-plane slice.
+`AoASDK.control_plane.resolve()` intersects the trusted SDK-canonical routing
+registry with the exact pinned `aoa-skills` capability graph.
+`AoASDK.control_plane.explain()` accounts for the resulting decision without
+rerouting.
+
+```text
+RouteIntent
+  + SDK-canonical G5 runtime manifest and source lock
+  + pinned aoa-skills capability projection
+  -> RouteDecision
+  -> RouteExplanation
+```
+
+The snapshot fails closed on trust, receipt, digest, path, ref, or owner
+binding drift. Resolution uses only owner projection retrieval fields and a
+published integer score law. Equal eligible top scores block; lexical order is
+serialization only and never a semantic fallback. C1 resolves `skill`
+candidates only. Deferred and candidate-only capabilities require an exact
+explicit constraint.
+
+A selected route is not activation. C1 does not compile a `RunPlan`, select a
+runtime adapter, invoke a skill, or execute an effect. Those boundaries remain
+for separate C2 and C3-C5 landings.
 
 ## Design as Aim
 
@@ -270,6 +298,7 @@ The repository should support:
 - explicit workspace discovery and topology resolution;
 - typed facades over published sibling surfaces;
 - compatibility checks that fail on silent drift;
+- deterministic, explainable route decisions from exact owner projections;
 - generated capsules for low-context orientation;
 - bounded CLI helpers for inspection, checkpoint evidence materialization,
   release, and handoff routes;

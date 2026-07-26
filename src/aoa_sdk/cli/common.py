@@ -40,6 +40,20 @@ def _workspace_payload(workspace: Workspace) -> dict[str, Any]:
         "federation_root": str(workspace.federation_root),
         "federation_root_source": workspace.federation_root_source,
         "manifest": str(workspace.manifest_path) if workspace.manifest_path else None,
+        "control_plane": {
+            "routing_bundle_root": (
+                str(workspace.routing_bundle_root)
+                if workspace.routing_bundle_root is not None
+                else None
+            ),
+            "routing_bundle_root_source": workspace.routing_bundle_root_source,
+            "routing_source_lock": (
+                str(workspace.routing_source_lock_path)
+                if workspace.routing_source_lock_path is not None
+                else None
+            ),
+            "routing_source_lock_source": workspace.routing_source_lock_source,
+        },
         "repos": repos,
     }
 

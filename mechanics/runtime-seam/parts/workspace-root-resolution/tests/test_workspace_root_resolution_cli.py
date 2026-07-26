@@ -12,6 +12,15 @@ def test_workspace_inspect_reports_manifest_and_repo_paths(workspace_root: Path)
 
     assert result.exit_code == 0
     assert f"manifest: {(workspace_root / 'aoa-sdk' / '.aoa' / 'workspace.toml').resolve()}" in result.stdout
+    assert (
+        "routing_bundle_root: "
+        f"{(workspace_root / 'abyss-stack' / 'Knowledge' / 'federation' / 'aoa-routing').resolve()} "
+        "[manifest:control_plane.routing_bundle_root]"
+    ) in result.stdout
+    assert (
+        "routing_source_lock: package default "
+        "[package:canonical-routing-source-lock]"
+    ) in result.stdout
     assert f"aoa-sdk: {(workspace_root / 'aoa-sdk').resolve()} [federation-root]" in result.stdout
 
 
@@ -28,3 +37,16 @@ def test_workspace_inspect_can_emit_json(workspace_root: Path) -> None:
         (workspace_root / "aoa-sdk" / ".aoa" / "workspace.toml").resolve()
     )
     assert payload["repos"]["aoa-sdk"]["origin"] == "federation-root"
+    assert payload["control_plane"]["routing_bundle_root"] == str(
+        (
+            workspace_root
+            / "abyss-stack"
+            / "Knowledge"
+            / "federation"
+            / "aoa-routing"
+        ).resolve()
+    )
+    assert payload["control_plane"]["routing_source_lock"] is None
+    assert payload["control_plane"]["routing_source_lock_source"] == (
+        "package:canonical-routing-source-lock"
+    )
