@@ -622,6 +622,40 @@ def test_core_contracts_round_trip_as_strict_json() -> None:
             wrong_plan_parent,
         )
 
+    unexpected_approval = _approval_requirement("closeout").model_copy(
+        update={
+            "requirement_id": "approval:unexpected-runtime",
+            "approval_owner": plan.runtime_profile.provenance,
+        }
+    )
+    unexpected_approval_plan = plan.model_copy(
+        update={
+            "approval_requirements": (
+                *plan.approval_requirements,
+                unexpected_approval,
+            ),
+            "plan_digest": _digest("placeholder"),
+        }
+    )
+    unexpected_approval_plan = unexpected_approval_plan.model_copy(
+        update={
+            "plan_digest": canonical_digest(
+                unexpected_approval_plan,
+                exclude={"plan_digest"},
+            )
+        }
+    )
+    with pytest.raises(
+        ControlPlaneContractError,
+        match="exact route and runtime-profile projections",
+    ):
+        assert_route_plan_chain(
+            intent,
+            decision,
+            explanation,
+            unexpected_approval_plan,
+        )
+
     duplicate_explanation = explanation.model_copy(
         update={
             "candidate_explanations": (

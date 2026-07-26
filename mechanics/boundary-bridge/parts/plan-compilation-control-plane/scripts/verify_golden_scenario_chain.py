@@ -301,9 +301,9 @@ def _verify_scenario(
             f"do not match {case['steps']!r}"
         )
     if not plan.provenance.source_ref.startswith(
-        "aoa_control_plane_plan_compiler_v2@"
+        "aoa_control_plane_plan_compiler_v3@"
     ):
-        raise SystemExit(f"{scenario_id}: plan was not compiled by compiler v2")
+        raise SystemExit(f"{scenario_id}: plan was not compiled by compiler v3")
 
     return {
         "agent_refs": [

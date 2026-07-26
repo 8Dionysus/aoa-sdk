@@ -93,6 +93,18 @@ def test_snapshot_pins_exact_admitted_owner_projection() -> None:
         snapshot.source_lock.trust_admission.record_id
         == snapshot.source_lock.trust_admission.latest_record_id
     )
+    assert (
+        snapshot.admission_provenance.source_ref
+        == snapshot.source_lock.trust_admission.record_id
+    )
+    assert (
+        snapshot.admission_provenance.artifact_digest
+        == snapshot.source_lock.trust_admission.record_artifact_digest
+    )
+    assert (
+        snapshot.admission_provenance.artifact_digest
+        != snapshot.admission_provenance.source_ref
+    )
     assert snapshot.source_lock.trust_admission.subject_store_ok is True
     assert {
         "abi_signature",
@@ -322,6 +334,76 @@ def test_explicit_route_approval_step_bindings_are_preserved() -> None:
     )
     with pytest.raises(ValueError, match="explicit step bindings"):
         RunPlan.model_validate(contradictory)
+
+
+def test_runtime_profile_approval_projection_is_bound_without_rewriting_route() -> None:
+    decision, binding, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    route_requirement = decision.approval_requirements[0]
+    runtime_requirement = route_requirement.model_copy(
+        update={
+            "requirement_id": "approval:abyss-stack:landing",
+            "approval_owner": runtime.provenance,
+            "operation": "abyss-stack:governed-execution:landing",
+            "risk_class": "repo_mutation",
+            "applies_to_step_ids": ("mutate",),
+        }
+    )
+    runtime = runtime.model_copy(
+        update={
+            "runtime_approval_requirements": (runtime_requirement,),
+        }
+    )
+
+    plan = compile_run_plan(
+        decision,
+        binding,
+        runtime,
+        load_plan_compilation_snapshot(),
+        compiler_provenance=_compiler_provenance(),
+    )
+
+    assert plan.decision_ref.digest == canonical_digest(decision)
+    assert plan.approval_requirements == (
+        route_requirement,
+        runtime_requirement,
+    )
+    mutate = next(step for step in plan.steps if step.step_id == "mutate")
+    assert mutate.approval_requirement_ids == (
+        route_requirement.requirement_id,
+        runtime_requirement.requirement_id,
+    )
+    assert runtime_requirement.approval_owner in plan.snapshot.source_refs
+
+
+def test_runtime_profile_cannot_shadow_a_route_approval_id() -> None:
+    decision, binding, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    route_requirement = decision.approval_requirements[0]
+    runtime_requirement = route_requirement.model_copy(
+        update={"approval_owner": runtime.provenance}
+    )
+    runtime = runtime.model_copy(
+        update={
+            "runtime_approval_requirements": (runtime_requirement,),
+        }
+    )
+
+    with pytest.raises(
+        PlanCompilationError,
+        match="route and runtime approval requirement ids must be unique",
+    ):
+        compile_run_plan(
+            decision,
+            binding,
+            runtime,
+            load_plan_compilation_snapshot(),
+            compiler_provenance=_compiler_provenance(),
+        )
 
 
 @pytest.mark.parametrize(

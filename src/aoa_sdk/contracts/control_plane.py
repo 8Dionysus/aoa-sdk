@@ -390,6 +390,7 @@ class RuntimeProfile(StrictControlPlaneModel):
     supported_event_schema_versions: tuple[NonEmptyStr, ...]
     supported_effect_classes: tuple[NonEmptyStr, ...]
     constraint_refs: tuple[ProvenanceRef, ...] = ()
+    runtime_approval_requirements: tuple[ApprovalRequirement, ...] = ()
     provenance: ProvenanceRef
 
     @model_validator(mode="after")
@@ -400,6 +401,21 @@ class RuntimeProfile(StrictControlPlaneModel):
             raise ValueError("runtime profile must declare supported plan versions")
         if not self.supported_event_schema_versions:
             raise ValueError("runtime profile must declare supported event versions")
+        requirement_ids = [
+            item.requirement_id for item in self.runtime_approval_requirements
+        ]
+        if len(requirement_ids) != len(set(requirement_ids)):
+            raise ValueError(
+                "runtime profile approval requirement ids must be unique"
+            )
+        if any(
+            item.approval_owner != self.provenance
+            for item in self.runtime_approval_requirements
+        ):
+            raise ValueError(
+                "runtime profile approval requirements must retain runtime-owner "
+                "provenance"
+            )
         return self
 
 
@@ -1284,19 +1300,15 @@ def assert_route_plan_chain(
         raise ControlPlaneContractError(
             "run plan correlation id does not match the route intent"
         )
-    decision_requirements = {
-        requirement.requirement_id: requirement
-        for requirement in decision.approval_requirements
-    }
-    plan_requirements = {
-        requirement.requirement_id: requirement
-        for requirement in plan.approval_requirements
-    }
-    for requirement_id, requirement in decision_requirements.items():
-        if plan_requirements.get(requirement_id) != requirement:
-            raise ControlPlaneContractError(
-                f"run plan dropped or changed route approval {requirement_id}"
-            )
+    expected_approval_requirements = (
+        *decision.approval_requirements,
+        *plan.runtime_profile.runtime_approval_requirements,
+    )
+    if plan.approval_requirements != expected_approval_requirements:
+        raise ControlPlaneContractError(
+            "run plan approval requirements differ from the exact route and "
+            "runtime-profile projections"
+        )
     if decision.selected_candidate_id is None:
         raise ControlPlaneContractError(
             "a blocked decision cannot compile into a run plan"

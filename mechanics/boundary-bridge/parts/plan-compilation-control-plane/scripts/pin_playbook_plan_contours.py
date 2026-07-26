@@ -23,6 +23,7 @@ OWNER_SCHEMA_REF = (
     "schemas/playbook-plan-contours.schema.json"
 )
 REGISTRY_REF = "dist/abyss-artifact-registry/aoa-playbooks-playbook-registry"
+REGISTRY_RECORDS_REF = f"{REGISTRY_REF}/records"
 REQUIRED_CONTROLS = {"abi_signature", "slsa_in_toto"}
 _OID_RE = re.compile(r"^[0-9a-f]{40}$")
 _DIGEST_RE = re.compile(r"^sha256:[0-9a-f]{64}$")
@@ -188,6 +189,17 @@ def build_outputs(owner_root: Path) -> dict[Path, bytes]:
         or not _DIGEST_RE.fullmatch(latest_record_id)
     ):
         raise PinError("aoa-playbooks subject store identity is incomplete")
+    record_artifact_ref = (
+        f"{REGISTRY_RECORDS_REF}/"
+        f"{record_id.removeprefix('sha256:')}.json"
+    )
+    record_raw = _read_bounded_regular_file(
+        owner_root,
+        record_artifact_ref,
+        "aoa-playbooks trust record",
+    )
+    if _load_object(record_raw, "aoa-playbooks trust record") != record:
+        raise PinError("aoa-playbooks trust-gate record differs from its file")
     store_root = _resolve_bounded_dir(
         owner_root,
         store_path,
@@ -238,6 +250,7 @@ def build_outputs(owner_root: Path) -> dict[Path, bytes]:
             "consumer_intent": "agent",
             "verdict": "allow",
             "record_id": record_id,
+            "record_artifact_digest": _sha256(record_raw),
             "latest_record_id": latest_record_id,
             "latest_required": True,
             "subject_store_required": True,

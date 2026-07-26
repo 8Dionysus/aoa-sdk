@@ -5,7 +5,9 @@
 - one `RuntimeProfile` whose owner is `abyss-stack` and whose adapter ID is
   `abyss_stack_agent_os_adapter_v1`;
 - one `AbyssStackRuntimeBinding` for the exact plan digest and scenario;
-- one governed request provenance ref already present in the scenario inputs;
+- one runtime request provenance ref already present either in the scenario's
+  untyped `input_refs` or typed `input_artifact_bindings`, and bound to at
+  least one admitted step;
 - one absolute request delivery path;
 - exact absolute delivery coordinates for every source and ABI in the plan
   snapshot;
@@ -18,7 +20,10 @@ extra observations.
 `load_abyss_stack_runtime_profile()` is the supported construction route for
 the runtime profile. It requires one absolute descriptor coordinate and an
 exact owner/artifact location for every declared runtime constraint. It does
-not discover `abyss-stack`, a policy file, or an executable.
+not discover `abyss-stack`, a policy file, or an executable. When the caller
+supplies an exact `scenario_id`, the loader also projects only that
+compatibility entry's runtime-owned approval requirements into the profile;
+it grants none of them.
 
 ## Transport
 

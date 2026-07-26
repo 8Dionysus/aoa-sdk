@@ -114,7 +114,7 @@ def _installed_probe(fixture_path: Path, expected_plan_path: Path) -> int:
     if (
         default_plan.provenance.artifact_digest != module_digest
         or default_plan.provenance.source_ref
-        != f"aoa_control_plane_plan_compiler_v2@{module_digest}"
+        != f"aoa_control_plane_plan_compiler_v3@{module_digest}"
     ):
         raise SystemExit(
             "installed wheel default compiler provenance does not bind "

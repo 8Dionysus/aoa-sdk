@@ -29,6 +29,7 @@
     "consumer_intent": "agent",
     "latest_record_id": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e",
     "latest_required": true,
+    "record_artifact_digest": "sha256:35991ad90fd5339a6962849b36404295a1c4e41239fd229babfc1432b1aa137c",
     "record_id": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e",
     "required_controls": [
       "abi_signature",

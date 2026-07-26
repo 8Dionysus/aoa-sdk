@@ -12,10 +12,12 @@ python scripts/validate_mechanics_topology.py
 python scripts/validate_sdk_source_home.py
 ```
 
-The focused suite proves owner-descriptor and constraint hashing, exact
-binding admission, missing/extra snapshot location rejection, typed Runner
-delegation through a transport double, no-shell subprocess argument shape,
-response-version checking, and transport-error closure.
+The focused suite proves owner-descriptor and constraint hashing,
+scenario-scoped runtime approval projection, exact
+binding admission for untyped and typed scenario inputs, missing/extra
+snapshot location rejection, typed Runner delegation through a transport
+double, no-shell subprocess argument shape, response-version checking, and
+transport-error closure.
 
 Real runtime execution proof remains paired with the runtime owner at
 `repo:abyss-stack/mechanics/governed-execution/parts/agent-os-adapter/tests`.

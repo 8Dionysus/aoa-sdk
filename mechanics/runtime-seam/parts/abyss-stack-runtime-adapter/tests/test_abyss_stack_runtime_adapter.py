@@ -69,8 +69,8 @@ def _stack_contract_ref() -> ProvenanceRef:
     )
 
 
-def _stack_plan() -> RunPlan:
-    original = RunPlan.model_validate_json(EXAMPLE.read_text(encoding="utf-8"))
+def _stack_plan(example: Path = EXAMPLE) -> RunPlan:
+    original = RunPlan.model_validate_json(example.read_text(encoding="utf-8"))
     contract_ref = _stack_contract_ref()
     profile = RuntimeProfile(
         profile_id="runtime-profile:abyss-stack-governed-execution-v1",
@@ -140,7 +140,22 @@ def _runtime_descriptor() -> dict[str, Any]:
                 "schema_version": "v1",
             }
         ],
-        "compatibility": [{"scenario_id": "bounded_change_safe"}],
+        "compatibility": [
+            {
+                "scenario_id": "bounded_change_safe",
+                "runtime_approval_requirements": [
+                    {
+                        "requirement_id": "approval:abyss-stack:landing",
+                        "operation": "abyss-stack:governed-execution:landing",
+                        "risk_class": "repo_mutation",
+                        "applies_to_step_ids": ["mutate"],
+                        "required_evidence_refs": [],
+                        "expires_after_seconds": None,
+                        "renewable": False,
+                    }
+                ],
+            }
+        ],
         "boundaries": {"executes_through_governed_runner_only": True},
     }
 
@@ -174,6 +189,48 @@ def test_profile_loader_hashes_the_exact_owner_artifacts(
         policy_path.read_text(encoding="utf-8")
     )
     assert profile.constraint_refs[0].source_ref == "runtime-policy-v1"
+    assert profile.runtime_approval_requirements == ()
+
+
+def test_profile_loader_projects_exact_scenario_runtime_approvals(
+    tmp_path: Path,
+) -> None:
+    descriptor_path = tmp_path / "runtime-profile.v1.json"
+    descriptor_path.write_text(
+        json.dumps(_runtime_descriptor()) + "\n",
+        encoding="utf-8",
+    )
+    policy_path = tmp_path / "runtime-policy.yaml"
+    policy_path.write_text("enabled: true\n", encoding="utf-8")
+
+    profile = load_abyss_stack_runtime_profile(
+        descriptor_path,
+        constraint_locations=(
+            RuntimeArtifactLocation(
+                owner_repo="abyss-stack",
+                artifact_ref="config/runtime-policy.yaml",
+                local_path=str(policy_path),
+            ),
+        ),
+        scenario_id="bounded_change_safe",
+    )
+
+    assert [
+        (
+            item.requirement_id,
+            item.operation,
+            item.applies_to_step_ids,
+            item.approval_owner,
+        )
+        for item in profile.runtime_approval_requirements
+    ] == [
+        (
+            "approval:abyss-stack:landing",
+            "abyss-stack:governed-execution:landing",
+            ("mutate",),
+            profile.provenance,
+        )
+    ]
 
 
 def test_profile_loader_rejects_incomplete_constraint_delivery(
@@ -342,6 +399,51 @@ def test_binding_rejects_a_missing_snapshot_location_before_transport() -> None:
             plan,
             plan.runtime_profile,
         )
+
+
+def test_binding_accepts_a_typed_scenario_artifact_as_runtime_request() -> None:
+    example = (
+        EXAMPLE.parent
+        / "runtime-proof-without-reground.run-plan.json"
+    )
+    plan = _stack_plan(example)
+    typed_request = plan.scenario_binding.input_artifact_bindings[0].artifact_ref
+    request_path = "/tmp/aoa-agent-os/owner-runtime-receipt.json"
+    binding = AbyssStackRuntimeBinding(
+        binding_id="binding:test-runtime-chaos",
+        plan_digest=plan.plan_digest,
+        scenario_id=plan.scenario_binding.scenario.scenario_id,
+        playbook_id="AOA-P-0032",
+        request_ref=typed_request,
+        request_path=request_path,
+        source_locations=tuple(
+            RuntimeArtifactLocation(
+                owner_repo=item.owner_repo,
+                artifact_ref=item.artifact_ref,
+                local_path=(
+                    request_path
+                    if item == typed_request
+                    else f"/tmp/aoa-agent-os/source-{index}.json"
+                ),
+            )
+            for index, item in enumerate(plan.snapshot.source_refs)
+        ),
+        abi_locations=tuple(
+            RuntimeABILocation(
+                owner_repo=item.owner_repo,
+                abi_id=item.abi_id,
+                local_path=f"/tmp/aoa-agent-os/abi-{index}.json",
+            )
+            for index, item in enumerate(plan.snapshot.abi_refs)
+        ),
+        adapter_contract_ref=plan.runtime_profile.provenance,
+    )
+
+    assert_abyss_stack_binding_matches_plan(
+        binding,
+        plan,
+        plan.runtime_profile,
+    )
 
 
 def test_subprocess_transport_uses_exact_argv_and_typed_envelope(

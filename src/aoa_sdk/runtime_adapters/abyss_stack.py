@@ -14,6 +14,7 @@ from pydantic import BaseModel, ConfigDict, Field, TypeAdapter, model_validator
 
 from ..contracts.control_plane import (
     ApprovalDecision,
+    ApprovalRequirement,
     ApprovalRequest,
     CancelCommand,
     CloseoutBundleRef,
@@ -107,6 +108,7 @@ def load_abyss_stack_runtime_profile(
     descriptor_path: str | Path,
     *,
     constraint_locations: Iterable[RuntimeArtifactLocation],
+    scenario_id: str | None = None,
 ) -> RuntimeProfile:
     """Materialize one exact runtime-owner profile from delivered artifacts."""
 
@@ -199,6 +201,41 @@ def load_abyss_stack_runtime_profile(
         raise AbyssStackAdapterError(
             "abyss-stack runtime constraint locations are incomplete"
         )
+    runtime_approval_payloads: tuple[Mapping[str, Any], ...] = ()
+    if scenario_id is not None:
+        matches = [
+            item
+            for item in descriptor["compatibility"]
+            if isinstance(item, Mapping)
+            and item.get("scenario_id") == scenario_id
+        ]
+        if len(matches) != 1:
+            raise AbyssStackAdapterError(
+                "abyss-stack runtime profile does not contain one exact "
+                "scenario projection"
+            )
+        raw_requirements = matches[0].get("runtime_approval_requirements")
+        approval_fields = {
+            "requirement_id",
+            "operation",
+            "risk_class",
+            "applies_to_step_ids",
+            "required_evidence_refs",
+            "expires_after_seconds",
+            "renewable",
+        }
+        if (
+            not isinstance(raw_requirements, list)
+            or any(
+                not isinstance(item, Mapping)
+                or set(item) != approval_fields
+                for item in raw_requirements
+            )
+        ):
+            raise AbyssStackAdapterError(
+                "abyss-stack runtime approval projection is invalid"
+            )
+        runtime_approval_payloads = tuple(raw_requirements)
     try:
         constraint_refs = tuple(
             ProvenanceRef(
@@ -228,6 +265,22 @@ def load_abyss_stack_runtime_profile(
             schema_ref=descriptor["schema_ref"],
             schema_version=descriptor["schema_version"],
         )
+        runtime_approval_requirements = tuple(
+            ApprovalRequirement(
+                requirement_id=item["requirement_id"],
+                approval_owner=provenance,
+                operation=item["operation"],
+                risk_class=item["risk_class"],
+                applies_to_step_ids=tuple(item["applies_to_step_ids"]),
+                required_evidence_refs=tuple(
+                    ProvenanceRef.model_validate(evidence)
+                    for evidence in item["required_evidence_refs"]
+                ),
+                expires_after_seconds=item["expires_after_seconds"],
+                renewable=item["renewable"],
+            )
+            for item in runtime_approval_payloads
+        )
         return RuntimeProfile(
             profile_id=descriptor["profile_id"],
             runtime_owner=descriptor["runtime_owner"],
@@ -243,6 +296,7 @@ def load_abyss_stack_runtime_profile(
                 descriptor["supported_effect_classes"]
             ),
             constraint_refs=constraint_refs,
+            runtime_approval_requirements=runtime_approval_requirements,
             provenance=provenance,
         )
     except (KeyError, OSError, TypeError, ValueError) as exc:
@@ -329,7 +383,14 @@ def assert_abyss_stack_binding_matches_plan(
         raise AbyssStackAdapterError(
             "runtime binding contract ref differs from the profile provenance"
         )
-    if binding.request_ref not in plan.scenario_binding.input_refs:
+    admitted_input_refs = {
+        *plan.scenario_binding.input_refs,
+        *(
+            item.artifact_ref
+            for item in plan.scenario_binding.input_artifact_bindings
+        ),
+    }
+    if binding.request_ref not in admitted_input_refs:
         raise AbyssStackAdapterError(
             "runtime request is not an exact scenario input in the plan"
         )

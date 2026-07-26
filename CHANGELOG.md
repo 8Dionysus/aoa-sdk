@@ -31,10 +31,18 @@ Tracking starts with the community-docs baseline for this repository.
   selected entry route separate from playbook DAG capabilities, resolves each
   authored alias through exact pinned owner projections, and exposes semantic
   owner, lifecycle, migration, and unbound availability without activation.
+- Version the compiler as `aoa_control_plane_plan_compiler_v3` so exact
+  scenario-scoped runtime approval requirements projected by the selected
+  `RuntimeProfile` join, but never replace, route-owned approvals. The
+  `abyss-stack` profile loader can now project its two bounded-mutation gates
+  before public compilation instead of relying on fixture plan mutation.
 - Pin the exact trust-admitted `aoa_playbook_plan_contour_v1` owner projection
   and schema from `aoa-playbooks`, fail closed on source, digest, ABI, schema,
   or admission drift, and verify the installed wheel reproduces the golden
   plan without a sibling checkout.
+- Separate the playbook trust record's logical `record_id` from the SHA-256 of
+  its delivered registry JSON bytes, so exact runtime snapshot observation
+  can consume a public compiler plan without rewriting provenance.
 - Add C3 `AoASDK.runner` and `aoa_control_plane_runner_v1`: immutable session
   preparation, explicit adapter binding, runtime snapshot observation,
   approval round trips, bounded recovery, idempotent commands, append-only
@@ -53,9 +61,12 @@ Tracking starts with the community-docs baseline for this repository.
   owner-tool execution.
 - Add the C4 `abyss_stack_agent_os_adapter_v1` transport client, owner-exact
   runtime-profile loader, exact source/ABI binding, and no-shell subprocess
-  transport. The paired runtime-owner test proves one real governed
-  `AOA-P-0011` execution, durable restore, replay safety, approval enforcement,
-  and source drift closure.
+  transport. Runtime requests may bind either an untyped scenario input or an
+  exact typed `ScenarioArtifactBinding`, enabling owner-qualified A2A and
+  degradation contours without weakening snapshot coverage or moving
+  execution into the SDK. The paired runtime-owner test proves one real
+  governed `AOA-P-0011` execution, durable restore, replay safety, approval
+  enforcement, and source drift closure.
 - Add C5 `aoa_evidence_chain_v1`: immutable partial-to-complete composition of
   the exact SDK route/run objects, runtime events and outcome, plus
   owner-qualified eval, memo, checkpoint, and closeout refs. Add

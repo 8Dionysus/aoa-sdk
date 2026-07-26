@@ -2,7 +2,7 @@
 
 ## SDK owns
 
-- the versioned `aoa_control_plane_plan_compiler_v2`;
+- the versioned `aoa_control_plane_plan_compiler_v3`;
 - exact `ScenarioRef` construction from the admitted playbook source pin;
 - deterministic binding of playbook requirement aliases through the exact
   pinned `aoa-skills` migration and capability graph;
@@ -20,6 +20,8 @@
   authored capability aliases, artifact roles, eval anchors, retention
   references, and closeout contour;
 - routing owns route eligibility and route approval requirements;
+- the selected runtime owner supplies exact scenario-scoped runtime approval
+  requirements through its `RuntimeProfile` projection;
 - `aoa-agents` owns bound agent identities;
 - `aoa-skills` owns capability migration and graph projection while the
   semantic owner named by each graph node retains capability meaning;
@@ -40,7 +42,9 @@ The route entry capability, caller, and candidate agent are not implicitly
 scenario participants. The selected route must name the exact scenario, after
 which each playbook step alias resolves through `ScenarioCapabilityBinding`.
 Legacy exact bindings remain accepted during the compatibility window, but
-they are not synthesized by the v2 public binder.
+they are not synthesized by the v2 public binder. Compiler v3 combines route
+approvals with exact runtime-owner approval projections without rewriting
+either source object.
 
 ## Fail-closed gates
 
@@ -60,7 +64,10 @@ they are not synthesized by the v2 public binder.
 - No unsupported effect in the runtime profile.
 - No stale digest, non-latest trust record, denied admission, missing subject
   store, missing required trust control, or schema drift.
-- No route approval rewritten or dropped by the compiler.
+- No conflation of the trust record's logical `record_id` with the SHA-256 of
+  its delivered JSON bytes; both identities are pinned and snapshot-bound.
+- No route approval or runtime-profile approval projection rewritten, dropped,
+  reordered, or supplemented by the compiler.
 
 ## Stop lines
 

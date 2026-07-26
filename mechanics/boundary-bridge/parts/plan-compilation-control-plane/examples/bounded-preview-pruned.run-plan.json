@@ -152,8 +152,8 @@
       "terminal_required": true
     }
   ],
-  "plan_digest": "sha256:607af70b95767a0f5bf391a8e84906c8d7f873c84e8770d14c0a3751fb3af063",
-  "plan_id": "run-plan:e7275d7d8a2ab128fcb93689ccb98350fcbd498843ba810e96055621bcd6b594",
+  "plan_digest": "sha256:1eff1823f3ff06b201195d1d3f288c883d5ff46d28b7aa67594ecc1431741017",
+  "plan_id": "run-plan:031eaa34dd7b405ab696e7a44c4e7057ecbb46fee98edcdb764b6721695a53f9",
   "provenance": {
     "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
     "artifact_ref": "src/aoa_sdk/control_plane/planning/compiler.py",
@@ -221,6 +221,7 @@
       "schema_version": "fixture-v1",
       "source_ref": "fixture-source-ref"
     },
+    "runtime_approval_requirements": [],
     "runtime_owner": "abyss-stack",
     "schema_version": "aoa_control_plane_v1",
     "supported_effect_classes": [
@@ -485,8 +486,8 @@
         "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
       }
     ],
-    "snapshot_digest": "sha256:c639afb065a85b5e3aa5db99724c2e0444f5f4ba6695465356718d04a99bc621",
-    "snapshot_id": "plan-snapshot:0aeda92a4d0fbdda3d9331a6b5c236a158eca66ea8df3ac48094d55c858143a3",
+    "snapshot_digest": "sha256:7eb18a167e800c89c3209b04ea366a5640a4228cc01ac087712da7b6c8aee52d",
+    "snapshot_id": "plan-snapshot:6fdffdff76044f7bd6506c2d43c75466275630473a04ce0a49afe70bcf3455ae",
     "source_refs": [
       {
         "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
@@ -545,12 +546,12 @@
         "source_ref": "fixture-source-ref"
       },
       {
-        "artifact_digest": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e",
+        "artifact_digest": "sha256:35991ad90fd5339a6962849b36404295a1c4e41239fd229babfc1432b1aa137c",
         "artifact_ref": "dist/abyss-artifact-registry/aoa-playbooks-playbook-registry/records/698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e.json",
         "owner_repo": "aoa-playbooks",
         "schema_ref": "abyss-machine:artifact-bundle-registry-record",
         "schema_version": "abyss_machine_artifact_bundle_registry_record_v1",
-        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+        "source_ref": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e"
       },
       {
         "artifact_digest": "sha256:1effef6739136e3634f787572526926eb5731b978c03e15d6c21c8a047bdd7eb",

@@ -35,7 +35,7 @@ from .snapshot import (
 )
 
 
-PLAN_COMPILER_VERSION = "aoa_control_plane_plan_compiler_v2"
+PLAN_COMPILER_VERSION = "aoa_control_plane_plan_compiler_v3"
 _ZERO_DIGEST = "sha256:" + "0" * 64
 
 
@@ -70,18 +70,23 @@ def compile_run_plan(
         if step.guard_condition_id is None or active_conditions[step.guard_condition_id]
     )
     active_step_ids = {step.step_id for step in active_steps}
+    approval_requirements = (
+        *decision.approval_requirements,
+        *runtime_profile.runtime_approval_requirements,
+    )
     approval_ids = tuple(
-        requirement.requirement_id for requirement in decision.approval_requirements
+        requirement.requirement_id for requirement in approval_requirements
     )
     if len(approval_ids) != len(set(approval_ids)):
         raise PlanCompilationError(
-            "route approval requirement ids must be unique before compilation"
+            "route and runtime approval requirement ids must be unique "
+            "before compilation"
         )
-    for approval_requirement in decision.approval_requirements:
+    for approval_requirement in approval_requirements:
         missing = set(approval_requirement.applies_to_step_ids) - active_step_ids
         if missing:
             raise PlanCompilationError(
-                "route approval "
+                "approval "
                 f"{approval_requirement.requirement_id!r} references "
                 f"inactive contour steps: {sorted(missing)}"
             )
@@ -116,7 +121,7 @@ def compile_run_plan(
             expected_output_kinds=step.expected_output_kinds,
             approval_requirement_ids=tuple(
                 requirement.requirement_id
-                for requirement in decision.approval_requirements
+                for requirement in approval_requirements
                 if (
                     step.step_id in requirement.applies_to_step_ids
                     or (
@@ -136,7 +141,7 @@ def compile_run_plan(
     unbound_approval_ids = set(approval_ids) - bound_approval_ids
     if unbound_approval_ids:
         raise PlanCompilationError(
-            "route approvals have no active contour step binding: "
+            "route or runtime approvals have no active contour step binding: "
             f"{sorted(unbound_approval_ids)}"
         )
     evidence_requirements = tuple(
@@ -249,7 +254,7 @@ def compile_run_plan(
         runtime_profile=runtime_profile,
         snapshot=plan_snapshot,
         steps=plan_steps,
-        approval_requirements=decision.approval_requirements,
+        approval_requirements=approval_requirements,
         checkpoint_policy=CheckpointPolicy(
             owner=scenario.scenario.provenance,
             required_after_step_ids=checkpoint_steps,
@@ -619,10 +624,19 @@ def _snapshot_source_refs(
         *(item.provenance for item in scenario.condition_bindings),
         *scenario.requirement_refs,
         *runtime_profile.constraint_refs,
-        *(requirement.approval_owner for requirement in decision.approval_requirements),
+        *(
+            requirement.approval_owner
+            for requirement in (
+                *decision.approval_requirements,
+                *runtime_profile.runtime_approval_requirements,
+            )
+        ),
         *(
             evidence
-            for requirement in decision.approval_requirements
+            for requirement in (
+                *decision.approval_requirements,
+                *runtime_profile.runtime_approval_requirements,
+            )
             for evidence in requirement.required_evidence_refs
         ),
     ]
