@@ -24,6 +24,21 @@
     "default_compiler_plan_digest": "sha256:f3f473dfebd4d54c525440f8957722f114f02613b5d1f1a371e0353cb529066f",
     "packaged_resource_count": 3
   },
+  "clean_federation_probe": {
+    "verdict": "pass",
+    "forbidden_repo": "aoa-routing",
+    "forbidden_repo_present": false,
+    "linked_owner_repos": [
+      "aoa-sdk",
+      "aoa-agents",
+      "aoa-skills",
+      "aoa-playbooks",
+      "aoa-evals",
+      "aoa-memo"
+    ],
+    "verified_scenario_count": 3,
+    "import_posture": "isolated_venv_site_packages"
+  },
   "live_scenarios": [
     {
       "scenario_id": "bounded_change_safe",
@@ -99,6 +114,7 @@
   ],
   "acceptance_checks": {
     "public_facade_only": true,
+    "clean_federation_without_aoa_routing": true,
     "route_provider_agent_absent": true,
     "explicit_selected_scenario": true,
     "decision_repeatable": true,

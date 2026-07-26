@@ -15,3 +15,10 @@ isolated wheel:
 The receipt proves deterministic control-plane construction against the named
 pins. It does not activate a capability, execute a plan, establish task
 benefit, measure cost reduction, prove consumer-zero, or authorize archive.
+
+`fresh-context-full-chain-bounded-v1.json` retains the first no-history agent
+that used only the published Python surface to resolve, bind, and compile a
+bounded scenario. The behavior completed and independently replayed, but the
+child serialized several nested observation fields incorrectly. The receipt
+keeps those gaps explicit and records the parent replay separately; it is not
+presented as a fully self-describing child trace.

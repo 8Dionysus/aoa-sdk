@@ -129,9 +129,38 @@ plan = sdk.control_plane.compile(decision, binding, runtime_profile)
 ```
 
 Here `runtime_profile` is an exact compatibility projection supplied by its
-runtime owner. The route entry capability remains decision metadata; playbook
-requirements are independently mapped to current capability graph nodes with
-semantic owner, availability, lifecycle, and migration provenance.
+runtime owner. A consumer validates that owner payload through the public
+model rather than inventing runtime policy:
+
+```python
+from aoa_sdk.models import RuntimeProfile
+
+runtime_profile = RuntimeProfile.model_validate(runtime_owner_payload)
+```
+
+The required payload fields are `profile_id`, `runtime_owner`, `adapter_id`,
+`supported_plan_schema_versions`, `supported_event_schema_versions`,
+`supported_effect_classes`, and owner-matching `provenance`; the adapter
+protocol defaults to `aoa_runtime_adapter_v1`. This declaration proves
+compatibility only. It is not adapter selection, authorization, or execution.
+
+The route entry capability remains decision metadata; playbook requirements
+are independently mapped to current capability graph nodes with semantic
+owner, availability, lifecycle, and migration provenance. Those nested fields
+are inspected explicitly:
+
+```python
+for resolved in binding.capability_bindings:
+    print(
+        resolved.requirement_id,
+        resolved.capability.capability_id,
+        resolved.semantic_owner_repo,
+        resolved.availability,
+        resolved.lifecycle_health,
+    )
+
+print(plan.provenance.schema_version)  # compiler behavior version
+```
 
 `AoASDK.control_plane.compile()` validates the exact packaged
 `aoa-playbooks` contour/schema/trust pin and compiles that binding plus the

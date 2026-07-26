@@ -66,5 +66,7 @@ installed-wheel probe proves packaged compilation without an
 `aoa-playbooks` checkout. The public golden-chain verifier separately proves
 live C1 resolution, exact owner binding, and C2 compilation for all three
 admitted scenarios; it intentionally requires the pinned owner repositories.
+The clean-federation wrapper repeats that chain with no `aoa-routing`
+checkout.
 These checks do not prove runtime invocation, task benefit, cost reduction,
 consumer-zero, or archive readiness.

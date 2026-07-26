@@ -1,0 +1,203 @@
+{
+  "schema_version": "aoa_sdk_g8_fresh_context_chain_trial_v1",
+  "trial_family": "fresh_context_public_route_bind_compile",
+  "case_id": "T1-full-chain-bounded-1",
+  "request_ref": "aoa-sdk:T1:summon-request:fresh-context-full-chain:bounded-change:1",
+  "request_digest": "sha256:23e19d292743a7410f96fc184d86318701bd7b88d7f12e1c4875ce3ce3cd5179",
+  "wheel_sha256": "de50c347ebe18d38a8dd8c0aea0366eccbe65a13b6ace02adb8874a81db2301e",
+  "terminal_state": "compiled_candidate_plan_only_observation_incomplete",
+  "aggregate_acceptance": "accepted_behavior_with_observation_gap",
+  "route_intent": {
+    "schema_version": "aoa_control_plane_v1",
+    "intent_id": "intent:T1:fresh-context-full-chain:bounded-change:1",
+    "correlation_id": "correlation:T1:fresh-context-full-chain:bounded-change:1",
+    "objective": "resolve authority among authored, generated, runtime, and installed sources before a bounded repository change, and compile the admitted bounded_change_safe scenario with preview_required=false",
+    "requested_by": {
+      "agent_id": "agent:fresh-context-consumer:T1",
+      "provenance": {
+        "owner_repo": "fresh-context-consumer",
+        "artifact_ref": "requests/aoa-sdk/T1/fresh-context-full-chain-bounded-change-1.json",
+        "source_ref": "aoa-sdk:T1:summon-request:fresh-context-full-chain:bounded-change:1",
+        "artifact_digest": "sha256:e00f9bf47d60e7ef9c53072924151facbe130bf6ab30c377f0223b4c4a5d0bcd",
+        "schema_ref": "aoa_control_plane_v1",
+        "schema_version": "aoa_control_plane_v1"
+      }
+    },
+    "scenario": {
+      "scenario_id": "bounded_change_safe",
+      "provenance": {
+        "owner_repo": "aoa-playbooks",
+        "artifact_ref": "playbooks/operations/change/bounded-change-safe/PLAYBOOK.md",
+        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d",
+        "artifact_digest": "sha256:6369470e3e643d9daf1915bac798885ccdeefb54abc0170154e1e6f5c0269632",
+        "schema_ref": "mechanics/activation/parts/activation-surface/docs/playbook-bundle-contract.md",
+        "schema_version": "aoa_playbook_authored_bundle_v1"
+      }
+    },
+    "requested_capability_kinds": [
+      "skill"
+    ],
+    "constraints": [],
+    "context_refs": [],
+    "authored_at": "2026-07-26T00:00:00Z",
+    "provenance": {
+      "owner_repo": "fresh-context-consumer",
+      "artifact_ref": "requests/aoa-sdk/T1/fresh-context-full-chain-bounded-change-1.json",
+      "source_ref": "aoa-sdk:T1:summon-request:fresh-context-full-chain:bounded-change:1",
+      "artifact_digest": "sha256:e00f9bf47d60e7ef9c53072924151facbe130bf6ab30c377f0223b4c4a5d0bcd",
+      "schema_ref": "aoa_control_plane_v1",
+      "schema_version": "aoa_control_plane_v1"
+    }
+  },
+  "runtime_profile": {
+    "schema_version": "aoa_control_plane_v1",
+    "profile_id": "runtime-profile:T1-full-chain",
+    "runtime_owner": "abyss-stack",
+    "adapter_id": "T1-read-only-compile-witness",
+    "adapter_protocol_version": "aoa_runtime_adapter_v1",
+    "supported_plan_schema_versions": [
+      "aoa_control_plane_v1"
+    ],
+    "supported_event_schema_versions": [
+      "aoa_control_plane_v1"
+    ],
+    "supported_effect_classes": [
+      "read_only",
+      "repo_mutation",
+      "runtime_mutation",
+      "external"
+    ],
+    "constraint_refs": [],
+    "provenance": {
+      "owner_repo": "abyss-stack",
+      "artifact_ref": "runtime/agent-os/T1-full-chain-profile.json",
+      "source_ref": "T1-runtime-profile",
+      "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
+      "schema_ref": "aoa_control_plane_v1",
+      "schema_version": "aoa_control_plane_v1"
+    }
+  },
+  "binding_arguments": {
+    "binding_id": "scenario-binding:T1:fresh-context-full-chain:bounded-change:1",
+    "provenance": {
+      "owner_repo": "fresh-context-consumer",
+      "artifact_ref": "requests/aoa-sdk/T1/fresh-context-full-chain-bounded-change-1.json",
+      "source_ref": "aoa-sdk:T1:summon-request:fresh-context-full-chain:bounded-change:1",
+      "artifact_digest": "sha256:e00f9bf47d60e7ef9c53072924151facbe130bf6ab30c377f0223b4c4a5d0bcd",
+      "schema_ref": "aoa_control_plane_v1",
+      "schema_version": "aoa_control_plane_v1"
+    },
+    "input_refs": [
+      {
+        "owner_repo": "fresh-context-consumer",
+        "artifact_ref": "inputs/aoa-sdk/T1/authority-source-set-1.json",
+        "source_ref": "generic-input:T1:authority-source-set:1",
+        "artifact_digest": "sha256:721af35374d39a9b394fbebe8e9548d7414dada9e3be65a783c40e7fbb87e727",
+        "schema_ref": "generic_input_ref_v1",
+        "schema_version": "generic_input_ref_v1"
+      }
+    ],
+    "condition_bindings": [
+      {
+        "condition_id": "preview_required",
+        "value": false,
+        "provenance": {
+          "owner_repo": "fresh-context-consumer",
+          "artifact_ref": "requests/aoa-sdk/T1/fresh-context-full-chain-bounded-change-1.json",
+          "source_ref": "aoa-sdk:T1:summon-request:fresh-context-full-chain:bounded-change:1",
+          "artifact_digest": "sha256:e00f9bf47d60e7ef9c53072924151facbe130bf6ab30c377f0223b4c4a5d0bcd",
+          "schema_ref": "aoa_control_plane_v1",
+          "schema_version": "aoa_control_plane_v1"
+        }
+      }
+    ]
+  },
+  "child_observation": {
+    "resolver_version": "aoa_control_plane_route_resolver_v3",
+    "decision_id": "route-decision:e54c7a8fe9abe9c0ee8b00f48079072335fb4ae1e609167f3b54e9dd322ed555",
+    "decision_status": "degraded",
+    "selected_candidate_id": "aoa-skills:skill:aoa-knowledge-stewardship",
+    "selected_agent": null,
+    "selected_compatibility": "degraded",
+    "candidate_count": 9,
+    "fallback_used": false,
+    "decision_equal": true,
+    "binding_equal": true,
+    "plan_equal": true,
+    "plan_id": "run-plan:4f88c22ce5eb399d17af670c74abbbea5f39bb543bb1529bab0645e29cb27dc0",
+    "plan_digest": "sha256:435e3734d610d803192e1934d2abeba0d56c10e6e981257c6be4672f2180c9d3",
+    "steps": [
+      "orient",
+      "mutate",
+      "verify",
+      "closeout"
+    ],
+    "capability_invocations": 0,
+    "runner_instantiations": 0,
+    "plan_step_executions": 0,
+    "observation_gaps": [
+      "intent_digest_not_serialized",
+      "binding_agent_ids_not_serialized",
+      "nested_capability_ids_not_serialized",
+      "semantic_owner_and_lifecycle_health_not_serialized",
+      "compiler_version_not_serialized"
+    ]
+  },
+  "parent_replay": {
+    "intent_digest": "sha256:fac85fa6b5407eb820ed280128cad3fde50dcfa9e7308b6e12b634248c6a01ea",
+    "resolver_version": "aoa_control_plane_route_resolver_v3",
+    "compiler_version": "aoa_control_plane_plan_compiler_v2",
+    "decision_id": "route-decision:e54c7a8fe9abe9c0ee8b00f48079072335fb4ae1e609167f3b54e9dd322ed555",
+    "decision_status": "degraded",
+    "selected_candidate_id": "aoa-skills:skill:aoa-knowledge-stewardship",
+    "selected_agent": null,
+    "selected_compatibility": "degraded",
+    "candidate_count": 9,
+    "fallback_used": false,
+    "decision_model_equal": true,
+    "decision_byte_equal": true,
+    "binding_model_equal": true,
+    "binding_byte_equal": true,
+    "agent_ids": [
+      "architect",
+      "coder",
+      "reviewer",
+      "memory-keeper"
+    ],
+    "capability_binding_count": 9,
+    "unbound_binding": {
+      "requirement_id": "aoa-dry-run-first",
+      "capability_id": "guard.operations.preview",
+      "semantic_owner_repo": "target-runtime-owner",
+      "availability": "unbound",
+      "lifecycle_health": "unavailable"
+    },
+    "plan_model_equal": true,
+    "plan_byte_equal": true,
+    "plan_id": "run-plan:4f88c22ce5eb399d17af670c74abbbea5f39bb543bb1529bab0645e29cb27dc0",
+    "plan_digest": "sha256:435e3734d610d803192e1934d2abeba0d56c10e6e981257c6be4672f2180c9d3",
+    "steps": [
+      "orient",
+      "mutate",
+      "verify",
+      "closeout"
+    ]
+  },
+  "acceptance_checks": {
+    "fresh_context_no_history": true,
+    "public_facade_and_models_only": true,
+    "exact_inputs_returned": true,
+    "terminal_plan_observed": true,
+    "child_parent_core_outputs_match": true,
+    "parent_filled_observation_gaps": true,
+    "caller_not_projected_as_provider": true,
+    "unbound_capability_not_promoted": true,
+    "no_activation_or_execution": true
+  },
+  "usability_friction": [
+    "public README does not show the RuntimeProfile constructor",
+    "one-shot nested observation serialization was error-prone",
+    "compiler version is carried in plan provenance rather than a top-level RunPlan field"
+  ],
+  "claim_limit": "The child proved fresh-context public route-bind-compile usability for one exact bounded scenario, and parent replay completed the missing telemetry. Neither observation activated a capability, executed a plan, produced a verdict, wrote memory, or established benefit."
+}
