@@ -7,7 +7,7 @@ repositories remain authoritative.
 ## Source Ownership
 
 - `aoa-sdk` owns the canonical routing producer and dispatch ABI after the
-  receipt-bound G5 switch in `AOA-SDK-D-0075`; this advances, rather than
+  receipt-bound G5 switch in `AOA-SDK-D-0076`; this advances, rather than
   erases, the accepted-target/predecessor posture established by
   `AOA-SDK-D-0071`.
 - `aoa-routing` retains the exact predecessor implementation for
@@ -25,6 +25,10 @@ repositories remain authoritative.
 - `aoa-memo` owns recall and memory objects.
 - `aoa-evals` owns proof surfaces and verdict meaning.
 - `Dionysus` owns seed lineage, not runtime authority for the SDK.
+- `Agents-of-Abyss` owns constitutional organ-access admission law.
+- `abyss-stack` owns MCP package deployment, process and endpoint observations,
+  runtime lifecycle, and rollback execution.
+- Each organ owner owns its capability and owner-specific payload contract.
 
 ## aoa-sdk Should Own
 
@@ -63,6 +67,14 @@ repositories remain authoritative.
 - session and orchestration helpers that preserve source ownership
 - policy-aware guards around approval, mutation, and trust posture
 - adapters that can change transport without changing ownership
+- the protocol-independent organ-access contract models
+- the private organ-registry source contract and deterministic projection
+  compiler; the configured OS workspace owns the concrete private source
+  instance
+- owner-bounded catalog, organ and capability inspection, compatibility
+  comparison, and activation-plan compilation
+- attachment of stack observations and eval evidence as cited inputs without
+  promoting them to SDK-authored truth
 - passive skill-environment inspection and exact owner-profile user bootstrap
 - reviewed-session closeout helpers that call owner-owned publisher scripts and
   refresh derived stats without taking over workflow or proof meaning
@@ -88,6 +100,15 @@ repositories remain authoritative.
 - skill selection, activation, task-local composition, or admission for
   another repository's home
 - daemon or service responsibilities
+- MCP package deployment, process observation, endpoint lifecycle, credential
+  provisioning, or effect execution
+- a semantic mega-gateway that proxies owner tools or hides direct owner
+  connections
+- admission inferred from repository, package, process, endpoint, consumer
+  registration, or successful-call presence
+- automatic activation from discovery or an activation plan
+- owner-specific capability semantics flattened into one universal payload
+- proof, memory, source, runtime, or external-effect acceptance
 - project-specific overlays inside portable-core modules
 
 ## Practical Rule

@@ -33,7 +33,7 @@ Tracking starts with the community-docs baseline for this repository.
 - The landed first-parent range before this release prep is
   `v0.7.0..a3fba51`: two commits, PRs #225-#226, covering immutable-tag
   evidence replay and cross-zlib deterministic release archives.
-- This release-prep slice adds `AOA-SDK-D-0075`, the canonical builder,
+- This release-prep slice adds `AOA-SDK-D-0076`, the canonical builder,
   owner-switch receipt and provenance schemas, exact public-release/runtime
   input lock, installed-wheel probe, and `v0.8.0` tag workflow.
 - The routing assembly remains the exact public `v0.7.0` corpus. G5 changes
@@ -72,7 +72,7 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Notes
 
-- `AOA-SDK-D-0075` makes `aoa-sdk` the canonical routing producer. It does not
+- `AOA-SDK-D-0076` makes `aoa-sdk` the canonical routing producer. It does not
   claim that `abyss-machine` has admitted the exact release or that
   `abyss-stack` has executed the live cutover.
 - `aoa-routing` is retained for compatibility, security, rollback, and

@@ -30,7 +30,7 @@ This repository owns:
   reviewed checkpoint evidence handoff helpers that remain owner-subordinate
 - the accepted staged routing-producer succession model in
   `AOA-SDK-D-0071` and the receipt-bound G5 owner switch in
-  `AOA-SDK-D-0075`, which makes `aoa-sdk` the canonical routing producer
+  `AOA-SDK-D-0076`, which makes `aoa-sdk` the canonical routing producer
   while live runtime execution remains with the runtime owner
 - the explicit non-publishing SDK G5 candidate builder and validator used to
   request stronger-owner artifact trust and runtime canary evidence without

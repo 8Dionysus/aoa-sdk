@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 11168969,
+  "allowed_tracked_bytes": 15978207,
+  "approved_by": "repository-owner",
+  "base_ref": "a3fba51b545a16b1cb79d93d1943918a49101bfa",
+  "changed_generated_bytes": 11168969,
+  "changed_generated_files": 270,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "be23a855b00a4600b0199b06fcca1acb9304493f3192ad6b1378e857757f86bc",
+  "reason": "R2 SDK decision review fixes and stronger-owner evidence grounding",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 15978207,
+  "tracked_bytes_max": 15728640
+}

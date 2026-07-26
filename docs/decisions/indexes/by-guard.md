@@ -50,7 +50,7 @@
 
 ## archive stop line
 
-- [AOA-SDK-D-0075 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md`)
+- [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
 
 ## artifact trust
 
@@ -60,7 +60,7 @@
 
 ## byte parity
 
-- [AOA-SDK-D-0075 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md`)
+- [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
 
 ## canonical path
 
@@ -129,6 +129,10 @@
 - [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) (`docs/decisions/AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md`)
 - [AOA-SDK-D-0066 - Decision Index Read Model Symmetry](../AOA-SDK-D-0066-decision-index-read-model-symmetry.md) (`docs/decisions/AOA-SDK-D-0066-decision-index-read-model-symmetry.md`)
 
+## deny-by-default admission
+
+- [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
+
 ## docs routes
 
 - [AOA-SDK-D-0013 - Boundary Bridge And Checkpoint Active Part Localization](../AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md) (`docs/decisions/AOA-SDK-D-0013-boundary-checkpoint-active-part-localization.md`)
@@ -171,6 +175,7 @@
 - [AOA-SDK-D-0007 - Mechanic Artifact Localization](../AOA-SDK-D-0007-mechanic-artifact-localization.md) (`docs/decisions/AOA-SDK-D-0007-mechanic-artifact-localization.md`)
 - [AOA-SDK-D-0023 - Session Growth Checkpoint Cycle Localization](../AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md) (`docs/decisions/AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md`)
 - [AOA-SDK-D-0026 - Runtime Seam Test Surface Localization](../AOA-SDK-D-0026-runtime-seam-test-surface-localization.md) (`docs/decisions/AOA-SDK-D-0026-runtime-seam-test-surface-localization.md`)
+- [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
 
 ## generated registry parity
 
@@ -299,6 +304,7 @@
 - [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) (`docs/decisions/AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md`)
 - [AOA-SDK-D-0063 - Checkpoint Candidate Intelligence Navigation](../AOA-SDK-D-0063-checkpoint-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0063-checkpoint-candidate-intelligence.md`)
 - [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md`)
+- [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
 
 ## owner follow-through
 
@@ -312,7 +318,7 @@
 
 - [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
 - [AOA-SDK-D-0072 - Separate G5 Release Trust From Owner-Switch Authority](../AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md) (`docs/decisions/AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md`)
-- [AOA-SDK-D-0075 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md`)
+- [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
 
 ## owner-layer signal handoff
 
@@ -382,7 +388,7 @@
 - [AOA-SDK-D-0072 - Separate G5 Release Trust From Owner-Switch Authority](../AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md) (`docs/decisions/AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md`)
 - [AOA-SDK-D-0073 - Replay Release Evidence From an Immutable Tag](../AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md) (`docs/decisions/AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md`)
 - [AOA-SDK-D-0074 - Use a Cross-zlib Canonical Release Carrier](../AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md) (`docs/decisions/AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md`)
-- [AOA-SDK-D-0075 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md`)
+- [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
 
 ## release readiness
 
@@ -415,7 +421,8 @@
 - [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
 - [AOA-SDK-D-0072 - Separate G5 Release Trust From Owner-Switch Authority](../AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md) (`docs/decisions/AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md`)
 - [AOA-SDK-D-0073 - Replay Release Evidence From an Immutable Tag](../AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md) (`docs/decisions/AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md`)
-- [AOA-SDK-D-0075 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md`)
+- [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
+- [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
 
 ## root route law
 
@@ -461,7 +468,7 @@
 ## runtime admission
 
 - [AOA-SDK-D-0072 - Separate G5 Release Trust From Owner-Switch Authority](../AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md) (`docs/decisions/AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md`)
-- [AOA-SDK-D-0075 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0075-authorize-receipt-bound-routing-g5-owner-switch.md`)
+- [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
 
 ## runtime boundary
 

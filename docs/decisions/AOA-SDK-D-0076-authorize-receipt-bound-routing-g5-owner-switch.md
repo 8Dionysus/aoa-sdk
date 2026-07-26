@@ -6,7 +6,7 @@ Accepted.
 
 ## Index Metadata
 
-- Decision ID: AOA-SDK-D-0075
+- Decision ID: AOA-SDK-D-0076
 - Original date: 2026-07-26
 - Surface classes: ownership, routing succession, release trust, runtime boundary, repository lifecycle
 - SDK facets: control-plane, facade boundary, runtime entry, distribution
