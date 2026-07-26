@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 11157452,
+  "allowed_tracked_bytes": 15978872,
+  "approved_by": "repository-owner",
+  "base_ref": "a3fba51b545a16b1cb79d93d1943918a49101bfa",
+  "changed_generated_bytes": 11157452,
+  "changed_generated_files": 270,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "63263e5c3e7d65661b3cbd9a481230fc8ced8d730c1e2bd15bdbf110b89b9607",
+  "reason": "Refresh the portable KAG family for the reviewed R2 organ-access control-plane decision; this digest-bound receipt authorizes only the measured generated projection delta.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 15978872,
+  "tracked_bytes_max": 15728640
+}
