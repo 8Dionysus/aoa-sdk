@@ -685,6 +685,35 @@ def test_exact_owner_negative_phrase_blocks_candidate(
     assert "owner_negative_applicability_match" in decision_candidate.reason_codes
 
 
+def test_owner_negative_phrase_does_not_match_inside_a_token(
+    workspace_root: Path,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(
+        workspace_root,
+        negative_phrase="ordinary",
+    )
+    decision = _api(workspace_root, bundle_root, lock_path).resolve(
+        _intent(
+            objective=(
+                "find an extraordinary durable repository decision and rationale"
+            )
+        )
+    )
+
+    decision_candidate = next(
+        candidate
+        for candidate in decision.candidates
+        if candidate.capability.capability_id == "skill.aoa-decision"
+    )
+    assert decision.status == "resolved"
+    assert decision.selected_candidate_id == decision_candidate.candidate_id
+    assert decision_candidate.policy_posture == "eligible"
+    assert (
+        "owner_negative_applicability_match"
+        not in decision_candidate.reason_codes
+    )
+
+
 def test_unsupported_policy_constraint_returns_typed_blocked_decision(
     workspace_root: Path,
 ) -> None:

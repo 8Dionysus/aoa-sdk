@@ -609,7 +609,8 @@ def _score_candidate(
     explicitly_required: bool,
 ) -> tuple[int, tuple[str, ...], bool]:
     query = objective.casefold()
-    query_tokens = set(_tokens(objective))
+    query_token_sequence = _tokens(objective)
+    query_tokens = set(query_token_sequence)
     positive = query_tokens.intersection(
         token.casefold() for token in document.positive_tokens
     )
@@ -625,7 +626,10 @@ def _score_candidate(
     negative_phrases = tuple(
         phrase
         for phrase in document.negative_phrases
-        if phrase.strip() and phrase.casefold() in query
+        if _contains_token_phrase(
+            query_token_sequence,
+            _tokens(phrase),
+        )
     )
     score = (
         len(positive) * 40
@@ -700,6 +704,19 @@ def _pick_enabled(actions: dict) -> bool:
 
 def _tokens(text: str) -> tuple[str, ...]:
     return tuple(token.casefold() for token in _TOKEN_RE.findall(text))
+
+
+def _contains_token_phrase(
+    tokens: tuple[str, ...],
+    phrase_tokens: tuple[str, ...],
+) -> bool:
+    if not phrase_tokens or len(phrase_tokens) > len(tokens):
+        return False
+    width = len(phrase_tokens)
+    return any(
+        tokens[index : index + width] == phrase_tokens
+        for index in range(len(tokens) - width + 1)
+    )
 
 
 def _normalize_effect(value: str) -> str:
