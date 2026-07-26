@@ -9,7 +9,8 @@
 - GitHub-native release artifact and cadence audit workflow contracts.
 - Exact routing G5 release-candidate archives, checksums, and verification
   handoff metadata with every owner-switch authority flag false and every
-  manifest subject byte-resolved by the stronger owner.
+  manifest subject byte-resolved by the stronger owner. The gzip carrier must
+  be reproducible across zlib versions, not merely within one runner.
 
 ## Repo-local verifier discovery
 
@@ -28,6 +29,8 @@ without leaving tracked drift.
 - Do not treat dry runs as publication.
 - Do not move or recreate an existing release tag to repair failed release
   evidence; replay from the exact tag through a reviewed workflow revision.
+- Do not substitute newer SDK source while using newer reviewed orchestration
+  or archive tooling to replay evidence from an immutable tag.
 - Do not claim sibling releases happened until their owner repos, tags, and
   GitHub Releases verify.
 - Do not bypass protected branch, CI, or package publication checks.

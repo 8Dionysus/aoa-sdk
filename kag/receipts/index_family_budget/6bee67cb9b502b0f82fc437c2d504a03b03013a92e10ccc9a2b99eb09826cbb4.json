@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 11076405,
+  "allowed_tracked_bytes": 15945304,
+  "approved_by": "repository-owner",
+  "base_ref": "d82afecf322ced534d5e07c4889484ad9d67802c",
+  "changed_generated_bytes": 11076405,
+  "changed_generated_files": 275,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "6bee67cb9b502b0f82fc437c2d504a03b03013a92e10ccc9a2b99eb09826cbb4",
+  "reason": "Make release archive bytes cross-zlib deterministic and separate immutable release source from reviewed replay tooling.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 15945304,
+  "tracked_bytes_max": 15728640
+}

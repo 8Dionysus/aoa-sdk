@@ -44,14 +44,18 @@ When `release_tag` is supplied, the workflow must:
 
 - accept only an exact semantic-version tag name that exists on the remote;
 - check out that tag as the repository source used for tests, package build,
-  and release tooling;
+  and release subject construction;
 - check out the same tag as the nested `aoa-sdk` producer input;
 - retain every sibling and stronger-owner exact ref from the release input
   lock;
+- check out the reviewed replay workflow revision separately when a newer
+  orchestration or canonical carrier repair is required;
 - invoke the exact stronger-owner verifier through its valid Python module
   entry point;
-- byte-check all manifest subjects, rebuild the deterministic archive, attest
-  it through GitHub OIDC, and upload evidence under the original tag name.
+- use only the immutable tag's subject bytes and input lock while the reviewed
+  replay tooling byte-checks every subject, rebuilds the deterministic
+  archive, attests it through GitHub OIDC, and uploads evidence under the
+  original tag name.
 
 The workflow revision that performs the replay may be newer than the release
 tag. GitHub attestation provenance exposes that workflow revision separately;
@@ -63,6 +67,8 @@ it does not become the artifact source ref.
   release version merely to recover missing evidence.
 - The release source remains the public tag commit, while orchestration
   provenance remains independently inspectable.
+- A carrier or orchestration repair can be newer than the tag without
+  substituting SDK source, producer inputs, or release subject bytes.
 - Manual workflow dispatch without `release_tag` keeps its ordinary package
   validation behavior and does not enter the public routing release path.
 - Evidence replay remains weaker than G5 and cannot change canonical owner,
@@ -72,6 +78,7 @@ it does not become the artifact source ref.
 ## Source Surfaces
 
 - `.github/workflows/release-artifacts.yml`
+- `src/aoa_sdk/control_plane/routing/release_candidate.py`
 - `mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md`
 - `mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py`
 

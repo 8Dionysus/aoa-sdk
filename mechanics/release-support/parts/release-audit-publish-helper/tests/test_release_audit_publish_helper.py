@@ -382,6 +382,25 @@ def test_routing_g5_release_candidate_lock_and_builder_stay_non_authoritative() 
     assert "Validate immutable release evidence ref" in workflow
     assert "ref: ${{ inputs.release_tag || github.sha }}" in workflow
     assert "ref: ${{ env.ROUTING_RELEASE_SOURCE_REF }}" in workflow
+    assert "Checkout reviewed release replay tooling" in workflow
+    assert "ref: ${{ github.sha }}" in workflow
+    assert "path: .release-tooling/aoa-sdk" in workflow
+    assert "Canonicalize replay archive with reviewed tooling" in workflow
+    assert (
+        "PYTHONPATH: ${{ github.workspace }}/.release-tooling/aoa-sdk/src"
+        in workflow
+    )
+    assert (
+        "python .release-tooling/aoa-sdk/mechanics/release-support/parts/"
+        "release-audit-publish-helper/scripts/"
+        "build_routing_g5_release_candidate.py"
+        in workflow
+    )
+    assert (
+        "--input-lock .routing-inputs/aoa-sdk/sdk/distribution/manifests/"
+        "routing_g5_release_candidate.input-lock.json"
+        in workflow
+    )
     assert workflow.count("python -m abyss_machine.cli artifacts") == 4
     assert "\n          abyss-machine artifacts" not in workflow
 

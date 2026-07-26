@@ -34,7 +34,9 @@ valid non-publishing candidate under `candidate/`. The outer envelope adds:
 The input lock binds the predecessor, the fourteen producer inputs, and the
 exact `abyss-machine` verifier. The SDK ref is `SELF` and resolves to the clean
 release checkout commit. The archive writer normalizes path, owner, mode, and
-time metadata so two builds over the same inputs are byte-identical.
+time metadata, then emits a fixed gzip header and canonical stored DEFLATE
+blocks. Equal tar input therefore stays byte-identical across zlib versions
+and runner environments.
 
 ## Public Release And Trust Route
 

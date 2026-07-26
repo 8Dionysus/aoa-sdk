@@ -2,14 +2,16 @@
 
 from __future__ import annotations
 
-import gzip
+import binascii
 import hashlib
 import json
+import struct
 import tarfile
+import tempfile
 from dataclasses import dataclass
 from datetime import datetime
 from pathlib import Path
-from typing import Any, Mapping
+from typing import Any, BinaryIO, Mapping, cast
 
 from .candidate import (
     AUTHORITY_STOP_LINE,
@@ -72,6 +74,29 @@ def _stable_digest(payload: object) -> str:
         sort_keys=True,
     ).encode("utf-8")
     return hashlib.sha256(encoded).hexdigest()
+
+
+def _write_canonical_gzip(source: BinaryIO, destination: BinaryIO) -> None:
+    """Encode one cross-zlib-stable gzip stream with stored DEFLATE blocks."""
+
+    destination.write(b"\x1f\x8b\x08\x00\x00\x00\x00\x00\x00\xff")
+    crc32 = 0
+    size = 0
+    block = source.read(65535)
+    if not block:
+        destination.write(b"\x01\x00\x00\xff\xff")
+    while block:
+        next_block = source.read(65535)
+        destination.write(b"\x01" if not next_block else b"\x00")
+        block_size = len(block)
+        destination.write(
+            struct.pack("<HH", block_size, 0xFFFF ^ block_size)
+        )
+        destination.write(block)
+        crc32 = binascii.crc32(block, crc32)
+        size = (size + block_size) & 0xFFFFFFFF
+        block = next_block
+    destination.write(struct.pack("<II", crc32 & 0xFFFFFFFF, size))
 
 
 def _read_json_object(path: Path, label: str) -> dict[str, Any]:
@@ -536,7 +561,7 @@ def write_deterministic_release_archive(
     bundle: G5RoutingReleaseCandidateBundle,
     archive_path: Path,
 ) -> str:
-    """Write a path-independent deterministic tar.gz and return its SHA-256."""
+    """Write a path- and zlib-independent tar.gz and return its SHA-256."""
 
     archive = archive_path.expanduser().absolute()
     archive.parent.mkdir(parents=True, exist_ok=True)
@@ -547,28 +572,30 @@ def write_deterministic_release_archive(
     )
     if any(path.is_symlink() for path in paths):
         raise RouterError("release archive input must not contain symlinks")
-    with archive.open("wb") as raw:
-        with gzip.GzipFile(filename="", mode="wb", fileobj=raw, mtime=0) as zipped:
-            with tarfile.open(
-                fileobj=zipped,
-                mode="w",
-                format=tarfile.PAX_FORMAT,
-            ) as tar:
-                for path in paths:
-                    rel_path = path.relative_to(bundle.output_root)
-                    info = tar.gettarinfo(
-                        str(path),
-                        arcname=(prefix / rel_path).as_posix(),
-                    )
-                    info.uid = 0
-                    info.gid = 0
-                    info.uname = ""
-                    info.gname = ""
-                    info.mtime = 0
-                    info.mode = 0o755 if path.is_dir() else 0o644
-                    if path.is_file():
-                        with path.open("rb") as handle:
-                            tar.addfile(info, handle)
-                    else:
-                        tar.addfile(info)
+    with tempfile.SpooledTemporaryFile(max_size=8 * 1024 * 1024) as tar_stream:
+        with tarfile.open(
+            fileobj=tar_stream,
+            mode="w",
+            format=tarfile.PAX_FORMAT,
+        ) as tar:
+            for path in paths:
+                rel_path = path.relative_to(bundle.output_root)
+                info = tar.gettarinfo(
+                    str(path),
+                    arcname=(prefix / rel_path).as_posix(),
+                )
+                info.uid = 0
+                info.gid = 0
+                info.uname = ""
+                info.gname = ""
+                info.mtime = 0
+                info.mode = 0o755 if path.is_dir() else 0o644
+                if path.is_file():
+                    with path.open("rb") as handle:
+                        tar.addfile(info, handle)
+                else:
+                    tar.addfile(info)
+        tar_stream.seek(0)
+        with archive.open("wb") as raw:
+            _write_canonical_gzip(cast(BinaryIO, tar_stream), raw)
     return _sha256(archive)
