@@ -64,6 +64,7 @@ def _git_capability_graph(
     deferred: bool = False,
     negative_phrase: str | None = None,
     owner_mismatch: bool = False,
+    owner_health: str | None = "healthy",
 ) -> tuple[str, bytes]:
     repo = workspace_root / "aoa-skills"
     graph_path = repo / "generated" / "capability_graph.json"
@@ -122,7 +123,7 @@ def _git_capability_graph(
                 "lifecycle": {
                     "state": "candidate",
                     "visibility": spec["visibility"],
-                    "health": "healthy",
+                    "health": owner_health,
                     "version": "1.0.0",
                 },
                 "title": spec["title"],
@@ -210,6 +211,7 @@ def _routing_inputs(
     deferred: bool = False,
     negative_phrase: str | None = None,
     owner_mismatch: bool = False,
+    owner_health: str | None = "healthy",
     malformed_registry_attribute: tuple[str, object] | None = None,
 ) -> tuple[Path, Path]:
     shutil.rmtree(workspace_root / "aoa-routing")
@@ -226,6 +228,7 @@ def _routing_inputs(
         deferred=deferred,
         negative_phrase=negative_phrase,
         owner_mismatch=owner_mismatch,
+        owner_health=owner_health,
     )
     router_raw = _write_json(
         bundle_root / "generated" / "aoa_router.min.json",
@@ -831,6 +834,48 @@ def test_invalid_registry_invocation_posture_blocks(
         "routing_candidates_inconsistent_owner_projection:aoa-decision"
         in decision.reason_codes
     )
+
+
+@pytest.mark.parametrize("owner_health", (None, "unhealthy", "blocked"))
+def test_missing_or_unrecognized_owner_health_is_incompatible(
+    workspace_root: Path,
+    owner_health: str | None,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(
+        workspace_root,
+        owner_health=owner_health,
+    )
+
+    decision = _api(workspace_root, bundle_root, lock_path).resolve(_intent())
+
+    assert decision.status == "blocked"
+    assert decision.selected_candidate_id is None
+    assert all(
+        candidate.compatibility == "incompatible"
+        and "owner_health_missing_or_unrecognized" in candidate.reason_codes
+        for candidate in decision.candidates
+    )
+
+
+def test_degraded_owner_health_remains_an_explicit_degraded_posture(
+    workspace_root: Path,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(
+        workspace_root,
+        owner_health="degraded",
+    )
+
+    decision = _api(workspace_root, bundle_root, lock_path).resolve(_intent())
+
+    assert decision.status == "degraded"
+    assert decision.selected_candidate_id is not None
+    selected = next(
+        candidate
+        for candidate in decision.candidates
+        if candidate.candidate_id == decision.selected_candidate_id
+    )
+    assert selected.compatibility == "degraded"
+    assert "owner_health_degraded" in selected.reason_codes
 
 
 def test_conflicting_effect_ceilings_block_deterministically(

@@ -487,17 +487,22 @@ def _candidate_posture(
     reasons: list[str] = []
     lifecycle_state = node.lifecycle.state.casefold()
     health = (node.lifecycle.health or "").casefold()
-    compatibility: Literal["compatible", "degraded", "incompatible"] = (
-        "degraded" if health == "degraded" else "compatible"
-    )
+    compatibility: Literal["compatible", "degraded", "incompatible"]
+    if health == "healthy":
+        compatibility = "compatible"
+    elif health == "degraded":
+        compatibility = "degraded"
+        reasons.append("owner_health_degraded")
+    else:
+        compatibility = "incompatible"
+        reasons.append("owner_health_missing_or_unrecognized")
     if lifecycle_state in _FORBIDDEN_LIFECYCLE_STATES:
         compatibility = "incompatible"
         reasons.append("owner_lifecycle_not_selectable")
     elif lifecycle_state not in _SELECTABLE_LIFECYCLE_STATES:
-        compatibility = "degraded"
+        if compatibility != "incompatible":
+            compatibility = "degraded"
         reasons.append("owner_lifecycle_unrecognized")
-    if health == "degraded":
-        reasons.append("owner_health_degraded")
 
     policy: Literal["eligible", "approval_required", "forbidden"] = "eligible"
     availability = str(node.binding.get("availability", "")).casefold()
