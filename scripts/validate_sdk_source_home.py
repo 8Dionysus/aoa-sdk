@@ -39,6 +39,7 @@ EXPECTED_BRANCHES = {
         "families": {
             "workspace_context",
             "codex_entrypoints",
+            "runner_entrypoints",
             "closeout_entrypoints",
         },
     },

@@ -19,6 +19,7 @@ Next route: `pyproject.toml`, `src/aoa_sdk/`,
 `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py`,
 `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py`,
 `mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py`,
+`mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py`,
 `sdk/distribution/manifests/python_distribution.bundle.json`,
 `mechanics/release-support/parts/release-audit-publish-helper/`, and the
 package build owner in `pyproject.toml`.
@@ -32,3 +33,6 @@ evidence pass. A public release-candidate archive and attestation establish
 release trust only; normal runtime and canonical ownership remain separately
 gated. A successful C2 wheel probe proves packaged plan-contour availability
 and deterministic compilation, not adapter selection or runtime execution.
+A successful C3 wheel probe proves installed lifecycle coordination and
+restoration only through the non-executing reference adapter; it does not prove
+production invocation.

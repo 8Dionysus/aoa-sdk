@@ -30,8 +30,8 @@ mean.
   consumer-zero, Runner delivery, and repository archival.
 - Keep C1 route resolution receipt-bound, deterministic, explainable, and
   non-activating. Keep C2 plan compilation pinned to an admitted owner contour,
-  reviewed inputs, and explicit conditions. C3-C5 Runner behavior remains a
-  separate part and landing.
+  reviewed inputs, and explicit conditions. Keep C3 lifecycle coordination in
+  its own explicit-adapter part with a non-executing reference witness.
 - Keep cross-organ orchestration host-visible and one-stage-at-a-time. Owner
   calls, credentials, retries, acceptance, and runtime effects remain outside
   the SDK; every transition binds the prior snapshot and exact owner receipt.
@@ -43,11 +43,12 @@ mean.
 - Keep bridge helpers paired with source owner, route card, and focused tests.
 - Move repeated cross-owner pressure into the nearest current part before
   considering a new bridge part.
-- Build C3-C5 Runner lifecycle only over exact C2 plans and runtime-adapter
-  contracts; do not collapse compilation success into execution evidence.
 - Carry the cross-organ contract into an `abyss-stack` host adapter only after
   exact source/package/protocol/consumer compatibility is established. Do not
   add hidden MCP server chaining.
+- Land C4 production adapter behavior only in the selected runtime owner's
+  authority, then correlate C5 evidence without copying eval, memo, checkpoint,
+  evidence, or closeout truth into the SDK.
 - Measure the compatibility window and preserve the exact predecessor rollback
   route. Treat any source, corpus, runtime, trust, rollback, or consumer drift
   as a hard stop.

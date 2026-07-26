@@ -259,6 +259,12 @@ version change remains a separate decision.
 must verify both source snapshot and event cursor. A retry is not a license to
 reuse an idempotency key for different work.
 
+C3 realizes this without adding a lifecycle shortcut: each admitted
+`recoverable_failure -> recover -> paused` transition consumes one attempt
+after the initial attempt, and the separate `resume` transition revalidates
+snapshot and approvals. A non-retryable failure code or an attempt beyond
+`max_attempts` is rejected before adapter dispatch.
+
 `RollbackPolicy` names the runtime or mutation owner, trigger codes, and exact
 rollback artifact. A required rollback without an artifact ref is invalid.
 Rollback failure is terminal in v1 and must produce a failed outcome plus

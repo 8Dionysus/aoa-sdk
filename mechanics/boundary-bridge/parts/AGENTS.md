@@ -26,11 +26,15 @@ Active part homes:
 - `plan-compilation-control-plane/` compiles C2 runtime-neutral plans from an
   exact admitted `aoa-playbooks` contour and reviewed owner-qualified bindings
   without selecting an adapter, activating a capability, or executing work.
+- `runner-lifecycle-control-plane/` coordinates C3 lifecycle state through one
+  caller-supplied adapter, validates exact runtime evidence, and carries a
+  deterministic reference adapter that executes no plan steps.
 
 Keep source-owned truth in sibling repositories. Outside the separately
-contracted C1 resolver and C2 compiler, SDK parts may expose handles, labels,
-and reviewed handoff packets only. The C1 part may expose deterministic
-non-executing route decisions. The C2 part may compile only the bounded DAG
-owned by the admitted playbook contour; it may not infer missing scenario
-meaning. Runtime adapter selection and execution belong to the host, and
-capability meaning stays with its owner.
+contracted C1 resolver, C2 compiler, and C3 lifecycle client, SDK parts may
+expose handles, labels, and reviewed handoff packets only. The C1 part may
+expose deterministic non-executing route decisions. The C2 part may compile
+only the bounded DAG owned by the admitted playbook contour; it may not infer
+missing scenario meaning. The C3 part may validate and reconcile one explicit
+adapter but may not select it or execute a plan step. Runtime execution belongs
+to the host, and capability meaning stays with its owner.

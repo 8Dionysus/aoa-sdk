@@ -90,7 +90,7 @@ The current landed surface includes:
 - the strict, runtime-neutral
   [R2 Agent OS contract family](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md)
   for route decisions, plans, approvals, lifecycle, events, evidence, and
-  adapter protocols, without an active runner;
+  adapter protocols, now consumed by the separately bounded C3 Runner;
 - the owner-bounded
   [organ access control plane](mechanics/boundary-bridge/parts/organ-access-control-plane/README.md)
   and its progressive read-only projection through the existing
@@ -138,6 +138,12 @@ The current landed surface includes:
   requires owner-qualified scenario inputs and reviewed conditions, prunes
   guarded branches deterministically, and emits a content-addressed
   runtime-neutral `RunPlan` without adapter selection or execution;
+- the callable
+  [C3 Runner lifecycle control plane](mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/README.md),
+  which prepares immutable sessions, binds only caller-supplied adapters,
+  validates fresh runtime observations, approvals, bounded recovery, receipts,
+  event chains, outcomes, restoration, and closeout, and ships a deterministic
+  reference adapter that executes no plan steps;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

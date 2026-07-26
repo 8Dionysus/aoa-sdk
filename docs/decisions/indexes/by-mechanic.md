@@ -60,6 +60,7 @@
 - [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
 - [AOA-SDK-D-0079 - Expose Organ Discovery Through Workspace MCP](../AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md) (`docs/decisions/AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md`)
 - [AOA-SDK-D-0080 - Host-Visible Cross-Organ Orchestration](../AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md) (`docs/decisions/AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md`)
+- [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
 
 ## checkpoint
 

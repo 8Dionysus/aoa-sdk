@@ -19,6 +19,10 @@
 - [AOA-SDK-D-0040 - Sibling Fallback Field Input Alias Normalization](../AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md) (`docs/decisions/AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md`)
 - [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) (`docs/decisions/AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md`)
 
+## adapter protocol
+
+- [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
+
 ## agent guidance
 
 - [AOA-SDK-D-0002 - Root Design Surfaces Before Mechanics](../AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md) (`docs/decisions/AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md`)
@@ -222,6 +226,10 @@
 - [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) (`docs/decisions/AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md`)
 - [AOA-SDK-D-0065 - Checkpoint Backlog Runtime Trace Gaps](../AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md) (`docs/decisions/AOA-SDK-D-0065-checkpoint-backlog-runtime-trace-gaps.md`)
 
+## lifecycle contract
+
+- [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
+
 ## local automation
 
 - [AOA-SDK-D-0030 - Checkpoint Local Automation Template Localization](../AOA-SDK-D-0030-checkpoint-local-automation-template-localization.md) (`docs/decisions/AOA-SDK-D-0030-checkpoint-local-automation-template-localization.md`)
@@ -333,6 +341,7 @@
 - [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 - [AOA-SDK-D-0077 - Resolve Agent OS Routes from Receipt-bound Owner Projections](../AOA-SDK-D-0077-route-resolution-from-owner-projections.md) (`docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md`)
 - [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
+- [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
 
 ## public API naming
 
@@ -422,6 +431,7 @@
 - [AOA-SDK-D-0072 - Separate G5 Release Trust From Owner-Switch Authority](../AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md) (`docs/decisions/AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md`)
 - [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
 - [AOA-SDK-D-0077 - Resolve Agent OS Routes from Receipt-bound Owner Projections](../AOA-SDK-D-0077-route-resolution-from-owner-projections.md) (`docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md`)
+- [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
 
 ## runtime entrypoint
 

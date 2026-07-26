@@ -42,9 +42,14 @@ repositories remain authoritative.
   `aoa-playbooks` contour/schema pin, preserves reviewed input and condition
   provenance, and emits a runtime-neutral `RunPlan` without adapter selection
   or execution
+- the C3 `AoARunner` lifecycle client, which binds a caller-supplied adapter,
+  validates exact runtime observations, approvals, bounded retries, receipts,
+  event continuity, outcomes, restore, and closeout without executing a step
+- the deterministic SDK-owned reference adapter as a no-effect protocol
+  witness, never as production runtime or invocation proof
 - the versioned R2 route, plan, approval, lifecycle, event,
-  evidence-reference, and adapter protocol models used to prove the boundary;
-  the models do not activate an `AoASDK` runner or runtime
+  evidence-reference, and adapter protocol models used by C1-C3; the models
+  and Runner do not activate or implement a production runtime
 - the historical packaged routing shadow compiler, strict validator, and
   dual-producer sidecar that proved predecessor parity before the G5 switch
 - the historical SDK-identified, non-publishing candidate assembly

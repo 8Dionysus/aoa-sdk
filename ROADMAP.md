@@ -145,19 +145,22 @@ Exact `v0.8.0` admission, the receipt-gated `abyss-stack` cutover, deployed
 SDK-canonical route surface, and predecessor rollback posture are also
 complete. The C1 deterministic route resolver and separately landed C2
 runtime-neutral plan compiler now form the callable
-`RouteIntent -> RouteDecision -> RunPlan` control-plane chain. The next honest
-move is the separate C3-C5 Runner/lifecycle, adapter, evidence, resume, and
-closeout slices. Compatibility evidence continues in parallel; consumer-zero
-and archival remain unproved.
+`RouteIntent -> RouteDecision -> RunPlan` control-plane chain. C3 adds the
+explicit-adapter `AoARunner`, deterministic no-execution reference adapter,
+bounded recovery, event reconciliation, restore, and closeout. The next honest
+move is the separate C4 production runtime adapter and C5 unified evidence
+chain. Compatibility evidence continues in parallel; consumer-zero and
+archival remain unproved.
 
 ## Current Public Contour
 
 Current release marker: `v0.8.0`.
 
-Current unreleased contour: C1 deterministic route resolution plus C2
-runtime-neutral plan compilation, followed by compatibility-window evidence
-and separate C3-C5 Runner slices after `v0.8.0`. This is a directional contour,
-not a changelog replacement.
+Current unreleased contour: C1 deterministic route resolution, C2
+runtime-neutral plan compilation, and C3 explicit-adapter lifecycle
+coordination, followed by compatibility-window evidence and separate C4-C5
+runtime/evidence slices after `v0.8.0`. This is a directional contour, not a
+changelog replacement.
 
 Current anchors:
 
