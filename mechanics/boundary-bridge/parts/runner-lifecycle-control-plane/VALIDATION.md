@@ -23,11 +23,15 @@ The focused suite covers:
 - repeat of a rejected command with no new event or receipt;
 - idempotency payload mismatch;
 - partial failure;
-- disconnect before and after command acknowledgement;
+- disconnect before and after command acknowledgement, including durable
+  receipt import before replay;
 - out-of-order, tampered, or receipt-inconsistent runtime evidence;
+- cross-slice event-ID reuse and status timestamps older than accepted events;
 - exact approval request/decision event-reference correlation;
+- exclusive approval-TTL boundary enforcement;
 - exact runtime-outcome event-reference correlation;
-- restored receipt-to-event-slice and acknowledgement correlation;
+- atomic rollback after invalid approval, outcome, receipt, or closeout views;
+- restored ordered receipt-to-event-slice and acknowledgement correlation;
 - exact snapshot drift rejection before dispatch;
 - stale observation-time rejection before dispatch;
 - recoverable failure, recover-to-paused, resume, completion, and closeout;

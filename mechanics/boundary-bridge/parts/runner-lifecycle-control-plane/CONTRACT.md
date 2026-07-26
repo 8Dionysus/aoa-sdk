@@ -51,7 +51,8 @@ command digest.
 - Exact replay returns the already verified status and creates no new event or
   receipt.
 - Reusing a key with different content fails closed.
-- A fresh Runner restored from durable adapter state reloads applied receipts
+- Every reconciliation, including reconnect after an acknowledgement, binds
+  all command acknowledgements to the ordered durable applied-receipt ledger
   before admitting replay.
 - Exact approval-decision replay creates no new event; the same decision ID
   with different content is rejected.
@@ -77,15 +78,19 @@ recovery consumes no additional attempt.
 ## Event and outcome integrity
 
 - Runtime events are sequence-ordered, previous-digest linked,
-  content-addressed, runtime-owner emitted, and state-continuous.
-- Adapter status must name the exact verified event cursor and may not change
-  without an event.
+  content-addressed, globally event-ID unique, runtime-owner emitted, and
+  state-continuous.
+- Adapter status must name the exact verified event cursor, its timestamp must
+  cover the latest accepted event, and it may not change without an event.
 - An applied command must have one exact `command_ack`; its receipt binds the
   entire emitted event slice.
 - A terminal status must expose one matching runtime-owned `RunOutcome`.
 - Runtime success never synthesizes eval, evidence, memory, or closeout refs.
 - `closed` is admitted only after `assert_closeout_ready()` passes and the
-  adapter records the exact closeout bundle.
+  adapter records the exact closeout bundle while retaining the exact
+  runtime-owned outcome.
+- Status, events, receipts, approvals, and outcome enter the local read model
+  atomically; failure of any view restores the previous verified projection.
 
 ## Reference-adapter stop line
 

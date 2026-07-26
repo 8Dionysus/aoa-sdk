@@ -25,7 +25,8 @@ Tracking starts with the community-docs baseline for this repository.
 - Add C3 `AoASDK.runner` and `aoa_control_plane_runner_v1`: immutable session
   preparation, explicit adapter binding, runtime snapshot observation,
   approval round trips, bounded recovery, idempotent commands, append-only
-  event reconciliation, typed outcomes, restoration, and gated closeout.
+  event reconciliation, durable receipt recovery, atomic verified read-model
+  updates, typed outcomes, restoration, and gated closeout.
 - Add the SDK-owned `aoa_reference_runtime_adapter_v1` as an installed-wheel
   lifecycle witness with `executes_plan_steps=false`.
 - Keep production adapter selection, activation, runtime execution, measured

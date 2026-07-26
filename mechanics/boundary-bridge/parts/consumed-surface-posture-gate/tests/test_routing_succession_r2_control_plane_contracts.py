@@ -854,6 +854,15 @@ def test_snapshot_and_approval_guards_fail_closed_on_drift_or_bypass() -> None:
             session=session,
             at=NOW + timedelta(hours=2),
         )
+    expires_after = plan.approval_requirements[0].expires_after_seconds
+    assert expires_after is not None
+    with pytest.raises(ControlPlaneContractError, match="approval expired"):
+        assert_approvals_satisfied(
+            plan,
+            (approval,),
+            session=session,
+            at=NOW + timedelta(seconds=expires_after),
+        )
 
 
 def test_command_replay_is_idempotent_only_for_identical_payload() -> None:

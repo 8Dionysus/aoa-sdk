@@ -29,6 +29,7 @@ from aoa_sdk.contracts.control_plane import (
     StartCommand,
     canonical_digest,
     command_digest,
+    execution_event_digest,
 )
 from aoa_sdk.control_plane.planning import (
     compile_run_plan,
@@ -118,8 +119,12 @@ class InvalidReceiptAdapter(DeterministicReferenceAdapter):
 
 
 class InvalidRestoredReceiptAdapter(DeterministicReferenceAdapter):
+    tamper_receipts = False
+
     def command_receipts(self, session):
         receipts = tuple(super().command_receipts(session))
+        if not self.tamper_receipts:
+            return receipts
         return (
             receipts[0].model_copy(update={"event_refs": ()}),
             *receipts[1:],
@@ -172,6 +177,86 @@ class InvalidOutcomeReadAdapter(DeterministicReferenceAdapter):
                 )
             }
         )
+
+
+class InvalidPostCloseoutOutcomeReadAdapter(DeterministicReferenceAdapter):
+    def outcome(self, session):
+        outcome = super().outcome(session)
+        if outcome is None or super().status(session).state != "closed":
+            return outcome
+        return outcome.model_copy(
+            update={
+                "runtime_result_ref": outcome.runtime_result_ref.model_copy(
+                    update={"artifact_ref": "tampered-after-closeout"}
+                )
+            }
+        )
+
+
+class DisconnectAfterApplyAdapter(DeterministicReferenceAdapter):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.dispatch_count = 0
+        self.disconnect_after_apply = True
+
+    def dispatch(self, plan, session, command):
+        self.dispatch_count += 1
+        receipt = super().dispatch(plan, session, command)
+        if self.disconnect_after_apply:
+            self.disconnect_after_apply = False
+            raise ReferenceAdapterUnavailable("disconnected after durable command ack")
+        return receipt
+
+
+class MissingDurableReceiptAdapter(DeterministicReferenceAdapter):
+    def command_receipts(self, session):
+        super().command_receipts(session)
+        return ()
+
+
+class ReorderedDurableReceiptAdapter(DeterministicReferenceAdapter):
+    reverse_receipts = False
+
+    def command_receipts(self, session):
+        receipts = tuple(super().command_receipts(session))
+        if self.reverse_receipts:
+            return tuple(reversed(receipts))
+        return receipts
+
+
+class StaleStatusTimestampAdapter(DeterministicReferenceAdapter):
+    def status(self, session):
+        status = super().status(session)
+        if status.last_event_sequence < 0:
+            return status
+        return status.model_copy(
+            update={"updated_at": status.updated_at - timedelta(microseconds=1)}
+        )
+
+
+class ReusedEventIdAdapter(DeterministicReferenceAdapter):
+    def __init__(self, **kwargs) -> None:
+        super().__init__(**kwargs)
+        self.retained_event_id: str | None = None
+        self.reuse_next_event_id = False
+
+    def events(self, session, *, after_sequence: int):
+        events = tuple(super().events(session, after_sequence=after_sequence))
+        if self.retained_event_id is None and events:
+            self.retained_event_id = events[0].event_id
+        if not self.reuse_next_event_id or not events:
+            return events
+        self.reuse_next_event_id = False
+        reused = events[0].model_copy(
+            update={
+                "event_id": self.retained_event_id,
+                "event_digest": _digest("pending-reused-event"),
+            }
+        )
+        reused = reused.model_copy(
+            update={"event_digest": execution_event_digest(reused)}
+        )
+        return (reused, *events[1:])
 
 
 def _plan(
@@ -599,6 +684,17 @@ def test_approval_window_rejects_early_expiry_and_expiry_boundary_approval() -> 
         session,
         _approve(runner, session, at=NOW + timedelta(seconds=10)),
     ).state == "running"
+    runner.pause(
+        session,
+        adapter,
+        _pause(runner, session, at=NOW + timedelta(seconds=11)),
+    )
+    with pytest.raises(ControlPlaneContractError, match="approval expired"):
+        runner.resume(
+            session,
+            adapter,
+            _resume(runner, session, at=NOW + timedelta(seconds=20)),
+        )
 
 
 def test_pause_resume_and_duplicate_commands_are_idempotent() -> None:
@@ -696,6 +792,8 @@ def test_runtime_outcome_must_match_its_exact_event_reference() -> None:
         session,
         _approve(runner, session, at=NOW + timedelta(seconds=2)),
     )
+    verified_status = runner.status(session)
+    verified_events = runner.events(session)
     adapter.advance(
         session,
         trigger="runtime_completed",
@@ -703,6 +801,8 @@ def test_runtime_outcome_must_match_its_exact_event_reference() -> None:
     )
     with pytest.raises(AoARunnerError, match="lacks one exact event"):
         runner.sync(session, adapter)
+    assert runner.status(session) == verified_status
+    assert runner.events(session) == verified_events
 
 
 def test_disconnect_before_ack_is_replayable_without_state_change() -> None:
@@ -719,6 +819,30 @@ def test_disconnect_before_ack_is_replayable_without_state_change() -> None:
     assert runner.command_receipts(session) == ()
     adapter.set_available(True)
     assert runner.start(session, adapter, command).state == "awaiting_approval"
+
+
+def test_sync_imports_durable_receipt_after_disconnect_after_ack() -> None:
+    clock = MutableClock(NOW)
+    plan = _plan()
+    runner = _runner(clock)
+    adapter = DisconnectAfterApplyAdapter(clock=clock)
+    session = runner.prepare(plan)
+    command = _start(runner, session, at=NOW + timedelta(seconds=1))
+    with pytest.raises(
+        ReferenceAdapterUnavailable,
+        match="after durable command ack",
+    ):
+        runner.start(session, adapter, command)
+    assert runner.status(session).state == "prepared"
+    assert runner.events(session) == ()
+    assert runner.command_receipts(session) == ()
+
+    assert runner.sync(session, adapter).state == "awaiting_approval"
+    receipts = runner.command_receipts(session)
+    assert len(receipts) == 1
+    assert receipts[0].status == "applied"
+    assert runner.start(session, adapter, command).state == "awaiting_approval"
+    assert adapter.dispatch_count == 1
 
 
 def test_disconnect_after_ack_reconciles_to_recoverable_failure() -> None:
@@ -904,8 +1028,35 @@ def test_restore_rejects_a_receipt_without_its_verified_event_slice() -> None:
         adapter,
         _start(runner, session, at=NOW + timedelta(seconds=1)),
     )
+    adapter.tamper_receipts = True
     restored = AoARunner(clock=clock, id_factory=lambda: "unused")
     with pytest.raises(AoARunnerError, match="has no event slice"):
+        restored.restore(plan, session, adapter)
+
+
+def test_restore_rejects_reordered_durable_receipt_slices() -> None:
+    clock = MutableClock(NOW)
+    plan = _plan()
+    runner = _runner(clock)
+    adapter = ReorderedDurableReceiptAdapter(clock=clock)
+    session = runner.prepare(plan)
+    runner.start(
+        session,
+        adapter,
+        _start(runner, session, at=NOW + timedelta(seconds=1)),
+    )
+    runner.approve(
+        session,
+        _approve(runner, session, at=NOW + timedelta(seconds=2)),
+    )
+    runner.pause(
+        session,
+        adapter,
+        _pause(runner, session, at=NOW + timedelta(seconds=3)),
+    )
+    adapter.reverse_receipts = True
+    restored = AoARunner(clock=clock, id_factory=lambda: "unused")
+    with pytest.raises(AoARunnerError, match="not strictly ordered"):
         restored.restore(plan, session, adapter)
 
 
@@ -920,11 +1071,17 @@ def test_approval_decision_must_match_its_exact_event_reference() -> None:
         adapter,
         _start(runner, session, at=NOW + timedelta(seconds=1)),
     )
+    verified_status = runner.status(session)
+    verified_events = runner.events(session)
+    verified_receipts = runner.command_receipts(session)
     with pytest.raises(AoARunnerError, match="lacks one exact event"):
         runner.approve(
             session,
             _approve(runner, session, at=NOW + timedelta(seconds=2)),
         )
+    assert runner.status(session) == verified_status
+    assert runner.events(session) == verified_events
+    assert runner.command_receipts(session) == verified_receipts
 
 
 def test_snapshot_drift_blocks_before_dispatch() -> None:
@@ -961,6 +1118,48 @@ def test_stale_runtime_observation_blocks_before_dispatch() -> None:
             _start(runner, session, at=NOW + timedelta(seconds=1)),
         )
     assert runner.status(session).state == "prepared"
+
+
+def test_status_timestamp_cannot_precede_the_latest_event() -> None:
+    clock = MutableClock(NOW)
+    plan = _plan()
+    adapter = StaleStatusTimestampAdapter(clock=clock)
+    runner = _runner(clock)
+    session = runner.prepare(plan)
+    with pytest.raises(AoARunnerError, match="predates the latest verified event"):
+        runner.start(
+            session,
+            adapter,
+            _start(runner, session, at=NOW + timedelta(seconds=1)),
+        )
+    assert runner.status(session).state == "prepared"
+    assert runner.events(session) == ()
+    assert runner.command_receipts(session) == ()
+
+
+def test_event_id_cannot_be_reused_across_reconciled_slices() -> None:
+    clock = MutableClock(NOW)
+    plan = _plan()
+    adapter = ReusedEventIdAdapter(clock=clock)
+    runner = _runner(clock)
+    session = runner.prepare(plan)
+    runner.start(
+        session,
+        adapter,
+        _start(runner, session, at=NOW + timedelta(seconds=1)),
+    )
+    runner.approve(
+        session,
+        _approve(runner, session, at=NOW + timedelta(seconds=2)),
+    )
+    verified_status = runner.status(session)
+    verified_events = runner.events(session)
+    adapter.reuse_next_event_id = True
+    adapter.emit_progress(session, at=NOW + timedelta(seconds=3))
+    with pytest.raises(AoARunnerError, match="reused event ids"):
+        runner.sync(session, adapter)
+    assert runner.status(session) == verified_status
+    assert runner.events(session) == verified_events
 
 
 @pytest.mark.parametrize(
@@ -1005,6 +1204,26 @@ def test_invalid_receipt_does_not_enter_the_verified_local_ledger() -> None:
     assert runner.command_receipts(session) == ()
 
 
+def test_command_ack_without_a_durable_receipt_fails_closed() -> None:
+    clock = MutableClock(NOW)
+    plan = _plan()
+    adapter = MissingDurableReceiptAdapter(clock=clock)
+    runner = _runner(clock)
+    session = runner.prepare(plan)
+    with pytest.raises(
+        AoARunnerError,
+        match="acknowledgements and durable receipts do not match",
+    ):
+        runner.start(
+            session,
+            adapter,
+            _start(runner, session, at=NOW + timedelta(seconds=1)),
+        )
+    assert runner.status(session).state == "prepared"
+    assert runner.events(session) == ()
+    assert runner.command_receipts(session) == ()
+
+
 def test_closeout_rejects_missing_owner_evidence() -> None:
     clock, plan, runner, adapter, session, _ = _running_session()
     adapter.advance(
@@ -1018,6 +1237,42 @@ def test_closeout_rejects_missing_owner_evidence() -> None:
     clock.value = NOW + timedelta(seconds=4)
     with pytest.raises(ControlPlaneContractError, match="terminal evidence"):
         runner.closeout(session, outcome, _closeout_bundle(plan))
+
+
+def test_closeout_revalidates_the_exact_runtime_outcome_atomically() -> None:
+    clock = MutableClock(NOW)
+    plan = _plan()
+    runner = _runner(clock)
+    adapter = InvalidPostCloseoutOutcomeReadAdapter(clock=clock)
+    session = runner.prepare(plan)
+    runner.start(
+        session,
+        adapter,
+        _start(runner, session, at=NOW + timedelta(seconds=1)),
+    )
+    runner.approve(
+        session,
+        _approve(runner, session, at=NOW + timedelta(seconds=2)),
+    )
+    evidence, evals, memory = _completed_refs(plan)
+    adapter.advance(
+        session,
+        trigger="runtime_completed",
+        at=NOW + timedelta(seconds=3),
+        evidence_bundle_refs=evidence,
+        eval_verdict_refs=evals,
+        memory_receipt_refs=memory,
+    )
+    runner.sync(session, adapter)
+    outcome = runner.outcome(session)
+    assert outcome is not None
+    verified_status = runner.status(session)
+    verified_events = runner.events(session)
+    clock.value = NOW + timedelta(seconds=4)
+    with pytest.raises(AoARunnerError, match="lacks one exact event"):
+        runner.closeout(session, outcome, _closeout_bundle(plan))
+    assert runner.status(session) == verified_status
+    assert runner.events(session) == verified_events
 
 
 def test_idempotency_key_with_changed_payload_is_rejected() -> None:

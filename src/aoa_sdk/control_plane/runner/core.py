@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import uuid
-from collections.abc import Callable
+from collections.abc import Callable, Iterator
+from contextlib import contextmanager
 from dataclasses import dataclass, field
 from datetime import datetime, timezone
 from pathlib import Path
@@ -155,7 +156,7 @@ class AoARunner:
         self._sessions[session.session_id] = record
         try:
             status = self._reconcile(record, adapter)
-            self._restore_receipts(record, adapter)
+            self._reconcile_receipts(record, adapter)
             self._validate_current_approvals(record)
             self._validate_outcome(record)
             return status
@@ -210,19 +211,21 @@ class AoARunner:
             )
         assert_approval_decision_matches_request(requirement, request, approval)
         previous = record.status
-        adapter.apply_approval(record.plan, record.session, approval)
-        status = self._reconcile(record, adapter)
-        decisions = self._validate_current_approvals(record)
-        if not any(
-            decision.decision_id == approval.decision_id
-            and decision == approval
-            for decision in decisions
-        ):
-            raise AoARunnerError(
-                f"adapter did not retain approval decision {approval.decision_id!r}"
-            )
-        if status == previous and approval not in decisions:
-            raise AoARunnerError("duplicate approval was not retained exactly")
+        with _verified_read_model_update(record):
+            adapter.apply_approval(record.plan, record.session, approval)
+            status = self._reconcile(record, adapter)
+            self._reconcile_receipts(record, adapter)
+            decisions = self._validate_current_approvals(record)
+            self._validate_outcome(record)
+            if not any(
+                decision.decision_id == approval.decision_id and decision == approval
+                for decision in decisions
+            ):
+                raise AoARunnerError(
+                    f"adapter did not retain approval decision {approval.decision_id!r}"
+                )
+            if status == previous and approval not in decisions:
+                raise AoARunnerError("duplicate approval was not retained exactly")
         return status
 
     def renew_approvals(
@@ -238,13 +241,18 @@ class AoARunner:
             )
         adapter = self._bound_adapter(record)
         requested_at = _aware(requested_at, "requested_at")
-        adapter.renew_approvals(
-            record.plan,
-            record.session,
-            requested_at=requested_at,
-        )
-        self._reconcile(record, adapter)
-        return self._validated_approval_requests(record)
+        with _verified_read_model_update(record):
+            adapter.renew_approvals(
+                record.plan,
+                record.session,
+                requested_at=requested_at,
+            )
+            self._reconcile(record, adapter)
+            self._reconcile_receipts(record, adapter)
+            requests = self._validated_approval_requests(record)
+            self._validate_current_approvals(record)
+            self._validate_outcome(record)
+        return requests
 
     def resume(
         self,
@@ -293,9 +301,11 @@ class AoARunner:
     ) -> RunStatus:
         record = self._record(session)
         self._bind_adapter(record, adapter)
-        status = self._reconcile(record, adapter)
-        self._validate_current_approvals(record)
-        self._validate_outcome(record)
+        with _verified_read_model_update(record):
+            status = self._reconcile(record, adapter)
+            self._reconcile_receipts(record, adapter)
+            self._validate_current_approvals(record)
+            self._validate_outcome(record)
         return status
 
     def status(self, session: SessionHandle) -> RunStatus:
@@ -355,15 +365,23 @@ class AoARunner:
                 "closeout outcome does not match the current terminal state"
             )
         assert_closeout_ready(record.plan, record.session, outcome, bundle)
-        adapter.closeout(
-            record.plan,
-            record.session,
-            outcome,
-            bundle,
-        )
-        status = self._reconcile(record, adapter)
-        if status.state != "closed" or status.closeout_ref != bundle:
-            raise AoARunnerError("adapter did not close with the admitted bundle")
+        with _verified_read_model_update(record):
+            adapter.closeout(
+                record.plan,
+                record.session,
+                outcome,
+                bundle,
+            )
+            status = self._reconcile(record, adapter)
+            self._reconcile_receipts(record, adapter)
+            self._validate_current_approvals(record)
+            current_outcome = self._validate_outcome(record)
+            if current_outcome != outcome:
+                raise AoARunnerError(
+                    "adapter changed the runtime-owned outcome during closeout"
+                )
+            if status.state != "closed" or status.closeout_ref != bundle:
+                raise AoARunnerError("adapter did not close with the admitted bundle")
         return status
 
     def _record(self, session: SessionHandle) -> _SessionRecord:
@@ -433,29 +451,31 @@ class AoARunner:
             return replayed
         _assert_command_scope(record, command)
         receipt = adapter.dispatch(record.plan, record.session, command)
-        previous_status = record.status
-        status, new_events = self._reconcile_with_events(
-            record,
-            adapter,
-            commit=False,
-        )
-        _assert_receipt(
-            receipt,
-            command=command,
-            status=status,
-            previous_status=previous_status,
-            new_events=new_events,
-            runtime_provenance=adapter.profile.provenance,
-        )
-        record.events.extend(new_events)
-        record.status = status
-        record.receipts.append(receipt)
+        with _verified_read_model_update(record):
+            previous_status = record.status
+            status, new_events = self._reconcile_with_events(
+                record,
+                adapter,
+                commit=False,
+            )
+            _assert_receipt(
+                receipt,
+                command=command,
+                status=status,
+                previous_status=previous_status,
+                new_events=new_events,
+                runtime_provenance=adapter.profile.provenance,
+            )
+            record.events.extend(new_events)
+            record.status = status
+            record.receipts.append(receipt)
+            self._reconcile_receipts(record, adapter)
+            self._validate_current_approvals(record)
+            self._validate_outcome(record)
         if receipt.status == "rejected":
             raise RunnerCommandRejected(
                 f"runtime command rejected: {receipt.rejection_code}"
             )
-        self._validate_current_approvals(record)
-        self._validate_outcome(record)
         return status
 
     def _verified_replay_status(
@@ -532,6 +552,16 @@ class AoARunner:
             )
         )
         normalized = deduplicate_execution_events(supplied_events)
+        retained_event_ids = {event.event_id for event in record.events}
+        reused_event_ids = sorted(
+            event.event_id
+            for event in normalized
+            if event.event_id in retained_event_ids
+        )
+        if reused_event_ids:
+            raise AoARunnerError(
+                f"runtime reused event ids across reconciled slices: {reused_event_ids}"
+            )
         assert_execution_event_chain(
             normalized,
             session=record.session,
@@ -657,7 +687,7 @@ class AoARunner:
             )
         return decisions
 
-    def _restore_receipts(
+    def _reconcile_receipts(
         self,
         record: _SessionRecord,
         adapter: RuntimeAdapterProtocol,
@@ -666,6 +696,9 @@ class AoARunner:
         keys: set[str] = set()
         event_by_ref = {_ref_key(_event_ref(event)): event for event in record.events}
         claimed_event_refs: set[tuple[str, str, str, str]] = set()
+        previous_slice_end = -1
+        previous_resulting_revision = -1
+        durable_by_key: dict[str, CommandReceipt] = {}
         for receipt in receipts:
             if receipt.idempotency_key in keys:
                 raise AoARunnerError(
@@ -677,25 +710,31 @@ class AoARunner:
                 or receipt.produced_by != adapter.profile.provenance
                 or receipt.status != "applied"
             ):
-                raise AoARunnerError("restored adapter receipt is not authoritative")
+                raise AoARunnerError("durable runtime receipt is not authoritative")
             if not receipt.event_refs:
-                raise AoARunnerError("restored receipt has no event slice")
+                raise AoARunnerError("durable runtime receipt has no event slice")
             ref_keys = tuple(_ref_key(ref) for ref in receipt.event_refs)
             if len(ref_keys) != len(set(ref_keys)):
-                raise AoARunnerError("restored receipt repeats an event ref")
+                raise AoARunnerError("durable runtime receipt repeats an event ref")
             if claimed_event_refs.intersection(ref_keys):
-                raise AoARunnerError("restored receipts overlap event slices")
+                raise AoARunnerError("durable runtime receipts overlap event slices")
             try:
                 events = tuple(event_by_ref[key] for key in ref_keys)
             except KeyError as exc:
                 raise AoARunnerError(
-                    "restored receipt references an unverified event"
+                    "durable runtime receipt references an unverified event"
                 ) from exc
             sequences = tuple(event.sequence for event in events)
             if sequences != tuple(range(sequences[0], sequences[-1] + 1)):
                 raise AoARunnerError(
-                    "restored receipt event slice is not contiguous and ordered"
+                    "durable runtime receipt event slice is not contiguous and ordered"
                 )
+            if sequences[0] <= previous_slice_end:
+                raise AoARunnerError(
+                    "durable receipt event slices are not strictly ordered"
+                )
+            if receipt.resulting_revision < previous_resulting_revision:
+                raise AoARunnerError("durable receipt revisions moved backwards")
             acknowledgements = [
                 event
                 for event in events
@@ -705,13 +744,16 @@ class AoARunner:
             ]
             if len(acknowledgements) != 1 or acknowledgements[0] != events[-1]:
                 raise AoARunnerError(
-                    "restored receipt lacks one terminal exact acknowledgement"
+                    "durable runtime receipt lacks one terminal exact acknowledgement"
                 )
             if receipt.resulting_revision > record.status.revision:
                 raise AoARunnerError(
-                    "restored receipt revision exceeds runtime status"
+                    "durable runtime receipt revision exceeds runtime status"
                 )
             claimed_event_refs.update(ref_keys)
+            previous_slice_end = sequences[-1]
+            previous_resulting_revision = receipt.resulting_revision
+            durable_by_key[receipt.idempotency_key] = receipt
         acknowledged_commands = {
             (event.command_id, event.idempotency_key)
             for event in record.events
@@ -722,9 +764,50 @@ class AoARunner:
         }
         if acknowledged_commands != receipted_commands:
             raise AoARunnerError(
-                "restored command acknowledgements and receipts do not match"
+                "runtime command acknowledgements and durable receipts do not match"
             )
-        record.receipts.extend(receipts)
+        local_keys: set[str] = set()
+        rejected_receipts: list[CommandReceipt] = []
+        for local_receipt in record.receipts:
+            if local_receipt.idempotency_key in local_keys:
+                raise AoARunnerError(
+                    "duplicate local idempotency receipts are ambiguous"
+                )
+            local_keys.add(local_receipt.idempotency_key)
+            durable_receipt = durable_by_key.get(local_receipt.idempotency_key)
+            if local_receipt.status == "rejected":
+                if (
+                    local_receipt.session_id != record.session.session_id
+                    or local_receipt.produced_by != adapter.profile.provenance
+                ):
+                    raise AoARunnerError(
+                        "local rejected receipt is outside the runtime scope"
+                    )
+                if durable_receipt is not None:
+                    raise AoARunnerError(
+                        "a rejected command key also has a durable applied receipt"
+                    )
+                rejected_receipts.append(local_receipt)
+                continue
+            if durable_receipt is None:
+                raise AoARunnerError(
+                    "local applied or duplicate receipt is absent from durable state"
+                )
+            if local_receipt.status == "applied":
+                if local_receipt != durable_receipt:
+                    raise AoARunnerError(
+                        "local applied receipt differs from durable runtime state"
+                    )
+            elif (
+                local_receipt.command_id != durable_receipt.command_id
+                or local_receipt.command_digest != durable_receipt.command_digest
+                or local_receipt.session_id != durable_receipt.session_id
+                or local_receipt.produced_by != durable_receipt.produced_by
+            ):
+                raise AoARunnerError(
+                    "local duplicate receipt does not bind the durable command"
+                )
+        record.receipts[:] = [*receipts, *rejected_receipts]
 
     def _validate_outcome(self, record: _SessionRecord) -> RunOutcome | None:
         if record.adapter is None:
@@ -930,6 +1013,8 @@ def _assert_status_and_events(
             if event.state_after is None:
                 raise AoARunnerError("state transition lacks resulting state")
             state = event.state_after
+    if current.updated_at < previous_time:
+        raise AoARunnerError("runtime status time predates the latest verified event")
     if state != current.state:
         raise AoARunnerError("runtime status state is not derived from event history")
     changed = (
@@ -998,3 +1083,19 @@ def _aware(value: datetime, field_name: str) -> datetime:
     if value.tzinfo is None or value.utcoffset() is None:
         raise AoARunnerError(f"{field_name} must be timezone-aware")
     return value.astimezone(timezone.utc)
+
+
+@contextmanager
+def _verified_read_model_update(record: _SessionRecord) -> Iterator[None]:
+    """Rollback every local projection when one runtime view fails validation."""
+
+    previous_status = record.status
+    previous_events = tuple(record.events)
+    previous_receipts = tuple(record.receipts)
+    try:
+        yield
+    except Exception:
+        record.status = previous_status
+        record.events[:] = previous_events
+        record.receipts[:] = previous_receipts
+        raise

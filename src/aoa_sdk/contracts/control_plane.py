@@ -1350,7 +1350,7 @@ def assert_approvals_satisfied(
             )
         if requirement.expires_after_seconds is not None:
             age = (at - approved_decision.decided_at).total_seconds()
-            if age > requirement.expires_after_seconds:
+            if age >= requirement.expires_after_seconds:
                 raise ControlPlaneContractError(
                     f"approval expired for {requirement.requirement_id}"
                 )
