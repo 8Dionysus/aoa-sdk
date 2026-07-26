@@ -151,6 +151,7 @@
 
 - [AOA-SDK-D-0025 - Consumed Surface Posture Gate Test Localization](../AOA-SDK-D-0025-consumed-surface-posture-gate-test-localization.md) (`docs/decisions/AOA-SDK-D-0025-consumed-surface-posture-gate-test-localization.md`)
 - [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) (`docs/decisions/AOA-SDK-D-0031-public-support-sibling-canary-localization.md`)
+- [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
 
 ## compatibility input
 
@@ -185,6 +186,7 @@
 - [AOA-SDK-D-0072 - Separate G5 Release Trust From Owner-Switch Authority](../AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md) (`docs/decisions/AOA-SDK-D-0072-separate-g5-release-trust-from-owner-switch.md`)
 - [AOA-SDK-D-0073 - Replay Release Evidence From an Immutable Tag](../AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md) (`docs/decisions/AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md`)
 - [AOA-SDK-D-0074 - Use a Cross-zlib Canonical Release Carrier](../AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md) (`docs/decisions/AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md`)
+- [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
 
 ## control-plane routing
 
@@ -275,6 +277,10 @@
 ## manifest gate
 
 - [AOA-SDK-D-0012 - Recurrence Control Plane Part Localization](../AOA-SDK-D-0012-recurrence-control-plane-part-localization.md) (`docs/decisions/AOA-SDK-D-0012-recurrence-control-plane-part-localization.md`)
+
+## MCP projection
+
+- [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
 
 ## mechanics prep
 
@@ -612,6 +618,10 @@
 ## workspace control plane
 
 - [AOA-SDK-D-0023 - Session Growth Checkpoint Cycle Localization](../AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md) (`docs/decisions/AOA-SDK-D-0023-session-growth-checkpoint-cycle-localization.md`)
+
+## workspace discovery
+
+- [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
 
 ## workspace MCP
 
