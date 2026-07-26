@@ -160,6 +160,39 @@ A healthy SDK operation follows a bounded route:
 
 Control-plane power is useful only while it remains inspectable and reversible.
 
+## Organ Access Control Plane
+
+The organ access plane is a protocol-independent SDK control-plane surface.
+MCP is one adapter, not its owner model.
+
+```text
+owner records + private desired state + stack observations + proof refs
+  -> validated registry projection
+  -> catalog
+  -> inspect organ
+  -> inspect capability
+  -> compile activation plan
+  -> host-authorized direct owner connection
+  -> receipt
+```
+
+The configured workspace owns one explicit private registry source instance.
+`aoa-sdk` owns its schema, typed models, deterministic projection, discovery,
+compatibility comparison, and activation-plan compiler. `abyss-stack` supplies
+runtime observations and executes approved lifecycle work. Owner repositories
+retain payload meaning, and `aoa-evals` retains proof interpretation.
+
+Discovery never activates a server. A plan is content-addressed candidate
+intent with exact owners, capabilities, effects, credentials classes,
+preconditions, evidence references, expiry, and rollback route. Execution
+belongs to the host or runtime owner and must return a receipt before the
+registry may observe a stronger maturity state.
+
+The registry is deny-by-default. It can suppress discovery, compare desired
+and observed schemas, and route a consumer to a direct owner endpoint. It
+cannot infer domain truth, proof, freshness, or acceptance from its own fields,
+and it is not a proxy for owner tools.
+
 ## Accepted Routing Succession Shape
 
 `AOA-SDK-D-0071` accepts a staged succession of the routing producer into the

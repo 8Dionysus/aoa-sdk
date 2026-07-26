@@ -99,6 +99,11 @@
 - [AOA-SDK-D-0037 - Workspace MCP Surface Crosswalk Secondary Route Naming](../AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md) (`docs/decisions/AOA-SDK-D-0037-workspace-mcp-surface-crosswalk-secondary-route-naming.md`)
 - [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) (`docs/decisions/AOA-SDK-D-0043-sdk-source-home-tree.md`)
 - [AOA-SDK-D-0049 - Mechanics Roadmap Router And Package Contours](../AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md) (`docs/decisions/AOA-SDK-D-0049-mechanics-roadmap-router-and-package-contours.md`)
+- [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
+
+## compatibility
+
+- [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
 
 ## experience
 
