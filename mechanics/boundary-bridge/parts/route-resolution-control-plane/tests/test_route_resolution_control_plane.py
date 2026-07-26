@@ -668,6 +668,54 @@ def test_embedded_owner_switch_receipt_tampering_fails_closed(
         _api(workspace_root, bundle_root, lock_path).resolve(_intent())
 
 
+@pytest.mark.parametrize(
+    ("field_path", "match"),
+    (
+        (("trust_verdict",), "trust verdict must be a JSON object"),
+        (
+            ("trust_verdict", "decision"),
+            "trust decision must be a JSON object",
+        ),
+        (
+            ("trust_verdict", "record"),
+            "trust record must be a JSON object",
+        ),
+        (
+            ("trust_verdict", "record", "producer_admission"),
+            "producer admission must be a JSON object",
+        ),
+        (
+            (
+                "trust_verdict",
+                "record",
+                "producer_admission",
+                "owner_switch_receipt",
+            ),
+            "producer receipt summary must be a JSON object",
+        ),
+        (("file_sha256",), "manifest file hashes must be a JSON object"),
+    ),
+)
+def test_malformed_runtime_manifest_objects_fail_closed(
+    workspace_root: Path,
+    field_path: tuple[str, ...],
+    match: str,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(workspace_root)
+    manifest_path = (
+        bundle_root / "manifest" / "federation_mirror_manifest.json"
+    )
+    manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+    parent = manifest
+    for field in field_path[:-1]:
+        parent = parent[field]
+    parent[field_path[-1]] = []
+    _write_json(manifest_path, manifest)
+
+    with pytest.raises(RoutingSnapshotError, match=match):
+        _api(workspace_root, bundle_root, lock_path).resolve(_intent())
+
+
 def test_source_lock_owner_binding_fails_closed(
     workspace_root: Path,
 ) -> None:

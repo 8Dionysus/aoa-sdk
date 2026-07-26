@@ -421,17 +421,35 @@ def _validate_runtime_manifest(
         raise RoutingSnapshotError(
             "routing owner-switch receipt is missing or outside the locked scope"
         )
-    trust = manifest.get("trust_verdict", {})
+    trust = _require_manifest_object(
+        manifest.get("trust_verdict"),
+        "routing runtime trust verdict",
+    )
+    trust_decision = _require_manifest_object(
+        trust.get("decision"),
+        "routing runtime trust decision",
+    )
     if (
         trust.get("ok") is not True
         or trust.get("verdict") != "allow"
         or trust.get("subject_digest") != lock.routing_bundle_subject_digest
-        or trust.get("decision", {}).get("allow") is not True
+        or trust_decision.get("allow") is not True
     ):
         raise RoutingSnapshotError(
             "routing runtime trust verdict is not an exact allow for the locked subject"
         )
-    producer_admission = trust.get("record", {}).get("producer_admission", {})
+    trust_record = _require_manifest_object(
+        trust.get("record"),
+        "routing runtime trust record",
+    )
+    producer_admission = _require_manifest_object(
+        trust_record.get("producer_admission"),
+        "routing runtime canonical producer admission",
+    )
+    receipt_summary = _require_manifest_object(
+        producer_admission.get("owner_switch_receipt"),
+        "routing runtime canonical producer receipt summary",
+    )
     if (
         producer_admission.get("profile_id") != "aoa-sdk-g5-canonical"
         or producer_admission.get("owner_repo") != "aoa-sdk"
@@ -439,13 +457,15 @@ def _validate_runtime_manifest(
         or producer_admission.get("source_ref") != lock.routing_abi.source_ref
         or producer_admission.get("status") != "canonical_producer"
         or producer_admission.get("g5_authority") != expected_authority
-        or producer_admission.get("owner_switch_receipt", {}).get("digest")
-        != lock.owner_switch_receipt_digest
+        or receipt_summary.get("digest") != lock.owner_switch_receipt_digest
     ):
         raise RoutingSnapshotError(
             "routing runtime trust verdict lacks the exact canonical producer admission"
         )
-    file_hashes = manifest.get("file_sha256", {})
+    file_hashes = _require_manifest_object(
+        manifest.get("file_sha256"),
+        "routing runtime manifest file hashes",
+    )
     expected_hashes = {
         "generated/aoa_router.min.json": (
             lock.routing_abi.artifact_digest.removeprefix("sha256:")
@@ -471,6 +491,15 @@ def _validate_runtime_manifest(
             raise RoutingSnapshotError(
                 f"routing runtime manifest hash mismatch for {relative_path}"
             )
+
+
+def _require_manifest_object(
+    value: object,
+    label: str,
+) -> dict[str, object]:
+    if not isinstance(value, dict):
+        raise RoutingSnapshotError(f"{label} must be a JSON object")
+    return value
 
 
 def _validate_json_schema(
