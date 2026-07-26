@@ -15,3 +15,11 @@ against the same installed package and routing snapshot.
   model equality, and byte equality.
 
 Neither case invoked the selected capability or established task benefit.
+
+`fresh-context-resolver-v3.json` records T1-3 after the caller/provider
+identity repair. A no-history agent reconstructed the exact supplied intent
+through the installed public facade, repeated resolution twice, and returned
+`selected_agent=null`. Parent replay matched the canonical input digest,
+decision ID, status, selected capability, snapshot, model bytes, and null
+provider field. This makes the bounded current C1 trial replayable while still
+proving no invocation or outcome benefit.

@@ -18,10 +18,19 @@ Tracking starts with the community-docs baseline for this repository.
   live smoke exposed v1 rejecting the owner-defined `challenger` health enum.
   V2 keeps challenger routes explicitly degraded and preserves fail-closed
   handling for missing, unknown, unavailable, or retired health.
+- Version the resolver as `aoa_control_plane_route_resolver_v3` after the G8
+  chain exposed v2 copying the caller into `RouteCandidate.agent`. V3 leaves
+  the provider agent absent until an exact owner projection supplies it;
+  scenario agents remain a separate C2 binding.
 - Add C2 Agent OS plan compilation:
   `AoASDK.control_plane.compile()` and `aoa route compile`, with exact reviewed
   scenario bindings, deterministic guarded-branch pruning, content-addressed
   `PlanSnapshot` and `RunPlan`, and decision-bound validation.
+- Version the compiler as `aoa_control_plane_plan_compiler_v2` and add public
+  `scenario_ref()` plus `bind_scenario()` construction. The binder keeps the
+  selected entry route separate from playbook DAG capabilities, resolves each
+  authored alias through exact pinned owner projections, and exposes semantic
+  owner, lifecycle, migration, and unbound availability without activation.
 - Pin the exact trust-admitted `aoa_playbook_plan_contour_v1` owner projection
   and schema from `aoa-playbooks`, fail closed on source, digest, ABI, schema,
   or admission drift, and verify the installed wheel reproduces the golden

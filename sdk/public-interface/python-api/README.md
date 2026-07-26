@@ -88,11 +88,57 @@ codes, and approval requirements before any separate activation route. A
 challenger-only result into `blocked`; use `degraded_allowed` only when the
 caller is prepared to preserve that weaker posture.
 
-`AoASDK.control_plane.compile()` is implemented C2 behavior. It validates the
-exact packaged `aoa-playbooks` contour/schema/trust pin and compiles an exact
-`ScenarioBinding` plus runtime compatibility profile into a content-addressed
-`RunPlan`. Construction remains lazy and compilation does not read the C1
-routing snapshot.
+`RouteIntent.requested_by` is the caller. Resolver v3 leaves
+`RouteCandidate.agent` unset because C1 has no exact provider-agent projection;
+scenario participants are resolved separately from `aoa-agents` during C2
+binding.
+
+`AoASDK.control_plane.scenario_ref()` and `.bind_scenario()` are implemented
+C2 construction behavior. The caller first includes the exact scenario in the
+intent; after resolution, the binder uses the same validated C1 snapshot to
+resolve the admitted playbook's agents, capability aliases, eval refs, and
+memo refs from exact pinned owner Git objects:
+
+```python
+from aoa_sdk.models import ScenarioConditionBinding
+
+scenario = sdk.control_plane.scenario_ref("bounded_change_safe")
+scenario_intent = intent.model_copy(
+    update={
+        "intent_id": "intent:example:bounded-change",
+        "correlation_id": "correlation:example:bounded-change",
+        "scenario": scenario,
+    }
+)
+decision = sdk.control_plane.resolve(scenario_intent)
+binding = sdk.control_plane.bind_scenario(
+    decision,
+    scenario.scenario_id,
+    binding_id="scenario-binding:example:bounded-change",
+    provenance=caller_provenance,
+    input_refs=(caller_provenance,),
+    condition_bindings=(
+        ScenarioConditionBinding(
+            condition_id="preview_required",
+            value=False,
+            provenance=caller_provenance,
+        ),
+    ),
+)
+plan = sdk.control_plane.compile(decision, binding, runtime_profile)
+```
+
+Here `runtime_profile` is an exact compatibility projection supplied by its
+runtime owner. The route entry capability remains decision metadata; playbook
+requirements are independently mapped to current capability graph nodes with
+semantic owner, availability, lifecycle, and migration provenance.
+
+`AoASDK.control_plane.compile()` validates the exact packaged
+`aoa-playbooks` contour/schema/trust pin and compiles that binding plus the
+runtime profile into a content-addressed `RunPlan`. Compilation itself does
+not read the C1 routing snapshot and never activates the bound capabilities.
+The fully executable installed-wheel route is
+`mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_golden_scenario_chain.py`.
 
 `AoASDK.runner` is implemented C3 behavior. It prepares immutable sessions,
 binds only a caller-supplied exact adapter profile, verifies runtime snapshot

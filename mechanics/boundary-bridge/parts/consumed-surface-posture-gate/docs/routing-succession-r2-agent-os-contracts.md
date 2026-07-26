@@ -50,6 +50,8 @@ reserves these protocol meanings:
 ```python
 control_plane.resolve(intent) -> RouteDecision
 control_plane.explain(decision) -> RouteExplanation
+control_plane.scenario_ref(scenario_id) -> ScenarioRef
+control_plane.bind_scenario(decision, scenario_id, ...) -> ScenarioBinding
 control_plane.compile(decision, scenario_binding, runtime_profile) -> RunPlan
 
 runner.prepare(plan) -> SessionHandle
@@ -97,13 +99,18 @@ succession gates.
 `assert_route_plan_chain` proves the whole intent-to-plan handoff is
 content-addressed: decision points to the exact intent; explanation and both
 plan/binding refs point to the exact decision; all correlation IDs agree; the
-selected capability, agent, and scenario occur in the binding; and route-level
-approval requirements cannot be dropped or changed by compilation.
+selected candidate names the exact bound scenario; and route-level approval
+requirements cannot be dropped or changed by compilation. The selected entry
+capability and caller are not required to occur in the playbook DAG.
 
 ### Planning objects
 
-- `ScenarioBinding` binds exact scenario, agent, capability, input, and
-  decision references. It does not copy scenario prose into SDK source truth.
+- `ScenarioBinding` binds the exact scenario, owner agents, input, decision,
+  and requirement references. Its optional `ScenarioCapabilityBinding`
+  records map each authored playbook alias to the current pinned
+  `aoa-skills` graph projection while preserving semantic owner, availability,
+  lifecycle, and migration provenance. It does not copy scenario prose into
+  SDK source truth or promote an unbound capability.
 - `PlanSnapshot` pins every owner artifact and routing ABI by source ref and
   digest.
 - `PlanStep` carries abstract operation, effects, dependencies, refs, expected

@@ -199,8 +199,8 @@
       "terminal_required": true
     }
   ],
-  "plan_digest": "sha256:80b7634902c62905fa5a0a742a80f48545a168946451f7e084026a2f20122b28",
-  "plan_id": "run-plan:bc5faa5f8fe2e0b443e87d393317f069c81f3d830bde7dcdaf9344924c04b1b3",
+  "plan_digest": "sha256:39c206deaa84f9471365de23dfac8e3d7c3d710cf0d125c699734a55635f5960",
+  "plan_id": "run-plan:fbd7498d56e91825404fd8fbc51e8a8b728897704bbd5d2511f0123985ec140b",
   "provenance": {
     "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
     "artifact_ref": "src/aoa_sdk/control_plane/planning/compiler.py",
@@ -342,6 +342,7 @@
       }
     ],
     "binding_id": "scenario-binding:fixture:runtime_chaos_recovery",
+    "capability_bindings": [],
     "capability_refs": [
       {
         "capability_id": "aoa-source-of-truth-check",
@@ -522,8 +523,8 @@
         "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
       }
     ],
-    "snapshot_digest": "sha256:a4966cf1cc1f5df534d177b2a7238f17019445ba86521d022f15d9d1148ac2e6",
-    "snapshot_id": "plan-snapshot:1963395bab781bc7b866bd4ce468c78c24bdfc592206412a99e7125072a602b0",
+    "snapshot_digest": "sha256:837bc4cb091f41290f784da6ff26426914cd9b39a6dc06c50b0f2582c1965705",
+    "snapshot_id": "plan-snapshot:b0282163c5ebb093ad6d4db6b976b5fb4e0b99bb482f649c5d3cf65de5a871a8",
     "source_refs": [
       {
         "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",

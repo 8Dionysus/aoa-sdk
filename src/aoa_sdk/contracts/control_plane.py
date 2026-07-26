@@ -119,6 +119,20 @@ class ScenarioConditionBinding(StrictControlPlaneModel):
     provenance: ProvenanceRef
 
 
+class ScenarioCapabilityBinding(StrictControlPlaneModel):
+    """Resolve one playbook capability requirement through its current owner map."""
+
+    requirement_id: NonEmptyStr
+    capability: CapabilityRef
+    semantic_owner_repo: NonEmptyStr
+    binding_action: NonEmptyStr
+    compatibility: NonEmptyStr
+    availability: NonEmptyStr
+    lifecycle_state: NonEmptyStr
+    lifecycle_health: NonEmptyStr
+    migration_provenance: ProvenanceRef
+
+
 class ResolvedAgentProfile(StrictControlPlaneModel):
     """SDK projection of an owner-authored agent; never an agent definition."""
 
@@ -314,6 +328,7 @@ class ScenarioBinding(StrictControlPlaneModel):
     decision_ref: ContentRef
     agent_refs: tuple[AgentRef, ...]
     capability_refs: tuple[CapabilityRef, ...]
+    capability_bindings: tuple[ScenarioCapabilityBinding, ...] = ()
     input_refs: tuple[ProvenanceRef, ...] = ()
     input_artifact_bindings: tuple[ScenarioArtifactBinding, ...] = ()
     condition_bindings: tuple[ScenarioConditionBinding, ...] = ()
@@ -328,6 +343,10 @@ class ScenarioBinding(StrictControlPlaneModel):
             (
                 "capability",
                 [item.capability_id for item in self.capability_refs],
+            ),
+            (
+                "capability requirement",
+                [item.requirement_id for item in self.capability_bindings],
             ),
             (
                 "input artifact",
@@ -347,6 +366,12 @@ class ScenarioBinding(StrictControlPlaneModel):
         if len(requirement_keys) != len(set(requirement_keys)):
             raise ValueError(
                 "scenario binding requirement refs must be owner-path unique"
+            )
+        if self.capability_bindings and self.capability_refs != tuple(
+            item.capability for item in self.capability_bindings
+        ):
+            raise ValueError(
+                "scenario capability refs must match resolved capability bindings"
             )
         return self
 
@@ -1282,17 +1307,9 @@ def assert_route_plan_chain(
         if candidate.candidate_id == decision.selected_candidate_id
     )
     binding = plan.scenario_binding
-    if selected.capability not in binding.capability_refs:
+    if selected.scenario != binding.scenario:
         raise ControlPlaneContractError(
-            "scenario binding does not include the selected capability"
-        )
-    if selected.agent is not None and selected.agent not in binding.agent_refs:
-        raise ControlPlaneContractError(
-            "scenario binding does not include the selected agent"
-        )
-    if selected.scenario is not None and selected.scenario != binding.scenario:
-        raise ControlPlaneContractError(
-            "scenario binding does not match the selected scenario"
+            "scenario binding must match an explicit selected scenario"
         )
 
 
@@ -1533,11 +1550,25 @@ def assert_closeout_bundle_scope(
 
 @runtime_checkable
 class ControlPlaneProtocol(Protocol):
-    """Future C1/C2 behavior surface; R2 defines the contract only."""
+    """Runtime-neutral C1/C2 control-plane behavior surface."""
 
     def resolve(self, intent: RouteIntent) -> RouteDecision: ...
 
     def explain(self, decision: RouteDecision) -> RouteExplanation: ...
+
+    def scenario_ref(self, scenario_id: str) -> ScenarioRef: ...
+
+    def bind_scenario(
+        self,
+        decision: RouteDecision,
+        scenario_id: str,
+        *,
+        binding_id: str,
+        provenance: ProvenanceRef,
+        input_refs: tuple[ProvenanceRef, ...] = (),
+        input_artifact_bindings: tuple[ScenarioArtifactBinding, ...] = (),
+        condition_bindings: tuple[ScenarioConditionBinding, ...] = (),
+    ) -> ScenarioBinding: ...
 
     def compile(
         self,

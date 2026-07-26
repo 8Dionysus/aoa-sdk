@@ -661,8 +661,12 @@ def test_resolve_is_deterministic_explainable_and_needs_no_predecessor_checkout(
     assert first == second
     assert first.status == "resolved"
     assert first.selected_candidate_id == "aoa-skills:skill:aoa-decision"
-    assert first.resolver_version == "aoa_control_plane_route_resolver_v2"
+    assert first.resolver_version == "aoa_control_plane_route_resolver_v3"
     assert len(first.candidates) == 2
+    assert all(candidate.agent is None for candidate in first.candidates)
+    assert all(
+        candidate.agent != intent.requested_by for candidate in first.candidates
+    )
     assert explanation.fallback_used is False
     assert len(explanation.candidate_explanations) == len(first.candidates)
     dispositions = {

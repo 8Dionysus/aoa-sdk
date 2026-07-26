@@ -17,6 +17,8 @@
 - `abyss-machine` owns artifact trust admission;
 - `abyss-stack` owns the deployed routing mirror and runtime lifecycle;
 - the requesting agent or scenario owner owns the intent and constraints;
+- a candidate provider agent remains absent unless an exact stronger-owner
+  projection supplies it; the caller is never substituted as that provider;
 - the runtime owner retains activation, model/tool execution, and receipts.
 
 ## Determinism
@@ -42,6 +44,8 @@ serialization only; it cannot select a winner.
 ## Stop lines
 
 - A selected route is a candidate reference, not invocation.
+- `RouteIntent.requested_by` is the caller, not a selected capability
+  provider or scenario participant.
 - `approval_required` is not approval.
 - Explanation never reruns or changes resolution.
 - Validation proves shape and parent binding, not execution.

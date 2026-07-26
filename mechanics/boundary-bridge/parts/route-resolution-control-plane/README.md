@@ -30,7 +30,7 @@ eligible.
 
 ## Selection law
 
-Version `aoa_control_plane_route_resolver_v2` uses only owner-authored
+Version `aoa_control_plane_route_resolver_v3` uses only owner-authored
 retrieval fields from the pinned capability graph:
 
 | Signal | Score |
@@ -57,6 +57,11 @@ unrecognized, unavailable, or retired health stays incompatible. Accepting an
 advertised challenger does not promote it to healthy or turn selection into a
 proof verdict.
 
+`RouteIntent.requested_by` remains only the caller identity. C1 has no pinned
+provider-agent projection for a skill candidate, so `RouteCandidate.agent` is
+`None`; the resolver must not relabel the caller as a provider. Scenario agents
+are resolved later from the exact admitted playbook contour.
+
 ## Public routes
 
 - Python: `AoASDK.control_plane.resolve()` and
@@ -76,8 +81,8 @@ Use [VALIDATION.md](VALIDATION.md). Green C1 checks prove deterministic SDK
 resolution over the tested snapshot; they do not prove capability invocation,
 task success, cost reduction, runtime admission, or Agent OS benefit.
 
-The bounded fresh-context T1 record lives in
-[`trials/fresh-context-resolver-v2.json`](trials/fresh-context-resolver-v2.json).
-Its first return is intentionally retained as terminal but unaccepted because
-it omitted the complete `RouteIntent`; the corrected return includes the
-canonical input and is independently replayable.
+The bounded v2 fresh-context record remains in
+[`trials/fresh-context-resolver-v2.json`](trials/fresh-context-resolver-v2.json)
+as historical evidence for the challenger-health change. The current v3
+caller/provider replay is retained separately in
+[`trials/fresh-context-resolver-v3.json`](trials/fresh-context-resolver-v3.json).

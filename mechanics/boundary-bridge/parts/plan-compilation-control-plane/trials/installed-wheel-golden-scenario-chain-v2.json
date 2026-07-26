@@ -1,0 +1,115 @@
+{
+  "schema_version": "aoa_sdk_g8_plan_compilation_trial_v1",
+  "trial_family": "installed_wheel_live_owner_chain",
+  "resolver_version": "aoa_control_plane_route_resolver_v3",
+  "compiler_version": "aoa_control_plane_plan_compiler_v2",
+  "source_base_ref": "370bcd5f59b5ac5f116c287c2362684b84fcc4d2",
+  "wheel": {
+    "package_version": "0.8.0",
+    "sha256": "de50c347ebe18d38a8dd8c0aea0366eccbe65a13b6ace02adb8874a81db2301e",
+    "import_posture": "isolated_venv_site_packages"
+  },
+  "owner_pins": {
+    "routing_snapshot_digest": "sha256:b6379fc0a9bf1a9d0a5382ff37b53adddc323169f69636841abf7e62ba09a2a3",
+    "playbook_contour_source_ref": "056cac249a353ae94abedbd4048e6730f70c064d",
+    "aoa_agents_source_ref": "66f8bf22d03518b1e2367fd4f51dab80650f6d37",
+    "aoa_skills_source_ref": "48598a9564c4621b15428831642b802dbc8d2a47",
+    "aoa_evals_source_ref": "3412b47f9ee7bec9567f92e1c2d59596c4428a2c",
+    "aoa_memo_source_ref": "7672add5e2bb4ff21c2581ca656998f0ca7c8a3e"
+  },
+  "legacy_fixture_probe": {
+    "verdict": "pass",
+    "scenario_id": "bounded_change_safe",
+    "plan_digest": "sha256:607af70b95767a0f5bf391a8e84906c8d7f873c84e8770d14c0a3751fb3af063",
+    "default_compiler_plan_digest": "sha256:f3f473dfebd4d54c525440f8957722f114f02613b5d1f1a371e0353cb529066f",
+    "packaged_resource_count": 3
+  },
+  "live_scenarios": [
+    {
+      "scenario_id": "bounded_change_safe",
+      "decision_status": "degraded",
+      "decision_id": "route-decision:21b1f033d01325c5bb5559d8c0c17951f833e2c854f4fad86e44aae5407ff8c8",
+      "selected_candidate_id": "aoa-skills:skill:aoa-knowledge-stewardship",
+      "agent_count": 4,
+      "capability_binding_count": 9,
+      "unbound_binding": {
+        "requirement_id": "aoa-dry-run-first",
+        "capability_id": "guard.operations.preview",
+        "semantic_owner_repo": "target-runtime-owner",
+        "availability": "unbound",
+        "lifecycle_health": "unavailable"
+      },
+      "plan_id": "run-plan:4dafe6bcdee92940f7ef4c27d13ab6e29f49ed0101c8dfba9c5700b8d4f02e16",
+      "plan_digest": "sha256:555d844bcea2b9686b729d753853faaf936291a3d467e9a96ea0833da5081141",
+      "steps": [
+        "orient",
+        "mutate",
+        "verify",
+        "closeout"
+      ]
+    },
+    {
+      "scenario_id": "a2a_summon_return_checkpoint",
+      "decision_status": "degraded",
+      "decision_id": "route-decision:01dcaa65ae2c304834faaf9f70b733ef8152f77ee32186fd9eda5e39827ebbaa",
+      "selected_candidate_id": "aoa-skills:skill:aoa-session-harvest",
+      "agent_count": 5,
+      "capability_binding_count": 7,
+      "unbound_binding": {
+        "requirement_id": "aoa-dry-run-first",
+        "capability_id": "guard.operations.preview",
+        "semantic_owner_repo": "target-runtime-owner",
+        "availability": "unbound",
+        "lifecycle_health": "unavailable"
+      },
+      "plan_id": "run-plan:f8dab73847b782abbc6890bb1e44565131a76df0264883e287bf49d51a85631d",
+      "plan_digest": "sha256:61b86fd3fd3669e4e7076b463923d063afcf6a7c948ef98c2326c349986aefc9",
+      "steps": [
+        "inspect-parent-anchor",
+        "inspect-child-target",
+        "review-return",
+        "checkpoint-return",
+        "evaluate-return",
+        "closeout-dry-run"
+      ]
+    },
+    {
+      "scenario_id": "runtime_chaos_recovery",
+      "decision_status": "degraded",
+      "decision_id": "route-decision:d0d25654643fa1dddfe67546043bd2473b9d5d45eb28e51131223a9758ea8baf",
+      "selected_candidate_id": "aoa-skills:skill:aoa-memo-writeback",
+      "agent_count": 5,
+      "capability_binding_count": 6,
+      "unbound_binding": {
+        "requirement_id": "aoa-dry-run-first",
+        "capability_id": "guard.operations.preview",
+        "semantic_owner_repo": "target-runtime-owner",
+        "availability": "unbound",
+        "lifecycle_health": "unavailable"
+      },
+      "plan_id": "run-plan:374d36fba8085adce883edf396cc2adbc7a65c4d1fa76c230dc983c938ae7499",
+      "plan_digest": "sha256:13be8dc868b97fbaeb71acd8729a944e8b77fede851368911b700337a73ca068",
+      "steps": [
+        "inspect-runtime-receipt",
+        "validate-degraded-lane",
+        "evaluate-reentry",
+        "closeout-recovery"
+      ]
+    }
+  ],
+  "acceptance_checks": {
+    "public_facade_only": true,
+    "route_provider_agent_absent": true,
+    "explicit_selected_scenario": true,
+    "decision_repeatable": true,
+    "binding_repeatable": true,
+    "plan_repeatable": true,
+    "entry_capability_absent_from_contour": true,
+    "migration_and_graph_source_refs_match": true,
+    "semantic_owner_visible": true,
+    "unbound_capability_not_promoted": true,
+    "all_three_admitted_scenarios_compile": true
+  },
+  "verdict": "pass",
+  "claim_limit": "This proves deterministic installed-wheel route-to-plan construction for three exact owner-pinned scenarios. It proves no capability activation, runtime execution, outcome benefit, cost reduction, consumer-zero, or archive authority."
+}

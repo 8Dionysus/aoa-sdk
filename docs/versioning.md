@@ -114,7 +114,7 @@ or owner authority requires a versioned contract decision; adapters declare
 the plan and event versions they support.
 
 C1 route selection is independently named
-`aoa_control_plane_route_resolver_v2`. Its version covers candidate
+`aoa_control_plane_route_resolver_v3`. Its version covers candidate
 intersection, score weights, negative applicability, constraint handling,
 eligibility rules, ambiguity behavior, decision identity, and fallback
 posture. Changing any of those semantics requires a new resolver version and
@@ -125,12 +125,18 @@ Resolver v1 incorrectly treated the owner-defined `challenger` health state
 as unknown and therefore blocked the only advertised challenger in the pinned
 live graph. Resolver v2 maps `challenger` to explicit degraded compatibility;
 it neither promotes owner health nor relaxes missing, unknown, unavailable,
-or retired health.
+or retired health. Resolver v3 retains that mapping and stops projecting
+`RouteIntent.requested_by` as `RouteCandidate.agent`: the former is a caller,
+while the latter is reserved for an exact provider projection.
 
 C2 plan compilation is independently named
-`aoa_control_plane_plan_compiler_v1`. Its version covers exact scenario
-binding, owner-contour interpretation, guarded pruning, plan snapshot scope,
+`aoa_control_plane_plan_compiler_v2`. Its version covers explicit selected
+scenario identity, exact owner-projection binding of playbook capability
+aliases, owner-contour interpretation, guarded pruning, plan snapshot scope,
 content identity, and preservation of approvals and lifecycle requirements.
+V1 required the route entry capability and candidate agent to appear in the
+scenario binding; v2 keeps entry navigation separate from scenario DAG
+participants and preserves semantic-owner plus unbound lifecycle posture.
 The consumed owner ABI is separately pinned as
 `aoa_playbook_plan_contour_v1`; changing either semantic contract requires a
 new versioned decision and fixture migration, not an in-place reinterpretation

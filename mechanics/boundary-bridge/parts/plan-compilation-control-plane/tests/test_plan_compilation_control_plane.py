@@ -19,6 +19,7 @@ from aoa_sdk.contracts.control_plane import (
     RuntimeProfile,
     ScenarioArtifactBinding,
     ScenarioBinding,
+    ScenarioCapabilityBinding,
     assert_run_plan_digest,
     canonical_digest,
 )
@@ -511,6 +512,90 @@ def test_blocked_decision_and_wrong_parent_binding_fail_closed() -> None:
             runtime,
             snapshot,
         )
+
+
+def test_resolved_contour_capabilities_are_distinct_from_route_entry() -> None:
+    decision, binding, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    snapshot = load_plan_compilation_snapshot()
+    resolved_bindings = tuple(
+        ScenarioCapabilityBinding(
+            requirement_id=capability.capability_id,
+            capability=capability.model_copy(
+                update={
+                    "capability_id": (
+                        "resolved." + capability.capability_id.removeprefix("aoa-")
+                    )
+                }
+            ),
+            semantic_owner_repo="fixture-owner",
+            binding_action="migration-alias",
+            compatibility="migration-alias",
+            availability="available",
+            lifecycle_state="active",
+            lifecycle_health="healthy",
+            migration_provenance=capability.provenance,
+        )
+        for capability in binding.capability_refs
+    )
+    selected = decision.candidates[0].model_copy(
+        update={
+            "capability": decision.candidates[0].capability.model_copy(
+                update={"capability_id": "skill.route-entry"}
+            ),
+            "agent": binding.agent_refs[0].model_copy(
+                update={"agent_id": "route-requester"}
+            ),
+        }
+    )
+    decision = decision.model_copy(update={"candidates": (selected,)})
+    binding = binding.model_copy(
+        update={
+            "decision_ref": binding.decision_ref.model_copy(
+                update={"digest": canonical_digest(decision)}
+            ),
+            "capability_refs": tuple(
+                item.capability for item in resolved_bindings
+            ),
+            "capability_bindings": resolved_bindings,
+        }
+    )
+
+    plan = compile_run_plan(decision, binding, runtime, snapshot)
+
+    assert plan.steps
+    assert all(
+        capability.capability_id.startswith("resolved.")
+        for step in plan.steps
+        for capability in step.capability_refs
+    )
+    assert selected.capability not in plan.scenario_binding.capability_refs
+    assert selected.agent not in plan.scenario_binding.agent_refs
+
+
+def test_plan_compilation_requires_an_explicit_selected_scenario() -> None:
+    decision, binding, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    snapshot = load_plan_compilation_snapshot()
+    selected = decision.candidates[0].model_copy(update={"scenario": None})
+    decision = decision.model_copy(update={"candidates": (selected,)})
+    binding = binding.model_copy(
+        update={
+            "decision_ref": binding.decision_ref.model_copy(
+                update={"digest": canonical_digest(decision)}
+            )
+        }
+    )
+
+    with pytest.raises(
+        PlanCompilationError,
+        match="explicit selected scenario",
+    ):
+        compile_run_plan(decision, binding, runtime, snapshot)
 
 
 def test_owner_identity_order_and_requirement_refs_fail_closed() -> None:

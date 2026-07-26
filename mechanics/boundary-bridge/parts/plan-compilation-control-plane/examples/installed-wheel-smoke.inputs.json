@@ -175,6 +175,7 @@
       }
     ],
     "binding_id": "scenario-binding:fixture:bounded_change_safe",
+    "capability_bindings": [],
     "capability_refs": [
       {
         "capability_id": "aoa-approval-gate-check",

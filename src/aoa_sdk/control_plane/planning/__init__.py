@@ -1,5 +1,10 @@
 """Runtime-neutral plan compilation from an exact owner contour."""
 
+from .bindings import (
+    ScenarioBindingError,
+    bind_scenario,
+    resolve_scenario_ref,
+)
 from .compiler import (
     PLAN_COMPILER_VERSION,
     PlanCompilationError,
@@ -16,6 +21,9 @@ __all__ = [
     "PlanCompilationError",
     "PlanCompilationSnapshot",
     "PlanCompilationSnapshotError",
+    "ScenarioBindingError",
+    "bind_scenario",
     "compile_run_plan",
     "load_plan_compilation_snapshot",
+    "resolve_scenario_ref",
 ]

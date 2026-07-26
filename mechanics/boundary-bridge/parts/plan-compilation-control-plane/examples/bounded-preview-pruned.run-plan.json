@@ -152,8 +152,8 @@
       "terminal_required": true
     }
   ],
-  "plan_digest": "sha256:40dc84b38557067ed639bbfb7b9a3e5e8c9b3bf0c7b8371f2ce0d13dba6073cc",
-  "plan_id": "run-plan:6276fadd9c5feb133b725eb78cc358005f176e85e45478cd861710aa72cf9a21",
+  "plan_digest": "sha256:607af70b95767a0f5bf391a8e84906c8d7f873c84e8770d14c0a3751fb3af063",
+  "plan_id": "run-plan:e7275d7d8a2ab128fcb93689ccb98350fcbd498843ba810e96055621bcd6b594",
   "provenance": {
     "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
     "artifact_ref": "src/aoa_sdk/control_plane/planning/compiler.py",
@@ -284,6 +284,7 @@
       }
     ],
     "binding_id": "scenario-binding:fixture:bounded_change_safe",
+    "capability_bindings": [],
     "capability_refs": [
       {
         "capability_id": "aoa-approval-gate-check",
@@ -484,8 +485,8 @@
         "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
       }
     ],
-    "snapshot_digest": "sha256:25a3d836f9dfd6d8b2aca7cab8ff791c3ff3bbd9c22e99ad8bdfef6263cde49b",
-    "snapshot_id": "plan-snapshot:7a9fe9f669ec7cb6959921d9e9d3494bb475adad5162866595f9fde5be89c7d0",
+    "snapshot_digest": "sha256:c639afb065a85b5e3aa5db99724c2e0444f5f4ba6695465356718d04a99bc621",
+    "snapshot_id": "plan-snapshot:0aeda92a4d0fbdda3d9331a6b5c236a158eca66ea8df3ac48094d55c858143a3",
     "source_refs": [
       {
         "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",

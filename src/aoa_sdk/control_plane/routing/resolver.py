@@ -31,7 +31,7 @@ from ...contracts.skills import (
 from .snapshot import RoutingResolutionSnapshot
 
 
-ROUTE_RESOLVER_VERSION = "aoa_control_plane_route_resolver_v2"
+ROUTE_RESOLVER_VERSION = "aoa_control_plane_route_resolver_v3"
 _TOKEN_RE = re.compile(r"[\w.-]+", re.UNICODE)
 _SELECTABLE_LIFECYCLE_STATES = frozenset({"active", "candidate"})
 _FORBIDDEN_LIFECYCLE_STATES = frozenset(
@@ -194,7 +194,7 @@ def resolve_route_intent(
                         capability_kind=node.kind,
                         provenance=capability_provenance,
                     ),
-                    agent=intent.requested_by,
+                    agent=None,
                     scenario=intent.scenario,
                     rank=0,
                     compatibility=compatibility,
@@ -381,7 +381,10 @@ def default_resolver_provenance() -> ProvenanceRef:
         artifact_ref="src/aoa_sdk/control_plane/routing/resolver.py",
         source_ref=(f"{ROUTE_RESOLVER_VERSION}@sha256:{module_digest}"),
         artifact_digest=f"sha256:{module_digest}",
-        schema_ref="docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md",
+        schema_ref=(
+            "docs/decisions/"
+            "AOA-SDK-D-0086-keep-route-callers-distinct-from-providers.md"
+        ),
         schema_version=ROUTE_RESOLVER_VERSION,
     )
 

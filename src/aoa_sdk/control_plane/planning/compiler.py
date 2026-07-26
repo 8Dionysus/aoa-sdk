@@ -35,7 +35,7 @@ from .snapshot import (
 )
 
 
-PLAN_COMPILER_VERSION = "aoa_control_plane_plan_compiler_v1"
+PLAN_COMPILER_VERSION = "aoa_control_plane_plan_compiler_v2"
 _ZERO_DIGEST = "sha256:" + "0" * 64
 
 
@@ -87,7 +87,14 @@ def compile_run_plan(
             )
 
     agents = {item.agent_id: item for item in scenario.agent_refs}
-    capabilities = {item.capability_id: item for item in scenario.capability_refs}
+    capabilities = (
+        {
+            item.requirement_id: item.capability
+            for item in scenario.capability_bindings
+        }
+        if scenario.capability_bindings
+        else {item.capability_id: item for item in scenario.capability_refs}
+    )
     plan_steps = tuple(
         PlanStep(
             step_id=step.step_id,
@@ -301,7 +308,7 @@ def default_compiler_provenance() -> ProvenanceRef:
         artifact_digest=f"sha256:{module_digest}",
         schema_ref=(
             "docs/decisions/"
-            "AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md"
+            "AOA-SDK-D-0085-resolve-scenario-capabilities-before-compilation.md"
         ),
         schema_version=PLAN_COMPILER_VERSION,
     )
@@ -334,17 +341,9 @@ def _validate_decision_binding(
         for candidate in decision.candidates
         if candidate.candidate_id == decision.selected_candidate_id
     )
-    if selected.capability not in scenario.capability_refs:
+    if selected.scenario != scenario.scenario:
         raise PlanCompilationError(
-            "scenario binding does not contain the selected capability"
-        )
-    if selected.agent is not None and selected.agent not in scenario.agent_refs:
-        raise PlanCompilationError(
-            "scenario binding does not contain the selected agent"
-        )
-    if selected.scenario is not None and selected.scenario != scenario.scenario:
-        raise PlanCompilationError(
-            "scenario binding does not match the selected scenario"
+            "scenario binding must match an explicit selected scenario"
         )
 
 
@@ -372,16 +371,29 @@ def _validate_scenario_binding(
     if any(item.provenance.owner_repo != "aoa-agents" for item in scenario.agent_refs):
         raise PlanCompilationError("scenario agents must remain owned by aoa-agents")
     expected_capabilities = contour.required_capability_ids
-    actual_capabilities = tuple(item.capability_id for item in scenario.capability_refs)
+    actual_capabilities = (
+        tuple(item.requirement_id for item in scenario.capability_bindings)
+        if scenario.capability_bindings
+        else tuple(item.capability_id for item in scenario.capability_refs)
+    )
     if actual_capabilities != expected_capabilities:
         raise PlanCompilationError(
             "scenario capabilities must match the owner contour exactly and in order"
         )
-    if any(
-        item.provenance.owner_repo != "aoa-skills" for item in scenario.capability_refs
+    if not scenario.capability_bindings and any(
+        item.provenance.owner_repo != "aoa-skills"
+        for item in scenario.capability_refs
     ):
         raise PlanCompilationError(
             "scenario capabilities must remain owned by aoa-skills"
+        )
+    if scenario.capability_bindings and any(
+        item.capability.provenance.owner_repo != "aoa-skills"
+        or item.migration_provenance.owner_repo != "aoa-skills"
+        for item in scenario.capability_bindings
+    ):
+        raise PlanCompilationError(
+            "resolved capability bindings must remain pinned aoa-skills projections"
         )
     if scenario.expected_artifact_kinds != contour.expected_artifact_kinds:
         raise PlanCompilationError(
@@ -598,6 +610,10 @@ def _snapshot_source_refs(
         compiler_provenance,
         *(item.provenance for item in scenario.agent_refs),
         *(item.provenance for item in scenario.capability_refs),
+        *(
+            item.migration_provenance
+            for item in scenario.capability_bindings
+        ),
         *scenario.input_refs,
         *(item.artifact_ref for item in scenario.input_artifact_bindings),
         *(item.provenance for item in scenario.condition_bindings),

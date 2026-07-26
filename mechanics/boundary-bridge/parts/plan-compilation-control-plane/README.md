@@ -13,9 +13,13 @@ activate a capability, or execute a step.
 ## Inputs
 
 - a resolved or degraded `RouteDecision` with one selected candidate;
-- an exact `ScenarioBinding` containing the owner contour's agents,
-  capabilities, expected artifacts, generic or kind-selected inputs, reviewed
-  boolean conditions, and owner requirement references;
+- an explicit selected `ScenarioRef` matching the admitted contour;
+- an exact `ScenarioBinding` whose authored capability aliases are resolved
+  through the same routing snapshot's pinned `aoa-skills` migration and
+  capability graph, while required agents and eval/memo refs are read from
+  their exact pinned owner Git objects;
+- generic or kind-selected inputs and reviewed boolean conditions supplied by
+  the caller rather than inferred by the SDK;
 - a runtime-owner `RuntimeProfile` declaring compatibility, not authorization;
 - the exact packaged contour/schema pin from
   `aoa-playbooks@056cac249a353ae94abedbd4048e6730f70c064d`;
@@ -34,9 +38,18 @@ activate a capability, or execute a step.
 
 ## Public routes
 
+- Python: `AoASDK.control_plane.scenario_ref(scenario_id)`;
+- Python: `AoASDK.control_plane.bind_scenario(decision, scenario_id, ...)`;
 - Python: `AoASDK.control_plane.compile(decision, scenario, runtime_profile)`;
 - CLI: `aoa route compile DECISION SCENARIO RUNTIME_PROFILE`;
 - validation: `aoa route validate RUN_PLAN --against DECISION`.
+
+The C1 entry capability remains in the route decision as navigation evidence.
+It is not required to be a playbook DAG step. Each playbook requirement keeps
+its authored alias alongside the resolved capability, semantic owner,
+availability, lifecycle posture, and migration provenance. An `unbound`
+runtime guard therefore remains visibly unbound; binding does not activate or
+promote it.
 
 ## Next route
 
@@ -48,7 +61,10 @@ invocation claim.
 ## Validation
 
 Use [VALIDATION.md](VALIDATION.md). Green C2 checks prove deterministic
-compilation over the pinned contour and tested bindings. The installed-wheel
-probe separately proves that package data and compilation work without an
-`aoa-playbooks` checkout. These checks do not prove runtime invocation, task
-benefit, cost reduction, consumer-zero, or archive readiness.
+compilation over the pinned contour and tested bindings. The base
+installed-wheel probe proves packaged compilation without an
+`aoa-playbooks` checkout. The public golden-chain verifier separately proves
+live C1 resolution, exact owner binding, and C2 compilation for all three
+admitted scenarios; it intentionally requires the pinned owner repositories.
+These checks do not prove runtime invocation, task benefit, cost reduction,
+consumer-zero, or archive readiness.
