@@ -14,6 +14,7 @@ from aoa_sdk import AoASDK
 from aoa_sdk.cli.main import app
 from aoa_sdk.contracts.control_plane import (
     AgentRef,
+    ControlPlaneContractError,
     ProvenanceRef,
     RouteConstraint,
     RouteIntent,
@@ -571,7 +572,9 @@ def test_equal_top_scores_block_without_lexical_fallback(
     workspace_root: Path,
 ) -> None:
     bundle_root, lock_path = _routing_inputs(workspace_root, ambiguous=True)
-    decision = _api(workspace_root, bundle_root, lock_path).resolve(_intent())
+    api = _api(workspace_root, bundle_root, lock_path)
+    decision = api.resolve(_intent())
+    explanation = api.explain(decision)
 
     assert decision.status == "blocked"
     assert decision.selected_candidate_id is None
@@ -580,6 +583,27 @@ def test_equal_top_scores_block_without_lexical_fallback(
         for reason in decision.reason_codes
     )
     assert [candidate.rank for candidate in decision.candidates[:2]] == [0, 0]
+    assert explanation.ambiguity_codes == tuple(
+        reason
+        for reason in decision.reason_codes
+        if reason.startswith("ambiguous_")
+    )
+    with pytest.raises(ControlPlaneContractError, match="decision order"):
+        assert_explanation_matches_decision(
+            decision,
+            explanation.model_copy(
+                update={
+                    "candidate_explanations": tuple(
+                        reversed(explanation.candidate_explanations)
+                    )
+                }
+            ),
+        )
+    with pytest.raises(ControlPlaneContractError, match="ambiguity codes"):
+        assert_explanation_matches_decision(
+            decision,
+            explanation.model_copy(update={"ambiguity_codes": ()}),
+        )
 
 
 def test_deferred_capability_requires_explicit_owner_scoped_constraint(
@@ -917,7 +941,15 @@ def test_route_cli_resolve_explain_and_validate(
 ) -> None:
     bundle_root, lock_path = _routing_inputs(workspace_root)
     intent_path = workspace_root / "intent.json"
-    _write_json(intent_path, _intent().model_dump(mode="json"))
+    _write_json(
+        intent_path,
+        _intent(
+            objective=(
+                "find a durable repository decision and rationale "
+                "with evaluation proof"
+            )
+        ).model_dump(mode="json"),
+    )
     runner = CliRunner()
 
     resolved = runner.invoke(
@@ -1033,6 +1065,39 @@ def test_route_cli_resolve_explain_and_validate(
         for candidate in explanation_payload["candidate_explanations"]
         if candidate["candidate_id"] != decision_payload["selected_candidate_id"]
     )
+    wrong_disposition_path = (
+        workspace_root / "explanation-wrong-disposition.json"
+    )
+    _write_json(
+        wrong_disposition_path,
+        {
+            **explanation_payload,
+            "candidate_explanations": [
+                (
+                    {**candidate, "disposition": "rejected"}
+                    if candidate["candidate_id"] == nonselected["candidate_id"]
+                    else candidate
+                )
+                for candidate in explanation_payload["candidate_explanations"]
+            ],
+        },
+    )
+    rejected_disposition = runner.invoke(
+        app,
+        [
+            "route",
+            "validate",
+            str(wrong_disposition_path),
+            "--against",
+            str(decision_path),
+        ],
+    )
+    assert rejected_disposition.exit_code == 1
+    assert (
+        "disposition contradicts the decision candidate"
+        in rejected_disposition.output
+    )
+
     duplicate_explanation_path = (
         workspace_root / "explanation-duplicate-candidate.json"
     )

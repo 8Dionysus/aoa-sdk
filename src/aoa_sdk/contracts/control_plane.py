@@ -10,6 +10,7 @@ from __future__ import annotations
 
 import hashlib
 import json
+import re
 from collections.abc import Iterable, Mapping
 from datetime import datetime, timezone
 from typing import Annotated, Literal, Protocol, TypeAlias, runtime_checkable
@@ -215,6 +216,40 @@ class CandidateExplanation(StrictControlPlaneModel):
     disposition: Literal["selected", "eligible", "degraded", "rejected"]
     reason_codes: tuple[NonEmptyStr, ...]
     evidence_refs: tuple[ProvenanceRef, ...]
+
+
+def candidate_explanation_disposition(
+    candidate: RouteCandidate,
+    *,
+    selected_candidate_id: str | None,
+) -> Literal["selected", "eligible", "degraded", "rejected"]:
+    """Derive one exact explanation disposition from a route candidate."""
+
+    if candidate.candidate_id == selected_candidate_id:
+        return "selected"
+    score_codes = tuple(
+        reason
+        for reason in candidate.reason_codes
+        if reason.startswith("resolver_score:")
+    )
+    score: int | None = None
+    if len(score_codes) == 1:
+        raw_score = score_codes[0].removeprefix("resolver_score:")
+        if re.fullmatch(r"-?\d+", raw_score) is not None:
+            score = int(raw_score)
+    if score is None or score <= 0:
+        return "rejected"
+    if (
+        candidate.compatibility == "incompatible"
+        or candidate.policy_posture == "forbidden"
+    ):
+        return "rejected"
+    if (
+        candidate.compatibility == "degraded"
+        or candidate.policy_posture == "approval_required"
+    ):
+        return "degraded"
+    return "eligible"
 
 
 class RouteExplanation(StrictControlPlaneModel):
@@ -903,7 +938,9 @@ def assert_explanation_matches_decision(
         raise ControlPlaneContractError(
             "route explanation scope does not match the route decision"
         )
-    decision_candidate_ids = {candidate.candidate_id for candidate in decision.candidates}
+    decision_candidate_ids = [
+        candidate.candidate_id for candidate in decision.candidates
+    ]
     explanation_ids = [
         candidate.candidate_id
         for candidate in explanation.candidate_explanations
@@ -912,10 +949,9 @@ def assert_explanation_matches_decision(
         raise ControlPlaneContractError(
             "route explanation candidate ids must be unique"
         )
-    explanation_candidate_ids = set(explanation_ids)
-    if decision_candidate_ids != explanation_candidate_ids:
+    if decision_candidate_ids != explanation_ids:
         raise ControlPlaneContractError(
-            "route explanation does not account for every decision candidate"
+            "route explanation does not account for candidates in decision order"
         )
     decision_by_id = {
         candidate.candidate_id: candidate for candidate in decision.candidates
@@ -929,24 +965,23 @@ def assert_explanation_matches_decision(
             raise ControlPlaneContractError(
                 "route explanation does not preserve candidate reasons and evidence"
             )
-        if candidate.candidate_id == decision.selected_candidate_id:
-            allowed_dispositions = {"selected"}
-        elif (
-            candidate.compatibility == "incompatible"
-            or candidate.policy_posture == "forbidden"
-        ):
-            allowed_dispositions = {"rejected"}
-        elif (
-            candidate.compatibility == "degraded"
-            or candidate.policy_posture == "approval_required"
-        ):
-            allowed_dispositions = {"degraded", "rejected"}
-        else:
-            allowed_dispositions = {"eligible", "rejected"}
-        if item.disposition not in allowed_dispositions:
+        expected_disposition = candidate_explanation_disposition(
+            candidate,
+            selected_candidate_id=decision.selected_candidate_id,
+        )
+        if item.disposition != expected_disposition:
             raise ControlPlaneContractError(
                 "route explanation disposition contradicts the decision candidate"
             )
+    expected_ambiguity_codes = tuple(
+        reason
+        for reason in decision.reason_codes
+        if reason.startswith("ambiguous_")
+    )
+    if explanation.ambiguity_codes != expected_ambiguity_codes:
+        raise ControlPlaneContractError(
+            "route explanation ambiguity codes do not match the decision"
+        )
 
 
 def assert_decision_matches_intent(

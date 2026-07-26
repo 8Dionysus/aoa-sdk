@@ -20,6 +20,7 @@ from ...contracts.control_plane import (
     RouteDecision,
     RouteExplanation,
     RouteIntent,
+    candidate_explanation_disposition,
     canonical_digest,
 )
 from ...contracts.routing import RegistryEntry
@@ -335,29 +336,13 @@ def explain_route_decision(
     provenance = resolver_provenance or default_resolver_provenance()
     explanations: list[CandidateExplanation] = []
     for candidate in decision.candidates:
-        score = _candidate_resolver_score(candidate)
-        if candidate.candidate_id == decision.selected_candidate_id:
-            disposition: Literal["selected", "eligible", "degraded", "rejected"] = (
-                "selected"
-            )
-        elif score is None or score <= 0:
-            disposition = "rejected"
-        elif (
-            candidate.compatibility == "incompatible"
-            or candidate.policy_posture == "forbidden"
-        ):
-            disposition = "rejected"
-        elif (
-            candidate.compatibility == "degraded"
-            or candidate.policy_posture == "approval_required"
-        ):
-            disposition = "degraded"
-        else:
-            disposition = "eligible"
         explanations.append(
             CandidateExplanation(
                 candidate_id=candidate.candidate_id,
-                disposition=disposition,
+                disposition=candidate_explanation_disposition(
+                    candidate,
+                    selected_candidate_id=decision.selected_candidate_id,
+                ),
                 reason_codes=candidate.reason_codes,
                 evidence_refs=candidate.evidence_refs,
             )
@@ -706,20 +691,6 @@ def _matches_capability(
             node.id,
         }.intersection(values)
     )
-
-
-def _candidate_resolver_score(candidate: RouteCandidate) -> int | None:
-    score_codes = tuple(
-        reason
-        for reason in candidate.reason_codes
-        if reason.startswith("resolver_score:")
-    )
-    if len(score_codes) != 1:
-        return None
-    raw_score = score_codes[0].removeprefix("resolver_score:")
-    if re.fullmatch(r"-?\d+", raw_score) is None:
-        return None
-    return int(raw_score)
 
 
 def _pick_enabled(actions: dict) -> bool:
