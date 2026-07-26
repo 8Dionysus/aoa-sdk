@@ -3,7 +3,7 @@ from __future__ import annotations
 import hashlib
 import json
 import os
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
 import pytest
@@ -58,10 +58,10 @@ RELEASE_OBSERVED_AT = datetime(
 CANONICAL_OBSERVED_AT = datetime(
     2026,
     7,
-    26,
-    2,
-    30,
-    tzinfo=timezone.utc,
+    25,
+    21,
+    16,
+    tzinfo=timezone(-timedelta(hours=6)),
 )
 
 
@@ -175,7 +175,9 @@ def test_canonical_bundle_authorizes_g5_without_archive_or_live_cutover(
     assert receipt["g5_authority"] == G5_CANONICAL_AUTHORITY
     assert receipt["archive_stop_line"] == ARCHIVE_STOP_LINE
     assert receipt["predecessor"]["rollback_posture"] == "retained"
+    assert receipt["authorized_at"] == "2026-07-26T03:16:00Z"
     assert provenance["state"] == "sdk_canonical"
+    assert provenance["observed_at"] == receipt["authorized_at"]
     assert provenance["runtime_consumer_contract"]["live_cutover_executed"] is False
     assert manifest["producer_admission_profile_id"] == CANONICAL_PROFILE_ID
     assert manifest["lifecycle"]["initial_state"] == "release-ready"

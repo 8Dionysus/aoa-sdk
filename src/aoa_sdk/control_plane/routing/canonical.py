@@ -581,6 +581,7 @@ def build_g5_canonical_bundle(
     timestamp = observed_at or datetime.now(timezone.utc)
     if timestamp.tzinfo is None or timestamp.utcoffset() is None:
         raise RouterError("observed_at must be timezone-aware")
+    timestamp = timestamp.astimezone(timezone.utc)
     if date.fromisoformat(started_on) > timestamp.date():
         raise RouterError(
             "compatibility window cannot start after authorization time"
