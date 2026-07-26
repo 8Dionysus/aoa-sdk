@@ -546,7 +546,10 @@ def _candidate_posture(
     if (
         not isinstance(raw_effects, list)
         or not raw_effects
-        or any(not isinstance(effect, str) or not effect for effect in raw_effects)
+        or any(
+            not isinstance(effect, str) or not _normalize_effect(effect)
+            for effect in raw_effects
+        )
     ):
         effects: set[str] = set()
         policy = "forbidden"
@@ -721,7 +724,7 @@ def _contains_token_phrase(
 
 
 def _normalize_effect(value: str) -> str:
-    return value.casefold().replace("-", "_")
+    return value.strip().casefold().replace("-", "_")
 
 
 def _hex_digest(payload: object) -> str:

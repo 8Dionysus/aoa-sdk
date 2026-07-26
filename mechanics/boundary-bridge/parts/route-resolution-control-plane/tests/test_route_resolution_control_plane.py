@@ -70,6 +70,7 @@ def _git_capability_graph(
     negative_phrase: str | None = None,
     owner_mismatch: bool = False,
     owner_health: str | None = "healthy",
+    owner_effects: list[str] | None = None,
 ) -> tuple[str, bytes]:
     repo = workspace_root / "aoa-skills"
     graph_path = repo / "generated" / "capability_graph.json"
@@ -147,7 +148,9 @@ def _git_capability_graph(
                     "public_safe": True,
                     "requires_human_approval": False,
                 },
-                "execution": {"effects": ["none"]},
+                "execution": {
+                    "effects": ["none"] if owner_effects is None else owner_effects
+                },
             }
         )
         documents.append(
@@ -217,6 +220,7 @@ def _routing_inputs(
     negative_phrase: str | None = None,
     owner_mismatch: bool = False,
     owner_health: str | None = "healthy",
+    owner_effects: list[str] | None = None,
     malformed_registry_attribute: tuple[str, object] | None = None,
 ) -> tuple[Path, Path]:
     shutil.rmtree(workspace_root / "aoa-routing")
@@ -234,6 +238,7 @@ def _routing_inputs(
         negative_phrase=negative_phrase,
         owner_mismatch=owner_mismatch,
         owner_health=owner_health,
+        owner_effects=owner_effects,
     )
     router_raw = _write_json(
         bundle_root / "generated" / "aoa_router.min.json",
@@ -1166,6 +1171,25 @@ def test_degraded_owner_health_remains_an_explicit_degraded_posture(
     )
     assert selected.compatibility == "degraded"
     assert "owner_health_degraded" in selected.reason_codes
+
+
+def test_blank_owner_effect_is_forbidden_without_an_effect_ceiling(
+    workspace_root: Path,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(
+        workspace_root,
+        owner_effects=[" "],
+    )
+
+    decision = _api(workspace_root, bundle_root, lock_path).resolve(_intent())
+
+    assert decision.status == "blocked"
+    assert decision.selected_candidate_id is None
+    assert all(
+        candidate.policy_posture == "forbidden"
+        and "owner_effect_posture_missing_or_invalid" in candidate.reason_codes
+        for candidate in decision.candidates
+    )
 
 
 def test_conflicting_effect_ceilings_block_deterministically(
