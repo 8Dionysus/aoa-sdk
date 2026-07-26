@@ -18,6 +18,7 @@ from aoa_sdk.contracts.organs import (
     PrimitiveContract,
 )
 from aoa_sdk.organs import OrganRegistryError, OrgansAPI, compile_registry
+from aoa_sdk.organs.adapters import DirectConnectionDescriptor
 from aoa_sdk.organs.registry import assert_projection_digest
 from aoa_sdk.cli.main import app
 from aoa_sdk.workspace.discovery import Workspace
@@ -301,6 +302,20 @@ def test_projection_is_deterministic_and_suspended_is_hidden(tmp_path: Path) -> 
     assert "input_schema_ref" not in catalog.model_dump_json()
 
 
+def test_long_lived_api_reloads_registry_revocations(tmp_path: Path) -> None:
+    admitted = _source(_record("aoa-kag", "admitted"))
+    api = _api(tmp_path, admitted)
+    assert [entry.organ_id for entry in api.catalog().entries] == ["aoa-kag"]
+
+    registry = tmp_path / "registry.json"
+    suspended = _source(_record("aoa-kag", "suspended"))
+    registry.write_text(suspended.model_dump_json(indent=2), encoding="utf-8")
+
+    refreshed = api.catalog()
+    assert refreshed.entries == ()
+    assert refreshed.hidden_state_counts == {"suspended": 1}
+
+
 def test_catalog_honors_byte_budget(tmp_path: Path) -> None:
     catalog = _api(
         tmp_path,
@@ -363,6 +378,70 @@ def test_activation_is_content_addressed_candidate_only(tmp_path: Path) -> None:
     assert first == second
     assert first.execution_authorized is False
     assert first.plan_kind == "candidate_only"
+
+
+def test_activation_uses_selected_consumer_schema_and_protocol(tmp_path: Path) -> None:
+    record = _record("aoa-kag", "admitted")
+    record["consumer_compatibility"][0]["observed_schema_digest"] = DIGEST_A
+    api = _api(tmp_path, _source(record))
+    request = ActivationRequest(
+        request_id="request-consumer-drift",
+        organ_id="aoa-kag",
+        capability_id="knowledge-inspect",
+        primitive_id="inspect-knowledge",
+        consumer_id="codex-main",
+        requested_policy_family="read",
+        authorized_policy_families=("read",),
+        credential_class="kag-read",
+        observed_server_schema_digest=DIGEST_B,
+        observed_consumer_schema_digest=DIGEST_C,
+        requested_at=NOW,
+        expires_at=NOW + timedelta(hours=1),
+        precondition_evidence=(_evidence("precondition"),),
+    )
+    with pytest.raises(OrganRegistryError, match="selected consumer schema"):
+        api.compile_activation(request, evaluated_at=NOW)
+
+    record = _record("aoa-kag", "admitted")
+    record["consumer_compatibility"][0]["protocol_versions"] = ["2099-01-01"]
+    api = _api(tmp_path, _source(record))
+    with pytest.raises(OrganRegistryError, match="no compatible endpoint protocol"):
+        api.compile_activation(request, evaluated_at=NOW)
+
+
+def test_activation_evidence_is_current_and_caps_plan_lifetime(
+    tmp_path: Path,
+) -> None:
+    record = _record("aoa-kag", "admitted")
+    evidence = _evidence("precondition")
+    evidence["expires_at"] = (NOW + timedelta(minutes=20)).isoformat()
+    record["activation_preconditions"] = [evidence]
+    api = _api(tmp_path, _source(record))
+    request = ActivationRequest(
+        request_id="request-bounded-evidence",
+        organ_id="aoa-kag",
+        capability_id="knowledge-inspect",
+        primitive_id="inspect-knowledge",
+        consumer_id="codex-main",
+        requested_policy_family="read",
+        authorized_policy_families=("read",),
+        credential_class="kag-read",
+        observed_server_schema_digest=DIGEST_B,
+        observed_consumer_schema_digest=DIGEST_C,
+        requested_at=NOW,
+        expires_at=NOW + timedelta(hours=1),
+        precondition_evidence=(evidence,),
+    )
+    plan = api.compile_activation(
+        request,
+        evaluated_at=NOW + timedelta(minutes=10),
+    )
+    assert plan.expires_at == NOW + timedelta(minutes=20)
+    with pytest.raises(OrganRegistryError, match="expired at plan compilation"):
+        api.compile_activation(
+            request,
+            evaluated_at=NOW + timedelta(minutes=21),
+        )
 
 
 def test_shadow_and_schema_drift_block_activation(tmp_path: Path) -> None:
@@ -470,6 +549,22 @@ def test_external_effect_needs_exact_target_and_approval() -> None:
         ActivationRequest.model_validate(payload)
 
 
+def test_direct_connection_descriptor_cannot_claim_execution_authority() -> None:
+    payload = {
+        "adapter_id": "owner-direct",
+        "endpoint": {
+            "adapter_id": "owner-direct",
+            "transport": "streamable-http",
+            "endpoint_ref": "config://organs/kag/endpoint",
+            "protocol_versions": ["2025-11-25"],
+        },
+        "credential_class": "kag-read",
+        "execution_authorized": True,
+    }
+    with pytest.raises(ValidationError, match="False"):
+        DirectConnectionDescriptor.model_validate(payload)
+
+
 class OwnerPayload(BaseModel):
     model_config = ConfigDict(extra="forbid")
     answer: str
@@ -544,3 +639,11 @@ def test_cli_exposes_progressive_non_executing_surface() -> None:
     assert catalog.exit_code == 0
     assert '"schema_bytes_loaded": 0' in catalog.stdout
     assert "input_schema_ref" not in catalog.stdout
+
+
+def test_generated_schemas_declare_dialect_and_stable_identity() -> None:
+    schema_root = Path(__file__).resolve().parents[5] / "schemas" / "organ-access"
+    for path in sorted(schema_root.glob("*.schema.json")):
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        assert payload["$schema"] == "https://json-schema.org/draft/2020-12/schema"
+        assert payload["$id"] == f"urn:aoa-sdk:organ-access:{path.name}"

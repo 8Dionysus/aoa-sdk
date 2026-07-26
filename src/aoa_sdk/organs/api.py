@@ -54,13 +54,17 @@ class OrgansAPI:
         self._clock = clock or (lambda: datetime.now(timezone.utc))
 
     def projection(self) -> OrganRegistryProjection:
-        if self._projection is None:
-            if self.registry_path is None:
-                raise OrganRegistryError(
-                    "no explicit organ registry configured; set "
-                    "AOA_SDK_ORGAN_REGISTRY or [organ_access].registry_source"
-                )
-            self._projection = compile_registry(load_registry_source(self.registry_path))
+        if self.registry_path is None:
+            raise OrganRegistryError(
+                "no explicit organ registry configured; set "
+                "AOA_SDK_ORGAN_REGISTRY or [organ_access].registry_source"
+            )
+        current = compile_registry(load_registry_source(self.registry_path))
+        if (
+            self._projection is None
+            or self._projection.source_digest != current.source_digest
+        ):
+            self._projection = current
         assert_projection_digest(self._projection)
         now = self._clock()
         if now.tzinfo is None or now.utcoffset() is None:
@@ -163,7 +167,7 @@ class OrgansAPI:
         )
 
     def inspect_organ(self, organ_id: str) -> OrganProjectionEntry:
-        entry = self._find_organ(organ_id)
+        entry = self._find_organ(organ_id, self.projection())
         if not entry.discoverable:
             raise OrganRegistryError(f"organ {organ_id!r} is not discoverable")
         return entry
@@ -173,12 +177,21 @@ class OrgansAPI:
         organ_id: str,
         capability_id: str,
     ) -> CapabilityContract:
-        entry = self.inspect_organ(organ_id)
+        entry = self._find_organ(organ_id, self.projection())
+        if not entry.discoverable:
+            raise OrganRegistryError(f"organ {organ_id!r} is not discoverable")
+        return self._find_capability(entry, capability_id)
+
+    @staticmethod
+    def _find_capability(
+        entry: OrganProjectionEntry,
+        capability_id: str,
+    ) -> CapabilityContract:
         for capability in entry.capabilities:
             if capability.capability_id == capability_id:
                 return capability
         raise OrganRegistryError(
-            f"unknown capability {capability_id!r} for organ {organ_id!r}"
+            f"unknown capability {capability_id!r} for organ {entry.organ_id!r}"
         )
 
     def compare_observation(
@@ -190,7 +203,8 @@ class OrgansAPI:
         observed_consumer_schema_digest: str | None,
         observed_at: datetime,
     ) -> CompatibilityObservation:
-        entry = self._find_organ(organ_id)
+        projection = self.projection()
+        entry = self._find_organ(organ_id, projection)
         reasons: list[str] = []
         state: FreshnessState = "exact"
         expected_deploy = (
@@ -221,7 +235,7 @@ class OrgansAPI:
             raise OrganRegistryError("observed_at must be timezone-aware")
         return CompatibilityObservation(
             organ_id=organ_id,
-            registry_digest=self.projection().projection_digest,
+            registry_digest=projection.projection_digest,
             expected_deploy_revision=expected_deploy,
             observed_deploy_revision=observed_deploy_revision,
             expected_server_schema_digest=expected_server,
@@ -251,17 +265,14 @@ class OrgansAPI:
             raise OrganRegistryError("activation request is from the future")
         if request.expires_at <= evaluation_time:
             raise OrganRegistryError("activation request is expired")
-        entry = self._find_organ(request.organ_id)
+        entry = self._find_organ(request.organ_id, projection)
         if entry.registry_state not in ACTIVATABLE_STATES:
             raise OrganRegistryError(
                 f"organ {entry.organ_id!r} is {entry.registry_state!r}, not admitted"
             )
         if entry.endpoint is None:
             raise OrganRegistryError("admitted organ has no direct endpoint")
-        capability = self.inspect_capability(
-            request.organ_id,
-            request.capability_id,
-        )
+        capability = self._find_capability(entry, request.capability_id)
         primitive = next(
             (
                 item
@@ -311,6 +322,16 @@ class OrgansAPI:
             raise OrganRegistryError(
                 "consumer is not explicitly supported by owner evidence"
             )
+        if consumer.observed_schema_digest != request.observed_consumer_schema_digest:
+            raise OrganRegistryError(
+                "selected consumer schema observation does not match the request"
+            )
+        if not set(consumer.protocol_versions).intersection(
+            entry.endpoint.protocol_versions
+        ):
+            raise OrganRegistryError(
+                "selected consumer has no compatible endpoint protocol"
+            )
         expected_evidence = {
             (item.owner, item.evidence_ref, item.revision)
             for item in entry.activation_preconditions
@@ -321,21 +342,32 @@ class OrgansAPI:
         }
         if not expected_evidence.issubset(supplied_evidence):
             raise OrganRegistryError("required activation preconditions are missing")
+        evidence_expiries: list[datetime] = []
         for evidence in request.precondition_evidence:
             if evidence.observed_at > request.requested_at:
                 raise OrganRegistryError("precondition evidence is from the future")
-            if evidence.expires_at is not None and evidence.expires_at <= request.requested_at:
-                raise OrganRegistryError("precondition evidence is expired")
+            if evidence.expires_at is not None:
+                if evidence.expires_at <= evaluation_time:
+                    raise OrganRegistryError(
+                        "precondition evidence is expired at plan compilation"
+                    )
+                evidence_expiries.append(evidence.expires_at)
         if request.approval_ref is not None:
             if request.approval_ref.observed_at > request.requested_at:
                 raise OrganRegistryError("approval evidence is from the future")
-            if (
-                request.approval_ref.expires_at is not None
-                and request.approval_ref.expires_at <= request.requested_at
-            ):
-                raise OrganRegistryError("approval evidence is expired")
+            if request.approval_ref.expires_at is not None:
+                if request.approval_ref.expires_at <= evaluation_time:
+                    raise OrganRegistryError(
+                        "approval evidence is expired at plan compilation"
+                    )
+                evidence_expiries.append(request.approval_ref.expires_at)
         if entry.revisions.package is None or entry.revisions.deploy is None:
             raise OrganRegistryError("package/deploy identity is incomplete")
+        plan_expiry = min(
+            request.expires_at,
+            projection.expires_at,
+            *evidence_expiries,
+        )
         unsigned = {
             "schema_version": "aoa_organ_activation_plan_v1",
             "plan_kind": "candidate_only",
@@ -365,15 +397,19 @@ class OrgansAPI:
                 else None
             ),
             "exact_effect_target": request.exact_effect_target,
-            "expires_at": request.expires_at.isoformat().replace("+00:00", "Z"),
+            "expires_at": plan_expiry.isoformat().replace("+00:00", "Z"),
             "rollback_route": primitive.rollback_route or entry.rollback_route,
         }
         return OrganActivationPlan.model_validate(
             {"plan_id": sha256_digest(unsigned), **unsigned}
         )
 
-    def _find_organ(self, organ_id: str) -> OrganProjectionEntry:
-        for entry in self.projection().entries:
+    @staticmethod
+    def _find_organ(
+        organ_id: str,
+        projection: OrganRegistryProjection,
+    ) -> OrganProjectionEntry:
+        for entry in projection.entries:
             if entry.organ_id == organ_id:
                 return entry
         raise OrganRegistryError(f"unknown organ {organ_id!r}")

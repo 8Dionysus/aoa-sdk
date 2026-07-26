@@ -6,7 +6,7 @@ no execution method: the SDK control plane does not become an organ gateway.
 
 from __future__ import annotations
 
-from typing import Protocol, runtime_checkable
+from typing import Literal, Protocol, runtime_checkable
 
 from pydantic import BaseModel, ConfigDict
 
@@ -20,7 +20,7 @@ class DirectConnectionDescriptor(BaseModel):
     endpoint: EndpointContract
     credential_class: Identifier
     credential_material_present: bool = False
-    execution_authorized: bool = False
+    execution_authorized: Literal[False] = False
 
 
 @runtime_checkable

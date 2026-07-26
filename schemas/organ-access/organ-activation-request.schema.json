@@ -48,6 +48,8 @@
       "type": "object"
     }
   },
+  "$id": "urn:aoa-sdk:organ-access:organ-activation-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "approval_ref": {

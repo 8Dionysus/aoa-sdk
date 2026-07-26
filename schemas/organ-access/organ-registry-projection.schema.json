@@ -911,6 +911,8 @@
       "type": "object"
     }
   },
+  "$id": "urn:aoa-sdk:organ-access:organ-registry-projection.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "compiled_at": {

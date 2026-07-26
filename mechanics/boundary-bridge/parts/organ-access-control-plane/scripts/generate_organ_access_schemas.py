@@ -34,10 +34,13 @@ OUTPUTS = {
 }
 
 
-def render(model: type) -> str:
+def render(filename: str, model: type) -> str:
+    schema = model.model_json_schema()
+    schema["$schema"] = "https://json-schema.org/draft/2020-12/schema"
+    schema["$id"] = f"urn:aoa-sdk:organ-access:{filename}"
     return (
         json.dumps(
-            model.model_json_schema(),
+            schema,
             indent=2,
             ensure_ascii=True,
             sort_keys=True,
@@ -57,7 +60,7 @@ def main() -> int:
     stale: list[str] = []
     for filename, model in OUTPUTS.items():
         destination = output_dir / filename
-        expected = render(model)
+        expected = render(filename, model)
         if args.check:
             if not destination.is_file() or destination.read_text(encoding="utf-8") != expected:
                 stale.append(str(destination.relative_to(REPO_ROOT)))

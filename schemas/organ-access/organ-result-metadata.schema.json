@@ -178,6 +178,8 @@
       "type": "object"
     }
   },
+  "$id": "urn:aoa-sdk:organ-access:organ-result-metadata.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
   "additionalProperties": false,
   "properties": {
     "applied_state": {
