@@ -127,6 +127,10 @@ The current landed surface includes:
   which makes `aoa-sdk` the single canonical routing producer by proving exact
   byte parity with the public `v0.7.0` asset, starts the compatibility window,
   retains `aoa-routing` for rollback, and keeps archival authority separate;
+- the post-G5 maintenance contour, in which routing compatibility reads prefer
+  the SDK-delivered runtime bundle, `aoa-routing` is optional workspace state,
+  paired predecessor CI/release dependencies are inactive, and the predecessor
+  remains available only for compatibility and rollback;
 - the callable
   [C1 route resolution control plane](mechanics/boundary-bridge/parts/route-resolution-control-plane/README.md),
   which validates the exact live G5 snapshot, intersects routing entries with

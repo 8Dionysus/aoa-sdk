@@ -17,12 +17,6 @@ jobs:
         with:
           path: workspace/aoa-sdk
 
-      - name: Checkout aoa-routing
-        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
-        with:
-          repository: 8Dionysus/aoa-routing
-          path: workspace/aoa-routing
-
       - name: Checkout aoa-playbooks
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:

@@ -120,6 +120,9 @@ The repo should now:
   `aoa_routing_thin_router_v1` during owner-only succession;
 - keep public release trust, stronger-owner admission, and live runtime cutover
   as distinct evidence even though all three G5 stages have now completed;
+- keep `aoa-routing` out of required workspace roots, sibling canaries, cadence
+  checkout, and active release selection while its compatibility and rollback
+  implementation remains available during the bounded window;
 - land deterministic route resolution, plan compilation, Runner lifecycle,
   evidence, and closeout as separate testable slices;
 - keep passive skill-environment inspection, `aoa surfaces detect`,
@@ -152,9 +155,10 @@ explicit no-shell `abyss-stack` transport client, owner-exact profile loader,
 and paired proof of one real governed contour while leaving execution with the
 runtime owner. C5 now adds immutable partial-to-complete evidence composition
 and reviewed closeout admission without absorbing eval, memo, checkpoint, or
-closeout owner truth. The next honest move is a real cross-owner golden chain
-and agent-in-loop trials. Compatibility evidence continues in parallel;
-consumer-zero and archival remain unproved.
+closeout owner truth. The cross-owner golden chain, bounded agent-in-loop
+trials, and G11 contour are now complete. The next honest move is measured E1
+process-cost comparison followed by consumer-zero proof. Compatibility
+evidence continues in parallel; consumer-zero and archival remain unproved.
 
 ## Current Public Contour
 
@@ -164,8 +168,9 @@ Current unreleased contour: C1 deterministic route resolution, C2
 runtime-neutral plan compilation, C3 explicit-adapter lifecycle coordination,
 the C4 `abyss-stack` transport client and paired governed-runtime proof, and
 C5 immutable evidence/closeout composition. Real cross-owner C5 evidence,
-agent-in-loop benefit evidence, and compatibility-window evidence remain after
-`v0.8.0`. This is a directional contour, not a changelog replacement.
+agent-in-loop trials, and the G11 contour are now present after `v0.8.0`.
+Measured E1 process-cost comparison and compatibility-window evidence remain.
+This is a directional contour, not a changelog replacement.
 
 Current anchors:
 

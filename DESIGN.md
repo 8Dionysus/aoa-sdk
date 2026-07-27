@@ -269,9 +269,9 @@ removed. The resulting M1 implementation now lives under
 `src/aoa_sdk/control_plane/routing/`: it resolves the inherited typing debt,
 packages schemas and a strict validator, preserves the fourteen predecessor
 bytes, emits dual-producer provenance, rejects canonical-looking publication
-targets, and is checked from an installed wheel. `aoa-routing` still remains
-canonical. The passed G4 chain and predecessor conditional handoff now permit
-one explicit next posture: the installed SDK can build a non-publishing
+targets, and is checked from an installed wheel. At M1, `aoa-routing` still
+remained canonical. The passed G4 chain and predecessor conditional handoff
+then permitted one explicit next posture: the installed SDK can build a non-publishing
 `sdk_g5_candidate` assembly carrying SDK producer identity, exact clean input
 refs, complete artifact subjects, and no switch authority. That candidate is
 input to stronger-owner artifact trust and runtime canary review, not the G5
@@ -288,6 +288,12 @@ mutation. Stronger-owner admission and the separate `abyss-stack` cutover have
 since executed from that exact receipt; the predecessor remains retained for
 compatibility and rollback. Compatibility exit, consumer-zero, and archival
 authority remain separate later gates.
+
+The active post-G5 SDK contour no longer requires a predecessor checkout for
+workspace discovery, compatibility reads, sibling canary, cadence audit, or
+release construction. Runtime routing compatibility resolves from the
+SDK-delivered bundle first; a predecessor checkout is only an optional legacy
+fallback during the compatibility window.
 
 ## C1 Route Resolution Shape
 

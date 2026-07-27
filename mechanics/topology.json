@@ -430,7 +430,7 @@
         "python mechanics/boundary-bridge/parts/cross-organ-orchestration/scripts/generate_cross_organ_schemas.py --check && python mechanics/boundary-bridge/parts/cross-organ-orchestration/scripts/generate_cross_organ_examples.py --check",
         "python -m mypy src/aoa_sdk/contracts/organs.py src/aoa_sdk/contracts/organ_orchestration.py src/aoa_sdk/organs src/aoa_sdk/cli/organs.py",
         "python -m mypy src/aoa_sdk/control_plane src/aoa_sdk/cli/route.py",
-        "python -m build && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py"
+        "python -m build && python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py"
       ]
     },
     {
@@ -613,7 +613,7 @@
     {
       "slug": "release-support",
       "name_type": "shared",
-      "operation": "Keep changelog, release audit, CI posture, build, public routing release-candidate trust, and publication support bounded and reproducible without owner-switch claims.",
+      "operation": "Keep changelog, release audit, CI posture, canonical SDK package trust, historical release-evidence replay, and publication support bounded and reproducible.",
       "source_surfaces": [
         "CHANGELOG.md",
         "docs/RELEASING.md",

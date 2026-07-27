@@ -17,7 +17,10 @@ from pydantic import BaseModel, Field
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
 
-OWNER_RELEASE_REPOS = tuple(repo for repo in KNOWN_REPOS if repo != "8Dionysus")
+NON_PUBLISHING_REPOS = ("8Dionysus", "aoa-routing")
+OWNER_RELEASE_REPOS = tuple(
+    repo for repo in KNOWN_REPOS if repo not in NON_PUBLISHING_REPOS
+)
 README_BANNER_TEMPLATE = "> Current release: `{tag}`. See [CHANGELOG](CHANGELOG.md) for release notes."
 PUBLIC_SURFACE_PREFIXES = ("docs/", "generated/", "schemas/", ".github/workflows/")
 PUBLIC_SURFACE_FILES = {"README.md", "CHANGELOG.md", "pyproject.toml", "package.json"}
@@ -506,6 +509,11 @@ class ReleaseAPI:
         if repo is not None:
             if repo == "8Dionysus":
                 raise ValueError("8Dionysus is excluded from release mutation and publication")
+            if repo == "aoa-routing":
+                raise ValueError(
+                    "aoa-routing is maintenance-only after G5 and has no "
+                    "active SDK-paired release contour"
+                )
             if repo not in OWNER_RELEASE_REPOS:
                 raise ValueError(f"Unknown owner repo {repo!r}")
             return [repo]

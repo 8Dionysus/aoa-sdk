@@ -26,7 +26,6 @@ WORKSPACE_REQUIRED_REPOS = (
     "aoa-kag",
     "aoa-memo",
     "aoa-playbooks",
-    "aoa-routing",
     "aoa-sdk",
     "aoa-skills",
     "aoa-stats",
@@ -34,11 +33,12 @@ WORKSPACE_REQUIRED_REPOS = (
 )
 
 WORKSPACE_OPTIONAL_REPOS = (
+    "aoa-routing",
     "abyss-stack",
 )
 
 CORE_FEDERATION_REPOS = (
-    "aoa-routing",
+    "aoa-sdk",
     "aoa-skills",
     "aoa-agents",
 )

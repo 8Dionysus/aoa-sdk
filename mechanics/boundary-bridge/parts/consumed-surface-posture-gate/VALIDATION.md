@@ -5,15 +5,14 @@ Run:
 ```bash
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests
 python -m mypy src/aoa_sdk/control_plane/routing
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/compare_routing_shadow_producers.py --predecessor-root /path/to/aoa-routing-at-7e2fe467
-ABYSS_MACHINE_TMP_ROOT=/srv/abyss-machine/tmp/ai python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_succession_g4.py --sdk-release-root /path/to/aoa-sdk-at-v0.6.0 --predecessor-root /path/to/aoa-routing-at-5c7c0e57 --abyss-stack-root /path/to/abyss-stack-at-fad9f951 --abyss-machine-root /path/to/abyss-machine-at-4a70f4b0 --input-workspace-root /path/to/federation-repositories --abyss-stack-input-root /path/to/abyss-stack-git-repository
 python -m build
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
 python scripts/validate_mechanics_topology.py
 ```
+
+The M1 shadow, G4, G5 candidate, and G5 release-candidate probes remain
+available for explicit historical replay. They are not part of ordinary
+post-G5 validation and require their exact immutable predecessor/input roots.
 
 `test_consumed_surface_compatibility_gate.py` also proves the
 `abyss-stack` diagnostic catalog resolves through the part-local

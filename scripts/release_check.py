@@ -75,30 +75,6 @@ COMMANDS = [
     ("run mypy", [sys.executable, "-m", "mypy", "src"]),
     ("build package", [sys.executable, "-m", "build"]),
     (
-        "verify installed routing shadow wheel",
-        [
-            sys.executable,
-            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/"
-            "verify_routing_shadow_wheel.py",
-        ],
-    ),
-    (
-        "verify installed routing G5 candidate wheel",
-        [
-            sys.executable,
-            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/"
-            "verify_routing_g5_candidate_wheel.py",
-        ],
-    ),
-    (
-        "verify installed routing G5 release-candidate wheel",
-        [
-            sys.executable,
-            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/"
-            "verify_routing_g5_release_candidate_wheel.py",
-        ],
-    ),
-    (
         "verify installed routing G5 canonical wheel",
         [
             sys.executable,

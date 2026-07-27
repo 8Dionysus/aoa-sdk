@@ -49,6 +49,8 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   owner-switch receipt, SDK canonical producer authority, compatibility-window
   start, runtime-contract handoff, retained predecessor rollback, and explicit
   denial of archive authority
+- the post-G5 compatibility posture: SDK-bundle-first reads, optional
+  predecessor discovery, and no active paired CI or release dependency
 
 ## Owner
 
@@ -84,8 +86,8 @@ G4 proves the released shadow successor and isolated runtime content path. The
 G5 candidate adds native SDK producer identity for trust and canary review.
 The release candidate adds exact public release trust without switch
 authority. The G5 receipt makes the SDK canonical and starts the compatibility
-window, but stronger-owner admission, live cutover execution, consumer-zero,
-and archival action remain separate.
+window. Stronger-owner admission and live cutover have completed; consumer-zero,
+rollback retirement, and archival action remain separate.
 
 ## Validation
 
