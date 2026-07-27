@@ -77,6 +77,14 @@ Tracking starts with the community-docs baseline for this repository.
   while canonical owner payloads remain outside the chain.
 - Keep adapter selection, runtime implementation, eval/memory verdicts,
   measured benefit, consumer-zero, and archival outside the SDK client.
+- Retire active `aoa-routing` checkout, sibling-canary, cadence, paired-release,
+  and historical pre-G5 probe dependencies. Compatibility reads now prefer the
+  SDK-delivered bundle while the predecessor remains optional rollback state.
+- Add the reproducible E1 cost comparison: workflow checkout actions fall
+  73 to 23, active producer control planes fall 2 to 1, and the clean
+  route-bind-compile federation falls from a 15–16-root maintenance lower
+  bound to six owner roots. G13 remains provisional until landed CI supplies
+  comparable lead-time, runner-minute, and failure-rate evidence.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.

@@ -52,6 +52,15 @@ COMMANDS = [
         [sys.executable, "scripts/validate_source_topology_index.py"],
     ),
     (
+        "validate routing succession E1 cost evidence",
+        [
+            sys.executable,
+            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/"
+            "scripts/measure_routing_succession_e1.py",
+            "--check",
+        ],
+    ),
+    (
         "build workspace control plane",
         [sys.executable, "scripts/build_workspace_control_plane.py", "--check"],
     ),

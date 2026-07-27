@@ -7,6 +7,7 @@ python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gat
 python -m mypy src/aoa_sdk/control_plane/routing
 python -m build
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
+python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/measure_routing_succession_e1.py --check
 python scripts/validate_mechanics_topology.py
 ```
 
@@ -75,6 +76,9 @@ archive output, and the archive stop line. It rejects digest, authority, and
 output-root substitution. The installed canonical wheel probe proves both new
 schemas and the canonical builder are shipped package data, while keeping
 `live_cutover_executed` and `archive_authorized` false.
+`test_routing_succession_e1_cost_comparison.py` recomputes workflow checkout
+and probe counts from pinned Git refs, joins retained T1/G11 receipts, rejects
+latency/token overclaims, and keeps G13 provisional until landed CI evidence.
 
 For full Boundary Bridge coverage, also run:
 

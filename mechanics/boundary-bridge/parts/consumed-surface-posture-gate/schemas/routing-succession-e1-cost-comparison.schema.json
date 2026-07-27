@@ -1,0 +1,122 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/8Dionysus/aoa-sdk/blob/main/mechanics/boundary-bridge/parts/consumed-surface-posture-gate/schemas/routing-succession-e1-cost-comparison.schema.json",
+  "title": "AoA SDK routing succession E1 cost comparison",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observed_on",
+    "status",
+    "scope",
+    "repository_and_ci_cost",
+    "agent_process_cost",
+    "quality_and_stop_lines",
+    "verdict"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_routing_succession_e1_cost_comparison_v1"
+    },
+    "observed_on": {
+      "type": "string",
+      "format": "date"
+    },
+    "status": {
+      "const": "provisional_pass_pending_landed_ci_observation"
+    },
+    "scope": {
+      "type": "object",
+      "required": [
+        "comparison",
+        "sdk_before_m3_ref",
+        "sdk_post_m3_ref",
+        "routing_before_m3_ref",
+        "routing_post_m3_ref",
+        "r0_evidence_sha256",
+        "routing_m3_evidence_sha256",
+        "comparison_rule"
+      ],
+      "additionalProperties": true
+    },
+    "repository_and_ci_cost": {
+      "type": "object",
+      "required": [
+        "canonical_routing_producers",
+        "active_producer_control_planes",
+        "physical_producer_implementations",
+        "workflow_files_in_comparison_family",
+        "routing_related_workflow_contours",
+        "checkout_actions",
+        "sdk_direct_predecessor_checkouts",
+        "paired_release_streams",
+        "active_historical_release_probes",
+        "sdk_requires_predecessor_workspace_repo",
+        "historical_runner_sample"
+      ],
+      "additionalProperties": true
+    },
+    "agent_process_cost": {
+      "type": "object",
+      "required": [
+        "scenarios",
+        "old_contour",
+        "new_contour",
+        "repository_context_reduction",
+        "telemetry_limits"
+      ],
+      "additionalProperties": true
+    },
+    "quality_and_stop_lines": {
+      "type": "object",
+      "required": [
+        "new_chain_all_benchmark_runs_passed",
+        "new_chain_scenarios_verified",
+        "g11_complete_to_rightful_stop_boundary",
+        "central_aoa_evals_verdict_claimed",
+        "process_cost_reduction_claimed",
+        "task_latency_reduction_claimed",
+        "post_landing_ci_failure_rate_reduction_claimed",
+        "consumer_zero_claimed",
+        "rollback_retired_claimed",
+        "archive_ready_claimed",
+        "archive_authorized_claimed"
+      ],
+      "additionalProperties": true
+    },
+    "verdict": {
+      "type": "object",
+      "required": [
+        "structural_process_cost_reduced",
+        "typed_agent_process_capability_increased",
+        "bounded_no_regression_signal",
+        "g13_gate",
+        "remaining_e1_observation",
+        "claim_limit"
+      ],
+      "additionalProperties": false,
+      "properties": {
+        "structural_process_cost_reduced": {
+          "const": true
+        },
+        "typed_agent_process_capability_increased": {
+          "const": true
+        },
+        "bounded_no_regression_signal": {
+          "const": true
+        },
+        "g13_gate": {
+          "const": "provisional_pass"
+        },
+        "remaining_e1_observation": {
+          "type": "string",
+          "minLength": 20
+        },
+        "claim_limit": {
+          "type": "string",
+          "minLength": 40
+        }
+      }
+    }
+  }
+}

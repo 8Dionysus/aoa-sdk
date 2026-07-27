@@ -1,0 +1,79 @@
+{
+  "schema_version": "aoa_sdk_routing_succession_e1_process_observations_v1",
+  "observed_on": "2026-07-26",
+  "pins": {
+    "sdk_before_m3_ref": "660a5ff1f3da73b81db0dfbed9c80301b800ebd4",
+    "sdk_post_m3_ref": "6e2a8e058a49afb42a95bad624866b3fbb29ef06",
+    "sdk_wheel_sha256": "990d52576c7963cbf913807f7da61951de4c3a6173fec16225c34cdb32f12aaa"
+  },
+  "routing_m3": {
+    "baseline_ref": "97f60de1b5992ef6bf5ff0f051bd452d940d9a85",
+    "source_ref": "fb4266ee26727f50f40ca4206194d14f451c5cd6",
+    "evidence_sha256": "892a172452757a2bc0b61f4304f430900c5a1a465e3ae07c4660dca9488852c1",
+    "workflow_contours_before": 2,
+    "workflow_contours_after": 1,
+    "checkout_actions_before": 30,
+    "checkout_actions_after": 0
+  },
+  "routing_related_workflows_after": 3,
+  "process_observations": {
+    "legacy_advisory_route": {
+      "request": "POST /routing/task-family with task_family=bounded-plan-shaping",
+      "runs": 10,
+      "all_ms": [
+        7.975,
+        5.491,
+        4.751,
+        3.432,
+        2.699,
+        4.128,
+        3.924,
+        2.78,
+        3.277,
+        4.84
+      ],
+      "median_ms": 4.026,
+      "p90_ms": 5.491,
+      "http_status": 200,
+      "response_bytes": 3449,
+      "response_sha256": "70d552024e44e59aaa4ab462d3d083910982c06c520b6ad7dedc95ca6d733142",
+      "result_kind": "advisory_role_tier_artifact_contract",
+      "has_route_decision": false,
+      "has_run_plan": false,
+      "measurement_posture": "live read-only repeat of the old route-api shape; not a full task"
+    },
+    "clean_federation_chain": {
+      "subject": "installed aoa-sdk wheel in a six-owner federation without aoa-routing",
+      "runs": 10,
+      "all_ms": [
+        3011.174,
+        3254.176,
+        3261.837,
+        3482.237,
+        3102.899,
+        3032.193,
+        3216.956,
+        2987.585,
+        3197.825,
+        3168.53
+      ],
+      "median_ms": 3183.177,
+      "p90_ms": 3261.837,
+      "output_bytes": 479,
+      "all_passed": true,
+      "verified_scenarios": [
+        "a2a_summon_return_checkpoint",
+        "bounded_change_safe",
+        "runtime_chaos_recovery"
+      ],
+      "verification_operations_per_scenario": 7,
+      "measurement_posture": "process startup plus clean-federation setup and repeated deterministic route-bind-compile checks for all three scenarios"
+    },
+    "repository_contexts": {
+      "old_lower_bound": 15,
+      "old_upper_bound": 16,
+      "new_clean_federation": 6
+    }
+  },
+  "claim_limit": "Raw observations preserve unlike outputs and timings without treating advisory-route latency, verifier latency, serialized bytes, process calls, agent tool calls, or model tokens as interchangeable."
+}
