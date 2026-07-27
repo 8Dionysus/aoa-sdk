@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 13174087,
+  "allowed_tracked_bytes": 17502428,
+  "approved_by": "repository-owner",
+  "base_ref": "5de159e449cc8d5ae93475db6b56a7b7279bc67b",
+  "changed_generated_bytes": 13174087,
+  "changed_generated_files": 310,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "77210af3026612b094b3e2e99c3e03d64983ace5d28ad22b328d4e1756fcfeb7",
+  "reason": "Index the reviewed progressive organ discovery and cross-organ orchestration surfaces with the SDK workflow-pinned generator.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 17502428,
+  "tracked_bytes_max": 15728640
+}
