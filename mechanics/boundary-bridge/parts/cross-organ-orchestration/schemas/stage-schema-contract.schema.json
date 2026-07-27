@@ -1,0 +1,140 @@
+{
+  "$defs": {
+    "SchemaIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "schema_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Schema Digest",
+          "type": "string"
+        },
+        "schema_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Schema Ref",
+          "type": "string"
+        },
+        "schema_version": {
+          "minLength": 1,
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_revision": {
+          "minLength": 1,
+          "title": "Source Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "schema_ref",
+        "schema_digest",
+        "source_revision",
+        "schema_version"
+      ],
+      "title": "SchemaIdentity",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:cross-organ-orchestration:stage-schema-contract.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authority_ceiling": {
+      "enum": [
+        "read",
+        "candidate",
+        "internal_effect",
+        "external_effect"
+      ],
+      "title": "Authority Ceiling",
+      "type": "string"
+    },
+    "effect_class": {
+      "enum": [
+        "observe",
+        "derive",
+        "validate",
+        "prepare_candidate",
+        "apply_runtime",
+        "accept_source",
+        "external_emit",
+        "external_change"
+      ],
+      "title": "Effect Class",
+      "type": "string"
+    },
+    "input_ref_kind": {
+      "enum": [
+        "orchestration_intent",
+        "kag_evidence",
+        "memo_candidate",
+        "eval_request",
+        "eval_result",
+        "owner_acceptance"
+      ],
+      "title": "Input Ref Kind",
+      "type": "string"
+    },
+    "next_owner": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "title": "Next Owner"
+    },
+    "output_ref_kind": {
+      "enum": [
+        "orchestration_intent",
+        "kag_evidence",
+        "memo_candidate",
+        "eval_request",
+        "eval_result",
+        "owner_acceptance"
+      ],
+      "title": "Output Ref Kind",
+      "type": "string"
+    },
+    "output_schema": {
+      "$ref": "#/$defs/SchemaIdentity"
+    },
+    "owner": {
+      "minLength": 1,
+      "title": "Owner",
+      "type": "string"
+    },
+    "stage_kind": {
+      "enum": [
+        "kag_evidence",
+        "memo_candidate",
+        "eval_request",
+        "eval_result",
+        "owner_acceptance"
+      ],
+      "title": "Stage Kind",
+      "type": "string"
+    }
+  },
+  "required": [
+    "stage_kind",
+    "owner",
+    "input_ref_kind",
+    "output_ref_kind",
+    "output_schema",
+    "authority_ceiling",
+    "effect_class",
+    "next_owner"
+  ],
+  "title": "StageSchemaContract",
+  "type": "object"
+}

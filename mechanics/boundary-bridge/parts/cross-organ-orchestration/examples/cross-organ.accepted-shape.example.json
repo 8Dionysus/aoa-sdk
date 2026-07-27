@@ -1,0 +1,652 @@
+{
+  "acceptance_inferred_by_sdk": false,
+  "durable_memory_written_by_sdk": false,
+  "next_owner": null,
+  "next_stage_kind": null,
+  "owner_tools_executed_by_sdk": false,
+  "proof_computed_by_sdk": false,
+  "request": {
+    "automatic_acceptance_allowed": false,
+    "automatic_candidate_promotion_allowed": false,
+    "created_at": "2026-07-26T12:00:00Z",
+    "evidence_refs": [
+      {
+        "evidence_ref": "example://decision/AOA-SDK-D-0080",
+        "expires_at": "2026-07-26T13:00:00Z",
+        "observed_at": "2026-07-26T12:00:00Z",
+        "owner": "aoa-sdk",
+        "revision": "example-sdk-revision"
+      }
+    ],
+    "expires_at": "2026-07-26T13:00:00Z",
+    "hidden_server_chaining_allowed": false,
+    "hidden_shared_context_allowed": false,
+    "host_id": "abyss-stack-example",
+    "host_visible_receipts_required": true,
+    "intent": "Demonstrate the typed KAG evidence to reviewed owner acceptance boundary without executing owner tools.",
+    "model_confidence_is_acceptance_authority": false,
+    "owners": {
+      "acceptance_owner": "aoa-memo",
+      "control_owner": "aoa-sdk",
+      "evidence_owner": "aoa-kag",
+      "memory_owner": "aoa-memo",
+      "proof_owner": "aoa-evals",
+      "runtime_owner": "abyss-stack"
+    },
+    "request_id": "cross-organ-research-1",
+    "requested_by": "public-safe-fixture",
+    "root_input": {
+      "artifact_digest": "sha256:1aa32f07826ac8a8b03e725b67b4c091634757475ed198b5d4b2ca7815dd323a",
+      "artifact_ref": "example://orchestration/intent/research-1",
+      "authority_ceiling": "read",
+      "created_at": "2026-07-26T11:59:00Z",
+      "expires_at": "2026-07-26T13:00:00Z",
+      "owner": "abyss-stack",
+      "ref_kind": "orchestration_intent",
+      "schema_identity": {
+        "owner": "abyss-stack",
+        "schema_digest": "sha256:fe6288db5722fd31d966bcce3ad56dd9f9707d6848de1bc5d945cc5caa5c755d",
+        "schema_ref": "urn:abyss-stack:cross-organ-intent:v1",
+        "schema_version": "abyss_stack_cross_organ_intent_v1",
+        "source_revision": "example-host-revision"
+      },
+      "source_revision": "example-host-revision"
+    },
+    "schema_version": "aoa_cross_organ_orchestration_request_v1",
+    "stage_contracts": [
+      {
+        "authority_ceiling": "read",
+        "effect_class": "observe",
+        "input_ref_kind": "orchestration_intent",
+        "next_owner": "aoa-memo",
+        "output_ref_kind": "kag_evidence",
+        "output_schema": {
+          "owner": "aoa-kag",
+          "schema_digest": "sha256:1516bc25755b26c156a58709c5e7600e276daa21f115d7cdc61031cbd67162d5",
+          "schema_ref": "schemas/kag-mcp-result.schema.json",
+          "schema_version": "aoa_kag_mcp_result_v1",
+          "source_revision": "58ab52ffc06bab5cc28842a0b4336c6efa16b6ff"
+        },
+        "owner": "aoa-kag",
+        "stage_kind": "kag_evidence"
+      },
+      {
+        "authority_ceiling": "candidate",
+        "effect_class": "prepare_candidate",
+        "input_ref_kind": "kag_evidence",
+        "next_owner": "aoa-evals",
+        "output_ref_kind": "memo_candidate",
+        "output_schema": {
+          "owner": "aoa-memo",
+          "schema_digest": "sha256:6a33ac41ac90d4af29827a637b8f3cea24ecb45ca259d866e79000a2a784c0d9",
+          "schema_ref": "schemas/memory-ports/local_memo_candidate.schema.json",
+          "schema_version": "aoa_local_memo_candidate_v1",
+          "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+        },
+        "owner": "aoa-memo",
+        "stage_kind": "memo_candidate"
+      },
+      {
+        "authority_ceiling": "candidate",
+        "effect_class": "prepare_candidate",
+        "input_ref_kind": "memo_candidate",
+        "next_owner": "aoa-evals",
+        "output_ref_kind": "eval_request",
+        "output_schema": {
+          "owner": "aoa-evals",
+          "schema_digest": "sha256:751dd78f0280dc2cd089e30b3a7275182656e8350cf84c458f98734d16b4fad1",
+          "schema_ref": "mechanics/proof-object/parts/eval-authoring/schemas/eval-need.schema.json",
+          "schema_version": "aoa_eval_need_v1",
+          "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+        },
+        "owner": "aoa-evals",
+        "stage_kind": "eval_request"
+      },
+      {
+        "authority_ceiling": "read",
+        "effect_class": "validate",
+        "input_ref_kind": "eval_request",
+        "next_owner": "aoa-memo",
+        "output_ref_kind": "eval_result",
+        "output_schema": {
+          "owner": "aoa-evals",
+          "schema_digest": "sha256:786c3bd7902fe78224adfc5ac76ed7a43b49f78bb6a5ade140a416458339a82a",
+          "schema_ref": "mechanics/publication-receipts/parts/receipt-payload/schemas/eval-result-receipt.schema.json",
+          "schema_version": "aoa_eval_result_receipt_v1",
+          "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+        },
+        "owner": "aoa-evals",
+        "stage_kind": "eval_result"
+      },
+      {
+        "authority_ceiling": "internal_effect",
+        "effect_class": "accept_source",
+        "input_ref_kind": "eval_result",
+        "next_owner": null,
+        "output_ref_kind": "owner_acceptance",
+        "output_schema": {
+          "owner": "aoa-memo",
+          "schema_digest": "sha256:e3a1e93846340f4d850028eeb722a32458cff6527fe38a6366052edf86a1239f",
+          "schema_ref": "schemas/support-objects/reviewed_intake_landing_receipt.schema.json",
+          "schema_version": "aoa_reviewed_intake_landing_receipt_v1",
+          "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+        },
+        "owner": "aoa-memo",
+        "stage_kind": "owner_acceptance"
+      }
+    ]
+  },
+  "request_digest": "sha256:93a36ff65b6032e2415f16f6a9b1be6e23d535894055a103e62209f3f494e147",
+  "run_id": "sha256:a2c7d7a1e3ed178dc12eaec4604d71cbf8a7034768ae1da8b488e2d1ad2b6efc",
+  "runtime_execution_authorized": false,
+  "schema_version": "aoa_cross_organ_orchestration_run_v1",
+  "snapshot_digest": "sha256:90ec57544adb0d405ad8bae32e36b9ade9882ec50a5b0541cb356ac1e2d6e2c8",
+  "stages": [
+    {
+      "observation": {
+        "acceptance_decision": null,
+        "applied_state": "not_applied",
+        "authority_ceiling": "read",
+        "effect_class": "observe",
+        "evidence_refs": [
+          {
+            "evidence_ref": "example://aoa-kag/evidence/1",
+            "expires_at": "2026-07-26T13:00:00Z",
+            "observed_at": "2026-07-26T12:05:00Z",
+            "owner": "aoa-kag",
+            "revision": "58ab52ffc06bab5cc28842a0b4336c6efa16b6ff"
+          }
+        ],
+        "expires_at": "2026-07-26T13:00:00Z",
+        "freshness_state": "exact",
+        "input_ref": {
+          "artifact_digest": "sha256:1aa32f07826ac8a8b03e725b67b4c091634757475ed198b5d4b2ca7815dd323a",
+          "artifact_ref": "example://orchestration/intent/research-1",
+          "authority_ceiling": "read",
+          "created_at": "2026-07-26T11:59:00Z",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "owner": "abyss-stack",
+          "ref_kind": "orchestration_intent",
+          "schema_identity": {
+            "owner": "abyss-stack",
+            "schema_digest": "sha256:fe6288db5722fd31d966bcce3ad56dd9f9707d6848de1bc5d945cc5caa5c755d",
+            "schema_ref": "urn:abyss-stack:cross-organ-intent:v1",
+            "schema_version": "abyss_stack_cross_organ_intent_v1",
+            "source_revision": "example-host-revision"
+          },
+          "source_revision": "example-host-revision"
+        },
+        "input_schema_identity": {
+          "owner": "abyss-stack",
+          "schema_digest": "sha256:fe6288db5722fd31d966bcce3ad56dd9f9707d6848de1bc5d945cc5caa5c755d",
+          "schema_ref": "urn:abyss-stack:cross-organ-intent:v1",
+          "schema_version": "abyss_stack_cross_organ_intent_v1",
+          "source_revision": "example-host-revision"
+        },
+        "mcp_tools_executed_by_sdk": false,
+        "model_confidence_is_acceptance_authority": false,
+        "next_owner": "aoa-memo",
+        "observed_at": "2026-07-26T12:05:00Z",
+        "output_ref": {
+          "artifact_digest": "sha256:643b67e33405b80c6b100b8925a27c4af3f92ca6f05931637f36cf42e6578ec4",
+          "artifact_ref": "example://aoa-kag/kag_evidence/1",
+          "authority_ceiling": "read",
+          "created_at": "2026-07-26T12:05:00Z",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "owner": "aoa-kag",
+          "ref_kind": "kag_evidence",
+          "schema_identity": {
+            "owner": "aoa-kag",
+            "schema_digest": "sha256:1516bc25755b26c156a58709c5e7600e276daa21f115d7cdc61031cbd67162d5",
+            "schema_ref": "schemas/kag-mcp-result.schema.json",
+            "schema_version": "aoa_kag_mcp_result_v1",
+            "source_revision": "58ab52ffc06bab5cc28842a0b4336c6efa16b6ff"
+          },
+          "source_revision": "58ab52ffc06bab5cc28842a0b4336c6efa16b6ff"
+        },
+        "output_schema_identity": {
+          "owner": "aoa-kag",
+          "schema_digest": "sha256:1516bc25755b26c156a58709c5e7600e276daa21f115d7cdc61031cbd67162d5",
+          "schema_ref": "schemas/kag-mcp-result.schema.json",
+          "schema_version": "aoa_kag_mcp_result_v1",
+          "source_revision": "58ab52ffc06bab5cc28842a0b4336c6efa16b6ff"
+        },
+        "receipt": {
+          "host_id": "abyss-stack-example",
+          "input_artifact_digest": "sha256:1aa32f07826ac8a8b03e725b67b4c091634757475ed198b5d4b2ca7815dd323a",
+          "issued_at": "2026-07-26T12:05:30Z",
+          "outcome": "observed",
+          "output_artifact_digest": "sha256:643b67e33405b80c6b100b8925a27c4af3f92ca6f05931637f36cf42e6578ec4",
+          "owner_receipt_refs": [],
+          "previous_snapshot_digest": "sha256:981f770df5c9b3bdedabf81491b317ff43bfec20853bab3b527b73746b16b517",
+          "receipt_digest": "sha256:674cba8c7a884da3770c823111b0b1c4c84d78def054bc43cfa5e5c4b821af89",
+          "receipt_id": "host-receipt-1",
+          "receipt_ref": "example://abyss-stack/receipt/1",
+          "run_id": "sha256:a2c7d7a1e3ed178dc12eaec4604d71cbf8a7034768ae1da8b488e2d1ad2b6efc",
+          "schema_version": "aoa_host_stage_receipt_v1",
+          "stage_kind": "kag_evidence"
+        },
+        "review_ref": null,
+        "source_revision": "58ab52ffc06bab5cc28842a0b4336c6efa16b6ff",
+        "stage_kind": "kag_evidence",
+        "stage_owner": "aoa-kag",
+        "stop_reason_codes": [],
+        "transition_state": "proceed"
+      },
+      "previous_stage_digest": null,
+      "schema_version": "aoa_cross_organ_stage_v1",
+      "sequence": 0,
+      "stage_digest": "sha256:39076003045a03ac78cda4b713d637878f84825dc55f6e9d00d008dc4b5b73c6"
+    },
+    {
+      "observation": {
+        "acceptance_decision": null,
+        "applied_state": "candidate_only",
+        "authority_ceiling": "candidate",
+        "effect_class": "prepare_candidate",
+        "evidence_refs": [
+          {
+            "evidence_ref": "example://aoa-memo/evidence/2",
+            "expires_at": "2026-07-26T13:00:00Z",
+            "observed_at": "2026-07-26T12:10:00Z",
+            "owner": "aoa-memo",
+            "revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+          }
+        ],
+        "expires_at": "2026-07-26T13:00:00Z",
+        "freshness_state": "exact",
+        "input_ref": {
+          "artifact_digest": "sha256:643b67e33405b80c6b100b8925a27c4af3f92ca6f05931637f36cf42e6578ec4",
+          "artifact_ref": "example://aoa-kag/kag_evidence/1",
+          "authority_ceiling": "read",
+          "created_at": "2026-07-26T12:05:00Z",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "owner": "aoa-kag",
+          "ref_kind": "kag_evidence",
+          "schema_identity": {
+            "owner": "aoa-kag",
+            "schema_digest": "sha256:1516bc25755b26c156a58709c5e7600e276daa21f115d7cdc61031cbd67162d5",
+            "schema_ref": "schemas/kag-mcp-result.schema.json",
+            "schema_version": "aoa_kag_mcp_result_v1",
+            "source_revision": "58ab52ffc06bab5cc28842a0b4336c6efa16b6ff"
+          },
+          "source_revision": "58ab52ffc06bab5cc28842a0b4336c6efa16b6ff"
+        },
+        "input_schema_identity": {
+          "owner": "aoa-kag",
+          "schema_digest": "sha256:1516bc25755b26c156a58709c5e7600e276daa21f115d7cdc61031cbd67162d5",
+          "schema_ref": "schemas/kag-mcp-result.schema.json",
+          "schema_version": "aoa_kag_mcp_result_v1",
+          "source_revision": "58ab52ffc06bab5cc28842a0b4336c6efa16b6ff"
+        },
+        "mcp_tools_executed_by_sdk": false,
+        "model_confidence_is_acceptance_authority": false,
+        "next_owner": "aoa-evals",
+        "observed_at": "2026-07-26T12:10:00Z",
+        "output_ref": {
+          "artifact_digest": "sha256:5f7342353923d6f24a1b1a1b1a31640be4eeac73b9a23893f873c0e41c7c24f7",
+          "artifact_ref": "example://aoa-memo/memo_candidate/1",
+          "authority_ceiling": "candidate",
+          "created_at": "2026-07-26T12:10:00Z",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "owner": "aoa-memo",
+          "ref_kind": "memo_candidate",
+          "schema_identity": {
+            "owner": "aoa-memo",
+            "schema_digest": "sha256:6a33ac41ac90d4af29827a637b8f3cea24ecb45ca259d866e79000a2a784c0d9",
+            "schema_ref": "schemas/memory-ports/local_memo_candidate.schema.json",
+            "schema_version": "aoa_local_memo_candidate_v1",
+            "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+          },
+          "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+        },
+        "output_schema_identity": {
+          "owner": "aoa-memo",
+          "schema_digest": "sha256:6a33ac41ac90d4af29827a637b8f3cea24ecb45ca259d866e79000a2a784c0d9",
+          "schema_ref": "schemas/memory-ports/local_memo_candidate.schema.json",
+          "schema_version": "aoa_local_memo_candidate_v1",
+          "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+        },
+        "receipt": {
+          "host_id": "abyss-stack-example",
+          "input_artifact_digest": "sha256:643b67e33405b80c6b100b8925a27c4af3f92ca6f05931637f36cf42e6578ec4",
+          "issued_at": "2026-07-26T12:10:30Z",
+          "outcome": "candidate_created",
+          "output_artifact_digest": "sha256:5f7342353923d6f24a1b1a1b1a31640be4eeac73b9a23893f873c0e41c7c24f7",
+          "owner_receipt_refs": [],
+          "previous_snapshot_digest": "sha256:51623fb0ca919e4b0642e21e70619d05547730ec6631d72ce55b046f6c940487",
+          "receipt_digest": "sha256:3631e76e3fc8f47bc28d62820e817d9ddebda755114b76b561b74aa3ea8dc8f7",
+          "receipt_id": "host-receipt-2",
+          "receipt_ref": "example://abyss-stack/receipt/2",
+          "run_id": "sha256:a2c7d7a1e3ed178dc12eaec4604d71cbf8a7034768ae1da8b488e2d1ad2b6efc",
+          "schema_version": "aoa_host_stage_receipt_v1",
+          "stage_kind": "memo_candidate"
+        },
+        "review_ref": null,
+        "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f",
+        "stage_kind": "memo_candidate",
+        "stage_owner": "aoa-memo",
+        "stop_reason_codes": [],
+        "transition_state": "proceed"
+      },
+      "previous_stage_digest": "sha256:39076003045a03ac78cda4b713d637878f84825dc55f6e9d00d008dc4b5b73c6",
+      "schema_version": "aoa_cross_organ_stage_v1",
+      "sequence": 1,
+      "stage_digest": "sha256:990865c0b8ab8780ee51bb4685016c238ec05b02a69cbf64fbc961a8669d243d"
+    },
+    {
+      "observation": {
+        "acceptance_decision": null,
+        "applied_state": "candidate_only",
+        "authority_ceiling": "candidate",
+        "effect_class": "prepare_candidate",
+        "evidence_refs": [
+          {
+            "evidence_ref": "example://aoa-evals/evidence/3",
+            "expires_at": "2026-07-26T13:00:00Z",
+            "observed_at": "2026-07-26T12:15:00Z",
+            "owner": "aoa-evals",
+            "revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+          }
+        ],
+        "expires_at": "2026-07-26T13:00:00Z",
+        "freshness_state": "exact",
+        "input_ref": {
+          "artifact_digest": "sha256:5f7342353923d6f24a1b1a1b1a31640be4eeac73b9a23893f873c0e41c7c24f7",
+          "artifact_ref": "example://aoa-memo/memo_candidate/1",
+          "authority_ceiling": "candidate",
+          "created_at": "2026-07-26T12:10:00Z",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "owner": "aoa-memo",
+          "ref_kind": "memo_candidate",
+          "schema_identity": {
+            "owner": "aoa-memo",
+            "schema_digest": "sha256:6a33ac41ac90d4af29827a637b8f3cea24ecb45ca259d866e79000a2a784c0d9",
+            "schema_ref": "schemas/memory-ports/local_memo_candidate.schema.json",
+            "schema_version": "aoa_local_memo_candidate_v1",
+            "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+          },
+          "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+        },
+        "input_schema_identity": {
+          "owner": "aoa-memo",
+          "schema_digest": "sha256:6a33ac41ac90d4af29827a637b8f3cea24ecb45ca259d866e79000a2a784c0d9",
+          "schema_ref": "schemas/memory-ports/local_memo_candidate.schema.json",
+          "schema_version": "aoa_local_memo_candidate_v1",
+          "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+        },
+        "mcp_tools_executed_by_sdk": false,
+        "model_confidence_is_acceptance_authority": false,
+        "next_owner": "aoa-evals",
+        "observed_at": "2026-07-26T12:15:00Z",
+        "output_ref": {
+          "artifact_digest": "sha256:930b7088e5608e951655edab4896b124f322230cad0eb2be5783d884106c55b6",
+          "artifact_ref": "example://aoa-evals/eval_request/1",
+          "authority_ceiling": "candidate",
+          "created_at": "2026-07-26T12:15:00Z",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "owner": "aoa-evals",
+          "ref_kind": "eval_request",
+          "schema_identity": {
+            "owner": "aoa-evals",
+            "schema_digest": "sha256:751dd78f0280dc2cd089e30b3a7275182656e8350cf84c458f98734d16b4fad1",
+            "schema_ref": "mechanics/proof-object/parts/eval-authoring/schemas/eval-need.schema.json",
+            "schema_version": "aoa_eval_need_v1",
+            "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+          },
+          "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+        },
+        "output_schema_identity": {
+          "owner": "aoa-evals",
+          "schema_digest": "sha256:751dd78f0280dc2cd089e30b3a7275182656e8350cf84c458f98734d16b4fad1",
+          "schema_ref": "mechanics/proof-object/parts/eval-authoring/schemas/eval-need.schema.json",
+          "schema_version": "aoa_eval_need_v1",
+          "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+        },
+        "receipt": {
+          "host_id": "abyss-stack-example",
+          "input_artifact_digest": "sha256:5f7342353923d6f24a1b1a1b1a31640be4eeac73b9a23893f873c0e41c7c24f7",
+          "issued_at": "2026-07-26T12:15:30Z",
+          "outcome": "request_created",
+          "output_artifact_digest": "sha256:930b7088e5608e951655edab4896b124f322230cad0eb2be5783d884106c55b6",
+          "owner_receipt_refs": [],
+          "previous_snapshot_digest": "sha256:51a4eade2f206ae2e0f9f07ead7922479f47ee8b96b59f2081aa3a61ca578636",
+          "receipt_digest": "sha256:63acd70656cf1898dbff740e1d3de0bf4a4c5e6266a5fe7e256dc53ce049572a",
+          "receipt_id": "host-receipt-3",
+          "receipt_ref": "example://abyss-stack/receipt/3",
+          "run_id": "sha256:a2c7d7a1e3ed178dc12eaec4604d71cbf8a7034768ae1da8b488e2d1ad2b6efc",
+          "schema_version": "aoa_host_stage_receipt_v1",
+          "stage_kind": "eval_request"
+        },
+        "review_ref": null,
+        "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23",
+        "stage_kind": "eval_request",
+        "stage_owner": "aoa-evals",
+        "stop_reason_codes": [],
+        "transition_state": "proceed"
+      },
+      "previous_stage_digest": "sha256:990865c0b8ab8780ee51bb4685016c238ec05b02a69cbf64fbc961a8669d243d",
+      "schema_version": "aoa_cross_organ_stage_v1",
+      "sequence": 2,
+      "stage_digest": "sha256:7a36825794a265db129585bee41f8ebeaaa8e9ccb2b78d60776f4774396ac61b"
+    },
+    {
+      "observation": {
+        "acceptance_decision": null,
+        "applied_state": "not_applied",
+        "authority_ceiling": "read",
+        "effect_class": "validate",
+        "evidence_refs": [
+          {
+            "evidence_ref": "example://aoa-evals/evidence/4",
+            "expires_at": "2026-07-26T13:00:00Z",
+            "observed_at": "2026-07-26T12:20:00Z",
+            "owner": "aoa-evals",
+            "revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+          }
+        ],
+        "expires_at": "2026-07-26T13:00:00Z",
+        "freshness_state": "exact",
+        "input_ref": {
+          "artifact_digest": "sha256:930b7088e5608e951655edab4896b124f322230cad0eb2be5783d884106c55b6",
+          "artifact_ref": "example://aoa-evals/eval_request/1",
+          "authority_ceiling": "candidate",
+          "created_at": "2026-07-26T12:15:00Z",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "owner": "aoa-evals",
+          "ref_kind": "eval_request",
+          "schema_identity": {
+            "owner": "aoa-evals",
+            "schema_digest": "sha256:751dd78f0280dc2cd089e30b3a7275182656e8350cf84c458f98734d16b4fad1",
+            "schema_ref": "mechanics/proof-object/parts/eval-authoring/schemas/eval-need.schema.json",
+            "schema_version": "aoa_eval_need_v1",
+            "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+          },
+          "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+        },
+        "input_schema_identity": {
+          "owner": "aoa-evals",
+          "schema_digest": "sha256:751dd78f0280dc2cd089e30b3a7275182656e8350cf84c458f98734d16b4fad1",
+          "schema_ref": "mechanics/proof-object/parts/eval-authoring/schemas/eval-need.schema.json",
+          "schema_version": "aoa_eval_need_v1",
+          "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+        },
+        "mcp_tools_executed_by_sdk": false,
+        "model_confidence_is_acceptance_authority": false,
+        "next_owner": "aoa-memo",
+        "observed_at": "2026-07-26T12:20:00Z",
+        "output_ref": {
+          "artifact_digest": "sha256:83238f337553bf3c02741eb57bcc76e42d8e4c1f46e87ebd542c5f67eedc3e7c",
+          "artifact_ref": "example://aoa-evals/eval_result/1",
+          "authority_ceiling": "read",
+          "created_at": "2026-07-26T12:20:00Z",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "owner": "aoa-evals",
+          "ref_kind": "eval_result",
+          "schema_identity": {
+            "owner": "aoa-evals",
+            "schema_digest": "sha256:786c3bd7902fe78224adfc5ac76ed7a43b49f78bb6a5ade140a416458339a82a",
+            "schema_ref": "mechanics/publication-receipts/parts/receipt-payload/schemas/eval-result-receipt.schema.json",
+            "schema_version": "aoa_eval_result_receipt_v1",
+            "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+          },
+          "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+        },
+        "output_schema_identity": {
+          "owner": "aoa-evals",
+          "schema_digest": "sha256:786c3bd7902fe78224adfc5ac76ed7a43b49f78bb6a5ade140a416458339a82a",
+          "schema_ref": "mechanics/publication-receipts/parts/receipt-payload/schemas/eval-result-receipt.schema.json",
+          "schema_version": "aoa_eval_result_receipt_v1",
+          "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+        },
+        "receipt": {
+          "host_id": "abyss-stack-example",
+          "input_artifact_digest": "sha256:930b7088e5608e951655edab4896b124f322230cad0eb2be5783d884106c55b6",
+          "issued_at": "2026-07-26T12:20:30Z",
+          "outcome": "validated",
+          "output_artifact_digest": "sha256:83238f337553bf3c02741eb57bcc76e42d8e4c1f46e87ebd542c5f67eedc3e7c",
+          "owner_receipt_refs": [],
+          "previous_snapshot_digest": "sha256:7c830d5405248f51824414c550f9598d36dc9c2d59a3ccca7a280f69ac8e98a7",
+          "receipt_digest": "sha256:3f83669b13f80a4d565bd5a67c2564e3d5c22b23a6ad1ddf40b032be524ba17a",
+          "receipt_id": "host-receipt-4",
+          "receipt_ref": "example://abyss-stack/receipt/4",
+          "run_id": "sha256:a2c7d7a1e3ed178dc12eaec4604d71cbf8a7034768ae1da8b488e2d1ad2b6efc",
+          "schema_version": "aoa_host_stage_receipt_v1",
+          "stage_kind": "eval_result"
+        },
+        "review_ref": null,
+        "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23",
+        "stage_kind": "eval_result",
+        "stage_owner": "aoa-evals",
+        "stop_reason_codes": [],
+        "transition_state": "proceed"
+      },
+      "previous_stage_digest": "sha256:7a36825794a265db129585bee41f8ebeaaa8e9ccb2b78d60776f4774396ac61b",
+      "schema_version": "aoa_cross_organ_stage_v1",
+      "sequence": 3,
+      "stage_digest": "sha256:dbab7e4025c0c3d330c8b9f9ef11995ec69512ea55739775dcebbf3eb8e0ddcf"
+    },
+    {
+      "observation": {
+        "acceptance_decision": "accepted",
+        "applied_state": "applied",
+        "authority_ceiling": "internal_effect",
+        "effect_class": "accept_source",
+        "evidence_refs": [
+          {
+            "evidence_ref": "example://aoa-memo/evidence/5",
+            "expires_at": "2026-07-26T13:00:00Z",
+            "observed_at": "2026-07-26T12:25:00Z",
+            "owner": "aoa-memo",
+            "revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+          }
+        ],
+        "expires_at": "2026-07-26T13:00:00Z",
+        "freshness_state": "exact",
+        "input_ref": {
+          "artifact_digest": "sha256:83238f337553bf3c02741eb57bcc76e42d8e4c1f46e87ebd542c5f67eedc3e7c",
+          "artifact_ref": "example://aoa-evals/eval_result/1",
+          "authority_ceiling": "read",
+          "created_at": "2026-07-26T12:20:00Z",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "owner": "aoa-evals",
+          "ref_kind": "eval_result",
+          "schema_identity": {
+            "owner": "aoa-evals",
+            "schema_digest": "sha256:786c3bd7902fe78224adfc5ac76ed7a43b49f78bb6a5ade140a416458339a82a",
+            "schema_ref": "mechanics/publication-receipts/parts/receipt-payload/schemas/eval-result-receipt.schema.json",
+            "schema_version": "aoa_eval_result_receipt_v1",
+            "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+          },
+          "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+        },
+        "input_schema_identity": {
+          "owner": "aoa-evals",
+          "schema_digest": "sha256:786c3bd7902fe78224adfc5ac76ed7a43b49f78bb6a5ade140a416458339a82a",
+          "schema_ref": "mechanics/publication-receipts/parts/receipt-payload/schemas/eval-result-receipt.schema.json",
+          "schema_version": "aoa_eval_result_receipt_v1",
+          "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+        },
+        "mcp_tools_executed_by_sdk": false,
+        "model_confidence_is_acceptance_authority": false,
+        "next_owner": null,
+        "observed_at": "2026-07-26T12:25:00Z",
+        "output_ref": {
+          "artifact_digest": "sha256:5ddea2890e6dafe032bcbb63e2e102894f3b224e4d862a51beea2a4a4c719c4c",
+          "artifact_ref": "example://aoa-memo/owner_acceptance/1",
+          "authority_ceiling": "internal_effect",
+          "created_at": "2026-07-26T12:25:00Z",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "owner": "aoa-memo",
+          "ref_kind": "owner_acceptance",
+          "schema_identity": {
+            "owner": "aoa-memo",
+            "schema_digest": "sha256:e3a1e93846340f4d850028eeb722a32458cff6527fe38a6366052edf86a1239f",
+            "schema_ref": "schemas/support-objects/reviewed_intake_landing_receipt.schema.json",
+            "schema_version": "aoa_reviewed_intake_landing_receipt_v1",
+            "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+          },
+          "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+        },
+        "output_schema_identity": {
+          "owner": "aoa-memo",
+          "schema_digest": "sha256:e3a1e93846340f4d850028eeb722a32458cff6527fe38a6366052edf86a1239f",
+          "schema_ref": "schemas/support-objects/reviewed_intake_landing_receipt.schema.json",
+          "schema_version": "aoa_reviewed_intake_landing_receipt_v1",
+          "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+        },
+        "receipt": {
+          "host_id": "abyss-stack-example",
+          "input_artifact_digest": "sha256:83238f337553bf3c02741eb57bcc76e42d8e4c1f46e87ebd542c5f67eedc3e7c",
+          "issued_at": "2026-07-26T12:25:30Z",
+          "outcome": "accepted",
+          "output_artifact_digest": "sha256:5ddea2890e6dafe032bcbb63e2e102894f3b224e4d862a51beea2a4a4c719c4c",
+          "owner_receipt_refs": [
+            {
+              "artifact_digest": "sha256:5ddea2890e6dafe032bcbb63e2e102894f3b224e4d862a51beea2a4a4c719c4c",
+              "artifact_ref": "example://aoa-memo/owner_acceptance/1",
+              "authority_ceiling": "internal_effect",
+              "created_at": "2026-07-26T12:25:00Z",
+              "expires_at": "2026-07-26T13:00:00Z",
+              "owner": "aoa-memo",
+              "ref_kind": "owner_acceptance",
+              "schema_identity": {
+                "owner": "aoa-memo",
+                "schema_digest": "sha256:e3a1e93846340f4d850028eeb722a32458cff6527fe38a6366052edf86a1239f",
+                "schema_ref": "schemas/support-objects/reviewed_intake_landing_receipt.schema.json",
+                "schema_version": "aoa_reviewed_intake_landing_receipt_v1",
+                "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+              },
+              "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+            }
+          ],
+          "previous_snapshot_digest": "sha256:bd1692a62f680eb3dbb769b43d69152bb71ea180f80d654f5c42101a80c522ef",
+          "receipt_digest": "sha256:bb538586000536f1753e058ec70826377c3d6f3abdde7b2b939d0db350616e16",
+          "receipt_id": "host-receipt-5",
+          "receipt_ref": "example://abyss-stack/receipt/5",
+          "run_id": "sha256:a2c7d7a1e3ed178dc12eaec4604d71cbf8a7034768ae1da8b488e2d1ad2b6efc",
+          "schema_version": "aoa_host_stage_receipt_v1",
+          "stage_kind": "owner_acceptance"
+        },
+        "review_ref": {
+          "evidence_ref": "example://aoa-memo/review/acceptance-1",
+          "expires_at": "2026-07-26T13:00:00Z",
+          "observed_at": "2026-07-26T12:25:00Z",
+          "owner": "aoa-memo",
+          "revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+        },
+        "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f",
+        "stage_kind": "owner_acceptance",
+        "stage_owner": "aoa-memo",
+        "stop_reason_codes": [],
+        "transition_state": "accepted_terminal"
+      },
+      "previous_stage_digest": "sha256:dbab7e4025c0c3d330c8b9f9ef11995ec69512ea55739775dcebbf3eb8e0ddcf",
+      "schema_version": "aoa_cross_organ_stage_v1",
+      "sequence": 4,
+      "stage_digest": "sha256:680e8b2db820644211b631392b9704b6125f3ddec40d4b59ded31bb5ba4cbf1b"
+    }
+  ],
+  "state": "accepted",
+  "stop_reason_codes": []
+}

@@ -6,11 +6,15 @@ from dataclasses import dataclass
 from pathlib import Path
 from typing import Any
 
+from pydantic import TypeAdapter
+
 try:
     import tomllib
 except ModuleNotFoundError:  # pragma: no cover
     import tomli as tomllib  # type: ignore[import-not-found, no-redef]
 
+from ..contracts.organs import EffectClass, FreshnessState, PolicyFamily
+from ..organs import OrganRegistryError, OrgansAPI
 from ..workspace.config import load_workspace_config
 from ..workspace.discovery import Workspace
 from ..workspace.roots import KNOWN_REPOS
@@ -102,10 +106,12 @@ REPO_HINTS: dict[str, dict[str, Any]] = {
         "entry_candidates": ["README.md", "docs/AGENTS.md"],
     },
     "Dionysus": {
-        "role": "seed-garden",
-        "surface": "seed staging, route maps, and planting follow-through",
-        "entry_candidates": ["generated/seed_route_map.min.json", "seed-registry.yaml", "README.md"],
-        "launcher": "scripts/dionysus_mcp_server.py",
+        "role": "portrait-protocol-owner",
+        "surface": (
+            "voice-first interview protocols, reviewed portrait claims, and "
+            "privacy-bounded projection formats"
+        ),
+        "entry_candidates": ["README.md", "DESIGN.md", "interviews/catalog.toml"],
     },
     "abyss-stack": {
         "role": "runtime-substrate-source",
@@ -149,10 +155,13 @@ SURFACE_CROSSWALK: list[dict[str, str]] = [
         "notes": "aoa_stats is a read transport; aoa-stats keeps statistical meaning and owner contracts",
     },
     {
-        "need": "seed staging, route map, and planting follow-through",
-        "primary_surface": "repo-local MCP: dionysus",
-        "secondary_surface": "owner repo source files",
-        "notes": "staging and route maps do not outrank planted owner objects",
+        "need": "human-reviewed portrait or interview protocol",
+        "primary_surface": "Dionysus owner source",
+        "secondary_surface": "purpose-bounded owner resource projection",
+        "notes": (
+            "the current owner defers MCP integration; never infer personal "
+            "truth or load a complete dossier automatically"
+        ),
     },
 ]
 
@@ -215,6 +224,7 @@ class AoAWorkspaceMCPState:
                 "present": workspace_marker.exists(),
             },
             "project_codex": project_codex,
+            "organ_registry": self.build_organ_registry_status(),
             "control_plane_surface": {
                 "path": str(control_plane_surface),
                 "exists": control_plane_surface.exists(),
@@ -254,6 +264,98 @@ class AoAWorkspaceMCPState:
             "workspace_root": str(self.workspace_root),
             "crosswalk": SURFACE_CROSSWALK,
         }
+
+    def build_organ_registry_status(self) -> dict[str, Any]:
+        registry_path = self.workspace.organ_registry_path
+        status: dict[str, Any] = {
+            "configured": registry_path is not None,
+            "source": self.workspace.organ_registry_source,
+            "path": str(registry_path) if registry_path is not None else None,
+            "exists": registry_path.is_file() if registry_path is not None else False,
+            "valid": False,
+            "registry_id": None,
+            "record_count": 0,
+            "projection_digest": None,
+            "expires_at": None,
+            "error": None,
+            "execution_authorized": False,
+        }
+        if registry_path is None:
+            status["error"] = "no explicit organ registry configured"
+            return status
+        try:
+            projection = OrgansAPI(self.workspace).projection()
+        except (OrganRegistryError, OSError, ValueError) as exc:
+            status["error"] = str(exc)
+            return status
+        status.update(
+            {
+                "valid": True,
+                "registry_id": projection.registry_id,
+                "record_count": len(projection.entries),
+                "projection_digest": projection.projection_digest,
+                "expires_at": projection.expires_at.isoformat(),
+            }
+        )
+        return status
+
+    def build_organ_catalog(
+        self,
+        *,
+        query: str = "",
+        source_owner: str = "",
+        maximum_policy: str = "read",
+        freshness_states: list[str] | None = None,
+        effect_classes: list[str] | None = None,
+        allow_organs: list[str] | None = None,
+        allow_capabilities: list[str] | None = None,
+        max_results: int = 24,
+        byte_budget: int = 32_768,
+    ) -> dict[str, Any]:
+        policy: PolicyFamily = TypeAdapter(PolicyFamily).validate_python(
+            maximum_policy
+        )
+        freshness: tuple[FreshnessState, ...] | None = (
+            TypeAdapter(tuple[FreshnessState, ...]).validate_python(
+                freshness_states
+            )
+            if freshness_states
+            else None
+        )
+        effects: tuple[EffectClass, ...] | None = (
+            TypeAdapter(tuple[EffectClass, ...]).validate_python(effect_classes)
+            if effect_classes
+            else None
+        )
+        result = OrgansAPI(self.workspace).catalog(
+            query=query or None,
+            source_owner=source_owner or None,
+            maximum_policy=policy,
+            freshness_states=freshness,
+            effect_classes=effects,
+            allowed_organ_ids=tuple(allow_organs) if allow_organs else None,
+            allowed_capability_ids=(
+                tuple(allow_capabilities) if allow_capabilities else None
+            ),
+            max_results=max_results,
+            byte_budget=byte_budget,
+        )
+        return result.model_dump(mode="json")
+
+    def build_organ_inspection(self, organ_id: str) -> dict[str, Any]:
+        return OrgansAPI(self.workspace).inspect_organ(organ_id).model_dump(
+            mode="json"
+        )
+
+    def build_organ_capability(
+        self,
+        organ_id: str,
+        capability_id: str,
+    ) -> dict[str, Any]:
+        return OrgansAPI(self.workspace).inspect_capability(
+            organ_id,
+            capability_id,
+        ).model_dump(mode="json")
 
     def build_runtime_entrypoints(self) -> dict[str, Any]:
         entries = [
@@ -306,10 +408,13 @@ class AoAWorkspaceMCPState:
                 "need": "derived observability catalog",
             },
             {
-                "name": "seed_route_map",
+                "name": "dionysus_interview_catalog",
                 "scope": "Dionysus",
-                "path": "generated/seed_route_map.min.json",
-                "need": "seed route orientation",
+                "path": "interviews/catalog.toml",
+                "need": (
+                    "owner-authored interview families without stale MCP or "
+                    "seed-garden authority"
+                ),
             },
             {
                 "name": "abyss_stack_diagnostic_catalog",
@@ -491,6 +596,7 @@ class AoAWorkspaceMCPState:
 def build_server(start: str | Path | None = None) -> Any:
     try:
         from mcp.server.fastmcp import FastMCP  # type: ignore[import-not-found]
+        from mcp.types import ToolAnnotations  # type: ignore[import-not-found]
     except ImportError as exc:
         raise SystemExit(
             "Missing dependency 'mcp'. Install with: python -m pip install -e '.[mcp]'"
@@ -498,44 +604,90 @@ def build_server(start: str | Path | None = None) -> Any:
 
     start_path = Path(start or Path.cwd()).expanduser().resolve()
     mcp = FastMCP("aoa-workspace", json_response=True)
+    read_annotations = ToolAnnotations(
+        readOnlyHint=True,
+        destructiveHint=False,
+        idempotentHint=True,
+        openWorldHint=False,
+    )
 
     def current_state() -> AoAWorkspaceMCPState:
         return AoAWorkspaceMCPState.discover(start_path)
 
-    @mcp.tool()
+    @mcp.tool(annotations=read_annotations)
     def workspace_resolution() -> dict[str, Any]:
         """Return the resolved aoa-sdk workspace payload with path origins."""
         return current_state().build_workspace_resolution()
 
-    @mcp.tool()
+    @mcp.tool(annotations=read_annotations)
     def workspace_health() -> dict[str, Any]:
         """Return a narrow health bundle for workspace marker, project config, and repo presence."""
         return current_state().build_health()
 
-    @mcp.tool()
+    @mcp.tool(annotations=read_annotations)
     def workspace_repo_map() -> dict[str, Any]:
         """Return the repo-role map using aoa-sdk workspace discovery plus advisory entrypoints."""
         return current_state().build_repo_map()
 
-    @mcp.tool()
+    @mcp.tool(annotations=read_annotations)
     def workspace_surface_crosswalk() -> dict[str, Any]:
         """Return the Codex surface-selection crosswalk for the workspace."""
         return current_state().build_surface_crosswalk()
 
-    @mcp.tool()
+    @mcp.tool(annotations=read_annotations)
     def workspace_runtime_entrypoints() -> dict[str, Any]:
         """Return curated runtime entrypoints across the workspace."""
         return current_state().build_runtime_entrypoints()
 
-    @mcp.tool()
+    @mcp.tool(annotations=read_annotations)
     def workspace_agent_skill_catalog() -> dict[str, Any]:
         """Return the compact owner-authored AoA skill catalog without selecting a skill."""
         return current_state().load_agent_skill_catalog()
 
-    @mcp.tool()
+    @mcp.tool(annotations=read_annotations)
     def workspace_agent_profiles() -> dict[str, Any]:
         """Return compact aoa-agents profile metadata."""
         return current_state().load_agent_profiles()
+
+    @mcp.tool(annotations=read_annotations)
+    def organ_registry_status() -> dict[str, Any]:
+        """Return explicit private-registry configuration and validation status."""
+        return current_state().build_organ_registry_status()
+
+    @mcp.tool(annotations=read_annotations)
+    def organ_catalog(
+        query: str = "",
+        source_owner: str = "",
+        maximum_policy: str = "read",
+        freshness_states: list[str] | None = None,
+        effect_classes: list[str] | None = None,
+        allow_organs: list[str] | None = None,
+        allow_capabilities: list[str] | None = None,
+        max_results: int = 24,
+        byte_budget: int = 32_768,
+    ) -> dict[str, Any]:
+        """Return a bounded organ/capability catalog without loading schemas."""
+        return current_state().build_organ_catalog(
+            query=query,
+            source_owner=source_owner,
+            maximum_policy=maximum_policy,
+            freshness_states=freshness_states,
+            effect_classes=effect_classes,
+            allow_organs=allow_organs,
+            allow_capabilities=allow_capabilities,
+            max_results=max_results,
+            byte_budget=byte_budget,
+        )
+
+    @mcp.tool(annotations=read_annotations)
+    def organ_inspect(organ_id: str) -> dict[str, Any]:
+        """Inspect one discoverable organ after bounded catalog selection."""
+        return current_state().build_organ_inspection(organ_id)
+
+    @mcp.tool(annotations=read_annotations)
+    def organ_capability(organ_id: str, capability_id: str) -> dict[str, Any]:
+        """Load one owner-bounded capability contract and its schema references."""
+        return current_state().build_organ_capability(organ_id, capability_id)
 
     @mcp.resource("aoa-workspace://resolution")
     def resolution_resource() -> str:
@@ -569,12 +721,47 @@ def build_server(start: str | Path | None = None) -> Any:
     def agent_profiles_resource() -> str:
         return json.dumps(current_state().load_agent_profiles(), ensure_ascii=False, indent=2)
 
+    @mcp.resource("aoa-workspace://organs/status")
+    def organ_registry_status_resource() -> str:
+        return json.dumps(
+            current_state().build_organ_registry_status(),
+            ensure_ascii=False,
+            indent=2,
+        )
+
+    @mcp.resource("aoa-workspace://organs/catalog")
+    def organ_catalog_resource() -> str:
+        return json.dumps(
+            current_state().build_organ_catalog(),
+            ensure_ascii=False,
+            indent=2,
+        )
+
+    @mcp.resource("aoa-workspace://organs/{organ_id}")
+    def organ_resource(organ_id: str) -> str:
+        return json.dumps(
+            current_state().build_organ_inspection(organ_id),
+            ensure_ascii=False,
+            indent=2,
+        )
+
+    @mcp.resource("aoa-workspace://organs/{organ_id}/capabilities/{capability_id}")
+    def organ_capability_resource(organ_id: str, capability_id: str) -> str:
+        return json.dumps(
+            current_state().build_organ_capability(organ_id, capability_id),
+            ensure_ascii=False,
+            indent=2,
+        )
+
     @mcp.prompt()
     def orient_in_aoa_workspace() -> str:
         """Prompt recipe for first orientation in the AoA workspace."""
         return (
-            "Use workspace_resolution, then workspace_repo_map, then workspace_surface_crosswalk. "
-            "Name the strongest next surface for the task, one secondary surface, and one owner boundary you must not cross."
+            "Use workspace_resolution, then workspace_repo_map, then "
+            "workspace_surface_crosswalk. If an organ access plane may help, "
+            "call organ_registry_status and bounded organ_catalog before "
+            "organ_inspect or organ_capability. Name the strongest next surface, "
+            "one secondary surface, and one owner boundary you must not cross."
         )
 
     @mcp.prompt()

@@ -32,6 +32,9 @@ mean.
   non-activating. Keep C2 plan compilation pinned to an admitted owner contour,
   reviewed inputs, and explicit conditions. C3-C5 Runner behavior remains a
   separate part and landing.
+- Keep cross-organ orchestration host-visible and one-stage-at-a-time. Owner
+  calls, credentials, retries, acceptance, and runtime effects remain outside
+  the SDK; every transition binds the prior snapshot and exact owner receipt.
 
 ## Next Work
 
@@ -42,6 +45,9 @@ mean.
   considering a new bridge part.
 - Build C3-C5 Runner lifecycle only over exact C2 plans and runtime-adapter
   contracts; do not collapse compilation success into execution evidence.
+- Carry the cross-organ contract into an `abyss-stack` host adapter only after
+  exact source/package/protocol/consumer compatibility is established. Do not
+  add hidden MCP server chaining.
 - Measure the compatibility window and preserve the exact predecessor rollback
   route. Treat any source, corpus, runtime, trust, rollback, or consumer drift
   as a hard stop.

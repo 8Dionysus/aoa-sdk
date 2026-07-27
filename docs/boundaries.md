@@ -81,6 +81,9 @@ repositories remain authoritative.
   comparison, and activation-plan compilation
 - attachment of stack observations and eval evidence as cited inputs without
   promoting them to SDK-authored truth
+- deterministic validation of a host-visible, one-stage-at-a-time KAG,
+  memo-candidate, eval, and explicit owner-acceptance receipt chain without
+  owner invocation
 - passive skill-environment inspection and exact owner-profile user bootstrap
 - reviewed-session closeout helpers that call owner-owned publisher scripts and
   refresh derived stats without taking over workflow or proof meaning
@@ -115,6 +118,9 @@ repositories remain authoritative.
 - automatic activation from discovery or an activation plan
 - owner-specific capability semantics flattened into one universal payload
 - proof, memory, source, runtime, or external-effect acceptance
+- hidden MCP server chaining, owner-tool invocation, proof computation,
+  durable memory write, or inferred acceptance inside cross-organ
+  orchestration
 - project-specific overlays inside portable-core modules
 
 ## Practical Rule

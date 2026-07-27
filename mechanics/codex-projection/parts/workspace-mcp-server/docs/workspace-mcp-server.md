@@ -8,6 +8,8 @@ This surface stays on the control plane:
 - it reuses `Workspace.discover()` and `.aoa/workspace.toml`
 - it reports repo paths and origins without inventing a second topology model
 - it orients Codex toward the right repo or surface
+- it exposes bounded progressive organ discovery when one exact private
+  registry is configured
 - it does not replace owner-layer truth in sibling repositories
 
 ## What it exposes
@@ -18,7 +20,29 @@ This surface stays on the control plane:
 - a surface crosswalk for AGENTS, skills, subagents, project-level MCP, and
   owner-local source surfaces, with primary and secondary routes named
   explicitly
-- compact skill index and agent profile previews
+- compact skill catalog and agent profile previews
+- registry status, bounded organ catalog, one-organ inspection, and
+  one-capability inspection
+
+The organ route is:
+
+```text
+organ_registry_status
+  -> organ_catalog
+  -> organ_inspect
+  -> organ_capability
+  -> return to the host/SDK route for any candidate plan or execution
+```
+
+The same readouts are available as
+`aoa-workspace://organs/status`,
+`aoa-workspace://organs/catalog`,
+`aoa-workspace://organs/{organ_id}`, and
+`aoa-workspace://organs/{organ_id}/capabilities/{capability_id}`.
+Catalog calls are result- and byte-bounded and do not load primitive schemas.
+Configure the registry through `[organ_access].registry_source` in
+`.aoa/workspace.toml` or `AOA_SDK_ORGAN_REGISTRY`; no repository, process,
+listener, or Codex-config scan is used as admission.
 
 ## Install
 
@@ -44,7 +68,12 @@ cwd = "../aoa-sdk"
 
 - `aoa-sdk` stays the control plane
 - `aoa_workspace` orients; it does not claim semantic ownership
+- the MCP surface has no activation-plan, registry-write, lifecycle,
+  connection, or owner-tool proxy
+- all tool annotations are non-authoritative hints; typed policy, owner
+  evidence, and host authorization remain required
 - project-level `aoa_stats` remains a separate read transport; `aoa-stats`
   keeps its source contracts and does not host the launcher
-- repo-local MCP servers such as `dionysus` remain separate layers
+- the retired repo-local Dionysus MCP route is not advertised; its current
+  owner surface defers MCP integration and remains privacy-bounded source
 - `abyss-stack` path resolution must respect preferred source checkouts over runtime mirrors

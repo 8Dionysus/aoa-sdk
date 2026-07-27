@@ -1,9 +1,10 @@
 from __future__ import annotations
 
+import asyncio
 import json
 from pathlib import Path
 
-from aoa_sdk.codex.workspace_mcp import AoAWorkspaceMCPState
+from aoa_sdk.codex.workspace_mcp import AoAWorkspaceMCPState, build_server
 
 
 def _seed_codex_workspace(workspace_root: Path) -> None:
@@ -92,9 +93,13 @@ def _seed_codex_workspace(workspace_root: Path) -> None:
         encoding="utf-8",
     )
 
-    (workspace_root / "Dionysus" / "generated").mkdir(parents=True, exist_ok=True)
-    (workspace_root / "Dionysus" / "generated" / "seed_route_map.min.json").write_text(
-        "{}\n",
+    (workspace_root / "Dionysus" / "interviews").mkdir(parents=True, exist_ok=True)
+    (workspace_root / "Dionysus" / "README.md").write_text(
+        "# Dionysus\n",
+        encoding="utf-8",
+    )
+    (workspace_root / "Dionysus" / "interviews" / "catalog.toml").write_text(
+        'schema_version = "dionysus_interview_catalog_v1"\n',
         encoding="utf-8",
     )
 
@@ -156,6 +161,10 @@ def test_workspace_repo_map_lists_curated_entrypoints(workspace_root: Path) -> N
     assert rows["aoa-skills"]["preferred_entrypoints"][0]["path"] == (
         "generated/agent_skill_catalog.min.json"
     )
+    assert rows["Dionysus"]["role"] == "portrait-protocol-owner"
+    assert "scripts/dionysus_mcp_server.py" not in {
+        entry["path"] for entry in rows["Dionysus"]["preferred_entrypoints"]
+    }
 
 
 def test_workspace_repo_map_keeps_aoa_stats_entrypoints_transport_neutral(workspace_root: Path) -> None:
@@ -196,7 +205,7 @@ def test_workspace_runtime_entrypoints_report_curated_surfaces(workspace_root: P
     assert entries["workspace_control_plane"]["exists"] is True
     assert entries["agent_skill_catalog"]["exists"] is True
     assert entries["capability_graph"]["exists"] is True
-    assert entries["seed_route_map"]["exists"] is True
+    assert entries["dionysus_interview_catalog"]["exists"] is True
     assert entries["abyss_stack_diagnostic_catalog"]["exists"] is True
     assert entries["abyss_stack_diagnostic_catalog"]["path"] == (
         "mechanics/diagnostic-spine/parts/diagnostic-surfaces/generated/"
@@ -220,3 +229,88 @@ def test_load_agent_profiles_and_passive_skill_catalog(workspace_root: Path) -> 
     assert skill_catalog["payload"]["skills"] == [
         {"name": "aoa-decision", "candidate_only": False}
     ]
+
+
+def test_organ_discovery_is_explicit_bounded_and_non_executing(
+    workspace_root: Path,
+    monkeypatch,
+) -> None:
+    _seed_codex_workspace(workspace_root)
+    registry = (
+        Path(__file__).resolve().parents[4]
+        / "boundary-bridge"
+        / "parts"
+        / "organ-access-control-plane"
+        / "examples"
+        / "organ_registry.wave1-shadow.example.json"
+    )
+    monkeypatch.setenv("AOA_SDK_ORGAN_REGISTRY", str(registry))
+
+    state = AoAWorkspaceMCPState.discover(workspace_root / "aoa-sdk")
+    status = state.build_organ_registry_status()
+    assert status["configured"] is True
+    assert status["valid"] is True
+    assert status["record_count"] == 3
+    assert status["execution_authorized"] is False
+
+    catalog = state.build_organ_catalog(
+        query="knowledge",
+        allow_organs=["aoa-kag"],
+        byte_budget=8_192,
+    )
+    assert [entry["organ_id"] for entry in catalog["entries"]] == ["aoa-kag"]
+    assert catalog["schema_bytes_loaded"] == 0
+
+    organ = state.build_organ_inspection("aoa-kag")
+    capability = state.build_organ_capability(
+        "aoa-kag",
+        "knowledge-retrieval",
+    )
+    assert organ["registry_state"] == "shadow"
+    assert organ["endpoint"] is None
+    assert capability["policy_family"] == "read"
+
+
+def test_workspace_mcp_catalog_is_read_only_and_has_no_activation_tool(
+    workspace_root: Path,
+) -> None:
+    _seed_codex_workspace(workspace_root)
+    server = build_server(workspace_root / "aoa-sdk")
+    tools = asyncio.run(server.list_tools())
+    names = {tool.name for tool in tools}
+
+    assert names == {
+        "workspace_resolution",
+        "workspace_health",
+        "workspace_repo_map",
+        "workspace_surface_crosswalk",
+        "workspace_runtime_entrypoints",
+        "workspace_agent_skill_catalog",
+        "workspace_agent_profiles",
+        "organ_registry_status",
+        "organ_catalog",
+        "organ_inspect",
+        "organ_capability",
+    }
+    assert "organ_activation" not in names
+    for tool in tools:
+        assert tool.annotations is not None
+        assert tool.annotations.readOnlyHint is True
+        assert tool.annotations.destructiveHint is False
+        assert tool.annotations.idempotentHint is True
+        assert tool.annotations.openWorldHint is False
+
+    resources = asyncio.run(server.list_resources())
+    assert {
+        str(resource.uri)
+        for resource in resources
+        if str(resource.uri).startswith("aoa-workspace://organs/")
+    } == {
+        "aoa-workspace://organs/catalog",
+        "aoa-workspace://organs/status",
+    }
+    templates = asyncio.run(server.list_resource_templates())
+    assert {template.uriTemplate for template in templates} == {
+        "aoa-workspace://organs/{organ_id}",
+        "aoa-workspace://organs/{organ_id}/capabilities/{capability_id}",
+    }

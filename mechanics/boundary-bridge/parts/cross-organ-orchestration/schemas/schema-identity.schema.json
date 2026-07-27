@@ -1,0 +1,42 @@
+{
+  "$id": "urn:aoa-sdk:cross-organ-orchestration:schema-identity.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "owner": {
+      "minLength": 1,
+      "title": "Owner",
+      "type": "string"
+    },
+    "schema_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Schema Digest",
+      "type": "string"
+    },
+    "schema_ref": {
+      "maxLength": 512,
+      "minLength": 3,
+      "title": "Schema Ref",
+      "type": "string"
+    },
+    "schema_version": {
+      "minLength": 1,
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "source_revision": {
+      "minLength": 1,
+      "title": "Source Revision",
+      "type": "string"
+    }
+  },
+  "required": [
+    "owner",
+    "schema_ref",
+    "schema_digest",
+    "source_revision",
+    "schema_version"
+  ],
+  "title": "SchemaIdentity",
+  "type": "object"
+}

@@ -13,7 +13,8 @@ sibling repositories retain meaning.
 
 Use this mechanic when a typed facade, registry, consumed-surface posture gate,
 skill environment inspector, technique promotion readiness reader, owner-layer signal
-handoff, route hint, deterministic route resolution, stats read, or
+handoff, explicit cross-organ receipt chain, route hint, deterministic route
+resolution, stats read, or
 sibling-owned generated reader changes.
 
 ### SDK owns
@@ -30,6 +31,8 @@ sibling-owned generated reader changes.
   without activation
 - deterministic compilation of an exact reviewed scenario binding from an
   admitted owner contour into a runtime-neutral plan without execution
+- deterministic validation of a host-visible KAG-to-memory-to-eval-to-owner
+  receipt chain without invoking an owner tool
 
 ### Stronger owner split
 
@@ -63,6 +66,7 @@ retain their domain meaning.
 - `src/aoa_sdk/techniques/`
 - `mechanics/boundary-bridge/parts/route-resolution-control-plane/`
 - `mechanics/boundary-bridge/parts/plan-compilation-control-plane/`
+- `mechanics/boundary-bridge/parts/cross-organ-orchestration/`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`
 - `mechanics/boundary-bridge/parts/skill-environment-inspector/`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/`
@@ -79,6 +83,7 @@ retain their domain meaning.
 - organ-access-control-plane
 - route-resolution-control-plane
 - plan-compilation-control-plane
+- cross-organ-orchestration
 
 ### Must not claim
 

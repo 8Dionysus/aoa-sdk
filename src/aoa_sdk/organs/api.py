@@ -23,7 +23,17 @@ from ..contracts.organs import (
     PolicyFamily,
     RegistryState,
 )
+from ..contracts.organ_orchestration import (
+    CrossOrganOrchestrationRequest,
+    CrossOrganOrchestrationRun,
+    CrossOrganStageObservation,
+)
 from ..workspace.discovery import Workspace
+from .orchestration import (
+    advance_orchestration,
+    start_orchestration,
+    validate_orchestration_run,
+)
 from .registry import (
     OrganRegistryError,
     assert_projection_digest,
@@ -181,6 +191,31 @@ class OrgansAPI:
         if not entry.discoverable:
             raise OrganRegistryError(f"organ {organ_id!r} is not discoverable")
         return self._find_capability(entry, capability_id)
+
+    def start_orchestration(
+        self,
+        request: CrossOrganOrchestrationRequest,
+    ) -> CrossOrganOrchestrationRun:
+        """Start a host-visible run without calling any owner tool."""
+
+        return start_orchestration(request)
+
+    def advance_orchestration(
+        self,
+        run: CrossOrganOrchestrationRun,
+        observation: CrossOrganStageObservation,
+    ) -> CrossOrganOrchestrationRun:
+        """Append one explicitly supplied owner observation and receipt."""
+
+        return advance_orchestration(run, observation)
+
+    def validate_orchestration(
+        self,
+        run: CrossOrganOrchestrationRun,
+    ) -> CrossOrganOrchestrationRun:
+        """Rebuild and validate a complete or partial orchestration chain."""
+
+        return validate_orchestration_run(run)
 
     @staticmethod
     def _find_capability(

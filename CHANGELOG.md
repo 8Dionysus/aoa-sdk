@@ -24,6 +24,15 @@ Tracking starts with the community-docs baseline for this repository.
   plan without a sibling checkout.
 - Keep `AoARunner`, adapter selection, activation, runtime execution, measured
   benefit, consumer-zero, and archival outside this slice.
+- Project the existing typed organ registry through four bounded read-only
+  `aoa_workspace` MCP tools and four resources, while keeping activation-plan
+  compilation, connection, lifecycle, and execution outside the MCP surface.
+- Replace the stale Dionysus repo-local MCP entrypoint with its current
+  privacy-bounded interview/portrait owner surface.
+- Add an immutable host-visible cross-organ state machine for KAG evidence,
+  memo candidate, eval request/result, and explicit owner acceptance, with
+  pinned owner schemas, per-stage receipts, stale-stop behavior, and no SDK
+  owner-tool execution.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.

@@ -1,0 +1,426 @@
+{
+  "$defs": {
+    "OrchestrationOwners": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptance_owner": {
+          "minLength": 1,
+          "title": "Acceptance Owner",
+          "type": "string"
+        },
+        "control_owner": {
+          "const": "aoa-sdk",
+          "default": "aoa-sdk",
+          "title": "Control Owner",
+          "type": "string"
+        },
+        "evidence_owner": {
+          "minLength": 1,
+          "title": "Evidence Owner",
+          "type": "string"
+        },
+        "memory_owner": {
+          "minLength": 1,
+          "title": "Memory Owner",
+          "type": "string"
+        },
+        "proof_owner": {
+          "minLength": 1,
+          "title": "Proof Owner",
+          "type": "string"
+        },
+        "runtime_owner": {
+          "minLength": 1,
+          "title": "Runtime Owner",
+          "type": "string"
+        }
+      },
+      "required": [
+        "evidence_owner",
+        "memory_owner",
+        "proof_owner",
+        "acceptance_owner",
+        "runtime_owner"
+      ],
+      "title": "OrchestrationOwners",
+      "type": "object"
+    },
+    "QualifiedEvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "title": "Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "evidence_ref",
+        "revision",
+        "observed_at"
+      ],
+      "title": "QualifiedEvidenceRef",
+      "type": "object"
+    },
+    "SchemaIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "schema_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Schema Digest",
+          "type": "string"
+        },
+        "schema_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Schema Ref",
+          "type": "string"
+        },
+        "schema_version": {
+          "minLength": 1,
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_revision": {
+          "minLength": 1,
+          "title": "Source Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "schema_ref",
+        "schema_digest",
+        "source_revision",
+        "schema_version"
+      ],
+      "title": "SchemaIdentity",
+      "type": "object"
+    },
+    "StageSchemaContract": {
+      "additionalProperties": false,
+      "properties": {
+        "authority_ceiling": {
+          "enum": [
+            "read",
+            "candidate",
+            "internal_effect",
+            "external_effect"
+          ],
+          "title": "Authority Ceiling",
+          "type": "string"
+        },
+        "effect_class": {
+          "enum": [
+            "observe",
+            "derive",
+            "validate",
+            "prepare_candidate",
+            "apply_runtime",
+            "accept_source",
+            "external_emit",
+            "external_change"
+          ],
+          "title": "Effect Class",
+          "type": "string"
+        },
+        "input_ref_kind": {
+          "enum": [
+            "orchestration_intent",
+            "kag_evidence",
+            "memo_candidate",
+            "eval_request",
+            "eval_result",
+            "owner_acceptance"
+          ],
+          "title": "Input Ref Kind",
+          "type": "string"
+        },
+        "next_owner": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "title": "Next Owner"
+        },
+        "output_ref_kind": {
+          "enum": [
+            "orchestration_intent",
+            "kag_evidence",
+            "memo_candidate",
+            "eval_request",
+            "eval_result",
+            "owner_acceptance"
+          ],
+          "title": "Output Ref Kind",
+          "type": "string"
+        },
+        "output_schema": {
+          "$ref": "#/$defs/SchemaIdentity"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "stage_kind": {
+          "enum": [
+            "kag_evidence",
+            "memo_candidate",
+            "eval_request",
+            "eval_result",
+            "owner_acceptance"
+          ],
+          "title": "Stage Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stage_kind",
+        "owner",
+        "input_ref_kind",
+        "output_ref_kind",
+        "output_schema",
+        "authority_ceiling",
+        "effect_class",
+        "next_owner"
+      ],
+      "title": "StageSchemaContract",
+      "type": "object"
+    },
+    "TypedArtifactRef": {
+      "additionalProperties": false,
+      "properties": {
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        },
+        "artifact_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Artifact Ref",
+          "type": "string"
+        },
+        "authority_ceiling": {
+          "enum": [
+            "read",
+            "candidate",
+            "internal_effect",
+            "external_effect"
+          ],
+          "title": "Authority Ceiling",
+          "type": "string"
+        },
+        "created_at": {
+          "format": "date-time",
+          "title": "Created At",
+          "type": "string"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "ref_kind": {
+          "enum": [
+            "orchestration_intent",
+            "kag_evidence",
+            "memo_candidate",
+            "eval_request",
+            "eval_result",
+            "owner_acceptance"
+          ],
+          "title": "Ref Kind",
+          "type": "string"
+        },
+        "schema_identity": {
+          "$ref": "#/$defs/SchemaIdentity"
+        },
+        "source_revision": {
+          "minLength": 1,
+          "title": "Source Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "ref_kind",
+        "owner",
+        "artifact_ref",
+        "artifact_digest",
+        "source_revision",
+        "schema_identity",
+        "authority_ceiling",
+        "created_at"
+      ],
+      "title": "TypedArtifactRef",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:cross-organ-orchestration:cross-organ-orchestration-request.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "automatic_acceptance_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Automatic Acceptance Allowed",
+      "type": "boolean"
+    },
+    "automatic_candidate_promotion_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Automatic Candidate Promotion Allowed",
+      "type": "boolean"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "evidence_refs": {
+      "items": {
+        "$ref": "#/$defs/QualifiedEvidenceRef"
+      },
+      "minItems": 1,
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "hidden_server_chaining_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Hidden Server Chaining Allowed",
+      "type": "boolean"
+    },
+    "hidden_shared_context_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Hidden Shared Context Allowed",
+      "type": "boolean"
+    },
+    "host_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Host Id",
+      "type": "string"
+    },
+    "host_visible_receipts_required": {
+      "const": true,
+      "default": true,
+      "title": "Host Visible Receipts Required",
+      "type": "boolean"
+    },
+    "intent": {
+      "maxLength": 2048,
+      "minLength": 12,
+      "title": "Intent",
+      "type": "string"
+    },
+    "model_confidence_is_acceptance_authority": {
+      "const": false,
+      "default": false,
+      "title": "Model Confidence Is Acceptance Authority",
+      "type": "boolean"
+    },
+    "owners": {
+      "$ref": "#/$defs/OrchestrationOwners"
+    },
+    "request_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Request Id",
+      "type": "string"
+    },
+    "requested_by": {
+      "minLength": 1,
+      "title": "Requested By",
+      "type": "string"
+    },
+    "root_input": {
+      "$ref": "#/$defs/TypedArtifactRef"
+    },
+    "schema_version": {
+      "const": "aoa_cross_organ_orchestration_request_v1",
+      "default": "aoa_cross_organ_orchestration_request_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "stage_contracts": {
+      "items": {
+        "$ref": "#/$defs/StageSchemaContract"
+      },
+      "title": "Stage Contracts",
+      "type": "array"
+    }
+  },
+  "required": [
+    "request_id",
+    "intent",
+    "requested_by",
+    "host_id",
+    "owners",
+    "root_input",
+    "stage_contracts",
+    "evidence_refs",
+    "created_at",
+    "expires_at"
+  ],
+  "title": "CrossOrganOrchestrationRequest",
+  "type": "object"
+}
