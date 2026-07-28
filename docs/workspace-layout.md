@@ -13,13 +13,16 @@
 The repository tracks its workspace expectations in `.aoa/workspace.toml`.
 `Workspace.discover()` loads that manifest automatically and uses it before falling back to generic ancestor scanning.
 
-The current manifest expresses three things:
+The current manifest expresses five things:
 
 - the expected federation root is the parent of the `aoa-sdk` checkout
 - additional source checkouts may exist under `~/src`
 - `abyss-stack` should prefer `~/src/abyss-stack`
 - C1 route resolution reads the explicit deployed SDK-canonical routing bundle
   under the `abyss-stack` runtime mirror
+- organ discovery reads exactly one OS-private registry source under the
+  workspace-owned `.aoa/organ-access/` directory; a missing, invalid, stale, or
+  expired instance fails closed and cannot authorize activation
 
 ## Overrides
 
@@ -40,6 +43,11 @@ For a different machine layout, prefer overrides over code changes.
   Replace the packaged canonical source lock for an explicit bounded test or
   rehearsal. The override is still subject to canonical path, owner, ref,
   digest, receipt, and trust checks.
+- `AOA_SDK_ORGAN_REGISTRY`
+  Select one explicit OS-private organ-registry source. The source contains no
+  credential values, remains outside this public repository, and is still
+  subject to strict schema, expiry, admission, compatibility, and maturity
+  validation.
 
 Repo names in env vars are normalized to uppercase with non-alphanumeric characters replaced by `_`.
 

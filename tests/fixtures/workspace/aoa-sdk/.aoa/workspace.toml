@@ -14,3 +14,6 @@ notes = "Use the git checkout for source work. The /srv path is a deployed runti
 
 [control_plane]
 routing_bundle_root = "{workspace_parent}/abyss-stack/Knowledge/federation/aoa-routing"
+
+[organ_access]
+registry_source = "{workspace_parent}/.aoa/organ-access/organ-registry.source.json"

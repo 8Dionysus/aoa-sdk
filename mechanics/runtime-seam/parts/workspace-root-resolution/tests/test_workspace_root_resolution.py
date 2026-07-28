@@ -25,6 +25,15 @@ def test_from_workspace_resolves_root(workspace_root: Path) -> None:
     assert sdk.workspace.routing_source_lock_source == (
         "package:canonical-routing-source-lock"
     )
+    assert sdk.workspace.organ_registry_path == (
+        workspace_root
+        / ".aoa"
+        / "organ-access"
+        / "organ-registry.source.json"
+    ).resolve()
+    assert sdk.workspace.organ_registry_source == (
+        "manifest:organ_access.registry_source"
+    )
     assert sdk.workspace.surface_path(
         "aoa-skills",
         "generated/agent_skill_catalog.json",
@@ -50,6 +59,12 @@ def test_manifest_patterns_stay_anchored_when_started_below_checkout(
         / "Knowledge"
         / "federation"
         / "aoa-routing"
+    ).resolve()
+    assert sdk.workspace.organ_registry_path == (
+        workspace_root
+        / ".aoa"
+        / "organ-access"
+        / "organ-registry.source.json"
     ).resolve()
 
 
