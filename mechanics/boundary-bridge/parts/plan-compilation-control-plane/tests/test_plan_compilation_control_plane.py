@@ -19,6 +19,7 @@ from aoa_sdk.contracts.control_plane import (
     RuntimeProfile,
     ScenarioArtifactBinding,
     ScenarioBinding,
+    ScenarioCapabilityBinding,
     assert_run_plan_digest,
     canonical_digest,
 )
@@ -91,6 +92,18 @@ def test_snapshot_pins_exact_admitted_owner_projection() -> None:
     assert (
         snapshot.source_lock.trust_admission.record_id
         == snapshot.source_lock.trust_admission.latest_record_id
+    )
+    assert (
+        snapshot.admission_provenance.source_ref
+        == snapshot.source_lock.trust_admission.record_id
+    )
+    assert (
+        snapshot.admission_provenance.artifact_digest
+        == snapshot.source_lock.trust_admission.record_artifact_digest
+    )
+    assert (
+        snapshot.admission_provenance.artifact_digest
+        != snapshot.admission_provenance.source_ref
     )
     assert snapshot.source_lock.trust_admission.subject_store_ok is True
     assert {
@@ -323,6 +336,100 @@ def test_explicit_route_approval_step_bindings_are_preserved() -> None:
         RunPlan.model_validate(contradictory)
 
 
+def test_runtime_profile_approval_projection_is_bound_without_rewriting_route() -> None:
+    decision, binding, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    route_requirement = decision.approval_requirements[0]
+    runtime_requirement = route_requirement.model_copy(
+        update={
+            "requirement_id": "approval:abyss-stack:landing",
+            "approval_owner": runtime.provenance,
+            "operation": "abyss-stack:governed-execution:landing",
+            "risk_class": "repo_mutation",
+            "applies_to_step_ids": ("mutate",),
+        }
+    )
+    runtime = runtime.model_copy(
+        update={
+            "runtime_approval_requirements": (runtime_requirement,),
+        }
+    )
+
+    plan = compile_run_plan(
+        decision,
+        binding,
+        runtime,
+        load_plan_compilation_snapshot(),
+        compiler_provenance=_compiler_provenance(),
+    )
+
+    assert plan.decision_ref.digest == canonical_digest(decision)
+    assert plan.approval_requirements == (
+        route_requirement,
+        runtime_requirement,
+    )
+    mutate = next(step for step in plan.steps if step.step_id == "mutate")
+    assert mutate.approval_requirement_ids == (
+        route_requirement.requirement_id,
+        runtime_requirement.requirement_id,
+    )
+    assert runtime_requirement.approval_owner in plan.snapshot.source_refs
+
+
+def test_runtime_profile_rejects_an_approval_from_another_owner() -> None:
+    decision, _, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    foreign_requirement = decision.approval_requirements[0].model_copy(
+        update={
+            "approval_owner": runtime.provenance.model_copy(
+                update={"owner_repo": "foreign-runtime-owner"}
+            )
+        }
+    )
+    payload = runtime.model_dump(mode="python")
+    payload["runtime_approval_requirements"] = [
+        foreign_requirement.model_dump(mode="python")
+    ]
+
+    with pytest.raises(
+        ValueError,
+        match="must retain runtime-owner provenance",
+    ):
+        RuntimeProfile.model_validate(payload)
+
+
+def test_runtime_profile_cannot_shadow_a_route_approval_id() -> None:
+    decision, binding, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    route_requirement = decision.approval_requirements[0]
+    runtime_requirement = route_requirement.model_copy(
+        update={"approval_owner": runtime.provenance}
+    )
+    runtime = runtime.model_copy(
+        update={
+            "runtime_approval_requirements": (runtime_requirement,),
+        }
+    )
+
+    with pytest.raises(
+        PlanCompilationError,
+        match="route and runtime approval requirement ids must be unique",
+    ):
+        compile_run_plan(
+            decision,
+            binding,
+            runtime,
+            load_plan_compilation_snapshot(),
+            compiler_provenance=_compiler_provenance(),
+        )
+
+
 @pytest.mark.parametrize(
     ("scenario_id", "conditions"),
     (
@@ -511,6 +618,90 @@ def test_blocked_decision_and_wrong_parent_binding_fail_closed() -> None:
             runtime,
             snapshot,
         )
+
+
+def test_resolved_contour_capabilities_are_distinct_from_route_entry() -> None:
+    decision, binding, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    snapshot = load_plan_compilation_snapshot()
+    resolved_bindings = tuple(
+        ScenarioCapabilityBinding(
+            requirement_id=capability.capability_id,
+            capability=capability.model_copy(
+                update={
+                    "capability_id": (
+                        "resolved." + capability.capability_id.removeprefix("aoa-")
+                    )
+                }
+            ),
+            semantic_owner_repo="fixture-owner",
+            binding_action="migration-alias",
+            compatibility="migration-alias",
+            availability="available",
+            lifecycle_state="active",
+            lifecycle_health="healthy",
+            migration_provenance=capability.provenance,
+        )
+        for capability in binding.capability_refs
+    )
+    selected = decision.candidates[0].model_copy(
+        update={
+            "capability": decision.candidates[0].capability.model_copy(
+                update={"capability_id": "skill.route-entry"}
+            ),
+            "agent": binding.agent_refs[0].model_copy(
+                update={"agent_id": "route-requester"}
+            ),
+        }
+    )
+    decision = decision.model_copy(update={"candidates": (selected,)})
+    binding = binding.model_copy(
+        update={
+            "decision_ref": binding.decision_ref.model_copy(
+                update={"digest": canonical_digest(decision)}
+            ),
+            "capability_refs": tuple(
+                item.capability for item in resolved_bindings
+            ),
+            "capability_bindings": resolved_bindings,
+        }
+    )
+
+    plan = compile_run_plan(decision, binding, runtime, snapshot)
+
+    assert plan.steps
+    assert all(
+        capability.capability_id.startswith("resolved.")
+        for step in plan.steps
+        for capability in step.capability_refs
+    )
+    assert selected.capability not in plan.scenario_binding.capability_refs
+    assert selected.agent not in plan.scenario_binding.agent_refs
+
+
+def test_plan_compilation_requires_an_explicit_selected_scenario() -> None:
+    decision, binding, runtime = _inputs(
+        "bounded_change_safe",
+        {"preview_required": False},
+    )
+    snapshot = load_plan_compilation_snapshot()
+    selected = decision.candidates[0].model_copy(update={"scenario": None})
+    decision = decision.model_copy(update={"candidates": (selected,)})
+    binding = binding.model_copy(
+        update={
+            "decision_ref": binding.decision_ref.model_copy(
+                update={"digest": canonical_digest(decision)}
+            )
+        }
+    )
+
+    with pytest.raises(
+        PlanCompilationError,
+        match="explicit selected scenario",
+    ):
+        compile_run_plan(decision, binding, runtime, snapshot)
 
 
 def test_owner_identity_order_and_requirement_refs_fail_closed() -> None:

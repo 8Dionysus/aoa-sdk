@@ -8,3 +8,4 @@ explicit.
 - `portable-workspace-bootstrap/`
 - `control-plane-capsule/`
 - `runtime-mirror-boundary/`
+- `abyss-stack-runtime-adapter/`

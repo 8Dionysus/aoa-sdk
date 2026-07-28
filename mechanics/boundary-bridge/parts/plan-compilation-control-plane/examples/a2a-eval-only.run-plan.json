@@ -180,8 +180,8 @@
       "terminal_required": true
     }
   ],
-  "plan_digest": "sha256:0bafd8613a472434b53031c2892766ea260965acfa0f24df81d99480ac51dc7a",
-  "plan_id": "run-plan:abb3c1858b4be81fcd3dae673ab550b88aa19acac82bcdb39467e1229b33e789",
+  "plan_digest": "sha256:539aad32560b3a0dc11a2045f2c72d13fc7f8373600a4dfb9ef96ae7b079f99e",
+  "plan_id": "run-plan:f7a80aa787e852b4db63b0233631d89423ba794e76bad5c13927b5d5c47fec62",
   "provenance": {
     "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
     "artifact_ref": "src/aoa_sdk/control_plane/planning/compiler.py",
@@ -228,6 +228,7 @@
       "schema_version": "fixture-v1",
       "source_ref": "fixture-source-ref"
     },
+    "runtime_approval_requirements": [],
     "runtime_owner": "abyss-stack",
     "schema_version": "aoa_control_plane_v1",
     "supported_effect_classes": [
@@ -302,6 +303,7 @@
       }
     ],
     "binding_id": "scenario-binding:fixture:a2a_summon_return_checkpoint",
+    "capability_bindings": [],
     "capability_refs": [
       {
         "capability_id": "aoa-source-of-truth-check",
@@ -519,8 +521,8 @@
         "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
       }
     ],
-    "snapshot_digest": "sha256:20930b69aef70668fb1a03cb3a8a2dd2c8c558b389ea7f75fd5edb0589513696",
-    "snapshot_id": "plan-snapshot:65859e3593367193243fa79debd956c70085635fd99714c053c40c44cae489d6",
+    "snapshot_digest": "sha256:e2213f93d724179d594462fb297769eec26b40adbf135265ad6a94d87851437b",
+    "snapshot_id": "plan-snapshot:adc8979c5f289c01437b9f5ee385dc1128faea14ee8002972b09d5e9e4948ed8",
     "source_refs": [
       {
         "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
@@ -587,12 +589,12 @@
         "source_ref": "fixture-source-ref"
       },
       {
-        "artifact_digest": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e",
+        "artifact_digest": "sha256:35991ad90fd5339a6962849b36404295a1c4e41239fd229babfc1432b1aa137c",
         "artifact_ref": "dist/abyss-artifact-registry/aoa-playbooks-playbook-registry/records/698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e.json",
         "owner_repo": "aoa-playbooks",
         "schema_ref": "abyss-machine:artifact-bundle-registry-record",
         "schema_version": "abyss_machine_artifact_bundle_registry_record_v1",
-        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+        "source_ref": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e"
       },
       {
         "artifact_digest": "sha256:1effef6739136e3634f787572526926eb5731b978c03e15d6c21c8a047bdd7eb",

@@ -31,5 +31,11 @@ provenance, and attests a separate canonical archive. This authorizes
 `aoa-sdk` as producer but records live runtime cutover as unexecuted and keeps
 archive authority false.
 
+After G5, ordinary SDK releases do not rebuild the M1 shadow, G5 candidate, or
+G5 release-candidate envelopes and do not checkout `aoa-routing`. Those
+immutable stages remain replayable historical evidence. The active release
+battery verifies the canonical SDK routing wheel, C2 plan compiler, C3 Runner,
+C5 evidence chain, and package trust bundle.
+
 Use that part when changing release audit, publish helper behavior, changelog
 publication shape, or release validation.

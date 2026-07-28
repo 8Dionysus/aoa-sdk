@@ -5,18 +5,24 @@ from __future__ import annotations
 from pathlib import Path
 
 from ..contracts.control_plane import (
+    ProvenanceRef,
     RouteDecision,
     RouteExplanation,
     RouteIntent,
     RunPlan,
     RuntimeProfile,
+    ScenarioArtifactBinding,
     ScenarioBinding,
+    ScenarioConditionBinding,
+    ScenarioRef,
 )
 from ..workspace.discovery import Workspace
 from .planning import (
     PlanCompilationSnapshot,
+    bind_scenario,
     compile_run_plan,
     load_plan_compilation_snapshot,
+    resolve_scenario_ref,
 )
 from .routing.resolver import explain_route_decision, resolve_route_intent
 from .routing.snapshot import (
@@ -26,7 +32,7 @@ from .routing.snapshot import (
 
 
 class ControlPlaneAPI:
-    """Resolve and explain routes without activating a capability."""
+    """Resolve, bind, and compile routes without activating a capability."""
 
     def __init__(
         self,
@@ -58,6 +64,37 @@ class ControlPlaneAPI:
             scenario,
             runtime_profile,
             self.plan_contours(),
+        )
+
+    def scenario_ref(self, scenario_id: str) -> ScenarioRef:
+        return resolve_scenario_ref(
+            self.workspace,
+            scenario_id,
+            self.plan_contours(),
+        )
+
+    def bind_scenario(
+        self,
+        decision: RouteDecision,
+        scenario_id: str,
+        *,
+        binding_id: str,
+        provenance: ProvenanceRef,
+        input_refs: tuple[ProvenanceRef, ...] = (),
+        input_artifact_bindings: tuple[ScenarioArtifactBinding, ...] = (),
+        condition_bindings: tuple[ScenarioConditionBinding, ...] = (),
+    ) -> ScenarioBinding:
+        return bind_scenario(
+            self.workspace,
+            decision,
+            scenario_id,
+            self.snapshot(),
+            self.plan_contours(),
+            binding_id=binding_id,
+            provenance=provenance,
+            input_refs=input_refs,
+            input_artifact_bindings=input_artifact_bindings,
+            condition_bindings=condition_bindings,
         )
 
     def snapshot(self) -> RoutingResolutionSnapshot:

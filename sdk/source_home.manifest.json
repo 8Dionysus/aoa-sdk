@@ -45,10 +45,11 @@
     {
       "id": "runtime_entry",
       "path": "sdk/runtime-entry",
-      "role": "Workspace, Codex, and reviewed closeout entry posture that stays below runtime authority.",
+      "role": "Workspace, Codex, explicit Runner, and reviewed closeout entry posture that stays below runtime authority.",
       "families": [
         "workspace_context",
         "codex_entrypoints",
+        "runner_entrypoints",
         "closeout_entrypoints"
       ],
       "owner_surface": "sdk/runtime-entry/AGENTS.md",
@@ -111,17 +112,27 @@
         "src/aoa_sdk/__init__.py",
         "src/aoa_sdk/api.py",
         "src/aoa_sdk/control_plane/api.py",
-        "src/aoa_sdk/control_plane/planning"
+        "src/aoa_sdk/control_plane/planning",
+        "src/aoa_sdk/control_plane/runner",
+        "src/aoa_sdk/control_plane/evidence_chain.py",
+        "src/aoa_sdk/contracts/evidence_chain.py",
+        "src/aoa_sdk/runtime_adapters"
       ],
       "mechanic_routes": [
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
         "mechanics/boundary-bridge/parts/route-resolution-control-plane",
-        "mechanics/boundary-bridge/parts/plan-compilation-control-plane"
+        "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
+        "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane",
+        "mechanics/boundary-bridge/parts/evidence-closeout-chain",
+        "mechanics/runtime-seam/parts/abyss-stack-runtime-adapter"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
         "python -m pytest -q",
-        "python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests"
+        "python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests",
+        "python -m pytest -q mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests",
+        "python -m pytest -q mechanics/boundary-bridge/parts/evidence-closeout-chain/tests",
+        "python -m pytest -q mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/tests"
       ],
       "stop_lines": [
         "Do not document an API promise that is not implemented and tested."
@@ -164,16 +175,22 @@
       "implementation_routes": [
         "src/aoa_sdk/models.py",
         "src/aoa_sdk/contracts/control_plane.py",
+        "src/aoa_sdk/contracts/evidence_chain.py",
         "schemas"
       ],
       "mechanic_routes": [
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
-        "mechanics/boundary-bridge/parts/plan-compilation-control-plane"
+        "mechanics/agon/parts/gate-routing-bridge",
+        "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
+        "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane",
+        "mechanics/boundary-bridge/parts/evidence-closeout-chain"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
         "python -m pytest -q",
-        "python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests"
+        "python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests",
+        "python -m pytest -q mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests",
+        "python -m pytest -q mechanics/boundary-bridge/parts/evidence-closeout-chain/tests"
       ],
       "stop_lines": [
         "Do not make compatibility input aliases active output names."
@@ -219,19 +236,26 @@
         "src/aoa_sdk/compatibility",
         "src/aoa_sdk/control_plane/routing",
         "src/aoa_sdk/control_plane/planning",
+        "src/aoa_sdk/control_plane/runner",
+        "src/aoa_sdk/runtime_adapters",
         "docs/versioning.md"
       ],
       "mechanic_routes": [
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
         "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
+        "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane",
+        "mechanics/runtime-seam/parts/abyss-stack-runtime-adapter",
         "mechanics/release-support/parts/public-support-ci-posture"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
         "aoa compatibility check /srv/AbyssOS/aoa-sdk",
+        "python -m pytest -q mechanics/agon/parts/gate-routing-bridge/tests",
         "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests",
         "python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests",
-        "python -m mypy src/aoa_sdk/control_plane"
+        "python -m pytest -q mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests",
+        "python -m pytest -q mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/tests",
+        "python -m mypy src/aoa_sdk/control_plane src/aoa_sdk/runtime_adapters"
       ],
       "stop_lines": [
         "Do not turn missing source surfaces into silent pass conditions."
@@ -309,6 +333,40 @@
       ]
     },
     {
+      "id": "runner_entrypoints",
+      "branch": "runtime_entry",
+      "path": "sdk/runtime-entry/runner-entrypoints",
+      "source_kind": "lifecycle_client_entry_posture",
+      "meaning": "Route contract for explicit-adapter Runner lifecycle coordination below runtime execution authority.",
+      "owner_surface": "sdk/runtime-entry/AGENTS.md",
+      "implementation_routes": [
+        "src/aoa_sdk/api.py",
+        "src/aoa_sdk/control_plane/runner",
+        "src/aoa_sdk/control_plane/evidence_chain.py",
+        "src/aoa_sdk/contracts/control_plane.py",
+        "src/aoa_sdk/contracts/evidence_chain.py",
+        "src/aoa_sdk/runtime_adapters"
+      ],
+      "mechanic_routes": [
+        "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane",
+        "mechanics/boundary-bridge/parts/evidence-closeout-chain",
+        "mechanics/runtime-seam/parts/abyss-stack-runtime-adapter"
+      ],
+      "validators": [
+        "scripts/validate_sdk_source_home.py",
+        "python -m pytest -q mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests",
+        "python -m pytest -q mechanics/boundary-bridge/parts/evidence-closeout-chain/tests",
+        "python -m pytest -q mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/tests",
+        "python -m mypy src/aoa_sdk/control_plane src/aoa_sdk/runtime_adapters",
+        "python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py"
+      ],
+      "stop_lines": [
+        "Do not discover or select an adapter implicitly.",
+        "Do not execute a model, tool, capability, or plan step in the Runner or reference adapter.",
+        "Do not treat reference lifecycle state as production execution evidence."
+      ]
+    },
+    {
       "id": "closeout_entrypoints",
       "branch": "runtime_entry",
       "path": "sdk/runtime-entry/closeout-entrypoints",
@@ -344,22 +402,32 @@
         "src/aoa_sdk"
       ],
       "mechanic_routes": [
+        "mechanics/agon/parts/gate-routing-bridge",
         "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
+        "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane",
+        "mechanics/boundary-bridge/parts/evidence-closeout-chain",
+        "mechanics/runtime-seam/parts/abyss-stack-runtime-adapter",
         "mechanics/release-support/parts/release-audit-publish-helper"
       ],
       "validators": [
         "scripts/validate_sdk_source_home.py",
         "python -m build",
+        "python mechanics/agon/parts/gate-routing-bridge/scripts/verify_agon_gate_routing_wheel.py",
         "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py",
         "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py",
         "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py",
         "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py",
-        "python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py"
+        "python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py",
+        "python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py",
+        "python mechanics/boundary-bridge/parts/evidence-closeout-chain/scripts/verify_evidence_chain_wheel.py",
+        "python mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/scripts/verify_abyss_stack_adapter_wheel.py"
       ],
       "stop_lines": [
         "Do not claim package publication before external publication proof exists.",
         "Do not treat an installed non-publishing or public release G5 candidate as canonical routing authority.",
-        "Do not treat an installed plan compiler as runtime execution proof."
+        "Do not treat an installed plan compiler as runtime execution proof.",
+        "Do not treat an installed reference Runner lifecycle as production invocation proof.",
+        "Do not treat an installed runtime transport client as proof that a runtime-owner bridge was invoked."
       ]
     },
     {

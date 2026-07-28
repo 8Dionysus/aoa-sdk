@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 16372868,
+  "allowed_tracked_bytes": 18452757,
+  "approved_by": "repository-owner",
+  "base_ref": "83930e822c6c4df645b5ab2a0eb6d3f9c849b5bf",
+  "changed_generated_bytes": 16372868,
+  "changed_generated_files": 419,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "0601ef43ba9ce0d8ad5ebe929b9b49f11e5ed29259ec9594d7631b6c76aadf87",
+  "reason": "Refresh the derived KAG family for the SDK routing succession branch, including canonical G5, C2, C3, and post-switch Agon gate bridge source surfaces; no publication, runtime invocation, archive authorization, cost-reduction, or final completion claim.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 18452757,
+  "tracked_bytes_max": 15728640
+}

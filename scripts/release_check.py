@@ -52,6 +52,15 @@ COMMANDS = [
         [sys.executable, "scripts/validate_source_topology_index.py"],
     ),
     (
+        "validate routing succession E1 cost evidence",
+        [
+            sys.executable,
+            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/"
+            "scripts/measure_routing_succession_e1.py",
+            "--check",
+        ],
+    ),
+    (
         "build workspace control plane",
         [sys.executable, "scripts/build_workspace_control_plane.py", "--check"],
     ),
@@ -75,30 +84,6 @@ COMMANDS = [
     ("run mypy", [sys.executable, "-m", "mypy", "src"]),
     ("build package", [sys.executable, "-m", "build"]),
     (
-        "verify installed routing shadow wheel",
-        [
-            sys.executable,
-            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/"
-            "verify_routing_shadow_wheel.py",
-        ],
-    ),
-    (
-        "verify installed routing G5 candidate wheel",
-        [
-            sys.executable,
-            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/"
-            "verify_routing_g5_candidate_wheel.py",
-        ],
-    ),
-    (
-        "verify installed routing G5 release-candidate wheel",
-        [
-            sys.executable,
-            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/"
-            "verify_routing_g5_release_candidate_wheel.py",
-        ],
-    ),
-    (
         "verify installed routing G5 canonical wheel",
         [
             sys.executable,
@@ -112,6 +97,22 @@ COMMANDS = [
             sys.executable,
             "mechanics/boundary-bridge/parts/plan-compilation-control-plane/"
             "scripts/verify_plan_compilation_wheel.py",
+        ],
+    ),
+    (
+        "verify installed C3 Runner wheel",
+        [
+            sys.executable,
+            "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/"
+            "scripts/verify_runner_wheel.py",
+        ],
+    ),
+    (
+        "verify installed Agon gate routing wheel",
+        [
+            sys.executable,
+            "mechanics/agon/parts/gate-routing-bridge/scripts/"
+            "verify_agon_gate_routing_wheel.py",
         ],
     ),
     (

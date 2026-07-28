@@ -30,6 +30,18 @@ scenario bindings and preserves artifact role plus eval anchor in compiled
 requirements. These fields carry exact owner provenance; they do not accept
 scenario, eval, or runtime meaning for the SDK.
 
+C3 adds exact runtime snapshot observations and approval-decision event
+references to the same contract family. `AoARunner` validates those objects;
+runtime adapters remain their lifecycle source, and reference-adapter events
+are protocol witnesses rather than execution proof.
+
+C5 adds `EvidenceChain`, `CheckpointReceiptRef`, and checked index models in
+`src/aoa_sdk/contracts/evidence_chain.py`. The chain embeds SDK-owned
+route/run objects and runtime events for auditability, but represents eval,
+memo, checkpoint, and closeout material only by exact owner-qualified refs.
+Its `partial` or `complete` state is derived from required-owner coverage;
+callers cannot assert completeness.
+
 The organ-access model family is authored in
 `src/aoa_sdk/contracts/organs.py`, published as deterministic JSON Schema in
 `schemas/organ-access/`, and re-exported through `aoa_sdk.models`. It keeps

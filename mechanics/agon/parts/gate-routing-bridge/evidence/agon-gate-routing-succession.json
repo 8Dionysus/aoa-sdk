@@ -1,0 +1,54 @@
+{
+  "schema_version": "aoa_sdk_agon_gate_routing_succession_receipt_v1",
+  "disposition": "merge",
+  "predecessor": {
+    "owner_repo": "aoa-routing",
+    "source_ref": "fb4266ee26727f50f40ca4206194d14f451c5cd6",
+    "config_path": "mechanics/agon/parts/gate-routing/config/agon_gate_routing.config.json",
+    "config_sha256": "1aa40095c2561638141a7ad740b3ce673ca4d68b8fa2ed347aa6c42e2ecb4d88",
+    "registry_path": "mechanics/agon/parts/gate-routing/generated/agon_gate_routing_registry.min.json",
+    "registry_sha256": "6acfb832c84a3adccf6f3926f1387c5682e939844f9f0ea91a5c44febaed1491"
+  },
+  "successor": {
+    "owner_repo": "aoa-sdk",
+    "config_path": "src/aoa_sdk/control_plane/routing/data/agon_gate_routing.config.json",
+    "registry_path": "src/aoa_sdk/control_plane/routing/data/agon_gate_routing_registry.min.json",
+    "builder": "aoa_sdk.control_plane.routing.agon.build_agon_gate_routing_registry",
+    "schema_version": "agon_gate_routing_registry.v1",
+    "wheel_packaged": true,
+    "predecessor_checkout_required": false
+  },
+  "sdk_sha256": {
+    "config": "459501a31c3197c4d47b36c2dd99f513fb5b8bc36844caff79d5dd0223a06d91",
+    "registry": "807c75bf837d0793d4008bb157789dcaa167d520e37459f348f940ddf15073e4"
+  },
+  "preserved_trigger_ids": [
+    "contested_closure",
+    "open_material_contradiction",
+    "broken_trace_or_trace_gap",
+    "evidence_floor_collapse",
+    "repeated_failure_without_delta",
+    "assistant_scope_breach",
+    "assistant_anti_drift_alarm",
+    "model_divergence_above_threshold",
+    "canonical_risk",
+    "summon_intent_requires_review",
+    "novelty_above_service_threshold",
+    "actor_kind_mismatch"
+  ],
+  "intentional_deltas": [
+    "registry owner_repo changes from aoa-routing to aoa-sdk",
+    "active self-return next hops change from aoa-routing to aoa-sdk",
+    "the final validation invariant names aoa-sdk instead of aoa-routing",
+    "center source refs follow the current part-local lawful-move and owner-binding registries",
+    "schema resource ids move to the aoa-sdk schema namespace",
+    "owner dispatch seam id changes to aoa-sdk.owner-dispatch-seam.v1"
+  ],
+  "authority_stop_lines": {
+    "center_owner": "Agents-of-Abyss",
+    "live_protocol": false,
+    "runtime_effect": "none",
+    "activation_authorized": false,
+    "verdict_authorized": false
+  }
+}

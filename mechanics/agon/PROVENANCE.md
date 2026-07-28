@@ -2,6 +2,10 @@
 
 ## Source Surfaces
 
+- `mechanics/agon/parts/gate-routing-bridge/`
+- `src/aoa_sdk/control_plane/routing/agon.py`
+- `src/aoa_sdk/control_plane/routing/data/agon_gate_routing.config.json`
+- `src/aoa_sdk/control_plane/routing/data/agon_gate_routing_registry.min.json`
 - `mechanics/agon/parts/center-law-preview-helpers/`
 - `mechanics/agon/parts/state-packet-review-bindings/`
 - `mechanics/agon/parts/recurrence-adapter/`
@@ -13,6 +17,11 @@
 
 ## Moved Root Families
 
+- The routing function formerly owned by
+  `aoa-routing/mechanics/agon/parts/gate-routing/` is merged into the
+  importable SDK routing package and `parts/gate-routing-bridge/`. The pinned
+  source/digest and intentional owner deltas live in
+  `parts/gate-routing-bridge/evidence/agon-gate-routing-succession.json`.
 - `config/agon_recurrence_adapter.seed.json` -> `mechanics/agon/parts/recurrence-adapter/config/agon_recurrence_adapter.seed.json`
 - `config/agon_recurrence_prebinding_review_lanes.seed.json` -> `mechanics/agon/parts/recurrence-adapter/config/agon_recurrence_prebinding_review_lanes.seed.json`
 - `docs/AGON_RECURRENCE_ADAPTER*.md`, `docs/AGON_RECURRENCE_REVIEW_LANES.md`, `docs/AGON_RECURRENCE_STOP_LINES.md`, and `docs/prebinding-review-lanes.md` -> `mechanics/agon/parts/recurrence-adapter/docs/`
@@ -39,8 +48,9 @@ the part-local home.
 
 ## Stronger Owners
 
-Agon owners decide helper acceptance and domain truth. SDK Agon surfaces are
-candidate helper contracts and generated control-plane readers.
+Agon owners decide law, helper acceptance, and domain truth. The SDK owns only
+advisory route candidates, candidate helper contracts, and generated
+control-plane readers.
 
 ## Notes
 

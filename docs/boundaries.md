@@ -42,9 +42,25 @@ repositories remain authoritative.
   `aoa-playbooks` contour/schema pin, preserves reviewed input and condition
   provenance, and emits a runtime-neutral `RunPlan` without adapter selection
   or execution
+- the C3 `AoARunner` lifecycle client, which binds a caller-supplied adapter,
+  validates exact runtime observations, approvals, bounded retries, receipts,
+  event continuity, outcomes, restore, and closeout without executing a step
+- the C4 `abyss-stack` runtime adapter client, which loads an explicitly
+  delivered owner profile and constraints, validates exact delivery
+  coordinates, and transports lifecycle calls without owning the external
+  bridge, runtime policy, effects, or execution evidence
+- the C5 evidence-chain composer and repository, which validate exact
+  cross-owner identity and completeness across immutable partial revisions
+  while keeping eval verdicts, memo contents, checkpoint receipts, and
+  closeout payloads in their owner repositories
+- the deterministic SDK-owned reference adapter as a no-effect protocol
+  witness, never as production runtime or invocation proof
+- the wheel-packaged pre-protocol Agon gate-routing bridge, deterministic
+  advisory route hints, and owner-dispatch seam; `Agents-of-Abyss` retains
+  Agon law and no emitted candidate activates a protocol or runtime effect
 - the versioned R2 route, plan, approval, lifecycle, event,
-  evidence-reference, and adapter protocol models used to prove the boundary;
-  the models do not activate an `AoASDK` runner or runtime
+  evidence-reference, and adapter protocol models used by C1-C5; the models
+  and Runner do not activate or implement a production runtime
 - the historical packaged routing shadow compiler, strict validator, and
   dual-producer sidecar that proved predecessor parity before the G5 switch
 - the historical SDK-identified, non-publishing candidate assembly
@@ -84,6 +100,8 @@ repositories remain authoritative.
 - deterministic validation of a host-visible, one-stage-at-a-time KAG,
   memo-candidate, eval, and explicit owner-acceptance receipt chain without
   owner invocation
+- exact composition and lookup of owner-qualified evidence refs without
+  copying, reinterpreting, or superseding their canonical payloads
 - passive skill-environment inspection and exact owner-profile user bootstrap
 - reviewed-session closeout helpers that call owner-owned publisher scripts and
   refresh derived stats without taking over workflow or proof meaning
@@ -106,6 +124,8 @@ repositories remain authoritative.
 - `sdk/` folders that pretend to be a second Python implementation tree or a
   sibling-source owner
 - hidden ranking, routing, or memory policy
+- Agon law, live arena state, verdict, scar, rank, retention, or ToS authority
+  inferred from an SDK gate candidate
 - skill selection, activation, task-local composition, or admission for
   another repository's home
 - daemon or service responsibilities

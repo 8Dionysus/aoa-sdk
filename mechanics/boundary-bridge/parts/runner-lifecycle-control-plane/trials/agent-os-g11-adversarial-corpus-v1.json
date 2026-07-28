@@ -1,0 +1,146 @@
+{
+  "schema_version": "aoa_sdk_g11_adversarial_corpus_reduced_receipt_v1",
+  "case_id": "T1-G11-fresh-context-adversarial-corpus",
+  "trial_family": "fresh_context_sdk_and_runtime_owner_corpus",
+  "subject": {
+    "child_handle": "/root/t1_adversarial_corpus",
+    "forked_parent_turns": "none",
+    "parent_history_available": false,
+    "repository_writes_allowed": false,
+    "test_repair_allowed": false,
+    "test_substitution_allowed": false
+  },
+  "request": {
+    "schema_version": "aoa_summon_request_v3",
+    "request_digest": "sha256:526156855da6e8a4003edd463d5e943e16483d32229971504273a0bb356f93be",
+    "serialized_file_sha256": "d81b06b92754fbd6b66e210662158ddede42229a171a64716fb573bd623e5e1e",
+    "run_contract_sha256": "3c367c4d12bfbe0f00ff2249112a6e8087c0374c8ea34239abe6d1d827a050c7",
+    "expected_output_keys": [
+      "adversarial_corpus_receipt",
+      "adversarial_corpus_observation"
+    ],
+    "schema_valid": true,
+    "canonical_digest_valid": true
+  },
+  "pinned_inputs": {
+    "aoa_sdk_commit": "6f61aa9682662a919d778bf50c8c22ee9ba0eef1",
+    "abyss_stack_commit": "dd4fc056a9ea490df7ca2cc85fe205d4fc38f743",
+    "wheel_sha256": "1ed2330b49e3cfb7307a4e4279eac5c4a0163648faba76259f48b4fab61b830f",
+    "sdk_suite_contract_sha256": "d288d761267c9fe2ba0fd55bae0564a691ec6eed371970dc6f44851341a76f73",
+    "runtime_owner_test_source_sha256": "a471e844223b3e412f104f8dae2a6e075d55b9faea6a37822c6f378b5c01ac61",
+    "incomplete_passport_sha256": "c6942d0f49850a505929a26512c874fc9d8dcb670ef5eb06400941efb811aef2",
+    "blocked_result_sha256": "841d23b5b169c7abc39cb20bcdb4d3df073bfa565fd880f63aaf744c550700d0",
+    "isolated_runtime_receipt_sha256": "ad1f7eb00467e81e6fee9d46285177c5b141426fcb68d6c62dc756f03a34e758"
+  },
+  "runs": {
+    "sdk_suite": {
+      "passed": 16,
+      "skipped": 0,
+      "exit_code": 0,
+      "parent_replay_equal": true
+    },
+    "runtime_owner_suite": {
+      "passed": 5,
+      "skipped": 0,
+      "exit_code": 0,
+      "parent_replay_equal": true
+    },
+    "fresh_context_reproduction": true
+  },
+  "adversarial_mapping": {
+    "ambiguous_intent": [
+      "sdk:ambiguous-intent"
+    ],
+    "missing_capability": [
+      "sdk:missing-capability"
+    ],
+    "conflicting_routes": [
+      "sdk:conflicting-routes"
+    ],
+    "forbidden_action": [
+      "sdk:forbidden-action"
+    ],
+    "approval_bypass": [
+      "runtime-owner:test_runtime_rejects_resume_that_bypasses_plan_freeze_approval",
+      "runtime-owner:test_runtime_rejects_weakened_approval_requirement"
+    ],
+    "stale_artifact": [
+      "sdk:stale-route-snapshot",
+      "sdk:stale-runtime-observation"
+    ],
+    "wrong_runtime_profile": [
+      "sdk:runtime-approval-owner",
+      "sdk:runtime-approval-id-collision"
+    ],
+    "incomplete_passport": [
+      "summon-request-v3:invalid-required-fields",
+      "summon-result-v3:blocked-not-run"
+    ],
+    "incorrect_return": [
+      "runtime-owner:test_a2a_return_lane_fails_closed_on_an_incomplete_reviewed_return",
+      "runtime-owner:test_a2a_return_lane_rejects_a_conflicting_review_chain"
+    ],
+    "lost_event": [
+      "sdk:missing-event-slice",
+      "sdk:reordered-event-slice",
+      "sdk:invalid-runtime-event"
+    ],
+    "duplicate_execution": [
+      "sdk:duplicate-execution"
+    ],
+    "runtime_failure": [
+      "sdk:runtime-disconnect",
+      "isolated-runtime:service-failure-and-recovery"
+    ],
+    "inherited_context_leakage": [
+      "summon:fork-turns-none",
+      "fresh-context-compiler-v3",
+      "fresh-context-isolated-runtime",
+      "fresh-context-adversarial-corpus"
+    ]
+  },
+  "golden_mapping": {
+    "public_route_bind_compile": "fresh-context-compiler-v3",
+    "runner_lifecycle_closeout": "sdk:golden-runner-lifecycle",
+    "a2a_c5_closeout": "runtime-owner:test_a2a_return_lane_completes_a_public_compiler_v3_c5_chain"
+  },
+  "terminal_posture": {
+    "adversarial_category_count": 13,
+    "golden_case_count": 3,
+    "complete_to_rightful_stop_boundary": true,
+    "blocked_routes_not_forced_into_runtime": true,
+    "execution_outcome_is_eval_verdict": false,
+    "forbidden_effects_observed": []
+  },
+  "schema_adversary": {
+    "missing_required_fields": [
+      "child_inputs",
+      "child_scope",
+      "child_stop_line",
+      "expected_outputs",
+      "request_digest",
+      "request_ref",
+      "return_owner"
+    ],
+    "blocked_result_schema_valid": true,
+    "blocked_result_runtime_state": "not_run",
+    "accepted_child_return_schema_valid": true
+  },
+  "parent_validation": {
+    "raw_child_receipt_sha256": "4df3d13ce786977a4137f71e5e1484f206e44b7e2e30c6ed60931f50c0802feb",
+    "child_observation_sha256": "5bf742fb0c2c1eb156a41165cc42295fbddfa311891c93fbfdd81a956a29f2df",
+    "summon_result_schema": "summon-result-v3",
+    "summon_result_state": "accepted",
+    "summon_result_sha256": "dc2454d750ed14aa2dc145cdcf6e650dc271288af483f4b6f98442657d4609c0",
+    "returned_output_keys_exact": true,
+    "category_mapping_equals_contract": true,
+    "golden_mapping_equals_contract": true
+  },
+  "actual_effects": [
+    "child-agent-runtime",
+    "read-only-inspection",
+    "subprocess-execution",
+    "session-local-output-write"
+  ],
+  "claim_limit": "This receipt supports one literal fresh-context replay of 16 SDK and 5 runtime-owner cases, exact schema handling, and complete mapping of the declared 13 adversarial and 3 golden cases to their rightful typed or fail-closed stop boundaries. It is owner-local evidence, not a central eval verdict, general agent-quality claim, production-benefit claim, consumer-zero proof, or archive authorization."
+}

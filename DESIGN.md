@@ -254,9 +254,11 @@ The runtime-neutral R2 types, lifecycle graph, replay rules, three golden
 scenarios, and threat controls live in
 `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md`
 and `src/aoa_sdk/contracts/control_plane.py`. They define protocols, not active
-`AoASDK` behavior or a runtime body. The R2 contracts alone did not authorize
-producer movement; the G3-authorized M1 slice below is shadow-only and does not
-authorize G5.
+`AoASDK` behavior or a runtime body by themselves. C1-C4 now implement bounded
+control-plane behavior and one explicit runtime transport client over those
+contracts, while runtime execution remains external. The R2 contracts alone
+did not authorize producer movement; the
+G3-authorized M1 slice below was shadow-only and did not authorize G5.
 
 The disposable R3 migration result lives in
 `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r3-migration-rehearsal.json`.
@@ -267,9 +269,9 @@ removed. The resulting M1 implementation now lives under
 `src/aoa_sdk/control_plane/routing/`: it resolves the inherited typing debt,
 packages schemas and a strict validator, preserves the fourteen predecessor
 bytes, emits dual-producer provenance, rejects canonical-looking publication
-targets, and is checked from an installed wheel. `aoa-routing` still remains
-canonical. The passed G4 chain and predecessor conditional handoff now permit
-one explicit next posture: the installed SDK can build a non-publishing
+targets, and is checked from an installed wheel. At M1, `aoa-routing` still
+remained canonical. The passed G4 chain and predecessor conditional handoff
+then permitted one explicit next posture: the installed SDK can build a non-publishing
 `sdk_g5_candidate` assembly carrying SDK producer identity, exact clean input
 refs, complete artifact subjects, and no switch authority. That candidate is
 input to stronger-owner artifact trust and runtime canary review, not the G5
@@ -286,6 +288,12 @@ mutation. Stronger-owner admission and the separate `abyss-stack` cutover have
 since executed from that exact receipt; the predecessor remains retained for
 compatibility and rollback. Compatibility exit, consumer-zero, and archival
 authority remain separate later gates.
+
+The active post-G5 SDK contour no longer requires a predecessor checkout for
+workspace discovery, compatibility reads, sibling canary, cadence audit, or
+release construction. Runtime routing compatibility resolves from the
+SDK-delivered bundle first; a predecessor checkout is only an optional legacy
+fallback during the compatibility window.
 
 ## C1 Route Resolution Shape
 
@@ -311,8 +319,61 @@ candidates only. Deferred and candidate-only capabilities require an exact
 explicit constraint.
 
 A selected route is not activation. C1 does not compile a `RunPlan`, select a
-runtime adapter, invoke a skill, or execute an effect. Those boundaries remain
-for separate C2 and C3-C5 landings.
+runtime adapter, invoke a skill, or execute an effect. C2 compilation and C3
+lifecycle coordination are separately bounded surfaces.
+
+## C2 Plan Compilation, C3 Lifecycle, C4 Transport, and C5 Evidence Shape
+
+`AOA-SDK-D-0078` keeps C2 compilation deterministic and runtime-neutral.
+`AOA-SDK-D-0081` makes `AoARunner` a lifecycle client over one explicit
+caller-supplied adapter:
+
+```text
+RouteDecision + ScenarioBinding + RuntimeProfile
+  -> immutable RunPlan
+  -> SessionHandle
+  -> exact runtime observation
+  -> command receipt + append-only events + RunStatus
+  -> runtime-owned RunOutcome
+  -> owner-complete CloseoutBundleRef
+```
+
+The Runner owns admission and reconciliation, not execution. It never discovers
+an adapter, invokes a plan step, or creates eval, memo, checkpoint, or evidence
+truth. The SDK-owned reference adapter is a deterministic lifecycle witness
+with `executes_plan_steps=false`. `AOA-SDK-D-0082` adds the C4
+`AbyssStackRuntimeAdapter` as a transport-only production client:
+
+```text
+absolute owner profile + exact constraint locations
+  -> hashed RuntimeProfile
+  + exact RunPlan source/ABI delivery binding
+  + explicit no-shell subprocess transport
+  -> abyss-stack-owned durable runtime bridge
+```
+
+The client can cause execution only through that external bridge. It neither
+executes a plan step nor discovers a runtime, policy, executable, or adapter.
+Installed-client proof is package proof, not runtime invocation proof.
+
+`AOA-SDK-D-0083` adds C5 only after the runtime-owned outcome is immutable:
+
+```text
+RouteIntent + RouteDecision + RouteExplanation + RunPlan
+  + SessionHandle + append-only RuntimeEvents + RunOutcome
+  + owner-qualified eval, memo, and checkpoint refs
+  -> immutable partial EvidenceChain revisions
+  + final owner-qualified CloseoutBundleRef
+  -> complete EvidenceChain
+  -> Runner closeout
+```
+
+The SDK validates identity, ordering, required-owner coverage, and
+partial-to-complete monotonicity. It embeds only SDK control-plane objects and
+runtime events needed to audit one run. Eval verdicts, memo contents,
+checkpoint receipts, and closeout payloads remain external owner truth. A
+partial chain cannot close a Runner session; a complete chain is immutable
+and is resolvable only by exact session or closeout-receipt identity.
 
 ## Design as Aim
 
@@ -389,9 +450,9 @@ surfaces have a real owner role.
 
 ### 9. Runtime remains outside
 
-The SDK can inspect, enqueue, and assist bounded local automation. It should not
-become a daemon, service runtime, memory store, proof engine, or hidden agent
-runner.
+The SDK can inspect, enqueue, coordinate a typed lifecycle through an explicit
+adapter, and assist bounded local automation. It should not become a daemon,
+service runtime, memory store, proof engine, or hidden execution engine.
 
 ### 10. Handoff before absorption
 

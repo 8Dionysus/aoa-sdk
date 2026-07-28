@@ -1,5 +1,6 @@
 import json
 import re
+from shutil import copytree, rmtree
 from pathlib import Path
 
 import pytest
@@ -473,6 +474,28 @@ def test_repo_filtered_compatibility_covers_playbook_memo_technique_and_kag_surf
     assert technique_checks["aoa-techniques.technique_promotion_readiness.min"].compatible is True
     assert kag_checks["aoa-kag.kag_registry.min"].detected_version == 1
     assert kag_checks["aoa-kag.tos_zarathustra_route_retrieval_pack.min"].compatible is True
+
+
+def test_routing_compatibility_prefers_runtime_bundle_without_predecessor_checkout(
+    workspace_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    predecessor_root = workspace_root / "aoa-routing"
+    bundle_root = workspace_root / "runtime-routing-bundle"
+    copytree(predecessor_root / "generated", bundle_root / "generated")
+    rmtree(predecessor_root)
+    monkeypatch.setenv("AOA_SDK_ROUTING_BUNDLE_ROOT", str(bundle_root))
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    routing_checks = {
+        entry.surface_id: entry
+        for entry in sdk.compatibility.check_repo("aoa-routing")
+    }
+
+    assert sdk.workspace.has_repo("aoa-routing") is False
+    assert sdk.routing.hints()
+    assert routing_checks["aoa-routing.task_to_surface_hints"].compatible is True
+    assert routing_checks["aoa-routing.cross_repo_registry.min"].compatible is True
 
 
 def test_compatibility_accepts_legacy_and_v2_stats_and_routing_capsules(workspace_root: Path) -> None:

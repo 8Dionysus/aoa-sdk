@@ -1,0 +1,79 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/agon-gate-trigger.schema.json",
+  "additionalProperties": false,
+  "properties": {
+    "assistant_allowed": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "assistant_forbidden": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "primary_next_hop": {
+      "type": "string"
+    },
+    "recommended_lawful_moves": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "required_signals": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "routing_action": {
+      "type": "string"
+    },
+    "secondary_next_hops": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "severity_floor": {
+      "enum": [
+        "low",
+        "medium",
+        "high"
+      ],
+      "type": "string"
+    },
+    "summary": {
+      "minLength": 12,
+      "type": "string"
+    },
+    "trigger_class": {
+      "type": "string"
+    },
+    "trigger_id": {
+      "pattern": "^[a-z0-9_]+$",
+      "type": "string"
+    }
+  },
+  "required": [
+    "trigger_id",
+    "trigger_class",
+    "severity_floor",
+    "summary",
+    "required_signals",
+    "recommended_lawful_moves",
+    "primary_next_hop",
+    "secondary_next_hops",
+    "routing_action",
+    "assistant_allowed",
+    "assistant_forbidden"
+  ],
+  "title": "Agon Gate Trigger",
+  "type": "object"
+}

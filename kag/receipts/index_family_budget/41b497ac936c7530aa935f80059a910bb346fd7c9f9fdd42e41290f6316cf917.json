@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 16147645,
+  "allowed_tracked_bytes": 18816051,
+  "approved_by": "repository-owner",
+  "base_ref": "83930e822c6c4df645b5ab2a0eb6d3f9c849b5bf",
+  "changed_generated_bytes": 16147645,
+  "changed_generated_files": 401,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "41b497ac936c7530aa935f80059a910bb346fd7c9f9fdd42e41290f6316cf917",
+  "reason": "Refresh the derived SDK KAG family after binding X1 to the passed release gate and current live mirror/runtime trust evidence; landed consumer-zero, compatibility exit, rollback retirement, archive readiness, and archive authorization remain false.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 18816051,
+  "tracked_bytes_max": 15728640
+}

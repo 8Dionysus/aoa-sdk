@@ -6,12 +6,13 @@ This card applies to `sdk/runtime-entry/`.
 
 ## Role
 
-`sdk/runtime-entry/` names Workspace, Codex, and reviewed closeout entry
-posture.
+`sdk/runtime-entry/` names Workspace, Codex, explicit Runner, and reviewed
+closeout entry posture.
 
 It keeps entry surfaces below runtime authority. The SDK may inspect, build
-packets, materialize reviewed evidence, or orient Codex; it must not become a
-runtime worker.
+packets, coordinate a typed lifecycle through a caller-supplied adapter,
+materialize reviewed evidence, or orient Codex; it must not become a runtime
+worker.
 
 ## Read Before Editing
 
@@ -30,6 +31,8 @@ runtime worker.
 - Do not treat checkpoint or closeout artifacts as memory, proof, progression,
   or owner verdicts.
 - Do not create hidden daemon behavior from entrypoint posture.
+- Do not discover or select a runtime adapter implicitly.
+- Do not treat reference-adapter lifecycle events as plan-step execution.
 
 ## Validation
 

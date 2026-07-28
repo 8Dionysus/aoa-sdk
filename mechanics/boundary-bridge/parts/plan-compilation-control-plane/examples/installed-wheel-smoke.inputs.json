@@ -112,6 +112,7 @@
       "schema_version": "fixture-v1",
       "source_ref": "fixture-source-ref"
     },
+    "runtime_approval_requirements": [],
     "runtime_owner": "abyss-stack",
     "schema_version": "aoa_control_plane_v1",
     "supported_effect_classes": [
@@ -175,6 +176,7 @@
       }
     ],
     "binding_id": "scenario-binding:fixture:bounded_change_safe",
+    "capability_bindings": [],
     "capability_refs": [
       {
         "capability_id": "aoa-approval-gate-check",

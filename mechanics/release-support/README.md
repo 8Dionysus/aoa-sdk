@@ -22,8 +22,9 @@ release checks, package build behavior, or publication helper behavior changes.
 - release check orchestration
 - package build validation
 - OS Abyss artifact bundle validation for built package outputs
-- exact public routing release-candidate construction and verification without
-  canonical owner-switch authority
+- canonical SDK routing/package verification after G5
+- explicit immutable replay of historical routing release-candidate evidence
+  outside the ordinary release battery
 
 ### Stronger owner split
 

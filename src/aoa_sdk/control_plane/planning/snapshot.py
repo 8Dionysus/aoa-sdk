@@ -42,6 +42,7 @@ class _TrustAdmission(_StrictModel):
     consumer_intent: Literal["agent"]
     verdict: Literal["allow"]
     record_id: Digest
+    record_artifact_digest: Digest
     latest_record_id: Digest
     latest_required: Literal[True]
     subject_store_required: Literal[True]
@@ -478,8 +479,8 @@ def load_plan_compilation_snapshot(
             "aoa-playbooks-playbook-registry/records/"
             f"{admission.record_id.removeprefix('sha256:')}.json"
         ),
-        source_ref=source_lock.owner_source_ref,
-        artifact_digest=admission.record_id,
+        source_ref=admission.record_id,
+        artifact_digest=admission.record_artifact_digest,
         schema_ref="abyss-machine:artifact-bundle-registry-record",
         schema_version="abyss_machine_artifact_bundle_registry_record_v1",
     )
@@ -489,6 +490,7 @@ def load_plan_compilation_snapshot(
         "contour_digest": _sha256(contour_raw),
         "schema_digest": _sha256(schema_raw),
         "trust_record_id": admission.record_id,
+        "trust_record_artifact_digest": admission.record_artifact_digest,
         "subject_store_aggregate_digest": (admission.subject_store_aggregate_digest),
     }
     return PlanCompilationSnapshot(

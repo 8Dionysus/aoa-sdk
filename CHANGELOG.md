@@ -14,16 +14,42 @@ Tracking starts with the community-docs baseline for this repository.
 - Bind deterministic skill candidate selection to the exact SDK-canonical G5
   runtime snapshot and pinned `aoa-skills` owner projection, blocking trust
   drift, mixed projections, unsupported constraints, and top-rank ambiguity.
+- Version the resolver as `aoa_control_plane_route_resolver_v2` after the T1
+  live smoke exposed v1 rejecting the owner-defined `challenger` health enum.
+  V2 keeps challenger routes explicitly degraded and preserves fail-closed
+  handling for missing, unknown, unavailable, or retired health.
+- Version the resolver as `aoa_control_plane_route_resolver_v3` after the G8
+  chain exposed v2 copying the caller into `RouteCandidate.agent`. V3 leaves
+  the provider agent absent until an exact owner projection supplies it;
+  scenario agents remain a separate C2 binding.
 - Add C2 Agent OS plan compilation:
   `AoASDK.control_plane.compile()` and `aoa route compile`, with exact reviewed
   scenario bindings, deterministic guarded-branch pruning, content-addressed
   `PlanSnapshot` and `RunPlan`, and decision-bound validation.
+- Version the compiler as `aoa_control_plane_plan_compiler_v2` and add public
+  `scenario_ref()` plus `bind_scenario()` construction. The binder keeps the
+  selected entry route separate from playbook DAG capabilities, resolves each
+  authored alias through exact pinned owner projections, and exposes semantic
+  owner, lifecycle, migration, and unbound availability without activation.
+- Version the compiler as `aoa_control_plane_plan_compiler_v3` so exact
+  scenario-scoped runtime approval requirements projected by the selected
+  `RuntimeProfile` join, but never replace, route-owned approvals. The
+  `abyss-stack` profile loader can now project its two bounded-mutation gates
+  before public compilation instead of relying on fixture plan mutation.
 - Pin the exact trust-admitted `aoa_playbook_plan_contour_v1` owner projection
   and schema from `aoa-playbooks`, fail closed on source, digest, ABI, schema,
   or admission drift, and verify the installed wheel reproduces the golden
   plan without a sibling checkout.
-- Keep `AoARunner`, adapter selection, activation, runtime execution, measured
-  benefit, consumer-zero, and archival outside this slice.
+- Separate the playbook trust record's logical `record_id` from the SHA-256 of
+  its delivered registry JSON bytes, so exact runtime snapshot observation
+  can consume a public compiler plan without rewriting provenance.
+- Add C3 `AoASDK.runner` and `aoa_control_plane_runner_v1`: immutable session
+  preparation, explicit adapter binding, runtime snapshot observation,
+  approval round trips, bounded recovery, idempotent commands, append-only
+  event reconciliation, durable receipt recovery, atomic verified read-model
+  updates, typed outcomes, restoration, and gated closeout.
+- Add the SDK-owned `aoa_reference_runtime_adapter_v1` as an installed-wheel
+  lifecycle witness with `executes_plan_steps=false`.
 - Project the existing typed organ registry through four bounded read-only
   `aoa_workspace` MCP tools and four resources, while keeping activation-plan
   compilation, connection, lifecycle, and execution outside the MCP surface.
@@ -33,6 +59,37 @@ Tracking starts with the community-docs baseline for this repository.
   memo candidate, eval request/result, and explicit owner acceptance, with
   pinned owner schemas, per-stage receipts, stale-stop behavior, and no SDK
   owner-tool execution.
+- Add the C4 `abyss_stack_agent_os_adapter_v1` transport client, owner-exact
+  runtime-profile loader, exact source/ABI binding, and no-shell subprocess
+  transport. Runtime requests may bind either an untyped scenario input or an
+  exact typed `ScenarioArtifactBinding`, enabling owner-qualified A2A and
+  degradation contours without weakening snapshot coverage or moving
+  execution into the SDK. The paired runtime-owner test proves one real
+  governed `AOA-P-0011` execution, durable restore, replay safety, approval
+  enforcement, and source drift closure.
+- Add C5 `aoa_evidence_chain_v1`: immutable partial-to-complete composition of
+  the exact SDK route/run objects, runtime events and outcome, plus
+  owner-qualified eval, memo, checkpoint, and closeout refs. Add
+  content-addressed durable revisions, exact session/receipt lookup, tamper
+  rejection, and complete-chain-gated Runner closeout.
+- Keep runtime outcomes immutable and reject any adapter attempt to synthesize
+  eval, memo, or closeout authority. The SDK validates cross-owner coverage
+  while canonical owner payloads remain outside the chain.
+- Keep adapter selection, runtime implementation, eval/memory verdicts,
+  measured benefit, consumer-zero, and archival outside the SDK client.
+- Retire active `aoa-routing` checkout, sibling-canary, cadence, paired-release,
+  and historical pre-G5 probe dependencies. Compatibility reads now prefer the
+  SDK-delivered bundle while the predecessor remains optional rollback state.
+- Merge the routing-owned pre-protocol Agon gate function into
+  `aoa_sdk.control_plane.routing.agon`: preserve the twelve trigger IDs and
+  `agon_gate_routing_registry.v1`, move route-hint ownership to `aoa-sdk`,
+  package config/registry/schemas in the wheel, and keep center law,
+  activation, verdicts, and runtime effects outside the SDK.
+- Add the reproducible E1 cost comparison: workflow checkout actions fall
+  73 to 23, active producer control planes fall 2 to 1, and the clean
+  route-bind-compile federation falls from a 15–16-root maintenance lower
+  bound to six owner roots. G13 remains provisional until landed CI supplies
+  comparable lead-time, runner-minute, and failure-rate evidence.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.

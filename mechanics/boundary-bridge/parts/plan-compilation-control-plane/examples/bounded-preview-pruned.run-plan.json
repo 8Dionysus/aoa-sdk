@@ -152,8 +152,8 @@
       "terminal_required": true
     }
   ],
-  "plan_digest": "sha256:40dc84b38557067ed639bbfb7b9a3e5e8c9b3bf0c7b8371f2ce0d13dba6073cc",
-  "plan_id": "run-plan:6276fadd9c5feb133b725eb78cc358005f176e85e45478cd861710aa72cf9a21",
+  "plan_digest": "sha256:1eff1823f3ff06b201195d1d3f288c883d5ff46d28b7aa67594ecc1431741017",
+  "plan_id": "run-plan:031eaa34dd7b405ab696e7a44c4e7057ecbb46fee98edcdb764b6721695a53f9",
   "provenance": {
     "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
     "artifact_ref": "src/aoa_sdk/control_plane/planning/compiler.py",
@@ -221,6 +221,7 @@
       "schema_version": "fixture-v1",
       "source_ref": "fixture-source-ref"
     },
+    "runtime_approval_requirements": [],
     "runtime_owner": "abyss-stack",
     "schema_version": "aoa_control_plane_v1",
     "supported_effect_classes": [
@@ -284,6 +285,7 @@
       }
     ],
     "binding_id": "scenario-binding:fixture:bounded_change_safe",
+    "capability_bindings": [],
     "capability_refs": [
       {
         "capability_id": "aoa-approval-gate-check",
@@ -484,8 +486,8 @@
         "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
       }
     ],
-    "snapshot_digest": "sha256:25a3d836f9dfd6d8b2aca7cab8ff791c3ff3bbd9c22e99ad8bdfef6263cde49b",
-    "snapshot_id": "plan-snapshot:7a9fe9f669ec7cb6959921d9e9d3494bb475adad5162866595f9fde5be89c7d0",
+    "snapshot_digest": "sha256:7eb18a167e800c89c3209b04ea366a5640a4228cc01ac087712da7b6c8aee52d",
+    "snapshot_id": "plan-snapshot:6fdffdff76044f7bd6506c2d43c75466275630473a04ce0a49afe70bcf3455ae",
     "source_refs": [
       {
         "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
@@ -544,12 +546,12 @@
         "source_ref": "fixture-source-ref"
       },
       {
-        "artifact_digest": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e",
+        "artifact_digest": "sha256:35991ad90fd5339a6962849b36404295a1c4e41239fd229babfc1432b1aa137c",
         "artifact_ref": "dist/abyss-artifact-registry/aoa-playbooks-playbook-registry/records/698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e.json",
         "owner_repo": "aoa-playbooks",
         "schema_ref": "abyss-machine:artifact-bundle-registry-record",
         "schema_version": "abyss_machine_artifact_bundle_registry_record_v1",
-        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+        "source_ref": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e"
       },
       {
         "artifact_digest": "sha256:1effef6739136e3634f787572526926eb5731b978c03e15d6c21c8a047bdd7eb",

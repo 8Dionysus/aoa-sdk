@@ -13,6 +13,7 @@ from typing import Any
 import pytest
 
 from aoa_sdk.release.api import (
+    OWNER_RELEASE_REPOS,
     ReleaseAPI,
     ReleaseAuditRepoReport,
     ReleaseAuditResult,
@@ -324,7 +325,7 @@ def test_package_artifact_manifest_keeps_consumer_trust_gate_contract() -> None:
     assert "unverified latest" in helper_readme
 
 
-def test_routing_g5_release_candidate_lock_and_builder_stay_non_authoritative() -> None:
+def test_routing_g5_release_candidate_lock_and_builder_are_historical_not_active_ci() -> None:
     repo_root = _repo_root()
     lock = json.loads(
         (
@@ -382,53 +383,16 @@ def test_routing_g5_release_candidate_lock_and_builder_stay_non_authoritative() 
     assert "write_deterministic_release_archive" in builder
     assert '"g5_authority": False' in builder
     assert '"production_runtime_allowed": False' in builder
-    exact_refs = {
-        value
-        for value in lock["input_source_refs"].values()
-        if value != "SELF"
-    } | {
-        lock["predecessor"]["source_ref"],
-        lock["artifact_verifier"]["source_ref"],
-    }
-    assert all(source_ref in workflow for source_ref in exact_refs)
-    assert "build_routing_g5_release_candidate.py" in workflow
-    assert "verify_routing_g5_release_candidate_wheel.py" in workflow
-    assert (
-        "actions/attest@36051bcae73b7c2a8a6945a48cbf80953c6baa35"
-        in workflow
-    )
-    assert "attestations: write" in workflow
-    assert workflow.count(
-        '--subject-root "$GITHUB_WORKSPACE/dist/routing-g5-release-candidate"'
-    ) == 3
+    assert "build_routing_g5_release_candidate.py" not in workflow
+    assert "verify_routing_g5_release_candidate_wheel.py" not in workflow
+    assert "repository: 8Dionysus/aoa-routing" not in workflow
+    assert "ROUTING_RELEASE_TAG" not in workflow
     assert "release_tag:" in workflow
     assert "Validate immutable release evidence ref" in workflow
     assert "ref: ${{ inputs.release_tag || github.sha }}" in workflow
-    assert "ref: ${{ env.ROUTING_RELEASE_SOURCE_REF }}" in workflow
-    assert "Checkout reviewed release replay tooling" in workflow
-    assert "ref: ${{ github.sha }}" in workflow
-    assert "path: .release-tooling/aoa-sdk" in workflow
-    assert "Canonicalize replay archive with reviewed tooling" in workflow
-    assert (
-        "PYTHONPATH: ${{ github.workspace }}/.release-tooling/aoa-sdk/src"
-        in workflow
-    )
-    assert (
-        "python .release-tooling/aoa-sdk/mechanics/release-support/parts/"
-        "release-audit-publish-helper/scripts/"
-        "build_routing_g5_release_candidate.py"
-        in workflow
-    )
-    assert (
-        "--input-lock .routing-inputs/aoa-sdk/sdk/distribution/manifests/"
-        "routing_g5_release_candidate.input-lock.json"
-        in workflow
-    )
-    assert workflow.count("python -m abyss_machine.cli artifacts") == 4
-    assert "\n          abyss-machine artifacts" not in workflow
 
 
-def test_routing_g5_canonical_lock_and_workflow_bind_owner_switch() -> None:
+def test_routing_g5_canonical_lock_remains_replayable_outside_active_workflow() -> None:
     repo_root = _repo_root()
     lock = json.loads(
         (
@@ -492,14 +456,31 @@ def test_routing_g5_canonical_lock_and_workflow_bind_owner_switch() -> None:
     assert '"archive_authorized": False' in builder
     assert '"live_cutover_executed": False' in builder
     assert "verify_routing_g5_canonical_wheel.py" in workflow
-    assert "Build exact receipt-bound routing G5 canonical artifact" in workflow
-    assert "env.ROUTING_RELEASE_TAG == 'v0.8.0'" in workflow
-    assert "env.ROUTING_RELEASE_TAG == 'v0.7.0'" in workflow
-    assert lock["runtime_consumer_contract"]["source_ref"] in workflow
-    assert lock["public_release_trust_root"]["asset_digest"].removeprefix(
-        "sha256:"
-    ) in workflow
-    assert "aoa-sdk-routing-g5-canonical-$ROUTING_RELEASE_TAG.tar.gz" in workflow
+    assert "Build exact receipt-bound routing G5 canonical artifact" not in workflow
+    assert "ROUTING_RELEASE_TAG" not in workflow
+    assert lock["runtime_consumer_contract"]["source_ref"] not in workflow
+    assert "repository: 8Dionysus/aoa-routing" not in workflow
+
+
+def test_aoa_routing_is_excluded_from_active_release_selection(
+    workspace_root: Path,
+) -> None:
+    assert "aoa-routing" not in OWNER_RELEASE_REPOS
+    api = ReleaseAPI(
+        _workspace_for(
+            "aoa-routing",
+            workspace_root / "aoa-routing",
+            workspace_root,
+        )
+    )
+
+    with pytest.raises(ValueError, match="maintenance-only after G5"):
+        api.audit(
+            workspace_root=workspace_root,
+            phase="cadence",
+            repo="aoa-routing",
+            include_all=False,
+        )
 
 
 def test_routing_g5_canonical_check_rejects_input_lock_substitutions() -> None:

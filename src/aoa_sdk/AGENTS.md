@@ -6,7 +6,10 @@ This directory owns typed control-plane facades for consumed AoA surfaces.
 ## Scope
 
 Code here loads, validates, inspects, and hands off owner-owned surfaces.
-Stay on the control plane: do not turn typed helpers into runtime services, route authorities, hidden policy engines, or sources of sibling-repo meaning.
+Stay on the control plane: the explicitly accepted
+`control_plane/routing/` family owns deterministic routing producer and route
+candidate contracts, but no typed helper may become a runtime service, hidden
+policy engine, or source of sibling-repo meaning.
 
 ## Local contract
 

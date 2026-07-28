@@ -29,7 +29,9 @@ from aoa_sdk.workspace.discovery import Workspace
 
 
 REPO_ROOT = Path(__file__).resolve().parents[5]
-ROUTING_SCHEMAS = REPO_ROOT / "src" / "aoa_sdk" / "control_plane" / "routing" / "schemas"
+ROUTING_SCHEMAS = (
+    REPO_ROOT / "src" / "aoa_sdk" / "control_plane" / "routing" / "schemas"
+)
 ZERO_DIGEST = "sha256:" + "0" * 64
 SDK_PRODUCER_REF = "a" * 40
 RUNTIME_CONSUMER_REF = "b" * 40
@@ -138,10 +140,7 @@ def _git_capability_graph(
                     "availability": "available",
                     "kind": "skill",
                     "operation": "route-one-mode",
-                    "ref": (
-                        "skills/"
-                        f"{spec['id'].removeprefix('skill.')}/SKILL.md"
-                    ),
+                    "ref": (f"skills/{spec['id'].removeprefix('skill.')}/SKILL.md"),
                 },
                 "trust": {
                     "posture": "authored-procedure",
@@ -225,11 +224,7 @@ def _routing_inputs(
 ) -> tuple[Path, Path]:
     shutil.rmtree(workspace_root / "aoa-routing")
     bundle_root = (
-        workspace_root
-        / "abyss-stack"
-        / "Knowledge"
-        / "federation"
-        / "aoa-routing"
+        workspace_root / "abyss-stack" / "Knowledge" / "federation" / "aoa-routing"
     )
     source_ref, graph_raw = _git_capability_graph(
         workspace_root,
@@ -254,9 +249,7 @@ def _routing_inputs(
             "invocation_mode": (
                 "suggest" if deferred and name == "aoa-decision" else "invoke"
             ),
-            "allow_implicit_invocation": not (
-                deferred and name == "aoa-decision"
-            ),
+            "allow_implicit_invocation": not (deferred and name == "aoa-decision"),
             "candidate_only": deferred and name == "aoa-decision",
             "capability_id": f"skill.{name}",
             "capability_graph_ref": "generated/capability_graph.json",
@@ -533,9 +526,7 @@ def _routing_inputs(
             "owner_repo": "aoa-sdk",
             "relative_path": "schemas/router-entry.schema.json",
             "source_ref": SDK_PRODUCER_REF,
-            "artifact_digest": _sha256(
-                schema_artifacts["router-entry.schema.json"]
-            ),
+            "artifact_digest": _sha256(schema_artifacts["router-entry.schema.json"]),
             "schema_ref": "schemas/router-entry.schema.json",
             "schema_version": "1",
         },
@@ -597,9 +588,9 @@ def _routing_inputs(
                 "generated/cross_repo_registry.min.json": _sha256(
                     registry_raw
                 ).removeprefix("sha256:"),
-                "generated/task_to_surface_hints.json": _sha256(
-                    hints_raw
-                ).removeprefix("sha256:"),
+                "generated/task_to_surface_hints.json": _sha256(hints_raw).removeprefix(
+                    "sha256:"
+                ),
                 "schemas/cross-repo-registry.schema.json": _sha256(
                     schema_artifacts["cross-repo-registry.schema.json"]
                 ).removeprefix("sha256:"),
@@ -670,8 +661,12 @@ def test_resolve_is_deterministic_explainable_and_needs_no_predecessor_checkout(
     assert first == second
     assert first.status == "resolved"
     assert first.selected_candidate_id == "aoa-skills:skill:aoa-decision"
-    assert first.resolver_version == "aoa_control_plane_route_resolver_v1"
+    assert first.resolver_version == "aoa_control_plane_route_resolver_v3"
     assert len(first.candidates) == 2
+    assert all(candidate.agent is None for candidate in first.candidates)
+    assert all(
+        candidate.agent != intent.requested_by for candidate in first.candidates
+    )
     assert explanation.fallback_used is False
     assert len(explanation.candidate_explanations) == len(first.candidates)
     dispositions = {
@@ -691,9 +686,7 @@ def test_nonpositive_scores_are_rejected_in_blocked_explanation(
     bundle_root, lock_path = _routing_inputs(workspace_root)
     api = _api(workspace_root, bundle_root, lock_path)
 
-    decision = api.resolve(
-        _intent(objective="weather forecast tomorrow")
-    )
+    decision = api.resolve(_intent(objective="weather forecast tomorrow"))
     explanation = api.explain(decision)
 
     assert decision.status == "blocked"
@@ -715,14 +708,11 @@ def test_equal_top_scores_block_without_lexical_fallback(
     assert decision.status == "blocked"
     assert decision.selected_candidate_id is None
     assert any(
-        reason.startswith("ambiguous_top_rank:")
-        for reason in decision.reason_codes
+        reason.startswith("ambiguous_top_rank:") for reason in decision.reason_codes
     )
     assert [candidate.rank for candidate in decision.candidates[:2]] == [0, 0]
     assert explanation.ambiguity_codes == tuple(
-        reason
-        for reason in decision.reason_codes
-        if reason.startswith("ambiguous_")
+        reason for reason in decision.reason_codes if reason.startswith("ambiguous_")
     )
     with pytest.raises(ControlPlaneContractError, match="decision order"):
         assert_explanation_matches_decision(
@@ -794,8 +784,7 @@ def test_required_capability_is_a_hard_constraint(
     assert decision.selected_candidate_id is None
     assert all(
         candidate.policy_posture == "forbidden"
-        and "required_capability_constraint_mismatch"
-        in candidate.reason_codes
+        and "required_capability_constraint_mismatch" in candidate.reason_codes
         for candidate in decision.candidates
     )
 
@@ -844,10 +833,7 @@ def test_owner_negative_phrase_does_not_match_inside_a_token(
     assert decision.status == "resolved"
     assert decision.selected_candidate_id == decision_candidate.candidate_id
     assert decision_candidate.policy_posture == "eligible"
-    assert (
-        "owner_negative_applicability_match"
-        not in decision_candidate.reason_codes
-    )
+    assert "owner_negative_applicability_match" not in decision_candidate.reason_codes
 
 
 def test_unsupported_policy_constraint_returns_typed_blocked_decision(
@@ -869,10 +855,7 @@ def test_unsupported_policy_constraint_returns_typed_blocked_decision(
 
     assert decision.status == "blocked"
     assert decision.selected_candidate_id is None
-    assert (
-        "constraint_not_resolvable_in_c1:unknown-risk-order"
-        in decision.reason_codes
-    )
+    assert "constraint_not_resolvable_in_c1:unknown-risk-order" in decision.reason_codes
 
 
 def test_snapshot_tampering_fails_closed(
@@ -953,9 +936,7 @@ def test_embedded_owner_switch_receipt_tampering_fails_closed(
     workspace_root: Path,
 ) -> None:
     bundle_root, lock_path = _routing_inputs(workspace_root)
-    manifest_path = (
-        bundle_root / "manifest" / "federation_mirror_manifest.json"
-    )
+    manifest_path = bundle_root / "manifest" / "federation_mirror_manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     manifest["owner_switch_receipt"]["authorized_at"] = "tampered"
     _write_json(manifest_path, manifest)
@@ -1006,9 +987,7 @@ def test_malformed_runtime_manifest_objects_fail_closed(
     match: str,
 ) -> None:
     bundle_root, lock_path = _routing_inputs(workspace_root)
-    manifest_path = (
-        bundle_root / "manifest" / "federation_mirror_manifest.json"
-    )
+    manifest_path = bundle_root / "manifest" / "federation_mirror_manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     parent = manifest
     for field in field_path[:-1]:
@@ -1057,9 +1036,7 @@ def test_contradictory_runtime_trust_posture_fails_closed(
     match: str,
 ) -> None:
     bundle_root, lock_path = _routing_inputs(workspace_root)
-    manifest_path = (
-        bundle_root / "manifest" / "federation_mirror_manifest.json"
-    )
+    manifest_path = bundle_root / "manifest" / "federation_mirror_manifest.json"
     manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
     parent = manifest
     for field in field_path[:-1]:
@@ -1173,6 +1150,28 @@ def test_degraded_owner_health_remains_an_explicit_degraded_posture(
     assert "owner_health_degraded" in selected.reason_codes
 
 
+def test_challenger_owner_health_is_selectable_only_as_degraded(
+    workspace_root: Path,
+) -> None:
+    bundle_root, lock_path = _routing_inputs(
+        workspace_root,
+        owner_health="challenger",
+    )
+
+    decision = _api(workspace_root, bundle_root, lock_path).resolve(_intent())
+
+    assert decision.status == "degraded"
+    assert decision.selected_candidate_id is not None
+    selected = next(
+        candidate
+        for candidate in decision.candidates
+        if candidate.candidate_id == decision.selected_candidate_id
+    )
+    assert selected.compatibility == "degraded"
+    assert "owner_health_challenger" in selected.reason_codes
+    assert "owner_health_degraded" not in selected.reason_codes
+
+
 def test_blank_owner_effect_is_forbidden_without_an_effect_ceiling(
     workspace_root: Path,
 ) -> None:
@@ -1235,8 +1234,7 @@ def test_route_cli_resolve_explain_and_validate(
         intent_path,
         _intent(
             objective=(
-                "find a durable repository decision and rationale "
-                "with evaluation proof"
+                "find a durable repository decision and rationale with evaluation proof"
             )
         ).model_dump(mode="json"),
     )
@@ -1325,9 +1323,7 @@ def test_route_cli_resolve_explain_and_validate(
     )
     assert validated.exit_code == 0, validated.output
     assert json.loads(validated.output)["execution_authorized"] is False
-    tampered_explanation_path = (
-        workspace_root / "explanation-wrong-parent-schema.json"
-    )
+    tampered_explanation_path = workspace_root / "explanation-wrong-parent-schema.json"
     _write_json(
         tampered_explanation_path,
         {
@@ -1355,9 +1351,7 @@ def test_route_cli_resolve_explain_and_validate(
         for candidate in explanation_payload["candidate_explanations"]
         if candidate["candidate_id"] != decision_payload["selected_candidate_id"]
     )
-    wrong_disposition_path = (
-        workspace_root / "explanation-wrong-disposition.json"
-    )
+    wrong_disposition_path = workspace_root / "explanation-wrong-disposition.json"
     _write_json(
         wrong_disposition_path,
         {
@@ -1384,13 +1378,10 @@ def test_route_cli_resolve_explain_and_validate(
     )
     assert rejected_disposition.exit_code == 1
     assert (
-        "disposition contradicts the decision candidate"
-        in rejected_disposition.output
+        "disposition contradicts the decision candidate" in rejected_disposition.output
     )
 
-    duplicate_explanation_path = (
-        workspace_root / "explanation-duplicate-candidate.json"
-    )
+    duplicate_explanation_path = workspace_root / "explanation-duplicate-candidate.json"
     _write_json(
         duplicate_explanation_path,
         {

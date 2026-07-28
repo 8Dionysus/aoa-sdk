@@ -3,11 +3,6 @@
   "profile": "ws02-first-slice",
   "entries": [
     {
-      "repo": "aoa-routing",
-      "target_ref": "main",
-      "purpose": "route-directed public surfaces plus federation capsule ABI"
-    },
-    {
       "repo": "aoa-playbooks",
       "target_ref": "main",
       "purpose": "activation and federation surface contracts"

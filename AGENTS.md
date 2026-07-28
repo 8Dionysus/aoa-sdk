@@ -45,8 +45,10 @@ This repository owns:
   adapter contract family, plus the C1 receipt-bound deterministic
   `AoASDK.control_plane.resolve()` and `.explain()` facade and the C2
   deterministic `AoASDK.control_plane.compile()` facade over an exact admitted
-  `aoa-playbooks` contour; `AoASDK.runner` and runtime execution remain
-  unimplemented at this stage
+  `aoa-playbooks` contour, plus the C3 `AoASDK.runner` lifecycle client and
+  deterministic no-execution reference adapter, plus the C4 explicit
+  `abyss-stack` transport client and owner-exact profile loader; production
+  runtime execution remains outside this repository
 
 It does not own:
 

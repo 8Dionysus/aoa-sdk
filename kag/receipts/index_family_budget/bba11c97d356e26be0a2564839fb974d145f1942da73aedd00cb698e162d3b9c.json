@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 16081709,
+  "allowed_tracked_bytes": 18787254,
+  "approved_by": "repository-owner",
+  "base_ref": "83930e822c6c4df645b5ab2a0eb6d3f9c849b5bf",
+  "changed_generated_bytes": 16081709,
+  "changed_generated_files": 399,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "bba11c97d356e26be0a2564839fb974d145f1942da73aedd00cb698e162d3b9c",
+  "reason": "Regenerate the derived SDK KAG family after combining current main organ access surfaces with the routing succession branch; no publication, runtime invocation, archive authorization, cost-reduction, or final completion claim.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 18787254,
+  "tracked_bytes_max": 15728640
+}

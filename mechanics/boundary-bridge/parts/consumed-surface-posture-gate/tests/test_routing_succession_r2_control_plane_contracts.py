@@ -622,6 +622,40 @@ def test_core_contracts_round_trip_as_strict_json() -> None:
             wrong_plan_parent,
         )
 
+    unexpected_approval = _approval_requirement("closeout").model_copy(
+        update={
+            "requirement_id": "approval:unexpected-runtime",
+            "approval_owner": plan.runtime_profile.provenance,
+        }
+    )
+    unexpected_approval_plan = plan.model_copy(
+        update={
+            "approval_requirements": (
+                *plan.approval_requirements,
+                unexpected_approval,
+            ),
+            "plan_digest": _digest("placeholder"),
+        }
+    )
+    unexpected_approval_plan = unexpected_approval_plan.model_copy(
+        update={
+            "plan_digest": canonical_digest(
+                unexpected_approval_plan,
+                exclude={"plan_digest"},
+            )
+        }
+    )
+    with pytest.raises(
+        ControlPlaneContractError,
+        match="exact route and runtime-profile projections",
+    ):
+        assert_route_plan_chain(
+            intent,
+            decision,
+            explanation,
+            unexpected_approval_plan,
+        )
+
     duplicate_explanation = explanation.model_copy(
         update={
             "candidate_explanations": (
@@ -853,6 +887,15 @@ def test_snapshot_and_approval_guards_fail_closed_on_drift_or_bypass() -> None:
             (approval,),
             session=session,
             at=NOW + timedelta(hours=2),
+        )
+    expires_after = plan.approval_requirements[0].expires_after_seconds
+    assert expires_after is not None
+    with pytest.raises(ControlPlaneContractError, match="approval expired"):
+        assert_approvals_satisfied(
+            plan,
+            (approval,),
+            session=session,
+            at=NOW + timedelta(seconds=expires_after),
         )
 
 

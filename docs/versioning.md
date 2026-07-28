@@ -114,21 +114,68 @@ or owner authority requires a versioned contract decision; adapters declare
 the plan and event versions they support.
 
 C1 route selection is independently named
-`aoa_control_plane_route_resolver_v1`. Its version covers candidate
+`aoa_control_plane_route_resolver_v3`. Its version covers candidate
 intersection, score weights, negative applicability, constraint handling,
 eligibility rules, ambiguity behavior, decision identity, and fallback
 posture. Changing any of those semantics requires a new resolver version and
 old-vs-new evaluation; it must not be hidden behind the stable
 `aoa_control_plane_v1` envelope.
 
+Resolver v1 incorrectly treated the owner-defined `challenger` health state
+as unknown and therefore blocked the only advertised challenger in the pinned
+live graph. Resolver v2 maps `challenger` to explicit degraded compatibility;
+it neither promotes owner health nor relaxes missing, unknown, unavailable,
+or retired health. Resolver v3 retains that mapping and stops projecting
+`RouteIntent.requested_by` as `RouteCandidate.agent`: the former is a caller,
+while the latter is reserved for an exact provider projection.
+
 C2 plan compilation is independently named
-`aoa_control_plane_plan_compiler_v1`. Its version covers exact scenario
-binding, owner-contour interpretation, guarded pruning, plan snapshot scope,
+`aoa_control_plane_plan_compiler_v3`. Its version covers explicit selected
+scenario identity, exact owner-projection binding of playbook capability
+aliases, owner-contour interpretation, guarded pruning, plan snapshot scope,
 content identity, and preservation of approvals and lifecycle requirements.
+V1 required the route entry capability and candidate agent to appear in the
+scenario binding; v2 keeps entry navigation separate from scenario DAG
+participants and preserves semantic-owner plus unbound lifecycle posture.
+V3 preserves route approvals while adding exact scenario-scoped
+runtime-owner approval requirements from `RuntimeProfile`; it does not let
+the compiler invent or grant either approval family.
 The consumed owner ABI is separately pinned as
 `aoa_playbook_plan_contour_v1`; changing either semantic contract requires a
 new versioned decision and fixture migration, not an in-place reinterpretation
 of packaged data.
+
+C3 lifecycle coordination is independently named
+`aoa_control_plane_runner_v1`. Its version covers immutable session binding,
+explicit adapter binding, runtime snapshot observation, command and approval
+replay, bounded recovery, event/status/receipt reconciliation, restoration,
+runtime-owned outcome correlation, and closeout admission. The SDK reference
+adapter is independently named `aoa_reference_runtime_adapter_v1` and is
+strictly non-executing. A production adapter may implement
+`aoa_runtime_adapter_v1`, but runtime deployment and execution evidence do not
+become SDK release evidence.
+
+The first production transport client is independently named
+`abyss_stack_agent_os_adapter_v1`, with binding schema
+`abyss_stack_agent_os_binding_v1` and bridge response
+`abyss_stack_agent_os_bridge_response_v1`. These versions cover exact profile
+materialization, source/ABI delivery binding, operation envelopes, and typed
+response handling. The runtime-owner profile independently controls admitted
+scenario/phase mappings; changing that meaning does not silently widen the SDK
+transport ABI.
+
+C5 evidence composition is independently named `aoa_evidence_chain_v1`.
+Its version covers embedded SDK/run objects, owner-qualified reference kinds,
+partial-versus-complete derivation, exact owner coverage, and monotonic
+revision rules. The checked repository index is
+`aoa_evidence_chain_index_v1`. External eval, memo, checkpoint, and closeout
+payload schemas remain independently versioned by their owners.
+
+The legacy Runner closeout form that reads eval, memo, and closeout refs from
+`RunOutcome` remains a compatibility-only input during the C3-C5 convergence
+window. New composition rejects those fields in runtime outcomes and closes
+only from a complete `EvidenceChain`. Removing the legacy form requires an
+explicit compatibility decision and consumer evidence.
 
 ## Operational Expectation
 

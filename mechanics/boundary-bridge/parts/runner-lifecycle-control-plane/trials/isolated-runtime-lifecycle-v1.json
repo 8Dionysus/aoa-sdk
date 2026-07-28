@@ -1,0 +1,92 @@
+{
+  "schema_version": "aoa_sdk_g11_isolated_runtime_reduced_receipt_v1",
+  "case_id": "T1-G11-isolated-runtime-lifecycle",
+  "trial_family": "fresh_context_non_executing_runner_lifecycle",
+  "subject": {
+    "child_handle": "/root/t1_isolated_runtime_lifecycle",
+    "forked_parent_turns": "none",
+    "parent_history_available": false,
+    "implementation_tests_allowed": false,
+    "canonical_repository_writes_allowed": false
+  },
+  "request": {
+    "schema_version": "aoa_summon_request_v3",
+    "request_digest": "sha256:1f765d79237006d2a0b0807cdea0c207fb1d20d4537610467cb33e4128e7f8db",
+    "serialized_file_sha256": "8d98c3bae43430ea8dcf39c9834c35dbb369b2225a138b13de7ef9ae9d004d70",
+    "expected_output_keys": [
+      "isolated_runtime_receipt",
+      "isolated_runtime_observation"
+    ],
+    "schema_valid": true,
+    "canonical_digest_valid": true
+  },
+  "pinned_inputs": {
+    "aoa_sdk_commit": "6f61aa9682662a919d778bf50c8c22ee9ba0eef1",
+    "wheel": {
+      "name": "aoa_sdk-0.8.0-py3-none-any.whl",
+      "sha256": "1ed2330b49e3cfb7307a4e4279eac5c4a0163648faba76259f48b4fab61b830f"
+    },
+    "typed_chain_sha256": "30600f684113c2fcb2b885bbe80b5e89503079e1b7934303a3f7daf988de2424",
+    "verifier_sha256": "5416d61e749bd34a0f20e7afa2d9c031742712ec5d7d9b57a6696346ae7a156d",
+    "aoa_routing_checkout_present": false
+  },
+  "test_plan": {
+    "base_plan_id": "run-plan:6217338726428af2436f4c3ef80b5ea7b91692208775975cd12ece4ff18542e9",
+    "base_plan_digest": "sha256:73f348513c2cd662ab67b1282666eae1c4d7aacdd627132c7e961fb4b7e7792d",
+    "test_plan_digest": "sha256:506acb9ee1ae5aed433dcdfa767e34547e67bd8cffb04dde593bc8edb7991205",
+    "variation": "retry_policy",
+    "max_attempts": 2,
+    "retryable_failure_codes": [
+      "reference_disconnect"
+    ],
+    "compiler_output_claimed": false
+  },
+  "lifecycle": {
+    "terminal_state": "closed",
+    "execution_status": "succeeded",
+    "session_id": "aoa-session:T1-isolated-primary",
+    "final_revision": 10,
+    "event_count": 83,
+    "command_receipt_count": 5,
+    "progress_event_count": 64,
+    "duplicate_start_no_new_event": true,
+    "duplicate_pause_no_new_event": true,
+    "pause_resume_completed": true,
+    "service_failure_preserved_verified_state": true,
+    "interruption_reconciled": true,
+    "recovery_stopped_at_pause": true,
+    "recovered_session_resumed": true,
+    "session_handle_restore_exact": true,
+    "event_sequences_contiguous": true,
+    "reference_adapter_executes_plan_steps": false
+  },
+  "parent_validation": {
+    "installed_wheel_models": [
+      "SessionHandle",
+      "RunStatus",
+      "RunOutcome"
+    ],
+    "model_scope_exact": true,
+    "session_outcome_status_identity_exact": true,
+    "parent_replay_byte_equal": true,
+    "raw_receipt_sha256": "ad1f7eb00467e81e6fee9d46285177c5b141426fcb68d6c62dc756f03a34e758",
+    "child_observation_sha256": "bf657d4dd4f0ea8bf859a96d628fff63154e0ffd56ab0cfce528b6d21b2ef4fa",
+    "summon_result_schema": "summon-result-v3",
+    "summon_result_state": "accepted",
+    "summon_result_sha256": "2e89d45b824745292c28b9471ccab366bfd965c3520ea34154722d9308b267be",
+    "returned_output_keys_exact": true
+  },
+  "defect_found_and_repaired": {
+    "symptom": "The first decision in a two-approval plan was compared against the full request set instead of the remaining pending set.",
+    "repair_commit": "f357e8f7c91850c38e18be7a2490b8e081130b1d",
+    "regression_test": "test_multiple_approvals_reconcile_one_decision_at_a_time"
+  },
+  "actual_effects": [
+    "child-agent-runtime",
+    "read-only-inspection",
+    "subprocess-execution",
+    "in-memory-reference-lifecycle",
+    "session-local-output-write"
+  ],
+  "claim_limit": "This receipt supports deterministic isolated AoARunner lifecycle behavior with a non-executing reference adapter and a byte-equal parent replay. It does not execute plan steps, invoke a production runtime, model, tool, or capability, establish an eval verdict or benefit, prove the remaining G11 corpus, consumer-zero, or archive readiness."
+}

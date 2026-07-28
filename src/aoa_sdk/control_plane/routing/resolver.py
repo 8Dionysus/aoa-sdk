@@ -31,7 +31,7 @@ from ...contracts.skills import (
 from .snapshot import RoutingResolutionSnapshot
 
 
-ROUTE_RESOLVER_VERSION = "aoa_control_plane_route_resolver_v1"
+ROUTE_RESOLVER_VERSION = "aoa_control_plane_route_resolver_v3"
 _TOKEN_RE = re.compile(r"[\w.-]+", re.UNICODE)
 _SELECTABLE_LIFECYCLE_STATES = frozenset({"active", "candidate"})
 _FORBIDDEN_LIFECYCLE_STATES = frozenset(
@@ -150,18 +150,14 @@ def resolve_route_intent(
             entry,
             node,
             document,
-            explicitly_required=_matches_capability(
-                entry, node, explicit_required
-            ),
+            explicitly_required=_matches_capability(entry, node, explicit_required),
         )
         compatibility, policy_posture, posture_reasons = _candidate_posture(
             intent=intent,
             entry=entry,
             node=node,
             negative_match=negative_match,
-            explicitly_required=_matches_capability(
-                entry, node, explicit_required
-            ),
+            explicitly_required=_matches_capability(entry, node, explicit_required),
             invocation_posture=invocation_posture,
             required_capabilities=explicit_required,
             forbidden_capabilities=forbidden_capabilities,
@@ -171,8 +167,7 @@ def resolve_route_intent(
         capability_provenance = ProvenanceRef(
             owner_repo="aoa-skills",
             artifact_ref=(
-                f"{snapshot.source_lock.capability_graph.relative_path}"
-                f"#nodes/{node.id}"
+                f"{snapshot.source_lock.capability_graph.relative_path}#nodes/{node.id}"
             ),
             source_ref=snapshot.source_lock.capability_graph.source_ref,
             artifact_digest=canonical_digest(node),
@@ -199,7 +194,7 @@ def resolve_route_intent(
                         capability_kind=node.kind,
                         provenance=capability_provenance,
                     ),
-                    agent=intent.requested_by,
+                    agent=None,
                     scenario=intent.scenario,
                     rank=0,
                     compatibility=compatibility,
@@ -281,12 +276,14 @@ def resolve_route_intent(
             decision_reasons.append("selected_candidate_requires_degraded_posture")
 
     approval_requirements: tuple[ApprovalRequirement, ...] = ()
-    if selected is not None and selected.candidate.policy_posture == "approval_required":
+    if (
+        selected is not None
+        and selected.candidate.policy_posture == "approval_required"
+    ):
         approval_requirements = (
             ApprovalRequirement(
                 requirement_id=(
-                    "route-approval:"
-                    + selected.candidate.capability.capability_id
+                    "route-approval:" + selected.candidate.capability.capability_id
                 ),
                 approval_owner=selected.candidate.capability.provenance,
                 operation=(
@@ -350,9 +347,7 @@ def explain_route_decision(
         )
     decision_digest = canonical_digest(decision)
     ambiguity_codes = tuple(
-        reason
-        for reason in decision.reason_codes
-        if reason.startswith("ambiguous_")
+        reason for reason in decision.reason_codes if reason.startswith("ambiguous_")
     )
     return RouteExplanation(
         explanation_id="route-explanation:"
@@ -384,11 +379,12 @@ def default_resolver_provenance() -> ProvenanceRef:
     return ProvenanceRef(
         owner_repo="aoa-sdk",
         artifact_ref="src/aoa_sdk/control_plane/routing/resolver.py",
-        source_ref=(
-            f"{ROUTE_RESOLVER_VERSION}@sha256:{module_digest}"
-        ),
+        source_ref=(f"{ROUTE_RESOLVER_VERSION}@sha256:{module_digest}"),
         artifact_digest=f"sha256:{module_digest}",
-        schema_ref="docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md",
+        schema_ref=(
+            "docs/decisions/"
+            "AOA-SDK-D-0086-keep-route-callers-distinct-from-providers.md"
+        ),
         schema_version=ROUTE_RESOLVER_VERSION,
     )
 
@@ -404,8 +400,7 @@ def _intent_blockers(intent: RouteIntent) -> list[str]:
     required = _constraint_values(intent.constraints, "required_capability")
     if len(required) > 1:
         blockers.append(
-            "conflicting_required_capability_constraints:"
-            + ",".join(sorted(required))
+            "conflicting_required_capability_constraints:" + ",".join(sorted(required))
         )
     required_owners = _constraint_values(intent.constraints, "required_owner")
     if len(required_owners) > 1:
@@ -431,14 +426,17 @@ def _intent_blockers(intent: RouteIntent) -> list[str]:
             blockers.append(
                 f"constraint_not_resolvable_in_c1:{constraint.constraint_id}"
             )
-        elif constraint.kind == "effect_ceiling" and constraint.value not in _EFFECT_CEILINGS:
+        elif (
+            constraint.kind == "effect_ceiling"
+            and constraint.value not in _EFFECT_CEILINGS
+        ):
             blockers.append(
                 f"unsupported_effect_ceiling:{constraint.constraint_id}:{constraint.value}"
             )
-        elif (
-            constraint.kind == "approval_requirement"
-            and constraint.value not in {"none", "required"}
-        ):
+        elif constraint.kind == "approval_requirement" and constraint.value not in {
+            "none",
+            "required",
+        }:
             blockers.append(
                 f"unsupported_approval_requirement:{constraint.constraint_id}:{constraint.value}"
             )
@@ -476,6 +474,9 @@ def _candidate_posture(
     compatibility: Literal["compatible", "degraded", "incompatible"]
     if health == "healthy":
         compatibility = "compatible"
+    elif health == "challenger":
+        compatibility = "degraded"
+        reasons.append("owner_health_challenger")
     elif health == "degraded":
         compatibility = "degraded"
         reasons.append("owner_health_degraded")
@@ -511,14 +512,11 @@ def _candidate_posture(
         policy = "forbidden"
         reasons.append("forbidden_owner_constraint")
 
-    if (
-        not explicitly_required
-        and (
-            not invocation_posture.allow_implicit_invocation
-            or invocation_posture.candidate_only
-            or invocation_posture.invocation_mode == "suggest"
-            or node.lifecycle.visibility.casefold() == "deferred"
-        )
+    if not explicitly_required and (
+        not invocation_posture.allow_implicit_invocation
+        or invocation_posture.candidate_only
+        or invocation_posture.invocation_mode == "suggest"
+        or node.lifecycle.visibility.casefold() == "deferred"
     ):
         policy = "forbidden"
         reasons.append("explicit_capability_constraint_required")
@@ -539,9 +537,7 @@ def _candidate_posture(
 
     effect_ceilings = _constraint_values(intent.constraints, "effect_ceiling")
     raw_effects = (
-        node.execution.get("effects")
-        if isinstance(node.execution, dict)
-        else None
+        node.execution.get("effects") if isinstance(node.execution, dict) else None
     )
     if (
         not isinstance(raw_effects, list)
@@ -621,9 +617,7 @@ def _score_candidate(
     routing = query_tokens.intersection(
         token.casefold() for token in document.routing_tokens
     )
-    general = query_tokens.intersection(
-        token.casefold() for token in document.tokens
-    )
+    general = query_tokens.intersection(token.casefold() for token in document.tokens)
     negative = query_tokens.intersection(
         token.casefold() for token in document.negative_tokens
     )
@@ -680,11 +674,7 @@ def _constraint_values(
     constraints: tuple[RouteConstraint, ...],
     kind: str,
 ) -> set[str]:
-    return {
-        constraint.value
-        for constraint in constraints
-        if constraint.kind == kind
-    }
+    return {constraint.value for constraint in constraints if constraint.kind == kind}
 
 
 def _matches_capability(

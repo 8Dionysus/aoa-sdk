@@ -9,6 +9,8 @@
 | `organ-access-control-plane` | Project an explicit OS-private organ registry into bounded discovery and candidate-only plans without absorbing owner meaning or runtime authority. | contracts, schemas, generator, examples, tests, and `src/aoa_sdk/organs/` |
 | `route-resolution-control-plane` | Resolve and explain one route deterministically from an exact trusted routing snapshot and pinned owner projection without activation. | contract, source lock, implementation, CLI, and focused tests |
 | `plan-compilation-control-plane` | Compile one resolved route and exact reviewed scenario binding from an admitted owner contour into a runtime-neutral plan. | contract, exact contour/schema/trust pin, compiler, generated branch fixtures, installed-wheel probe, CLI, and focused tests |
+| `runner-lifecycle-control-plane` | Coordinate one explicit runtime adapter through the C3 lifecycle without selecting it or executing plan steps in the SDK. | contracts, deterministic reference adapter, installed-wheel probe, and focused tests |
+| `evidence-closeout-chain` | Compose one C5 partial-to-complete audit chain from exact SDK objects and external owner-qualified refs. | contracts, durable repository, decision, validation route, and focused tests |
 
 Candidate-only boundary bridge parts stay listed in
 `mechanics/boundary-bridge/PARTS.md` until they have part-local payload.

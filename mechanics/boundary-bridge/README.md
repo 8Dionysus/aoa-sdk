@@ -14,8 +14,8 @@ sibling repositories retain meaning.
 Use this mechanic when a typed facade, registry, consumed-surface posture gate,
 skill environment inspector, technique promotion readiness reader, owner-layer signal
 handoff, explicit cross-organ receipt chain, route hint, deterministic route
-resolution, stats read, or
-sibling-owned generated reader changes.
+resolution, stats read, or sibling-owned generated reader changes, or when
+lifecycle boundary or the cross-owner evidence/closeout composition changes.
 
 ### SDK owns
 
@@ -33,6 +33,12 @@ sibling-owned generated reader changes.
   admitted owner contour into a runtime-neutral plan without execution
 - deterministic validation of a host-visible KAG-to-memory-to-eval-to-owner
   receipt chain without invoking an owner tool
+- explicit-adapter lifecycle admission and reconciliation without plan-step
+  execution
+- a deterministic no-execution reference adapter for protocol verification
+- immutable partial-to-complete evidence-chain composition over exact
+  owner-qualified refs, without copying owner payloads or verdicts
+- exact chain lookup by session identity or final closeout receipt
 
 ### Stronger owner split
 
@@ -67,6 +73,8 @@ retain their domain meaning.
 - `mechanics/boundary-bridge/parts/route-resolution-control-plane/`
 - `mechanics/boundary-bridge/parts/plan-compilation-control-plane/`
 - `mechanics/boundary-bridge/parts/cross-organ-orchestration/`
+- `mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/`
+- `mechanics/boundary-bridge/parts/evidence-closeout-chain/`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`
 - `mechanics/boundary-bridge/parts/skill-environment-inspector/`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/`
@@ -84,6 +92,8 @@ retain their domain meaning.
 - route-resolution-control-plane
 - plan-compilation-control-plane
 - cross-organ-orchestration
+- runner-lifecycle-control-plane
+- evidence-closeout-chain
 
 ### Must not claim
 

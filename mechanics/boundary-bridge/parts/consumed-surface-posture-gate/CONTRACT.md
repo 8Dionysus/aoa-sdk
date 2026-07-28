@@ -74,6 +74,14 @@
   authority flags.
 - Makes SDK producer authority explicit while recording live runtime cutover
   as unexecuted and archive authority as false.
+- Accounts for every R0 consumer plus later discoveries before a consumer-zero
+  claim, and keeps clean local candidates distinct from landed origin/main
+  state.
+- Classifies stable ABI names, history, rollback fixtures, negative
+  assertions, trust provenance, naming fixtures, and generated projections
+  without mistaking those records for active checkout dependencies.
+- Requires all evidence-based compatibility exit conditions and post-landing
+  observations before rollback retirement or archive readiness.
 - Admits the current owner shortlist `guard` kind without removing the legacy
   `seed` compatibility value or taking ownership of either meaning.
 
@@ -104,6 +112,9 @@
 - A valid G5 owner-switch receipt is not stronger-owner admission, executed
   runtime cutover, consumer-zero, compatibility exit, Runner implementation,
   or archive authorization.
+- Candidate direct-checkout consumer-zero is not landed consumer-zero,
+  compatibility exit, rollback retirement, archive readiness, or archive
+  authorization.
 
 ## Active Test Home
 
@@ -127,3 +138,4 @@
 - `tests/test_routing_g5_candidate.py`
 - `tests/test_routing_g5_release_candidate.py`
 - `tests/test_routing_g5_canonical.py`
+- `tests/test_routing_succession_x1_consumer_zero_candidate.py`

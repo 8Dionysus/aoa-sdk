@@ -1,0 +1,323 @@
+{
+  "schema_version": "aoa_sdk_routing_succession_x1_consumer_zero_candidate_v1",
+  "observed_at_utc": "2026-07-28T10:28:00Z",
+  "status": "candidate_consumer_zero_pending_coordinated_landing",
+  "scope": {
+    "r0_baseline_ref": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json",
+    "sdk_candidate_ref": "31a46af288ef1b9f171e3951ea222e021286ade7",
+    "sdk_validation_ref": "79062c485a60bc01dc041ed32adc8d723c260027",
+    "sdk_base_ref": "83930e822c6c4df645b5ab2a0eb6d3f9c849b5bf",
+    "observation_class": "exact local candidate commits plus pinned origin/main classifications",
+    "direct_dependency_patterns": [
+      "AOA_ROUTING_ROOT",
+      "/srv/AbyssOS/aoa-routing",
+      "github.com/8Dionysus/aoa-routing",
+      "repository: 8Dionysus/aoa-routing"
+    ],
+    "claim_boundary": "The snapshot proves a clean local candidate set with no active direct predecessor checkout dependency. It does not claim those commits are landed, that post-landing CI is green, that the compatibility window has ended, or that aoa-routing may be archived."
+  },
+  "consumer_accounting": {
+    "r0_registered_consumers": 16,
+    "post_r0_discovered_consumers": 1,
+    "total_accounted_consumers": 17,
+    "candidate_migrations": 13,
+    "unchanged_classifications": 4,
+    "all_known_consumers_accounted": true
+  },
+  "candidate_migrations": [
+    {
+      "repo": "aoa-sdk",
+      "base_ref": "83930e822c6c4df645b5ab2a0eb6d3f9c849b5bf",
+      "candidate_ref": "31a46af288ef1b9f171e3951ea222e021286ade7",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "full release gate passed at descendant 79062c485a60bc01dc041ed32adc8d723c260027: 716 tests, 2 skipped, 537 subtests, Ruff, mypy, build, four installed-wheel probes, and OS Abyss artifact bundle"
+    },
+    {
+      "repo": "abyss-stack",
+      "base_ref": "8bcfe0edf7ad499d666207ca2087d8db9df4d7a9",
+      "candidate_ref": "6a93f295a72469f7dfe70ccd014a5109a41b76e9",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "1272 tests passed, 4 skipped, 226 subtests passed; release bundle and source/deployed parity passed"
+    },
+    {
+      "repo": "aoa-kag",
+      "base_ref": "0ff913279868735b41a17aab84c0c89341d7cb77",
+      "candidate_ref": "f8cfda8326d82c2e8b60d870032bad812834ed34",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "owner-local provider and generated-family validation passed; exact SDK pin must be refreshed after the SDK landing"
+    },
+    {
+      "repo": "aoa-stats",
+      "base_ref": "504571995cc36905cc886259c0a19be6e8e35045",
+      "candidate_ref": "45cea23b6c28642726c251c169431d814b9ccd6f",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "owner-local routing consumer and generated stats-family validation passed before this snapshot"
+    },
+    {
+      "repo": "aoa-agents",
+      "base_ref": "8e5a989428a11108b8fc427cb351c313df2a14c2",
+      "candidate_ref": "ecb5892a96f813be0d8c9fb9f2132efaa84b57a5",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "owner-local agent source-home, routing projection, decision-index, and generated-family validation passed"
+    },
+    {
+      "repo": "aoa-evals",
+      "base_ref": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23",
+      "candidate_ref": "e96150d65c66664d49a6dd9a787163ecb60d0fba",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "owner-local latest-sibling, root-context, decision-index, and generated-family validation passed"
+    },
+    {
+      "repo": "Tree-of-Sophia",
+      "base_ref": "54be6f25a2272d02f119a16b1c75e8756decf900",
+      "candidate_ref": "7ae0a8204a8af747617ad682064d0004da11386a",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "owner-local tiny-entry route, knowledge-boundary, and generated KAG-family validation passed"
+    },
+    {
+      "repo": "aoa-playbooks",
+      "base_ref": "577b772c62b692b18a7f0945a470d00245c998c8",
+      "candidate_ref": "b78f5169be2f5d50614dad85e39e83fd3a166f10",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "owner-local playbook, Agon trial, quest, documentation, and generated-family validation passed"
+    },
+    {
+      "repo": "Agents-of-Abyss",
+      "base_ref": "81f6ef479b14ff29684e1fa40aa499c6c6bd9b39",
+      "candidate_ref": "5ae2f8b74f57a0bb07b9e1a7c2a655ae58e89f98",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "owner-local organ-contract, federation map, generated registry, and route-card validation passed"
+    },
+    {
+      "repo": "8Dionysus",
+      "base_ref": "b2bfd59ae789d165fc275f1bb84751f6fc7e7496",
+      "candidate_ref": "15df8c4e2d01c1ae9e440236041483b35f01261a",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "owner-local public route-map, required-check contract, generated map, and KAG-family validation passed"
+    },
+    {
+      "repo": "aoa-techniques",
+      "base_ref": "e842c0d0156c58cfb9020b636e81134e96fc8cfb",
+      "candidate_ref": "f0d362b709a79f709ebdd6ddfd5994973919c29a",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "owner-local technique source, selection guidance, generated projection, and KAG-family validation passed"
+    },
+    {
+      "repo": "aoa-memo",
+      "base_ref": "e0d3653c11d948f962bcb033749c86c52388ec5f",
+      "candidate_ref": "f5b0f867d0967545a79caf2e60ccfc97428f4b06",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "owner-local memory boundaries, mechanic maps, generated memory surfaces, and KAG-family validation passed"
+    },
+    {
+      "repo": "aoa-skills",
+      "base_ref": "9b009123e88cd864ef11147a6d9cba31a3bf81a5",
+      "candidate_ref": "ccf9bf9b39cb5aa58492f63167cfff68b0d73951",
+      "direct_predecessor_checkout_dependencies": 0,
+      "active_dependency_residuals": [],
+      "candidate_worktree_clean": true,
+      "landed": false,
+      "validation": "post-R0 discovered active capability consumer was retargeted and its owner-local generated graph validation passed"
+    }
+  ],
+  "predecessor_candidate": {
+    "repo": "aoa-routing",
+    "base_ref": "97f60de1b5992ef6bf5ff0f051bd452d940d9a85",
+    "candidate_ref": "fb4266ee26727f50f40ca4206194d14f451c5cd6",
+    "posture": "maintenance_only_with_rollback_retained",
+    "landed": false,
+    "archive_authorized": false
+  },
+  "unchanged_classifications": [
+    {
+      "repo": "abyss-machine",
+      "origin_main": "a70b7f3a029c2dc4e86aa7446e4a058aa9e2e83e",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "SDK producer admission is already landed; predecessor identity remains only in bounded trust and rollback fixtures"
+    },
+    {
+      "repo": "Dionysus",
+      "origin_main": "8c5c8ec960c507e097b37472e9e8353c369919bf",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "no active checkout dependency; predecessor URLs occur only in frozen legacy archive and exploratory source history"
+    },
+    {
+      "repo": "aoa-session-memory",
+      "origin_main": "1d79b84e7ae09738936ba7e88adeeefd4f0f28b2",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "stable-name golden text remains fixture evidence and is not an executable checkout or runtime dependency"
+    },
+    {
+      "repo": "ATM10-Agent",
+      "origin_main": "1f3c1753776936fd50206045754f0895c6aa1d93",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "the predecessor repository URL remains immutable donor-ledger provenance and is not an executable dependency"
+    }
+  ],
+  "zero_reference_repositories": [
+    {
+      "repo": "aoa-4pda-connector",
+      "origin_main": "a273f71c6fcc30c34759b2ef1e2f08cd8fc6baa3",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "pinned origin/main has no predecessor checkout reference and needs no succession change"
+    },
+    {
+      "repo": "aoa-course-connector",
+      "origin_main": "3f322cbd5c874744f29039b560044641862a7822",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "freshly fetched origin/main has no predecessor checkout reference and needs no succession change"
+    },
+    {
+      "repo": "aoa-discord-connector",
+      "origin_main": "2652b1d657cbe5a7888ac979cc07a8f9ec792887",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "pinned origin/main has no predecessor checkout reference and needs no succession change"
+    },
+    {
+      "repo": "aoa-editing",
+      "origin_main": "3c538aa9741f364a469953ab22111872cc5c9070",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "pinned origin/main has no predecessor checkout reference and needs no succession change"
+    },
+    {
+      "repo": "aoa-stackoverflow-connector",
+      "origin_main": "a239551bd629f59d32b59649eb308245be99c903",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "pinned origin/main has no predecessor checkout reference and needs no succession change"
+    },
+    {
+      "repo": "aoa-telegram-connector",
+      "origin_main": "1d7e4157446839dc03f3ec80b687fdbb12dd8a22",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "pinned origin/main has no predecessor checkout reference and needs no succession change"
+    },
+    {
+      "repo": "aoa-xda-connector",
+      "origin_main": "45dc97667c104f17b71fcd13978de5172e5c4c8d",
+      "direct_predecessor_checkout_dependencies": 0,
+      "classification": "pinned origin/main has no predecessor checkout reference and needs no succession change"
+    }
+  ],
+  "allowed_residuals": [
+    "the stable aoa-routing artifact namespace and ABI name preserved during compatibility",
+    "aoa-routing repository self-identity and its maintenance-only release contract",
+    "historical decisions, baselines, releases, reviewed run records, and public provenance",
+    "explicit compatibility and predecessor rollback fixtures used only by bounded historical replay",
+    "negative tests and validators that reject active predecessor checkout dependencies",
+    "artifact-trust, donor-ledger, and source-intake provenance that must remain immutable",
+    "session-memory naming fixtures whose literal wording is the object under test",
+    "generated KAG and audit projections derived from one of the allowed authored residual classes"
+  ],
+  "live_runtime_evidence": {
+    "mirror_manifest_ref": "/srv/AbyssOS/abyss-stack/Knowledge/federation/aoa-routing/manifest/federation_mirror_manifest.json",
+    "mirror_source_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+    "activation_mode": "authorized_live_cutover",
+    "producer_posture": "sdk_canonical",
+    "trust_record_id": "sha256:ffe9c974882b0033248b0733c6d1223d9a0108d911d493d673b31286f0f2161e",
+    "subject_digest": "sha256:4b18aa61850afe3859ca2e3a221a6710a34dc45ea47d9321126abb1ebbe1671b",
+    "trust_verdict": "allow",
+    "post_landing_refresh_required": true
+  },
+  "compatibility_exit": {
+    "criteria": [
+      {
+        "id": "all_registered_consumers_green",
+        "candidate_state": "partial",
+        "exit_satisfied": false,
+        "evidence_limit": "owner-local candidate validation exists, but no consumer migration commit is landed on origin/main"
+      },
+      {
+        "id": "direct_checkout_consumer_zero",
+        "candidate_state": "passed",
+        "exit_satisfied": false,
+        "evidence_limit": "the exact local candidate set is zero, but landed origin/main branches do not yet contain that coordinated set"
+      },
+      {
+        "id": "install_upgrade_downgrade_rollback",
+        "candidate_state": "partial",
+        "exit_satisfied": false,
+        "evidence_limit": "clean install and predecessor rollback were proved before landing; post-landing upgrade and downgrade rehearsals remain"
+      },
+      {
+        "id": "two_consecutive_sdk_validation_cycles",
+        "candidate_state": "pending",
+        "exit_satisfied": false,
+        "evidence_limit": "zero of two required post-landing SDK main or release validation cycles have completed"
+      },
+      {
+        "id": "runtime_mirror_and_trust_identify_sdk",
+        "candidate_state": "passed",
+        "exit_satisfied": true,
+        "evidence_limit": "the live mirror is authorized_live_cutover at SDK source e4ffd26e and the exact runtime trust gate returns allow; freshness still requires a post-landing recheck"
+      },
+      {
+        "id": "no_high_severity_regression",
+        "candidate_state": "partial",
+        "exit_satisfied": false,
+        "evidence_limit": "no known candidate regression is open, but only landed CI and post-merge runtime observation can close this criterion"
+      }
+    ],
+    "required_validation_cycles": 2,
+    "completed_post_landing_validation_cycles": 0,
+    "compatibility_window_exited": false,
+    "rollback_retired": false
+  },
+  "remaining_work": [
+    "rebase or refresh every candidate against its current origin/main immediately before the coordinated landing wave",
+    "land aoa-sdk first and bind downstream consumers to the exact landed SDK artifact and source ref",
+    "refresh the aoa-kag SDK pin and regenerate its provider and portable index families after the SDK landing",
+    "land all consumer and aoa-routing maintenance candidates with owner CI and review green",
+    "capture comparable post-landing CI lead-time, runner-minute, and failure-rate evidence for the E1 report",
+    "complete two consecutive SDK main or release validation cycles without predecessor generation",
+    "run clean install, upgrade, downgrade, and rollback rehearsals against landed releases",
+    "observe multiple real runtime execution and evidence-complete closeout cycles after landing",
+    "prove the predecessor implementation is no longer required for operational rollback",
+    "produce the final landed consumer-zero and archive-readiness receipt before requesting any archive approval"
+  ],
+  "verdict": {
+    "candidate_direct_checkout_consumer_zero": true,
+    "landed_direct_checkout_consumer_zero": false,
+    "all_consumers_landed_green": false,
+    "post_merge_cost_report_complete": false,
+    "real_execution_closeout_window_complete": false,
+    "archive_ready": false,
+    "archive_authorized": false,
+    "claim_limit": "This is a local coordinated-landing candidate, not a completed X1 gate. It authorizes neither compatibility exit nor rollback retirement, deprecation release, GitHub archival, deletion, or any other irreversible predecessor action."
+  }
+}

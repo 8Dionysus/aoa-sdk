@@ -22,6 +22,10 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
 - facade regression tests bound to part-local validation
 - read-only succession baselines that pin consumed producer, consumer,
   runtime, trust, cost, and disposition evidence without switching authority
+- a pinned X1 candidate snapshot that accounts for every known consumer,
+  distinguishes local direct-checkout consumer-zero from landed
+  consumer-zero, and keeps compatibility exit, rollback retirement, and
+  archive authority false
 - the accepted routing succession target model, authority matrix,
   compatibility policy, and repository state machine without moving producer
   code or switching live authority
@@ -49,6 +53,14 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   owner-switch receipt, SDK canonical producer authority, compatibility-window
   start, runtime-contract handoff, retained predecessor rollback, and explicit
   denial of archive authority
+- the post-G5 compatibility posture: SDK-bundle-first reads, optional
+  predecessor discovery, and no active paired CI or release dependency
+- the E1 cost comparison: pinned structural CI/release/context reduction,
+  unlike-latency stop lines, and a provisional G13 result pending landed CI
+- the post-switch consumer contract and SDK-owned composite-stress
+  compatibility witness used by sibling validators without an
+  `aoa-routing` checkout, including the wheel-packaged Agon gate-routing
+  successor route
 
 ## Owner
 
@@ -80,12 +92,18 @@ Then read the public-trust-only
 [`docs/routing-succession-g5-release-candidate.md`](docs/routing-succession-g5-release-candidate.md).
 Then read the receipt-bound
 [`docs/routing-succession-g5-owner-switch.md`](docs/routing-succession-g5-owner-switch.md).
+Then read the measured
+[`docs/routing-succession-e1-cost-comparison.md`](docs/routing-succession-e1-cost-comparison.md).
+Then read the candidate-only
+[`docs/routing-succession-x1-consumer-zero-candidate.md`](docs/routing-succession-x1-consumer-zero-candidate.md).
+Consumers migrating away from the predecessor checkout use
+[`docs/routing-consumer-contract.md`](docs/routing-consumer-contract.md).
 G4 proves the released shadow successor and isolated runtime content path. The
 G5 candidate adds native SDK producer identity for trust and canary review.
 The release candidate adds exact public release trust without switch
 authority. The G5 receipt makes the SDK canonical and starts the compatibility
-window, but stronger-owner admission, live cutover execution, consumer-zero,
-and archival action remain separate.
+window. Stronger-owner admission and live cutover have completed; consumer-zero,
+rollback retirement, and archival action remain separate.
 
 ## Validation
 

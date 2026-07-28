@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from pathlib import Path
+
 from ..errors import IncompatibleSurfaceVersion, RepoNotFound, SurfaceNotFound
 from ..loaders.json_file import load_json
 from ..models import SurfaceCompatibilityCheck, SurfaceCompatibilityRule
@@ -596,6 +598,28 @@ def _candidate_relative_paths(rule: SurfaceCompatibilityRule) -> list[str]:
     return candidates
 
 
+def _candidate_surface_paths(
+    workspace: Workspace,
+    rule: SurfaceCompatibilityRule,
+) -> list[tuple[str, Path]]:
+    candidates: list[tuple[str, Path]] = []
+    for relative_path in _candidate_relative_paths(rule):
+        if rule.repo == "aoa-routing" and workspace.routing_bundle_root is not None:
+            candidates.append(
+                (
+                    relative_path,
+                    workspace.routing_bundle_root / relative_path,
+                )
+            )
+        try:
+            legacy_path = workspace.surface_path(rule.repo, relative_path)
+        except RepoNotFound:
+            continue
+        if all(path != legacy_path for _, path in candidates):
+            candidates.append((relative_path, legacy_path))
+    return candidates
+
+
 def _evaluate_data(
     rule: SurfaceCompatibilityRule,
     data,
@@ -707,10 +731,10 @@ def _surface_shape_error(rule: SurfaceCompatibilityRule, data) -> str | None:
 def load_surface(workspace: Workspace, surface_id: str):
     rule = get_rule(surface_id)
     last_missing_error: Exception | None = None
-    for relative_path in _candidate_relative_paths(rule):
+    for relative_path, surface_path in _candidate_surface_paths(workspace, rule):
         try:
-            data = load_json(workspace.surface_path(rule.repo, relative_path))
-        except (RepoNotFound, SurfaceNotFound) as exc:
+            data = load_json(surface_path)
+        except SurfaceNotFound as exc:
             last_missing_error = exc
             continue
         result = _evaluate_data(rule, data, resolved_relative_path=relative_path)
@@ -733,10 +757,13 @@ class CompatibilityAPI:
 
     def check(self, surface_id: str) -> SurfaceCompatibilityCheck:
         rule = get_rule(surface_id)
-        for relative_path in _candidate_relative_paths(rule):
+        for relative_path, surface_path in _candidate_surface_paths(
+            self.workspace,
+            rule,
+        ):
             try:
-                data = load_json(self.workspace.surface_path(rule.repo, relative_path))
-            except (RepoNotFound, SurfaceNotFound):
+                data = load_json(surface_path)
+            except SurfaceNotFound:
                 continue
             return _evaluate_data(rule, data, resolved_relative_path=relative_path)
 

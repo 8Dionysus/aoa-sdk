@@ -90,7 +90,7 @@ The current landed surface includes:
 - the strict, runtime-neutral
   [R2 Agent OS contract family](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md)
   for route decisions, plans, approvals, lifecycle, events, evidence, and
-  adapter protocols, without an active runner;
+  adapter protocols, now consumed by the separately bounded C3 Runner;
 - the owner-bounded
   [organ access control plane](mechanics/boundary-bridge/parts/organ-access-control-plane/README.md)
   and its progressive read-only projection through the existing
@@ -127,6 +127,15 @@ The current landed surface includes:
   which makes `aoa-sdk` the single canonical routing producer by proving exact
   byte parity with the public `v0.7.0` asset, starts the compatibility window,
   retains `aoa-routing` for rollback, and keeps archival authority separate;
+- the post-G5 maintenance contour, in which routing compatibility reads prefer
+  the SDK-delivered runtime bundle, `aoa-routing` is optional workspace state,
+  paired predecessor CI/release dependencies are inactive, and the predecessor
+  remains available only for compatibility and rollback;
+- the provisional
+  [E1 cost comparison](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-e1-cost-comparison.md),
+  which proves structural workflow, checkout, release, and repository-context
+  reduction while leaving direct latency, token, landed-CI, and consumer-zero
+  claims open;
 - the callable
   [C1 route resolution control plane](mechanics/boundary-bridge/parts/route-resolution-control-plane/README.md),
   which validates the exact live G5 snapshot, intersects routing entries with
@@ -138,6 +147,24 @@ The current landed surface includes:
   requires owner-qualified scenario inputs and reviewed conditions, prunes
   guarded branches deterministically, and emits a content-addressed
   runtime-neutral `RunPlan` without adapter selection or execution;
+- the callable
+  [C3 Runner lifecycle control plane](mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/README.md),
+  which prepares immutable sessions, binds only caller-supplied adapters,
+  validates fresh runtime observations, approvals, bounded recovery, receipts,
+  event chains, outcomes, restoration, and closeout, and ships a deterministic
+  reference adapter that executes no plan steps;
+- the explicit
+  [C4 abyss-stack runtime adapter client](mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/README.md),
+  which hashes an owner-delivered runtime profile and constraints, binds exact
+  plan source/ABI coordinates, and invokes one absolute runtime-owner
+  executable through a no-shell JSON transport without moving execution,
+  policy, or adapter selection into the SDK;
+- the callable
+  [C5 unified evidence and closeout chain](mechanics/boundary-bridge/parts/evidence-closeout-chain/README.md),
+  which records immutable partial-to-complete audit projections, resolves
+  them by exact session or closeout-receipt identity, and requires external
+  owner-qualified eval, memo, checkpoint, and closeout refs without copying
+  their canonical truth into the SDK;
 - active mechanics topology under [mechanics](mechanics/README.md) with
   future-pressure routing in [mechanics roadmap](mechanics/ROADMAP.md);
 - typed compatibility and workspace inspection helpers;

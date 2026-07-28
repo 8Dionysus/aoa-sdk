@@ -1,0 +1,115 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/owner-dispatch-seam.schema.json",
+  "title": "aoa-sdk owner dispatch seam",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "contract_id",
+    "owner_repo",
+    "route_signal",
+    "route_decision",
+    "owner_dispatch",
+    "source_refs"
+  ],
+  "properties": {
+    "contract_id": {
+      "const": "aoa-sdk.owner-dispatch-seam.v1"
+    },
+    "owner_repo": {
+      "const": "aoa-sdk"
+    },
+    "route_signal": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "signal_kind",
+        "signal_state",
+        "owner_truth_ref"
+      ],
+      "properties": {
+        "signal_kind": {
+          "type": "string",
+          "enum": [
+            "candidate",
+            "boundary",
+            "handoff"
+          ]
+        },
+        "signal_state": {
+          "type": "string",
+          "enum": [
+            "active",
+            "blocked",
+            "pending"
+          ]
+        },
+        "owner_truth_ref": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "route_decision": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "decision_kind",
+        "next_hop",
+        "decision_note"
+      ],
+      "properties": {
+        "decision_kind": {
+          "type": "string",
+          "enum": [
+            "route",
+            "quarantine",
+            "owner_review"
+          ]
+        },
+        "next_hop": {
+          "type": "string",
+          "minLength": 1
+        },
+        "decision_note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "owner_dispatch": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "dispatch_kind",
+        "owner_repo",
+        "handoff_note"
+      ],
+      "properties": {
+        "dispatch_kind": {
+          "type": "string",
+          "enum": [
+            "owner_handoff",
+            "owner_review",
+            "quarantine"
+          ]
+        },
+        "owner_repo": {
+          "type": "string",
+          "minLength": 1
+        },
+        "handoff_note": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "source_refs": {
+      "type": "array",
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1
+    }
+  }
+}

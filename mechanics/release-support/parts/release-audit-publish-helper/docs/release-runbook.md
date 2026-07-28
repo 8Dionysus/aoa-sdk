@@ -64,30 +64,29 @@ Postpublish is red if any of these are false:
   - `## Full Release Notes`
 - `origin/main:README.md` still shows the same current-release banner
 
-## Routing G5 candidate validation
+## Active routing and Agent OS package validation
 
-The non-publishing routing-owner candidate extends the release battery with
-focused source, typing, package, and installed-wheel checks:
+After G5, the release battery validates the canonical routing producer and the
+current Agent OS package surfaces:
 
 ```bash
-python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_g5_candidate.py
 python -m mypy src/aoa_sdk/control_plane/routing
 python -m build
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
 python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py
+python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py
 ```
 
-These commands prove routing candidate construction and installed-package
-behavior, including packaged C2 owner contours and deterministic plan
-compilation. They do not grant runtime execution, durable artifact admission,
-runtime cutover, G5, predecessor retirement, compatibility-window start, or
-archival authority.
+These commands prove canonical routing and installed-package behavior,
+including packaged C2 owner contours, deterministic plan
+compilation, and C3 lifecycle coordination through a non-executing reference
+adapter. They do not grant runtime execution, durable artifact admission,
+predecessor retirement, consumer-zero, or archival authority.
 
-## Routing G5 release-candidate publication
+## Historical routing G5 release-candidate replay
 
-The public release candidate is a separate trust stage, not the G5 switch:
+The public release candidate was a separate pre-G5 trust stage. Its exact
+immutable inputs remain replayable for audit or recovery:
 
 ```bash
 python mechanics/release-support/parts/release-audit-publish-helper/scripts/build_routing_g5_release_candidate.py \
@@ -99,7 +98,7 @@ python mechanics/release-support/parts/release-audit-publish-helper/scripts/buil
   --checksum-output /path/to/aoa-sdk-routing-g5-release-candidate-v0.7.0.tar.gz.sha256
 ```
 
-The matching tag workflow checks out every input and the stronger-owner
+The historical matching-tag workflow checked out every input and the stronger-owner
 verifier at the exact refs in
 `sdk/distribution/manifests/routing_g5_release_candidate.input-lock.json`,
 repeats package and envelope validation, resolves and hashes all 29 manifest
@@ -111,21 +110,16 @@ public reference.
 Publication is not complete until the exact archive is attached to the
 matching GitHub Release and its public attestation verifies. Stronger-owner
 promotion must then allow `release_consumer` and deny normal `runtime`.
-Only the later separate G5 receipt may change canonical ownership.
+Only the later separate G5 receipt changed canonical ownership.
 
 If the original tag workflow fails before attestation because of a workflow,
 runner, or carrier-determinism defect, do not move or recreate the public tag.
-Land the bounded orchestration repair on `main`, then dispatch `Release
-Artifacts` from that repaired workflow with `release_tag` set to the existing
-exact tag. The workflow checks out that immutable tag for the repository
-package and nested SDK producer input, rebuilds the same subject bytes, and
-uses a separate checkout of the reviewed workflow revision only for replay
-orchestration and canonical archive encoding. GitHub attestation provenance
-records that tooling revision separately. A replay must reject non-semantic
-tag names and must not substitute current `main` as the release source or
-input lock.
+Use an explicit, separately reviewed recovery contour for such a replay. The
+ordinary `Release Artifacts` workflow no longer checks out predecessor or G5
+candidate inputs. A replay must reject non-semantic tag names and must not
+substitute current `main` for immutable source or input-lock refs.
 
-## Routing G5 canonical publication
+## Historical routing G5 canonical publication
 
 `v0.8.0` is the separate owner-switch release. It consumes the immutable
 `v0.7.0` release candidate as a byte-parity trust root and adds the
@@ -146,15 +140,16 @@ python mechanics/release-support/parts/release-audit-publish-helper/scripts/buil
 The exact inputs, public asset digest, runtime contract, compatibility start,
 and authority flags are pinned in
 `sdk/distribution/manifests/routing_g5_canonical.input-lock.json`. The tag
-workflow downloads and verifies the public asset, rebuilds the canonical
-envelope twice, verifies its checksum, and attests the new archive.
+workflow downloaded and verified the public asset, rebuilt the canonical
+envelope twice, verified its checksum, and attested the new archive.
 
 This release makes `aoa-sdk` the canonical routing producer. It does not
 pretend the downstream steps already ran: canonical provenance keeps
 `live_cutover_executed=false`, and the receipt keeps
 `archive_authorized=false`. `abyss-machine` admission, the separate
-`abyss-stack` cutover receipt, the paired predecessor M3 record, compatibility
-exit, consumer-zero, and archive approval remain ordered follow-ups.
+`abyss-stack` cutover receipt, and the predecessor M3 maintenance record have
+since landed in the staged contour. Compatibility exit, consumer-zero, and
+archive approval remain ordered follow-ups.
 
 ## Notes
 

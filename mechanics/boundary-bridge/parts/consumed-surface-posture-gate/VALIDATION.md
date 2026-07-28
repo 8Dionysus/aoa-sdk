@@ -5,15 +5,16 @@ Run:
 ```bash
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests
 python -m mypy src/aoa_sdk/control_plane/routing
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/compare_routing_shadow_producers.py --predecessor-root /path/to/aoa-routing-at-7e2fe467
-ABYSS_MACHINE_TMP_ROOT=/srv/abyss-machine/tmp/ai python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_succession_g4.py --sdk-release-root /path/to/aoa-sdk-at-v0.6.0 --predecessor-root /path/to/aoa-routing-at-5c7c0e57 --abyss-stack-root /path/to/abyss-stack-at-fad9f951 --abyss-machine-root /path/to/abyss-machine-at-4a70f4b0 --input-workspace-root /path/to/federation-repositories --abyss-stack-input-root /path/to/abyss-stack-git-repository
 python -m build
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py
-python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
+python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/measure_routing_succession_e1.py --check
+python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_x1_consumer_zero_candidate.py
 python scripts/validate_mechanics_topology.py
 ```
+
+The M1 shadow, G4, G5 candidate, and G5 release-candidate probes remain
+available for explicit historical replay. They are not part of ordinary
+post-G5 validation and require their exact immutable predecessor/input roots.
 
 `test_consumed_surface_compatibility_gate.py` also proves the
 `abyss-stack` diagnostic catalog resolves through the part-local
@@ -62,9 +63,10 @@ substitution or canonical-looking output roots, and keeps every G5 authority
 flag false. It also proves the manifest exposes only `manually-verified` as
 an active registry state and uses the distinct `runtime_canary` intent, while
 keeping superseded and revoked terminal exits. `verify_routing_g5_candidate_wheel.py` proves the installed wheel
-contains the candidate builder, twenty-one routing schemas, two runtime boundary
-documents, the complete fourteen-artifact assembly, and the exact 23-file
-runtime-required subset.
+contains the candidate builder, the twenty-one historical G5 routing schemas
+plus four post-switch Agon bridge schemas, two runtime boundary documents, the
+complete fourteen-artifact assembly, and the exact 23-file runtime-required
+subset.
 `test_routing_g5_release_candidate.py` proves the release envelope binds the
 exact nested candidate, 29 release subjects, deterministic archive, public
 release lifecycle, explicit admission profile, and all-false G5 authority.
@@ -76,6 +78,18 @@ archive output, and the archive stop line. It rejects digest, authority, and
 output-root substitution. The installed canonical wheel probe proves both new
 schemas and the canonical builder are shipped package data, while keeping
 `live_cutover_executed` and `archive_authorized` false.
+`test_routing_succession_e1_cost_comparison.py` recomputes workflow checkout
+and probe counts from pinned Git refs, joins retained T1/G11 receipts, rejects
+latency/token overclaims, and keeps G13 provisional until landed CI evidence.
+`test_routing_shadow_producer.py` also validates the SDK-owned
+composite-stress compatibility witness and the post-switch consumer contract,
+including its explicit predecessor-checkout prohibition and packaged Agon
+bridge route.
+`test_routing_succession_x1_consumer_zero_candidate.py` validates exact
+candidate refs, complete accounting for the sixteen R0 consumers and one
+later discovery, zero active direct-checkout dependencies in the candidate
+set, classified residual references, and the still-false landed,
+compatibility-exit, rollback-retirement, and archive gates.
 
 For full Boundary Bridge coverage, also run:
 

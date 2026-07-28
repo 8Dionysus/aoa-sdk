@@ -4,6 +4,7 @@
 
 | Part | Active home | Role | Validation |
 | --- | --- | --- | --- |
+| gate-routing-bridge | `parts/gate-routing-bridge/` | SDK-owned pre-protocol gate candidates and owner-review handoff without activation | `parts/gate-routing-bridge/VALIDATION.md` |
 | center-law-preview-helpers | `parts/center-law-preview-helpers/` | candidate-only CCS law preview helper registry | `parts/center-law-preview-helpers/VALIDATION.md` |
 | state-packet-review-bindings | `parts/state-packet-review-bindings/` | candidate-only packet, sealed-commit, reveal, and stop-line bindings | `parts/state-packet-review-bindings/VALIDATION.md` |
 | recurrence-adapter | `parts/recurrence-adapter/` | candidate-only Agon recurrence adapter and prebinding review lanes | `parts/recurrence-adapter/VALIDATION.md` |
@@ -21,4 +22,4 @@ and package-local legacy indexes.
 
 ## Candidate Parts
 
-None for the current localized Agon helper payload.
+None for the current localized Agon routing/helper payload.

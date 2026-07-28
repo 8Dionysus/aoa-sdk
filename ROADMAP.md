@@ -120,6 +120,9 @@ The repo should now:
   `aoa_routing_thin_router_v1` during owner-only succession;
 - keep public release trust, stronger-owner admission, and live runtime cutover
   as distinct evidence even though all three G5 stages have now completed;
+- keep `aoa-routing` out of required workspace roots, sibling canaries, cadence
+  checkout, and active release selection while its compatibility and rollback
+  implementation remains available during the bounded window;
 - land deterministic route resolution, plan compilation, Runner lifecycle,
   evidence, and closeout as separate testable slices;
 - keep passive skill-environment inspection, `aoa surfaces detect`,
@@ -145,19 +148,32 @@ Exact `v0.8.0` admission, the receipt-gated `abyss-stack` cutover, deployed
 SDK-canonical route surface, and predecessor rollback posture are also
 complete. The C1 deterministic route resolver and separately landed C2
 runtime-neutral plan compiler now form the callable
-`RouteIntent -> RouteDecision -> RunPlan` control-plane chain. The next honest
-move is the separate C3-C5 Runner/lifecycle, adapter, evidence, resume, and
-closeout slices. Compatibility evidence continues in parallel; consumer-zero
-and archival remain unproved.
+`RouteIntent -> RouteDecision -> RunPlan` control-plane chain. C3 adds the
+explicit-adapter `AoARunner`, deterministic no-execution reference adapter,
+bounded recovery, event reconciliation, restore, and closeout. C4 now adds an
+explicit no-shell `abyss-stack` transport client, owner-exact profile loader,
+and paired proof of one real governed contour while leaving execution with the
+runtime owner. C5 now adds immutable partial-to-complete evidence composition
+and reviewed closeout admission without absorbing eval, memo, checkpoint, or
+closeout owner truth. The cross-owner golden chain, bounded agent-in-loop
+trials, and G11 contour are now complete. E1 now has a provisional structural
+G13 pass; the single final landing must still supply comparable CI lead-time,
+runner-minute, and failure-rate evidence. Consumer-zero inspection is the next
+implementation contour. Compatibility evidence continues in parallel;
+consumer-zero and archival remain unproved.
 
 ## Current Public Contour
 
 Current release marker: `v0.8.0`.
 
-Current unreleased contour: C1 deterministic route resolution plus C2
-runtime-neutral plan compilation, followed by compatibility-window evidence
-and separate C3-C5 Runner slices after `v0.8.0`. This is a directional contour,
-not a changelog replacement.
+Current unreleased contour: C1 deterministic route resolution, C2
+runtime-neutral plan compilation, C3 explicit-adapter lifecycle coordination,
+the C4 `abyss-stack` transport client and paired governed-runtime proof, and
+C5 immutable evidence/closeout composition. Real cross-owner C5 evidence,
+agent-in-loop trials, the G11 contour, and provisional E1 structural cost
+evidence are now present after `v0.8.0`. Landed-CI E1 completion and
+compatibility-window evidence remain. This is a directional contour, not a
+changelog replacement.
 
 Current anchors:
 
