@@ -265,7 +265,7 @@ def _verify_scenario(
             f"{scenario_id}: entry capability leaked into the scenario contour"
         )
     if not binding.capability_bindings:
-        raise SystemExit(f"{scenario_id}: capability aliases were not resolved")
+        raise SystemExit(f"{scenario_id}: capability requirements were not resolved")
     for item in binding.capability_bindings:
         if item.capability.provenance.owner_repo != "aoa-skills":
             raise SystemExit(
@@ -275,7 +275,7 @@ def _verify_scenario(
             item.capability.provenance.source_ref
         ):
             raise SystemExit(
-                f"{scenario_id}: capability and migration pins disagree"
+                f"{scenario_id}: capability and resolution pins disagree"
             )
         if (
             item.availability == "unbound"

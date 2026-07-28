@@ -4,8 +4,9 @@
 
 - the versioned `aoa_control_plane_plan_compiler_v3`;
 - exact `ScenarioRef` construction from the admitted playbook source pin;
-- deterministic binding of playbook requirement aliases through the exact
-  pinned `aoa-skills` migration and capability graph;
+- deterministic direct binding of playbook requirement IDs through the exact
+  pinned `aoa-skills` capability graph, with migration lookup only for legacy
+  aliases;
 - strict typed scenario artifact and reviewed-condition bindings;
 - exact validation of the admitted owner projection and schema pin;
 - deterministic guard pruning, dependency repair, provenance binding,
@@ -40,11 +41,13 @@ removed while retained relative order and retained dependencies stay intact.
 
 The route entry capability, caller, and candidate agent are not implicitly
 scenario participants. The selected route must name the exact scenario, after
-which each playbook step alias resolves through `ScenarioCapabilityBinding`.
-Legacy exact bindings remain accepted during the compatibility window, but
-they are not synthesized by the v2 public binder. Compiler v3 combines route
-approvals with exact runtime-owner approval projections without rewriting
-either source object.
+which each playbook step capability ID resolves through
+`ScenarioCapabilityBinding`. Exact graph IDs do not incur a migration-ledger
+read. Legacy aliases remain accepted during the compatibility window and are
+resolved through that ledger. Legacy exact bindings remain accepted, but they
+are not synthesized by the public binder. Compiler v3 combines route approvals
+with exact runtime-owner approval projections without rewriting either source
+object.
 
 ## Fail-closed gates
 
@@ -55,7 +58,7 @@ either source object.
 - No scenario owner, playbook path, or Git-ref mismatch from the admitted
   contour snapshot.
 - No missing, extra, reordered, or substituted agent, capability-requirement,
-  migration, or requirement-owner binding.
+  direct graph or legacy migration resolution, or requirement-owner binding.
 - No agent or capability projection moved outside its stronger owner
   repository, and no semantic owner rewritten by the SDK.
 - No generic input for a typed contour and no positional artifact matching.

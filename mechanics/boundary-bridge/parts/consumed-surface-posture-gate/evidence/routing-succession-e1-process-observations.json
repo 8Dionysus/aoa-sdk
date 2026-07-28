@@ -3,7 +3,7 @@
   "observed_on": "2026-07-26",
   "pins": {
     "sdk_before_m3_ref": "7802585aabf80518c0871178fd512a7f94d6a45a",
-    "sdk_post_m3_ref": "f436d58ec9a8e9af7cd1bbd70bbfd5a19f521169",
+    "sdk_post_m3_ref": "7fba39d38cf5902c41dfbb7ae91f405b849880b7",
     "sdk_wheel_sha256": "990d52576c7963cbf913807f7da61951de4c3a6173fec16225c34cdb32f12aaa"
   },
   "routing_m3": {

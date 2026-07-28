@@ -42,11 +42,11 @@
         },
         "candidate_id": "route-candidate:fixture:bounded_change_safe",
         "capability": {
-          "capability_id": "aoa-approval-gate-check",
+          "capability_id": "guard.operations.approval",
           "capability_kind": "skill",
           "provenance": {
             "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-            "artifact_ref": "generated/capability_graph.json#nodes/aoa-approval-gate-check",
+            "artifact_ref": "generated/capability_graph.json#nodes/guard.operations.approval",
             "owner_repo": "aoa-skills",
             "schema_ref": "schemas/fixture.schema.json",
             "schema_version": "fixture-v1",
@@ -67,7 +67,7 @@
             "owner_repo": "aoa-playbooks",
             "schema_ref": "schemas/fixture.schema.json",
             "schema_version": "fixture-v1",
-            "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+            "source_ref": "f9e638395e86be8556e3579ab4ad5bf358e9499e"
           },
           "scenario_id": "bounded_change_safe"
         }
@@ -179,11 +179,11 @@
     "capability_bindings": [],
     "capability_refs": [
       {
-        "capability_id": "aoa-approval-gate-check",
+        "capability_id": "guard.operations.approval",
         "capability_kind": "skill",
         "provenance": {
           "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "artifact_ref": "generated/capability_graph.json#nodes/aoa-approval-gate-check",
+          "artifact_ref": "generated/capability_graph.json#nodes/guard.operations.approval",
           "owner_repo": "aoa-skills",
           "schema_ref": "schemas/fixture.schema.json",
           "schema_version": "fixture-v1",
@@ -191,11 +191,11 @@
         }
       },
       {
-        "capability_id": "aoa-source-of-truth-check",
+        "capability_id": "mode.knowledge.authority-map",
         "capability_kind": "skill",
         "provenance": {
           "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "artifact_ref": "generated/capability_graph.json#nodes/aoa-source-of-truth-check",
+          "artifact_ref": "generated/capability_graph.json#nodes/mode.knowledge.authority-map",
           "owner_repo": "aoa-skills",
           "schema_ref": "schemas/fixture.schema.json",
           "schema_version": "fixture-v1",
@@ -203,11 +203,11 @@
         }
       },
       {
-        "capability_id": "aoa-bounded-context-map",
+        "capability_id": "mode.engineering-shape.contexts",
         "capability_kind": "skill",
         "provenance": {
           "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "artifact_ref": "generated/capability_graph.json#nodes/aoa-bounded-context-map",
+          "artifact_ref": "generated/capability_graph.json#nodes/mode.engineering-shape.contexts",
           "owner_repo": "aoa-skills",
           "schema_ref": "schemas/fixture.schema.json",
           "schema_version": "fixture-v1",
@@ -215,11 +215,11 @@
         }
       },
       {
-        "capability_id": "aoa-dry-run-first",
+        "capability_id": "guard.operations.preview",
         "capability_kind": "skill",
         "provenance": {
           "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "artifact_ref": "generated/capability_graph.json#nodes/aoa-dry-run-first",
+          "artifact_ref": "generated/capability_graph.json#nodes/guard.operations.preview",
           "owner_repo": "aoa-skills",
           "schema_ref": "schemas/fixture.schema.json",
           "schema_version": "fixture-v1",
@@ -227,11 +227,11 @@
         }
       },
       {
-        "capability_id": "aoa-change-protocol",
+        "capability_id": "workflow.operations.repository-change",
         "capability_kind": "skill",
         "provenance": {
           "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "artifact_ref": "generated/capability_graph.json#nodes/aoa-change-protocol",
+          "artifact_ref": "generated/capability_graph.json#nodes/workflow.operations.repository-change",
           "owner_repo": "aoa-skills",
           "schema_ref": "schemas/fixture.schema.json",
           "schema_version": "fixture-v1",
@@ -239,11 +239,11 @@
         }
       },
       {
-        "capability_id": "aoa-contract-test",
+        "capability_id": "mode.verification.contract",
         "capability_kind": "skill",
         "provenance": {
           "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "artifact_ref": "generated/capability_graph.json#nodes/aoa-contract-test",
+          "artifact_ref": "generated/capability_graph.json#nodes/mode.verification.contract",
           "owner_repo": "aoa-skills",
           "schema_ref": "schemas/fixture.schema.json",
           "schema_version": "fixture-v1",
@@ -251,11 +251,11 @@
         }
       },
       {
-        "capability_id": "aoa-tdd-slice",
+        "capability_id": "workflow.operations.tdd-slice",
         "capability_kind": "skill",
         "provenance": {
           "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "artifact_ref": "generated/capability_graph.json#nodes/aoa-tdd-slice",
+          "artifact_ref": "generated/capability_graph.json#nodes/workflow.operations.tdd-slice",
           "owner_repo": "aoa-skills",
           "schema_ref": "schemas/fixture.schema.json",
           "schema_version": "fixture-v1",
@@ -263,11 +263,11 @@
         }
       },
       {
-        "capability_id": "aoa-adr-write",
+        "capability_id": "mode.decision.record",
         "capability_kind": "skill",
         "provenance": {
           "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "artifact_ref": "generated/capability_graph.json#nodes/aoa-adr-write",
+          "artifact_ref": "generated/capability_graph.json#nodes/mode.decision.record",
           "owner_repo": "aoa-skills",
           "schema_ref": "schemas/fixture.schema.json",
           "schema_version": "fixture-v1",
@@ -275,11 +275,11 @@
         }
       },
       {
-        "capability_id": "aoa-sanitized-share",
+        "capability_id": "mode.knowledge.sanitized-share",
         "capability_kind": "skill",
         "provenance": {
           "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
-          "artifact_ref": "generated/capability_graph.json#nodes/aoa-sanitized-share",
+          "artifact_ref": "generated/capability_graph.json#nodes/mode.knowledge.sanitized-share",
           "owner_repo": "aoa-skills",
           "schema_ref": "schemas/fixture.schema.json",
           "schema_version": "fixture-v1",
@@ -303,7 +303,7 @@
     ],
     "correlation_id": "correlation:fixture:bounded_change_safe",
     "decision_ref": {
-      "digest": "sha256:bbc57ed235bf7440618183e6302a98815ae033466822310c745042546e79b0a4",
+      "digest": "sha256:4182ef75514372bda99666ba20a7fc62716c4cc549f5021339f6e4a22f9fdafd",
       "object_id": "route-decision:fixture:bounded_change_safe",
       "owner_repo": "aoa-sdk",
       "schema_version": "aoa_control_plane_v1"
@@ -359,7 +359,7 @@
         "owner_repo": "aoa-playbooks",
         "schema_ref": "schemas/fixture.schema.json",
         "schema_version": "fixture-v1",
-        "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+        "source_ref": "f9e638395e86be8556e3579ab4ad5bf358e9499e"
       },
       "scenario_id": "bounded_change_safe"
     },

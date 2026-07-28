@@ -229,75 +229,126 @@ def _resolve_capabilities(
     routing_snapshot: RoutingResolutionSnapshot,
 ) -> tuple[ScenarioCapabilityBinding, ...]:
     source_ref = routing_snapshot.source_lock.capability_graph.source_ref
-    raw = _read_git_artifact(
-        workspace,
-        owner_repo="aoa-skills",
-        source_ref=source_ref,
-        relative_path=_CAPABILITY_MIGRATION_PATH,
-    )
-    try:
-        payload = yaml.safe_load(raw)
-    except yaml.YAMLError as exc:
-        raise ScenarioBindingError(
-            f"pinned aoa-skills capability migration is invalid YAML: {exc}"
-        ) from exc
-    if not isinstance(payload, dict) or payload.get("schema_version") != (
-        "aoa-skill-migration-v1"
-    ):
-        raise ScenarioBindingError(
-            "pinned aoa-skills capability migration identity is invalid"
-        )
-    records = payload.get("entries")
-    if not isinstance(records, list) or not all(
-        isinstance(record, dict) for record in records
-    ):
-        raise ScenarioBindingError(
-            "pinned aoa-skills capability migration has invalid entries"
-        )
-    by_name = {
-        record.get("legacy_name"): record
-        for record in records
-        if isinstance(record.get("legacy_name"), str)
-    }
-    if len(by_name) != len(records):
-        raise ScenarioBindingError(
-            "pinned aoa-skills migration names must be present and unique"
-        )
     nodes = {node.id: node for node in routing_snapshot.capability_graph.nodes}
+    legacy_requirement_ids = tuple(
+        requirement_id
+        for requirement_id in contour.required_capability_ids
+        if requirement_id not in nodes
+    )
+    by_name: dict[str, dict[str, object]] = {}
+    if legacy_requirement_ids:
+        raw = _read_git_artifact(
+            workspace,
+            owner_repo="aoa-skills",
+            source_ref=source_ref,
+            relative_path=_CAPABILITY_MIGRATION_PATH,
+        )
+        try:
+            payload = yaml.safe_load(raw)
+        except yaml.YAMLError as exc:
+            raise ScenarioBindingError(
+                f"pinned aoa-skills capability migration is invalid YAML: {exc}"
+            ) from exc
+        if not isinstance(payload, dict) or payload.get("schema_version") != (
+            "aoa-skill-migration-v1"
+        ):
+            raise ScenarioBindingError(
+                "pinned aoa-skills capability migration identity is invalid"
+            )
+        records = payload.get("entries")
+        if not isinstance(records, list) or not all(
+            isinstance(record, dict) for record in records
+        ):
+            raise ScenarioBindingError(
+                "pinned aoa-skills capability migration has invalid entries"
+            )
+        by_name = {
+            record.get("legacy_name"): record
+            for record in records
+            if isinstance(record.get("legacy_name"), str)
+        }
+        if len(by_name) != len(records):
+            raise ScenarioBindingError(
+                "pinned aoa-skills migration names must be present and unique"
+            )
+
     bindings: list[ScenarioCapabilityBinding] = []
     graph_lock = routing_snapshot.source_lock.capability_graph
     for requirement_id in contour.required_capability_ids:
-        migration = by_name.get(requirement_id)
-        if migration is None:
-            raise ScenarioBindingError(
-                f"owner contour capability {requirement_id!r} has no pinned migration"
-            )
-        target_id = _required_string(migration, "target_id", requirement_id)
-        target_kind = _required_string(migration, "target_kind", requirement_id)
-        target_owner = _required_string(
-            migration,
-            "target_owner",
-            requirement_id,
-        )
-        node = nodes.get(target_id)
+        node = nodes.get(requirement_id)
+        migration: dict[str, object] | None = None
         if node is None:
-            raise ScenarioBindingError(
-                f"pinned capability target {target_id!r} is absent from the graph"
+            migration = by_name.get(requirement_id)
+            if migration is None:
+                raise ScenarioBindingError(
+                    f"owner contour capability {requirement_id!r} is absent from "
+                    "the graph and has no pinned migration"
+                )
+            target_id = _required_string(migration, "target_id", requirement_id)
+            target_kind = _required_string(
+                migration,
+                "target_kind",
+                requirement_id,
             )
-        if node.kind != target_kind or node.owner.repo != target_owner:
-            raise ScenarioBindingError(
-                f"pinned capability target {target_id!r} disagrees with its "
-                "owner migration"
+            target_owner = _required_string(
+                migration,
+                "target_owner",
+                requirement_id,
             )
+            node = nodes.get(target_id)
+            if node is None:
+                raise ScenarioBindingError(
+                    f"pinned capability target {target_id!r} is absent from the graph"
+                )
+            if node.kind != target_kind or node.owner.repo != target_owner:
+                raise ScenarioBindingError(
+                    f"pinned capability target {target_id!r} disagrees with its "
+                    "owner migration"
+                )
+
         availability = node.binding.get("availability")
         health = node.lifecycle.health
         if not isinstance(availability, str) or not availability:
             raise ScenarioBindingError(
-                f"pinned capability target {target_id!r} has no availability"
+                f"pinned capability target {node.id!r} has no availability"
             )
         if not isinstance(health, str) or not health:
             raise ScenarioBindingError(
-                f"pinned capability target {target_id!r} has no health"
+                f"pinned capability target {node.id!r} has no health"
+            )
+        node_provenance = ProvenanceRef(
+            owner_repo="aoa-skills",
+            artifact_ref=f"{graph_lock.relative_path}#nodes/{node.id}",
+            source_ref=source_ref,
+            artifact_digest=canonical_digest(node),
+            schema_ref=graph_lock.schema_ref,
+            schema_version=graph_lock.schema_version,
+        )
+        if migration is None:
+            binding_action = "direct-graph-id"
+            compatibility = "exact-id"
+            resolution_provenance = node_provenance
+        else:
+            binding_action = _required_string(
+                migration,
+                "action",
+                requirement_id,
+            )
+            compatibility = _required_string(
+                migration,
+                "compatibility",
+                requirement_id,
+            )
+            resolution_provenance = ProvenanceRef(
+                owner_repo="aoa-skills",
+                artifact_ref=(
+                    f"{_CAPABILITY_MIGRATION_PATH}"
+                    f"#entries/{requirement_id}"
+                ),
+                source_ref=source_ref,
+                artifact_digest=_mapping_digest(migration),
+                schema_ref=_CAPABILITY_MIGRATION_PATH,
+                schema_version="aoa-skill-migration-v1",
             )
         bindings.append(
             ScenarioCapabilityBinding(
@@ -305,42 +356,15 @@ def _resolve_capabilities(
                 capability=CapabilityRef(
                     capability_id=node.id,
                     capability_kind=node.kind,
-                    provenance=ProvenanceRef(
-                        owner_repo="aoa-skills",
-                        artifact_ref=(
-                            f"{graph_lock.relative_path}#nodes/{node.id}"
-                        ),
-                        source_ref=source_ref,
-                        artifact_digest=canonical_digest(node),
-                        schema_ref=graph_lock.schema_ref,
-                        schema_version=graph_lock.schema_version,
-                    ),
+                    provenance=node_provenance,
                 ),
                 semantic_owner_repo=node.owner.repo,
-                binding_action=_required_string(
-                    migration,
-                    "action",
-                    requirement_id,
-                ),
-                compatibility=_required_string(
-                    migration,
-                    "compatibility",
-                    requirement_id,
-                ),
+                binding_action=binding_action,
+                compatibility=compatibility,
                 availability=availability,
                 lifecycle_state=node.lifecycle.state,
                 lifecycle_health=health,
-                migration_provenance=ProvenanceRef(
-                    owner_repo="aoa-skills",
-                    artifact_ref=(
-                        f"{_CAPABILITY_MIGRATION_PATH}"
-                        f"#entries/{requirement_id}"
-                    ),
-                    source_ref=source_ref,
-                    artifact_digest=_mapping_digest(migration),
-                    schema_ref=_CAPABILITY_MIGRATION_PATH,
-                    schema_version="aoa-skill-migration-v1",
-                ),
+                migration_provenance=resolution_provenance,
             )
         )
     return tuple(bindings)

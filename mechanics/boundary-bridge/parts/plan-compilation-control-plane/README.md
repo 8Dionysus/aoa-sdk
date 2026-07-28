@@ -14,15 +14,15 @@ activate a capability, or execute a step.
 
 - a resolved or degraded `RouteDecision` with one selected candidate;
 - an explicit selected `ScenarioRef` matching the admitted contour;
-- an exact `ScenarioBinding` whose authored capability aliases are resolved
-  through the same routing snapshot's pinned `aoa-skills` migration and
-  capability graph, while required agents and eval/memo refs are read from
-  their exact pinned owner Git objects;
+- an exact `ScenarioBinding` whose capability graph IDs are bound directly
+  through the same routing snapshot; legacy aliases alone fall back through
+  the pinned `aoa-skills` migration ledger, while required agents and
+  eval/memo refs are read from their exact pinned owner Git objects;
 - generic or kind-selected inputs and reviewed boolean conditions supplied by
   the caller rather than inferred by the SDK;
 - a runtime-owner `RuntimeProfile` declaring compatibility, not authorization;
 - the exact packaged contour/schema pin from
-  `aoa-playbooks@056cac249a353ae94abedbd4048e6730f70c064d`;
+  `aoa-playbooks@f9e638395e86be8556e3579ab4ad5bf358e9499e`;
 - the latest eligible `playbook_registry_bundle` admission and materialized
   subject-store identity observed when that pin was created.
 
@@ -46,10 +46,11 @@ activate a capability, or execute a step.
 
 The C1 entry capability remains in the route decision as navigation evidence.
 It is not required to be a playbook DAG step. Each playbook requirement keeps
-its authored alias alongside the resolved capability, semantic owner,
-availability, lifecycle posture, and migration provenance. An `unbound`
-runtime guard therefore remains visibly unbound; binding does not activate or
-promote it.
+its exact owner ID alongside the resolved capability, semantic owner,
+availability, lifecycle posture, and resolution provenance. The compatibility
+field `migration_provenance` points to the graph node for a direct ID and to
+the migration entry only for a legacy alias. An `unbound` runtime guard
+therefore remains visibly unbound; binding does not activate or promote it.
 
 ## Next route
 

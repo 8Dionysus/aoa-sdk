@@ -131,7 +131,7 @@ def _installed_probe(fixture_path: Path, expected_plan_path: Path) -> int:
         )
     if (
         snapshot.source_lock.owner_source_ref
-        != "056cac249a353ae94abedbd4048e6730f70c064d"
+        != "f9e638395e86be8556e3579ab4ad5bf358e9499e"
     ):
         raise SystemExit("installed wheel owner contour source ref drifted")
 

@@ -230,15 +230,12 @@ def _owner_artifacts(migration: dict | None = None) -> dict[tuple[str, str], byt
             for agent_id in contour.required_agent_ids
         ],
     }
-    return {
+    artifacts = {
         ("aoa-playbooks", contour.source_playbook_ref): (
             b"---\nid: AOA-P-0011\nscenario: bounded_change_safe\n---\n"
         ),
         ("aoa-agents", "generated/agent_registry.min.json"): (
             json.dumps(agents).encode()
-        ),
-        ("aoa-skills", "capabilities/legacy-skill-migration.yaml"): (
-            yaml.safe_dump(migration or _migration_payload()).encode()
         ),
         ("aoa-evals", "generated/eval_catalog.min.json"): b"{}\n",
         (
@@ -247,6 +244,11 @@ def _owner_artifacts(migration: dict | None = None) -> dict[tuple[str, str], byt
             "examples/checkpoint_to_memory_contract.example.json",
         ): b"{}\n",
     }
+    if migration is not None:
+        artifacts[
+            ("aoa-skills", "capabilities/legacy-skill-migration.yaml")
+        ] = yaml.safe_dump(migration).encode()
+    return artifacts
 
 
 def _patch_owner_reads(
@@ -349,16 +351,22 @@ def test_owner_resolved_scenario_binding_compiles_without_hidden_refs(
     ]
     assert [
         item.requirement_id for item in binding.capability_bindings
-    ] == list(TARGETS)
+    ] == [target[0] for target in TARGETS.values()]
     assert binding.capability_bindings[0].semantic_owner_repo == "host-runtime"
     preview = next(
         item
         for item in binding.capability_bindings
-        if item.requirement_id == "aoa-dry-run-first"
+        if item.requirement_id == "guard.operations.preview"
     )
     assert preview.capability.capability_id == "guard.operations.preview"
     assert preview.availability == "unbound"
     assert preview.lifecycle_health == "unavailable"
+    assert all(
+        item.binding_action == "direct-graph-id"
+        and item.compatibility == "exact-id"
+        and item.migration_provenance == item.capability.provenance
+        for item in binding.capability_bindings
+    )
     assert decision.candidates[0].capability not in binding.capability_refs
     plan_sources = {
         (item.owner_repo, item.artifact_ref) for item in plan.snapshot.source_refs
@@ -438,22 +446,48 @@ def test_owner_migration_target_mismatch_fails_closed(
     _patch_owner_reads(monkeypatch, _owner_artifacts(migration))
     routing_snapshot = _RoutingSnapshot()
     plan_snapshot = load_plan_compilation_snapshot()
-    scenario = resolve_scenario_ref(
-        object(),
-        "bounded_change_safe",
-        plan_snapshot,
+    legacy_contour = plan_snapshot.contour_for(
+        "bounded_change_safe"
+    ).model_copy(
+        update={"required_capability_ids": tuple(TARGETS)}
     )
 
     with pytest.raises(
         ScenarioBindingError,
         match="disagrees with its owner migration",
     ):
-        bind_scenario(
+        scenario_bindings._resolve_capabilities(
             object(),
-            _decision(scenario, routing_snapshot),
-            "bounded_change_safe",
+            legacy_contour,
             routing_snapshot,
-            plan_snapshot,
-            binding_id="scenario-binding:fixture:mismatch",
-            provenance=_provenance("agent-session"),
         )
+
+
+def test_legacy_requirement_aliases_remain_migration_bound(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    _patch_owner_reads(monkeypatch, _owner_artifacts(_migration_payload()))
+    routing_snapshot = _RoutingSnapshot()
+    plan_snapshot = load_plan_compilation_snapshot()
+    legacy_contour = plan_snapshot.contour_for(
+        "bounded_change_safe"
+    ).model_copy(
+        update={"required_capability_ids": tuple(TARGETS)}
+    )
+
+    bindings = scenario_bindings._resolve_capabilities(
+        object(),
+        legacy_contour,
+        routing_snapshot,
+    )
+
+    assert [item.requirement_id for item in bindings] == list(TARGETS)
+    assert [item.capability.capability_id for item in bindings] == [
+        target[0] for target in TARGETS.values()
+    ]
+    assert all(
+        item.migration_provenance.artifact_ref.startswith(
+            "capabilities/legacy-skill-migration.yaml#entries/"
+        )
+        for item in bindings
+    )

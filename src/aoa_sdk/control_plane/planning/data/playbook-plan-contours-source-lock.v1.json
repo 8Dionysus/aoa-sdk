@@ -2,21 +2,21 @@
   "abi": {
     "abi_id": "aoa_playbook_plan_contour_v1",
     "abi_version": "aoa_playbook_plan_contour_v1",
-    "artifact_digest": "sha256:1effef6739136e3634f787572526926eb5731b978c03e15d6c21c8a047bdd7eb",
+    "artifact_digest": "sha256:58145fb4fe85aaba0168904550722e188055539b10963013966293f430e5be25",
     "owner_repo": "aoa-playbooks",
     "schema_ref": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json",
-    "source_ref": "056cac249a353ae94abedbd4048e6730f70c064d"
+    "source_ref": "f9e638395e86be8556e3579ab4ad5bf358e9499e"
   },
   "artifact_class": "playbook_registry_bundle",
   "contours": {
-    "artifact_digest": "sha256:1effef6739136e3634f787572526926eb5731b978c03e15d6c21c8a047bdd7eb",
+    "artifact_digest": "sha256:58145fb4fe85aaba0168904550722e188055539b10963013966293f430e5be25",
     "owner_artifact_ref": "generated/playbook_plan_contours.min.json",
     "packaged_resource": "playbook-plan-contours.v1.json",
     "schema_ref": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json",
     "schema_version": "aoa_playbook_plan_contours_v1"
   },
   "owner_repo": "aoa-playbooks",
-  "owner_source_ref": "056cac249a353ae94abedbd4048e6730f70c064d",
+  "owner_source_ref": "f9e638395e86be8556e3579ab4ad5bf358e9499e",
   "schema": {
     "artifact_digest": "sha256:29d6260b80691a46c005d91bd72c3305c167a953b7a6a5d42e2c98d1a38d4673",
     "owner_artifact_ref": "mechanics/scenario-composition/parts/plan-contours/schemas/playbook-plan-contours.schema.json",
@@ -27,16 +27,16 @@
   "schema_version": "aoa_control_plane_plan_contour_source_lock_v1",
   "trust_admission": {
     "consumer_intent": "agent",
-    "latest_record_id": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e",
+    "latest_record_id": "sha256:53fe0bf88dd48f5d2eb57831dd9350ced0935de6f6a8a5ee89fae8cb8a3c3776",
     "latest_required": true,
-    "record_artifact_digest": "sha256:35991ad90fd5339a6962849b36404295a1c4e41239fd229babfc1432b1aa137c",
-    "record_id": "sha256:698b79956e5fce57769852fc1f2edfe7324a07697e2ae6b3913e157f9639989e",
+    "record_artifact_digest": "sha256:9185da1e28bd04d77cc6bd6db688be8b209bb40a73c98b71fc1955b2fb1cf43e",
+    "record_id": "sha256:53fe0bf88dd48f5d2eb57831dd9350ced0935de6f6a8a5ee89fae8cb8a3c3776",
     "required_controls": [
       "abi_signature",
       "slsa_in_toto"
     ],
     "schema_version": "abyss_machine_artifact_trust_gate_v1",
-    "subject_store_aggregate_digest": "sha256:868966ebfefe5eae88e445c269a05fefa2a6d996e5e6289a35675b5c4ca47d44",
+    "subject_store_aggregate_digest": "sha256:d7e13ad2c76e2530f3b5a5348de7a69a3caac19fef9cf27c340e2bfa00bcd554",
     "subject_store_ok": true,
     "subject_store_required": true,
     "verdict": "allow",

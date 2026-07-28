@@ -23,8 +23,9 @@ bounded golden without importing the source checkout or requiring an
 `aoa-playbooks` checkout. The installed-wheel golden-chain verifier uses only
 the public SDK facade and public models to resolve, bind, and compile all three
 scenarios from the exact live owner pins. It asserts explicit scenario
-selection, repeatability, migration-backed capability identities, semantic
-owner and availability visibility, and preservation of every unbound guard.
+selection, repeatability, direct graph identities, legacy migration
+compatibility, semantic owner and availability visibility, and preservation
+of every unbound guard.
 The clean-federation wrapper repeats that verifier with only the six required
 owner repositories linked into a disposable federation and explicitly omits
 an `aoa-routing` checkout.
@@ -33,8 +34,9 @@ The focused suite additionally covers repeatability, exact trust/source pins,
 distinct trust-record logical and delivered-byte identities,
 generic versus kind-selected inputs, no positional guessing, missing/extra
 conditions, exact requirement refs, owner identity order, route snapshot
-drift, absent selected scenario, migration-owner substitution, entry-route
-versus contour separation, explicit versus contour-default approval step
+drift, absent selected scenario, direct graph binding, legacy
+migration-owner substitution, entry-route versus contour separation, explicit
+versus contour-default approval step
 bindings, standalone RunPlan parent-ref integrity, contour-to-ABI digest
 identity, runtime effect compatibility, tampering, public API construction,
 CLI compilation, and plan validation.

@@ -98,3 +98,33 @@ adapter route.
 Run the plan-compilation focused tests, deterministic example check,
 installed-wheel probe, and the three-scenario public golden-chain verifier
 listed in the part validation card.
+
+## Current Applicability
+
+As of 2026-07-28:
+
+- Still valid: route-entry identity remains separate from scenario
+  participants, and every scenario requirement remains owner-bound before
+  compilation.
+- Changed: current `aoa-playbooks` contours carry exact
+  `aoa-skills/generated/capability_graph.json` node IDs rather than legacy
+  skill aliases.
+- Compatibility: the binder resolves an exact graph ID directly and reads
+  `capabilities/legacy-skill-migration.yaml` only when a legacy contour alias
+  is not itself a graph node.
+- ABI preservation: `ScenarioCapabilityBinding.migration_provenance` remains
+  the public compatibility field. For a direct ID it cites the exact graph
+  node; for a legacy alias it cites the migration entry.
+- Superseded by: none.
+
+## Review Log
+
+### 2026-07-28 - Prefer exact graph identity over migration lookup
+
+- Classified the mismatch as semantic supersession of the original
+  alias-first owner input, not a change to route-entry separation or plan
+  meaning.
+- Removed the unnecessary migration-ledger read from the current exact-ID
+  path.
+- Retained alias resolution as a tested compatibility path without inventing
+  an ABI for navigation-only nodes or moving capability meaning into the SDK.

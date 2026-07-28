@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 3922300,
+  "allowed_tracked_bytes": 18831734,
+  "approved_by": "repository-owner",
+  "base_ref": "7fba39d38cf5902c41dfbb7ae91f405b849880b7",
+  "changed_generated_bytes": 3922300,
+  "changed_generated_files": 89,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "b0af714ec6329543fd79546e85c0ad168a8618c6ba24c69be7c6abb2ebbaa147",
+  "reason": "Refresh the derived SDK KAG family after binding E1 replay to its restored historical evidence branch; no runtime invocation, rollback retirement, archive readiness, or archive authorization claim.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 18831734,
+  "tracked_bytes_max": 15728640
+}

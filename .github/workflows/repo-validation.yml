@@ -13,6 +13,13 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+
+      - name: Fetch routing succession evidence history
+        run: >-
+          git fetch --no-tags origin
+          '+refs/tags/routing-succession-e1-evidence-20260728:refs/tags/routing-succession-e1-evidence-20260728'
 
       - name: Checkout aoa-stats validator
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
