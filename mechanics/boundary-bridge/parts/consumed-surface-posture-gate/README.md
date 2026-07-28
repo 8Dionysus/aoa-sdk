@@ -22,6 +22,10 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
 - facade regression tests bound to part-local validation
 - read-only succession baselines that pin consumed producer, consumer,
   runtime, trust, cost, and disposition evidence without switching authority
+- a pinned X1 candidate snapshot that accounts for every known consumer,
+  distinguishes local direct-checkout consumer-zero from landed
+  consumer-zero, and keeps compatibility exit, rollback retirement, and
+  archive authority false
 - the accepted routing succession target model, authority matrix,
   compatibility policy, and repository state machine without moving producer
   code or switching live authority
@@ -90,6 +94,8 @@ Then read the receipt-bound
 [`docs/routing-succession-g5-owner-switch.md`](docs/routing-succession-g5-owner-switch.md).
 Then read the measured
 [`docs/routing-succession-e1-cost-comparison.md`](docs/routing-succession-e1-cost-comparison.md).
+Then read the candidate-only
+[`docs/routing-succession-x1-consumer-zero-candidate.md`](docs/routing-succession-x1-consumer-zero-candidate.md).
 Consumers migrating away from the predecessor checkout use
 [`docs/routing-consumer-contract.md`](docs/routing-consumer-contract.md).
 G4 proves the released shadow successor and isolated runtime content path. The

@@ -1,0 +1,355 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/8Dionysus/aoa-sdk/blob/main/mechanics/boundary-bridge/parts/consumed-surface-posture-gate/schemas/routing-succession-x1-consumer-zero-candidate.schema.json",
+  "title": "AoA SDK routing succession X1 consumer-zero candidate",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observed_at_utc",
+    "status",
+    "scope",
+    "consumer_accounting",
+    "candidate_migrations",
+    "predecessor_candidate",
+    "unchanged_classifications",
+    "zero_reference_repositories",
+    "allowed_residuals",
+    "compatibility_exit",
+    "remaining_work",
+    "verdict"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_routing_succession_x1_consumer_zero_candidate_v1"
+    },
+    "observed_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "const": "candidate_consumer_zero_pending_coordinated_landing"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "r0_baseline_ref",
+        "sdk_candidate_ref",
+        "sdk_base_ref",
+        "observation_class",
+        "direct_dependency_patterns",
+        "claim_boundary"
+      ],
+      "properties": {
+        "r0_baseline_ref": {
+          "const": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json"
+        },
+        "sdk_candidate_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "sdk_base_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "observation_class": {
+          "const": "exact local candidate commits plus pinned origin/main classifications"
+        },
+        "direct_dependency_patterns": {
+          "type": "array",
+          "minItems": 4,
+          "uniqueItems": true,
+          "items": {
+            "type": "string",
+            "minLength": 8
+          }
+        },
+        "claim_boundary": {
+          "type": "string",
+          "minLength": 80
+        }
+      }
+    },
+    "consumer_accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "r0_registered_consumers",
+        "post_r0_discovered_consumers",
+        "total_accounted_consumers",
+        "candidate_migrations",
+        "unchanged_classifications",
+        "all_known_consumers_accounted"
+      ],
+      "properties": {
+        "r0_registered_consumers": {
+          "const": 16
+        },
+        "post_r0_discovered_consumers": {
+          "const": 1
+        },
+        "total_accounted_consumers": {
+          "const": 17
+        },
+        "candidate_migrations": {
+          "const": 13
+        },
+        "unchanged_classifications": {
+          "const": 4
+        },
+        "all_known_consumers_accounted": {
+          "const": true
+        }
+      }
+    },
+    "candidate_migrations": {
+      "type": "array",
+      "minItems": 13,
+      "maxItems": 13,
+      "items": {
+        "$ref": "#/$defs/candidate"
+      }
+    },
+    "predecessor_candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "base_ref",
+        "candidate_ref",
+        "posture",
+        "landed",
+        "archive_authorized"
+      ],
+      "properties": {
+        "repo": {
+          "const": "aoa-routing"
+        },
+        "base_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "candidate_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "posture": {
+          "const": "maintenance_only_with_rollback_retained"
+        },
+        "landed": {
+          "const": false
+        },
+        "archive_authorized": {
+          "const": false
+        }
+      }
+    },
+    "unchanged_classifications": {
+      "type": "array",
+      "minItems": 4,
+      "maxItems": 4,
+      "items": {
+        "$ref": "#/$defs/classification"
+      }
+    },
+    "zero_reference_repositories": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "$ref": "#/$defs/classification"
+      }
+    },
+    "allowed_residuals": {
+      "type": "array",
+      "minItems": 7,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 20
+      }
+    },
+    "compatibility_exit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criteria",
+        "required_validation_cycles",
+        "completed_post_landing_validation_cycles",
+        "compatibility_window_exited",
+        "rollback_retired"
+      ],
+      "properties": {
+        "criteria": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "type": "object",
+            "additionalProperties": false,
+            "required": [
+              "id",
+              "candidate_state",
+              "exit_satisfied",
+              "evidence_limit"
+            ],
+            "properties": {
+              "id": {
+                "type": "string",
+                "minLength": 8
+              },
+              "candidate_state": {
+                "enum": [
+                  "passed",
+                  "partial",
+                  "pending"
+                ]
+              },
+              "exit_satisfied": {
+                "type": "boolean"
+              },
+              "evidence_limit": {
+                "type": "string",
+                "minLength": 30
+              }
+            }
+          }
+        },
+        "required_validation_cycles": {
+          "const": 2
+        },
+        "completed_post_landing_validation_cycles": {
+          "const": 0
+        },
+        "compatibility_window_exited": {
+          "const": false
+        },
+        "rollback_retired": {
+          "const": false
+        }
+      }
+    },
+    "remaining_work": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 20
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "candidate_direct_checkout_consumer_zero",
+        "landed_direct_checkout_consumer_zero",
+        "all_consumers_landed_green",
+        "post_merge_cost_report_complete",
+        "real_execution_closeout_window_complete",
+        "archive_ready",
+        "archive_authorized",
+        "claim_limit"
+      ],
+      "properties": {
+        "candidate_direct_checkout_consumer_zero": {
+          "const": true
+        },
+        "landed_direct_checkout_consumer_zero": {
+          "const": false
+        },
+        "all_consumers_landed_green": {
+          "const": false
+        },
+        "post_merge_cost_report_complete": {
+          "const": false
+        },
+        "real_execution_closeout_window_complete": {
+          "const": false
+        },
+        "archive_ready": {
+          "const": false
+        },
+        "archive_authorized": {
+          "const": false
+        },
+        "claim_limit": {
+          "type": "string",
+          "minLength": 100
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "candidate": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "base_ref",
+        "candidate_ref",
+        "direct_predecessor_checkout_dependencies",
+        "active_dependency_residuals",
+        "candidate_worktree_clean",
+        "landed",
+        "validation"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "minLength": 3
+        },
+        "base_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "candidate_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "direct_predecessor_checkout_dependencies": {
+          "const": 0
+        },
+        "active_dependency_residuals": {
+          "type": "array",
+          "maxItems": 0
+        },
+        "candidate_worktree_clean": {
+          "const": true
+        },
+        "landed": {
+          "const": false
+        },
+        "validation": {
+          "type": "string",
+          "minLength": 20
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "origin_main",
+        "direct_predecessor_checkout_dependencies",
+        "classification"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "minLength": 3
+        },
+        "origin_main": {
+          "$ref": "#/$defs/sha"
+        },
+        "direct_predecessor_checkout_dependencies": {
+          "const": 0
+        },
+        "classification": {
+          "type": "string",
+          "minLength": 20
+        }
+      }
+    }
+  }
+}

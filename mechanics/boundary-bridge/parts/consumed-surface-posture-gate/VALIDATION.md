@@ -8,6 +8,7 @@ python -m mypy src/aoa_sdk/control_plane/routing
 python -m build
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/measure_routing_succession_e1.py --check
+python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_x1_consumer_zero_candidate.py
 python scripts/validate_mechanics_topology.py
 ```
 
@@ -84,6 +85,11 @@ latency/token overclaims, and keeps G13 provisional until landed CI evidence.
 composite-stress compatibility witness and the post-switch consumer contract,
 including its explicit predecessor-checkout prohibition and packaged Agon
 bridge route.
+`test_routing_succession_x1_consumer_zero_candidate.py` validates exact
+candidate refs, complete accounting for the sixteen R0 consumers and one
+later discovery, zero active direct-checkout dependencies in the candidate
+set, classified residual references, and the still-false landed,
+compatibility-exit, rollback-retirement, and archive gates.
 
 For full Boundary Bridge coverage, also run:
 
