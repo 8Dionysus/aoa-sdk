@@ -18,3 +18,6 @@ notes = "This repository is expected to live inside the local AoA federation wor
 
 [control_plane]
 routing_bundle_root = "{workspace_parent}/abyss-stack/Knowledge/federation/aoa-routing"
+
+[organ_access]
+registry_source = "{workspace_parent}/.aoa/organ-access/organ-registry.source.json"

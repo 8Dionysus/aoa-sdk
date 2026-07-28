@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 205894,
+  "allowed_tracked_bytes": 17502706,
+  "approved_by": "repository-owner",
+  "base_ref": "b2215e9348e8c39616b6838ed3043d1d7e926d76",
+  "changed_generated_bytes": 205894,
+  "changed_generated_files": 4,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "58cd72217e11a60c4dc5b3e287a8aacbb655e8f1db26b54820eba460fbcce4a9",
+  "reason": "Index the explicit OS-private organ-registry workspace route and its bounded resolution contract.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "tracked_size",
+  "tracked_bytes": 17502706,
+  "tracked_bytes_max": 15728640
+}
