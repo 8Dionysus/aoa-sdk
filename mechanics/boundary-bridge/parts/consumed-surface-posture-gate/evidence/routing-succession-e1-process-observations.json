@@ -2,8 +2,8 @@
   "schema_version": "aoa_sdk_routing_succession_e1_process_observations_v1",
   "observed_on": "2026-07-26",
   "pins": {
-    "sdk_before_m3_ref": "660a5ff1f3da73b81db0dfbed9c80301b800ebd4",
-    "sdk_post_m3_ref": "6e2a8e058a49afb42a95bad624866b3fbb29ef06",
+    "sdk_before_m3_ref": "7802585aabf80518c0871178fd512a7f94d6a45a",
+    "sdk_post_m3_ref": "f436d58ec9a8e9af7cd1bbd70bbfd5a19f521169",
     "sdk_wheel_sha256": "990d52576c7963cbf913807f7da61951de4c3a6173fec16225c34cdb32f12aaa"
   },
   "routing_m3": {
