@@ -120,7 +120,7 @@ class ScenarioConditionBinding(StrictControlPlaneModel):
 
 
 class ScenarioCapabilityBinding(StrictControlPlaneModel):
-    """Resolve one playbook capability requirement through its current owner map."""
+    """Resolve one playbook requirement through the current owner graph or alias map."""
 
     requirement_id: NonEmptyStr
     capability: CapabilityRef

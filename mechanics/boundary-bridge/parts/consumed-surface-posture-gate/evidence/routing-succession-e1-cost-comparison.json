@@ -5,7 +5,7 @@
   "scope": {
     "comparison": "R0 predecessor contour to post-G5 M3 contour",
     "sdk_before_m3_ref": "7802585aabf80518c0871178fd512a7f94d6a45a",
-    "sdk_post_m3_ref": "f436d58ec9a8e9af7cd1bbd70bbfd5a19f521169",
+    "sdk_post_m3_ref": "7fba39d38cf5902c41dfbb7ae91f405b849880b7",
     "routing_before_m3_ref": "97f60de1b5992ef6bf5ff0f051bd452d940d9a85",
     "routing_post_m3_ref": "fb4266ee26727f50f40ca4206194d14f451c5cd6",
     "r0_evidence_sha256": "ee28bc71bd083c0e1a35ca42ea0debb326d8f1ca312189a9c854de447e0b8219",

@@ -86,7 +86,7 @@ def test_snapshot_pins_exact_admitted_owner_projection() -> None:
 
     assert (
         snapshot.source_lock.owner_source_ref
-        == "056cac249a353ae94abedbd4048e6730f70c064d"
+        == "f9e638395e86be8556e3579ab4ad5bf358e9499e"
     )
     assert snapshot.source_lock.trust_admission.verdict == "allow"
     assert (

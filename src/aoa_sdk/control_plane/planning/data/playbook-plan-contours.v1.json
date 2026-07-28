@@ -25,15 +25,15 @@
         "memory-keeper"
       ],
       "required_capability_ids": [
-        "aoa-approval-gate-check",
-        "aoa-source-of-truth-check",
-        "aoa-bounded-context-map",
-        "aoa-dry-run-first",
-        "aoa-change-protocol",
-        "aoa-contract-test",
-        "aoa-tdd-slice",
-        "aoa-adr-write",
-        "aoa-sanitized-share"
+        "guard.operations.approval",
+        "mode.knowledge.authority-map",
+        "mode.engineering-shape.contexts",
+        "guard.operations.preview",
+        "workflow.operations.repository-change",
+        "mode.verification.contract",
+        "workflow.operations.tdd-slice",
+        "mode.decision.record",
+        "mode.knowledge.sanitized-share"
       ],
       "expected_artifact_kinds": [
         "approval_record",
@@ -60,9 +60,9 @@
             "architect"
           ],
           "capability_ids": [
-            "aoa-approval-gate-check",
-            "aoa-source-of-truth-check",
-            "aoa-bounded-context-map"
+            "guard.operations.approval",
+            "mode.knowledge.authority-map",
+            "mode.engineering-shape.contexts"
           ],
           "input_binding": "all_scenario_inputs",
           "input_artifact_kinds": [],
@@ -85,7 +85,7 @@
             "coder"
           ],
           "capability_ids": [
-            "aoa-dry-run-first"
+            "guard.operations.preview"
           ],
           "input_binding": "all_scenario_inputs",
           "input_artifact_kinds": [],
@@ -104,7 +104,7 @@
             "coder"
           ],
           "capability_ids": [
-            "aoa-change-protocol"
+            "workflow.operations.repository-change"
           ],
           "input_binding": "all_scenario_inputs",
           "input_artifact_kinds": [],
@@ -125,8 +125,8 @@
             "reviewer"
           ],
           "capability_ids": [
-            "aoa-contract-test",
-            "aoa-tdd-slice"
+            "mode.verification.contract",
+            "workflow.operations.tdd-slice"
           ],
           "input_binding": "none",
           "input_artifact_kinds": [],
@@ -148,8 +148,8 @@
             "memory-keeper"
           ],
           "capability_ids": [
-            "aoa-adr-write",
-            "aoa-sanitized-share"
+            "mode.decision.record",
+            "mode.knowledge.sanitized-share"
           ],
           "input_binding": "none",
           "input_artifact_kinds": [],
@@ -289,13 +289,13 @@
         "memory-keeper"
       ],
       "required_capability_ids": [
-        "aoa-source-of-truth-check",
-        "aoa-bounded-context-map",
-        "aoa-approval-gate-check",
-        "aoa-dry-run-first",
-        "aoa-change-protocol",
-        "aoa-contract-test",
-        "aoa-checkpoint-closeout-bridge"
+        "mode.knowledge.authority-map",
+        "mode.engineering-shape.contexts",
+        "guard.operations.approval",
+        "guard.operations.preview",
+        "workflow.operations.repository-change",
+        "mode.verification.contract",
+        "skill.aoa-checkpoint-closeout-bridge"
       ],
       "expected_artifact_kinds": [
         "summon_request",
@@ -335,9 +335,9 @@
             "reviewer"
           ],
           "capability_ids": [
-            "aoa-source-of-truth-check",
-            "aoa-bounded-context-map",
-            "aoa-approval-gate-check"
+            "mode.knowledge.authority-map",
+            "mode.engineering-shape.contexts",
+            "guard.operations.approval"
           ],
           "input_binding": "selected_scenario_inputs",
           "input_artifact_kinds": [
@@ -360,8 +360,8 @@
             "coder"
           ],
           "capability_ids": [
-            "aoa-dry-run-first",
-            "aoa-change-protocol"
+            "guard.operations.preview",
+            "workflow.operations.repository-change"
           ],
           "input_binding": "selected_scenario_inputs",
           "input_artifact_kinds": [
@@ -385,7 +385,7 @@
             "reviewer"
           ],
           "capability_ids": [
-            "aoa-contract-test"
+            "mode.verification.contract"
           ],
           "input_binding": "selected_scenario_inputs",
           "input_artifact_kinds": [
@@ -408,7 +408,7 @@
             "reviewer"
           ],
           "capability_ids": [
-            "aoa-checkpoint-closeout-bridge"
+            "skill.aoa-checkpoint-closeout-bridge"
           ],
           "input_binding": "none",
           "input_artifact_kinds": [],
@@ -429,7 +429,7 @@
             "evaluator"
           ],
           "capability_ids": [
-            "aoa-contract-test"
+            "mode.verification.contract"
           ],
           "input_binding": "none",
           "input_artifact_kinds": [],
@@ -472,7 +472,7 @@
             "reviewer"
           ],
           "capability_ids": [
-            "aoa-dry-run-first"
+            "guard.operations.preview"
           ],
           "input_binding": "none",
           "input_artifact_kinds": [],
@@ -648,12 +648,12 @@
         "memory-keeper"
       ],
       "required_capability_ids": [
-        "aoa-source-of-truth-check",
-        "aoa-bounded-context-map",
-        "aoa-approval-gate-check",
-        "aoa-dry-run-first",
-        "aoa-change-protocol",
-        "aoa-contract-test"
+        "mode.knowledge.authority-map",
+        "mode.engineering-shape.contexts",
+        "guard.operations.approval",
+        "guard.operations.preview",
+        "workflow.operations.repository-change",
+        "mode.verification.contract"
       ],
       "expected_artifact_kinds": [
         "runtime_stress_lane",
@@ -688,9 +688,9 @@
             "reviewer"
           ],
           "capability_ids": [
-            "aoa-source-of-truth-check",
-            "aoa-bounded-context-map",
-            "aoa-approval-gate-check"
+            "mode.knowledge.authority-map",
+            "mode.engineering-shape.contexts",
+            "guard.operations.approval"
           ],
           "input_binding": "selected_scenario_inputs",
           "input_artifact_kinds": [
@@ -713,9 +713,9 @@
             "reviewer"
           ],
           "capability_ids": [
-            "aoa-dry-run-first",
-            "aoa-change-protocol",
-            "aoa-contract-test"
+            "guard.operations.preview",
+            "workflow.operations.repository-change",
+            "mode.verification.contract"
           ],
           "input_binding": "selected_scenario_inputs",
           "input_artifact_kinds": [
@@ -739,7 +739,7 @@
             "architect"
           ],
           "capability_ids": [
-            "aoa-source-of-truth-check"
+            "mode.knowledge.authority-map"
           ],
           "input_binding": "none",
           "input_artifact_kinds": [],
@@ -762,7 +762,7 @@
             "reviewer"
           ],
           "capability_ids": [
-            "aoa-contract-test"
+            "mode.verification.contract"
           ],
           "input_binding": "none",
           "input_artifact_kinds": [],
