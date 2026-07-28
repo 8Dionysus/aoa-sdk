@@ -15,6 +15,7 @@
     "unchanged_classifications",
     "zero_reference_repositories",
     "allowed_residuals",
+    "live_runtime_evidence",
     "compatibility_exit",
     "remaining_work",
     "verdict"
@@ -36,6 +37,7 @@
       "required": [
         "r0_baseline_ref",
         "sdk_candidate_ref",
+        "sdk_validation_ref",
         "sdk_base_ref",
         "observation_class",
         "direct_dependency_patterns",
@@ -46,6 +48,9 @@
           "const": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json"
         },
         "sdk_candidate_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "sdk_validation_ref": {
           "$ref": "#/$defs/sha"
         },
         "sdk_base_ref": {
@@ -166,6 +171,46 @@
         "minLength": 20
       }
     },
+    "live_runtime_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "mirror_manifest_ref",
+        "mirror_source_ref",
+        "activation_mode",
+        "producer_posture",
+        "trust_record_id",
+        "subject_digest",
+        "trust_verdict",
+        "post_landing_refresh_required"
+      ],
+      "properties": {
+        "mirror_manifest_ref": {
+          "const": "/srv/AbyssOS/abyss-stack/Knowledge/federation/aoa-routing/manifest/federation_mirror_manifest.json"
+        },
+        "mirror_source_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "activation_mode": {
+          "const": "authorized_live_cutover"
+        },
+        "producer_posture": {
+          "const": "sdk_canonical"
+        },
+        "trust_record_id": {
+          "$ref": "#/$defs/sha256"
+        },
+        "subject_digest": {
+          "$ref": "#/$defs/sha256"
+        },
+        "trust_verdict": {
+          "const": "allow"
+        },
+        "post_landing_refresh_required": {
+          "const": true
+        }
+      }
+    },
     "compatibility_exit": {
       "type": "object",
       "additionalProperties": false,
@@ -281,6 +326,10 @@
     "sha": {
       "type": "string",
       "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
     },
     "candidate": {
       "type": "object",

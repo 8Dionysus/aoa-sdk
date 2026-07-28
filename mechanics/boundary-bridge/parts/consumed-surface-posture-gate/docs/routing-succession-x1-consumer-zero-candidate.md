@@ -19,11 +19,24 @@ Seven additional active organization repositories have no direct predecessor
 reference at their pinned `origin/main`. The only one whose ref changed after
 R0, `aoa-course-connector`, was fetched and rescanned at the new ref.
 
+The rebased SDK candidate passed its full release gate: 716 tests, 2 skipped,
+537 subtests, Ruff, mypy, package build, four clean installed-wheel probes,
+and the OS Abyss package artifact-bundle gate.
+
 Literal predecessor references are not blindly deleted. Stable artifact and
 ABI names, repository self-identity, historical decisions and reviewed runs,
 rollback fixtures, negative assertions, trust and donor provenance, naming
 fixtures, and their generated projections remain valid residual classes.
 None of them requires the predecessor checkout for active execution.
+
+The current host mirror independently confirms the earlier G5 cutover:
+`routing_producer_posture=sdk_canonical`,
+`cutover_activation_mode=authorized_live_cutover`, SDK source
+`e4ffd26ed9e50125be584c00839ee6a8f7016a0d`, and the exact runtime trust
+gate returns `allow` for subject
+`sha256:4b18aa61850afe3859ca2e3a221a6710a34dc45ea47d9321126abb1ebbe1671b`.
+This is current live-mirror/trust evidence, not a substitute for refreshing it
+after the final landing.
 
 ## What Is Not Proved
 

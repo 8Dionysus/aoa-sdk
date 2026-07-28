@@ -107,6 +107,18 @@ def test_x1_keeps_compatibility_and_archive_stop_lines_false() -> None:
     assert verdict["archive_authorized"] is False
 
 
+def test_x1_pins_current_live_mirror_and_runtime_trust_allow() -> None:
+    runtime = load_evidence()["live_runtime_evidence"]
+
+    assert runtime["mirror_source_ref"] == (
+        "e4ffd26ed9e50125be584c00839ee6a8f7016a0d"
+    )
+    assert runtime["activation_mode"] == "authorized_live_cutover"
+    assert runtime["producer_posture"] == "sdk_canonical"
+    assert runtime["trust_verdict"] == "allow"
+    assert runtime["post_landing_refresh_required"] is True
+
+
 def test_x1_predecessor_remains_maintenance_only_and_operator_gated() -> None:
     predecessor = load_evidence()["predecessor_candidate"]
 

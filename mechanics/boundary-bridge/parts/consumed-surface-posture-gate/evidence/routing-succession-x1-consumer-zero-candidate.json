@@ -1,10 +1,11 @@
 {
   "schema_version": "aoa_sdk_routing_succession_x1_consumer_zero_candidate_v1",
-  "observed_at_utc": "2026-07-28T10:18:23Z",
+  "observed_at_utc": "2026-07-28T10:28:00Z",
   "status": "candidate_consumer_zero_pending_coordinated_landing",
   "scope": {
     "r0_baseline_ref": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json",
     "sdk_candidate_ref": "31a46af288ef1b9f171e3951ea222e021286ade7",
+    "sdk_validation_ref": "79062c485a60bc01dc041ed32adc8d723c260027",
     "sdk_base_ref": "83930e822c6c4df645b5ab2a0eb6d3f9c849b5bf",
     "observation_class": "exact local candidate commits plus pinned origin/main classifications",
     "direct_dependency_patterns": [
@@ -32,7 +33,7 @@
       "active_dependency_residuals": [],
       "candidate_worktree_clean": true,
       "landed": false,
-      "validation": "rebased decision, topology, E1, and full/incremental KAG gates passed; final release gate follows this X1 landing candidate"
+      "validation": "full release gate passed at descendant 79062c485a60bc01dc041ed32adc8d723c260027: 716 tests, 2 skipped, 537 subtests, Ruff, mypy, build, four installed-wheel probes, and OS Abyss artifact bundle"
     },
     {
       "repo": "abyss-stack",
@@ -243,6 +244,16 @@
     "session-memory naming fixtures whose literal wording is the object under test",
     "generated KAG and audit projections derived from one of the allowed authored residual classes"
   ],
+  "live_runtime_evidence": {
+    "mirror_manifest_ref": "/srv/AbyssOS/abyss-stack/Knowledge/federation/aoa-routing/manifest/federation_mirror_manifest.json",
+    "mirror_source_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+    "activation_mode": "authorized_live_cutover",
+    "producer_posture": "sdk_canonical",
+    "trust_record_id": "sha256:ffe9c974882b0033248b0733c6d1223d9a0108d911d493d673b31286f0f2161e",
+    "subject_digest": "sha256:4b18aa61850afe3859ca2e3a221a6710a34dc45ea47d9321126abb1ebbe1671b",
+    "trust_verdict": "allow",
+    "post_landing_refresh_required": true
+  },
   "compatibility_exit": {
     "criteria": [
       {
@@ -273,7 +284,7 @@
         "id": "runtime_mirror_and_trust_identify_sdk",
         "candidate_state": "passed",
         "exit_satisfied": true,
-        "evidence_limit": "the receipt-bound G5 owner switch and stronger-owner admission passed; freshness must be rechecked after final landing"
+        "evidence_limit": "the live mirror is authorized_live_cutover at SDK source e4ffd26e and the exact runtime trust gate returns allow; freshness still requires a post-landing recheck"
       },
       {
         "id": "no_high_severity_regression",
