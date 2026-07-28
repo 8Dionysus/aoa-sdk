@@ -17,6 +17,21 @@ python scripts/validate_mechanics_topology.py
   repo-local MCP launcher, and the crosswalk names project-level `aoa_stats`.
 - the skill readout uses the compact owner catalog and capability graph, not
   retired index or runtime-discovery files.
+- explicit private-registry configuration exposes bounded catalog, organ, and
+  capability inspection without schema preloading or execution;
+- the server exposes exactly eleven tools, all with read-only annotation
+  hints, and no activation tool;
+- two static organ resources and two organ URI templates are registered;
+- the current Dionysus interview catalog replaces its retired repo-local MCP
+  launcher in curated workspace entrypoints.
+
+For the underlying organ contracts, also run:
+
+```bash
+python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_schemas.py --check
+python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_example.py --check
+python -m pytest -q mechanics/boundary-bridge/parts/organ-access-control-plane/tests
+```
 
 For broader Codex Projection routing, also run:
 

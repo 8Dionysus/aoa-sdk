@@ -1,0 +1,125 @@
+{
+  "$defs": {
+    "SchemaIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "schema_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Schema Digest",
+          "type": "string"
+        },
+        "schema_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Schema Ref",
+          "type": "string"
+        },
+        "schema_version": {
+          "minLength": 1,
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_revision": {
+          "minLength": 1,
+          "title": "Source Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "schema_ref",
+        "schema_digest",
+        "source_revision",
+        "schema_version"
+      ],
+      "title": "SchemaIdentity",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:cross-organ-orchestration:typed-artifact-ref.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Artifact Digest",
+      "type": "string"
+    },
+    "artifact_ref": {
+      "maxLength": 512,
+      "minLength": 3,
+      "title": "Artifact Ref",
+      "type": "string"
+    },
+    "authority_ceiling": {
+      "enum": [
+        "read",
+        "candidate",
+        "internal_effect",
+        "external_effect"
+      ],
+      "title": "Authority Ceiling",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "expires_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Expires At"
+    },
+    "owner": {
+      "minLength": 1,
+      "title": "Owner",
+      "type": "string"
+    },
+    "ref_kind": {
+      "enum": [
+        "orchestration_intent",
+        "kag_evidence",
+        "memo_candidate",
+        "eval_request",
+        "eval_result",
+        "owner_acceptance"
+      ],
+      "title": "Ref Kind",
+      "type": "string"
+    },
+    "schema_identity": {
+      "$ref": "#/$defs/SchemaIdentity"
+    },
+    "source_revision": {
+      "minLength": 1,
+      "title": "Source Revision",
+      "type": "string"
+    }
+  },
+  "required": [
+    "ref_kind",
+    "owner",
+    "artifact_ref",
+    "artifact_digest",
+    "source_revision",
+    "schema_identity",
+    "authority_ceiling",
+    "created_at"
+  ],
+  "title": "TypedArtifactRef",
+  "type": "object"
+}

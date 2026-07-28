@@ -18,6 +18,8 @@ Active part homes:
   owner-layer handoff material below activation or dispatch authority.
 - `organ-access-control-plane/` projects one explicit private registry into
   discovery and candidate-only activation plans.
+- `cross-organ-orchestration/` validates one host-visible KAG, memo candidate,
+  eval, and owner-acceptance receipt chain without invoking owner tools.
 - `route-resolution-control-plane/` resolves and explains C1 route candidates
   from receipt-bound routing and exact owner projections without plan
   compilation, activation, or execution.

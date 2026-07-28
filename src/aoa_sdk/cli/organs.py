@@ -13,7 +13,18 @@ from ..contracts.organs import (
     FreshnessState,
     PolicyFamily,
 )
-from ..organs import OrganRegistryError, OrgansAPI, compile_registry, load_registry_source
+from ..contracts.organ_orchestration import (
+    CrossOrganOrchestrationRequest,
+    CrossOrganOrchestrationRun,
+    CrossOrganStageObservation,
+)
+from ..organs import (
+    OrganOrchestrationError,
+    OrganRegistryError,
+    OrgansAPI,
+    compile_registry,
+    load_registry_source,
+)
 from ..workspace.discovery import Workspace
 
 
@@ -34,6 +45,28 @@ def _emit(value: Any) -> None:
 def _fail(exc: Exception) -> None:
     typer.echo(f"error: {exc}", err=True)
     raise typer.Exit(code=1) from exc
+
+
+def _write_or_emit(value: Any, output: str | None) -> None:
+    if output is None:
+        _emit(value)
+        return
+    payload = value.model_dump(mode="json") if hasattr(value, "model_dump") else value
+    rendered = json.dumps(
+        payload,
+        indent=2,
+        ensure_ascii=True,
+        sort_keys=True,
+    )
+    destination = Path(output).expanduser().resolve(strict=False)
+    destination.write_text(rendered + "\n", encoding="utf-8")
+    _emit(
+        {
+            "written": str(destination),
+            "snapshot_digest": payload.get("snapshot_digest"),
+            "owner_tools_executed_by_sdk": False,
+        }
+    )
 
 
 @organs_app.command("validate")
@@ -187,3 +220,90 @@ def organs_plan(
     ) as exc:
         _fail(exc)
     _emit(plan)
+
+
+@organs_app.command("orchestration-start")
+def organs_orchestration_start(
+    request: str = typer.Argument(
+        ...,
+        help="Pinned cross-organ orchestration request JSON path.",
+    ),
+    root: str = typer.Option(".", "--root"),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        payload = json.loads(Path(request).read_text(encoding="utf-8"))
+        run = _api(root, None).start_orchestration(
+            CrossOrganOrchestrationRequest.model_validate(payload)
+        )
+    except (
+        OSError,
+        json.JSONDecodeError,
+        OrganOrchestrationError,
+        ValidationError,
+    ) as exc:
+        _fail(exc)
+    _write_or_emit(run, output)
+
+
+@organs_app.command("orchestration-advance")
+def organs_orchestration_advance(
+    run_path: str = typer.Argument(..., help="Current orchestration run JSON path."),
+    observation: str = typer.Argument(
+        ...,
+        help="One host-receipted owner stage observation JSON path.",
+    ),
+    root: str = typer.Option(".", "--root"),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        run_payload = json.loads(Path(run_path).read_text(encoding="utf-8"))
+        observation_payload = json.loads(
+            Path(observation).read_text(encoding="utf-8")
+        )
+        updated = _api(root, None).advance_orchestration(
+            CrossOrganOrchestrationRun.model_validate(run_payload),
+            CrossOrganStageObservation.model_validate(observation_payload),
+        )
+    except (
+        OSError,
+        json.JSONDecodeError,
+        OrganOrchestrationError,
+        ValidationError,
+    ) as exc:
+        _fail(exc)
+    _write_or_emit(updated, output)
+
+
+@organs_app.command("orchestration-validate")
+def organs_orchestration_validate(
+    run_path: str = typer.Argument(..., help="Orchestration run JSON path."),
+    root: str = typer.Option(".", "--root"),
+) -> None:
+    try:
+        payload = json.loads(Path(run_path).read_text(encoding="utf-8"))
+        run = _api(root, None).validate_orchestration(
+            CrossOrganOrchestrationRun.model_validate(payload)
+        )
+    except (
+        OSError,
+        json.JSONDecodeError,
+        OrganOrchestrationError,
+        ValidationError,
+    ) as exc:
+        _fail(exc)
+    _emit(
+        {
+            "valid": True,
+            "run_id": run.run_id,
+            "snapshot_digest": run.snapshot_digest,
+            "state": run.state,
+            "stage_count": len(run.stages),
+            "next_stage_kind": run.next_stage_kind,
+            "next_owner": run.next_owner,
+            "owner_tools_executed_by_sdk": False,
+            "proof_computed_by_sdk": False,
+            "durable_memory_written_by_sdk": False,
+            "acceptance_inferred_by_sdk": False,
+        }
+    )

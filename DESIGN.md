@@ -193,6 +193,32 @@ and observed schemas, and route a consumer to a direct owner endpoint. It
 cannot infer domain truth, proof, freshness, or acceptance from its own fields,
 and it is not a proxy for owner tools.
 
+## Cross-Organ Orchestration
+
+When one OS task crosses several direct owner access planes, `aoa-sdk` may
+validate the chain but may not execute it:
+
+```text
+host intent
+  -> KAG evidence
+  -> memo candidate
+  -> eval request
+  -> eval result
+  -> explicit owner acceptance or rejection
+```
+
+The request pins every owner schema digest and source revision. Each stage
+binds the previous content-addressed run snapshot, exact input and output,
+freshness, effect state, owner evidence, host receipt, and next owner. The SDK
+accepts only one stage per call and reconstructs the entire chain during
+validation.
+
+The host, normally `abyss-stack`, selects transport, holds credentials, calls
+the direct owner, issues the host receipt, and performs lifecycle or rollback.
+KAG, memo, and eval owners retain their meaning. The state machine is not a
+workspace MCP tool and cannot infer owner acceptance from proof or model
+confidence.
+
 ## Accepted Routing Succession Shape
 
 `AOA-SDK-D-0071` accepts a staged succession of the routing producer into the

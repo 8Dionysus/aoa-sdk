@@ -58,6 +58,7 @@ follow the linked owner surface instead of expanding this page.
 | Checkpoint capture, review gates, closeout handoff, child-task re-entry, and reviewed carry | [mechanics/checkpoint](mechanics/checkpoint/README.md) |
 | Codex workspace MCP, live rollout status, portability boundary, and rollout refs | [mechanics/codex-projection](mechanics/codex-projection/README.md) |
 | OS Abyss organ discovery, registry projection, and candidate activation contracts | [mechanics/boundary-bridge/parts/organ-access-control-plane](mechanics/boundary-bridge/parts/organ-access-control-plane/README.md) |
+| Host-visible KAG to memo candidate to eval to owner-acceptance chains | [mechanics/boundary-bridge/parts/cross-organ-orchestration](mechanics/boundary-bridge/parts/cross-organ-orchestration/README.md) |
 | Release audit, publication helpers, CI posture, and sibling canaries | [mechanics/release-support](mechanics/release-support/README.md) |
 | RPG typed consumer reads and surface-path transport | [mechanics/rpg](mechanics/rpg/README.md) |
 | Workspace roots, mirrors, bootstrap, and generated control-plane capsule | [mechanics/runtime-seam](mechanics/runtime-seam/README.md) |
@@ -90,6 +91,14 @@ The current landed surface includes:
   [R2 Agent OS contract family](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r2-agent-os-contracts.md)
   for route decisions, plans, approvals, lifecycle, events, evidence, and
   adapter protocols, without an active runner;
+- the owner-bounded
+  [organ access control plane](mechanics/boundary-bridge/parts/organ-access-control-plane/README.md)
+  and its progressive read-only projection through the existing
+  `aoa_workspace` MCP server, without activation or runtime execution;
+- the host-visible
+  [cross-organ orchestration contract](mechanics/boundary-bridge/parts/cross-organ-orchestration/README.md)
+  for KAG evidence, memo candidates, eval pressure, and explicit owner
+  acceptance, without SDK-owned MCP invocation;
 - the passed
   [R3 disposable migration rehearsal](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-r3-migration-rehearsal.md),
   which proves 14/14 byte parity, installed-wheel construction without the

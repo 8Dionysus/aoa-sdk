@@ -9,6 +9,9 @@ truth, or owner acceptance.
 
 - Keep workspace MCP, live rollout status readouts, portability boundaries, and
   owner rollout reference handoff routed through active `parts/`.
+- Keep organ access progressively disclosed through registry status, bounded
+  catalog, organ inspection, and capability inspection; do not add activation
+  or execution merely because the transport can expose another tool.
 - Keep rollout readouts lower authority than raw session archives, GitHub
   state, and owner repositories.
 - Keep portability boundaries explicit about what can travel and what remains

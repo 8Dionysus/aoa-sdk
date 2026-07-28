@@ -17,7 +17,8 @@ schemas, portability docs, rollout refs, or Codex registry code changes.
 
 ### SDK owns
 
-- local workspace MCP server over SDK workspace orientation
+- local workspace MCP server over SDK workspace orientation and bounded,
+  read-only organ discovery
 - typed live rollout status snapshot reads
 - portability boundary docs
 - owner rollout reference handoff surfaces
@@ -50,7 +51,8 @@ repo authority remain outside SDK ownership.
 ### Must not claim
 
 This mechanic must not treat a live rollout status snapshot as live deployment
-authority or make the SDK a Codex runtime.
+authority, make the SDK a Codex runtime, or expose organ activation and
+execution through the workspace MCP server.
 
 ### Validation
 

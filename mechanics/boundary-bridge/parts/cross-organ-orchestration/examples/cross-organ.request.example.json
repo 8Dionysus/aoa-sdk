@@ -1,0 +1,131 @@
+{
+  "automatic_acceptance_allowed": false,
+  "automatic_candidate_promotion_allowed": false,
+  "created_at": "2026-07-26T12:00:00Z",
+  "evidence_refs": [
+    {
+      "evidence_ref": "example://decision/AOA-SDK-D-0080",
+      "expires_at": "2026-07-26T13:00:00Z",
+      "observed_at": "2026-07-26T12:00:00Z",
+      "owner": "aoa-sdk",
+      "revision": "example-sdk-revision"
+    }
+  ],
+  "expires_at": "2026-07-26T13:00:00Z",
+  "hidden_server_chaining_allowed": false,
+  "hidden_shared_context_allowed": false,
+  "host_id": "abyss-stack-example",
+  "host_visible_receipts_required": true,
+  "intent": "Demonstrate the typed KAG evidence to reviewed owner acceptance boundary without executing owner tools.",
+  "model_confidence_is_acceptance_authority": false,
+  "owners": {
+    "acceptance_owner": "aoa-memo",
+    "control_owner": "aoa-sdk",
+    "evidence_owner": "aoa-kag",
+    "memory_owner": "aoa-memo",
+    "proof_owner": "aoa-evals",
+    "runtime_owner": "abyss-stack"
+  },
+  "request_id": "cross-organ-research-1",
+  "requested_by": "public-safe-fixture",
+  "root_input": {
+    "artifact_digest": "sha256:1aa32f07826ac8a8b03e725b67b4c091634757475ed198b5d4b2ca7815dd323a",
+    "artifact_ref": "example://orchestration/intent/research-1",
+    "authority_ceiling": "read",
+    "created_at": "2026-07-26T11:59:00Z",
+    "expires_at": "2026-07-26T13:00:00Z",
+    "owner": "abyss-stack",
+    "ref_kind": "orchestration_intent",
+    "schema_identity": {
+      "owner": "abyss-stack",
+      "schema_digest": "sha256:fe6288db5722fd31d966bcce3ad56dd9f9707d6848de1bc5d945cc5caa5c755d",
+      "schema_ref": "urn:abyss-stack:cross-organ-intent:v1",
+      "schema_version": "abyss_stack_cross_organ_intent_v1",
+      "source_revision": "example-host-revision"
+    },
+    "source_revision": "example-host-revision"
+  },
+  "schema_version": "aoa_cross_organ_orchestration_request_v1",
+  "stage_contracts": [
+    {
+      "authority_ceiling": "read",
+      "effect_class": "observe",
+      "input_ref_kind": "orchestration_intent",
+      "next_owner": "aoa-memo",
+      "output_ref_kind": "kag_evidence",
+      "output_schema": {
+        "owner": "aoa-kag",
+        "schema_digest": "sha256:1516bc25755b26c156a58709c5e7600e276daa21f115d7cdc61031cbd67162d5",
+        "schema_ref": "schemas/kag-mcp-result.schema.json",
+        "schema_version": "aoa_kag_mcp_result_v1",
+        "source_revision": "58ab52ffc06bab5cc28842a0b4336c6efa16b6ff"
+      },
+      "owner": "aoa-kag",
+      "stage_kind": "kag_evidence"
+    },
+    {
+      "authority_ceiling": "candidate",
+      "effect_class": "prepare_candidate",
+      "input_ref_kind": "kag_evidence",
+      "next_owner": "aoa-evals",
+      "output_ref_kind": "memo_candidate",
+      "output_schema": {
+        "owner": "aoa-memo",
+        "schema_digest": "sha256:6a33ac41ac90d4af29827a637b8f3cea24ecb45ca259d866e79000a2a784c0d9",
+        "schema_ref": "schemas/memory-ports/local_memo_candidate.schema.json",
+        "schema_version": "aoa_local_memo_candidate_v1",
+        "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+      },
+      "owner": "aoa-memo",
+      "stage_kind": "memo_candidate"
+    },
+    {
+      "authority_ceiling": "candidate",
+      "effect_class": "prepare_candidate",
+      "input_ref_kind": "memo_candidate",
+      "next_owner": "aoa-evals",
+      "output_ref_kind": "eval_request",
+      "output_schema": {
+        "owner": "aoa-evals",
+        "schema_digest": "sha256:751dd78f0280dc2cd089e30b3a7275182656e8350cf84c458f98734d16b4fad1",
+        "schema_ref": "mechanics/proof-object/parts/eval-authoring/schemas/eval-need.schema.json",
+        "schema_version": "aoa_eval_need_v1",
+        "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+      },
+      "owner": "aoa-evals",
+      "stage_kind": "eval_request"
+    },
+    {
+      "authority_ceiling": "read",
+      "effect_class": "validate",
+      "input_ref_kind": "eval_request",
+      "next_owner": "aoa-memo",
+      "output_ref_kind": "eval_result",
+      "output_schema": {
+        "owner": "aoa-evals",
+        "schema_digest": "sha256:786c3bd7902fe78224adfc5ac76ed7a43b49f78bb6a5ade140a416458339a82a",
+        "schema_ref": "mechanics/publication-receipts/parts/receipt-payload/schemas/eval-result-receipt.schema.json",
+        "schema_version": "aoa_eval_result_receipt_v1",
+        "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
+      },
+      "owner": "aoa-evals",
+      "stage_kind": "eval_result"
+    },
+    {
+      "authority_ceiling": "internal_effect",
+      "effect_class": "accept_source",
+      "input_ref_kind": "eval_result",
+      "next_owner": null,
+      "output_ref_kind": "owner_acceptance",
+      "output_schema": {
+        "owner": "aoa-memo",
+        "schema_digest": "sha256:e3a1e93846340f4d850028eeb722a32458cff6527fe38a6366052edf86a1239f",
+        "schema_ref": "schemas/support-objects/reviewed_intake_landing_receipt.schema.json",
+        "schema_version": "aoa_reviewed_intake_landing_receipt_v1",
+        "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
+      },
+      "owner": "aoa-memo",
+      "stage_kind": "owner_acceptance"
+    }
+  ]
+}

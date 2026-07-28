@@ -9,6 +9,7 @@
 - `src/aoa_sdk/errors.py`
 - `src/aoa_sdk/models.py`
 - `src/aoa_sdk/contracts/control_plane.py`
+- `src/aoa_sdk/contracts/organ_orchestration.py`
 - `src/aoa_sdk/agents/`
 - `src/aoa_sdk/artifacts/`
 - `src/aoa_sdk/cli/`
@@ -24,6 +25,8 @@
 - `src/aoa_sdk/stats/`
 - `src/aoa_sdk/surfaces/`
 - `src/aoa_sdk/techniques/`
+- `src/aoa_sdk/organs/orchestration.py`
+- `mechanics/boundary-bridge/parts/cross-organ-orchestration/`
 - `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`
 - `mechanics/boundary-bridge/parts/skill-environment-inspector/`
 - `mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/`
