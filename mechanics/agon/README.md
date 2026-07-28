@@ -6,16 +6,18 @@ Status: active topology with part-local payload.
 
 ### Operation
 
-Build and validate Agon SDK helper candidates, registries, recurrence adapters,
-state-packet bridges, and generated companions.
+Build and validate the SDK-owned pre-protocol Agon gate-routing bridge, helper
+candidates, registries, recurrence adapters, state-packet bridges, and
+generated companions.
 
 ### Trigger
 
-Use this mechanic when an Agon helper seed, generated registry, schema,
-example, quest, or SDK helper test changes.
+Use this mechanic when the Agon routing bridge, a helper seed, generated
+registry, schema, example, quest, or SDK helper test changes.
 
 ### SDK owns
 
+- advisory gate-route candidates and deterministic next-hop orientation
 - SDK helper candidate schemas and examples
 - generated helper registries from local seeds
 - SDK stop-line documentation for Agon helper bridges
@@ -27,6 +29,9 @@ mechanical-trial, and state-packet meaning.
 
 ### Current source surfaces
 
+- `mechanics/agon/parts/gate-routing-bridge/`
+- `src/aoa_sdk/control_plane/routing/agon.py`
+- `src/aoa_sdk/control_plane/routing/data/agon_gate_routing.config.json`
 - `mechanics/agon/parts/center-law-preview-helpers/`
 - `mechanics/agon/parts/state-packet-review-bindings/`
 - `mechanics/agon/parts/recurrence-adapter/`
@@ -38,6 +43,7 @@ mechanical-trial, and state-packet meaning.
 
 ### Active parts
 
+- gate-routing-bridge
 - center-law-preview-helpers
 - state-packet-review-bindings
 - recurrence-adapter
@@ -54,8 +60,8 @@ a named part only after it has a real owner boundary and validation route.
 
 ### Must not claim
 
-This mechanic must not make candidate helper packs accepted Agon truth or
-replace stronger Agon owner review.
+This mechanic must not turn a gate candidate into activation, make candidate
+helper packs accepted Agon truth, or replace stronger Agon owner review.
 
 ### Validation
 
@@ -65,5 +71,5 @@ and then run the mechanics topology gate from the root route card.
 
 ### Next route
 
-Accepted helper meaning routes to the Agon owner surface; SDK keeps only
-candidate helper contracts and generated read models.
+Gate candidates and accepted helper meaning route to the Agon owner surface;
+the SDK keeps only routing/control-plane contracts and generated read models.

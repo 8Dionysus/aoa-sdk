@@ -180,6 +180,7 @@
       ],
       "mechanic_routes": [
         "mechanics/boundary-bridge/parts/consumed-surface-posture-gate",
+        "mechanics/agon/parts/gate-routing-bridge",
         "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
         "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane",
         "mechanics/boundary-bridge/parts/evidence-closeout-chain"
@@ -249,6 +250,7 @@
       "validators": [
         "scripts/validate_sdk_source_home.py",
         "aoa compatibility check /srv/AbyssOS/aoa-sdk",
+        "python -m pytest -q mechanics/agon/parts/gate-routing-bridge/tests",
         "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests",
         "python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests",
         "python -m pytest -q mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests",
@@ -400,6 +402,7 @@
         "src/aoa_sdk"
       ],
       "mechanic_routes": [
+        "mechanics/agon/parts/gate-routing-bridge",
         "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
         "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane",
         "mechanics/boundary-bridge/parts/evidence-closeout-chain",
@@ -409,6 +412,7 @@
       "validators": [
         "scripts/validate_sdk_source_home.py",
         "python -m build",
+        "python mechanics/agon/parts/gate-routing-bridge/scripts/verify_agon_gate_routing_wheel.py",
         "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_shadow_wheel.py",
         "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_candidate_wheel.py",
         "python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_release_candidate_wheel.py",

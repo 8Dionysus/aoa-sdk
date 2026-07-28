@@ -1,0 +1,106 @@
+{
+  "schema_version": "composite_stress_route_hint_v1",
+  "hint_id": "composite-stress-route:hybrid-query-kag-unhealthy",
+  "stressor_family": "hybrid-query-kag-unhealthy",
+  "owner_surface": {
+    "repo": "ATM10-Agent",
+    "surface": "examples/stressor_receipt.retrieval_only_fallback.example.json",
+    "surface_family": "kag-regrounding"
+  },
+  "preferred_posture": "source_first_until_pass",
+  "input_refs": {
+    "stats_summary_ref": "aoa-stats:generated/stress_recovery_window_summary.min.json",
+    "playbook_lane_ref": "aoa-playbooks:mechanics/antifragility/parts/stress-lanes/examples/playbook_stress_lane.example.json",
+    "reentry_gate_ref": "aoa-playbooks:mechanics/antifragility/parts/reentry-gates/examples/playbook_reentry_gate.example.json",
+    "projection_health_ref": "aoa-kag:mechanics/antifragility/parts/projection-health/examples/projection_health_receipt.example.json",
+    "regrounding_ticket_ref": "aoa-kag:mechanics/antifragility/parts/retrieval-outage-regrounding/examples/regrounding_ticket.example.json",
+    "memo_pattern_refs": [
+      "aoa-memo:mechanics/antifragility/parts/recovery-pattern-memory/examples/pattern.antifragility-stress-recovery-window.example.json"
+    ]
+  },
+  "route_status": {
+    "stats_suppression_status": "low_sample",
+    "projection_health_state": "degraded_source_first",
+    "consumer_posture": "source_first",
+    "reentry_decision": "resume_degraded",
+    "regrounding_status": "proposed",
+    "route_discipline": null,
+    "reentry_quality": null,
+    "regrounding_effectiveness": null,
+    "trend_flags": [
+      "overall-posture-mixed",
+      "low-sample-window",
+      "false-promotion-guard-held"
+    ]
+  },
+  "source_priority": {
+    "owner_receipt_refs": [
+      "ATM10-Agent/examples/stressor_receipt.retrieval_only_fallback.example.json"
+    ],
+    "proof_refs": [
+      "repo:aoa-evals/evals/comparison/longitudinal-window/aoa-stress-recovery-window/reports/example-report.json"
+    ],
+    "adjacent_source_refs": [
+      "ATM10-Agent:stressor_receipt_v1#stress:2026-04-07:retrieval-only-fallback",
+      "aoa-agents:stress_handoff_envelope_v1#handoff:stress:architect->reviewer:2026-04-07T15:10:00Z",
+      "aoa-kag:projection_health_receipt_v1#kag:health:reasoning-handoff-pack:2026-04-07T15:40:00Z",
+      "aoa-agents/generated/agent_registry.min.json",
+      "aoa-playbooks/generated/playbook_handoff_contracts.json"
+    ],
+    "routing_is_advisory": true
+  },
+  "next_hops": [
+    {
+      "kind": "source_receipt",
+      "target_repo": "ATM10-Agent",
+      "target_surface": "examples/stressor_receipt.retrieval_only_fallback.example.json",
+      "reason": "Start from the source-owned stress receipt before trusting any downstream route overlay.",
+      "bounded": true
+    },
+    {
+      "kind": "playbook_lane",
+      "target_repo": "aoa-playbooks",
+      "target_surface": "mechanics/antifragility/parts/stress-lanes/examples/playbook_stress_lane.example.json",
+      "reason": "Use the structured degraded lane contract instead of reparsing authored playbook markdown.",
+      "bounded": true
+    },
+    {
+      "kind": "reentry_gate",
+      "target_repo": "aoa-playbooks",
+      "target_surface": "mechanics/antifragility/parts/reentry-gates/examples/playbook_reentry_gate.example.json",
+      "reason": "Re-entry posture stays source-owned by the explicit gate surface.",
+      "bounded": true
+    },
+    {
+      "kind": "projection_health",
+      "target_repo": "aoa-kag",
+      "target_surface": "mechanics/antifragility/parts/projection-health/examples/projection_health_receipt.example.json",
+      "reason": "Quarantined or degraded KAG posture must be read from the source-owned health receipt.",
+      "bounded": true
+    },
+    {
+      "kind": "regrounding_ticket",
+      "target_repo": "aoa-kag",
+      "target_surface": "mechanics/antifragility/parts/retrieval-outage-regrounding/examples/regrounding_ticket.example.json",
+      "reason": "Regrounding remains a bounded KAG repair plan, not a router-owned recovery action.",
+      "bounded": true
+    },
+    {
+      "kind": "memo_pattern",
+      "target_repo": "aoa-memo",
+      "target_surface": "mechanics/antifragility/parts/recovery-pattern-memory/examples/pattern.antifragility-stress-recovery-window.example.json",
+      "reason": "Reviewed recovery-pattern context may be recalled after source receipts and re-entry gates are named.",
+      "bounded": true
+    }
+  ],
+  "memo_context": [
+    {
+      "memory_id": "memo.pattern.2026-04-07.antifragility-stress-recovery-window",
+      "title": "Stress recovery stays bounded only when replay follows source receipt, gate, and regrounding order",
+      "source_path": "mechanics/antifragility/parts/recovery-pattern-memory/examples/pattern.antifragility-stress-recovery-window.example.json",
+      "review_state": "confirmed",
+      "current_recall_status": "preferred"
+    }
+  ],
+  "notes": "Compatibility witness only; the SDK produces the artifact but source owners retain stress, proof, playbook, KAG, memo, and runtime meaning."
+}

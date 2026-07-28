@@ -7,6 +7,8 @@ Tree-of-Sophia boundaries.
 
 ## Current Contour
 
+- Keep the G5-successor gate-routing bridge deterministic, wheel-packaged,
+  advisory, and free of predecessor checkout dependencies.
 - Keep Agon helper families candidate-only unless an owner surface names the
   executable meaning.
 - Keep center-law previews, state-packet review bindings, recurrence adapters,

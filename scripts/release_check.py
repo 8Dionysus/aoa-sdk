@@ -108,6 +108,14 @@ COMMANDS = [
         ],
     ),
     (
+        "verify installed Agon gate routing wheel",
+        [
+            sys.executable,
+            "mechanics/agon/parts/gate-routing-bridge/scripts/"
+            "verify_agon_gate_routing_wheel.py",
+        ],
+    ),
+    (
         "validate OS Abyss package artifact bundle",
         [
             sys.executable,

@@ -1,0 +1,24 @@
+{
+  "contract_id": "aoa-sdk.owner-dispatch-seam.v1",
+  "owner_repo": "aoa-sdk",
+  "route_signal": {
+    "signal_kind": "candidate",
+    "signal_state": "active",
+    "owner_truth_ref": "Agents-of-Abyss/generated/agon_lawful_move_registry.min.json"
+  },
+  "route_decision": {
+    "decision_kind": "owner_review",
+    "next_hop": "aoa-agents",
+    "decision_note": "Send assistant projection and role-boundary questions to the owning repo."
+  },
+  "owner_dispatch": {
+    "dispatch_kind": "owner_handoff",
+    "owner_repo": "aoa-agents",
+    "handoff_note": "The SDK may hand off to the owner repo, but it does not replace the owner repo's decision surfaces."
+  },
+  "source_refs": [
+    "mechanics/agon/parts/gate-routing-bridge/docs/owner-boundary.md",
+    "src/aoa_sdk/control_plane/routing/data/agon_gate_routing.config.json",
+    "docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md"
+  ]
+}

@@ -62,9 +62,10 @@ substitution or canonical-looking output roots, and keeps every G5 authority
 flag false. It also proves the manifest exposes only `manually-verified` as
 an active registry state and uses the distinct `runtime_canary` intent, while
 keeping superseded and revoked terminal exits. `verify_routing_g5_candidate_wheel.py` proves the installed wheel
-contains the candidate builder, twenty-one routing schemas, two runtime boundary
-documents, the complete fourteen-artifact assembly, and the exact 23-file
-runtime-required subset.
+contains the candidate builder, the twenty-one historical G5 routing schemas
+plus four post-switch Agon bridge schemas, two runtime boundary documents, the
+complete fourteen-artifact assembly, and the exact 23-file runtime-required
+subset.
 `test_routing_g5_release_candidate.py` proves the release envelope binds the
 exact nested candidate, 29 release subjects, deterministic archive, public
 release lifecycle, explicit admission profile, and all-false G5 authority.
@@ -79,6 +80,10 @@ schemas and the canonical builder are shipped package data, while keeping
 `test_routing_succession_e1_cost_comparison.py` recomputes workflow checkout
 and probe counts from pinned Git refs, joins retained T1/G11 receipts, rejects
 latency/token overclaims, and keeps G13 provisional until landed CI evidence.
+`test_routing_shadow_producer.py` also validates the SDK-owned
+composite-stress compatibility witness and the post-switch consumer contract,
+including its explicit predecessor-checkout prohibition and packaged Agon
+bridge route.
 
 For full Boundary Bridge coverage, also run:
 

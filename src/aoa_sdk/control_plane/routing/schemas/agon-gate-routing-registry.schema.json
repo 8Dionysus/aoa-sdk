@@ -1,0 +1,95 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/agon-gate-routing-registry.schema.json",
+  "additionalProperties": false,
+  "properties": {
+    "center_repo": {
+      "const": "Agents-of-Abyss",
+      "type": "string"
+    },
+    "decision_states": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "owner_repo": {
+      "const": "aoa-sdk",
+      "type": "string"
+    },
+    "route_hint_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "route_hints": {
+      "items": {
+        "$ref": "agon-gate-route-hint.schema.json"
+      },
+      "type": "array"
+    },
+    "schema_version": {
+      "const": "agon_gate_routing_registry.v1",
+      "type": "string"
+    },
+    "source_authority_refs": {
+      "items": {
+        "type": "object"
+      },
+      "type": "array"
+    },
+    "status": {
+      "type": "string"
+    },
+    "stop_lines": {
+      "items": {
+        "type": "string"
+      },
+      "minItems": 1,
+      "type": "array"
+    },
+    "trigger_classes": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "trigger_count": {
+      "minimum": 1,
+      "type": "integer"
+    },
+    "triggers": {
+      "items": {
+        "$ref": "agon-gate-trigger.schema.json"
+      },
+      "type": "array"
+    },
+    "validation_invariants": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "routing_contour": {
+      "const": "gate-routing",
+      "type": "string"
+    }
+  },
+  "required": [
+    "schema_version",
+    "routing_contour",
+    "status",
+    "owner_repo",
+    "center_repo",
+    "source_authority_refs",
+    "decision_states",
+    "stop_lines",
+    "trigger_count",
+    "route_hint_count",
+    "trigger_classes",
+    "triggers",
+    "route_hints",
+    "validation_invariants"
+  ],
+  "title": "Agon Gate Routing Registry",
+  "type": "object"
+}

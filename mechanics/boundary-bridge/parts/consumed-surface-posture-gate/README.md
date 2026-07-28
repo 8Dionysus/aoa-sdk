@@ -53,6 +53,10 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   predecessor discovery, and no active paired CI or release dependency
 - the E1 cost comparison: pinned structural CI/release/context reduction,
   unlike-latency stop lines, and a provisional G13 result pending landed CI
+- the post-switch consumer contract and SDK-owned composite-stress
+  compatibility witness used by sibling validators without an
+  `aoa-routing` checkout, including the wheel-packaged Agon gate-routing
+  successor route
 
 ## Owner
 
@@ -86,6 +90,8 @@ Then read the receipt-bound
 [`docs/routing-succession-g5-owner-switch.md`](docs/routing-succession-g5-owner-switch.md).
 Then read the measured
 [`docs/routing-succession-e1-cost-comparison.md`](docs/routing-succession-e1-cost-comparison.md).
+Consumers migrating away from the predecessor checkout use
+[`docs/routing-consumer-contract.md`](docs/routing-consumer-contract.md).
 G4 proves the released shadow successor and isolated runtime content path. The
 G5 candidate adds native SDK producer identity for trust and canary review.
 The release candidate adds exact public release trust without switch

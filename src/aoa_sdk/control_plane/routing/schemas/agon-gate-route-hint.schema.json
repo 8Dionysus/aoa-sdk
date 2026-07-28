@@ -1,0 +1,87 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://aoa-sdk/schemas/agon-gate-route-hint.schema.json",
+  "additionalProperties": false,
+  "properties": {
+    "assistant_allowed": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "assistant_forbidden": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "decision_state": {
+      "type": "string"
+    },
+    "hint_id": {
+      "type": "string"
+    },
+    "live_protocol": {
+      "const": false,
+      "type": "boolean"
+    },
+    "primary_next_hop": {
+      "type": "string"
+    },
+    "recommended_lawful_moves": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "routing_action": {
+      "type": "string"
+    },
+    "routing_must_not_own": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "routing_owns": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "runtime_effect": {
+      "const": "none",
+      "type": "string"
+    },
+    "secondary_next_hops": {
+      "items": {
+        "type": "string"
+      },
+      "type": "array"
+    },
+    "trigger_class": {
+      "type": "string"
+    },
+    "trigger_id": {
+      "type": "string"
+    }
+  },
+  "required": [
+    "hint_id",
+    "trigger_id",
+    "trigger_class",
+    "routing_action",
+    "decision_state",
+    "primary_next_hop",
+    "secondary_next_hops",
+    "recommended_lawful_moves",
+    "assistant_allowed",
+    "assistant_forbidden",
+    "live_protocol",
+    "runtime_effect",
+    "routing_owns",
+    "routing_must_not_own"
+  ],
+  "title": "Agon Gate Route Hint",
+  "type": "object"
+}

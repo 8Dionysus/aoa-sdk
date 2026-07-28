@@ -55,6 +55,9 @@ repositories remain authoritative.
   closeout payloads in their owner repositories
 - the deterministic SDK-owned reference adapter as a no-effect protocol
   witness, never as production runtime or invocation proof
+- the wheel-packaged pre-protocol Agon gate-routing bridge, deterministic
+  advisory route hints, and owner-dispatch seam; `Agents-of-Abyss` retains
+  Agon law and no emitted candidate activates a protocol or runtime effect
 - the versioned R2 route, plan, approval, lifecycle, event,
   evidence-reference, and adapter protocol models used by C1-C5; the models
   and Runner do not activate or implement a production runtime
@@ -121,6 +124,8 @@ repositories remain authoritative.
 - `sdk/` folders that pretend to be a second Python implementation tree or a
   sibling-source owner
 - hidden ranking, routing, or memory policy
+- Agon law, live arena state, verdict, scar, rank, retention, or ToS authority
+  inferred from an SDK gate candidate
 - skill selection, activation, task-local composition, or admission for
   another repository's home
 - daemon or service responsibilities

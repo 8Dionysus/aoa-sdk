@@ -80,6 +80,11 @@ Tracking starts with the community-docs baseline for this repository.
 - Retire active `aoa-routing` checkout, sibling-canary, cadence, paired-release,
   and historical pre-G5 probe dependencies. Compatibility reads now prefer the
   SDK-delivered bundle while the predecessor remains optional rollback state.
+- Merge the routing-owned pre-protocol Agon gate function into
+  `aoa_sdk.control_plane.routing.agon`: preserve the twelve trigger IDs and
+  `agon_gate_routing_registry.v1`, move route-hint ownership to `aoa-sdk`,
+  package config/registry/schemas in the wheel, and keep center law,
+  activation, verdicts, and runtime effects outside the SDK.
 - Add the reproducible E1 cost comparison: workflow checkout actions fall
   73 to 23, active producer control planes fall 2 to 1, and the clean
   route-bind-compile federation falls from a 15–16-root maintenance lower

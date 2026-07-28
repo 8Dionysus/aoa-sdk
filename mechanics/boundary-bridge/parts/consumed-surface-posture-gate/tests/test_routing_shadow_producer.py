@@ -10,6 +10,7 @@ import pytest
 
 from aoa_sdk.control_plane.routing import core as router_core
 from aoa_sdk.control_plane.routing import producer as build_router
+from aoa_sdk.control_plane.routing.validator import get_schema_validator
 
 
 PART_ROOT = Path(__file__).resolve().parents[1]
@@ -33,6 +34,49 @@ FIXTURE_REPO_NAMES = (
     "8Dionysus",
     "abyss-stack",
 )
+
+
+def test_sdk_owned_consumer_fixture_preserves_advisory_hint_contract() -> None:
+    fixture_path = (
+        PART_ROOT / "examples" / "composite_stress_route_hint.example.json"
+    )
+    fixture = json.loads(fixture_path.read_text(encoding="utf-8"))
+    source_inputs = [
+        {
+            "repo": f"owner-{index}",
+            "surface_kind": "compatibility-input",
+            "ref": f"owner-{index}:surface.json",
+        }
+        for index in range(6)
+    ]
+    get_schema_validator("composite-stress-route-hints.schema.json").validate(
+        {
+            "schema_version": "aoa_routing_composite_stress_route_hints_v1",
+            "source_inputs": source_inputs,
+            "hints": [fixture],
+        }
+    )
+    assert fixture["source_priority"]["routing_is_advisory"] is True
+    assert fixture["input_refs"]["stats_summary_ref"] == (
+        "aoa-stats:generated/stress_recovery_window_summary.min.json"
+    )
+
+
+def test_routing_consumer_contract_rejects_predecessor_checkout_dependency() -> None:
+    text = (
+        PART_ROOT / "docs" / "routing-consumer-contract.md"
+    ).read_text(encoding="utf-8")
+
+    assert "`aoa-sdk` is the canonical routing producer" in text
+    assert "must not require an `aoa-routing` checkout" in text
+    assert "`aoa-stats/generated/stress_recovery_window_summary.min.json`" in text
+    assert (
+        "does not replace\n"
+        "`recommended_paths.min.json`, `owner_layer_shortlist.min.json`"
+    ) in text
+    assert "`aoa_sdk.control_plane.routing.agon`" in text
+    assert "former `aoa-routing/mechanics/agon/parts/gate-routing/`" in text
+    assert "`runtime_effect=none`" in text
 
 
 def test_shadow_producer_refuses_canonical_looking_generated_directory(
