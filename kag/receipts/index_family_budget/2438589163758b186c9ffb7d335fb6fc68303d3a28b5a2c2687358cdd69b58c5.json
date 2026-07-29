@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 3095321,
+  "allowed_tracked_bytes": 19038876,
+  "approved_by": "repository-owner",
+  "base_ref": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb",
+  "changed_generated_bytes": 3095321,
+  "changed_generated_files": 59,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "2438589163758b186c9ffb7d335fb6fc68303d3a28b5a2c2687358cdd69b58c5",
+  "reason": "Release workflow history fix changes one workflow and its regression coverage; regenerate the exact repository-local KAG family against the PR base.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19038876,
+  "tracked_bytes_max": 15728640
+}
