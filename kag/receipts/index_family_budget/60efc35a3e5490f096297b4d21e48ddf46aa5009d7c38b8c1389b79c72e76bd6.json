@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 13798234,
+  "allowed_tracked_bytes": 18918194,
+  "approved_by": "repository-owner",
+  "base_ref": "eda623ecd8a77606414a29ea7102369e369b95be",
+  "changed_generated_bytes": 13798234,
+  "changed_generated_files": 289,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "60efc35a3e5490f096297b4d21e48ddf46aa5009d7c38b8c1389b79c72e76bd6",
+  "reason": "Owner result review adds typed organ-access contracts, examples, tests, and topology",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 18918194,
+  "tracked_bytes_max": 15728640
+}
