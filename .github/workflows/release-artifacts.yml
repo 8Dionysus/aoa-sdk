@@ -26,6 +26,12 @@ jobs:
         uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
         with:
           ref: ${{ inputs.release_tag || github.sha }}
+          fetch-depth: 0
+
+      - name: Fetch routing succession evidence history
+        run: >-
+          git fetch --no-tags origin
+          '+refs/tags/routing-succession-e1-evidence-20260728:refs/tags/routing-succession-e1-evidence-20260728'
 
       - name: Validate immutable release evidence ref
         if: env.RELEASE_TAG != ''

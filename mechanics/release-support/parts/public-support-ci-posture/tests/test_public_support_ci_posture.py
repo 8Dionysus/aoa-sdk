@@ -30,6 +30,43 @@ def load_yaml(relative_path: str) -> dict[str, object]:
     return payload
 
 
+def test_release_artifacts_replay_fetches_succession_evidence_history() -> None:
+    workflow = load_yaml(".github/workflows/release-artifacts.yml")
+    jobs = workflow["jobs"]
+    assert isinstance(jobs, dict)
+    build = jobs["build"]
+    assert isinstance(build, dict)
+    steps = build["steps"]
+    assert isinstance(steps, list)
+
+    checkout_index = next(
+        index
+        for index, step in enumerate(steps)
+        if isinstance(step, dict) and step.get("name") == "Checkout"
+    )
+    checkout = steps[checkout_index]
+    assert isinstance(checkout, dict)
+    checkout_inputs = checkout["with"]
+    assert isinstance(checkout_inputs, dict)
+    assert checkout_inputs["ref"] == "${{ inputs.release_tag || github.sha }}"
+    assert checkout_inputs["fetch-depth"] == 0
+
+    history_index = next(
+        index
+        for index, step in enumerate(steps)
+        if isinstance(step, dict)
+        and step.get("name") == "Fetch routing succession evidence history"
+    )
+    history_step = steps[history_index]
+    assert isinstance(history_step, dict)
+    assert history_index == checkout_index + 1
+    assert history_step["run"] == (
+        "git fetch --no-tags origin "
+        "'+refs/tags/routing-succession-e1-evidence-20260728:"
+        "refs/tags/routing-succession-e1-evidence-20260728'"
+    )
+
+
 def test_latest_sibling_workflow_checks_out_every_matrix_repo() -> None:
     matrix = load_json(
         "mechanics/release-support/parts/public-support-ci-posture/"
