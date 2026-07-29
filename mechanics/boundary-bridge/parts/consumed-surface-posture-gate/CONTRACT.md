@@ -97,7 +97,9 @@
   recording `archive_ready=true`. That receipt still cannot grant archive
   authority.
 - Requires X2 to preserve the exact X1 bytes and historical false authority
-  fields while separately binding the later exact operator approval, final
+  fields while separately binding the later exact operator approval through a
+  schema-validated receipt with exact raw-session request/response timestamps,
+  record digests, repository identity, and scope; then binds the final
   predecessor landing, final deprecation release, public archive state, and
   post-archive SDK-canonical runtime evidence.
 - Keeps the retired canonical KAG provider distinct from the stale mutable

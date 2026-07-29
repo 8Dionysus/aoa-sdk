@@ -32,8 +32,9 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   prerequisites, including its own successful post-merge main validation,
   making archive readiness true while keeping every irreversible-action
   authority false until separate exact operator approval
-- an X2 archive closeout that pins X1 unchanged, binds the exact operator
-  scope, final predecessor landing and release, preserved public GitHub
+- an X2 archive closeout that pins X1 unchanged, binds a separately
+  schema-validated and digest-pinned raw-session operator approval receipt,
+  final predecessor landing and release, preserved public GitHub
   archive state, post-archive SDK-canonical runtime health, and the
   non-blocking stale KAG runtime-slice residual
 - the accepted routing succession target model, authority matrix,

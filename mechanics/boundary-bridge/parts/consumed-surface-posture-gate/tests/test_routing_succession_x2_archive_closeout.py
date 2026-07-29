@@ -15,11 +15,18 @@ EVIDENCE_PATH = (
 SCHEMA_PATH = (
     PART_ROOT / "schemas" / "routing-succession-x2-archive-closeout.schema.json"
 )
+APPROVAL_PATH = (
+    PART_ROOT / "evidence" / "routing-succession-x2-operator-approval.json"
+)
+APPROVAL_SCHEMA_PATH = (
+    PART_ROOT / "schemas" / "routing-succession-x2-operator-approval.schema.json"
+)
 X1_PATH = (
     PART_ROOT / "evidence" / "routing-succession-x1-consumer-zero-report.json"
 )
 
 X1_SHA256 = "354a4e55d9be56e4801271daec3dd7b661ff6ba8fdb23da41cb32e2ce9c8a09d"
+APPROVAL_SHA256 = "f582fdf98eb050705ae5ba53ce7c5881660f26c09218103b116a4516bdc620c3"
 PREDECESSOR_MAIN = "5142b0176f136c7703c2c0d5d8526d106132e84e"
 SDK_RUNTIME_SOURCE = "e4ffd26ed9e50125be584c00839ee6a8f7016a0d"
 KAG_SUCCESSION_MAIN = "15e1639740873f374faecb42029ae5cc8eb5375c"
@@ -36,11 +43,28 @@ def validator() -> Draft202012Validator:
     )
 
 
+def approval_validator() -> Draft202012Validator:
+    return Draft202012Validator(
+        load_json(APPROVAL_SCHEMA_PATH),
+        format_checker=FormatChecker(),
+    )
+
+
 def load_evidence() -> dict[str, object]:
     evidence = load_json(EVIDENCE_PATH)
     errors = sorted(validator().iter_errors(evidence), key=lambda item: list(item.path))
     assert errors == []
     return evidence
+
+
+def load_approval() -> dict[str, object]:
+    approval = load_json(APPROVAL_PATH)
+    errors = sorted(
+        approval_validator().iter_errors(approval),
+        key=lambda item: list(item.path),
+    )
+    assert errors == []
+    return approval
 
 
 def test_x2_is_schema_valid_and_keeps_x1_immutable() -> None:
@@ -80,6 +104,8 @@ def test_x2_is_schema_valid_and_keeps_x1_immutable() -> None:
 
 def test_x2_binds_exact_operator_scope_and_predecessor_landing() -> None:
     evidence = load_evidence()
+    approval_bytes = APPROVAL_PATH.read_bytes()
+    approval = load_approval()
     authorization = evidence["operator_authorization"]
     landing = evidence["predecessor_landing"]
 
@@ -89,6 +115,19 @@ def test_x2_binds_exact_operator_scope_and_predecessor_landing() -> None:
         "full_name": "8Dionysus/aoa-routing",
     }
     assert authorization["granted"] is True
+    assert authorization["authority_source"] == "durable_operator_approval_receipt"
+    assert authorization["approval_receipt_ref"] == (
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/"
+        "evidence/routing-succession-x2-operator-approval.json"
+    )
+    assert hashlib.sha256(approval_bytes).hexdigest() == APPROVAL_SHA256
+    assert authorization["approval_receipt_sha256"] == f"sha256:{APPROVAL_SHA256}"
+    assert authorization["source_session_id"] == (
+        "019f9029-57ac-7c13-8c53-e3852ac6f5ae"
+    )
+    assert authorization["approval_granted_at_utc"] == (
+        "2026-07-29T16:04:42.016Z"
+    )
     assert authorization["repository"] == expected_repository
     assert authorization["approved_actions"] == [
         "publish_final_deprecation_release",
@@ -100,6 +139,35 @@ def test_x2_binds_exact_operator_scope_and_predecessor_landing() -> None:
         "rename_repository",
     ]
     assert authorization["approval_scope_exact"] is True
+    assert approval["authority_source"]["request"] == {
+        "timestamp": "2026-07-29T15:56:13.555Z",
+        "role": "assistant",
+        "raw_jsonl_line": 63130,
+        "raw_jsonl_record_sha256": (
+            "sha256:e344cbb6a045185f068c575c195efe1810173daeea7f586347ceac6f7f050faf"
+        ),
+        "exact_scope_prompt": (
+            "Разрешаю irreversible sequence для `8Dionysus/aoa-routing`, "
+            "repository ID `1186624390`, node ID `R_kgDORrpzhg`, на основании "
+            "X1 `9d10318e…` и run `30464461615`: final deprecation release, "
+            "About/README/routes update и GitHub archive."
+        ),
+    }
+    assert approval["authority_source"]["approval"] == {
+        "timestamp": "2026-07-29T16:04:42.016Z",
+        "role": "user",
+        "raw_jsonl_line": 63136,
+        "raw_jsonl_record_sha256": (
+            "sha256:8b0390a5a0d6f6a0f67b2e2224bcc2c2de83468286d1fd5319dbc235274114b3"
+        ),
+        "exact_response": "Разрешаю, делай",
+    }
+    assert approval["repository"] == expected_repository
+    assert approval["approved_actions"] == authorization["approved_actions"]
+    assert approval["forbidden_actions"] == authorization["forbidden_actions"]
+    assert approval["verdict"]["granted"] is True
+    assert approval["verdict"]["scope_exact"] is True
+    assert approval["verdict"]["approval_precedes_execution"] is True
 
     assert landing["pull_request"] == {
         "number": 158,
@@ -266,6 +334,17 @@ def test_x2_schema_rejects_authority_identity_and_closeout_substitution() -> Non
     mutated = deepcopy(evidence)
     mutated["operator_authorization"]["repository"]["id"] = 1
     assert list(validator().iter_errors(mutated))
+
+    mutated = deepcopy(evidence)
+    mutated["operator_authorization"]["approval_receipt_sha256"] = (
+        "sha256:" + ("0" * 64)
+    )
+    assert list(validator().iter_errors(mutated))
+
+    approval = load_approval()
+    mutated_approval = deepcopy(approval)
+    mutated_approval["authority_source"]["approval"]["exact_response"] = "делай"
+    assert list(approval_validator().iter_errors(mutated_approval))
 
     mutated = deepcopy(evidence)
     mutated["live_runtime"]["runtime_mirror"]["canonical_owner_repo"] = "aoa-routing"

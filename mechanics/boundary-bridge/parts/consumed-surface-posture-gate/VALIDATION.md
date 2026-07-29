@@ -106,12 +106,14 @@ It also proves the schema keeps archive readiness distinct from authority and
 rejects live-runtime or report archive authorization and any executed
 irreversible predecessor action.
 `test_routing_succession_x2_archive_closeout.py` pins the immutable X1 bytes,
-validates the exact later operator scope, final predecessor landing and
-release, preserved public GitHub archive state, SDK-canonical post-archive
-runtime health, and `aoa-kag` provider succession. It also keeps the old KAG
-runtime slice visible as a non-blocking `source_unavailable` projection
-residual instead of relabeling it as current or treating it as an active
-checkout dependency.
+independently validates the durable raw-session operator approval receipt and
+its exact request/response record digests, requires X2 to bind that receipt by
+path and SHA-256, and validates the final predecessor landing and release,
+preserved public GitHub archive state, SDK-canonical post-archive runtime
+health, and `aoa-kag` provider succession. It also keeps the old KAG runtime
+slice visible as a non-blocking `source_unavailable` projection residual
+instead of relabeling it as current or treating it as an active checkout
+dependency.
 
 For full Boundary Bridge coverage, also run:
 

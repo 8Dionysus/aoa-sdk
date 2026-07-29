@@ -3,6 +3,22 @@
 X2 is the final SDK-owned receipt for the operator-approved hosting succession
 of `8Dionysus/aoa-routing`. Its machine-readable source is
 [`../evidence/routing-succession-x2-archive-closeout.json`](../evidence/routing-succession-x2-archive-closeout.json).
+The separate immutable authority source is
+[`../evidence/routing-succession-x2-operator-approval.json`](../evidence/routing-succession-x2-operator-approval.json).
+
+## Durable operator authority
+
+X2 does not infer authorization from a session-local summary. The approval
+receipt preserves the exact request/response message pair from Codex session
+`019f9029-57ac-7c13-8c53-e3852ac6f5ae`, including both UTC timestamps, JSONL
+line identities, and SHA-256 digests of the exact raw records. Its schema pins
+the repository numeric and node IDs, X1 readiness basis, three approved
+actions, and the explicit delete/rename exclusions.
+
+The X2 closeout then binds that receipt by repository-relative path and
+SHA-256. Tests validate the approval receipt independently before accepting
+the closeout. The raw transcript remains the stronger provenance source; the
+repo-local receipt is its durable, auditable scope projection.
 
 ## What X2 closes
 

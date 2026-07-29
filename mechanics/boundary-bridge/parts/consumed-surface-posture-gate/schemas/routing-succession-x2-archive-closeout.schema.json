@@ -88,6 +88,10 @@
       "required": [
         "granted",
         "authority_source",
+        "approval_receipt_ref",
+        "approval_receipt_sha256",
+        "source_session_id",
+        "approval_granted_at_utc",
         "repository",
         "approved_actions",
         "forbidden_actions",
@@ -98,8 +102,19 @@
           "const": true
         },
         "authority_source": {
-          "type": "string",
-          "minLength": 1
+          "const": "durable_operator_approval_receipt"
+        },
+        "approval_receipt_ref": {
+          "const": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-x2-operator-approval.json"
+        },
+        "approval_receipt_sha256": {
+          "const": "sha256:f582fdf98eb050705ae5ba53ce7c5881660f26c09218103b116a4516bdc620c3"
+        },
+        "source_session_id": {
+          "const": "019f9029-57ac-7c13-8c53-e3852ac6f5ae"
+        },
+        "approval_granted_at_utc": {
+          "const": "2026-07-29T16:04:42.016Z"
         },
         "repository": {
           "$ref": "#/$defs/repositoryIdentity"

@@ -1,0 +1,226 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/8Dionysus/aoa-sdk/blob/main/mechanics/boundary-bridge/parts/consumed-surface-posture-gate/schemas/routing-succession-x2-operator-approval.schema.json",
+  "title": "AoA SDK routing succession X2 operator approval",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "receipt_id",
+    "recorded_at_utc",
+    "authority_source",
+    "repository",
+    "readiness_basis",
+    "approved_actions",
+    "forbidden_actions",
+    "verdict"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_routing_succession_x2_operator_approval_v1"
+    },
+    "receipt_id": {
+      "const": "routing-succession-x2-operator-approval"
+    },
+    "recorded_at_utc": {
+      "$ref": "#/$defs/dateTime"
+    },
+    "authority_source": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "kind",
+        "session_id",
+        "raw_transcript_ref",
+        "request",
+        "approval",
+        "hash_basis"
+      ],
+      "properties": {
+        "kind": {
+          "const": "preserved_codex_session_message_pair"
+        },
+        "session_id": {
+          "const": "019f9029-57ac-7c13-8c53-e3852ac6f5ae"
+        },
+        "raw_transcript_ref": {
+          "const": "codex-session:019f9029-57ac-7c13-8c53-e3852ac6f5ae"
+        },
+        "request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "timestamp",
+            "role",
+            "raw_jsonl_line",
+            "raw_jsonl_record_sha256",
+            "exact_scope_prompt"
+          ],
+          "properties": {
+            "timestamp": {
+              "const": "2026-07-29T15:56:13.555Z"
+            },
+            "role": {
+              "const": "assistant"
+            },
+            "raw_jsonl_line": {
+              "const": 63130
+            },
+            "raw_jsonl_record_sha256": {
+              "const": "sha256:e344cbb6a045185f068c575c195efe1810173daeea7f586347ceac6f7f050faf"
+            },
+            "exact_scope_prompt": {
+              "const": "Разрешаю irreversible sequence для `8Dionysus/aoa-routing`, repository ID `1186624390`, node ID `R_kgDORrpzhg`, на основании X1 `9d10318e…` и run `30464461615`: final deprecation release, About/README/routes update и GitHub archive."
+            }
+          }
+        },
+        "approval": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "timestamp",
+            "role",
+            "raw_jsonl_line",
+            "raw_jsonl_record_sha256",
+            "exact_response"
+          ],
+          "properties": {
+            "timestamp": {
+              "const": "2026-07-29T16:04:42.016Z"
+            },
+            "role": {
+              "const": "user"
+            },
+            "raw_jsonl_line": {
+              "const": 63136
+            },
+            "raw_jsonl_record_sha256": {
+              "const": "sha256:8b0390a5a0d6f6a0f67b2e2224bcc2c2de83468286d1fd5319dbc235274114b3"
+            },
+            "exact_response": {
+              "const": "Разрешаю, делай"
+            }
+          }
+        },
+        "hash_basis": {
+          "const": "SHA-256 of the exact UTF-8 JSONL response_item record including its trailing LF."
+        }
+      }
+    },
+    "repository": {
+      "$ref": "#/$defs/repositoryIdentity"
+    },
+    "readiness_basis": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "x1_landed_main_ref",
+        "x1_main_validation_run_id",
+        "archive_readiness_ref",
+        "archive_readiness_validation_run_id"
+      ],
+      "properties": {
+        "x1_landed_main_ref": {
+          "const": "9d10318e446304bb951a7c71aab0b5def961af72"
+        },
+        "x1_main_validation_run_id": {
+          "const": 30464461615
+        },
+        "archive_readiness_ref": {
+          "const": "37c5aab075c115b50bb47fc431785b2c2b6e0d86"
+        },
+        "archive_readiness_validation_run_id": {
+          "const": 30466542840
+        }
+      }
+    },
+    "approved_actions": {
+      "$ref": "#/$defs/approvedActions"
+    },
+    "forbidden_actions": {
+      "$ref": "#/$defs/forbiddenActions"
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "granted",
+        "scope_exact",
+        "approval_precedes_execution",
+        "claim_limit"
+      ],
+      "properties": {
+        "granted": {
+          "const": true
+        },
+        "scope_exact": {
+          "const": true
+        },
+        "approval_precedes_execution": {
+          "const": true
+        },
+        "claim_limit": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "$defs": {
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "repositoryIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "node_id",
+        "full_name"
+      ],
+      "properties": {
+        "id": {
+          "const": 1186624390
+        },
+        "node_id": {
+          "const": "R_kgDORrpzhg"
+        },
+        "full_name": {
+          "const": "8Dionysus/aoa-routing"
+        }
+      }
+    },
+    "approvedActions": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "publish_final_deprecation_release"
+        },
+        {
+          "const": "update_repository_about_metadata"
+        },
+        {
+          "const": "archive_repository"
+        }
+      ],
+      "items": false,
+      "minItems": 3,
+      "maxItems": 3
+    },
+    "forbiddenActions": {
+      "type": "array",
+      "prefixItems": [
+        {
+          "const": "delete_repository"
+        },
+        {
+          "const": "rename_repository"
+        }
+      ],
+      "items": false,
+      "minItems": 2,
+      "maxItems": 2
+    }
+  }
+}
