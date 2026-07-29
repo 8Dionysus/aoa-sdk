@@ -1,7 +1,7 @@
 {
   "schema_version": "aoa_sdk_routing_succession_x1_consumer_zero_report_v1",
-  "observed_at_utc": "2026-07-29T13:46:44Z",
-  "status": "postmerge_validation_pending",
+  "observed_at_utc": "2026-07-29T15:15:41Z",
+  "status": "archive_ready_operator_approval_required",
   "scope": {
     "r0_baseline_ref": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json",
     "r0_baseline_sha256": "sha256:ee28bc71bd083c0e1a35ca42ea0debb326d8f1ca312189a9c854de447e0b8219",
@@ -9,8 +9,9 @@
     "candidate_sha256": "sha256:4cbeb2945940e3a760c37e47dc0ff56d9e533155b66aca05ddf8baad5e3eaf21",
     "sdk_landed_control_plane_ref": "780ac06d1739246d6402445e6ec43ef39a97b90a",
     "sdk_final_evidence_ref": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
-    "observation_class": "exact landed main refs, owner PR and CI evidence, immutable-tag release replay artifacts, exact installed wheels, live SDK-canonical runtime health, and post-repair Agent OS lifecycle cycles",
-    "claim_boundary": "X1 proves landed direct-checkout consumer-zero, compatibility exit, operational predecessor rollback retirement, and every substantive archive-readiness prerequisite, but keeps archive readiness pending its own successful post-merge main validation receipt. It does not authorize a deprecation release, repository metadata mutation, GitHub archival, deletion, rename, or any other irreversible predecessor action."
+    "x1_report_landed_main_ref": "9d10318e446304bb951a7c71aab0b5def961af72",
+    "observation_class": "exact landed main refs, owner PR and CI evidence, immutable-tag release replay artifacts, exact installed wheels, live SDK-canonical runtime health, post-repair Agent OS lifecycle cycles, and the landed X1 report's own successful main validation receipt",
+    "claim_boundary": "X1 proves landed direct-checkout consumer-zero, compatibility exit, operational predecessor rollback retirement, and every substantive archive-readiness prerequisite, including its own successful post-merge main validation. Archive readiness is true, but this receipt does not authorize a deprecation release, repository metadata mutation, GitHub archival, deletion, rename, or any other irreversible predecessor action; separate exact operator approval remains required."
   },
   "consumer_accounting": {
     "r0_registered_consumers": 16,
@@ -26,10 +27,10 @@
       "repo": "aoa-sdk",
       "change_mode": "landed_migration",
       "migration_ref": "780ac06d1739246d6402445e6ec43ef39a97b90a",
-      "current_main_ref": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
+      "current_main_ref": "9d10318e446304bb951a7c71aab0b5def961af72",
       "direct_predecessor_checkout_dependencies": 0,
       "landed_or_classified": true,
-      "validation": "PRs 236, 237, and 239 landed the canonical producer, consumer contract, and Agent OS control plane; PRs 240 through 243 released v0.9.0 and repaired immutable-tag replay history, lint isolation, and sdist isolation. Three earlier main validations are retained as pre-migration baseline evidence; five validations at or after migration ref 780ac06d and the final exact-tag release replay passed."
+      "validation": "PRs 236, 237, and 239 landed the canonical producer, consumer contract, and Agent OS control plane; PRs 240 through 243 released v0.9.0 and repaired immutable-tag replay history, lint isolation, and sdist isolation; PR 244 landed the X1 report. Three earlier main validations are retained as pre-migration baseline evidence; six validations at or after migration ref 780ac06d, including the X1 report's own main validation, and the final exact-tag release replay passed."
     },
     {
       "repo": "abyss-stack",
@@ -329,6 +330,13 @@
         "runner_seconds": 205,
         "conclusion": "success",
         "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30455955079"
+      },
+      {
+        "run_id": 30464461615,
+        "head_sha": "9d10318e446304bb951a7c71aab0b5def961af72",
+        "runner_seconds": 215,
+        "conclusion": "success",
+        "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30464461615"
       }
     ],
     "required_sdk_main_success_cycles": 2,
@@ -416,13 +424,16 @@
     "strict_postpublish_audit_passed": true,
     "x1_report_postmerge_validation": {
       "required": true,
-      "status": "pending",
-      "landed_main_ref": null,
-      "run_id": null,
-      "conclusion": null,
-      "claim_limit": "The X1 report cannot claim archive readiness until a subsequent receipt binds a successful aoa-sdk main validation run containing this report."
+      "status": "success",
+      "landed_main_ref": "9d10318e446304bb951a7c71aab0b5def961af72",
+      "run_id": 30464461615,
+      "conclusion": "success",
+      "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30464461615",
+      "runner_seconds": 215,
+      "validated_x1_report_path": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-x1-consumer-zero-report.json",
+      "claim_limit": "This run validates the landed pending X1 report; this subsequent receipt records that observation and does not authorize predecessor mutation."
     },
-    "all_required_validation_green": false
+    "all_required_validation_green": true
   },
   "package_compatibility": {
     "sdk_source_ref": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb",
@@ -581,7 +592,7 @@
       {
         "id": "two_consecutive_sdk_validation_cycles",
         "exit_satisfied": true,
-        "evidence": "Five aoa-sdk main Repo Validation runs passed at or after the SDK migration landing 780ac06d, including the final release-workflow repair at 956c32cd; three earlier runs are retained separately as pre-migration baseline evidence."
+        "evidence": "Six aoa-sdk main Repo Validation runs passed at or after the SDK migration landing 780ac06d, including the final release-workflow repair at 956c32cd and the landed X1 report at 9d10318e; three earlier runs are retained separately as pre-migration baseline evidence."
       },
       {
         "id": "runtime_mirror_and_trust_identify_sdk",
@@ -595,7 +606,7 @@
       }
     ],
     "required_validation_cycles": 2,
-    "completed_post_landing_validation_cycles": 5,
+    "completed_post_landing_validation_cycles": 6,
     "compatibility_window_exited": true,
     "operational_predecessor_rollback_retired": true
   },
@@ -610,29 +621,21 @@
     "preserved": true,
     "posture": "maintenance_only_compatibility_security_deprecation",
     "operational_runtime_rollback_required": false,
-    "archive_ready": false,
+    "archive_ready": true,
     "archive_authorized": false,
     "deprecation_release_executed": false,
     "github_archive_executed": false,
     "irreversible_action_taken": false,
-    "approval_rule": "Only after a subsequent receipt binds a successful aoa-sdk main validation run containing this X1 report may a separate exact operator approval naming repository ID 1186624390 authorize the deprecation-release, About-banner, and GitHub-archive sequence."
+    "approval_rule": "The successful aoa-sdk main validation containing the landed X1 report is bound by this receipt. A separate exact operator approval naming repository ID 1186624390 is the only authority that may authorize the deprecation-release, About-banner, and GitHub-archive sequence."
   },
   "remaining_external_gates": [
-    {
-      "id": "x1_report_postmerge_validation",
-      "kind": "postmerge_validation_evidence",
-      "target": "github:8Dionysus/aoa-sdk:main:x1-report-containing-commit",
-      "required": true,
-      "satisfied": false,
-      "reason": "The X1 report must land first, then a subsequent receipt must bind a successful Repo Validation run on the aoa-sdk main commit containing this report before archive readiness can be claimed."
-    },
     {
       "id": "exact_operator_archive_approval",
       "kind": "irreversible_external_authority",
       "target": "github:repository:1186624390:8Dionysus/aoa-routing",
       "required": true,
       "satisfied": false,
-      "reason": "Repository archival, the deprecation release, and the About banner are irreversible external actions and require a separate exact operator approval after this X1 report is landed and post-merge green."
+      "reason": "The landed X1 report at 9d10318e446304bb951a7c71aab0b5def961af72 and its main validation run 30464461615 are green. Repository archival, the final deprecation release, and the About banner remain irreversible external actions requiring separate exact operator approval naming repository ID 1186624390."
     }
   ],
   "verdict": {
@@ -642,9 +645,9 @@
     "real_execution_closeout_window_complete": true,
     "compatibility_window_exited": true,
     "operational_predecessor_rollback_retired": true,
-    "archive_ready": false,
+    "archive_ready": true,
     "archive_authorized": false,
     "irreversible_action_taken": false,
-    "claim_limit": "Every substantive in-scope consumer, runtime, exact-wheel lifecycle, immutable-tag release replay, and compatibility-exit prerequisite is green. The package artifact is admitted for the agent-consumer intent used here; no public-release-trust-root Python distribution consumption is claimed. This report remains archive_ready=false until a subsequent receipt binds its own successful post-merge main validation. Separate exact operator authority for repository ID 1186624390 remains required afterward; this report supplies no authority to publish the predecessor deprecation release, edit its metadata, archive, delete, rename, or otherwise irreversibly mutate aoa-routing."
+    "claim_limit": "Every substantive in-scope consumer, runtime, exact-wheel lifecycle, immutable-tag release replay, compatibility-exit, and landed-X1 post-merge validation prerequisite is green, so archive_ready=true. The package artifact is admitted for the agent-consumer intent used here; no public-release-trust-root Python distribution consumption is claimed. The sole remaining gate is separate exact operator approval naming repository ID 1186624390; this report supplies no authority to publish the predecessor deprecation release, edit its metadata, archive, delete, rename, or otherwise irreversibly mutate aoa-routing."
   }
 }

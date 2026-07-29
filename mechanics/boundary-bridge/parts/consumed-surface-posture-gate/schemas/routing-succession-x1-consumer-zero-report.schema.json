@@ -33,7 +33,7 @@
       "format": "date-time"
     },
     "status": {
-      "const": "postmerge_validation_pending"
+      "const": "archive_ready_operator_approval_required"
     },
     "scope": {
       "type": "object",
@@ -45,6 +45,7 @@
         "candidate_sha256",
         "sdk_landed_control_plane_ref",
         "sdk_final_evidence_ref",
+        "x1_report_landed_main_ref",
         "observation_class",
         "claim_boundary"
       ],
@@ -67,11 +68,14 @@
         "sdk_final_evidence_ref": {
           "const": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7"
         },
+        "x1_report_landed_main_ref": {
+          "const": "9d10318e446304bb951a7c71aab0b5def961af72"
+        },
         "observation_class": {
-          "const": "exact landed main refs, owner PR and CI evidence, immutable-tag release replay artifacts, exact installed wheels, live SDK-canonical runtime health, and post-repair Agent OS lifecycle cycles"
+          "const": "exact landed main refs, owner PR and CI evidence, immutable-tag release replay artifacts, exact installed wheels, live SDK-canonical runtime health, post-repair Agent OS lifecycle cycles, and the landed X1 report's own successful main validation receipt"
         },
         "claim_boundary": {
-          "const": "X1 proves landed direct-checkout consumer-zero, compatibility exit, operational predecessor rollback retirement, and every substantive archive-readiness prerequisite, but keeps archive readiness pending its own successful post-merge main validation receipt. It does not authorize a deprecation release, repository metadata mutation, GitHub archival, deletion, rename, or any other irreversible predecessor action."
+          "const": "X1 proves landed direct-checkout consumer-zero, compatibility exit, operational predecessor rollback retirement, and every substantive archive-readiness prerequisite, including its own successful post-merge main validation. Archive readiness is true, but this receipt does not authorize a deprecation release, repository metadata mutation, GitHub archival, deletion, rename, or any other irreversible predecessor action; separate exact operator approval remains required."
         }
       }
     },
@@ -647,8 +651,8 @@
         },
         "sdk_main_success_cycles": {
           "type": "array",
-          "minItems": 5,
-          "maxItems": 5,
+          "minItems": 6,
+          "maxItems": 6,
           "prefixItems": [
             {
               "const": {
@@ -693,6 +697,15 @@
                 "runner_seconds": 205,
                 "conclusion": "success",
                 "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30455955079"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30464461615,
+                "head_sha": "9d10318e446304bb951a7c71aab0b5def961af72",
+                "runner_seconds": 215,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30464461615"
               }
             }
           ],
@@ -870,6 +883,9 @@
             "landed_main_ref",
             "run_id",
             "conclusion",
+            "url",
+            "runner_seconds",
+            "validated_x1_report_path",
             "claim_limit"
           ],
           "properties": {
@@ -877,24 +893,33 @@
               "const": true
             },
             "status": {
-              "const": "pending"
+              "const": "success"
             },
             "landed_main_ref": {
-              "const": null
+              "const": "9d10318e446304bb951a7c71aab0b5def961af72"
             },
             "run_id": {
-              "const": null
+              "const": 30464461615
             },
             "conclusion": {
-              "const": null
+              "const": "success"
+            },
+            "url": {
+              "const": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30464461615"
+            },
+            "runner_seconds": {
+              "const": 215
+            },
+            "validated_x1_report_path": {
+              "const": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-x1-consumer-zero-report.json"
             },
             "claim_limit": {
-              "const": "The X1 report cannot claim archive readiness until a subsequent receipt binds a successful aoa-sdk main validation run containing this report."
+              "const": "This run validates the landed pending X1 report; this subsequent receipt records that observation and does not authorize predecessor mutation."
             }
           }
         },
         "all_required_validation_green": {
-          "const": false
+          "const": true
         }
       }
     },
@@ -1325,7 +1350,7 @@
             {
               "id": "two_consecutive_sdk_validation_cycles",
               "exit_satisfied": true,
-              "evidence": "Five aoa-sdk main Repo Validation runs passed at or after the SDK migration landing 780ac06d, including the final release-workflow repair at 956c32cd; three earlier runs are retained separately as pre-migration baseline evidence."
+              "evidence": "Six aoa-sdk main Repo Validation runs passed at or after the SDK migration landing 780ac06d, including the final release-workflow repair at 956c32cd and the landed X1 report at 9d10318e; three earlier runs are retained separately as pre-migration baseline evidence."
             },
             {
               "id": "runtime_mirror_and_trust_identify_sdk",
@@ -1343,7 +1368,7 @@
           "const": 2
         },
         "completed_post_landing_validation_cycles": {
-          "const": 5
+          "const": 6
         },
         "compatibility_window_exited": {
           "const": true
@@ -1406,7 +1431,7 @@
           "const": false
         },
         "archive_ready": {
-          "const": false
+          "const": true
         },
         "archive_authorized": {
           "const": false
@@ -1421,48 +1446,15 @@
           "const": false
         },
         "approval_rule": {
-          "const": "Only after a subsequent receipt binds a successful aoa-sdk main validation run containing this X1 report may a separate exact operator approval naming repository ID 1186624390 authorize the deprecation-release, About-banner, and GitHub-archive sequence."
+          "const": "The successful aoa-sdk main validation containing the landed X1 report is bound by this receipt. A separate exact operator approval naming repository ID 1186624390 is the only authority that may authorize the deprecation-release, About-banner, and GitHub-archive sequence."
         }
       }
     },
     "remaining_external_gates": {
       "type": "array",
-      "minItems": 2,
-      "maxItems": 2,
+      "minItems": 1,
+      "maxItems": 1,
       "prefixItems": [
-        {
-          "type": "object",
-          "additionalProperties": false,
-          "required": [
-            "id",
-            "kind",
-            "target",
-            "required",
-            "satisfied",
-            "reason"
-          ],
-          "properties": {
-            "id": {
-              "const": "x1_report_postmerge_validation"
-            },
-            "kind": {
-              "const": "postmerge_validation_evidence"
-            },
-            "target": {
-              "const": "github:8Dionysus/aoa-sdk:main:x1-report-containing-commit"
-            },
-            "required": {
-              "const": true
-            },
-            "satisfied": {
-              "const": false
-            },
-            "reason": {
-              "type": "string",
-              "minLength": 120
-            }
-          }
-        },
         {
           "type": "object",
           "additionalProperties": false,
@@ -1534,7 +1526,7 @@
           "const": true
         },
         "archive_ready": {
-          "const": false
+          "const": true
         },
         "archive_authorized": {
           "const": false
