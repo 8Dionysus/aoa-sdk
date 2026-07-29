@@ -12,6 +12,7 @@ from typing import Any
 REPO_ROOT = Path(__file__).resolve().parents[1]
 SDK_DIR = Path("sdk")
 MANIFEST_PATH = SDK_DIR / "source_home.manifest.json"
+KAG_PROVIDER_INDEX_PATH = Path("kag/indexes/provider_readiness_index.json")
 
 EXPECTED_SCHEMA_VERSION = "aoa_sdk_source_home_v1"
 EXPECTED_BRANCHES = {
@@ -62,6 +63,11 @@ REQUIRED_ROOT_FILES = (
 REQUIRED_BRANCH_FILES = ("AGENTS.md", "README.md")
 REQUIRED_FAMILY_FILES = ("README.md",)
 FORBIDDEN_SDK_FILES = ("PARTS.md",)
+EXPECTED_KAG_SOURCE_RECORD_IDS = {
+    "node:sdk:sdk-source-home",
+    "node:sdk:sdk-source-route",
+    "edge:sdk:source-returns-to-owner",
+}
 
 
 def _read_json(path: Path, issues: list[str]) -> dict[str, Any]:
@@ -99,6 +105,66 @@ def _validate_text_snippet(
             issues.append(f"{rel_path}: missing required snippet {snippet!r}")
 
 
+def _validate_kag_provider_index(repo_root: Path, issues: list[str]) -> None:
+    path = repo_root / KAG_PROVIDER_INDEX_PATH
+    if not path.is_file():
+        issues.append(
+            f"{KAG_PROVIDER_INDEX_PATH.as_posix()}: required SDK provider inventory index is missing"
+        )
+        return
+
+    index = _read_json(path, issues)
+    if not index:
+        return
+    expected_scalars = {
+        "schema_version": "aoa-local-kag-record-v1",
+        "repo": "aoa-sdk",
+        "local_id": "index:sdk:source-surfaces",
+        "record_class": "index",
+        "source_owner": "aoa-sdk",
+        "provenance_mode": "strict_source_linked",
+        "status": "active",
+        "index_kind": "inventory",
+    }
+    for key, expected in expected_scalars.items():
+        if index.get(key) != expected:
+            issues.append(
+                f"{KAG_PROVIDER_INDEX_PATH.as_posix()}: {key} must be {expected!r}"
+            )
+
+    source_refs = index.get("source_refs")
+    expected_refs = {
+        ("sdk/source_home.manifest.json", "primary"),
+        ("sdk/README.md", "owner_route"),
+    }
+    actual_refs: set[tuple[str, str]] = set()
+    if isinstance(source_refs, list):
+        for source_ref in source_refs:
+            if not isinstance(source_ref, dict):
+                continue
+            source_path = source_ref.get("path")
+            role = source_ref.get("role")
+            if isinstance(source_path, str) and isinstance(role, str):
+                actual_refs.add((source_path, role))
+                if not (repo_root / source_path).is_file():
+                    issues.append(
+                        f"{KAG_PROVIDER_INDEX_PATH.as_posix()}: source ref {source_path} is missing"
+                    )
+    if actual_refs != expected_refs:
+        issues.append(
+            f"{KAG_PROVIDER_INDEX_PATH.as_posix()}: source_refs must return to SDK source home"
+        )
+
+    if set(index.get("indexed_record_classes", [])) != {"node", "edge"}:
+        issues.append(
+            f"{KAG_PROVIDER_INDEX_PATH.as_posix()}: indexed_record_classes must cover node and edge"
+        )
+    if set(index.get("source_record_ids", [])) != EXPECTED_KAG_SOURCE_RECORD_IDS:
+        issues.append(
+            f"{KAG_PROVIDER_INDEX_PATH.as_posix()}: source_record_ids must cover the SDK provider route"
+        )
+
+
 def validate(repo_root: Path = REPO_ROOT) -> list[str]:
     repo_root = repo_root.resolve()
     issues: list[str] = []
@@ -110,6 +176,8 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
     for file_name in FORBIDDEN_SDK_FILES:
         if (repo_root / SDK_DIR / file_name).exists():
             issues.append(f"sdk/{file_name}: sdk/ must not use mechanics PARTS.md vocabulary")
+
+    _validate_kag_provider_index(repo_root, issues)
 
     _validate_text_snippet(
         repo_root,

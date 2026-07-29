@@ -19,6 +19,17 @@ def test_live_sdk_source_home_is_valid() -> None:
     assert sdk_home_validator.validate(REPO_ROOT) == []
 
 
+def test_sdk_source_home_rejects_missing_provider_inventory_index(tmp_path: Path) -> None:
+    issues: list[str] = []
+
+    sdk_home_validator._validate_kag_provider_index(tmp_path, issues)
+
+    assert issues == [
+        "kag/indexes/provider_readiness_index.json: "
+        "required SDK provider inventory index is missing"
+    ]
+
+
 def test_sdk_source_home_branches_are_explicit_and_agent_routed() -> None:
     manifest = json.loads((REPO_ROOT / "sdk/source_home.manifest.json").read_text(encoding="utf-8"))
     branch_paths = {branch["path"] for branch in manifest["branches"]}
