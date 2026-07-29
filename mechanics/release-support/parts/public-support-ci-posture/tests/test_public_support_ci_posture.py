@@ -3,6 +3,8 @@ from __future__ import annotations
 import json
 from pathlib import Path
 
+import yaml
+
 
 def _repo_root() -> Path:
     for candidate in Path(__file__).resolve().parents:
@@ -20,6 +22,48 @@ def read_text(relative_path: str) -> str:
 
 def load_json(relative_path: str) -> object:
     return json.loads((REPO_ROOT / relative_path).read_text(encoding="utf-8"))
+
+
+def load_yaml(relative_path: str) -> dict[str, object]:
+    payload = yaml.safe_load(read_text(relative_path))
+    assert isinstance(payload, dict)
+    return payload
+
+
+def test_latest_sibling_workflow_checks_out_every_matrix_repo() -> None:
+    matrix = load_json(
+        "mechanics/release-support/parts/public-support-ci-posture/"
+        "config/sibling_canary_matrix.json"
+    )
+    assert isinstance(matrix, dict)
+    workflow = load_yaml(".github/workflows/latest-sibling-canary.yml")
+    jobs = workflow["jobs"]
+    assert isinstance(jobs, dict)
+    canary = jobs["canary"]
+    assert isinstance(canary, dict)
+    steps = canary["steps"]
+    assert isinstance(steps, list)
+
+    checkout_paths: dict[str, str | None] = {}
+    for step in steps:
+        assert isinstance(step, dict)
+        if not str(step.get("uses", "")).startswith("actions/checkout@"):
+            continue
+        inputs = step.get("with")
+        assert isinstance(inputs, dict)
+        checkout_path = str(inputs["path"])
+        repo = Path(checkout_path).name
+        checkout_paths[repo] = (
+            str(inputs["repository"]) if "repository" in inputs else None
+        )
+
+    entries = matrix["entries"]
+    assert isinstance(entries, list)
+    matrix_repos = {str(entry["repo"]) for entry in entries}
+    assert set(checkout_paths) == {"aoa-sdk", *matrix_repos}
+    assert checkout_paths["aoa-sdk"] is None
+    for repo in matrix_repos:
+        assert checkout_paths[repo] == f"8Dionysus/{repo}"
 
 
 def test_roadmap_keeps_current_control_plane_surface_explicit() -> None:
