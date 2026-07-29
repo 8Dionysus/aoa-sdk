@@ -2,7 +2,7 @@ from __future__ import annotations
 
 from typing import Literal
 
-from ..compatibility import load_surface
+from ..compatibility import CompatibilityAPI, load_surface
 from ..errors import RecordNotFound
 from ..models import (
     KagFederationSpine,
@@ -60,7 +60,7 @@ class KagAPI:
             pack=pack,
             source_files=[
                 str(self.workspace.surface_path("aoa-kag", "generated/kag_registry.min.json")),
-                str(self.workspace.surface_path("aoa-kag", _relative_path_for(surface_rule_id))),
+                str(_resolved_surface_path(self.workspace, surface_rule_id)),
             ],
         )
 
@@ -96,8 +96,18 @@ class KagAPI:
             reasoning_scenarios=scenarios,
             regrounding_modes=regrounding_modes,
             source_files=[
-                str(self.workspace.surface_path("aoa-kag", "generated/reasoning_handoff_pack.min.json")),
-                str(self.workspace.surface_path("aoa-kag", "generated/return_regrounding_pack.min.json")),
+                str(
+                    _resolved_surface_path(
+                        self.workspace,
+                        "aoa-kag.reasoning_handoff_pack.min",
+                    )
+                ),
+                str(
+                    _resolved_surface_path(
+                        self.workspace,
+                        "aoa-kag.return_regrounding_pack.min",
+                    )
+                ),
             ],
         )
 
@@ -120,13 +130,10 @@ class KagAPI:
         raise RecordNotFound(f"KAG federation entry not found: {repo}")
 
 
-def _relative_path_for(surface_rule_id: str) -> str:
-    relative_paths = {
-        "aoa-kag.tos_text_chunk_map.min": "generated/tos_text_chunk_map.min.json",
-        "aoa-kag.cross_source_node_projection.min": "generated/cross_source_node_projection.min.json",
-        "aoa-kag.tos_retrieval_axis_pack.min": "generated/tos_retrieval_axis_pack.min.json",
-        "aoa-kag.counterpart_federation_exposure_review.min": "generated/counterpart_federation_exposure_review.min.json",
-        "aoa-kag.federation_spine.min": "generated/federation_spine.min.json",
-        "aoa-kag.tos_zarathustra_route_retrieval_pack.min": "generated/tos_zarathustra_route_retrieval_pack.min.json",
-    }
-    return relative_paths[surface_rule_id]
+def _resolved_surface_path(workspace: Workspace, surface_id: str):
+    result = CompatibilityAPI(workspace).check(surface_id)
+    if not result.compatible or result.resolved_relative_path is None:
+        raise RecordNotFound(
+            f"KAG compatibility surface is unavailable: {surface_id}: {result.reason}"
+        )
+    return workspace.surface_path("aoa-kag", result.resolved_relative_path)
