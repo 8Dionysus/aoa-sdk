@@ -1,17 +1,17 @@
 {
-  "allowed_bytes": 14112852,
-  "allowed_tracked_bytes": 19027990,
+  "allowed_bytes": 14116627,
+  "allowed_tracked_bytes": 19032533,
   "approved_by": "repository-owner",
   "base_ref": "780ac06d1739246d6402445e6ec43ef39a97b90a",
-  "changed_generated_bytes": 14112852,
+  "changed_generated_bytes": 14116627,
   "changed_generated_files": 294,
   "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
   "default_limit_bytes": 1048576,
-  "head_family_digest": "209279c496576597649b1a44d57e7171421c039c7b0fcb18e0b21bd0aca68324",
-  "reason": "Regenerate the integrated Agent OS v0.9.0 release family against the exact PR main base.",
+  "head_family_digest": "492d137f21c120c7a886b58f211714aa86a7afc14ba6491583c41248aae3fcba",
+  "reason": "Regenerate the integrated Agent OS v0.9.0 release family against the exact PR main base after review hardening.",
   "repo": "aoa-sdk",
   "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
   "scope": "generated_delta_and_tracked_size",
-  "tracked_bytes": 19027990,
+  "tracked_bytes": 19032533,
   "tracked_bytes_max": 15728640
 }

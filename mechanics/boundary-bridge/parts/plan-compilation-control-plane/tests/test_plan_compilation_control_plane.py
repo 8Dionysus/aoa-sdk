@@ -124,6 +124,44 @@ def test_snapshot_pins_exact_admitted_owner_projection() -> None:
     ]
 
 
+def test_packaged_trust_controls_are_order_independent(
+    tmp_path: Path,
+) -> None:
+    resource_root = tmp_path / "data"
+    shutil.copytree(DATA_ROOT, resource_root)
+    trust_record_path = (
+        resource_root / "playbook-plan-contours-trust-record.v1.json"
+    )
+    trust_record = json.loads(trust_record_path.read_text(encoding="utf-8"))
+    trust_record["controls"]["required"].reverse()
+    trust_record["controls"]["verified"].reverse()
+    trust_record_path.write_text(
+        json.dumps(trust_record, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    trust_record_digest = (
+        "sha256:" + hashlib.sha256(trust_record_path.read_bytes()).hexdigest()
+    )
+    lock_path = resource_root / "playbook-plan-contours-source-lock.v1.json"
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    lock["trust_admission"]["record_artifact_digest"] = trust_record_digest
+    lock_path.write_text(
+        json.dumps(lock, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    snapshot = load_plan_compilation_snapshot(resource_root=resource_root)
+
+    assert snapshot.source_lock.trust_admission.required_controls == (
+        "abi_signature",
+        "slsa_in_toto",
+    )
+    assert snapshot.source_lock.trust_admission.verified_controls == (
+        "abi_signature",
+        "slsa_in_toto",
+    )
+
+
 def test_pin_reader_rejects_escape_and_symlink_inputs(tmp_path: Path) -> None:
     generator = _load_pin_generator()
     owner_root = tmp_path / "owner"

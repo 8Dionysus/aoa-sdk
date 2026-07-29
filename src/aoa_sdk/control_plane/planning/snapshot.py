@@ -562,12 +562,30 @@ def _validate_packaged_trust_record(
         or subject_store.get("aggregate_digest")
         != admission.subject_store_aggregate_digest
         or not isinstance(controls, dict)
-        or controls.get("required") != list(admission.required_controls)
-        or controls.get("verified") != list(admission.verified_controls)
+        or not _control_collection_matches(
+            controls.get("required"),
+            admission.required_controls,
+        )
+        or not _control_collection_matches(
+            controls.get("verified"),
+            admission.verified_controls,
+        )
     ):
         raise PlanCompilationSnapshotError(
             "packaged playbook trust record does not match its source lock"
         )
+
+
+def _control_collection_matches(
+    actual: Any,
+    expected: tuple[str, ...],
+) -> bool:
+    return (
+        isinstance(actual, list)
+        and all(isinstance(item, str) for item in actual)
+        and len(actual) == len(set(actual))
+        and set(actual) == set(expected)
+    )
 
 
 def _read_resource(
