@@ -65,6 +65,24 @@ jobs:
           repository: 8Dionysus/aoa-stats
           path: workspace/aoa-stats
 
+      - name: Checkout Dionysus
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/Dionysus
+          path: workspace/Dionysus
+
+      - name: Checkout 8Dionysus
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/8Dionysus
+          path: workspace/8Dionysus
+
+      - name: Checkout abyss-stack
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/abyss-stack
+          path: workspace/abyss-stack
+
       - name: Setup Python
         uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
         with:

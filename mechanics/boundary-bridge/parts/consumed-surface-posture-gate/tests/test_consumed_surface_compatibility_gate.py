@@ -68,27 +68,42 @@ def seed_center_capsule_fixtures(workspace_root: Path) -> None:
         encoding="utf-8",
     )
 
+    dionysus_root = workspace_root / "Dionysus"
+    (dionysus_root / "README.md").parent.mkdir(parents=True, exist_ok=True)
+    (dionysus_root / "README.md").write_text(
+        "# Dionysus\n",
+        encoding="utf-8",
+    )
+    dionysus_schemas = {
+        "interview-session.schema.json": (
+            "https://8dionysus.github.io/Dionysus/schemas/"
+            "interview-session.schema.json"
+        ),
+        "portrait-claim.schema.json": (
+            "https://8dionysus.github.io/Dionysus/schemas/"
+            "portrait-claim.schema.json"
+        ),
+    }
+    for filename, schema_id in dionysus_schemas.items():
+        target = dionysus_root / "schemas" / filename
+        target.parent.mkdir(parents=True, exist_ok=True)
+        target.write_text(
+            json.dumps(
+                {
+                    "$schema": "https://json-schema.org/draft/2020-12/schema",
+                    "$id": schema_id,
+                    "title": filename,
+                    "type": "object",
+                    "properties": {},
+                }
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+
 
 def test_compatibility_report_includes_versioned_and_unversioned_surfaces(workspace_root: Path) -> None:
     seed_center_capsule_fixtures(workspace_root)
-    dionysus_surface = workspace_root / "Dionysus" / "generated" / "seed_route_map.min.json"
-    dionysus_surface.parent.mkdir(parents=True, exist_ok=True)
-    dionysus_surface.write_text(
-        json.dumps(
-            {
-                "schema_version": "dionysus_seed_route_map_v2",
-                "schema_ref": "schemas/seed-route-map.schema.json",
-                "owner_repo": "Dionysus",
-                "surface_kind": "seed",
-                "authority_ref": "docs/codex/planting-protocol.md",
-                "next_live_seed_ref": "seed_expansion/example.md#seed",
-                "validation_refs": ["scripts/validate_seed_route_map.py"],
-                "routes": [],
-            }
-        )
-        + "\n",
-        encoding="utf-8",
-    )
 
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
@@ -99,7 +114,8 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["aoa-routing.return_navigation_hints.min"].compatible is True
     assert report["aoa-routing.owner_layer_shortlist.min"].compatible is True
     assert report["aoa-routing.stats_regrounding_hints.min"].compatible is True
-    assert report["Dionysus.seed_route_map.min"].compatible is True
+    assert report["Dionysus.interview_session.schema"].compatible is True
+    assert report["Dionysus.portrait_claim.schema"].compatible is True
     assert report["8Dionysus.public_route_map.min"].compatible is True
     assert report["Agents-of-Abyss.center_entry_map.min"].compatible is True
     assert report["Tree-of-Sophia.root_entry_map.min"].compatible is True
@@ -204,6 +220,89 @@ def test_diagnostic_surface_catalog_uses_part_local_path_not_old_root_path(
         "mechanics/diagnostic-spine/parts/diagnostic-surfaces/generated/"
         "diagnostic_surface_catalog.min.json"
     )
+
+
+def test_kag_compatibility_prefers_current_part_local_paths(
+    workspace_root: Path,
+) -> None:
+    preferred_paths = {
+        "aoa-kag.federation_spine.min": (
+            "mechanics/boundary-bridge/parts/federation-spine/generated/"
+            "federation_spine.min.json"
+        ),
+        "aoa-kag.tiny_consumer_bundle.min": (
+            "mechanics/boundary-bridge/parts/tiny-consumer-bundle/generated/"
+            "tiny_consumer_bundle.min.json"
+        ),
+        "aoa-kag.reasoning_handoff_pack.min": (
+            "mechanics/checkpoint/parts/reasoning-handoff/generated/"
+            "reasoning_handoff_pack.min.json"
+        ),
+        "aoa-kag.return_regrounding_pack.min": (
+            "mechanics/recurrence/parts/return-regrounding/generated/"
+            "return_regrounding_pack.min.json"
+        ),
+        "aoa-kag.tos_text_chunk_map.min": (
+            "mechanics/distillation/parts/tos-text-chunk-map/generated/"
+            "tos_text_chunk_map.min.json"
+        ),
+        "aoa-kag.tos_retrieval_axis_pack.min": (
+            "mechanics/boundary-bridge/parts/tos-retrieval-axis/generated/"
+            "tos_retrieval_axis_pack.min.json"
+        ),
+        "aoa-kag.cross_source_node_projection.min": (
+            "mechanics/boundary-bridge/parts/cross-source-projection/generated/"
+            "cross_source_node_projection.min.json"
+        ),
+        "aoa-kag.counterpart_federation_exposure_review.min": (
+            "mechanics/audit/parts/exposure-review/generated/"
+            "counterpart_federation_exposure_review.min.json"
+        ),
+        "aoa-kag.tos_zarathustra_route_retrieval_pack.min": (
+            "mechanics/boundary-bridge/parts/tos-retrieval-axis/generated/"
+            "tos_zarathustra_route_retrieval_pack.min.json"
+        ),
+    }
+    kag_root = workspace_root / "aoa-kag"
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    for surface_id, preferred_path in preferred_paths.items():
+        rule = SURFACE_COMPATIBILITY_RULES[surface_id]
+        legacy_path = kag_root / rule.relative_path
+        current_path = kag_root / preferred_path
+        current_path.parent.mkdir(parents=True, exist_ok=True)
+        current_path.write_bytes(legacy_path.read_bytes())
+        report = sdk.compatibility.check(surface_id)
+
+        assert rule.preferred_relative_paths == [preferred_path]
+        assert report.compatible is True
+        assert report.resolved_relative_path == preferred_path
+
+    inspect_result = sdk.kag.inspect("AOA-K-0011")
+    query_result = sdk.kag.query_mode("local_search")
+    assert inspect_result.source_files[-1].endswith(
+        preferred_paths["aoa-kag.tos_zarathustra_route_retrieval_pack.min"]
+    )
+    assert query_result.source_files == [
+        str(kag_root / preferred_paths["aoa-kag.reasoning_handoff_pack.min"]),
+        str(kag_root / preferred_paths["aoa-kag.return_regrounding_pack.min"]),
+    ]
+
+
+def test_agent_runtime_seam_bindings_v2_is_compatible(workspace_root: Path) -> None:
+    target = workspace_root / "aoa-agents" / "generated" / "runtime_seam_bindings.json"
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    payload["version"] = 2
+    payload["artifact_identity"] = {
+        "abi_epoch": "aoa_agents_runtime_seam_bindings_v2"
+    }
+    target.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.compatibility.check("aoa-agents.runtime_seam_bindings")
+
+    assert report.compatible is True
+    assert report.detected_version == 2
 
 
 def test_workspace_control_plane_requires_artifact_identity(workspace_root: Path) -> None:

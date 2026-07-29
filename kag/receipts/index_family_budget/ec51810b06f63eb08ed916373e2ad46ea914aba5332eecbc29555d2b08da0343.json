@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 7818479,
+  "allowed_tracked_bytes": 18948782,
+  "approved_by": "repository-owner",
+  "base_ref": "cbf225627f9f28d0470deb8a962ae12d1fe72375",
+  "changed_generated_bytes": 7818479,
+  "changed_generated_files": 159,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "ec51810b06f63eb08ed916373e2ad46ea914aba5332eecbc29555d2b08da0343",
+  "reason": "Refresh the exact compatibility census and succession canary projection.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 18948782,
+  "tracked_bytes_max": 15728640
+}

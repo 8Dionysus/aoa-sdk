@@ -70,12 +70,27 @@ SURFACE_COMPATIBILITY_RULES = {
         ],
         required_top_level_object_keys=["artifact_identity"],
     ),
-    "Dionysus.seed_route_map.min": SurfaceCompatibilityRule(
-        surface_id="Dionysus.seed_route_map.min",
+    "Dionysus.interview_session.schema": SurfaceCompatibilityRule(
+        surface_id="Dionysus.interview_session.schema",
         repo="Dionysus",
-        relative_path="generated/seed_route_map.min.json",
-        version_field="schema_version",
-        supported_versions=["dionysus_seed_route_map_v2"],
+        relative_path="schemas/interview-session.schema.json",
+        version_field="$id",
+        supported_versions=[
+            "https://8dionysus.github.io/Dionysus/schemas/interview-session.schema.json"
+        ],
+        required_top_level_keys=["$schema", "title", "type", "properties"],
+        required_top_level_object_keys=["properties"],
+    ),
+    "Dionysus.portrait_claim.schema": SurfaceCompatibilityRule(
+        surface_id="Dionysus.portrait_claim.schema",
+        repo="Dionysus",
+        relative_path="schemas/portrait-claim.schema.json",
+        version_field="$id",
+        supported_versions=[
+            "https://8dionysus.github.io/Dionysus/schemas/portrait-claim.schema.json"
+        ],
+        required_top_level_keys=["$schema", "title", "type", "properties"],
+        required_top_level_object_keys=["properties"],
     ),
     "8Dionysus.public_route_map.min": SurfaceCompatibilityRule(
         surface_id="8Dionysus.public_route_map.min",
@@ -198,7 +213,8 @@ SURFACE_COMPATIBILITY_RULES = {
         repo="aoa-agents",
         relative_path="generated/runtime_seam_bindings.json",
         version_field="version",
-        supported_versions=[1],
+        supported_versions=[1, 2],
+        required_top_level_keys=["bindings"],
     ),
     "aoa-agents.codex_projection_manifest": SurfaceCompatibilityRule(
         surface_id="aoa-agents.codex_projection_manifest",
@@ -524,6 +540,10 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-kag.federation_spine.min",
         repo="aoa-kag",
         relative_path="generated/federation_spine.min.json",
+        preferred_relative_paths=[
+            "mechanics/boundary-bridge/parts/federation-spine/generated/"
+            "federation_spine.min.json"
+        ],
         version_field="pack_version",
         supported_versions=[1],
     ),
@@ -531,6 +551,10 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-kag.tiny_consumer_bundle.min",
         repo="aoa-kag",
         relative_path="generated/tiny_consumer_bundle.min.json",
+        preferred_relative_paths=[
+            "mechanics/boundary-bridge/parts/tiny-consumer-bundle/generated/"
+            "tiny_consumer_bundle.min.json"
+        ],
         version_field="bundle_version",
         supported_versions=[1],
     ),
@@ -538,6 +562,10 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-kag.reasoning_handoff_pack.min",
         repo="aoa-kag",
         relative_path="generated/reasoning_handoff_pack.min.json",
+        preferred_relative_paths=[
+            "mechanics/checkpoint/parts/reasoning-handoff/generated/"
+            "reasoning_handoff_pack.min.json"
+        ],
         version_field="pack_version",
         supported_versions=[1],
     ),
@@ -545,6 +573,10 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-kag.return_regrounding_pack.min",
         repo="aoa-kag",
         relative_path="generated/return_regrounding_pack.min.json",
+        preferred_relative_paths=[
+            "mechanics/recurrence/parts/return-regrounding/generated/"
+            "return_regrounding_pack.min.json"
+        ],
         version_field="pack_version",
         supported_versions=[1],
     ),
@@ -552,6 +584,10 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-kag.tos_text_chunk_map.min",
         repo="aoa-kag",
         relative_path="generated/tos_text_chunk_map.min.json",
+        preferred_relative_paths=[
+            "mechanics/distillation/parts/tos-text-chunk-map/generated/"
+            "tos_text_chunk_map.min.json"
+        ],
         version_field="pack_version",
         supported_versions=[1],
     ),
@@ -559,6 +595,10 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-kag.tos_retrieval_axis_pack.min",
         repo="aoa-kag",
         relative_path="generated/tos_retrieval_axis_pack.min.json",
+        preferred_relative_paths=[
+            "mechanics/boundary-bridge/parts/tos-retrieval-axis/generated/"
+            "tos_retrieval_axis_pack.min.json"
+        ],
         version_field="pack_version",
         supported_versions=[1],
     ),
@@ -566,6 +606,10 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-kag.cross_source_node_projection.min",
         repo="aoa-kag",
         relative_path="generated/cross_source_node_projection.min.json",
+        preferred_relative_paths=[
+            "mechanics/boundary-bridge/parts/cross-source-projection/generated/"
+            "cross_source_node_projection.min.json"
+        ],
         version_field="pack_version",
         supported_versions=[1],
     ),
@@ -573,6 +617,10 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-kag.counterpart_federation_exposure_review.min",
         repo="aoa-kag",
         relative_path="generated/counterpart_federation_exposure_review.min.json",
+        preferred_relative_paths=[
+            "mechanics/audit/parts/exposure-review/generated/"
+            "counterpart_federation_exposure_review.min.json"
+        ],
         version_field="review_version",
         supported_versions=[1],
     ),
@@ -580,6 +628,10 @@ SURFACE_COMPATIBILITY_RULES = {
         surface_id="aoa-kag.tos_zarathustra_route_retrieval_pack.min",
         repo="aoa-kag",
         relative_path="generated/tos_zarathustra_route_retrieval_pack.min.json",
+        preferred_relative_paths=[
+            "mechanics/boundary-bridge/parts/tos-retrieval-axis/generated/"
+            "tos_zarathustra_route_retrieval_pack.min.json"
+        ],
         version_field="pack_version",
         supported_versions=[1],
     ),

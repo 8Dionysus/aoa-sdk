@@ -11,6 +11,7 @@ from types import SimpleNamespace
 from typing import Any
 
 import pytest
+import yaml
 
 from aoa_sdk.release.api import (
     OWNER_RELEASE_REPOS,
@@ -32,6 +33,23 @@ def _repo_root() -> Path:
         if (parent / "pyproject.toml").is_file() and (parent / "AGENTS.md").is_file():
             return parent
     raise RuntimeError("could not find aoa-sdk repository root")
+
+
+def test_release_cadence_checkouts_retain_full_tag_history() -> None:
+    workflow = yaml.safe_load(
+        (_repo_root() / ".github" / "workflows" / "release-cadence-audit.yml")
+        .read_text(encoding="utf-8")
+    )
+    steps = workflow["jobs"]["cadence"]["steps"]
+    checkout_steps = [
+        step
+        for step in steps
+        if str(step.get("uses", "")).startswith("actions/checkout@")
+    ]
+
+    assert len(checkout_steps) == 13
+    for step in checkout_steps:
+        assert step["with"]["fetch-depth"] == 0
 
 
 def _artifact_bundle_validator_module():
