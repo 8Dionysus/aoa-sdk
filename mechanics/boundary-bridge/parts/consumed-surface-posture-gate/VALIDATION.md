@@ -94,8 +94,10 @@ later discovery, zero active direct-checkout dependencies in the candidate
 set, classified residual references, and the still-false landed,
 compatibility-exit, rollback-retirement, and archive gates.
 `test_routing_succession_x1_consumer_zero_report.py` validates the final 17
-consumer and 24-current-head census, thirteen exact owner landings, eight SDK
-main cycles, `aoa-kag` post-merge success, the clean immutable-tag release
+consumer and 24-current-head census, thirteen exact owner landings, five SDK
+main cycles at or after the SDK migration landing plus three separately
+classified pre-migration baseline cycles, `aoa-kag` post-merge success, the
+clean immutable-tag release
 replay, exact wheel install/upgrade/downgrade/restore, three post-repair Agent
 OS cycles, live SDK-only rollback, mixed E1 result, all six compatibility-exit
 criteria, and the explicit pending post-merge validation gate. It also proves

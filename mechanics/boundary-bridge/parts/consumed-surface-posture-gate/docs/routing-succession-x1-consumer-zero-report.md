@@ -26,10 +26,13 @@ residuals.
 ## Landed Validation
 
 The thirteen owner migrations are bound to their exact merge refs and owner
-PRs. Eight consecutive post-landing `aoa-sdk` main validations passed, and the
-landed `aoa-kag` provider succession passed both its pre-merge 23-provider
-release audit and post-merge run `30445769702`. The final report records these
-as owner evidence; it does not convert them into SDK-owned meaning.
+PRs. Five consecutive `aoa-sdk` main validations at or after the SDK migration
+landing `780ac06d` passed. Three earlier successful main runs are retained
+separately as pre-migration baseline evidence and are not counted toward the
+post-landing gate. The landed `aoa-kag` provider succession passed both its
+pre-merge 23-provider release audit and post-merge run `30445769702`. The final
+report records these as owner evidence; it does not convert them into
+SDK-owned meaning.
 
 Those validations end at parent `956c32cd`; none can prove a report that had
 not yet landed. This report therefore keeps
@@ -128,7 +131,8 @@ All six compatibility-exit criteria are satisfied:
 1. every registered consumer is landed and green;
 2. active direct-checkout consumer count is zero;
 3. clean install, upgrade, downgrade, and restore passed;
-4. eight consecutive SDK main validations exceed the required two;
+4. five consecutive SDK main validations at or after migration landing exceed
+   the required two;
 5. the live mirror and trust record identify the SDK canonical producer;
 6. the discovered portability regression is repaired with post-repair proof.
 

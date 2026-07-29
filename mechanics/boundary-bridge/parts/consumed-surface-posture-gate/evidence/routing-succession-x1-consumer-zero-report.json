@@ -29,7 +29,7 @@
       "current_main_ref": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
       "direct_predecessor_checkout_dependencies": 0,
       "landed_or_classified": true,
-      "validation": "PRs 236, 237, and 239 landed the canonical producer, consumer contract, and Agent OS control plane; PRs 240 through 243 released v0.9.0 and repaired immutable-tag replay history, lint isolation, and sdist isolation. Eight post-landing main validations and the final exact-tag release replay passed."
+      "validation": "PRs 236, 237, and 239 landed the canonical producer, consumer contract, and Agent OS control plane; PRs 240 through 243 released v0.9.0 and repaired immutable-tag replay history, lint isolation, and sdist isolation. Three earlier main validations are retained as pre-migration baseline evidence; five validations at or after migration ref 780ac06d and the final exact-tag release replay passed."
     },
     {
       "repo": "abyss-stack",
@@ -271,7 +271,7 @@
     "claim_limit": "Literal predecessor names remain only in the allowed residual classes; consumer-zero means no current executable checkout, environment-root, CI clone, generation, runtime, or release dependency."
   },
   "post_landing_validation": {
-    "sdk_main_success_cycles": [
+    "pre_migration_sdk_main_success_cycles": [
       {
         "run_id": 30369543263,
         "head_sha": "ac6c1e5f7dd824ebaa6a583c4bb8965e3ca194a0",
@@ -292,7 +292,9 @@
         "runner_seconds": 214,
         "conclusion": "success",
         "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30428491862"
-      },
+      }
+    ],
+    "sdk_main_success_cycles": [
       {
         "run_id": 30443863477,
         "head_sha": "780ac06d1739246d6402445e6ec43ef39a97b90a",
@@ -579,7 +581,7 @@
       {
         "id": "two_consecutive_sdk_validation_cycles",
         "exit_satisfied": true,
-        "evidence": "Eight aoa-sdk main Repo Validation runs passed after the coordinated owner and consumer landings, including the final release-workflow repair at 956c32cd."
+        "evidence": "Five aoa-sdk main Repo Validation runs passed at or after the SDK migration landing 780ac06d, including the final release-workflow repair at 956c32cd; three earlier runs are retained separately as pre-migration baseline evidence."
       },
       {
         "id": "runtime_mirror_and_trust_identify_sdk",
@@ -593,7 +595,7 @@
       }
     ],
     "required_validation_cycles": 2,
-    "completed_post_landing_validation_cycles": 8,
+    "completed_post_landing_validation_cycles": 5,
     "compatibility_window_exited": true,
     "operational_predecessor_rollback_retired": true
   },

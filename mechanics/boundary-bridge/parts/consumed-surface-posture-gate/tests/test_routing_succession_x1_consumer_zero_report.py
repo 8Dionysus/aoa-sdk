@@ -183,7 +183,22 @@ def test_x1_records_prior_validation_and_pending_own_postmerge_cycle() -> None:
     validation = evidence["post_landing_validation"]
     package = evidence["package_compatibility"]
 
-    assert len(validation["sdk_main_success_cycles"]) == 8
+    assert {
+        item["head_sha"]
+        for item in validation["pre_migration_sdk_main_success_cycles"]
+    } == {
+        "ac6c1e5f7dd824ebaa6a583c4bb8965e3ca194a0",
+        "eda623ecd8a77606414a29ea7102369e369b95be",
+        "cbf225627f9f28d0470deb8a962ae12d1fe72375",
+    }
+    assert len(validation["sdk_main_success_cycles"]) == 5
+    assert [item["head_sha"] for item in validation["sdk_main_success_cycles"]] == [
+        "780ac06d1739246d6402445e6ec43ef39a97b90a",
+        "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb",
+        "0d9efa61e3ab1fd3abf8facdd194a1b2025193b6",
+        "35e01329763d68e148144d9f5b4be4bce43446b8",
+        "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
+    ]
     assert all(
         item["conclusion"] == "success"
         for item in validation["sdk_main_success_cycles"]
@@ -353,7 +368,7 @@ def test_x1_exits_compatibility_with_sdk_only_operational_rollback() -> None:
         "no_high_severity_regression",
     }
     assert all(item["exit_satisfied"] is True for item in compatibility["criteria"])
-    assert compatibility["completed_post_landing_validation_cycles"] == 8
+    assert compatibility["completed_post_landing_validation_cycles"] == 5
     assert compatibility["compatibility_window_exited"] is True
     assert compatibility["operational_predecessor_rollback_retired"] is True
 
@@ -447,6 +462,18 @@ def test_x1_schema_rejects_archive_authorization_or_executed_actions() -> None:
     patterns_candidate = deepcopy(evidence)
     patterns_candidate["direct_dependency_census"]["patterns"] = []
     assert list(validator().iter_errors(patterns_candidate))
+
+    pre_migration_candidate = deepcopy(evidence)
+    pre_migration_candidate["post_landing_validation"][
+        "pre_migration_sdk_main_success_cycles"
+    ][0]["head_sha"] = "780ac06d1739246d6402445e6ec43ef39a97b90a"
+    assert list(validator().iter_errors(pre_migration_candidate))
+
+    post_landing_candidate = deepcopy(evidence)
+    post_landing_candidate["post_landing_validation"]["sdk_main_success_cycles"][
+        0
+    ]["head_sha"] = "ac6c1e5f7dd824ebaa6a583c4bb8965e3ca194a0"
+    assert list(validator().iter_errors(post_landing_candidate))
 
     landing_shape_candidate = deepcopy(evidence)
     landing_shape_candidate["post_landing_validation"]["consumer_owner_landings"][

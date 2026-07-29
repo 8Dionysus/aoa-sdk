@@ -148,6 +148,7 @@
       "type": "object",
       "additionalProperties": true,
       "required": [
+        "pre_migration_sdk_main_success_cycles",
         "sdk_main_success_cycles",
         "required_sdk_main_success_cycles",
         "consumer_owner_landings",
@@ -158,10 +159,93 @@
         "all_required_validation_green"
       ],
       "properties": {
+        "pre_migration_sdk_main_success_cycles": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "prefixItems": [
+            {
+              "const": {
+                "run_id": 30369543263,
+                "head_sha": "ac6c1e5f7dd824ebaa6a583c4bb8965e3ca194a0",
+                "runner_seconds": 213,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30369543263"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30422604505,
+                "head_sha": "eda623ecd8a77606414a29ea7102369e369b95be",
+                "runner_seconds": 208,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30422604505"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30428491862,
+                "head_sha": "cbf225627f9f28d0470deb8a962ae12d1fe72375",
+                "runner_seconds": 214,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30428491862"
+              }
+            }
+          ],
+          "items": false
+        },
         "sdk_main_success_cycles": {
           "type": "array",
-          "minItems": 8,
-          "maxItems": 8
+          "minItems": 5,
+          "maxItems": 5,
+          "prefixItems": [
+            {
+              "const": {
+                "run_id": 30443863477,
+                "head_sha": "780ac06d1739246d6402445e6ec43ef39a97b90a",
+                "runner_seconds": 199,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30443863477"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30450724848,
+                "head_sha": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb",
+                "runner_seconds": 218,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30450724848"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30452734159,
+                "head_sha": "0d9efa61e3ab1fd3abf8facdd194a1b2025193b6",
+                "runner_seconds": 220,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30452734159"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30453859729,
+                "head_sha": "35e01329763d68e148144d9f5b4be4bce43446b8",
+                "runner_seconds": 213,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30453859729"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30455955079,
+                "head_sha": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
+                "runner_seconds": 205,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30455955079"
+              }
+            }
+          ],
+          "items": false
         },
         "required_sdk_main_success_cycles": {
           "const": 2
@@ -669,7 +753,7 @@
           "const": 2
         },
         "completed_post_landing_validation_cycles": {
-          "const": 8
+          "const": 5
         },
         "compatibility_window_exited": {
           "const": true
