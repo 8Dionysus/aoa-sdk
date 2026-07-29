@@ -130,7 +130,8 @@ The current landed surface includes:
 - the post-G5 maintenance contour, in which routing compatibility reads prefer
   the SDK-delivered runtime bundle, `aoa-routing` is optional workspace state,
   paired predecessor CI/release dependencies are inactive, and the predecessor
-  remains available only for compatibility and rollback;
+  remained available only for compatibility and rollback until X1 closed that
+  window;
 - the completed mixed-verdict
   [E1 cost comparison](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-e1-cost-comparison.md),
   which proves structural workflow, checkout, release, and repository-context
@@ -144,6 +145,12 @@ The current landed surface includes:
   post-repair Agent OS cycles, compatibility exit, and SDK-only operational
   rollback, including a receipt for its own landed `aoa-sdk` main validation,
   while leaving every irreversible archive action separately operator-gated;
+- the operator-approved
+  [X2 archive closeout](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-x2-archive-closeout.md),
+  which pins X1 unchanged, binds the final predecessor landing and `v0.4.0`
+  release, records the preserved public GitHub archive, verifies the
+  SDK-canonical live route and RAG path, and exposes the old KAG runtime slice
+  as a non-blocking derived projection residual;
 - the callable
   [C1 route resolution control plane](mechanics/boundary-bridge/parts/route-resolution-control-plane/README.md),
   which validates the exact live G5 snapshot, intersects routing entries with

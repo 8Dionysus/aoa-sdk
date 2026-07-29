@@ -32,6 +32,10 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   prerequisites, including its own successful post-merge main validation,
   making archive readiness true while keeping every irreversible-action
   authority false until separate exact operator approval
+- an X2 archive closeout that pins X1 unchanged, binds the exact operator
+  scope, final predecessor landing and release, preserved public GitHub
+  archive state, post-archive SDK-canonical runtime health, and the
+  non-blocking stale KAG runtime-slice residual
 - the accepted routing succession target model, authority matrix,
   compatibility policy, and repository state machine without moving producer
   code or switching live authority
@@ -103,8 +107,10 @@ Then read the measured
 [`docs/routing-succession-e1-cost-comparison.md`](docs/routing-succession-e1-cost-comparison.md).
 Then read the candidate-only
 [`docs/routing-succession-x1-consumer-zero-candidate.md`](docs/routing-succession-x1-consumer-zero-candidate.md).
-Finally read the landed
+Then read the landed
 [`docs/routing-succession-x1-consumer-zero-report.md`](docs/routing-succession-x1-consumer-zero-report.md).
+Finally read the operator-approved
+[`docs/routing-succession-x2-archive-closeout.md`](docs/routing-succession-x2-archive-closeout.md).
 Consumers migrating away from the predecessor checkout use
 [`docs/routing-consumer-contract.md`](docs/routing-consumer-contract.md).
 G4 proves the released shadow successor and isolated runtime content path. The
@@ -115,8 +121,9 @@ window. Stronger-owner admission, live cutover, landed consumer-zero,
 compatibility exit, and SDK-only operational rollback proof are complete.
 The subsequent receipt binds the successful main validation containing the X1
 report, so archive readiness is true. The predecessor repository remains
-preserved and unarchived; only a separate exact operator approval can authorize
-its deprecation-release and archive sequence.
+preserved. X2 binds the later exact operator approval, final `v0.4.0`
+deprecation release, public archive state, and post-archive runtime
+verification without rewriting X1 or the historical G5 authority receipt.
 
 ## Validation
 

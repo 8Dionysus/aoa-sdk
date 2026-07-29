@@ -96,6 +96,13 @@
   subsequent receipt to bind its successful `aoa-sdk` main validation before
   recording `archive_ready=true`. That receipt still cannot grant archive
   authority.
+- Requires X2 to preserve the exact X1 bytes and historical false authority
+  fields while separately binding the later exact operator approval, final
+  predecessor landing, final deprecation release, public archive state, and
+  post-archive SDK-canonical runtime evidence.
+- Keeps the retired canonical KAG provider distinct from the stale mutable
+  runtime slice, and requires the latter to remain explicitly degraded and
+  non-blocking rather than being claimed current or hidden.
 - Admits the current owner shortlist `guard` kind without removing the legacy
   `seed` compatibility value or taking ownership of either meaning.
 
@@ -132,6 +139,9 @@
 - A final `archive_ready=true` X1 report is not authority to publish a
   deprecation release, mutate repository metadata, archive, delete, rename, or
   otherwise irreversibly change the predecessor repository.
+- X2 archival closeout is not authority to delete or rename the predecessor,
+  rewrite X1, revise the historical G5 receipt, or treat a mutable KAG
+  projection as owner truth.
 
 ## Active Test Home
 
@@ -157,3 +167,4 @@
 - `tests/test_routing_g5_canonical.py`
 - `tests/test_routing_succession_x1_consumer_zero_candidate.py`
 - `tests/test_routing_succession_x1_consumer_zero_report.py`
+- `tests/test_routing_succession_x2_archive_closeout.py`

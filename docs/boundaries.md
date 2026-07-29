@@ -10,10 +10,11 @@ repositories remain authoritative.
   receipt-bound G5 switch in `AOA-SDK-D-0076`; this advances, rather than
   erases, the accepted-target/predecessor posture established by
   `AOA-SDK-D-0071`.
-- `aoa-routing` retains the exact predecessor implementation for
-  compatibility, security, rollback, and deprecation support. Its repository
-  lifecycle remains separate from producer ownership and archival is not
-  authorized.
+- Archived `aoa-routing` preserves the exact predecessor implementation,
+  historical ABI, releases, decisions, and deprecation evidence. X1 closed
+  compatibility and operational rollback; X2 binds the later separate
+  operator approval and public archive without transferring runtime or
+  historical source authority into the SDK.
 - `aoa-skills` owns shared skill sources, capability families, install
   profiles, port grammar, and portable exports.
 - Each repository owns authored procedures and admission for its own skill

@@ -1,0 +1,203 @@
+{
+  "schema_version": "aoa_sdk_routing_succession_x2_archive_closeout_v1",
+  "report_id": "routing-succession-x2-archive-closeout",
+  "observed_at_utc": "2026-07-29T17:36:26Z",
+  "x1_provenance": {
+    "evidence_ref": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-x1-consumer-zero-report.json",
+    "evidence_sha256": "sha256:354a4e55d9be56e4801271daec3dd7b661ff6ba8fdb23da41cb32e2ce9c8a09d",
+    "landed_main_ref": "9d10318e446304bb951a7c71aab0b5def961af72",
+    "landed_main_validation_run_id": 30464461615,
+    "landed_main_validation_url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30464461615",
+    "archive_readiness_ref": "37c5aab075c115b50bb47fc431785b2c2b6e0d86",
+    "archive_readiness_validation_run_id": 30466542840,
+    "archive_readiness_validation_url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30466542840",
+    "immutable_historical_receipt": true,
+    "historical_archive_authorized": false,
+    "historical_archive_executed": false
+  },
+  "operator_authorization": {
+    "granted": true,
+    "authority_source": "explicit operator approval in the active succession goal",
+    "repository": {
+      "id": 1186624390,
+      "node_id": "R_kgDORrpzhg",
+      "full_name": "8Dionysus/aoa-routing"
+    },
+    "approved_actions": [
+      "publish_final_deprecation_release",
+      "update_repository_about_metadata",
+      "archive_repository"
+    ],
+    "forbidden_actions": [
+      "delete_repository",
+      "rename_repository"
+    ],
+    "approval_scope_exact": true
+  },
+  "predecessor_landing": {
+    "pull_request": {
+      "number": 158,
+      "url": "https://github.com/8Dionysus/aoa-routing/pull/158",
+      "title": "Final aoa-routing deprecation release boundary",
+      "head_ref": "a7e9d60c40593b2efaee85f2a2bd2ef8eee66963",
+      "exact_head_validation_run_id": 30475000557,
+      "exact_head_validation_url": "https://github.com/8Dionysus/aoa-routing/actions/runs/30475000557",
+      "merged_at": "2026-07-29T17:27:55Z"
+    },
+    "landed_main_ref": "5142b0176f136c7703c2c0d5d8526d106132e84e",
+    "main_validation_run_id": 30475444327,
+    "main_validation_url": "https://github.com/8Dionysus/aoa-routing/actions/runs/30475444327",
+    "main_validation_conclusion": "success",
+    "full_gate": {
+      "passed_tests": 325,
+      "skipped_tests": 2,
+      "passed_subtests": 950,
+      "result": "passed"
+    },
+    "final_review_result": "no_major_issues"
+  },
+  "deprecation_release": {
+    "release_id": 361935588,
+    "tag": "v0.4.0",
+    "name": "aoa-routing v0.4.0 — Final deprecation release",
+    "url": "https://github.com/8Dionysus/aoa-routing/releases/tag/v0.4.0",
+    "target_commit": "5142b0176f136c7703c2c0d5d8526d106132e84e",
+    "published_at": "2026-07-29T17:29:39Z",
+    "draft": false,
+    "prerelease": false,
+    "adds_routing_behavior": false,
+    "routes_future_work_to": "8Dionysus/aoa-sdk"
+  },
+  "github_archive_state": {
+    "repository": {
+      "id": 1186624390,
+      "node_id": "R_kgDORrpzhg",
+      "full_name": "8Dionysus/aoa-routing"
+    },
+    "archived": true,
+    "disabled": false,
+    "visibility": "public",
+    "default_branch": "main",
+    "renamed": false,
+    "deleted": false,
+    "description": "Archived predecessor for the AoA routing ABI; canonical routing and Agent OS control-plane work live in aoa-sdk.",
+    "homepage": "https://github.com/8Dionysus/aoa-sdk",
+    "topics": [
+      "agents-of-abyss",
+      "aoa",
+      "aoa-sdk",
+      "archived",
+      "cross-repo",
+      "deprecated",
+      "derived-data",
+      "dispatch",
+      "entry-surfaces",
+      "historical",
+      "navigation",
+      "routing-architecture",
+      "routing-layer",
+      "source-of-truth",
+      "task-routing"
+    ],
+    "public_http_checks": [
+      {
+        "surface": "repository",
+        "url": "https://github.com/8Dionysus/aoa-routing",
+        "status": 200
+      },
+      {
+        "surface": "readme",
+        "url": "https://github.com/8Dionysus/aoa-routing/blob/main/README.md",
+        "status": 200
+      },
+      {
+        "surface": "release",
+        "url": "https://github.com/8Dionysus/aoa-routing/releases/tag/v0.4.0",
+        "status": 200
+      }
+    ],
+    "observed_at_utc": "2026-07-29T17:36:26Z"
+  },
+  "live_runtime": {
+    "observed_at_utc": "2026-07-29T17:36:26Z",
+    "runtime_owner": "abyss-stack",
+    "route_api": {
+      "healthy": true,
+      "all_layers_ready": true,
+      "layer_count": 7,
+      "router_owner_repo": "aoa-sdk",
+      "router_version": 1,
+      "route_entry_count": 170
+    },
+    "rag_api": {
+      "healthy": true,
+      "route_api_dependency_healthy": true
+    },
+    "runtime_mirror": {
+      "manifest_ref": "abyss-stack:Knowledge/federation/aoa-routing/manifest/federation_mirror_manifest.json",
+      "manifest_sha256": "sha256:51eb7f03bf13df386ffb86cffae4618aad4c3aef237beada80854cadc64243c5",
+      "generated_at_utc": "2026-07-29T10:24:54.302075+00:00",
+      "canonical_owner_repo": "aoa-sdk",
+      "canonical_source_ref": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d",
+      "producer_posture": "sdk_canonical",
+      "activation_mode": "authorized_live_cutover",
+      "required_file_count": 23,
+      "trust_verdict": "allow",
+      "trust_record_id": "sha256:ffe9c974882b0033248b0733c6d1223d9a0108d911d493d673b31286f0f2161e",
+      "subject_digest": "sha256:4b18aa61850afe3859ca2e3a221a6710a34dc45ea47d9321126abb1ebbe1671b"
+    },
+    "predecessor_checkout_mounted": false,
+    "predecessor_runtime_dependency_active": false,
+    "historical_g5_archive_authorized": false,
+    "historical_g5_field_interpretation": "The live mirror preserves the authority state of the earlier G5 owner-switch receipt. It is not the authority or observation record for the later operator-approved GitHub archive action."
+  },
+  "kag_posture": {
+    "canonical_provider_succession": {
+      "owner_repo": "aoa-kag",
+      "decision": "AOA-KAG-D-0020",
+      "pull_request_url": "https://github.com/8Dionysus/aoa-kag/pull/180",
+      "landed_main_ref": "15e1639740873f374faecb42029ae5cc8eb5375c",
+      "main_validation_run_id": 30445769702,
+      "main_validation_url": "https://github.com/8Dionysus/aoa-kag/actions/runs/30445769702",
+      "aoa_routing_active_provider": false,
+      "current_routing_owner_route": "aoa-sdk"
+    },
+    "live_projection_observation": {
+      "trace_id": "3a284b05-be08-44ee-9808-35f676a5d40a",
+      "projection_digest": "c609f9ab62aedde64afeaf672e028ba1e52d71c4f394b55f2d990c3aa57ab3cb",
+      "projection_updated_at": "2026-07-14T22:14:59.446854+00:00",
+      "predecessor_runtime_source_digest": "d9a97a2f48085bcc9fdc588c11d286d85b245787decfe04924424c9253272d81",
+      "predecessor_canonical_source_digest": "",
+      "freshness_state": "source_unavailable",
+      "query_status": "degraded",
+      "historical_runtime_slice_present": true
+    },
+    "residual": {
+      "classification": "derived_projection_refresh_pending",
+      "active_consumer_dependency": false,
+      "source_owner_route_correct": true,
+      "blocks_succession_closeout": false,
+      "reason": "The live KAG runtime still retains a July 14 historical aoa-routing slice, but its canonical provider has been retired and every returned record is explicitly marked source_unavailable. Refresh belongs to the stack-owned mutable projection lifecycle and is not evidence that the archived checkout remains required."
+    }
+  },
+  "sdk_release_audit": {
+    "command": "aoa release audit /srv/AbyssOS --phase postpublish --repo aoa-sdk --strict --json",
+    "expected_version": "0.9.0",
+    "latest_tag": "v0.9.0",
+    "release_url": "https://github.com/8Dionysus/aoa-sdk/releases/tag/v0.9.0",
+    "passed": true
+  },
+  "verdict": {
+    "sdk_single_canonical_routing_owner": true,
+    "runtime_uses_sdk_artifact": true,
+    "active_predecessor_checkout_consumers": 0,
+    "compatibility_window_exited": true,
+    "predecessor_archived": true,
+    "predecessor_preserved": true,
+    "deprecation_release_published": true,
+    "operator_scope_respected": true,
+    "delete_or_rename_executed": false,
+    "succession_complete": true,
+    "claim_limit": "X2 closes the operator-approved hosting succession: the exact predecessor was released, preserved, and archived while the live route and RAG path stayed SDK-canonical and healthy. The old KAG runtime slice remains a flagged derived-projection refresh residual, not an active provider, consumer, producer, or rollback dependency. X2 does not rewrite X1 or retroactively change the historical G5 receipt."
+  }
+}

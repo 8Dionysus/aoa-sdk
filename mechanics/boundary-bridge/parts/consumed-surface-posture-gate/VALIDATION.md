@@ -10,6 +10,7 @@ python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/ver
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/measure_routing_succession_e1.py --check
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_x1_consumer_zero_candidate.py
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_x1_consumer_zero_report.py
+python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_x2_archive_closeout.py
 python scripts/validate_mechanics_topology.py
 ```
 
@@ -104,6 +105,13 @@ criteria, and the successful main validation containing the landed X1 report.
 It also proves the schema keeps archive readiness distinct from authority and
 rejects live-runtime or report archive authorization and any executed
 irreversible predecessor action.
+`test_routing_succession_x2_archive_closeout.py` pins the immutable X1 bytes,
+validates the exact later operator scope, final predecessor landing and
+release, preserved public GitHub archive state, SDK-canonical post-archive
+runtime health, and `aoa-kag` provider succession. It also keeps the old KAG
+runtime slice visible as a non-blocking `source_unavailable` projection
+residual instead of relabeling it as current or treating it as an active
+checkout dependency.
 
 For full Boundary Bridge coverage, also run:
 

@@ -18,6 +18,11 @@ Tracking starts with the community-docs baseline for this repository.
   and record `aoa-routing` as archive-ready. The evidence and schema still keep
   deprecation release, About metadata, GitHub archive, and every irreversible
   action false until separate exact operator approval.
+- Add the separate X2 closeout after that exact approval: pin X1 unchanged,
+  bind the final predecessor PR and `v0.4.0` release, preserve the public
+  repository while recording its GitHub archive state, verify the live
+  SDK-canonical route and RAG path, and retain the stale KAG runtime slice as
+  an explicit non-blocking derived-projection residual.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.

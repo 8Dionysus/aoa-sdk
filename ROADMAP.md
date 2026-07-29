@@ -159,8 +159,9 @@ closeout owner truth. The cross-owner golden chain, bounded agent-in-loop
 trials, and G11 contour are now complete. E1 is complete with a mixed verdict:
 the structural process cost falls, while the directly comparable landed CI
 runner median regresses by 23.1%. The final X1 evidence landing owns
-consumer-zero and compatibility exit; predecessor archival remains separately
-operator-gated.
+consumer-zero and compatibility exit. X2 now binds the separate exact operator
+approval, final predecessor release, preserved public archive state, and
+post-archive SDK-canonical runtime verification.
 
 ## Current Public Contour
 
@@ -171,8 +172,9 @@ deterministic route resolution, C2 runtime-neutral plan compilation, C3
 explicit-adapter lifecycle coordination, the C4 `abyss-stack` transport
 client, C5 immutable evidence/closeout composition, exact owner projections,
 fresh-context G11 evidence, and the completed mixed E1 report ship together.
-Current unreleased contour: the final X1 consumer-zero and compatibility-exit
-evidence. This is a directional contour, not a changelog replacement.
+Current unreleased contour: the X2 archive closeout over immutable X1
+consumer-zero evidence. This is a directional contour, not a changelog
+replacement.
 
 Current anchors:
 
