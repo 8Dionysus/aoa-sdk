@@ -122,6 +122,14 @@
         "claim_limit"
       ],
       "properties": {
+        "patterns": {
+          "const": [
+            "AOA_ROUTING_ROOT",
+            "/srv/AbyssOS/aoa-routing",
+            "github.com/8Dionysus/aoa-routing",
+            "repository: 8Dionysus/aoa-routing"
+          ]
+        },
         "current_main_heads_checked": {
           "const": 24
         },
@@ -160,7 +168,104 @@
         },
         "consumer_owner_landings": {
           "type": "array",
-          "minItems": 13
+          "minItems": 13,
+          "maxItems": 13,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "const": {
+                  "repo": "aoa-sdk",
+                  "migration_ref": "780ac06d1739246d6402445e6ec43ef39a97b90a",
+                  "pr": "https://github.com/8Dionysus/aoa-sdk/pull/239"
+                }
+              },
+              {
+                "const": {
+                  "repo": "abyss-stack",
+                  "migration_ref": "c779d1413690ec11b5df7b6fc638e2a8b95510a5",
+                  "pr": "https://github.com/8Dionysus/abyss-stack/pull/336"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-kag",
+                  "migration_ref": "15e1639740873f374faecb42029ae5cc8eb5375c",
+                  "pr": "https://github.com/8Dionysus/aoa-kag/pull/180"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-stats",
+                  "migration_ref": "740c57d6ab2fe78d6a8440c19c2637431e039c6b",
+                  "pr": "https://github.com/8Dionysus/aoa-stats/pull/178"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-agents",
+                  "migration_ref": "92dd79e6c79fef60faedf6b97f2c65ff89477d06",
+                  "pr": "https://github.com/8Dionysus/aoa-agents/pull/270"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-evals",
+                  "migration_ref": "12b408727e40174dd10e1f9ad0fa2e7f7fd11eec",
+                  "pr": "https://github.com/8Dionysus/aoa-evals/pull/437"
+                }
+              },
+              {
+                "const": {
+                  "repo": "Tree-of-Sophia",
+                  "migration_ref": "d95a583272acb84dcb5b7e6896801f0364c7b234",
+                  "pr": "https://github.com/8Dionysus/Tree-of-Sophia/pull/140"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-playbooks",
+                  "migration_ref": "b72ca2d333bcdf516ed6656e34670fa93df88162",
+                  "pr": "https://github.com/8Dionysus/aoa-playbooks/pull/198"
+                }
+              },
+              {
+                "const": {
+                  "repo": "Agents-of-Abyss",
+                  "migration_ref": "66d86b04e685cf06b03a95a3f9c74e7c8d607740",
+                  "pr": "https://github.com/8Dionysus/Agents-of-Abyss/pull/270"
+                }
+              },
+              {
+                "const": {
+                  "repo": "8Dionysus",
+                  "migration_ref": "aa67908a137a9c9631a439f266d32a8918c7213c",
+                  "pr": "https://github.com/8Dionysus/8Dionysus/pull/136"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-techniques",
+                  "migration_ref": "9a5222cc6a6b1fdc52b4df906f49dadfd0383c71",
+                  "pr": "https://github.com/8Dionysus/aoa-techniques/pull/497"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-memo",
+                  "migration_ref": "bcda57fe47d5e3daaee8258cc4428dc6315ae239",
+                  "pr": "https://github.com/8Dionysus/aoa-memo/pull/291"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-skills",
+                  "migration_ref": "5929ad000ff06750ced1c806766138dc11e54e5a",
+                  "pr": "https://github.com/8Dionysus/aoa-skills/pull/380"
+                }
+              }
+            ]
+          }
         },
         "aoa_kag_postmerge": {
           "type": "object",

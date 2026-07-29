@@ -45,6 +45,60 @@ ZERO_REFERENCE_REPOS = {
     "aoa-telegram-connector",
     "aoa-xda-connector",
 }
+EXPECTED_OWNER_LANDINGS = {
+    "aoa-sdk": (
+        "780ac06d1739246d6402445e6ec43ef39a97b90a",
+        "https://github.com/8Dionysus/aoa-sdk/pull/239",
+    ),
+    "abyss-stack": (
+        "c779d1413690ec11b5df7b6fc638e2a8b95510a5",
+        "https://github.com/8Dionysus/abyss-stack/pull/336",
+    ),
+    "aoa-kag": (
+        "15e1639740873f374faecb42029ae5cc8eb5375c",
+        "https://github.com/8Dionysus/aoa-kag/pull/180",
+    ),
+    "aoa-stats": (
+        "740c57d6ab2fe78d6a8440c19c2637431e039c6b",
+        "https://github.com/8Dionysus/aoa-stats/pull/178",
+    ),
+    "aoa-agents": (
+        "92dd79e6c79fef60faedf6b97f2c65ff89477d06",
+        "https://github.com/8Dionysus/aoa-agents/pull/270",
+    ),
+    "aoa-evals": (
+        "12b408727e40174dd10e1f9ad0fa2e7f7fd11eec",
+        "https://github.com/8Dionysus/aoa-evals/pull/437",
+    ),
+    "Tree-of-Sophia": (
+        "d95a583272acb84dcb5b7e6896801f0364c7b234",
+        "https://github.com/8Dionysus/Tree-of-Sophia/pull/140",
+    ),
+    "aoa-playbooks": (
+        "b72ca2d333bcdf516ed6656e34670fa93df88162",
+        "https://github.com/8Dionysus/aoa-playbooks/pull/198",
+    ),
+    "Agents-of-Abyss": (
+        "66d86b04e685cf06b03a95a3f9c74e7c8d607740",
+        "https://github.com/8Dionysus/Agents-of-Abyss/pull/270",
+    ),
+    "8Dionysus": (
+        "aa67908a137a9c9631a439f266d32a8918c7213c",
+        "https://github.com/8Dionysus/8Dionysus/pull/136",
+    ),
+    "aoa-techniques": (
+        "9a5222cc6a6b1fdc52b4df906f49dadfd0383c71",
+        "https://github.com/8Dionysus/aoa-techniques/pull/497",
+    ),
+    "aoa-memo": (
+        "bcda57fe47d5e3daaee8258cc4428dc6315ae239",
+        "https://github.com/8Dionysus/aoa-memo/pull/291",
+    ),
+    "aoa-skills": (
+        "5929ad000ff06750ced1c806766138dc11e54e5a",
+        "https://github.com/8Dionysus/aoa-skills/pull/380",
+    ),
+}
 
 
 def load_json(path: Path) -> dict[str, object]:
@@ -103,6 +157,12 @@ def test_x1_final_report_proves_current_main_consumer_zero() -> None:
         item["direct_predecessor_checkout_dependencies"] == 0 for item in zero_reference
     )
     assert census["current_main_heads_checked"] == 24
+    assert census["patterns"] == [
+        "AOA_ROUTING_ROOT",
+        "/srv/AbyssOS/aoa-routing",
+        "github.com/8Dionysus/aoa-routing",
+        "repository: 8Dionysus/aoa-routing",
+    ]
     assert census["active_direct_predecessor_checkout_dependencies"] == 0
     assert census["post_candidate_drift_rescanned"] is True
     assert {
@@ -128,7 +188,10 @@ def test_x1_records_prior_validation_and_pending_own_postmerge_cycle() -> None:
         item["conclusion"] == "success"
         for item in validation["sdk_main_success_cycles"]
     )
-    assert len(validation["consumer_owner_landings"]) == 13
+    assert {
+        item["repo"]: (item["migration_ref"], item["pr"])
+        for item in validation["consumer_owner_landings"]
+    } == EXPECTED_OWNER_LANDINGS
     assert validation["aoa_kag_postmerge"] == {
         "run_id": 30445769702,
         "head_sha": "15e1639740873f374faecb42029ae5cc8eb5375c",
@@ -380,3 +443,23 @@ def test_x1_schema_rejects_archive_authorization_or_executed_actions() -> None:
     operator_candidate = deepcopy(evidence)
     operator_candidate["remaining_external_gates"][1]["satisfied"] = True
     assert list(validator().iter_errors(operator_candidate))
+
+    patterns_candidate = deepcopy(evidence)
+    patterns_candidate["direct_dependency_census"]["patterns"] = []
+    assert list(validator().iter_errors(patterns_candidate))
+
+    landing_shape_candidate = deepcopy(evidence)
+    landing_shape_candidate["post_landing_validation"]["consumer_owner_landings"][
+        0
+    ] = None
+    assert list(validator().iter_errors(landing_shape_candidate))
+
+    duplicate_landing_candidate = deepcopy(evidence)
+    duplicate_landing_candidate["post_landing_validation"][
+        "consumer_owner_landings"
+    ][1] = deepcopy(
+        duplicate_landing_candidate["post_landing_validation"][
+            "consumer_owner_landings"
+        ][0]
+    )
+    assert list(validator().iter_errors(duplicate_landing_candidate))
