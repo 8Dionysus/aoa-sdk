@@ -55,8 +55,9 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   denial of archive authority
 - the post-G5 compatibility posture: SDK-bundle-first reads, optional
   predecessor discovery, and no active paired CI or release dependency
-- the E1 cost comparison: pinned structural CI/release/context reduction,
-  unlike-latency stop lines, and a provisional G13 result pending landed CI
+- the completed E1 cost comparison: pinned structural
+  CI/release/context reduction, unlike-latency stop lines, and a mixed G13
+  verdict that exposes the landed 23.1% median CI runner-time regression
 - the post-switch consumer contract and SDK-owned composite-stress
   compatibility witness used by sibling validators without an
   `aoa-routing` checkout, including the wheel-packaged Agon gate-routing

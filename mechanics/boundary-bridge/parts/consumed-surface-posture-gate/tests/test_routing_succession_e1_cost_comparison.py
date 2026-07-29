@@ -47,6 +47,15 @@ def test_e1_report_is_recomputed_from_pinned_git_and_trial_evidence() -> None:
         "after": 0,
     }
     assert repository_cost["active_historical_release_probes"]["after"] == []
+    assert repository_cost["post_landing_runner_sample"][
+        "median_runner_seconds"
+    ] == 210.5
+    assert repository_cost["post_landing_runner_sample"][
+        "paired_predecessor_median_runner_seconds"
+    ] == 171
+    assert repository_cost["post_landing_runner_sample"][
+        "runner_time_regression_fraction"
+    ] == 0.231
     assert process_cost["old_contour"]["compile_ready_scenarios"] == 0
     assert process_cost["new_contour"]["compile_ready_scenarios"] == 3
     assert process_cost["new_contour"]["predecessor_checkout_present"] is False
@@ -60,6 +69,8 @@ def test_e1_keeps_unlike_latency_and_missing_telemetry_out_of_benefit_claim() ->
 
     assert limits["direct_latency_comparison_valid"] is False
     assert limits["model_tokens"] == "unavailable in both contours"
+    assert stop_lines["structural_process_cost_reduction_claimed"] is True
+    assert stop_lines["direct_ci_runner_time_reduction_claimed"] is False
     assert stop_lines["task_latency_reduction_claimed"] is False
     assert stop_lines["post_landing_ci_failure_rate_reduction_claimed"] is False
     assert stop_lines["central_aoa_evals_verdict_claimed"] is False
@@ -72,6 +83,7 @@ def test_e1_keeps_unlike_latency_and_missing_telemetry_out_of_benefit_claim() ->
     ("section", "field", "value"),
     [
         ("verdict", "structural_process_cost_reduced", False),
+        ("verdict", "direct_ci_runner_time_reduced", True),
         ("verdict", "typed_agent_process_capability_increased", False),
         ("verdict", "g13_gate", "pass"),
     ],

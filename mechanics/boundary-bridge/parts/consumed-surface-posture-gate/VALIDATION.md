@@ -80,7 +80,9 @@ schemas and the canonical builder are shipped package data, while keeping
 `live_cutover_executed` and `archive_authorized` false.
 `test_routing_succession_e1_cost_comparison.py` recomputes workflow checkout
 and probe counts from pinned Git refs, joins retained T1/G11 receipts, rejects
-latency/token overclaims, and keeps G13 provisional until landed CI evidence.
+latency/token overclaims, recomputes four exact landed main-run durations, and
+requires G13 to expose rather than hide the 23.1% median runner-time
+regression.
 `test_routing_shadow_producer.py` also validates the SDK-owned
 composite-stress compatibility witness and the post-switch consumer contract,
 including its explicit predecessor-checkout prohibition and packaged Agon

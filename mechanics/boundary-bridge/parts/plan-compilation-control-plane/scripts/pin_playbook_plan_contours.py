@@ -17,6 +17,7 @@ RESOURCE_ROOT = REPO_ROOT / "src" / "aoa_sdk" / "control_plane" / "planning" / "
 LOCK_PATH = RESOURCE_ROOT / "playbook-plan-contours-source-lock.v1.json"
 CONTOUR_PATH = RESOURCE_ROOT / "playbook-plan-contours.v1.json"
 SCHEMA_PATH = RESOURCE_ROOT / "playbook-plan-contours.schema.json"
+TRUST_RECORD_PATH = RESOURCE_ROOT / "playbook-plan-contours-trust-record.v1.json"
 OWNER_CONTOUR_REF = "generated/playbook_plan_contours.min.json"
 OWNER_SCHEMA_REF = (
     "mechanics/scenario-composition/parts/plan-contours/"
@@ -251,6 +252,7 @@ def build_outputs(owner_root: Path) -> dict[Path, bytes]:
             "verdict": "allow",
             "record_id": record_id,
             "record_artifact_digest": _sha256(record_raw),
+            "packaged_resource": TRUST_RECORD_PATH.name,
             "latest_record_id": latest_record_id,
             "latest_required": True,
             "subject_store_required": True,
@@ -282,6 +284,7 @@ def build_outputs(owner_root: Path) -> dict[Path, bytes]:
     return {
         CONTOUR_PATH: contour_raw,
         SCHEMA_PATH: schema_raw,
+        TRUST_RECORD_PATH: record_raw,
         LOCK_PATH: _stable_json(lock),
     }
 

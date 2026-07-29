@@ -1,6 +1,6 @@
 # Routing Succession E1 Process-Cost Comparison
 
-Status: provisional pass pending landed CI observation.
+Status: complete mixed verdict.
 
 Machine-readable evidence:
 [`../evidence/routing-succession-e1-cost-comparison.json`](../evidence/routing-succession-e1-cost-comparison.json).
@@ -13,9 +13,10 @@ Did succession reduce the cost of maintaining and consuming routing while
 adding the typed Agent OS path, without hiding a regression or pretending that
 unavailable telemetry is zero?
 
-For the pinned M3 contour, the answer is yes for structural process cost and
-supported process completeness. Direct task-latency, model-token, and landed
-CI reliability reductions are not yet proved.
+For the landed control-plane contour, the answer is yes for structural
+process cost and supported process completeness, but no for direct CI
+runner-time reduction. Direct task-latency, model-token, and long-run CI
+reliability reductions are not proved.
 
 ## Repository And CI Result
 
@@ -39,6 +40,33 @@ drift and cadence duties that still have separate meaning.
 The predecessor implementation is deliberately still present. Consumer-zero,
 compatibility exit, and rollback retirement have not passed, so counting
 physical implementations as `2 -> 1` would be false.
+
+### Landed CI Observation
+
+Four exact successful `push` runs of `Repo Validation` on `aoa-sdk/main`
+were observed after the owner and consumer landings:
+
+| run | landed SDK ref | runner seconds | workflow lead-time seconds |
+| ---: | --- | ---: | ---: |
+| 30369543263 | `ac6c1e5` | 213 | 219 |
+| 30422604505 | `eda623e` | 208 | 213 |
+| 30428491862 | `cbf2256` | 214 | 218 |
+| 30443863477 | `780ac06` | 199 | 208 |
+
+The new median is 210.5 runner seconds. The historical successful medians were
+70 seconds for SDK validation and 101 seconds for predecessor validation, or
+171 seconds when both repositories changed. The landed single-SDK contour is
+therefore 39.5 seconds, or 23.1%, slower in direct runner time.
+
+This regression is not hidden as a “cost reduction.” The structural saving is
+real, but the direct CI-time saving is not. The added time is attributable to
+the portable multi-owner KAG audit and the expanded package, trust, routing,
+planning, lifecycle, and runtime-adapter gates. Duplicate producer scaffolding
+did not return, and no assurance gate was removed to manufacture a faster
+number.
+
+All four runs passed, but they are a small non-random sample. They do not prove
+that the historical 52.3% aggregate failure rate improved.
 
 ## Agent Process Result
 
@@ -88,20 +116,16 @@ agent-level tool-call totals are also unavailable. HTTP/process calls are
 counted, and serialized byte sizes are retained, but the unlike output
 contracts make bytes an invalid token-cost comparison.
 
-## G13 And Remaining E1 Work
+## G13 Verdict
 
-G13 is a provisional pass:
+G13 passes with a disclosed CI runner-time regression:
 
 - structural maintenance and coordination cost decreased;
 - the typed agent process gained supported route, plan, lifecycle, and
   closeout boundaries;
 - the retained adversarial contour remains green;
-- no direct latency or token reduction is claimed.
+- direct CI runner time increased by 23.1%;
+- no direct task-latency, token, or long-run failure-rate reduction is claimed.
 
-E1 stays provisional until the single final landing supplies a comparable
-post-landing CI sample for lead time, runner minutes, and failure rate. This
-does not block consumer-zero inspection, but it does block a final claim that
-the historical 52.3% workflow failure rate has improved.
-
-Consumer-zero, rollback retirement, archive readiness, and archive authority
-all remain false.
+E1 itself does not claim consumer-zero, rollback retirement, archive
+readiness, or archive authority. Those remain separate X1 and operator gates.

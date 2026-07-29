@@ -97,6 +97,11 @@ def test_snapshot_pins_exact_admitted_owner_projection() -> None:
         snapshot.admission_provenance.source_ref
         == snapshot.source_lock.trust_admission.record_id
     )
+    assert snapshot.admission_provenance.owner_repo == "aoa-sdk"
+    assert snapshot.admission_provenance.artifact_ref == (
+        "src/aoa_sdk/control_plane/planning/data/"
+        "playbook-plan-contours-trust-record.v1.json"
+    )
     assert (
         snapshot.admission_provenance.artifact_digest
         == snapshot.source_lock.trust_admission.record_artifact_digest
@@ -817,6 +822,18 @@ def test_packaged_contour_or_lock_tampering_fails_closed(
     with pytest.raises(
         PlanCompilationSnapshotError,
         match="digest mismatch",
+    ):
+        load_plan_compilation_snapshot(resource_root=resource_root)
+
+    shutil.rmtree(resource_root)
+    shutil.copytree(DATA_ROOT, resource_root)
+    trust_record_path = (
+        resource_root / "playbook-plan-contours-trust-record.v1.json"
+    )
+    trust_record_path.write_bytes(trust_record_path.read_bytes() + b" ")
+    with pytest.raises(
+        PlanCompilationSnapshotError,
+        match="packaged playbook trust record digest mismatch",
     ):
         load_plan_compilation_snapshot(resource_root=resource_root)
 

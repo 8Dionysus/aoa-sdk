@@ -43,6 +43,9 @@ Tracking starts with the community-docs baseline for this repository.
 - Separate the playbook trust record's logical `record_id` from the SHA-256 of
   its delivered registry JSON bytes, so exact runtime snapshot observation
   can consume a public compiler plan without rewriting provenance.
+- Package those exact public-safe trust-record bytes as a lower-authority SDK
+  delivery projection, so clean installed-wheel runtime observation does not
+  require ephemeral `aoa-playbooks` registry state.
 - Add C3 `AoASDK.runner` and `aoa_control_plane_runner_v1`: immutable session
   preparation, explicit adapter binding, runtime snapshot observation,
   approval round trips, bounded recovery, idempotent commands, append-only
@@ -88,8 +91,11 @@ Tracking starts with the community-docs baseline for this repository.
 - Add the reproducible E1 cost comparison: workflow checkout actions fall
   73 to 23, active producer control planes fall 2 to 1, and the clean
   route-bind-compile federation falls from a 15–16-root maintenance lower
-  bound to six owner roots. G13 remains provisional until landed CI supplies
-  comparable lead-time, runner-minute, and failure-rate evidence.
+  bound to six owner roots. Four landed main runs complete G13 with a mixed
+  verdict: the single-SDK median is 210.5 runner seconds, 23.1% slower than
+  the old paired 171-second median because portable KAG and expanded
+  package/trust/control-plane gates add assurance; no direct CI-time or
+  failure-rate reduction is claimed.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.

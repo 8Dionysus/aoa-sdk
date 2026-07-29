@@ -7,7 +7,9 @@ import argparse
 import hashlib
 import json
 import subprocess
+from datetime import datetime
 from pathlib import Path
+from statistics import median
 from typing import Any
 
 from jsonschema import Draft202012Validator, FormatChecker
@@ -87,6 +89,12 @@ def _read_json(path: Path) -> dict[str, Any]:
 
 def _sha256(path: Path) -> str:
     return hashlib.sha256(path.read_bytes()).hexdigest()
+
+
+def _duration_seconds(started_at: str, completed_at: str) -> int:
+    start = datetime.fromisoformat(started_at.replace("Z", "+00:00"))
+    end = datetime.fromisoformat(completed_at.replace("Z", "+00:00"))
+    return int((end - start).total_seconds())
 
 
 def _git(
@@ -247,17 +255,87 @@ def build_report(routing_root: Path | None = None) -> dict[str, Any]:
     contexts = observations["process_observations"]["repository_contexts"]
     legacy_route = observations["process_observations"]["legacy_advisory_route"]
     clean_chain = observations["process_observations"]["clean_federation_chain"]
+    post_ci = observations["post_landing_ci"]
     old_agent = baseline_cost["agent_process_baseline"]
     g11_runs = g11_trial["runs"]
 
+    for run in post_ci["runs"]:
+        _require_ancestor(REPO_ROOT, run["head_sha"])
+        if run["conclusion"] != "success":
+            raise RuntimeError("post-landing E1 CI sample contains a failed run")
+        if run["runner_seconds"] != _duration_seconds(
+            run["job_started_at"],
+            run["job_completed_at"],
+        ):
+            raise RuntimeError("post-landing E1 runner duration is inconsistent")
+        if run["lead_time_seconds"] != _duration_seconds(
+            run["created_at"],
+            run["updated_at"],
+        ):
+            raise RuntimeError("post-landing E1 lead time is inconsistent")
+
+    runner_seconds = [run["runner_seconds"] for run in post_ci["runs"]]
+    lead_time_seconds = [run["lead_time_seconds"] for run in post_ci["runs"]]
+    sdk_baseline = next(
+        item
+        for item in baseline_cost["workflow_metrics"]
+        if item["repo"] == "aoa-sdk" and item["workflow"] == "Repo Validation"
+    )
+    routing_baseline = next(
+        item
+        for item in baseline_cost["workflow_metrics"]
+        if (
+            item["repo"] == "aoa-routing"
+            and item["workflow"] == "Repo Validation"
+        )
+    )
+    paired_baseline_seconds = (
+        sdk_baseline["successful_median_seconds"]
+        + routing_baseline["successful_median_seconds"]
+    )
+    post_runner_median = median(runner_seconds)
+    post_lead_median = median(lead_time_seconds)
+    runner_delta = post_runner_median - paired_baseline_seconds
+    runner_regression_fraction = round(
+        runner_delta / paired_baseline_seconds,
+        3,
+    )
+    expected_sample = post_ci["sample"]
+    if expected_sample != {
+        "run_count": len(post_ci["runs"]),
+        "all_success": True,
+        "runner_seconds": runner_seconds,
+        "lead_time_seconds": lead_time_seconds,
+        "median_runner_seconds": post_runner_median,
+        "median_lead_time_seconds": post_lead_median,
+        "runner_seconds_delta_from_paired_baseline": runner_delta,
+        "runner_time_regression_fraction": runner_regression_fraction,
+    }:
+        raise RuntimeError("post-landing E1 CI sample summary is inconsistent")
+    if post_ci["baseline"] != {
+        "sdk_successful_median_runner_seconds": sdk_baseline[
+            "successful_median_seconds"
+        ],
+        "predecessor_successful_median_runner_seconds": routing_baseline[
+            "successful_median_seconds"
+        ],
+        "paired_successful_validation_runner_seconds": paired_baseline_seconds,
+    }:
+        raise RuntimeError("post-landing E1 CI baseline summary is inconsistent")
+
     report: dict[str, Any] = {
-        "schema_version": "aoa_sdk_routing_succession_e1_cost_comparison_v1",
+        "schema_version": "aoa_sdk_routing_succession_e1_cost_comparison_v2",
         "observed_on": observations["observed_on"],
-        "status": "provisional_pass_pending_landed_ci_observation",
+        "status": "complete_mixed_verdict",
         "scope": {
-            "comparison": "R0 predecessor contour to post-G5 M3 contour",
+            "comparison": (
+                "R0 predecessor contour to landed SDK control-plane contour"
+            ),
             "sdk_before_m3_ref": pins["sdk_before_m3_ref"],
             "sdk_post_m3_ref": pins["sdk_post_m3_ref"],
+            "sdk_post_landing_observation_through_ref": post_ci["runs"][-1][
+                "head_sha"
+            ],
             "routing_before_m3_ref": routing_m3["baseline_ref"],
             "routing_post_m3_ref": routing_m3["source_ref"],
             "r0_evidence_sha256": _sha256(BASELINE_PATH),
@@ -330,7 +408,28 @@ def build_report(routing_root: Path | None = None) -> dict[str, Any]:
                 "runner_minutes": baseline_cost["measured_runner_minutes"],
                 "failed_runs": baseline_cost["measured_failed_runs"],
                 "failure_rate": baseline_cost["measured_failure_rate"],
-                "post_landing_comparable_sample_available": False,
+                "post_landing_comparable_sample_available": True,
+            },
+            "post_landing_runner_sample": {
+                "observation_class": post_ci["observation_class"],
+                "workflow": post_ci["workflow"],
+                "event": post_ci["event"],
+                "branch": post_ci["branch"],
+                "runs": post_ci["runs"],
+                "run_count": len(post_ci["runs"]),
+                "all_success": True,
+                "median_runner_seconds": post_runner_median,
+                "median_lead_time_seconds": post_lead_median,
+                "paired_predecessor_median_runner_seconds": (
+                    paired_baseline_seconds
+                ),
+                "runner_seconds_delta_from_paired_baseline": runner_delta,
+                "runner_time_regression_fraction": runner_regression_fraction,
+                "failure_rate_reduction_claimable": post_ci[
+                    "failure_rate_reduction_claimable"
+                ],
+                "growth_sources": post_ci["growth_sources"],
+                "claim_limit": post_ci["claim_limit"],
             },
         },
         "agent_process_cost": {
@@ -445,9 +544,11 @@ def build_report(routing_root: Path | None = None) -> dict[str, Any]:
                 "terminal_posture"
             ]["complete_to_rightful_stop_boundary"],
             "central_aoa_evals_verdict_claimed": False,
-            "process_cost_reduction_claimed": True,
+            "structural_process_cost_reduction_claimed": True,
+            "direct_ci_runner_time_reduction_claimed": False,
             "task_latency_reduction_claimed": False,
             "post_landing_ci_failure_rate_reduction_claimed": False,
+            "assurance_removed_to_reduce_ci_time": False,
             "consumer_zero_claimed": False,
             "rollback_retired_claimed": False,
             "archive_ready_claimed": False,
@@ -455,19 +556,26 @@ def build_report(routing_root: Path | None = None) -> dict[str, Any]:
         },
         "verdict": {
             "structural_process_cost_reduced": True,
+            "direct_ci_runner_time_reduced": False,
+            "direct_ci_runner_time_regression_fraction": (
+                runner_regression_fraction
+            ),
             "typed_agent_process_capability_increased": True,
             "bounded_no_regression_signal": True,
-            "g13_gate": "provisional_pass",
-            "remaining_e1_observation": (
-                "collect comparable post-landing CI lead-time, runner-minute, "
-                "and failure-rate evidence after the single final landing"
+            "g13_gate": "pass_with_ci_runner_time_regression",
+            "growth_source": (
+                "The 23.1% runner-time increase is attributable to the "
+                "portable multi-owner KAG audit and expanded package, trust, "
+                "routing, planning, lifecycle, and runtime-adapter gates; "
+                "duplicate producer scaffolding did not return."
             ),
             "claim_limit": (
                 "E1 proves structural checkout, workflow, release, context, "
-                "and supported-process improvement for pinned evidence. It "
-                "does not prove direct latency or token reduction, a central "
-                "eval verdict, post-landing CI reliability, consumer-zero, "
-                "rollback retirement, archive readiness, or archive authority."
+                "and supported-process improvement, while reporting a 23.1% "
+                "median CI runner-time regression. It does not prove direct "
+                "task latency or token reduction, a long-run CI failure-rate "
+                "improvement, a central eval verdict, consumer-zero, rollback "
+                "retirement, archive readiness, or archive authority."
             ),
         },
     }

@@ -34,7 +34,9 @@
 ## Determinism
 
 The plan identity binds the exact decision, scenario binding, runtime profile,
-owner contour/schema/trust pin, compiler projection, and plan snapshot. Equal
+owner contour/schema/trust pin, packaged exact trust-record bytes, compiler
+projection, and plan snapshot. The package copy is a delivery projection;
+`aoa-playbooks` and `abyss-machine` retain source and trust authority. Equal
 inputs produce equal bytes. A false reviewed condition removes only its
 guarded steps and guarded requirements; references to removed steps are
 removed while retained relative order and retained dependencies stay intact.
@@ -67,6 +69,7 @@ object.
 - No unsupported effect in the runtime profile.
 - No stale digest, non-latest trust record, denied admission, missing subject
   store, missing required trust control, or schema drift.
+- No absent, altered, or lock-conflicting packaged trust-record input.
 - No conflation of the trust record's logical `record_id` with the SHA-256 of
   its delivered JSON bytes; both identities are pinned and snapshot-bound.
 - No route approval or runtime-profile approval projection rewritten, dropped,

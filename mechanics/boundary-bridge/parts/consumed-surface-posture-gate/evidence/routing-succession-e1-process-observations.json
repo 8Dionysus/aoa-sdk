@@ -1,6 +1,6 @@
 {
   "schema_version": "aoa_sdk_routing_succession_e1_process_observations_v1",
-  "observed_on": "2026-07-26",
+  "observed_on": "2026-07-29",
   "pins": {
     "sdk_before_m3_ref": "7802585aabf80518c0871178fd512a7f94d6a45a",
     "sdk_post_m3_ref": "7fba39d38cf5902c41dfbb7ae91f405b849880b7",
@@ -16,6 +16,98 @@
     "checkout_actions_after": 0
   },
   "routing_related_workflows_after": 3,
+  "post_landing_ci": {
+    "observation_class": "GitHub Actions push runs on aoa-sdk main after coordinated owner and consumer landings",
+    "workflow": "Repo Validation",
+    "event": "push",
+    "branch": "main",
+    "runs": [
+      {
+        "run_id": 30369543263,
+        "job_id": 90309467669,
+        "head_sha": "ac6c1e5f7dd824ebaa6a583c4bb8965e3ca194a0",
+        "created_at": "2026-07-28T14:40:36Z",
+        "job_started_at": "2026-07-28T14:40:41Z",
+        "job_completed_at": "2026-07-28T14:44:14Z",
+        "updated_at": "2026-07-28T14:44:15Z",
+        "runner_seconds": 213,
+        "lead_time_seconds": 219,
+        "conclusion": "success",
+        "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30369543263"
+      },
+      {
+        "run_id": 30422604505,
+        "job_id": 90482299246,
+        "head_sha": "eda623ecd8a77606414a29ea7102369e369b95be",
+        "created_at": "2026-07-29T04:33:39Z",
+        "job_started_at": "2026-07-29T04:33:43Z",
+        "job_completed_at": "2026-07-29T04:37:11Z",
+        "updated_at": "2026-07-29T04:37:12Z",
+        "runner_seconds": 208,
+        "lead_time_seconds": 213,
+        "conclusion": "success",
+        "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30422604505"
+      },
+      {
+        "run_id": 30428491862,
+        "job_id": 90500118314,
+        "head_sha": "cbf225627f9f28d0470deb8a962ae12d1fe72375",
+        "created_at": "2026-07-29T06:32:23Z",
+        "job_started_at": "2026-07-29T06:32:26Z",
+        "job_completed_at": "2026-07-29T06:36:00Z",
+        "updated_at": "2026-07-29T06:36:01Z",
+        "runner_seconds": 214,
+        "lead_time_seconds": 218,
+        "conclusion": "success",
+        "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30428491862"
+      },
+      {
+        "run_id": 30443863477,
+        "job_id": 90549331214,
+        "head_sha": "780ac06d1739246d6402445e6ec43ef39a97b90a",
+        "created_at": "2026-07-29T10:29:27Z",
+        "job_started_at": "2026-07-29T10:29:36Z",
+        "job_completed_at": "2026-07-29T10:32:55Z",
+        "updated_at": "2026-07-29T10:32:55Z",
+        "runner_seconds": 199,
+        "lead_time_seconds": 208,
+        "conclusion": "success",
+        "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30443863477"
+      }
+    ],
+    "baseline": {
+      "sdk_successful_median_runner_seconds": 70,
+      "predecessor_successful_median_runner_seconds": 101,
+      "paired_successful_validation_runner_seconds": 171
+    },
+    "sample": {
+      "run_count": 4,
+      "all_success": true,
+      "runner_seconds": [
+        213,
+        208,
+        214,
+        199
+      ],
+      "lead_time_seconds": [
+        219,
+        213,
+        218,
+        208
+      ],
+      "median_runner_seconds": 210.5,
+      "median_lead_time_seconds": 215.5,
+      "runner_seconds_delta_from_paired_baseline": 39.5,
+      "runner_time_regression_fraction": 0.231
+    },
+    "growth_sources": [
+      "the SDK validation now carries the portable multi-owner KAG release audit that succeeds without an aoa-routing producer checkout",
+      "the package and trust gates cover the expanded routing, planning, lifecycle, and runtime-adapter control plane",
+      "no duplicate producer workflow was reintroduced and no assurance gate was removed to manufacture a faster result"
+    ],
+    "failure_rate_reduction_claimable": false,
+    "claim_limit": "Four successful non-random main runs are enough to expose the direct runner-time regression, but not enough to claim a failure-rate improvement or long-run reliability change."
+  },
   "process_observations": {
     "legacy_advisory_route": {
       "request": "POST /routing/task-family with task_family=bounded-plan-shaping",

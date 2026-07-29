@@ -395,6 +395,7 @@
 
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
 - [AOA-SDK-D-0089 - Project Runtime Approvals Before Plan Compilation](../AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md`)
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 
 ## playbook reader
 
@@ -557,6 +558,7 @@
 - [AOA-SDK-D-0087 - Admit Typed Scenario Artifacts as Runtime Requests](../AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md) (`docs/decisions/AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md`)
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
 - [AOA-SDK-D-0089 - Project Runtime Approvals Before Plan Compilation](../AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md`)
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 
 ## runtime seam
 
@@ -605,6 +607,7 @@
 ## snapshot
 
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 
 ## source family routing
 
