@@ -26,6 +26,10 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   distinguishes local direct-checkout consumer-zero from landed
   consumer-zero, and keeps compatibility exit, rollback retirement, and
   archive authority false
+- a final X1 landed report that binds all 17 consumers and 7 zero-reference
+  repositories at current `main`, exact package and Agent OS cycles, live
+  SDK-only rollback, the mixed E1 result, compatibility exit, and archive
+  readiness while keeping every irreversible-action authority false
 - the accepted routing succession target model, authority matrix,
   compatibility policy, and repository state machine without moving producer
   code or switching live authority
@@ -97,14 +101,18 @@ Then read the measured
 [`docs/routing-succession-e1-cost-comparison.md`](docs/routing-succession-e1-cost-comparison.md).
 Then read the candidate-only
 [`docs/routing-succession-x1-consumer-zero-candidate.md`](docs/routing-succession-x1-consumer-zero-candidate.md).
+Finally read the landed
+[`docs/routing-succession-x1-consumer-zero-report.md`](docs/routing-succession-x1-consumer-zero-report.md).
 Consumers migrating away from the predecessor checkout use
 [`docs/routing-consumer-contract.md`](docs/routing-consumer-contract.md).
 G4 proves the released shadow successor and isolated runtime content path. The
 G5 candidate adds native SDK producer identity for trust and canary review.
 The release candidate adds exact public release trust without switch
 authority. The G5 receipt makes the SDK canonical and starts the compatibility
-window. Stronger-owner admission and live cutover have completed; consumer-zero,
-rollback retirement, and archival action remain separate.
+window. Stronger-owner admission, live cutover, landed consumer-zero,
+compatibility exit, and SDK-only operational rollback proof are complete. The
+predecessor repository remains preserved and unarchived; only an exact
+operator approval can authorize its deprecation-release and archive sequence.
 
 ## Validation
 

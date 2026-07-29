@@ -9,6 +9,7 @@ python -m build
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/measure_routing_succession_e1.py --check
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_x1_consumer_zero_candidate.py
+python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_x1_consumer_zero_report.py
 python scripts/validate_mechanics_topology.py
 ```
 
@@ -92,6 +93,13 @@ candidate refs, complete accounting for the sixteen R0 consumers and one
 later discovery, zero active direct-checkout dependencies in the candidate
 set, classified residual references, and the still-false landed,
 compatibility-exit, rollback-retirement, and archive gates.
+`test_routing_succession_x1_consumer_zero_report.py` validates the final 17
+consumer and 24-current-head census, thirteen exact owner landings, eight SDK
+main cycles, `aoa-kag` post-merge success, the clean immutable-tag release
+replay, exact wheel install/upgrade/downgrade/restore, three post-repair Agent
+OS cycles, live SDK-only rollback, mixed E1 result, all six compatibility-exit
+criteria, and archive readiness. It also proves the schema rejects archive
+authorization or any executed irreversible predecessor action.
 
 For full Boundary Bridge coverage, also run:
 

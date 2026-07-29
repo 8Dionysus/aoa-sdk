@@ -82,6 +82,14 @@
   without mistaking those records for active checkout dependencies.
 - Requires all evidence-based compatibility exit conditions and post-landing
   observations before rollback retirement or archive readiness.
+- Requires landed owner refs, green post-merge validation, current-main
+  direct-checkout consumer-zero, exact package compatibility, post-repair
+  Agent OS cycles, live SDK-only rollback evidence, and an honest E1 verdict
+  before the final X1 report may claim compatibility exit or archive
+  readiness.
+- Keeps archive readiness distinct from archive authority and requires the
+  final X1 schema to reject deprecation-release, metadata, archive, or other
+  irreversible-action execution before separate exact operator approval.
 - Admits the current owner shortlist `guard` kind without removing the legacy
   `seed` compatibility value or taking ownership of either meaning.
 
@@ -115,6 +123,9 @@
 - Candidate direct-checkout consumer-zero is not landed consumer-zero,
   compatibility exit, rollback retirement, archive readiness, or archive
   authorization.
+- A final `archive_ready=true` X1 report is not authority to publish a
+  deprecation release, mutate repository metadata, archive, delete, rename, or
+  otherwise irreversibly change the predecessor repository.
 
 ## Active Test Home
 
@@ -139,3 +150,4 @@
 - `tests/test_routing_g5_release_candidate.py`
 - `tests/test_routing_g5_canonical.py`
 - `tests/test_routing_succession_x1_consumer_zero_candidate.py`
+- `tests/test_routing_succession_x1_consumer_zero_report.py`

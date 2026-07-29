@@ -9,6 +9,15 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
+- Complete the X1 landed consumer-zero report: all 17 known consumers are
+  landed or classified, 24 current repository heads have zero active
+  predecessor checkout dependency, package upgrade/downgrade/restore and
+  three post-repair Agent OS cycles pass, live rollback is SDK-only, and all
+  compatibility-exit criteria are satisfied.
+- Mark `aoa-routing` archive-ready while preserving it as public,
+  maintenance-only, and unarchived. The final evidence and schema keep
+  deprecation release, About metadata, GitHub archive, and every irreversible
+  action false until separate exact operator approval.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.

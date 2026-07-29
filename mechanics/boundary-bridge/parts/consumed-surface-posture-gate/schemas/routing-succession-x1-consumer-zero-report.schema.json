@@ -1,0 +1,790 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/8Dionysus/aoa-sdk/blob/main/mechanics/boundary-bridge/parts/consumed-surface-posture-gate/schemas/routing-succession-x1-consumer-zero-report.schema.json",
+  "title": "AoA SDK routing succession X1 consumer-zero report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observed_at_utc",
+    "status",
+    "scope",
+    "consumer_accounting",
+    "landed_consumers",
+    "zero_reference_repositories",
+    "allowed_residuals",
+    "direct_dependency_census",
+    "post_landing_validation",
+    "package_compatibility",
+    "agent_os_execution_window",
+    "live_runtime_evidence",
+    "e1_outcome",
+    "compatibility_exit",
+    "predecessor",
+    "remaining_external_gates",
+    "verdict"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_routing_succession_x1_consumer_zero_report_v1"
+    },
+    "observed_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "const": "archive_ready_operator_approval_required"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "r0_baseline_ref",
+        "r0_baseline_sha256",
+        "candidate_ref",
+        "candidate_sha256",
+        "sdk_landed_control_plane_ref",
+        "sdk_final_evidence_ref",
+        "observation_class",
+        "claim_boundary"
+      ]
+    },
+    "consumer_accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "r0_registered_consumers",
+        "post_r0_discovered_consumers",
+        "total_accounted_consumers",
+        "landed_migrations",
+        "unchanged_classifications",
+        "all_known_consumers_accounted",
+        "all_known_consumers_landed_or_classified"
+      ],
+      "properties": {
+        "r0_registered_consumers": {
+          "const": 16
+        },
+        "post_r0_discovered_consumers": {
+          "const": 1
+        },
+        "total_accounted_consumers": {
+          "const": 17
+        },
+        "landed_migrations": {
+          "const": 13
+        },
+        "unchanged_classifications": {
+          "const": 4
+        },
+        "all_known_consumers_accounted": {
+          "const": true
+        },
+        "all_known_consumers_landed_or_classified": {
+          "const": true
+        }
+      }
+    },
+    "landed_consumers": {
+      "type": "array",
+      "minItems": 17,
+      "maxItems": 17,
+      "items": {
+        "$ref": "#/$defs/consumer"
+      }
+    },
+    "zero_reference_repositories": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "items": {
+        "$ref": "#/$defs/classification"
+      }
+    },
+    "allowed_residuals": {
+      "type": "array",
+      "minItems": 8,
+      "uniqueItems": true,
+      "items": {
+        "type": "string",
+        "minLength": 20
+      }
+    },
+    "direct_dependency_census": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "patterns",
+        "current_main_heads_checked",
+        "active_direct_predecessor_checkout_dependencies",
+        "post_candidate_drift_rescanned",
+        "result",
+        "claim_limit"
+      ],
+      "properties": {
+        "current_main_heads_checked": {
+          "const": 24
+        },
+        "active_direct_predecessor_checkout_dependencies": {
+          "const": 0
+        },
+        "post_candidate_drift_rescanned": {
+          "const": true
+        },
+        "result": {
+          "const": "landed_consumer_zero"
+        }
+      }
+    },
+    "post_landing_validation": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "sdk_main_success_cycles",
+        "required_sdk_main_success_cycles",
+        "consumer_owner_landings",
+        "aoa_kag_postmerge",
+        "release_artifact_replay",
+        "strict_postpublish_audit_passed",
+        "all_required_validation_green"
+      ],
+      "properties": {
+        "sdk_main_success_cycles": {
+          "type": "array",
+          "minItems": 8,
+          "maxItems": 8
+        },
+        "required_sdk_main_success_cycles": {
+          "const": 2
+        },
+        "consumer_owner_landings": {
+          "type": "array",
+          "minItems": 13
+        },
+        "aoa_kag_postmerge": {
+          "type": "object",
+          "required": [
+            "run_id",
+            "head_sha",
+            "conclusion",
+            "url"
+          ],
+          "properties": {
+            "head_sha": {
+              "const": "15e1639740873f374faecb42029ae5cc8eb5375c"
+            },
+            "conclusion": {
+              "const": "success"
+            }
+          }
+        },
+        "release_artifact_replay": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "run_id",
+            "workflow_head_sha",
+            "package_source_ref",
+            "runner_seconds",
+            "conclusion",
+            "url"
+          ],
+          "properties": {
+            "run_id": {
+              "const": 30456244099
+            },
+            "workflow_head_sha": {
+              "const": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7"
+            },
+            "package_source_ref": {
+              "const": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb"
+            },
+            "runner_seconds": {
+              "const": 143
+            },
+            "conclusion": {
+              "const": "success"
+            },
+            "url": {
+              "const": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30456244099"
+            }
+          }
+        },
+        "strict_postpublish_audit_passed": {
+          "const": true
+        },
+        "all_required_validation_green": {
+          "const": true
+        }
+      }
+    },
+    "package_compatibility": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "sdk_source_ref",
+        "new_version",
+        "new_wheel_sha256",
+        "predecessor_version",
+        "predecessor_source_ref",
+        "predecessor_wheel_sha256",
+        "steps",
+        "release_artifact",
+        "clean_install_passed",
+        "upgrade_passed",
+        "downgrade_passed",
+        "restore_passed"
+      ],
+      "properties": {
+        "sdk_source_ref": {
+          "const": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb"
+        },
+        "new_version": {
+          "const": "0.9.0"
+        },
+        "new_wheel_sha256": {
+          "const": "sha256:e9af2e6674e30bc1fd81d142cd70b3149c12d11dfc6db5d1564d30028ec5d236"
+        },
+        "predecessor_version": {
+          "const": "0.8.0"
+        },
+        "predecessor_source_ref": {
+          "const": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d"
+        },
+        "predecessor_wheel_sha256": {
+          "const": "sha256:fe89ca58f1291119123f74fdbedf6e462bd43ccb840d5d7a08fa2dbcdb691f37"
+        },
+        "steps": {
+          "type": "array",
+          "minItems": 4,
+          "maxItems": 4
+        },
+        "release_artifact": {
+          "type": "object",
+          "additionalProperties": true,
+          "required": [
+            "workflow_run_id",
+            "workflow_head_ref",
+            "package_source_ref",
+            "wheel_sha256",
+            "sdist_sha256",
+            "local_clean_build_wheel_sha256",
+            "local_clean_build_sdist_sha256",
+            "wheel_unpacked_file_count",
+            "sdist_unpacked_file_count",
+            "cross_environment_carrier_hash_parity",
+            "wheel_unpacked_content_parity",
+            "sdist_unpacked_content_parity",
+            "sdist_external_verifier_checkout_present",
+            "workflow_package_bundle_validation_passed",
+            "verified_controls",
+            "agent_consumer_trust_verdict",
+            "release_consumer_trust_verdict",
+            "release_consumer_manual_review_reason",
+            "public_release_python_distribution_consumption_claimed",
+            "claim_limit"
+          ],
+          "properties": {
+            "workflow_run_id": {
+              "const": 30456244099
+            },
+            "workflow_head_ref": {
+              "const": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7"
+            },
+            "package_source_ref": {
+              "const": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb"
+            },
+            "wheel_sha256": {
+              "const": "sha256:e9af2e6674e30bc1fd81d142cd70b3149c12d11dfc6db5d1564d30028ec5d236"
+            },
+            "sdist_sha256": {
+              "const": "sha256:a05670ecdc30ab6a769b7cb203114a0f6bd493312fe6f1fcbb523f6a466be40f"
+            },
+            "local_clean_build_wheel_sha256": {
+              "const": "sha256:4d9a76f8be7b47e52321dd4c08299561944547a1eff0a2c510efe061ce8aa9b2"
+            },
+            "local_clean_build_sdist_sha256": {
+              "const": "sha256:0b394adeb247c1b509001bfc0d8586862997ab945b5563aad92c1a7096bad0b4"
+            },
+            "wheel_unpacked_file_count": {
+              "const": 268
+            },
+            "sdist_unpacked_file_count": {
+              "const": 2172
+            },
+            "cross_environment_carrier_hash_parity": {
+              "const": false
+            },
+            "wheel_unpacked_content_parity": {
+              "const": true
+            },
+            "sdist_unpacked_content_parity": {
+              "const": true
+            },
+            "sdist_external_verifier_checkout_present": {
+              "const": false
+            },
+            "workflow_package_bundle_validation_passed": {
+              "const": true
+            },
+            "verified_controls": {
+              "const": [
+                "abi_signature",
+                "sbom",
+                "slsa_in_toto"
+              ]
+            },
+            "agent_consumer_trust_verdict": {
+              "const": "allow"
+            },
+            "release_consumer_trust_verdict": {
+              "const": "manual_review_required"
+            },
+            "release_consumer_manual_review_reason": {
+              "const": "production_consumer_requires_release_trust_root"
+            },
+            "public_release_python_distribution_consumption_claimed": {
+              "const": false
+            },
+            "claim_limit": {
+              "type": "string",
+              "minLength": 180
+            }
+          }
+        },
+        "clean_install_passed": {
+          "const": true
+        },
+        "upgrade_passed": {
+          "const": true
+        },
+        "downgrade_passed": {
+          "const": true
+        },
+        "restore_passed": {
+          "const": true
+        }
+      }
+    },
+    "agent_os_execution_window": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "sdk_source_ref",
+        "runtime_owner_ref",
+        "release_workflow_run_id",
+        "installed_wheel_sha256",
+        "installed_artifact_byte_identical_to_final_release_replay",
+        "routing_bundle_source_ref",
+        "cycles",
+        "execution_cycles_passed",
+        "evidence_complete_closeouts",
+        "portability_regression_found",
+        "portability_regression_repaired",
+        "post_repair_cycles_passed"
+      ],
+      "properties": {
+        "sdk_source_ref": {
+          "const": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb"
+        },
+        "runtime_owner_ref": {
+          "const": "c779d1413690ec11b5df7b6fc638e2a8b95510a5"
+        },
+        "release_workflow_run_id": {
+          "const": 30456244099
+        },
+        "installed_wheel_sha256": {
+          "const": "sha256:e9af2e6674e30bc1fd81d142cd70b3149c12d11dfc6db5d1564d30028ec5d236"
+        },
+        "installed_artifact_byte_identical_to_final_release_replay": {
+          "const": true
+        },
+        "routing_bundle_source_ref": {
+          "const": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d"
+        },
+        "cycles": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "execution_cycles_passed": {
+          "const": 3
+        },
+        "evidence_complete_closeouts": {
+          "const": 3
+        },
+        "portability_regression_found": {
+          "const": true
+        },
+        "portability_regression_repaired": {
+          "const": true
+        },
+        "post_repair_cycles_passed": {
+          "const": true
+        }
+      }
+    },
+    "live_runtime_evidence": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "route_api_healthy",
+        "rag_api_healthy",
+        "mirror_source_ref",
+        "producer_posture",
+        "activation_mode",
+        "trust_record_id",
+        "subject_digest",
+        "trust_verdict",
+        "predecessor_operationally_required",
+        "sdk_runtime_rollback_primary",
+        "predecessor_implementation_required_for_rollback"
+      ],
+      "properties": {
+        "route_api_healthy": {
+          "const": true
+        },
+        "rag_api_healthy": {
+          "const": true
+        },
+        "producer_posture": {
+          "const": "sdk_canonical"
+        },
+        "activation_mode": {
+          "const": "authorized_live_cutover"
+        },
+        "trust_verdict": {
+          "const": "allow"
+        },
+        "predecessor_operationally_required": {
+          "const": false
+        },
+        "sdk_runtime_rollback_primary": {
+          "const": true
+        },
+        "predecessor_implementation_required_for_rollback": {
+          "const": false
+        }
+      }
+    },
+    "e1_outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report_sha256",
+        "status",
+        "structural_process_cost_reduced",
+        "direct_ci_runner_time_reduced",
+        "direct_ci_runner_time_regression_fraction",
+        "g13_gate",
+        "post_merge_cost_report_complete"
+      ],
+      "properties": {
+        "report_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "status": {
+          "const": "complete_mixed_verdict"
+        },
+        "structural_process_cost_reduced": {
+          "const": true
+        },
+        "direct_ci_runner_time_reduced": {
+          "const": false
+        },
+        "direct_ci_runner_time_regression_fraction": {
+          "const": 0.231
+        },
+        "g13_gate": {
+          "const": "pass_with_ci_runner_time_regression"
+        },
+        "post_merge_cost_report_complete": {
+          "const": true
+        }
+      }
+    },
+    "compatibility_exit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criteria",
+        "required_validation_cycles",
+        "completed_post_landing_validation_cycles",
+        "compatibility_window_exited",
+        "operational_predecessor_rollback_retired"
+      ],
+      "properties": {
+        "criteria": {
+          "type": "array",
+          "minItems": 6,
+          "maxItems": 6,
+          "items": {
+            "$ref": "#/$defs/criterion"
+          }
+        },
+        "required_validation_cycles": {
+          "const": 2
+        },
+        "completed_post_landing_validation_cycles": {
+          "const": 8
+        },
+        "compatibility_window_exited": {
+          "const": true
+        },
+        "operational_predecessor_rollback_retired": {
+          "const": true
+        }
+      }
+    },
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": true,
+      "required": [
+        "repo",
+        "repository_id",
+        "repository_node_id",
+        "current_main_ref",
+        "latest_release_tag",
+        "latest_release_url",
+        "github_archived",
+        "preserved",
+        "archive_ready",
+        "archive_authorized",
+        "deprecation_release_executed",
+        "github_archive_executed",
+        "irreversible_action_taken"
+      ],
+      "properties": {
+        "repo": {
+          "const": "8Dionysus/aoa-routing"
+        },
+        "repository_id": {
+          "const": 1186624390
+        },
+        "repository_node_id": {
+          "const": "R_kgDORrpzhg"
+        },
+        "latest_release_tag": {
+          "const": "v0.3.0"
+        },
+        "latest_release_url": {
+          "const": "https://github.com/8Dionysus/aoa-routing/releases/tag/v0.3.0"
+        },
+        "github_archived": {
+          "const": false
+        },
+        "preserved": {
+          "const": true
+        },
+        "archive_ready": {
+          "const": true
+        },
+        "archive_authorized": {
+          "const": false
+        },
+        "deprecation_release_executed": {
+          "const": false
+        },
+        "github_archive_executed": {
+          "const": false
+        },
+        "irreversible_action_taken": {
+          "const": false
+        }
+      }
+    },
+    "remaining_external_gates": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 1,
+      "items": {
+        "type": "object",
+        "additionalProperties": false,
+        "required": [
+          "id",
+          "kind",
+          "target",
+          "required",
+          "satisfied",
+          "reason"
+        ],
+        "properties": {
+          "id": {
+            "const": "exact_operator_archive_approval"
+          },
+          "kind": {
+            "const": "irreversible_external_authority"
+          },
+          "target": {
+            "const": "github:repository:1186624390:8Dionysus/aoa-routing"
+          },
+          "required": {
+            "const": true
+          },
+          "satisfied": {
+            "const": false
+          },
+          "reason": {
+            "type": "string",
+            "minLength": 80
+          }
+        }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "landed_direct_checkout_consumer_zero",
+        "all_consumers_landed_green",
+        "post_merge_cost_report_complete",
+        "real_execution_closeout_window_complete",
+        "compatibility_window_exited",
+        "operational_predecessor_rollback_retired",
+        "archive_ready",
+        "archive_authorized",
+        "irreversible_action_taken",
+        "claim_limit"
+      ],
+      "properties": {
+        "landed_direct_checkout_consumer_zero": {
+          "const": true
+        },
+        "all_consumers_landed_green": {
+          "const": true
+        },
+        "post_merge_cost_report_complete": {
+          "const": true
+        },
+        "real_execution_closeout_window_complete": {
+          "const": true
+        },
+        "compatibility_window_exited": {
+          "const": true
+        },
+        "operational_predecessor_rollback_retired": {
+          "const": true
+        },
+        "archive_ready": {
+          "const": true
+        },
+        "archive_authorized": {
+          "const": false
+        },
+        "irreversible_action_taken": {
+          "const": false
+        },
+        "claim_limit": {
+          "type": "string",
+          "minLength": 140
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "change_mode",
+        "migration_ref",
+        "current_main_ref",
+        "direct_predecessor_checkout_dependencies",
+        "landed_or_classified",
+        "validation"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "minLength": 3
+        },
+        "change_mode": {
+          "enum": [
+            "landed_migration",
+            "unchanged_classification"
+          ]
+        },
+        "migration_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "current_main_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "direct_predecessor_checkout_dependencies": {
+          "const": 0
+        },
+        "landed_or_classified": {
+          "const": true
+        },
+        "validation": {
+          "type": "string",
+          "minLength": 30
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "current_main_ref",
+        "direct_predecessor_checkout_dependencies",
+        "classification"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "minLength": 3
+        },
+        "current_main_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "direct_predecessor_checkout_dependencies": {
+          "const": 0
+        },
+        "classification": {
+          "type": "string",
+          "minLength": 30
+        }
+      }
+    },
+    "criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "exit_satisfied",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 8
+        },
+        "exit_satisfied": {
+          "const": true
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 40
+        }
+      }
+    }
+  }
+}
