@@ -37,5 +37,12 @@ immutable stages remain replayable historical evidence. The active release
 battery verifies the canonical SDK routing wheel, C2 plan compiler, C3 Runner,
 C5 evidence chain, and package trust bundle.
 
+`v0.9.0` is the first ordinary post-G5 Agent OS control-plane release. It
+publishes C1-C5, the explicit `abyss-stack` transport client, exact owner
+projection admission, post-repair installed-wheel portability, and the
+completed mixed E1 report. It does not change `aoa_routing_thin_router_v1`,
+move runtime execution into the SDK, supply an eval verdict, or authorize an
+irreversible predecessor action.
+
 Use that part when changing release audit, publish helper behavior, changelog
 publication shape, or release validation.

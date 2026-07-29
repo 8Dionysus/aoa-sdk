@@ -108,6 +108,14 @@ COMMANDS = [
         ],
     ),
     (
+        "verify installed C5 evidence chain wheel",
+        [
+            sys.executable,
+            "mechanics/boundary-bridge/parts/evidence-closeout-chain/"
+            "scripts/verify_evidence_chain_wheel.py",
+        ],
+    ),
+    (
         "verify installed Agon gate routing wheel",
         [
             sys.executable,

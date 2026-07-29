@@ -75,13 +75,30 @@ python -m build
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
 python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py
 python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py
+python mechanics/boundary-bridge/parts/evidence-closeout-chain/scripts/verify_evidence_chain_wheel.py
+python mechanics/agon/parts/gate-routing-bridge/scripts/verify_agon_gate_routing_wheel.py
 ```
 
 These commands prove canonical routing and installed-package behavior,
 including packaged C2 owner contours, deterministic plan
-compilation, and C3 lifecycle coordination through a non-executing reference
-adapter. They do not grant runtime execution, durable artifact admission,
+compilation, C3 lifecycle coordination through a non-executing reference
+adapter, C5 evidence-chain reconstruction, and the SDK-owned Agon routing
+bridge. They do not grant runtime execution, durable artifact admission,
 predecessor retirement, consumer-zero, or archival authority.
+
+## Integrated Agent OS control-plane publication
+
+`v0.9.0` is the first ordinary post-G5 package release containing the complete
+C1-C5 control-plane chain, the explicit `abyss-stack` transport client,
+fresh-context G11 evidence, exact owner projection delivery, and the completed
+mixed E1 cost report. Release validation must use the exact built wheel, prove
+upgrade, downgrade, and restore against the published `v0.8.0` source, and
+repeat the three bounded Agent OS lifecycle cycles after the D-0091
+portability repair.
+
+This release does not change the routing ABI, execute model or tool work inside
+the SDK, promote a runtime outcome into an eval verdict, close the X1
+compatibility window by itself, or authorize predecessor archival.
 
 ## Historical routing G5 release-candidate replay
 

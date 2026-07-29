@@ -156,24 +156,23 @@ and paired proof of one real governed contour while leaving execution with the
 runtime owner. C5 now adds immutable partial-to-complete evidence composition
 and reviewed closeout admission without absorbing eval, memo, checkpoint, or
 closeout owner truth. The cross-owner golden chain, bounded agent-in-loop
-trials, and G11 contour are now complete. E1 now has a provisional structural
-G13 pass; the single final landing must still supply comparable CI lead-time,
-runner-minute, and failure-rate evidence. Consumer-zero inspection is the next
-implementation contour. Compatibility evidence continues in parallel;
-consumer-zero and archival remain unproved.
+trials, and G11 contour are now complete. E1 is complete with a mixed verdict:
+the structural process cost falls, while the directly comparable landed CI
+runner median regresses by 23.1%. The final X1 evidence landing owns
+consumer-zero and compatibility exit; predecessor archival remains separately
+operator-gated.
 
 ## Current Public Contour
 
-Current release marker: `v0.8.0`.
+Current release marker: `v0.9.0`.
 
-Current unreleased contour: C1 deterministic route resolution, C2
-runtime-neutral plan compilation, C3 explicit-adapter lifecycle coordination,
-the C4 `abyss-stack` transport client and paired governed-runtime proof, and
-C5 immutable evidence/closeout composition. Real cross-owner C5 evidence,
-agent-in-loop trials, the G11 contour, and provisional E1 structural cost
-evidence are now present after `v0.8.0`. Landed-CI E1 completion and
-compatibility-window evidence remain. This is a directional contour, not a
-changelog replacement.
+`v0.9.0` is the first integrated Agent OS control-plane release: C1
+deterministic route resolution, C2 runtime-neutral plan compilation, C3
+explicit-adapter lifecycle coordination, the C4 `abyss-stack` transport
+client, C5 immutable evidence/closeout composition, exact owner projections,
+fresh-context G11 evidence, and the completed mixed E1 report ship together.
+Current unreleased contour: the final X1 consumer-zero and compatibility-exit
+evidence. This is a directional contour, not a changelog replacement.
 
 Current anchors:
 

@@ -11,7 +11,7 @@ This README is the public front door. When work becomes operational,
 source-authored, generated, mechanic-local, release-facing, or agent-facing,
 follow the linked owner surface instead of expanding this page.
 
-> Current release: `v0.8.0`. See [CHANGELOG](CHANGELOG.md) for release notes.
+> Current release: `v0.9.0`. See [CHANGELOG](CHANGELOG.md) for release notes.
 
 ## What This Repository Does
 
