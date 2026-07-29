@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import json
 from pathlib import Path
+import tomllib
 
 import yaml
 
@@ -66,14 +67,33 @@ def test_release_artifacts_replay_fetches_succession_evidence_history() -> None:
         "refs/tags/routing-succession-e1-evidence-20260728'"
     )
 
-    ruff_step = next(
-        step
-        for step in steps
-        if isinstance(step, dict) and step.get("name") == "Run Ruff"
+    step_indexes = {
+        str(step["name"]): index
+        for index, step in enumerate(steps)
+        if isinstance(step, dict) and "name" in step
+    }
+    verifier_checkout = steps[step_indexes["Checkout abyss-machine verifier"]]
+    assert isinstance(verifier_checkout, dict)
+    verifier_inputs = verifier_checkout["with"]
+    assert isinstance(verifier_inputs, dict)
+    assert verifier_inputs["repository"] == "8Dionysus/abyss-machine"
+    assert verifier_inputs["ref"] == "7f1b9fcf6f5beca7203f49ffb7ec53d765d1db86"
+    assert verifier_inputs["path"] == ".abyss-machine-verifier"
+    assert (
+        step_indexes["Verify installed evidence chain"]
+        < step_indexes["Checkout abyss-machine verifier"]
+        < step_indexes["Validate OS Abyss package artifact bundle"]
     )
-    assert ruff_step["run"] == (
-        "python -m ruff check . --extend-exclude .abyss-machine-verifier"
-    )
+    assert step_indexes["Build package"] < step_indexes["Checkout abyss-machine verifier"]
+
+    ruff_step = steps[step_indexes["Run Ruff"]]
+    assert isinstance(ruff_step, dict)
+    assert ruff_step["run"] == "python -m ruff check ."
+
+    package_config = tomllib.loads(read_text("pyproject.toml"))
+    hatch_build = package_config["tool"]["hatch"]["build"]
+    assert isinstance(hatch_build, dict)
+    assert "/.abyss-machine-verifier" in hatch_build["exclude"]
 
 
 def test_latest_sibling_workflow_checks_out_every_matrix_repo() -> None:

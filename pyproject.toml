@@ -41,6 +41,7 @@ aoa = "aoa_sdk.cli.main:app"
 [tool.hatch.build]
 exclude = [
   "/.agents",
+  "/.abyss-machine-verifier",
   "/.aoa",
 ]
 
