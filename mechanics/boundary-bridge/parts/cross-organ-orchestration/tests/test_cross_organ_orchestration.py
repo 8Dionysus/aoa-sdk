@@ -209,3 +209,17 @@ def test_generated_schemas_declare_dialect_and_part_local_identity() -> None:
         assert payload["$id"] == (
             "urn:aoa-sdk:cross-organ-orchestration:" + path.name
         )
+
+
+def test_examples_pin_exact_consumed_owner_schema_versions() -> None:
+    request = _payload("cross-organ.request.example.json")
+    by_stage = {
+        contract["stage_kind"]: contract["output_schema"]
+        for contract in request["stage_contracts"]
+    }
+
+    assert by_stage["eval_request"]["schema_version"] == "eval_need_v1"
+    assert (
+        by_stage["owner_acceptance"]["schema_version"]
+        == "aoa_memo_reviewed_intake_landing_receipt_v1"
+    )

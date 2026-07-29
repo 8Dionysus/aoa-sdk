@@ -13,11 +13,19 @@ from aoa_sdk.contracts.organs import (
     CredentialContours,
     OrganRecord,
     OrganRegistrySource,
+    OwnerResultCapture,
+    OwnerResultReviewReceipt,
+    OwnerResultReviewStatement,
     OrganResultEnvelope,
     OrganResultMetadata,
     PrimitiveContract,
 )
 from aoa_sdk.organs import OrganRegistryError, OrgansAPI, compile_registry
+from aoa_sdk.organs import (
+    OwnerResultReviewError,
+    assert_owner_result_review,
+    materialize_owner_result_review,
+)
 from aoa_sdk.organs.adapters import DirectConnectionDescriptor
 from aoa_sdk.organs.registry import assert_projection_digest
 from aoa_sdk.cli.main import app
@@ -615,6 +623,107 @@ def test_result_envelope_keeps_owner_payload_typed() -> None:
     raw["metadata"]["applied_state"] = "applied"
     with pytest.raises(ValidationError, match="cannot claim"):
         OrganResultEnvelope[OwnerPayload].model_validate(raw)
+
+
+def _owner_result_capture() -> OwnerResultCapture:
+    return OwnerResultCapture(
+        capture_owner="abyss-stack",
+        capture_receipt_ref="records/aoa-kag/receipt.json",
+        capture_receipt_id=DIGEST_A,
+        result_artifact_ref="results/aoa-kag/result.json",
+        result_artifact_id=DIGEST_B,
+        organ_id="aoa-kag",
+        capability_id="knowledge-inspect",
+        primitive_id="inspect-knowledge",
+        result_digest=DIGEST_C,
+        result_schema_identity="aoa_kag_discover_result_v1",
+        server_schema_digest=DIGEST_A,
+        primitive_schema_digest=DIGEST_B,
+        observed_at=NOW,
+        expires_at=NOW + timedelta(minutes=10),
+    )
+
+
+def _owner_result_review() -> OwnerResultReviewStatement:
+    return OwnerResultReviewStatement(
+        review_owner="aoa-kag",
+        organ_id="aoa-kag",
+        capability_id="knowledge-inspect",
+        primitive_id="inspect-knowledge",
+        owners={
+            "source_owner": "aoa-kag",
+            "access_owner": "aoa-kag",
+            "runtime_owner": "abyss-stack",
+            "proof_owner": "aoa-evals",
+            "acceptance_owner": "aoa-kag",
+        },
+        capture=_owner_result_capture(),
+        source_revision={"revision": "source-1", "digest": DIGEST_A},
+        owner_payload_schema_ref="schemas/kag-payload.json",
+        owner_payload_schema_digest=DIGEST_B,
+        reviewed_at=NOW + timedelta(seconds=2),
+        expires_at=NOW + timedelta(minutes=5),
+        grounding_state="grounded",
+        freshness_state="exact",
+        freshness_policy={
+            "policy_id": "kag-freshness",
+            "max_age_seconds": 300,
+            "cache_scope": "task",
+        },
+        provider_watermark="owner-watermark-1",
+        grounding_evidence=(
+            {
+                **_evidence("owner-grounding"),
+                "owner": "aoa-kag",
+            },
+        ),
+    )
+
+
+def test_owner_result_review_is_owner_bounded_and_content_addressed() -> None:
+    receipt = materialize_owner_result_review(_owner_result_review())
+    assert assert_owner_result_review(receipt) is receipt
+    assert receipt.review_owner == receipt.owners.source_owner
+    assert receipt.capture.capture_owner == receipt.owners.runtime_owner
+    assert receipt.owner_accepted is False
+    assert receipt.central_proof_asserted is False
+    assert receipt.admission_asserted is False
+
+    tampered = receipt.model_copy(update={"review_id": DIGEST_C})
+    with pytest.raises(OwnerResultReviewError, match="digest mismatch"):
+        assert_owner_result_review(tampered)
+
+
+def test_owner_result_review_rejects_authority_and_freshness_overreach() -> None:
+    payload = _owner_result_review().model_dump(mode="json")
+    payload["review_owner"] = "abyss-stack"
+    with pytest.raises(ValidationError, match="source or acceptance owner"):
+        OwnerResultReviewStatement.model_validate(payload)
+
+    payload = _owner_result_review().model_dump(mode="json")
+    payload["capture"]["capture_owner"] = "aoa-sdk"
+    with pytest.raises(ValidationError, match="runtime owner"):
+        OwnerResultReviewStatement.model_validate(payload)
+
+    payload = _owner_result_review().model_dump(mode="json")
+    payload["expires_at"] = (NOW + timedelta(minutes=11)).isoformat()
+    with pytest.raises(ValidationError, match="outlive"):
+        OwnerResultReviewStatement.model_validate(payload)
+
+    payload = _owner_result_review().model_dump(mode="json")
+    payload["grounding_state"] = "blocked"
+    payload["freshness_state"] = "blocked"
+    payload["provider_watermark"] = None
+    payload["reason_codes"] = []
+    with pytest.raises(ValidationError, match="reason codes"):
+        OwnerResultReviewStatement.model_validate(payload)
+
+    receipt_payload = materialize_owner_result_review(
+        _owner_result_review()
+    ).model_dump(mode="json")
+    receipt_payload["owner_accepted"] = True
+    with pytest.raises(ValidationError, match="False"):
+        OwnerResultReviewReceipt.model_validate(receipt_payload)
 
 
 def test_cli_exposes_progressive_non_executing_surface() -> None:

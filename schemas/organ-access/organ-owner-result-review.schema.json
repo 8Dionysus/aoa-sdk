@@ -1,0 +1,464 @@
+{
+  "$defs": {
+    "FreshnessPolicy": {
+      "additionalProperties": false,
+      "properties": {
+        "cache_scope": {
+          "enum": [
+            "none",
+            "request",
+            "task",
+            "agent",
+            "workspace"
+          ],
+          "title": "Cache Scope",
+          "type": "string"
+        },
+        "max_age_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Max Age Seconds",
+          "type": "integer"
+        },
+        "policy_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Policy Id",
+          "type": "string"
+        },
+        "provider_watermark_required": {
+          "default": true,
+          "title": "Provider Watermark Required",
+          "type": "boolean"
+        },
+        "stale_readable_seconds": {
+          "default": 0,
+          "minimum": 0,
+          "title": "Stale Readable Seconds",
+          "type": "integer"
+        }
+      },
+      "required": [
+        "policy_id",
+        "max_age_seconds",
+        "cache_scope"
+      ],
+      "title": "FreshnessPolicy",
+      "type": "object"
+    },
+    "OrganOwners": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptance_owner": {
+          "minLength": 1,
+          "title": "Acceptance Owner",
+          "type": "string"
+        },
+        "access_owner": {
+          "minLength": 1,
+          "title": "Access Owner",
+          "type": "string"
+        },
+        "control_owner": {
+          "const": "aoa-sdk",
+          "default": "aoa-sdk",
+          "title": "Control Owner",
+          "type": "string"
+        },
+        "proof_owner": {
+          "minLength": 1,
+          "title": "Proof Owner",
+          "type": "string"
+        },
+        "runtime_owner": {
+          "minLength": 1,
+          "title": "Runtime Owner",
+          "type": "string"
+        },
+        "source_owner": {
+          "minLength": 1,
+          "title": "Source Owner",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_owner",
+        "access_owner",
+        "runtime_owner",
+        "proof_owner",
+        "acceptance_owner"
+      ],
+      "title": "OrganOwners",
+      "type": "object"
+    },
+    "OwnerResultCapture": {
+      "additionalProperties": false,
+      "description": "Runtime-owner binding for one captured owner result.",
+      "properties": {
+        "capability_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Capability Id",
+          "type": "string"
+        },
+        "capture_owner": {
+          "minLength": 1,
+          "title": "Capture Owner",
+          "type": "string"
+        },
+        "capture_receipt_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Capture Receipt Id",
+          "type": "string"
+        },
+        "capture_receipt_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Capture Receipt Ref",
+          "type": "string"
+        },
+        "expires_at": {
+          "format": "date-time",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "organ_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Organ Id",
+          "type": "string"
+        },
+        "primitive_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Primitive Id",
+          "type": "string"
+        },
+        "primitive_schema_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Primitive Schema Digest",
+          "type": "string"
+        },
+        "result_artifact_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Result Artifact Id",
+          "type": "string"
+        },
+        "result_artifact_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Result Artifact Ref",
+          "type": "string"
+        },
+        "result_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Result Digest",
+          "type": "string"
+        },
+        "result_schema_identity": {
+          "minLength": 1,
+          "title": "Result Schema Identity",
+          "type": "string"
+        },
+        "server_schema_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Server Schema Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "capture_owner",
+        "capture_receipt_ref",
+        "capture_receipt_id",
+        "result_artifact_ref",
+        "result_artifact_id",
+        "organ_id",
+        "capability_id",
+        "primitive_id",
+        "result_digest",
+        "result_schema_identity",
+        "server_schema_digest",
+        "primitive_schema_digest",
+        "observed_at",
+        "expires_at"
+      ],
+      "title": "OwnerResultCapture",
+      "type": "object"
+    },
+    "QualifiedEvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "title": "Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "evidence_ref",
+        "revision",
+        "observed_at"
+      ],
+      "title": "QualifiedEvidenceRef",
+      "type": "object"
+    },
+    "RevisionIdentity": {
+      "additionalProperties": false,
+      "properties": {
+        "digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Digest"
+        },
+        "revision": {
+          "minLength": 1,
+          "title": "Revision",
+          "type": "string"
+        },
+        "schema_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Schema Digest"
+        }
+      },
+      "required": [
+        "revision"
+      ],
+      "title": "RevisionIdentity",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:organ-owner-result-review.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Content-addressed owner review; validation does not create its verdict.",
+  "properties": {
+    "admission_asserted": {
+      "const": false,
+      "default": false,
+      "title": "Admission Asserted",
+      "type": "boolean"
+    },
+    "capability_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Capability Id",
+      "type": "string"
+    },
+    "capture": {
+      "$ref": "#/$defs/OwnerResultCapture"
+    },
+    "central_proof_asserted": {
+      "const": false,
+      "default": false,
+      "title": "Central Proof Asserted",
+      "type": "boolean"
+    },
+    "claim_limit": {
+      "const": "This owner-issued review proves only the named owner's schema grounding and freshness assessment for one content-addressed captured result. It does not prove owner acceptance, central proof, admission, cross-organ benefit, execution authorization, or rollback.",
+      "default": "This owner-issued review proves only the named owner's schema grounding and freshness assessment for one content-addressed captured result. It does not prove owner acceptance, central proof, admission, cross-organ benefit, execution authorization, or rollback.",
+      "title": "Claim Limit",
+      "type": "string"
+    },
+    "contains_secrets": {
+      "const": false,
+      "default": false,
+      "title": "Contains Secrets",
+      "type": "boolean"
+    },
+    "cross_organ_proven": {
+      "const": false,
+      "default": false,
+      "title": "Cross Organ Proven",
+      "type": "boolean"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "freshness_policy": {
+      "$ref": "#/$defs/FreshnessPolicy"
+    },
+    "freshness_state": {
+      "enum": [
+        "exact",
+        "compatible_drift",
+        "stale_readable",
+        "blocked",
+        "unknown"
+      ],
+      "title": "Freshness State",
+      "type": "string"
+    },
+    "grounding_evidence": {
+      "items": {
+        "$ref": "#/$defs/QualifiedEvidenceRef"
+      },
+      "title": "Grounding Evidence",
+      "type": "array"
+    },
+    "grounding_state": {
+      "enum": [
+        "grounded",
+        "rejected",
+        "blocked"
+      ],
+      "title": "Grounding State",
+      "type": "string"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "owner_accepted": {
+      "const": false,
+      "default": false,
+      "title": "Owner Accepted",
+      "type": "boolean"
+    },
+    "owner_payload_schema_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Owner Payload Schema Digest",
+      "type": "string"
+    },
+    "owner_payload_schema_ref": {
+      "maxLength": 512,
+      "minLength": 3,
+      "title": "Owner Payload Schema Ref",
+      "type": "string"
+    },
+    "owners": {
+      "$ref": "#/$defs/OrganOwners"
+    },
+    "primitive_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Primitive Id",
+      "type": "string"
+    },
+    "provider_watermark": {
+      "anyOf": [
+        {
+          "minLength": 1,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Provider Watermark"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "review_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Review Id",
+      "type": "string"
+    },
+    "review_owner": {
+      "minLength": 1,
+      "title": "Review Owner",
+      "type": "string"
+    },
+    "reviewed_at": {
+      "format": "date-time",
+      "title": "Reviewed At",
+      "type": "string"
+    },
+    "rollback_proven": {
+      "const": false,
+      "default": false,
+      "title": "Rollback Proven",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "aoa_organ_owner_result_review_v1",
+      "default": "aoa_organ_owner_result_review_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "self_report_is_security_authority": {
+      "const": false,
+      "default": false,
+      "title": "Self Report Is Security Authority",
+      "type": "boolean"
+    },
+    "source_revision": {
+      "$ref": "#/$defs/RevisionIdentity"
+    }
+  },
+  "required": [
+    "review_owner",
+    "organ_id",
+    "capability_id",
+    "primitive_id",
+    "owners",
+    "capture",
+    "source_revision",
+    "owner_payload_schema_ref",
+    "owner_payload_schema_digest",
+    "reviewed_at",
+    "expires_at",
+    "grounding_state",
+    "freshness_state",
+    "freshness_policy",
+    "grounding_evidence",
+    "review_id"
+  ],
+  "title": "OwnerResultReviewReceipt",
+  "type": "object"
+}

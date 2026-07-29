@@ -17,6 +17,7 @@ from aoa_sdk.contracts.organs import (  # noqa: E402
     OrganRecord,
     OrganRegistryProjection,
     OrganRegistrySource,
+    OwnerResultReviewReceipt,
     OrganResultEnvelope,
     OrganResultMetadata,
 )
@@ -31,6 +32,7 @@ OUTPUTS = {
     "organ-compatibility-observation.schema.json": CompatibilityObservation,
     "organ-result-metadata.schema.json": OrganResultMetadata,
     "organ-result-envelope.schema.json": OrganResultEnvelope,
+    "organ-owner-result-review.schema.json": OwnerResultReviewReceipt,
 }
 
 

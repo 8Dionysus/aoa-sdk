@@ -60,6 +60,7 @@ ROOT_TECHNICAL_DISTRICT_FILES = {
             "schemas/organ-access/organ-activation-request.schema.json",
             "schemas/organ-access/organ-compatibility-observation.schema.json",
             "schemas/organ-access/organ-contract.schema.json",
+            "schemas/organ-access/organ-owner-result-review.schema.json",
             "schemas/organ-access/organ-registry-projection.schema.json",
             "schemas/organ-access/organ-registry-source.schema.json",
             "schemas/organ-access/organ-result-envelope.schema.json",

@@ -4,6 +4,8 @@
 
 - strict organ, result-envelope, registry, compatibility, and activation-plan
   models;
+- strict runtime-capture and owner-result-review models plus deterministic
+  receipt addressing;
 - explicit registry-path resolution without repository/process discovery;
 - deterministic, secret-free projection and digests;
 - progressive catalog/inspect/capability discovery with context bounds;
@@ -34,3 +36,7 @@
   self-reported server identity.
 - No maturity-axis inference from another axis.
 - No owner truth, proof, memory, source, or effect acceptance by the SDK.
+- No owner-result review from a runtime capture alone. The runtime owner
+  captures bytes; the source or acceptance owner reviews their meaning.
+- No `owner_accepted`, central-proof, admission, cross-organ, execution, or
+  rollback claim from an owner grounding/freshness review.

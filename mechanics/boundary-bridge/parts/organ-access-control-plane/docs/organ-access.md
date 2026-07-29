@@ -16,6 +16,8 @@ owner contract + OS-private desired state + stack observations + eval refs
   -> capability and primitive inspection
   -> content-addressed candidate activation plan
   -> separate runtime-owner authorization and direct owner connection
+  -> private content-addressed runtime capture
+  -> source/acceptance-owner grounding and freshness review
   -> owner-qualified result envelope and runtime receipt
 ```
 
@@ -75,6 +77,28 @@ schema digests, watermark, freshness/TTL/cache policy, evidence, effect state,
 warnings, receipt, and trace ID. `T` remains the organ owner's typed payload;
 the envelope cannot upgrade self-reported output into proof, memory, source,
 or acceptance authority.
+
+## Owner review after runtime capture
+
+The runtime owner may preserve one bounded MCP result as an untrusted,
+content-addressed private artifact. That proves capture only. The source or
+acceptance owner must independently validate the exact artifact against its
+owner payload schema and freshness policy before `result_grounded` or
+`freshness_satisfied` can gain evidence.
+
+`OwnerResultReviewReceipt` binds:
+
+- the runtime-owner capture receipt and result artifact identities;
+- organ, capability, and primitive;
+- captured result, server schema, and primitive schema digests;
+- owner source revision and owner payload schema digest;
+- owner-qualified grounding evidence, freshness policy, watermark, and expiry.
+
+`aoa-sdk` validates this shared shape and its content address. It does not run
+the owner verifier or choose `grounded`, `rejected`, or `blocked`. The receipt
+has structurally false claims for owner acceptance, central proof, admission,
+cross-organ proof, and rollback. `aoa-evals` may consume a verified receipt as
+one exact evidence input, but must not infer those other axes.
 
 ## Reproducible example
 
