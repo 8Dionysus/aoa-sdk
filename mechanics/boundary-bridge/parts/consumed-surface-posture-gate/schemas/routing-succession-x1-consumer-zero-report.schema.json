@@ -37,7 +37,7 @@
     },
     "scope": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "required": [
         "r0_baseline_ref",
         "r0_baseline_sha256",
@@ -47,7 +47,33 @@
         "sdk_final_evidence_ref",
         "observation_class",
         "claim_boundary"
-      ]
+      ],
+      "properties": {
+        "r0_baseline_ref": {
+          "const": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json"
+        },
+        "r0_baseline_sha256": {
+          "const": "sha256:ee28bc71bd083c0e1a35ca42ea0debb326d8f1ca312189a9c854de447e0b8219"
+        },
+        "candidate_ref": {
+          "const": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-x1-consumer-zero-candidate.json"
+        },
+        "candidate_sha256": {
+          "const": "sha256:4cbeb2945940e3a760c37e47dc0ff56d9e533155b66aca05ddf8baad5e3eaf21"
+        },
+        "sdk_landed_control_plane_ref": {
+          "const": "780ac06d1739246d6402445e6ec43ef39a97b90a"
+        },
+        "sdk_final_evidence_ref": {
+          "const": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7"
+        },
+        "observation_class": {
+          "const": "exact landed main refs, owner PR and CI evidence, immutable-tag release replay artifacts, exact installed wheels, live SDK-canonical runtime health, and post-repair Agent OS lifecycle cycles"
+        },
+        "claim_boundary": {
+          "const": "X1 proves landed direct-checkout consumer-zero, compatibility exit, operational predecessor rollback retirement, and every substantive archive-readiness prerequisite, but keeps archive readiness pending its own successful post-merge main validation receipt. It does not authorize a deprecation release, repository metadata mutation, GitHub archival, deletion, rename, or any other irreversible predecessor action."
+        }
+      }
     },
     "consumer_accounting": {
       "type": "object",
@@ -89,35 +115,428 @@
       "type": "array",
       "minItems": 17,
       "maxItems": 17,
-      "items": {
-        "$ref": "#/$defs/consumer"
-      }
+      "uniqueItems": true,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-sdk"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "abyss-stack"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-kag"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-stats"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-agents"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-evals"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "Tree-of-Sophia"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-playbooks"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "Agents-of-Abyss"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "8Dionysus"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-techniques"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-memo"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-skills"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "abyss-machine"
+                },
+                "change_mode": {
+                  "const": "unchanged_classification"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "Dionysus"
+                },
+                "change_mode": {
+                  "const": "unchanged_classification"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-session-memory"
+                },
+                "change_mode": {
+                  "const": "unchanged_classification"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "ATM10-Agent"
+                },
+                "change_mode": {
+                  "const": "unchanged_classification"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
     },
     "zero_reference_repositories": {
       "type": "array",
       "minItems": 7,
       "maxItems": 7,
-      "items": {
-        "$ref": "#/$defs/classification"
-      }
+      "uniqueItems": true,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-4pda-connector"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-course-connector"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-discord-connector"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-editing"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-stackoverflow-connector"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-telegram-connector"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-xda-connector"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
     },
     "allowed_residuals": {
-      "type": "array",
-      "minItems": 8,
-      "uniqueItems": true,
-      "items": {
-        "type": "string",
-        "minLength": 20
-      }
+      "const": [
+        "the stable aoa-routing artifact namespace and ABI name preserved for consumers",
+        "aoa-routing repository self-identity and its maintenance-only release contract",
+        "historical decisions, baselines, releases, reviewed run records, and public provenance",
+        "explicit compatibility and predecessor rollback fixtures used only by bounded historical replay",
+        "negative tests and validators that reject active predecessor checkout dependencies",
+        "artifact-trust, donor-ledger, and source-intake provenance that must remain immutable",
+        "session-memory naming fixtures whose literal wording is the object under test",
+        "generated KAG and audit projections derived from one of the allowed authored residual classes"
+      ]
     },
     "direct_dependency_census": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "required": [
         "patterns",
         "current_main_heads_checked",
         "active_direct_predecessor_checkout_dependencies",
         "post_candidate_drift_rescanned",
+        "drifted_heads_rescanned",
         "result",
         "claim_limit"
       ],
@@ -139,14 +558,46 @@
         "post_candidate_drift_rescanned": {
           "const": true
         },
+        "drifted_heads_rescanned": {
+          "const": [
+            {
+              "repo": "abyss-stack",
+              "current_main_ref": "5fb7d6925ff502ac0b29f2213b42f27d22b6b083",
+              "result": "mcp_identity_and_session_memory_timeout_drift_zero_active_dependency"
+            },
+            {
+              "repo": "aoa-course-connector",
+              "current_main_ref": "5a5219ef027df029313fc527c71a8764cfbd193e",
+              "result": "zero_reference"
+            },
+            {
+              "repo": "aoa-evals",
+              "current_main_ref": "58bf49d374b008ef6625a9fd6893c61096777b4d",
+              "result": "history_fixture_and_negative_validator_only"
+            },
+            {
+              "repo": "aoa-memo",
+              "current_main_ref": "c7c83081b7db0a0e908f14888b7438b5ecdde3bf",
+              "result": "zero_active_dependency"
+            },
+            {
+              "repo": "aoa-stats",
+              "current_main_ref": "5627c41efe9f766a4b3437da857060847cb4f0f1",
+              "result": "zero_active_dependency"
+            }
+          ]
+        },
         "result": {
           "const": "landed_consumer_zero"
+        },
+        "claim_limit": {
+          "const": "Literal predecessor names remain only in the allowed residual classes; consumer-zero means no current executable checkout, environment-root, CI clone, generation, runtime, or release dependency."
         }
       }
     },
     "post_landing_validation": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "required": [
         "pre_migration_sdk_main_success_cycles",
         "sdk_main_success_cycles",
@@ -353,6 +804,7 @@
         },
         "aoa_kag_postmerge": {
           "type": "object",
+          "additionalProperties": false,
           "required": [
             "run_id",
             "head_sha",
@@ -360,11 +812,17 @@
             "url"
           ],
           "properties": {
+            "run_id": {
+              "const": 30445769702
+            },
             "head_sha": {
               "const": "15e1639740873f374faecb42029ae5cc8eb5375c"
             },
             "conclusion": {
               "const": "success"
+            },
+            "url": {
+              "const": "https://github.com/8Dionysus/aoa-kag/actions/runs/30445769702"
             }
           }
         },
@@ -431,8 +889,7 @@
               "const": null
             },
             "claim_limit": {
-              "type": "string",
-              "minLength": 100
+              "const": "The X1 report cannot claim archive readiness until a subsequent receipt binds a successful aoa-sdk main validation run containing this report."
             }
           }
         },
@@ -443,7 +900,7 @@
     },
     "package_compatibility": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "required": [
         "sdk_source_ref",
         "new_version",
@@ -478,13 +935,36 @@
           "const": "sha256:fe89ca58f1291119123f74fdbedf6e462bd43ccb840d5d7a08fa2dbcdb691f37"
         },
         "steps": {
-          "type": "array",
-          "minItems": 4,
-          "maxItems": 4
+          "const": [
+            {
+              "operation": "clean_install",
+              "from": null,
+              "to": "0.8.0",
+              "result": "pass_with_canonical_routing"
+            },
+            {
+              "operation": "upgrade",
+              "from": "0.8.0",
+              "to": "0.9.0",
+              "result": "pass_with_control_plane_api_runner_and_packaged_trust_record"
+            },
+            {
+              "operation": "downgrade",
+              "from": "0.9.0",
+              "to": "0.8.0",
+              "result": "pass_with_canonical_routing"
+            },
+            {
+              "operation": "restore",
+              "from": "0.8.0",
+              "to": "0.9.0",
+              "result": "pass_with_snapshot_sha256_9c1d0fcf4f9310106f4498f1b55fee21e65b57c03864eb78a0f7cc2f52c277d1"
+            }
+          ]
         },
         "release_artifact": {
           "type": "object",
-          "additionalProperties": true,
+          "additionalProperties": false,
           "required": [
             "workflow_run_id",
             "workflow_head_ref",
@@ -500,6 +980,9 @@
             "sdist_unpacked_content_parity",
             "sdist_external_verifier_checkout_present",
             "workflow_package_bundle_validation_passed",
+            "local_exact_bundle_record_id",
+            "local_exact_bundle_subject_digest",
+            "local_exact_bundle_subjects_digest",
             "verified_controls",
             "agent_consumer_trust_verdict",
             "release_consumer_trust_verdict",
@@ -550,6 +1033,15 @@
             "workflow_package_bundle_validation_passed": {
               "const": true
             },
+            "local_exact_bundle_record_id": {
+              "const": "sha256:b3025e37622c12f8604639d0be7e81a408be6c41456665711d4bb9fcafe30b74"
+            },
+            "local_exact_bundle_subject_digest": {
+              "const": "sha256:1d005aa8fe8cabef923f91776064b63619f489485207de6911e1e9525fc3bbf4"
+            },
+            "local_exact_bundle_subjects_digest": {
+              "const": "sha256:5c492ea3bcb1c9f43fb9f84789792fb9086f6aebe722c91514894db0aa09ef9e"
+            },
             "verified_controls": {
               "const": [
                 "abi_signature",
@@ -570,8 +1062,7 @@
               "const": false
             },
             "claim_limit": {
-              "type": "string",
-              "minLength": 180
+              "const": "The exact workflow wheel and sdist are hash-bound, unpack to the same files as a clean source build, pass installed behavior and local agent-consumer artifact admission, and exclude the verifier checkout. Their archive carrier hashes vary across build environments. The Python distribution is not claimed as a public-release-trust-root production package; that separate consumer intent correctly remains manual-review-required and is not used by the live routing runtime."
             }
           }
         },
@@ -591,7 +1082,7 @@
     },
     "agent_os_execution_window": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "required": [
         "sdk_source_ref",
         "runtime_owner_ref",
@@ -603,8 +1094,12 @@
         "execution_cycles_passed",
         "evidence_complete_closeouts",
         "portability_regression_found",
+        "portability_regression",
         "portability_regression_repaired",
-        "post_repair_cycles_passed"
+        "repair_decision",
+        "repair",
+        "post_repair_cycles_passed",
+        "claim_limit"
       ],
       "properties": {
         "sdk_source_ref": {
@@ -626,9 +1121,29 @@
           "const": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d"
         },
         "cycles": {
-          "type": "array",
-          "minItems": 3,
-          "maxItems": 3
+          "const": [
+            {
+              "case": "governed_runtime",
+              "test_id": "test_public_compiler_v3_c5_chain_closes_real_governed_runtime",
+              "suite_seconds": 23.845,
+              "junit_sha256": "sha256:156e13b8be7d58656ce3e7378da13dd7a2ab5da11c65d1e7f53ed1869e9cd671",
+              "result": "passed_with_evidence_complete_closeout"
+            },
+            {
+              "case": "a2a_return",
+              "test_id": "test_a2a_return_lane_completes_a_public_compiler_v3_c5_chain",
+              "suite_seconds": 2.647,
+              "junit_sha256": "sha256:1266919ec0fc8236c6ed47ea31d1b5b80ce348e8df5ff5b55104d3bdb3036d93",
+              "result": "passed_with_typed_return_and_closeout"
+            },
+            {
+              "case": "runtime_degradation",
+              "test_id": "test_runtime_degradation_lane_restores_a_public_compiler_v3_c5_chain",
+              "suite_seconds": 25.946,
+              "junit_sha256": "sha256:f05510e74105050e9328cde34cfd1ad9322ac8288b7b0ab4aa00e4e9091d13c2",
+              "result": "passed_with_pause_restore_resume_and_closeout"
+            }
+          ]
         },
         "execution_cycles_passed": {
           "const": 3
@@ -639,20 +1154,38 @@
         "portability_regression_found": {
           "const": true
         },
+        "portability_regression": {
+          "const": "The admitted aoa-playbooks trust record was host-generated dist state rather than a durable Git or package input, so a clean installed-wheel runtime could not materialize the exact plan source."
+        },
         "portability_regression_repaired": {
           "const": true
         },
+        "repair_decision": {
+          "const": "AOA-SDK-D-0091"
+        },
+        "repair": {
+          "const": "Package the exact admitted public-safe trust-record bytes as a lower-authority SDK delivery projection and fail closed on digest, identity, lifecycle, subject-store, or control mismatch."
+        },
         "post_repair_cycles_passed": {
           "const": true
+        },
+        "claim_limit": {
+          "const": "These are real disposable adapter cycles with governed repository mutation, typed A2A return, and degradation recovery. They prove SDK orchestration and evidence-complete closeout, not model quality or stronger-owner eval verdicts."
         }
       }
     },
     "live_runtime_evidence": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "required": [
+        "observed_at_utc",
+        "runtime_owner_ref",
+        "mirror_manifest_ref",
+        "mirror_manifest_sha256",
+        "mirror_generated_at_utc",
         "route_api_healthy",
         "rag_api_healthy",
+        "required_file_count",
         "mirror_source_ref",
         "producer_posture",
         "activation_mode",
@@ -662,20 +1195,48 @@
         "predecessor_operationally_required",
         "sdk_runtime_rollback_primary",
         "predecessor_implementation_required_for_rollback",
+        "sdk_runtime_rollback_root_name",
         "archive_authorized"
       ],
       "properties": {
+        "observed_at_utc": {
+          "const": "2026-07-29T13:13:11Z"
+        },
+        "runtime_owner_ref": {
+          "const": "c779d1413690ec11b5df7b6fc638e2a8b95510a5"
+        },
+        "mirror_manifest_ref": {
+          "const": "abyss-stack:Knowledge/federation/aoa-routing/manifest/federation_mirror_manifest.json"
+        },
+        "mirror_manifest_sha256": {
+          "const": "sha256:51eb7f03bf13df386ffb86cffae4618aad4c3aef237beada80854cadc64243c5"
+        },
+        "mirror_generated_at_utc": {
+          "const": "2026-07-29T10:24:54.302075+00:00"
+        },
         "route_api_healthy": {
           "const": true
         },
         "rag_api_healthy": {
           "const": true
         },
+        "required_file_count": {
+          "const": 23
+        },
+        "mirror_source_ref": {
+          "const": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d"
+        },
         "producer_posture": {
           "const": "sdk_canonical"
         },
         "activation_mode": {
           "const": "authorized_live_cutover"
+        },
+        "trust_record_id": {
+          "const": "sha256:ffe9c974882b0033248b0733c6d1223d9a0108d911d493d673b31286f0f2161e"
+        },
+        "subject_digest": {
+          "const": "sha256:4b18aa61850afe3859ca2e3a221a6710a34dc45ea47d9321126abb1ebbe1671b"
         },
         "trust_verdict": {
           "const": "allow"
@@ -688,6 +1249,9 @@
         },
         "predecessor_implementation_required_for_rollback": {
           "const": false
+        },
+        "sdk_runtime_rollback_root_name": {
+          "const": "aoa-routing.sdk-rollback-v0.8.0"
         },
         "archive_authorized": {
           "const": false
@@ -708,7 +1272,7 @@
       ],
       "properties": {
         "report_sha256": {
-          "$ref": "#/$defs/sha256"
+          "const": "sha256:92f9a2c4742b3d60d3eb95fd56da5a55865e3e4863d7a96df637aaf11cf3936f"
         },
         "status": {
           "const": "complete_mixed_verdict"
@@ -742,12 +1306,38 @@
       ],
       "properties": {
         "criteria": {
-          "type": "array",
-          "minItems": 6,
-          "maxItems": 6,
-          "items": {
-            "$ref": "#/$defs/criterion"
-          }
+          "const": [
+            {
+              "id": "all_registered_consumers_green",
+              "exit_satisfied": true,
+              "evidence": "All thirteen migrations are landed and owner validation passed; aoa-kag post-merge run 30445769702 completed successfully."
+            },
+            {
+              "id": "direct_checkout_consumer_zero",
+              "exit_satisfied": true,
+              "evidence": "All seventeen registered consumers and seven additional organization repositories have zero active direct predecessor checkout dependencies."
+            },
+            {
+              "id": "install_upgrade_downgrade_rollback",
+              "exit_satisfied": true,
+              "evidence": "Exact v0.8.0 and final v0.9.0 workflow wheels passed clean install, upgrade, downgrade, and restored v0.9.0 snapshot loading."
+            },
+            {
+              "id": "two_consecutive_sdk_validation_cycles",
+              "exit_satisfied": true,
+              "evidence": "Five aoa-sdk main Repo Validation runs passed at or after the SDK migration landing 780ac06d, including the final release-workflow repair at 956c32cd; three earlier runs are retained separately as pre-migration baseline evidence."
+            },
+            {
+              "id": "runtime_mirror_and_trust_identify_sdk",
+              "exit_satisfied": true,
+              "evidence": "Live route and RAG APIs are healthy at SDK source e4ffd26e with SDK canonical posture, authorized cutover, exact subject store, and trust allow."
+            },
+            {
+              "id": "no_high_severity_regression",
+              "exit_satisfied": true,
+              "evidence": "The clean-runtime trust-record defect was repaired under D-0091. Immutable-tag replay then exposed and repaired shallow-history, verifier-lint-scope, and verifier-in-sdist defects; the full 729-test gate, clean final replay, strict postpublish audit, and three exact-wheel Agent OS cycles passed."
+            }
+          ]
         },
         "required_validation_cycles": {
           "const": 2
@@ -765,7 +1355,7 @@
     },
     "predecessor": {
       "type": "object",
-      "additionalProperties": true,
+      "additionalProperties": false,
       "required": [
         "repo",
         "repository_id",
@@ -775,11 +1365,14 @@
         "latest_release_url",
         "github_archived",
         "preserved",
+        "posture",
+        "operational_runtime_rollback_required",
         "archive_ready",
         "archive_authorized",
         "deprecation_release_executed",
         "github_archive_executed",
-        "irreversible_action_taken"
+        "irreversible_action_taken",
+        "approval_rule"
       ],
       "properties": {
         "repo": {
@@ -790,6 +1383,9 @@
         },
         "repository_node_id": {
           "const": "R_kgDORrpzhg"
+        },
+        "current_main_ref": {
+          "const": "19c2629a207978a118f7db81d89f44748b2e5235"
         },
         "latest_release_tag": {
           "const": "v0.3.0"
@@ -802,6 +1398,12 @@
         },
         "preserved": {
           "const": true
+        },
+        "posture": {
+          "const": "maintenance_only_compatibility_security_deprecation"
+        },
+        "operational_runtime_rollback_required": {
+          "const": false
         },
         "archive_ready": {
           "const": false
@@ -817,6 +1419,9 @@
         },
         "irreversible_action_taken": {
           "const": false
+        },
+        "approval_rule": {
+          "const": "Only after a subsequent receipt binds a successful aoa-sdk main validation run containing this X1 report may a separate exact operator approval naming repository ID 1186624390 authorize the deprecation-release, About-banner, and GitHub-archive sequence."
         }
       }
     },

@@ -121,9 +121,44 @@ def load_evidence() -> dict[str, object]:
 
 def test_x1_final_report_accounts_for_every_landed_or_classified_consumer() -> None:
     evidence = load_evidence()
+    scope = evidence["scope"]
     accounting = evidence["consumer_accounting"]
     consumers = evidence["landed_consumers"]
 
+    assert scope == {
+        "r0_baseline_ref": (
+            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/"
+            "evidence/routing-succession-r0-baseline.json"
+        ),
+        "r0_baseline_sha256": (
+            "sha256:ee28bc71bd083c0e1a35ca42ea0debb326d8f1ca312189a9c854de447e0b8219"
+        ),
+        "candidate_ref": (
+            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/"
+            "evidence/routing-succession-x1-consumer-zero-candidate.json"
+        ),
+        "candidate_sha256": (
+            "sha256:4cbeb2945940e3a760c37e47dc0ff56d9e533155b66aca05ddf8baad5e3eaf21"
+        ),
+        "sdk_landed_control_plane_ref": (
+            "780ac06d1739246d6402445e6ec43ef39a97b90a"
+        ),
+        "sdk_final_evidence_ref": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
+        "observation_class": (
+            "exact landed main refs, owner PR and CI evidence, immutable-tag "
+            "release replay artifacts, exact installed wheels, live "
+            "SDK-canonical runtime health, and post-repair Agent OS lifecycle cycles"
+        ),
+        "claim_boundary": (
+            "X1 proves landed direct-checkout consumer-zero, compatibility exit, "
+            "operational predecessor rollback retirement, and every substantive "
+            "archive-readiness prerequisite, but keeps archive readiness pending "
+            "its own successful post-merge main validation receipt. It does not "
+            "authorize a deprecation release, repository metadata mutation, "
+            "GitHub archival, deletion, rename, or any other irreversible "
+            "predecessor action."
+        ),
+    }
     assert accounting == {
         "r0_registered_consumers": 16,
         "post_r0_discovered_consumers": 1,
@@ -462,6 +497,22 @@ def test_x1_schema_rejects_archive_authorization_or_executed_actions() -> None:
     patterns_candidate = deepcopy(evidence)
     patterns_candidate["direct_dependency_census"]["patterns"] = []
     assert list(validator().iter_errors(patterns_candidate))
+
+    scope_candidate = deepcopy(evidence)
+    scope_candidate["scope"]["candidate_sha256"] = False
+    assert list(validator().iter_errors(scope_candidate))
+
+    consumer_membership_candidate = deepcopy(evidence)
+    consumer_membership_candidate["landed_consumers"][1] = deepcopy(
+        consumer_membership_candidate["landed_consumers"][0]
+    )
+    assert list(validator().iter_errors(consumer_membership_candidate))
+
+    zero_membership_candidate = deepcopy(evidence)
+    zero_membership_candidate["zero_reference_repositories"][1] = deepcopy(
+        zero_membership_candidate["zero_reference_repositories"][0]
+    )
+    assert list(validator().iter_errors(zero_membership_candidate))
 
     pre_migration_candidate = deepcopy(evidence)
     pre_migration_candidate["post_landing_validation"][
