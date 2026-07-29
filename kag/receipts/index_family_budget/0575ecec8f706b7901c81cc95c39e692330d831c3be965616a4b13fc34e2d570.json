@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 9114866,
+  "allowed_tracked_bytes": 19159800,
+  "approved_by": "repository-owner",
+  "base_ref": "37c5aab075c115b50bb47fc431785b2c2b6e0d86",
+  "changed_generated_bytes": 9114866,
+  "changed_generated_files": 184,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "0575ecec8f706b7901c81cc95c39e692330d831c3be965616a4b13fc34e2d570",
+  "reason": "X2 archive closeout adds the final operator-approved routing succession receipt, schema, test, and owner route updates.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19159800,
+  "tracked_bytes_max": 15728640
+}

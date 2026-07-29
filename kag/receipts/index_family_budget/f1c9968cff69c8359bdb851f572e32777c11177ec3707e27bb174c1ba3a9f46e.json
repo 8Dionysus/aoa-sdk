@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 9727317,
+  "allowed_tracked_bytes": 19183757,
+  "approved_by": "repository-owner",
+  "base_ref": "37c5aab075c115b50bb47fc431785b2c2b6e0d86",
+  "changed_generated_bytes": 9727317,
+  "changed_generated_files": 194,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "f1c9968cff69c8359bdb851f572e32777c11177ec3707e27bb174c1ba3a9f46e",
+  "reason": "X2 review fix adds a durable raw-session operator approval receipt and binds the archive closeout to its exact digest.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19183757,
+  "tracked_bytes_max": 15728640
+}

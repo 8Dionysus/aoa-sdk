@@ -42,9 +42,10 @@ lifecycle boundary or the cross-owner evidence/closeout composition changes.
 
 ### Stronger owner split
 
-`aoa-routing`, `aoa-skills`, `aoa-evals`, `aoa-memo`, `aoa-agents`,
-`aoa-playbooks`, `aoa-techniques`, stats/KAG owners, and other sibling repos
-retain their domain meaning.
+`aoa-skills`, `aoa-evals`, `aoa-memo`, `aoa-agents`, `aoa-playbooks`,
+`aoa-techniques`, stats/KAG owners, and other active sibling repos retain their
+domain meaning. Archived `aoa-routing` retains historical predecessor and ABI
+provenance; current routing producer and ABI ownership belong to `aoa-sdk`.
 
 ### Current source surfaces
 

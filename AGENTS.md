@@ -41,6 +41,9 @@ This repository owns:
 - the canonical G5 envelope, owner-switch receipt, exact public-release parity
   proof, compatibility-window start, and retained predecessor rollback posture
   while archival authority remains false
+- the subsequent X2 archive closeout over immutable X1 evidence, which binds
+  the separate exact operator approval, final predecessor release, preserved
+  public GitHub archive state, and post-archive SDK-canonical runtime health
 - the strict R2 route, plan, approval, lifecycle, event, evidence, and runtime
   adapter contract family, plus the C1 receipt-bound deterministic
   `AoASDK.control_plane.resolve()` and `.explain()` facade and the C2

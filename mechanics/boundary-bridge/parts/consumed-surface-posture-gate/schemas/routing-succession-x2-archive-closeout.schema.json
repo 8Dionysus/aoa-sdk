@@ -1,0 +1,786 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/8Dionysus/aoa-sdk/blob/main/mechanics/boundary-bridge/parts/consumed-surface-posture-gate/schemas/routing-succession-x2-archive-closeout.schema.json",
+  "title": "AoA SDK routing succession X2 archive closeout",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "report_id",
+    "observed_at_utc",
+    "x1_provenance",
+    "operator_authorization",
+    "predecessor_landing",
+    "deprecation_release",
+    "github_archive_state",
+    "live_runtime",
+    "kag_posture",
+    "sdk_release_audit",
+    "verdict"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_routing_succession_x2_archive_closeout_v1"
+    },
+    "report_id": {
+      "const": "routing-succession-x2-archive-closeout"
+    },
+    "observed_at_utc": {
+      "$ref": "#/$defs/dateTime"
+    },
+    "x1_provenance": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "evidence_ref",
+        "evidence_sha256",
+        "landed_main_ref",
+        "landed_main_validation_run_id",
+        "landed_main_validation_url",
+        "archive_readiness_ref",
+        "archive_readiness_validation_run_id",
+        "archive_readiness_validation_url",
+        "immutable_historical_receipt",
+        "historical_archive_authorized",
+        "historical_archive_executed"
+      ],
+      "properties": {
+        "evidence_ref": {
+          "const": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-x1-consumer-zero-report.json"
+        },
+        "evidence_sha256": {
+          "$ref": "#/$defs/sha256"
+        },
+        "landed_main_ref": {
+          "$ref": "#/$defs/gitSha"
+        },
+        "landed_main_validation_run_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "landed_main_validation_url": {
+          "$ref": "#/$defs/uri"
+        },
+        "archive_readiness_ref": {
+          "$ref": "#/$defs/gitSha"
+        },
+        "archive_readiness_validation_run_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "archive_readiness_validation_url": {
+          "$ref": "#/$defs/uri"
+        },
+        "immutable_historical_receipt": {
+          "const": true
+        },
+        "historical_archive_authorized": {
+          "const": false
+        },
+        "historical_archive_executed": {
+          "const": false
+        }
+      }
+    },
+    "operator_authorization": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "granted",
+        "authority_source",
+        "approval_receipt_ref",
+        "approval_receipt_sha256",
+        "source_session_id",
+        "approval_granted_at_utc",
+        "repository",
+        "approved_actions",
+        "forbidden_actions",
+        "approval_scope_exact"
+      ],
+      "properties": {
+        "granted": {
+          "const": true
+        },
+        "authority_source": {
+          "const": "durable_operator_approval_receipt"
+        },
+        "approval_receipt_ref": {
+          "const": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-x2-operator-approval.json"
+        },
+        "approval_receipt_sha256": {
+          "const": "sha256:f582fdf98eb050705ae5ba53ce7c5881660f26c09218103b116a4516bdc620c3"
+        },
+        "source_session_id": {
+          "const": "019f9029-57ac-7c13-8c53-e3852ac6f5ae"
+        },
+        "approval_granted_at_utc": {
+          "const": "2026-07-29T16:04:42.016Z"
+        },
+        "repository": {
+          "$ref": "#/$defs/repositoryIdentity"
+        },
+        "approved_actions": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "publish_final_deprecation_release"
+            },
+            {
+              "const": "update_repository_about_metadata"
+            },
+            {
+              "const": "archive_repository"
+            }
+          ],
+          "items": false,
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "forbidden_actions": {
+          "type": "array",
+          "prefixItems": [
+            {
+              "const": "delete_repository"
+            },
+            {
+              "const": "rename_repository"
+            }
+          ],
+          "items": false,
+          "minItems": 2,
+          "maxItems": 2
+        },
+        "approval_scope_exact": {
+          "const": true
+        }
+      }
+    },
+    "predecessor_landing": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pull_request",
+        "landed_main_ref",
+        "main_validation_run_id",
+        "main_validation_url",
+        "main_validation_conclusion",
+        "full_gate",
+        "final_review_result"
+      ],
+      "properties": {
+        "pull_request": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "number",
+            "url",
+            "title",
+            "head_ref",
+            "exact_head_validation_run_id",
+            "exact_head_validation_url",
+            "merged_at"
+          ],
+          "properties": {
+            "number": {
+              "const": 158
+            },
+            "url": {
+              "$ref": "#/$defs/uri"
+            },
+            "title": {
+              "type": "string",
+              "minLength": 1
+            },
+            "head_ref": {
+              "$ref": "#/$defs/gitSha"
+            },
+            "exact_head_validation_run_id": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "exact_head_validation_url": {
+              "$ref": "#/$defs/uri"
+            },
+            "merged_at": {
+              "$ref": "#/$defs/dateTime"
+            }
+          }
+        },
+        "landed_main_ref": {
+          "$ref": "#/$defs/gitSha"
+        },
+        "main_validation_run_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "main_validation_url": {
+          "$ref": "#/$defs/uri"
+        },
+        "main_validation_conclusion": {
+          "const": "success"
+        },
+        "full_gate": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "passed_tests",
+            "skipped_tests",
+            "passed_subtests",
+            "result"
+          ],
+          "properties": {
+            "passed_tests": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "skipped_tests": {
+              "type": "integer",
+              "minimum": 0
+            },
+            "passed_subtests": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "result": {
+              "const": "passed"
+            }
+          }
+        },
+        "final_review_result": {
+          "const": "no_major_issues"
+        }
+      }
+    },
+    "deprecation_release": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "release_id",
+        "tag",
+        "name",
+        "url",
+        "target_commit",
+        "published_at",
+        "draft",
+        "prerelease",
+        "adds_routing_behavior",
+        "routes_future_work_to"
+      ],
+      "properties": {
+        "release_id": {
+          "type": "integer",
+          "minimum": 1
+        },
+        "tag": {
+          "const": "v0.4.0"
+        },
+        "name": {
+          "type": "string",
+          "minLength": 1
+        },
+        "url": {
+          "$ref": "#/$defs/uri"
+        },
+        "target_commit": {
+          "$ref": "#/$defs/gitSha"
+        },
+        "published_at": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "draft": {
+          "const": false
+        },
+        "prerelease": {
+          "const": false
+        },
+        "adds_routing_behavior": {
+          "const": false
+        },
+        "routes_future_work_to": {
+          "const": "8Dionysus/aoa-sdk"
+        }
+      }
+    },
+    "github_archive_state": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repository",
+        "archived",
+        "disabled",
+        "visibility",
+        "default_branch",
+        "renamed",
+        "deleted",
+        "description",
+        "homepage",
+        "topics",
+        "public_http_checks",
+        "observed_at_utc"
+      ],
+      "properties": {
+        "repository": {
+          "$ref": "#/$defs/repositoryIdentity"
+        },
+        "archived": {
+          "const": true
+        },
+        "disabled": {
+          "const": false
+        },
+        "visibility": {
+          "const": "public"
+        },
+        "default_branch": {
+          "const": "main"
+        },
+        "renamed": {
+          "const": false
+        },
+        "deleted": {
+          "const": false
+        },
+        "description": {
+          "type": "string",
+          "minLength": 1
+        },
+        "homepage": {
+          "$ref": "#/$defs/uri"
+        },
+        "topics": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "minLength": 1
+          },
+          "contains": {
+            "const": "aoa-sdk"
+          },
+          "minContains": 1,
+          "uniqueItems": true,
+          "minItems": 1
+        },
+        "public_http_checks": {
+          "type": "array",
+          "items": {
+            "$ref": "#/$defs/httpCheck"
+          },
+          "minItems": 3,
+          "maxItems": 3
+        },
+        "observed_at_utc": {
+          "$ref": "#/$defs/dateTime"
+        }
+      }
+    },
+    "live_runtime": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observed_at_utc",
+        "runtime_owner",
+        "route_api",
+        "rag_api",
+        "runtime_mirror",
+        "predecessor_checkout_mounted",
+        "predecessor_runtime_dependency_active",
+        "historical_g5_archive_authorized",
+        "historical_g5_field_interpretation"
+      ],
+      "properties": {
+        "observed_at_utc": {
+          "$ref": "#/$defs/dateTime"
+        },
+        "runtime_owner": {
+          "const": "abyss-stack"
+        },
+        "route_api": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "healthy",
+            "all_layers_ready",
+            "layer_count",
+            "router_owner_repo",
+            "router_version",
+            "route_entry_count"
+          ],
+          "properties": {
+            "healthy": {
+              "const": true
+            },
+            "all_layers_ready": {
+              "const": true
+            },
+            "layer_count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "router_owner_repo": {
+              "const": "aoa-sdk"
+            },
+            "router_version": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "route_entry_count": {
+              "type": "integer",
+              "minimum": 1
+            }
+          }
+        },
+        "rag_api": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "healthy",
+            "route_api_dependency_healthy"
+          ],
+          "properties": {
+            "healthy": {
+              "const": true
+            },
+            "route_api_dependency_healthy": {
+              "const": true
+            }
+          }
+        },
+        "runtime_mirror": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "manifest_ref",
+            "manifest_sha256",
+            "generated_at_utc",
+            "canonical_owner_repo",
+            "canonical_source_ref",
+            "producer_posture",
+            "activation_mode",
+            "required_file_count",
+            "trust_verdict",
+            "trust_record_id",
+            "subject_digest"
+          ],
+          "properties": {
+            "manifest_ref": {
+              "type": "string",
+              "minLength": 1
+            },
+            "manifest_sha256": {
+              "$ref": "#/$defs/sha256"
+            },
+            "generated_at_utc": {
+              "$ref": "#/$defs/dateTime"
+            },
+            "canonical_owner_repo": {
+              "const": "aoa-sdk"
+            },
+            "canonical_source_ref": {
+              "$ref": "#/$defs/gitSha"
+            },
+            "producer_posture": {
+              "const": "sdk_canonical"
+            },
+            "activation_mode": {
+              "const": "authorized_live_cutover"
+            },
+            "required_file_count": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "trust_verdict": {
+              "const": "allow"
+            },
+            "trust_record_id": {
+              "$ref": "#/$defs/sha256"
+            },
+            "subject_digest": {
+              "$ref": "#/$defs/sha256"
+            }
+          }
+        },
+        "predecessor_checkout_mounted": {
+          "const": false
+        },
+        "predecessor_runtime_dependency_active": {
+          "const": false
+        },
+        "historical_g5_archive_authorized": {
+          "const": false
+        },
+        "historical_g5_field_interpretation": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    },
+    "kag_posture": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "canonical_provider_succession",
+        "live_projection_observation",
+        "residual"
+      ],
+      "properties": {
+        "canonical_provider_succession": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "owner_repo",
+            "decision",
+            "pull_request_url",
+            "landed_main_ref",
+            "main_validation_run_id",
+            "main_validation_url",
+            "aoa_routing_active_provider",
+            "current_routing_owner_route"
+          ],
+          "properties": {
+            "owner_repo": {
+              "const": "aoa-kag"
+            },
+            "decision": {
+              "const": "AOA-KAG-D-0020"
+            },
+            "pull_request_url": {
+              "$ref": "#/$defs/uri"
+            },
+            "landed_main_ref": {
+              "$ref": "#/$defs/gitSha"
+            },
+            "main_validation_run_id": {
+              "type": "integer",
+              "minimum": 1
+            },
+            "main_validation_url": {
+              "$ref": "#/$defs/uri"
+            },
+            "aoa_routing_active_provider": {
+              "const": false
+            },
+            "current_routing_owner_route": {
+              "const": "aoa-sdk"
+            }
+          }
+        },
+        "live_projection_observation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "trace_id",
+            "projection_digest",
+            "projection_updated_at",
+            "predecessor_runtime_source_digest",
+            "predecessor_canonical_source_digest",
+            "freshness_state",
+            "query_status",
+            "historical_runtime_slice_present"
+          ],
+          "properties": {
+            "trace_id": {
+              "type": "string",
+              "format": "uuid"
+            },
+            "projection_digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "projection_updated_at": {
+              "$ref": "#/$defs/dateTime"
+            },
+            "predecessor_runtime_source_digest": {
+              "type": "string",
+              "pattern": "^[0-9a-f]{64}$"
+            },
+            "predecessor_canonical_source_digest": {
+              "const": ""
+            },
+            "freshness_state": {
+              "const": "source_unavailable"
+            },
+            "query_status": {
+              "const": "degraded"
+            },
+            "historical_runtime_slice_present": {
+              "const": true
+            }
+          }
+        },
+        "residual": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "classification",
+            "active_consumer_dependency",
+            "source_owner_route_correct",
+            "blocks_succession_closeout",
+            "reason"
+          ],
+          "properties": {
+            "classification": {
+              "const": "derived_projection_refresh_pending"
+            },
+            "active_consumer_dependency": {
+              "const": false
+            },
+            "source_owner_route_correct": {
+              "const": true
+            },
+            "blocks_succession_closeout": {
+              "const": false
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 1
+            }
+          }
+        }
+      }
+    },
+    "sdk_release_audit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "command",
+        "expected_version",
+        "latest_tag",
+        "release_url",
+        "passed"
+      ],
+      "properties": {
+        "command": {
+          "type": "string",
+          "minLength": 1
+        },
+        "expected_version": {
+          "const": "0.9.0"
+        },
+        "latest_tag": {
+          "const": "v0.9.0"
+        },
+        "release_url": {
+          "$ref": "#/$defs/uri"
+        },
+        "passed": {
+          "const": true
+        }
+      }
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sdk_single_canonical_routing_owner",
+        "runtime_uses_sdk_artifact",
+        "active_predecessor_checkout_consumers",
+        "compatibility_window_exited",
+        "predecessor_archived",
+        "predecessor_preserved",
+        "deprecation_release_published",
+        "operator_scope_respected",
+        "delete_or_rename_executed",
+        "succession_complete",
+        "claim_limit"
+      ],
+      "properties": {
+        "sdk_single_canonical_routing_owner": {
+          "const": true
+        },
+        "runtime_uses_sdk_artifact": {
+          "const": true
+        },
+        "active_predecessor_checkout_consumers": {
+          "const": 0
+        },
+        "compatibility_window_exited": {
+          "const": true
+        },
+        "predecessor_archived": {
+          "const": true
+        },
+        "predecessor_preserved": {
+          "const": true
+        },
+        "deprecation_release_published": {
+          "const": true
+        },
+        "operator_scope_respected": {
+          "const": true
+        },
+        "delete_or_rename_executed": {
+          "const": false
+        },
+        "succession_complete": {
+          "const": true
+        },
+        "claim_limit": {
+          "type": "string",
+          "minLength": 1
+        }
+      }
+    }
+  },
+  "$defs": {
+    "dateTime": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "gitSha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "uri": {
+      "type": "string",
+      "format": "uri"
+    },
+    "repositoryIdentity": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "node_id",
+        "full_name"
+      ],
+      "properties": {
+        "id": {
+          "const": 1186624390
+        },
+        "node_id": {
+          "const": "R_kgDORrpzhg"
+        },
+        "full_name": {
+          "const": "8Dionysus/aoa-routing"
+        }
+      }
+    },
+    "httpCheck": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "surface",
+        "url",
+        "status"
+      ],
+      "properties": {
+        "surface": {
+          "enum": [
+            "repository",
+            "readme",
+            "release"
+          ]
+        },
+        "url": {
+          "$ref": "#/$defs/uri"
+        },
+        "status": {
+          "const": 200
+        }
+      }
+    }
+  }
+}
