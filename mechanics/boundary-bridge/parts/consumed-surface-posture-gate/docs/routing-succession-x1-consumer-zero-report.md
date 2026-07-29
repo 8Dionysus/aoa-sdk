@@ -1,6 +1,6 @@
 # Routing Succession X1 Consumer-Zero Report
 
-Status: post-merge validation pending; archive readiness is false.
+Status: archive-ready; exact operator approval is still required.
 
 Machine-readable evidence:
 [`../evidence/routing-succession-x1-consumer-zero-report.json`](../evidence/routing-succession-x1-consumer-zero-report.json).
@@ -26,7 +26,7 @@ residuals.
 ## Landed Validation
 
 The thirteen owner migrations are bound to their exact merge refs and owner
-PRs. Five consecutive `aoa-sdk` main validations at or after the SDK migration
+PRs. Six consecutive `aoa-sdk` main validations at or after the SDK migration
 landing `780ac06d` passed. Three earlier successful main runs are retained
 separately as pre-migration baseline evidence and are not counted toward the
 post-landing gate. The landed `aoa-kag` provider succession passed both its
@@ -34,12 +34,13 @@ pre-merge 23-provider release audit and post-merge run `30445769702`. The final
 report records these as owner evidence; it does not convert them into
 SDK-owned meaning.
 
-Those validations end at parent `956c32cd`; none can prove a report that had
-not yet landed. This report therefore keeps
-`x1_report_postmerge_validation.status=pending`,
-`all_required_validation_green=false`, and `archive_ready=false`. A subsequent
-receipt must bind a successful `aoa-sdk` main validation run containing this
-report before the archive-readiness claim can change.
+The first X1 report landed at
+`9d10318e446304bb951a7c71aab0b5def961af72`. Repo Validation run
+[`30464461615`](https://github.com/8Dionysus/aoa-sdk/actions/runs/30464461615)
+then passed on that exact `main` ref in 215 runner seconds. This subsequent
+receipt therefore records `x1_report_postmerge_validation.status=success`,
+`all_required_validation_green=true`, and `archive_ready=true`. The receipt
+closes the evidence gate without granting authority to mutate the predecessor.
 
 An exact package cycle exercised the preceding `0.8.0` and final `0.9.0`
 workflow wheels:
@@ -131,24 +132,22 @@ All six compatibility-exit criteria are satisfied:
 1. every registered consumer is landed and green;
 2. active direct-checkout consumer count is zero;
 3. clean install, upgrade, downgrade, and restore passed;
-4. five consecutive SDK main validations at or after migration landing exceed
+4. six consecutive SDK main validations at or after migration landing exceed
    the required two;
 5. the live mirror and trust record identify the SDK canonical producer;
 6. the discovered portability regression is repaired with post-repair proof.
 
 Repository `8Dionysus/aoa-routing`, numeric ID `1186624390`, node ID
 `R_kgDORrpzhg`, has satisfied the substantive consumer, compatibility,
-runtime, release-replay, and rollback prerequisites but is not yet
-archive-ready. It remains public, unarchived, preserved, and maintenance-only
+runtime, release-replay, rollback, and landed-X1 validation prerequisites and
+is archive-ready. It remains public, unarchived, preserved, and maintenance-only
 at `main`
 `19c2629a207978a118f7db81d89f44748b2e5235`; its latest release remains
-`v0.3.0`. The report deliberately keeps `archive_ready=false`,
+`v0.3.0`. The report records `archive_ready=true` while deliberately keeping
 `archive_authorized=false`, `deprecation_release_executed=false`,
 `github_archive_executed=false`, and `irreversible_action_taken=false`.
 
-Two gates remain in sequence. First, this report must land and a subsequent
-receipt must bind its successful `aoa-sdk` main validation. Only then does the
-remaining gate become a separate exact operator approval naming repository ID
-`1186624390` and the landed X1 evidence. Without both, no deprecation release,
-About-banner mutation, GitHub archive, deletion, rename, or other irreversible
-predecessor action is authorized.
+Exactly one external gate remains: separate exact operator approval naming
+repository ID `1186624390` and the landed X1 evidence. Without it, no
+deprecation release, About-banner mutation, GitHub archive, deletion, rename,
+or other irreversible predecessor action is authorized.

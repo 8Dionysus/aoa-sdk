@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 6179578,
+  "allowed_tracked_bytes": 19108415,
+  "approved_by": "repository-owner",
+  "base_ref": "9d10318e446304bb951a7c71aab0b5def961af72",
+  "changed_generated_bytes": 6179578,
+  "changed_generated_files": 126,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "ced303c27221eb8de82240406b5c80187e21929736915990baa11a82c65fe6be",
+  "reason": "Bind the landed X1 report and successful main validation as the archive-readiness receipt while preserving separate operator authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19108415,
+  "tracked_bytes_max": 15728640
+}

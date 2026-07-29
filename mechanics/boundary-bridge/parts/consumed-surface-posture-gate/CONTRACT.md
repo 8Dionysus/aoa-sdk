@@ -92,9 +92,10 @@
   final X1 schema to reject deprecation-release, metadata, archive, or other
   irreversible-action execution before separate exact operator approval.
 - Requires the first landed X1 report to remain
-  `postmerge_validation_pending` and `archive_ready=false`; only a subsequent
-  receipt bound to its successful `aoa-sdk` main validation may close that
-  evidence gate.
+  `postmerge_validation_pending` and `archive_ready=false`, then requires a
+  subsequent receipt to bind its successful `aoa-sdk` main validation before
+  recording `archive_ready=true`. That receipt still cannot grant archive
+  authority.
 - Admits the current owner shortlist `guard` kind without removing the legacy
   `seed` compatibility value or taking ownership of either meaning.
 
