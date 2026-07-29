@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 2268012,
+  "allowed_tracked_bytes": 19043296,
+  "approved_by": "repository-owner",
+  "base_ref": "35e01329763d68e148144d9f5b4be4bce43446b8",
+  "changed_generated_bytes": 2268012,
+  "changed_generated_files": 45,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "1a2ee72297d3c996fd5b745a4d49cb7138a1033efa42e922b1de0164d5e93298",
+  "reason": "Release replay sdist isolation moves the pinned external verifier checkout after package construction, excludes it defensively from Hatch builds, and binds regression coverage.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19043296,
+  "tracked_bytes_max": 15728640
+}
