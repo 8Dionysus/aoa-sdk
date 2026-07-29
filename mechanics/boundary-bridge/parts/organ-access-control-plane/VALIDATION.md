@@ -14,7 +14,8 @@ The tests cover strict schemas, effect-policy matching, isolated credential
 contours, secret rejection, admission gates, deterministic projection,
 suspension, catalog byte budgets, explicit workspace configuration,
 candidate-only activation, schema drift, approvals, exact external targets,
-typed owner payloads, and CLI discovery.
+typed owner payloads, owner-bounded result review, content-addressed review
+receipts, and CLI discovery.
 
 Runtime deployment, consumer pairing, live freshness, grounded results,
 central proof, owner acceptance, and rollback are separate evidence axes and

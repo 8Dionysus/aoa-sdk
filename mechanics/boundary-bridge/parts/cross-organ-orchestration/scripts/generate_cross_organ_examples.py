@@ -73,7 +73,7 @@ SCHEMAS = {
         "aoa-evals",
         "mechanics/proof-object/parts/eval-authoring/schemas/eval-need.schema.json",
         "751dd78f0280dc2cd089e30b3a7275182656e8350cf84c458f98734d16b4fad1",
-        "aoa_eval_need_v1",
+        "eval_need_v1",
     ),
     "eval_result": _schema(
         "aoa-evals",
@@ -86,7 +86,7 @@ SCHEMAS = {
         "aoa-memo",
         "schemas/support-objects/reviewed_intake_landing_receipt.schema.json",
         "e3a1e93846340f4d850028eeb722a32458cff6527fe38a6366052edf86a1239f",
-        "aoa_reviewed_intake_landing_receipt_v1",
+        "aoa_memo_reviewed_intake_landing_receipt_v1",
     ),
 }
 

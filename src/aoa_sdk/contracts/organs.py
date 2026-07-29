@@ -29,6 +29,9 @@ ORGAN_ACTIVATION_PLAN_VERSION: Literal["aoa_organ_activation_plan_v1"] = (
 ORGAN_RESULT_ENVELOPE_VERSION: Literal["aoa_organ_result_envelope_v1"] = (
     "aoa_organ_result_envelope_v1"
 )
+ORGAN_OWNER_RESULT_REVIEW_VERSION: Literal[
+    "aoa_organ_owner_result_review_v1"
+] = "aoa_organ_owner_result_review_v1"
 ORGAN_ADAPTER_PROTOCOL_VERSION: Literal["aoa_organ_adapter_v1"] = (
     "aoa_organ_adapter_v1"
 )
@@ -71,6 +74,14 @@ FreshnessState: TypeAlias = Literal[
     "blocked",
     "unknown",
     "rollback_required",
+]
+ResultGroundingState: TypeAlias = Literal["grounded", "rejected", "blocked"]
+ResultReviewFreshnessState: TypeAlias = Literal[
+    "exact",
+    "compatible_drift",
+    "stale_readable",
+    "blocked",
+    "unknown",
 ]
 AxisState: TypeAlias = Literal["asserted", "not_asserted", "not_applicable"]
 EvalStatus: TypeAlias = Literal[
@@ -172,6 +183,146 @@ class FreshnessPolicy(StrictOrganModel):
     stale_readable_seconds: Annotated[int, Field(ge=0)] = 0
     cache_scope: Literal["none", "request", "task", "agent", "workspace"]
     provider_watermark_required: bool = True
+
+
+class OwnerResultCapture(StrictOrganModel):
+    """Runtime-owner binding for one captured owner result."""
+
+    capture_owner: NonEmptyStr
+    capture_receipt_ref: SecretFreeRef
+    capture_receipt_id: Digest
+    result_artifact_ref: SecretFreeRef
+    result_artifact_id: Digest
+    organ_id: Identifier
+    capability_id: Identifier
+    primitive_id: Identifier
+    result_digest: Digest
+    result_schema_identity: NonEmptyStr
+    server_schema_digest: Digest
+    primitive_schema_digest: Digest
+    observed_at: datetime
+    expires_at: datetime
+
+    @field_validator("observed_at", "expires_at")
+    @classmethod
+    def require_aware_time(cls, value: datetime) -> datetime:
+        result = _aware_utc(value)
+        assert result is not None
+        return result
+
+    @model_validator(mode="after")
+    def validate_expiry(self) -> OwnerResultCapture:
+        if self.expires_at <= self.observed_at:
+            raise ValueError("captured result expiry must follow observation")
+        return self
+
+
+class OwnerResultReviewStatement(StrictOrganModel):
+    """Owner-authored assessment before deterministic receipt addressing."""
+
+    schema_version: Literal["aoa_organ_owner_result_review_v1"] = (
+        ORGAN_OWNER_RESULT_REVIEW_VERSION
+    )
+    review_owner: NonEmptyStr
+    organ_id: Identifier
+    capability_id: Identifier
+    primitive_id: Identifier
+    owners: OrganOwners
+    capture: OwnerResultCapture
+    source_revision: RevisionIdentity
+    owner_payload_schema_ref: SecretFreeRef
+    owner_payload_schema_digest: Digest
+    reviewed_at: datetime
+    expires_at: datetime
+    grounding_state: ResultGroundingState
+    freshness_state: ResultReviewFreshnessState
+    freshness_policy: FreshnessPolicy
+    provider_watermark: NonEmptyStr | None = None
+    grounding_evidence: tuple[QualifiedEvidenceRef, ...]
+    reason_codes: tuple[Identifier, ...] = ()
+    owner_accepted: Literal[False] = False
+    central_proof_asserted: Literal[False] = False
+    admission_asserted: Literal[False] = False
+    cross_organ_proven: Literal[False] = False
+    rollback_proven: Literal[False] = False
+    contains_secrets: Literal[False] = False
+    self_report_is_security_authority: Literal[False] = False
+    claim_limit: Literal[
+        "This owner-issued review proves only the named owner's schema "
+        "grounding and freshness assessment for one content-addressed "
+        "captured result. It does not prove owner acceptance, central proof, "
+        "admission, cross-organ benefit, execution authorization, or rollback."
+    ] = (
+        "This owner-issued review proves only the named owner's schema "
+        "grounding and freshness assessment for one content-addressed "
+        "captured result. It does not prove owner acceptance, central proof, "
+        "admission, cross-organ benefit, execution authorization, or rollback."
+    )
+
+    @field_validator("reviewed_at", "expires_at")
+    @classmethod
+    def require_aware_time(cls, value: datetime) -> datetime:
+        result = _aware_utc(value)
+        assert result is not None
+        return result
+
+    @model_validator(mode="after")
+    def validate_owner_review(self) -> OwnerResultReviewStatement:
+        allowed_review_owners = {
+            self.owners.source_owner,
+            self.owners.acceptance_owner,
+        }
+        if self.review_owner not in allowed_review_owners:
+            raise ValueError(
+                "result review owner must be the source or acceptance owner"
+            )
+        if self.capture.capture_owner != self.owners.runtime_owner:
+            raise ValueError("captured result must come from the runtime owner")
+        if (
+            self.organ_id,
+            self.capability_id,
+            self.primitive_id,
+        ) != (
+            self.capture.organ_id,
+            self.capture.capability_id,
+            self.capture.primitive_id,
+        ):
+            raise ValueError("result review target must match the captured result")
+        if self.reviewed_at < self.capture.observed_at:
+            raise ValueError("result review cannot predate its captured result")
+        if self.expires_at <= self.reviewed_at:
+            raise ValueError("result review expiry must follow review time")
+        if self.expires_at > self.capture.expires_at:
+            raise ValueError("result review cannot outlive its captured result")
+        if self.grounding_state == "grounded" and not self.grounding_evidence:
+            raise ValueError("a grounded result requires owner-qualified evidence")
+        evidence_owners = {
+            self.review_owner,
+            self.owners.source_owner,
+            self.owners.acceptance_owner,
+        }
+        if any(item.owner not in evidence_owners for item in self.grounding_evidence):
+            raise ValueError("grounding evidence must come from an owner reviewer")
+        if self.grounding_state != "grounded" and not self.reason_codes:
+            raise ValueError("a rejected or blocked result requires reason codes")
+        if self.freshness_state != "exact" and not self.reason_codes:
+            raise ValueError("non-exact freshness requires reason codes")
+        if (
+            self.freshness_state
+            in {"exact", "compatible_drift", "stale_readable"}
+            and self.freshness_policy.provider_watermark_required
+            and self.provider_watermark is None
+        ):
+            raise ValueError(
+                "the owner freshness assessment requires a provider watermark"
+            )
+        return self
+
+
+class OwnerResultReviewReceipt(OwnerResultReviewStatement):
+    """Content-addressed owner review; validation does not create its verdict."""
+
+    review_id: Digest
 
 
 class CredentialContours(StrictOrganModel):

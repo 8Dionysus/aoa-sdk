@@ -89,7 +89,7 @@
         "owner": "aoa-evals",
         "schema_digest": "sha256:751dd78f0280dc2cd089e30b3a7275182656e8350cf84c458f98734d16b4fad1",
         "schema_ref": "mechanics/proof-object/parts/eval-authoring/schemas/eval-need.schema.json",
-        "schema_version": "aoa_eval_need_v1",
+        "schema_version": "eval_need_v1",
         "source_revision": "4d03125d0961dbc0b15332f1a146cd0f7f08eb23"
       },
       "owner": "aoa-evals",
@@ -121,7 +121,7 @@
         "owner": "aoa-memo",
         "schema_digest": "sha256:e3a1e93846340f4d850028eeb722a32458cff6527fe38a6366052edf86a1239f",
         "schema_ref": "schemas/support-objects/reviewed_intake_landing_receipt.schema.json",
-        "schema_version": "aoa_reviewed_intake_landing_receipt_v1",
+        "schema_version": "aoa_memo_reviewed_intake_landing_receipt_v1",
         "source_revision": "e0d3653c11d948f962bcb033749c86c52388ec5f"
       },
       "owner": "aoa-memo",

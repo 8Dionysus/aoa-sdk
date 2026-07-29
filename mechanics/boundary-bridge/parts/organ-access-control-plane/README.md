@@ -20,7 +20,9 @@ or runtime executor.
 - bounded catalog, organ inspection, and capability inspection;
 - compatibility observations;
 - immutable activation candidates with `execution_authorized=false`;
-- a minimal typed result envelope around owner-specific payloads.
+- a minimal typed result envelope around owner-specific payloads;
+- a content-addressed owner-result review contract that binds one private
+  runtime capture to an owner schema and freshness assessment.
 
 ## Owner
 
@@ -28,7 +30,8 @@ or runtime executor.
 candidate plan. The configured OS workspace owns the private registry
 instance. Organ repositories retain source meaning; `abyss-stack` retains
 deploy/runtime/lifecycle; `aoa-evals` retains proof; the relevant organ retains
-acceptance.
+grounding, freshness, and acceptance. An owner-result review can assert only
+the first two; acceptance stays a separate axis.
 
 ## Next route
 
@@ -41,4 +44,5 @@ inferred from this SDK projection.
 
 Use [VALIDATION.md](VALIDATION.md). A green local suite proves SDK contract
 behavior only. It does not prove a live endpoint, grounded result, owner
-acceptance, or production admission.
+acceptance, or production admission. Even a structurally valid review schema
+does not prove that an owner verifier actually inspected a captured result.
