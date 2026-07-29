@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 13744240,
+  "allowed_tracked_bytes": 18918181,
+  "approved_by": "repository-owner",
+  "base_ref": "eda623ecd8a77606414a29ea7102369e369b95be",
+  "changed_generated_bytes": 13744240,
+  "changed_generated_files": 286,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "70123f70879e7929642c017fff2dc0cdeea555a496329e55f1c5056836c831f2",
+  "reason": "Rebuild the SDK owner-result review projection with the workflow-pinned KAG action",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 18918181,
+  "tracked_bytes_max": 15728640
+}
