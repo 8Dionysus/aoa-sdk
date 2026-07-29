@@ -1,134 +1,7 @@
 {
-  "schema_version": "aoa_sdk_routing_succession_e1_cost_comparison_v1",
-  "observed_on": "2026-07-26",
-  "status": "provisional_pass_pending_landed_ci_observation",
-  "scope": {
-    "comparison": "R0 predecessor contour to post-G5 M3 contour",
-    "sdk_before_m3_ref": "7802585aabf80518c0871178fd512a7f94d6a45a",
-    "sdk_post_m3_ref": "7fba39d38cf5902c41dfbb7ae91f405b849880b7",
-    "routing_before_m3_ref": "97f60de1b5992ef6bf5ff0f051bd452d940d9a85",
-    "routing_post_m3_ref": "fb4266ee26727f50f40ca4206194d14f451c5cd6",
-    "r0_evidence_sha256": "ee28bc71bd083c0e1a35ca42ea0debb326d8f1ca312189a9c854de447e0b8219",
-    "routing_m3_evidence_sha256": "892a172452757a2bc0b61f4304f430900c5a1a465e3ae07c4660dca9488852c1",
-    "comparison_rule": "E1 must replay identical tasks and count tool calls, repository roots, manual transformations, elapsed time, and evidence completeness; unsupported old stages remain explicit rather than scored as zero cost"
-  },
-  "repository_and_ci_cost": {
-    "canonical_routing_producers": {
-      "before": 1,
-      "after": 1
-    },
-    "active_producer_control_planes": {
-      "before": 2,
-      "after": 1
-    },
-    "physical_producer_implementations": {
-      "before": 1,
-      "shadow_peak": 2,
-      "after": 2,
-      "active_after": 1,
-      "retained_after": "predecessor rollback implementation"
-    },
-    "workflow_files_in_comparison_family": {
-      "before": 6,
-      "after": 5
-    },
-    "routing_related_workflow_contours": {
-      "before": 6,
-      "after": 3
-    },
-    "checkout_actions": {
-      "before": 73,
-      "after": 23,
-      "removed": 50,
-      "reduction_fraction": 0.685,
-      "sdk_before": 43,
-      "sdk_after": 23,
-      "predecessor_before": 30,
-      "predecessor_after": 0
-    },
-    "sdk_direct_predecessor_checkouts": {
-      "before": 4,
-      "after": 0
-    },
-    "paired_release_streams": {
-      "before": 2,
-      "after": 1
-    },
-    "active_historical_release_probes": {
-      "before": [
-        "verify_routing_shadow_wheel.py",
-        "verify_routing_g5_candidate_wheel.py",
-        "verify_routing_g5_release_candidate_wheel.py"
-      ],
-      "after": []
-    },
-    "sdk_requires_predecessor_workspace_repo": {
-      "before": true,
-      "after": false
-    },
-    "historical_runner_sample": {
-      "runs": 430,
-      "runner_minutes": 476.97,
-      "failed_runs": 225,
-      "failure_rate": 0.523,
-      "post_landing_comparable_sample_available": false
-    }
-  },
   "agent_process_cost": {
-    "scenarios": [
-      "a2a_summon_return_checkpoint",
-      "bounded_change_safe",
-      "runtime_chaos_recovery"
-    ],
-    "old_contour": {
-      "free_text_intent_to_route_decision": "unsupported",
-      "route_decision_to_run_plan": "unsupported",
-      "run_plan_to_session_handle": "unsupported",
-      "session_handle_to_closeout": "unsupported",
-      "compile_ready_scenarios": 0,
-      "smallest_observed_route": {
-        "request": "POST /routing/task-family with task_family=bounded-plan-shaping",
-        "runs": 10,
-        "all_ms": [
-          7.975,
-          5.491,
-          4.751,
-          3.432,
-          2.699,
-          4.128,
-          3.924,
-          2.78,
-          3.277,
-          4.84
-        ],
-        "median_ms": 4.026,
-        "p90_ms": 5.491,
-        "http_status": 200,
-        "response_bytes": 3449,
-        "response_sha256": "70d552024e44e59aaa4ab462d3d083910982c06c520b6ad7dedc95ca6d733142",
-        "result_kind": "advisory_role_tier_artifact_contract",
-        "has_route_decision": false,
-        "has_run_plan": false,
-        "measurement_posture": "live read-only repeat of the old route-api shape; not a full task"
-      },
-      "manual_transformations_lower_bound": 1,
-      "artifact_maintenance_repository_contexts": "15 to 16 repository roots in current routing CI"
-    },
     "new_contour": {
-      "compile_ready_scenarios": 3,
-      "compile_ready_scenario_count": 3,
-      "clean_federation_repository_contexts": 6,
-      "predecessor_checkout_present": false,
-      "minimum_public_transformations_per_compile_scenario": [
-        "scenario_ref",
-        "resolve",
-        "bind_scenario",
-        "compile"
-      ],
-      "manual_json_transformations_after_typed_input": 0,
       "clean_federation_benchmark": {
-        "subject": "installed aoa-sdk wheel in a six-owner federation without aoa-routing",
-        "runs": 10,
         "all_ms": [
           3011.174,
           3254.176,
@@ -141,61 +14,267 @@
           3197.825,
           3168.53
         ],
-        "median_ms": 3183.177,
-        "p90_ms": 3261.837,
-        "output_bytes": 479,
         "all_passed": true,
+        "measurement_posture": "process startup plus clean-federation setup and repeated deterministic route-bind-compile checks for all three scenarios",
+        "median_ms": 3183.177,
+        "output_bytes": 479,
+        "p90_ms": 3261.837,
+        "runs": 10,
+        "subject": "installed aoa-sdk wheel in a six-owner federation without aoa-routing",
+        "verification_operations_per_scenario": 7,
         "verified_scenarios": [
           "a2a_summon_return_checkpoint",
           "bounded_change_safe",
           "runtime_chaos_recovery"
-        ],
-        "verification_operations_per_scenario": 7,
-        "measurement_posture": "process startup plus clean-federation setup and repeated deterministic route-bind-compile checks for all three scenarios"
+        ]
       },
+      "clean_federation_repository_contexts": 6,
+      "compile_ready_scenario_count": 3,
+      "compile_ready_scenarios": 3,
       "compiler_repeat_observations": 8,
-      "isolated_lifecycle_terminal_state": "closed",
-      "isolated_lifecycle_event_count": 83,
-      "g11_golden_case_count": 3,
       "g11_adversarial_category_count": 13,
+      "g11_golden_case_count": 3,
+      "g11_runtime_owner_cases_passed": 5,
       "g11_sdk_cases_passed": 16,
-      "g11_runtime_owner_cases_passed": 5
+      "isolated_lifecycle_event_count": 83,
+      "isolated_lifecycle_terminal_state": "closed",
+      "manual_json_transformations_after_typed_input": 0,
+      "minimum_public_transformations_per_compile_scenario": [
+        "scenario_ref",
+        "resolve",
+        "bind_scenario",
+        "compile"
+      ],
+      "predecessor_checkout_present": false
+    },
+    "old_contour": {
+      "artifact_maintenance_repository_contexts": "15 to 16 repository roots in current routing CI",
+      "compile_ready_scenarios": 0,
+      "free_text_intent_to_route_decision": "unsupported",
+      "manual_transformations_lower_bound": 1,
+      "route_decision_to_run_plan": "unsupported",
+      "run_plan_to_session_handle": "unsupported",
+      "session_handle_to_closeout": "unsupported",
+      "smallest_observed_route": {
+        "all_ms": [
+          7.975,
+          5.491,
+          4.751,
+          3.432,
+          2.699,
+          4.128,
+          3.924,
+          2.78,
+          3.277,
+          4.84
+        ],
+        "has_route_decision": false,
+        "has_run_plan": false,
+        "http_status": 200,
+        "measurement_posture": "live read-only repeat of the old route-api shape; not a full task",
+        "median_ms": 4.026,
+        "p90_ms": 5.491,
+        "request": "POST /routing/task-family with task_family=bounded-plan-shaping",
+        "response_bytes": 3449,
+        "response_sha256": "70d552024e44e59aaa4ab462d3d083910982c06c520b6ad7dedc95ca6d733142",
+        "result_kind": "advisory_role_tier_artifact_contract",
+        "runs": 10
+      }
     },
     "repository_context_reduction": {
+      "new": 6,
       "old_lower_bound": 15,
       "old_upper_bound": 16,
-      "new": 6,
       "reduction_from_lower_bound_fraction": 0.6,
       "reduction_from_upper_bound_fraction": 0.625
     },
+    "scenarios": [
+      "a2a_summon_return_checkpoint",
+      "bounded_change_safe",
+      "runtime_chaos_recovery"
+    ],
     "telemetry_limits": {
-      "model_tokens": "unavailable in both contours",
       "agent_tool_calls": "not recorded by the retained old or T1 receipts",
-      "process_calls": "legacy HTTP call and SDK public transformations counted",
-      "serialized_bytes": "observed but not compared as token cost because outputs have different contracts",
       "direct_latency_comparison_valid": false,
-      "reason": "the legacy sample returns advisory references while the new sample verifies three typed route-bind-compile chains"
+      "model_tokens": "unavailable in both contours",
+      "process_calls": "legacy HTTP call and SDK public transformations counted",
+      "reason": "the legacy sample returns advisory references while the new sample verifies three typed route-bind-compile chains",
+      "serialized_bytes": "observed but not compared as token cost because outputs have different contracts"
     }
   },
+  "observed_on": "2026-07-29",
   "quality_and_stop_lines": {
+    "archive_authorized_claimed": false,
+    "archive_ready_claimed": false,
+    "assurance_removed_to_reduce_ci_time": false,
+    "central_aoa_evals_verdict_claimed": false,
+    "consumer_zero_claimed": false,
+    "direct_ci_runner_time_reduction_claimed": false,
+    "g11_complete_to_rightful_stop_boundary": true,
     "new_chain_all_benchmark_runs_passed": true,
     "new_chain_scenarios_verified": 3,
-    "g11_complete_to_rightful_stop_boundary": true,
-    "central_aoa_evals_verdict_claimed": false,
-    "process_cost_reduction_claimed": true,
-    "task_latency_reduction_claimed": false,
     "post_landing_ci_failure_rate_reduction_claimed": false,
-    "consumer_zero_claimed": false,
     "rollback_retired_claimed": false,
-    "archive_ready_claimed": false,
-    "archive_authorized_claimed": false
+    "structural_process_cost_reduction_claimed": true,
+    "task_latency_reduction_claimed": false
   },
+  "repository_and_ci_cost": {
+    "active_historical_release_probes": {
+      "after": [],
+      "before": [
+        "verify_routing_shadow_wheel.py",
+        "verify_routing_g5_candidate_wheel.py",
+        "verify_routing_g5_release_candidate_wheel.py"
+      ]
+    },
+    "active_producer_control_planes": {
+      "after": 1,
+      "before": 2
+    },
+    "canonical_routing_producers": {
+      "after": 1,
+      "before": 1
+    },
+    "checkout_actions": {
+      "after": 23,
+      "before": 73,
+      "predecessor_after": 0,
+      "predecessor_before": 30,
+      "reduction_fraction": 0.685,
+      "removed": 50,
+      "sdk_after": 23,
+      "sdk_before": 43
+    },
+    "historical_runner_sample": {
+      "failed_runs": 225,
+      "failure_rate": 0.523,
+      "post_landing_comparable_sample_available": true,
+      "runner_minutes": 476.97,
+      "runs": 430
+    },
+    "paired_release_streams": {
+      "after": 1,
+      "before": 2
+    },
+    "physical_producer_implementations": {
+      "active_after": 1,
+      "after": 2,
+      "before": 1,
+      "retained_after": "predecessor rollback implementation",
+      "shadow_peak": 2
+    },
+    "post_landing_runner_sample": {
+      "all_success": true,
+      "branch": "main",
+      "claim_limit": "Four successful non-random main runs are enough to expose the direct runner-time regression, but not enough to claim a failure-rate improvement or long-run reliability change.",
+      "event": "push",
+      "failure_rate_reduction_claimable": false,
+      "growth_sources": [
+        "the SDK validation now carries the portable multi-owner KAG release audit that succeeds without an aoa-routing producer checkout",
+        "the package and trust gates cover the expanded routing, planning, lifecycle, and runtime-adapter control plane",
+        "no duplicate producer workflow was reintroduced and no assurance gate was removed to manufacture a faster result"
+      ],
+      "median_lead_time_seconds": 215.5,
+      "median_runner_seconds": 210.5,
+      "observation_class": "GitHub Actions push runs on aoa-sdk main after coordinated owner and consumer landings",
+      "paired_predecessor_median_runner_seconds": 171,
+      "run_count": 4,
+      "runner_seconds_delta_from_paired_baseline": 39.5,
+      "runner_time_regression_fraction": 0.231,
+      "runs": [
+        {
+          "conclusion": "success",
+          "created_at": "2026-07-28T14:40:36Z",
+          "head_sha": "ac6c1e5f7dd824ebaa6a583c4bb8965e3ca194a0",
+          "job_completed_at": "2026-07-28T14:44:14Z",
+          "job_id": 90309467669,
+          "job_started_at": "2026-07-28T14:40:41Z",
+          "lead_time_seconds": 219,
+          "run_id": 30369543263,
+          "runner_seconds": 213,
+          "updated_at": "2026-07-28T14:44:15Z",
+          "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30369543263"
+        },
+        {
+          "conclusion": "success",
+          "created_at": "2026-07-29T04:33:39Z",
+          "head_sha": "eda623ecd8a77606414a29ea7102369e369b95be",
+          "job_completed_at": "2026-07-29T04:37:11Z",
+          "job_id": 90482299246,
+          "job_started_at": "2026-07-29T04:33:43Z",
+          "lead_time_seconds": 213,
+          "run_id": 30422604505,
+          "runner_seconds": 208,
+          "updated_at": "2026-07-29T04:37:12Z",
+          "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30422604505"
+        },
+        {
+          "conclusion": "success",
+          "created_at": "2026-07-29T06:32:23Z",
+          "head_sha": "cbf225627f9f28d0470deb8a962ae12d1fe72375",
+          "job_completed_at": "2026-07-29T06:36:00Z",
+          "job_id": 90500118314,
+          "job_started_at": "2026-07-29T06:32:26Z",
+          "lead_time_seconds": 218,
+          "run_id": 30428491862,
+          "runner_seconds": 214,
+          "updated_at": "2026-07-29T06:36:01Z",
+          "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30428491862"
+        },
+        {
+          "conclusion": "success",
+          "created_at": "2026-07-29T10:29:27Z",
+          "head_sha": "780ac06d1739246d6402445e6ec43ef39a97b90a",
+          "job_completed_at": "2026-07-29T10:32:55Z",
+          "job_id": 90549331214,
+          "job_started_at": "2026-07-29T10:29:36Z",
+          "lead_time_seconds": 208,
+          "run_id": 30443863477,
+          "runner_seconds": 199,
+          "updated_at": "2026-07-29T10:32:55Z",
+          "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30443863477"
+        }
+      ],
+      "workflow": "Repo Validation"
+    },
+    "routing_related_workflow_contours": {
+      "after": 3,
+      "before": 6
+    },
+    "sdk_direct_predecessor_checkouts": {
+      "after": 0,
+      "before": 4
+    },
+    "sdk_requires_predecessor_workspace_repo": {
+      "after": false,
+      "before": true
+    },
+    "workflow_files_in_comparison_family": {
+      "after": 5,
+      "before": 6
+    }
+  },
+  "schema_version": "aoa_sdk_routing_succession_e1_cost_comparison_v2",
+  "scope": {
+    "comparison": "R0 predecessor contour to landed SDK control-plane contour",
+    "comparison_rule": "E1 must replay identical tasks and count tool calls, repository roots, manual transformations, elapsed time, and evidence completeness; unsupported old stages remain explicit rather than scored as zero cost",
+    "r0_evidence_sha256": "ee28bc71bd083c0e1a35ca42ea0debb326d8f1ca312189a9c854de447e0b8219",
+    "routing_before_m3_ref": "97f60de1b5992ef6bf5ff0f051bd452d940d9a85",
+    "routing_m3_evidence_sha256": "892a172452757a2bc0b61f4304f430900c5a1a465e3ae07c4660dca9488852c1",
+    "routing_post_m3_ref": "fb4266ee26727f50f40ca4206194d14f451c5cd6",
+    "sdk_before_m3_ref": "7802585aabf80518c0871178fd512a7f94d6a45a",
+    "sdk_post_landing_observation_through_ref": "780ac06d1739246d6402445e6ec43ef39a97b90a",
+    "sdk_post_m3_ref": "7fba39d38cf5902c41dfbb7ae91f405b849880b7"
+  },
+  "status": "complete_mixed_verdict",
   "verdict": {
-    "structural_process_cost_reduced": true,
-    "typed_agent_process_capability_increased": true,
     "bounded_no_regression_signal": true,
-    "g13_gate": "provisional_pass",
-    "remaining_e1_observation": "collect comparable post-landing CI lead-time, runner-minute, and failure-rate evidence after the single final landing",
-    "claim_limit": "E1 proves structural checkout, workflow, release, context, and supported-process improvement for pinned evidence. It does not prove direct latency or token reduction, a central eval verdict, post-landing CI reliability, consumer-zero, rollback retirement, archive readiness, or archive authority."
+    "claim_limit": "E1 proves structural checkout, workflow, release, context, and supported-process improvement, while reporting a 23.1% median CI runner-time regression. It does not prove direct task latency or token reduction, a long-run CI failure-rate improvement, a central eval verdict, consumer-zero, rollback retirement, archive readiness, or archive authority.",
+    "direct_ci_runner_time_reduced": false,
+    "direct_ci_runner_time_regression_fraction": 0.231,
+    "g13_gate": "pass_with_ci_runner_time_regression",
+    "growth_source": "The 23.1% runner-time increase is attributable to the portable multi-owner KAG audit and expanded package, trust, routing, planning, lifecycle, and runtime-adapter gates; duplicate producer scaffolding did not return.",
+    "structural_process_cost_reduced": true,
+    "typed_agent_process_capability_increased": true
   }
 }

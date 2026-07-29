@@ -97,6 +97,11 @@ def test_snapshot_pins_exact_admitted_owner_projection() -> None:
         snapshot.admission_provenance.source_ref
         == snapshot.source_lock.trust_admission.record_id
     )
+    assert snapshot.admission_provenance.owner_repo == "aoa-sdk"
+    assert snapshot.admission_provenance.artifact_ref == (
+        "src/aoa_sdk/control_plane/planning/data/"
+        "playbook-plan-contours-trust-record.v1.json"
+    )
     assert (
         snapshot.admission_provenance.artifact_digest
         == snapshot.source_lock.trust_admission.record_artifact_digest
@@ -117,6 +122,44 @@ def test_snapshot_pins_exact_admitted_owner_projection() -> None:
         "a2a_summon_return_checkpoint",
         "runtime_chaos_recovery",
     ]
+
+
+def test_packaged_trust_controls_are_order_independent(
+    tmp_path: Path,
+) -> None:
+    resource_root = tmp_path / "data"
+    shutil.copytree(DATA_ROOT, resource_root)
+    trust_record_path = (
+        resource_root / "playbook-plan-contours-trust-record.v1.json"
+    )
+    trust_record = json.loads(trust_record_path.read_text(encoding="utf-8"))
+    trust_record["controls"]["required"].reverse()
+    trust_record["controls"]["verified"].reverse()
+    trust_record_path.write_text(
+        json.dumps(trust_record, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+    trust_record_digest = (
+        "sha256:" + hashlib.sha256(trust_record_path.read_bytes()).hexdigest()
+    )
+    lock_path = resource_root / "playbook-plan-contours-source-lock.v1.json"
+    lock = json.loads(lock_path.read_text(encoding="utf-8"))
+    lock["trust_admission"]["record_artifact_digest"] = trust_record_digest
+    lock_path.write_text(
+        json.dumps(lock, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
+    )
+
+    snapshot = load_plan_compilation_snapshot(resource_root=resource_root)
+
+    assert snapshot.source_lock.trust_admission.required_controls == (
+        "abi_signature",
+        "slsa_in_toto",
+    )
+    assert snapshot.source_lock.trust_admission.verified_controls == (
+        "abi_signature",
+        "slsa_in_toto",
+    )
 
 
 def test_pin_reader_rejects_escape_and_symlink_inputs(tmp_path: Path) -> None:
@@ -817,6 +860,18 @@ def test_packaged_contour_or_lock_tampering_fails_closed(
     with pytest.raises(
         PlanCompilationSnapshotError,
         match="digest mismatch",
+    ):
+        load_plan_compilation_snapshot(resource_root=resource_root)
+
+    shutil.rmtree(resource_root)
+    shutil.copytree(DATA_ROOT, resource_root)
+    trust_record_path = (
+        resource_root / "playbook-plan-contours-trust-record.v1.json"
+    )
+    trust_record_path.write_bytes(trust_record_path.read_bytes() + b" ")
+    with pytest.raises(
+        PlanCompilationSnapshotError,
+        match="packaged playbook trust record digest mismatch",
     ):
         load_plan_compilation_snapshot(resource_root=resource_root)
 

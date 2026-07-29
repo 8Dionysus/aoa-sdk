@@ -16,14 +16,14 @@
   ],
   "properties": {
     "schema_version": {
-      "const": "aoa_sdk_routing_succession_e1_cost_comparison_v1"
+      "const": "aoa_sdk_routing_succession_e1_cost_comparison_v2"
     },
     "observed_on": {
       "type": "string",
       "format": "date"
     },
     "status": {
-      "const": "provisional_pass_pending_landed_ci_observation"
+      "const": "complete_mixed_verdict"
     },
     "scope": {
       "type": "object",
@@ -74,9 +74,11 @@
         "new_chain_scenarios_verified",
         "g11_complete_to_rightful_stop_boundary",
         "central_aoa_evals_verdict_claimed",
-        "process_cost_reduction_claimed",
+        "structural_process_cost_reduction_claimed",
+        "direct_ci_runner_time_reduction_claimed",
         "task_latency_reduction_claimed",
         "post_landing_ci_failure_rate_reduction_claimed",
+        "assurance_removed_to_reduce_ci_time",
         "consumer_zero_claimed",
         "rollback_retired_claimed",
         "archive_ready_claimed",
@@ -88,16 +90,24 @@
       "type": "object",
       "required": [
         "structural_process_cost_reduced",
+        "direct_ci_runner_time_reduced",
+        "direct_ci_runner_time_regression_fraction",
         "typed_agent_process_capability_increased",
         "bounded_no_regression_signal",
         "g13_gate",
-        "remaining_e1_observation",
+        "growth_source",
         "claim_limit"
       ],
       "additionalProperties": false,
       "properties": {
         "structural_process_cost_reduced": {
           "const": true
+        },
+        "direct_ci_runner_time_reduced": {
+          "const": false
+        },
+        "direct_ci_runner_time_regression_fraction": {
+          "const": 0.231
         },
         "typed_agent_process_capability_increased": {
           "const": true
@@ -106,11 +116,11 @@
           "const": true
         },
         "g13_gate": {
-          "const": "provisional_pass"
+          "const": "pass_with_ci_runner_time_regression"
         },
-        "remaining_e1_observation": {
+        "growth_source": {
           "type": "string",
-          "minLength": 20
+          "minLength": 80
         },
         "claim_limit": {
           "type": "string",

@@ -199,8 +199,8 @@
       "terminal_required": true
     }
   ],
-  "plan_digest": "sha256:b741ba16f05cadf4c7eb347dc124bed4c3d7947d4e34fb58e7198bef354152ed",
-  "plan_id": "run-plan:19c80ec3d9987d2a060986489f6fb5aaa090e7b6dfa55f5fa8f925db4397e12b",
+  "plan_digest": "sha256:22a3413b126a90cd5b250eeea3bc7c7a63e5504214df89d01eea3ac491ddb648",
+  "plan_id": "run-plan:ac1c45cf74efff5c6c8e40568e17f9c1cf21e690ee3667e65c69ff99152f64ea",
   "provenance": {
     "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
     "artifact_ref": "src/aoa_sdk/control_plane/planning/compiler.py",
@@ -524,8 +524,8 @@
         "source_ref": "f9e638395e86be8556e3579ab4ad5bf358e9499e"
       }
     ],
-    "snapshot_digest": "sha256:e01ec1929124d605af909c2e8531fda7c2b7ecf2c2f11f94bd13631f25d1a3f6",
-    "snapshot_id": "plan-snapshot:602e904af656b4dec6e7a00823df459fc5fea4485404dc2e2f8e811c2b218385",
+    "snapshot_digest": "sha256:3f96c0f4199b29e39ab8e68c469f249796e5d328c41c19b6a1521593438f2101",
+    "snapshot_id": "plan-snapshot:921305d10c2c40c33da02e96c0375533ef004650edd70e0583a83a7a33435fb2",
     "source_refs": [
       {
         "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",
@@ -592,14 +592,6 @@
         "source_ref": "fixture-source-ref"
       },
       {
-        "artifact_digest": "sha256:9185da1e28bd04d77cc6bd6db688be8b209bb40a73c98b71fc1955b2fb1cf43e",
-        "artifact_ref": "dist/abyss-artifact-registry/aoa-playbooks-playbook-registry/records/53fe0bf88dd48f5d2eb57831dd9350ced0935de6f6a8a5ee89fae8cb8a3c3776.json",
-        "owner_repo": "aoa-playbooks",
-        "schema_ref": "abyss-machine:artifact-bundle-registry-record",
-        "schema_version": "abyss_machine_artifact_bundle_registry_record_v1",
-        "source_ref": "sha256:53fe0bf88dd48f5d2eb57831dd9350ced0935de6f6a8a5ee89fae8cb8a3c3776"
-      },
-      {
         "artifact_digest": "sha256:58145fb4fe85aaba0168904550722e188055539b10963013966293f430e5be25",
         "artifact_ref": "generated/playbook_plan_contours.min.json",
         "owner_repo": "aoa-playbooks",
@@ -630,6 +622,14 @@
         "schema_ref": "schemas/fixture.schema.json",
         "schema_version": "fixture-v1",
         "source_ref": "fixture-source-ref"
+      },
+      {
+        "artifact_digest": "sha256:9185da1e28bd04d77cc6bd6db688be8b209bb40a73c98b71fc1955b2fb1cf43e",
+        "artifact_ref": "src/aoa_sdk/control_plane/planning/data/playbook-plan-contours-trust-record.v1.json",
+        "owner_repo": "aoa-sdk",
+        "schema_ref": "abyss-machine:artifact-bundle-registry-record",
+        "schema_version": "abyss_machine_artifact_bundle_registry_record_v1",
+        "source_ref": "sha256:53fe0bf88dd48f5d2eb57831dd9350ced0935de6f6a8a5ee89fae8cb8a3c3776"
       },
       {
         "artifact_digest": "sha256:0000000000000000000000000000000000000000000000000000000000000000",

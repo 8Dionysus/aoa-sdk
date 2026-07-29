@@ -21,6 +21,7 @@ from ...errors import AoASDKError
 LOCK_RESOURCE = "playbook-plan-contours-source-lock.v1.json"
 CONTOUR_RESOURCE = "playbook-plan-contours.v1.json"
 SCHEMA_RESOURCE = "playbook-plan-contours.schema.json"
+TRUST_RECORD_RESOURCE = "playbook-plan-contours-trust-record.v1.json"
 _OID_RE = re.compile(r"^[0-9a-f]{40}$")
 _REQUIRED_CONTROLS = frozenset({"abi_signature", "slsa_in_toto"})
 
@@ -43,6 +44,7 @@ class _TrustAdmission(_StrictModel):
     verdict: Literal["allow"]
     record_id: Digest
     record_artifact_digest: Digest
+    packaged_resource: Literal["playbook-plan-contours-trust-record.v1.json"]
     latest_record_id: Digest
     latest_required: Literal[True]
     subject_store_required: Literal[True]
@@ -398,6 +400,10 @@ def load_plan_compilation_snapshot(
     lock_raw = _read_resource(LOCK_RESOURCE, resource_root=resource_root)
     contour_raw = _read_resource(CONTOUR_RESOURCE, resource_root=resource_root)
     schema_raw = _read_resource(SCHEMA_RESOURCE, resource_root=resource_root)
+    trust_record_raw = _read_resource(
+        TRUST_RECORD_RESOURCE,
+        resource_root=resource_root,
+    )
     try:
         source_lock = PlanContourSourceLock.model_validate(
             _decode_object(lock_raw, "plan-contour source lock")
@@ -417,6 +423,12 @@ def load_plan_compilation_snapshot(
         source_lock.schema_resource.artifact_digest,
         "packaged plan-contour schema",
     )
+    _assert_digest(
+        trust_record_raw,
+        source_lock.trust_admission.record_artifact_digest,
+        "packaged playbook trust record",
+    )
+    _validate_packaged_trust_record(source_lock, trust_record_raw)
     contour_payload = _decode_object(contour_raw, "packaged plan contours")
     schema_payload = _decode_object(schema_raw, "packaged plan-contour schema")
     try:
@@ -473,11 +485,10 @@ def load_plan_compilation_snapshot(
     )
     admission = source_lock.trust_admission
     admission_provenance = ProvenanceRef(
-        owner_repo="aoa-playbooks",
+        owner_repo="aoa-sdk",
         artifact_ref=(
-            "dist/abyss-artifact-registry/"
-            "aoa-playbooks-playbook-registry/records/"
-            f"{admission.record_id.removeprefix('sha256:')}.json"
+            "src/aoa_sdk/control_plane/planning/data/"
+            f"{admission.packaged_resource}"
         ),
         source_ref=admission.record_id,
         artifact_digest=admission.record_artifact_digest,
@@ -491,6 +502,7 @@ def load_plan_compilation_snapshot(
         "schema_digest": _sha256(schema_raw),
         "trust_record_id": admission.record_id,
         "trust_record_artifact_digest": admission.record_artifact_digest,
+        "packaged_trust_record_digest": _sha256(trust_record_raw),
         "subject_store_aggregate_digest": (admission.subject_store_aggregate_digest),
     }
     return PlanCompilationSnapshot(
@@ -525,6 +537,55 @@ def _validate_admission(source_lock: PlanContourSourceLock) -> None:
         raise PlanCompilationSnapshotError(
             "plan-contour owner source ref must be an exact Git object id"
         )
+
+
+def _validate_packaged_trust_record(
+    source_lock: PlanContourSourceLock,
+    raw: bytes,
+) -> None:
+    record = _decode_object(raw, "packaged playbook trust record")
+    admission = source_lock.trust_admission
+    subject_store = record.get("artifact_subject_store")
+    controls = record.get("controls")
+    if (
+        record.get("schema")
+        != "abyss_machine_artifact_bundle_registry_record_v1"
+        or record.get("record_id") != admission.record_id
+        or record.get("artifact_class") != source_lock.artifact_class
+        or record.get("source_repo") != source_lock.owner_repo
+        or record.get("verification_ok") is not True
+        or record.get("latest_eligible") is not True
+        or record.get("terminal_state") is not False
+        or not isinstance(subject_store, dict)
+        or subject_store.get("required") is not True
+        or subject_store.get("ok") is not True
+        or subject_store.get("aggregate_digest")
+        != admission.subject_store_aggregate_digest
+        or not isinstance(controls, dict)
+        or not _control_collection_matches(
+            controls.get("required"),
+            admission.required_controls,
+        )
+        or not _control_collection_matches(
+            controls.get("verified"),
+            admission.verified_controls,
+        )
+    ):
+        raise PlanCompilationSnapshotError(
+            "packaged playbook trust record does not match its source lock"
+        )
+
+
+def _control_collection_matches(
+    actual: Any,
+    expected: tuple[str, ...],
+) -> bool:
+    return (
+        isinstance(actual, list)
+        and all(isinstance(item, str) for item in actual)
+        and len(actual) == len(set(actual))
+        and set(actual) == set(expected)
+    )
 
 
 def _read_resource(

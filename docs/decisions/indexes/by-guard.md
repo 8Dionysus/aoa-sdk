@@ -71,6 +71,7 @@
 - [AOA-SDK-D-0073 - Replay Release Evidence From an Immutable Tag](../AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md) (`docs/decisions/AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md`)
 - [AOA-SDK-D-0074 - Use a Cross-zlib Canonical Release Carrier](../AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md) (`docs/decisions/AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md`)
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 
 ## bounded context
 
@@ -195,6 +196,7 @@
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
 - [AOA-SDK-D-0089 - Project Runtime Approvals Before Plan Compilation](../AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md`)
 - [AOA-SDK-D-0090 - Bind Owner Result Review After Runtime Capture](../AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md) (`docs/decisions/AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md`)
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 
 ## exact recovery
 
@@ -484,6 +486,10 @@
 - [AOA-SDK-D-0061 - Checkpoint Lifecycle Close Archive](../AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md) (`docs/decisions/AOA-SDK-D-0061-checkpoint-lifecycle-close-archive.md`)
 - [AOA-SDK-D-0062 - Checkpoint No-Closeout Session Reconcile](../AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md) (`docs/decisions/AOA-SDK-D-0062-checkpoint-no-closeout-session-reconcile.md`)
 
+## portability
+
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
+
 ## profile parity
 
 - [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
@@ -653,6 +659,7 @@
 - [AOA-SDK-D-0077 - Resolve Agent OS Routes from Receipt-bound Owner Projections](../AOA-SDK-D-0077-route-resolution-from-owner-projections.md) (`docs/decisions/AOA-SDK-D-0077-route-resolution-from-owner-projections.md`)
 - [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 
 ## source ref preservation
 

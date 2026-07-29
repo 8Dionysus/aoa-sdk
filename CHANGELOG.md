@@ -9,6 +9,14 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
+- Add future changes here after the release tag lands.
+- Dated release sections own exact reconciliation spans, complete commit
+  inventories, and validation evidence.
+
+## [0.9.0] - 2026-07-29
+
+### Summary
+
 - Add C1 Agent OS route resolution: `AoASDK.control_plane.resolve()` and
   `.explain()`, plus `aoa route resolve|explain|validate`.
 - Bind deterministic skill candidate selection to the exact SDK-canonical G5
@@ -43,6 +51,9 @@ Tracking starts with the community-docs baseline for this repository.
 - Separate the playbook trust record's logical `record_id` from the SHA-256 of
   its delivered registry JSON bytes, so exact runtime snapshot observation
   can consume a public compiler plan without rewriting provenance.
+- Package those exact public-safe trust-record bytes as a lower-authority SDK
+  delivery projection, so clean installed-wheel runtime observation does not
+  require ephemeral `aoa-playbooks` registry state.
 - Add C3 `AoASDK.runner` and `aoa_control_plane_runner_v1`: immutable session
   preparation, explicit adapter binding, runtime snapshot observation,
   approval round trips, bounded recovery, idempotent commands, append-only
@@ -88,11 +99,44 @@ Tracking starts with the community-docs baseline for this repository.
 - Add the reproducible E1 cost comparison: workflow checkout actions fall
   73 to 23, active producer control planes fall 2 to 1, and the clean
   route-bind-compile federation falls from a 15–16-root maintenance lower
-  bound to six owner roots. G13 remains provisional until landed CI supplies
-  comparable lead-time, runner-minute, and failure-rate evidence.
-- Add future changes here after the release tag lands.
-- Dated release sections own exact reconciliation spans, complete commit
-  inventories, and validation evidence.
+  bound to six owner roots. Four landed main runs complete G13 with a mixed
+  verdict: the single-SDK median is 210.5 runner seconds, 23.1% slower than
+  the old paired 171-second median because portable KAG and expanded
+  package/trust/control-plane gates add assurance; no direct CI-time or
+  failure-rate reduction is claimed.
+
+### Reconciliation Basis
+
+- The landed first-parent range before this release-prep branch is
+  `v0.8.0..780ac06`: ten commits, PRs #229-#231 and #233-#239, covering the
+  C1-C5 control-plane, owner projection bindings, explicit runtime transport,
+  G11 evidence, and retirement of active predecessor release/CI dependencies.
+- This release-prep branch adds `AOA-SDK-D-0091`, the durable packaged
+  trust-record projection, the completed E1 mixed verdict, exact installed
+  package compatibility, and post-repair Agent OS lifecycle proof.
+- `v0.9.0` is a minor release because it publishes new control-plane APIs and
+  Runner behavior while preserving `aoa_routing_thin_router_v1` and its
+  fourteen compatibility paths.
+
+### Validation
+
+- The full SDK release gate covers source and mechanics topology, decision and
+  portable KAG parity, tests, Ruff, mypy, wheel/sdist build, installed routing,
+  plan, Runner, evidence-chain, and Agon probes, plus OS Abyss artifact trust.
+- Exact `v0.8.0 -> v0.9.0 -> v0.8.0 -> v0.9.0` package install,
+  upgrade, downgrade, and restore passes without an `aoa-routing` checkout.
+- Three exact-wheel Agent OS cycles cover governed execution, typed A2A
+  return, degradation pause/restore/resume, and evidence-complete closeout
+  after the D-0091 portability repair.
+
+### Notes
+
+- Runtime owners still execute model and tool work; the SDK remains a
+  deterministic lifecycle client and evidence-chain validator.
+- E1 is intentionally mixed: structural maintenance cost falls, while the
+  directly comparable median CI runner time regresses by 23.1%.
+- X1 consumer-zero, compatibility exit, and any irreversible predecessor
+  action remain separately evidenced and operator-gated.
 
 ## [0.8.0] - 2026-07-26
 

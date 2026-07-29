@@ -11,7 +11,7 @@ This README is the public front door. When work becomes operational,
 source-authored, generated, mechanic-local, release-facing, or agent-facing,
 follow the linked owner surface instead of expanding this page.
 
-> Current release: `v0.8.0`. See [CHANGELOG](CHANGELOG.md) for release notes.
+> Current release: `v0.9.0`. See [CHANGELOG](CHANGELOG.md) for release notes.
 
 ## What This Repository Does
 
@@ -131,11 +131,12 @@ The current landed surface includes:
   the SDK-delivered runtime bundle, `aoa-routing` is optional workspace state,
   paired predecessor CI/release dependencies are inactive, and the predecessor
   remains available only for compatibility and rollback;
-- the provisional
+- the completed mixed-verdict
   [E1 cost comparison](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-e1-cost-comparison.md),
   which proves structural workflow, checkout, release, and repository-context
-  reduction while leaving direct latency, token, landed-CI, and consumer-zero
-  claims open;
+  reduction, exposes a 23.1% landed median CI runner-time regression, and
+  leaves direct task-latency, token, long-run reliability, and consumer-zero
+  claims outside E1;
 - the callable
   [C1 route resolution control plane](mechanics/boundary-bridge/parts/route-resolution-control-plane/README.md),
   which validates the exact live G5 snapshot, intersects routing entries with

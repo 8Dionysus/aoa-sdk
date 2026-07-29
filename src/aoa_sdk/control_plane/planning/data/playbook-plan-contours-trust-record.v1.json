@@ -1,0 +1,123 @@
+{
+  "abi_ref": "generated/contract_abi_signatures.min.json",
+  "abi_subject_digest": "sha256:3ad131e72b65cbfd1352ea95710c772c20b2d4dead78d4b32fde2813acd80114",
+  "access_policy": null,
+  "artifact_class": "playbook_registry_bundle",
+  "artifact_subject_store": {
+    "aggregate_digest": "sha256:d7e13ad2c76e2530f3b5a5348de7a69a3caac19fef9cf27c340e2bfa00bcd554",
+    "files": 18,
+    "ok": true,
+    "path": "dist/abyss-artifact-subjects/aoa-playbooks-playbook-registry/playbook_registry_bundle/d7e13ad2c76e2530f3b5a5348de7a69a3caac19fef9cf27c340e2bfa00bcd554",
+    "path_basis": "local_host_state",
+    "required": true
+  },
+  "artifact_subjects_digest": "sha256:d7e13ad2c76e2530f3b5a5348de7a69a3caac19fef9cf27c340e2bfa00bcd554",
+  "bundle_layout": "abyss_machine_artifact_bundle_v1",
+  "bundle_manifest_ref": "docs/artifact-bundles/playbook_registry.bundle.json",
+  "bundle_ref": "aoa-playbooks-playbook-registry",
+  "consumer_contract": {
+    "admission_gate": "fail_closed_consumer_admission",
+    "consumer_expectation": "Playbook consumers select a playbook_registry_bundle from the registry latest read-model only after ABI verification, SLSA/in-toto provenance, durable evidence promotion, materialized subject-store verification, validate_playbooks, generated parity, and owner-boundary checks pass.",
+    "consumer_verdict": "allow_or_deny_required_before_use",
+    "registry_required": true,
+    "stable_interface": "python scripts/validate_abyss_machine_playbook_bundle.py --json and abyss-machine artifacts trust-gate --artifact-class playbook_registry_bundle --consumer-intent agent --json",
+    "subject_store_required": true
+  },
+  "consumer_expectation": "playbook consumers verify registry digests, ABI identity, SLSA/in-toto generation provenance, validate_playbooks, generated surface parity, and owner boundaries before using playbook scenario metadata",
+  "consumer_refs": [
+    "aoa-playbooks:playbook-registry"
+  ],
+  "contract_surface_id": null,
+  "controls": {
+    "present": [
+      "abi_signature",
+      "slsa_in_toto"
+    ],
+    "required": [
+      "abi_signature",
+      "slsa_in_toto"
+    ],
+    "verified": [
+      "abi_signature",
+      "slsa_in_toto"
+    ]
+  },
+  "created_at": "2026-07-28T12:10:15Z",
+  "evidence_refs": [
+    "materialized-subject-store"
+  ],
+  "external_artifact_identity": {
+    "abi_epoch": "aoa_playbooks_registry_bundle_v1",
+    "artifact_class": "playbook_registry_bundle",
+    "authority_ref": "README.md#current-public-surfaces",
+    "consumer_expectation": "playbook consumers verify registry digests, ABI identity, SLSA/in-toto generation provenance, validate_playbooks, generated surface parity, and owner boundaries before using playbook scenario metadata",
+    "content_identity": "generated/playbook_registry.min.json plus playbook-owned generated composition, activation, review, and federation surfaces",
+    "contract_version": "schemas/playbook-registry.schema.json@aoa_playbooks_registry_bundle_v1#artifact_identity",
+    "owner_repo": "aoa-playbooks",
+    "privacy_boundary": "public playbook metadata and generated playbook-owned composition/readout refs only; no private run logs, secrets, live runtime state, memo truth, proof verdicts, or routing authority",
+    "producer": "aoa-playbooks source-authored registry plus deterministic playbook-owned surface generators",
+    "surface_state": "public_source_authored_playbook_registry",
+    "trust_layer": [
+      "abi_contract_signature",
+      "slsa_in_toto"
+    ],
+    "verification": [
+      "python scripts/validate_playbooks.py",
+      "python scripts/release_check.py",
+      "abyss-machine artifacts verify BUNDLE_DIR --json"
+    ]
+  },
+  "latest_eligible": true,
+  "lifecycle_state": "release-ready",
+  "policy_ref": "manifests/artifact_signature_policy.manifest.json",
+  "present_controls": [
+    "abi_signature",
+    "slsa_in_toto"
+  ],
+  "privacy_boundary": "public playbook metadata and generated playbook-owned composition/readout refs only; no private run logs, secrets, live runtime state, memo truth, proof verdicts, or routing authority",
+  "producer": "aoa-playbooks playbook registry generator from reviewed scenario canon",
+  "producer_command": "python scripts/validate_abyss_machine_playbook_bundle.py",
+  "record_id": "sha256:53fe0bf88dd48f5d2eb57831dd9350ced0935de6f6a8a5ee89fae8cb8a3c3776",
+  "required_controls": [
+    "abi_signature",
+    "slsa_in_toto"
+  ],
+  "revocation_reason": "",
+  "schema": "abyss_machine_artifact_bundle_registry_record_v1",
+  "signature_required": false,
+  "signature_status": "not_required",
+  "source_ref": "docs/artifact-bundles/playbook_registry.bundle.json",
+  "source_refs": [
+    "manifests/artifact_signature_policy.manifest.json",
+    "generated/playbook_registry.min.json",
+    "docs/artifact-bundles/playbook_registry.bundle.json"
+  ],
+  "source_repo": "aoa-playbooks",
+  "subject_digest": "sha256:ba4b6ebf9de2b35461e55a768d7d03c0aa7a4f0c41a07791a4a2c09a41b069dc",
+  "supersedes": [],
+  "terminal_state": false,
+  "trust_domain": null,
+  "trust_root_evidence": {},
+  "trust_root_mode": "host_managed",
+  "verification_errors": [],
+  "verification_missing": [],
+  "verification_ok": true,
+  "verification_warnings": [],
+  "verified_controls": [
+    "abi_signature",
+    "slsa_in_toto"
+  ],
+  "verifier_versions": {
+    "abi": {
+      "ref": "generated/contract_abi_signatures.min.json"
+    },
+    "artifact_bundle_verifier": {
+      "bundle_layout": "abyss_machine_artifact_bundle_v1",
+      "id": "abyss-machine.artifact_bundles.verify_bundle",
+      "schema": "abyss_machine_artifact_bundle_verify_v1"
+    },
+    "policy": {
+      "ref": "manifests/artifact_signature_policy.manifest.json"
+    }
+  }
+}

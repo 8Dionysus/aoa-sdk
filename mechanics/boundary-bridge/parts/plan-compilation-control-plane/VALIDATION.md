@@ -31,7 +31,8 @@ owner repositories linked into a disposable federation and explicitly omits
 an `aoa-routing` checkout.
 
 The focused suite additionally covers repeatability, exact trust/source pins,
-distinct trust-record logical and delivered-byte identities,
+distinct trust-record logical and delivered-byte identities, immutable
+package delivery of the exact admitted trust record,
 generic versus kind-selected inputs, no positional guessing, missing/extra
 conditions, exact requirement refs, owner identity order, route snapshot
 drift, absent selected scenario, direct graph binding, legacy

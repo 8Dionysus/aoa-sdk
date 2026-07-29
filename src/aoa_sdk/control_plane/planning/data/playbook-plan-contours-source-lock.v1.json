@@ -29,6 +29,7 @@
     "consumer_intent": "agent",
     "latest_record_id": "sha256:53fe0bf88dd48f5d2eb57831dd9350ced0935de6f6a8a5ee89fae8cb8a3c3776",
     "latest_required": true,
+    "packaged_resource": "playbook-plan-contours-trust-record.v1.json",
     "record_artifact_digest": "sha256:9185da1e28bd04d77cc6bd6db688be8b209bb40a73c98b71fc1955b2fb1cf43e",
     "record_id": "sha256:53fe0bf88dd48f5d2eb57831dd9350ced0935de6f6a8a5ee89fae8cb8a3c3776",
     "required_controls": [

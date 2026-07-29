@@ -81,6 +81,7 @@
 ## artifact trust
 
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 
 ## boundary-bridge
 
@@ -156,6 +157,7 @@
 
 - [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 
 ## control-plane contract
 
@@ -355,6 +357,7 @@
 ## package data
 
 - [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 
 ## parent boundary
 
@@ -381,6 +384,7 @@
 
 - [AOA-SDK-D-0073 - Replay Release Evidence From an Immutable Tag](../AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md) (`docs/decisions/AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md`)
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
+- [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 
 ## public API
 

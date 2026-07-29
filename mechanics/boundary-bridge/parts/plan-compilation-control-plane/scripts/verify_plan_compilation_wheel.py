@@ -21,6 +21,7 @@ REPO_ROOT = PART_ROOT.parents[3]
 EXAMPLE_ROOT = PART_ROOT / "examples"
 EXPECTED_RESOURCES = {
     "playbook-plan-contours-source-lock.v1.json",
+    "playbook-plan-contours-trust-record.v1.json",
     "playbook-plan-contours.schema.json",
     "playbook-plan-contours.v1.json",
 }

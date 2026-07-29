@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 14011024,
+  "allowed_tracked_bytes": 19021165,
+  "approved_by": "repository-owner",
+  "base_ref": "780ac06d1739246d6402445e6ec43ef39a97b90a",
+  "changed_generated_bytes": 14011024,
+  "changed_generated_files": 287,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "8d6e7d7402af8c6f74165b1caa29267805db7f633e0736d73ff64f6a5b862405",
+  "reason": "Final routing succession evidence and the packaged trust-record delivery projection change source identities across the deterministic portable family; the full owner-index refresh is required.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19021165,
+  "tracked_bytes_max": 15728640
+}
