@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 7803233,
+  "allowed_tracked_bytes": 19098319,
+  "approved_by": "repository-owner",
+  "base_ref": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
+  "changed_generated_bytes": 7803233,
+  "changed_generated_files": 158,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "9c3ee49c91560dd3d5983e251e3dea341e3d30c3c1ff9b41b897c40fcd2e52f9",
+  "reason": "Final X1 consumer-zero evidence adds the immutable-tag release replay, exact package and Agent OS proof, compatibility exit, and archive-readiness boundary.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19098319,
+  "tracked_bytes_max": 15728640
+}

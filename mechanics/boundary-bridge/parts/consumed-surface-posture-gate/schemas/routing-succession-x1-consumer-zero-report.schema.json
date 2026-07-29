@@ -1,0 +1,1658 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/8Dionysus/aoa-sdk/blob/main/mechanics/boundary-bridge/parts/consumed-surface-posture-gate/schemas/routing-succession-x1-consumer-zero-report.schema.json",
+  "title": "AoA SDK routing succession X1 consumer-zero report",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "schema_version",
+    "observed_at_utc",
+    "status",
+    "scope",
+    "consumer_accounting",
+    "landed_consumers",
+    "zero_reference_repositories",
+    "allowed_residuals",
+    "direct_dependency_census",
+    "post_landing_validation",
+    "package_compatibility",
+    "agent_os_execution_window",
+    "live_runtime_evidence",
+    "e1_outcome",
+    "compatibility_exit",
+    "predecessor",
+    "remaining_external_gates",
+    "verdict"
+  ],
+  "properties": {
+    "schema_version": {
+      "const": "aoa_sdk_routing_succession_x1_consumer_zero_report_v1"
+    },
+    "observed_at_utc": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "status": {
+      "const": "postmerge_validation_pending"
+    },
+    "scope": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "r0_baseline_ref",
+        "r0_baseline_sha256",
+        "candidate_ref",
+        "candidate_sha256",
+        "sdk_landed_control_plane_ref",
+        "sdk_final_evidence_ref",
+        "observation_class",
+        "claim_boundary"
+      ],
+      "properties": {
+        "r0_baseline_ref": {
+          "const": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json"
+        },
+        "r0_baseline_sha256": {
+          "const": "sha256:ee28bc71bd083c0e1a35ca42ea0debb326d8f1ca312189a9c854de447e0b8219"
+        },
+        "candidate_ref": {
+          "const": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-x1-consumer-zero-candidate.json"
+        },
+        "candidate_sha256": {
+          "const": "sha256:4cbeb2945940e3a760c37e47dc0ff56d9e533155b66aca05ddf8baad5e3eaf21"
+        },
+        "sdk_landed_control_plane_ref": {
+          "const": "780ac06d1739246d6402445e6ec43ef39a97b90a"
+        },
+        "sdk_final_evidence_ref": {
+          "const": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7"
+        },
+        "observation_class": {
+          "const": "exact landed main refs, owner PR and CI evidence, immutable-tag release replay artifacts, exact installed wheels, live SDK-canonical runtime health, and post-repair Agent OS lifecycle cycles"
+        },
+        "claim_boundary": {
+          "const": "X1 proves landed direct-checkout consumer-zero, compatibility exit, operational predecessor rollback retirement, and every substantive archive-readiness prerequisite, but keeps archive readiness pending its own successful post-merge main validation receipt. It does not authorize a deprecation release, repository metadata mutation, GitHub archival, deletion, rename, or any other irreversible predecessor action."
+        }
+      }
+    },
+    "consumer_accounting": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "r0_registered_consumers",
+        "post_r0_discovered_consumers",
+        "total_accounted_consumers",
+        "landed_migrations",
+        "unchanged_classifications",
+        "all_known_consumers_accounted",
+        "all_known_consumers_landed_or_classified"
+      ],
+      "properties": {
+        "r0_registered_consumers": {
+          "const": 16
+        },
+        "post_r0_discovered_consumers": {
+          "const": 1
+        },
+        "total_accounted_consumers": {
+          "const": 17
+        },
+        "landed_migrations": {
+          "const": 13
+        },
+        "unchanged_classifications": {
+          "const": 4
+        },
+        "all_known_consumers_accounted": {
+          "const": true
+        },
+        "all_known_consumers_landed_or_classified": {
+          "const": true
+        }
+      }
+    },
+    "landed_consumers": {
+      "type": "array",
+      "minItems": 17,
+      "maxItems": 17,
+      "uniqueItems": true,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-sdk"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "abyss-stack"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-kag"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-stats"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-agents"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-evals"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "Tree-of-Sophia"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-playbooks"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "Agents-of-Abyss"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "8Dionysus"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-techniques"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-memo"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-skills"
+                },
+                "change_mode": {
+                  "const": "landed_migration"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "abyss-machine"
+                },
+                "change_mode": {
+                  "const": "unchanged_classification"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "Dionysus"
+                },
+                "change_mode": {
+                  "const": "unchanged_classification"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-session-memory"
+                },
+                "change_mode": {
+                  "const": "unchanged_classification"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/consumer"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "ATM10-Agent"
+                },
+                "change_mode": {
+                  "const": "unchanged_classification"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    },
+    "zero_reference_repositories": {
+      "type": "array",
+      "minItems": 7,
+      "maxItems": 7,
+      "uniqueItems": true,
+      "prefixItems": [
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-4pda-connector"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-course-connector"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-discord-connector"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-editing"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-stackoverflow-connector"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-telegram-connector"
+                }
+              }
+            }
+          ]
+        },
+        {
+          "allOf": [
+            {
+              "$ref": "#/$defs/classification"
+            },
+            {
+              "properties": {
+                "repo": {
+                  "const": "aoa-xda-connector"
+                }
+              }
+            }
+          ]
+        }
+      ],
+      "items": false
+    },
+    "allowed_residuals": {
+      "const": [
+        "the stable aoa-routing artifact namespace and ABI name preserved for consumers",
+        "aoa-routing repository self-identity and its maintenance-only release contract",
+        "historical decisions, baselines, releases, reviewed run records, and public provenance",
+        "explicit compatibility and predecessor rollback fixtures used only by bounded historical replay",
+        "negative tests and validators that reject active predecessor checkout dependencies",
+        "artifact-trust, donor-ledger, and source-intake provenance that must remain immutable",
+        "session-memory naming fixtures whose literal wording is the object under test",
+        "generated KAG and audit projections derived from one of the allowed authored residual classes"
+      ]
+    },
+    "direct_dependency_census": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "patterns",
+        "current_main_heads_checked",
+        "active_direct_predecessor_checkout_dependencies",
+        "post_candidate_drift_rescanned",
+        "drifted_heads_rescanned",
+        "result",
+        "claim_limit"
+      ],
+      "properties": {
+        "patterns": {
+          "const": [
+            "AOA_ROUTING_ROOT",
+            "/srv/AbyssOS/aoa-routing",
+            "github.com/8Dionysus/aoa-routing",
+            "repository: 8Dionysus/aoa-routing"
+          ]
+        },
+        "current_main_heads_checked": {
+          "const": 24
+        },
+        "active_direct_predecessor_checkout_dependencies": {
+          "const": 0
+        },
+        "post_candidate_drift_rescanned": {
+          "const": true
+        },
+        "drifted_heads_rescanned": {
+          "const": [
+            {
+              "repo": "abyss-stack",
+              "current_main_ref": "5fb7d6925ff502ac0b29f2213b42f27d22b6b083",
+              "result": "mcp_identity_and_session_memory_timeout_drift_zero_active_dependency"
+            },
+            {
+              "repo": "aoa-course-connector",
+              "current_main_ref": "5a5219ef027df029313fc527c71a8764cfbd193e",
+              "result": "zero_reference"
+            },
+            {
+              "repo": "aoa-evals",
+              "current_main_ref": "58bf49d374b008ef6625a9fd6893c61096777b4d",
+              "result": "history_fixture_and_negative_validator_only"
+            },
+            {
+              "repo": "aoa-memo",
+              "current_main_ref": "c7c83081b7db0a0e908f14888b7438b5ecdde3bf",
+              "result": "zero_active_dependency"
+            },
+            {
+              "repo": "aoa-stats",
+              "current_main_ref": "5627c41efe9f766a4b3437da857060847cb4f0f1",
+              "result": "zero_active_dependency"
+            }
+          ]
+        },
+        "result": {
+          "const": "landed_consumer_zero"
+        },
+        "claim_limit": {
+          "const": "Literal predecessor names remain only in the allowed residual classes; consumer-zero means no current executable checkout, environment-root, CI clone, generation, runtime, or release dependency."
+        }
+      }
+    },
+    "post_landing_validation": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "pre_migration_sdk_main_success_cycles",
+        "sdk_main_success_cycles",
+        "required_sdk_main_success_cycles",
+        "consumer_owner_landings",
+        "aoa_kag_postmerge",
+        "release_artifact_replay",
+        "strict_postpublish_audit_passed",
+        "x1_report_postmerge_validation",
+        "all_required_validation_green"
+      ],
+      "properties": {
+        "pre_migration_sdk_main_success_cycles": {
+          "type": "array",
+          "minItems": 3,
+          "maxItems": 3,
+          "prefixItems": [
+            {
+              "const": {
+                "run_id": 30369543263,
+                "head_sha": "ac6c1e5f7dd824ebaa6a583c4bb8965e3ca194a0",
+                "runner_seconds": 213,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30369543263"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30422604505,
+                "head_sha": "eda623ecd8a77606414a29ea7102369e369b95be",
+                "runner_seconds": 208,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30422604505"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30428491862,
+                "head_sha": "cbf225627f9f28d0470deb8a962ae12d1fe72375",
+                "runner_seconds": 214,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30428491862"
+              }
+            }
+          ],
+          "items": false
+        },
+        "sdk_main_success_cycles": {
+          "type": "array",
+          "minItems": 5,
+          "maxItems": 5,
+          "prefixItems": [
+            {
+              "const": {
+                "run_id": 30443863477,
+                "head_sha": "780ac06d1739246d6402445e6ec43ef39a97b90a",
+                "runner_seconds": 199,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30443863477"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30450724848,
+                "head_sha": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb",
+                "runner_seconds": 218,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30450724848"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30452734159,
+                "head_sha": "0d9efa61e3ab1fd3abf8facdd194a1b2025193b6",
+                "runner_seconds": 220,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30452734159"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30453859729,
+                "head_sha": "35e01329763d68e148144d9f5b4be4bce43446b8",
+                "runner_seconds": 213,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30453859729"
+              }
+            },
+            {
+              "const": {
+                "run_id": 30455955079,
+                "head_sha": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
+                "runner_seconds": 205,
+                "conclusion": "success",
+                "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30455955079"
+              }
+            }
+          ],
+          "items": false
+        },
+        "required_sdk_main_success_cycles": {
+          "const": 2
+        },
+        "consumer_owner_landings": {
+          "type": "array",
+          "minItems": 13,
+          "maxItems": 13,
+          "uniqueItems": true,
+          "items": {
+            "oneOf": [
+              {
+                "const": {
+                  "repo": "aoa-sdk",
+                  "migration_ref": "780ac06d1739246d6402445e6ec43ef39a97b90a",
+                  "pr": "https://github.com/8Dionysus/aoa-sdk/pull/239"
+                }
+              },
+              {
+                "const": {
+                  "repo": "abyss-stack",
+                  "migration_ref": "c779d1413690ec11b5df7b6fc638e2a8b95510a5",
+                  "pr": "https://github.com/8Dionysus/abyss-stack/pull/336"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-kag",
+                  "migration_ref": "15e1639740873f374faecb42029ae5cc8eb5375c",
+                  "pr": "https://github.com/8Dionysus/aoa-kag/pull/180"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-stats",
+                  "migration_ref": "740c57d6ab2fe78d6a8440c19c2637431e039c6b",
+                  "pr": "https://github.com/8Dionysus/aoa-stats/pull/178"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-agents",
+                  "migration_ref": "92dd79e6c79fef60faedf6b97f2c65ff89477d06",
+                  "pr": "https://github.com/8Dionysus/aoa-agents/pull/270"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-evals",
+                  "migration_ref": "12b408727e40174dd10e1f9ad0fa2e7f7fd11eec",
+                  "pr": "https://github.com/8Dionysus/aoa-evals/pull/437"
+                }
+              },
+              {
+                "const": {
+                  "repo": "Tree-of-Sophia",
+                  "migration_ref": "d95a583272acb84dcb5b7e6896801f0364c7b234",
+                  "pr": "https://github.com/8Dionysus/Tree-of-Sophia/pull/140"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-playbooks",
+                  "migration_ref": "b72ca2d333bcdf516ed6656e34670fa93df88162",
+                  "pr": "https://github.com/8Dionysus/aoa-playbooks/pull/198"
+                }
+              },
+              {
+                "const": {
+                  "repo": "Agents-of-Abyss",
+                  "migration_ref": "66d86b04e685cf06b03a95a3f9c74e7c8d607740",
+                  "pr": "https://github.com/8Dionysus/Agents-of-Abyss/pull/270"
+                }
+              },
+              {
+                "const": {
+                  "repo": "8Dionysus",
+                  "migration_ref": "aa67908a137a9c9631a439f266d32a8918c7213c",
+                  "pr": "https://github.com/8Dionysus/8Dionysus/pull/136"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-techniques",
+                  "migration_ref": "9a5222cc6a6b1fdc52b4df906f49dadfd0383c71",
+                  "pr": "https://github.com/8Dionysus/aoa-techniques/pull/497"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-memo",
+                  "migration_ref": "bcda57fe47d5e3daaee8258cc4428dc6315ae239",
+                  "pr": "https://github.com/8Dionysus/aoa-memo/pull/291"
+                }
+              },
+              {
+                "const": {
+                  "repo": "aoa-skills",
+                  "migration_ref": "5929ad000ff06750ced1c806766138dc11e54e5a",
+                  "pr": "https://github.com/8Dionysus/aoa-skills/pull/380"
+                }
+              }
+            ]
+          }
+        },
+        "aoa_kag_postmerge": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "run_id",
+            "head_sha",
+            "conclusion",
+            "url"
+          ],
+          "properties": {
+            "run_id": {
+              "const": 30445769702
+            },
+            "head_sha": {
+              "const": "15e1639740873f374faecb42029ae5cc8eb5375c"
+            },
+            "conclusion": {
+              "const": "success"
+            },
+            "url": {
+              "const": "https://github.com/8Dionysus/aoa-kag/actions/runs/30445769702"
+            }
+          }
+        },
+        "release_artifact_replay": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "run_id",
+            "workflow_head_sha",
+            "package_source_ref",
+            "runner_seconds",
+            "conclusion",
+            "url"
+          ],
+          "properties": {
+            "run_id": {
+              "const": 30456244099
+            },
+            "workflow_head_sha": {
+              "const": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7"
+            },
+            "package_source_ref": {
+              "const": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb"
+            },
+            "runner_seconds": {
+              "const": 143
+            },
+            "conclusion": {
+              "const": "success"
+            },
+            "url": {
+              "const": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30456244099"
+            }
+          }
+        },
+        "strict_postpublish_audit_passed": {
+          "const": true
+        },
+        "x1_report_postmerge_validation": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "required",
+            "status",
+            "landed_main_ref",
+            "run_id",
+            "conclusion",
+            "claim_limit"
+          ],
+          "properties": {
+            "required": {
+              "const": true
+            },
+            "status": {
+              "const": "pending"
+            },
+            "landed_main_ref": {
+              "const": null
+            },
+            "run_id": {
+              "const": null
+            },
+            "conclusion": {
+              "const": null
+            },
+            "claim_limit": {
+              "const": "The X1 report cannot claim archive readiness until a subsequent receipt binds a successful aoa-sdk main validation run containing this report."
+            }
+          }
+        },
+        "all_required_validation_green": {
+          "const": false
+        }
+      }
+    },
+    "package_compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sdk_source_ref",
+        "new_version",
+        "new_wheel_sha256",
+        "predecessor_version",
+        "predecessor_source_ref",
+        "predecessor_wheel_sha256",
+        "steps",
+        "release_artifact",
+        "clean_install_passed",
+        "upgrade_passed",
+        "downgrade_passed",
+        "restore_passed"
+      ],
+      "properties": {
+        "sdk_source_ref": {
+          "const": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb"
+        },
+        "new_version": {
+          "const": "0.9.0"
+        },
+        "new_wheel_sha256": {
+          "const": "sha256:e9af2e6674e30bc1fd81d142cd70b3149c12d11dfc6db5d1564d30028ec5d236"
+        },
+        "predecessor_version": {
+          "const": "0.8.0"
+        },
+        "predecessor_source_ref": {
+          "const": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d"
+        },
+        "predecessor_wheel_sha256": {
+          "const": "sha256:fe89ca58f1291119123f74fdbedf6e462bd43ccb840d5d7a08fa2dbcdb691f37"
+        },
+        "steps": {
+          "const": [
+            {
+              "operation": "clean_install",
+              "from": null,
+              "to": "0.8.0",
+              "result": "pass_with_canonical_routing"
+            },
+            {
+              "operation": "upgrade",
+              "from": "0.8.0",
+              "to": "0.9.0",
+              "result": "pass_with_control_plane_api_runner_and_packaged_trust_record"
+            },
+            {
+              "operation": "downgrade",
+              "from": "0.9.0",
+              "to": "0.8.0",
+              "result": "pass_with_canonical_routing"
+            },
+            {
+              "operation": "restore",
+              "from": "0.8.0",
+              "to": "0.9.0",
+              "result": "pass_with_snapshot_sha256_9c1d0fcf4f9310106f4498f1b55fee21e65b57c03864eb78a0f7cc2f52c277d1"
+            }
+          ]
+        },
+        "release_artifact": {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "workflow_run_id",
+            "workflow_head_ref",
+            "package_source_ref",
+            "wheel_sha256",
+            "sdist_sha256",
+            "local_clean_build_wheel_sha256",
+            "local_clean_build_sdist_sha256",
+            "wheel_unpacked_file_count",
+            "sdist_unpacked_file_count",
+            "cross_environment_carrier_hash_parity",
+            "wheel_unpacked_content_parity",
+            "sdist_unpacked_content_parity",
+            "sdist_external_verifier_checkout_present",
+            "workflow_package_bundle_validation_passed",
+            "local_exact_bundle_record_id",
+            "local_exact_bundle_subject_digest",
+            "local_exact_bundle_subjects_digest",
+            "verified_controls",
+            "agent_consumer_trust_verdict",
+            "release_consumer_trust_verdict",
+            "release_consumer_manual_review_reason",
+            "public_release_python_distribution_consumption_claimed",
+            "claim_limit"
+          ],
+          "properties": {
+            "workflow_run_id": {
+              "const": 30456244099
+            },
+            "workflow_head_ref": {
+              "const": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7"
+            },
+            "package_source_ref": {
+              "const": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb"
+            },
+            "wheel_sha256": {
+              "const": "sha256:e9af2e6674e30bc1fd81d142cd70b3149c12d11dfc6db5d1564d30028ec5d236"
+            },
+            "sdist_sha256": {
+              "const": "sha256:a05670ecdc30ab6a769b7cb203114a0f6bd493312fe6f1fcbb523f6a466be40f"
+            },
+            "local_clean_build_wheel_sha256": {
+              "const": "sha256:4d9a76f8be7b47e52321dd4c08299561944547a1eff0a2c510efe061ce8aa9b2"
+            },
+            "local_clean_build_sdist_sha256": {
+              "const": "sha256:0b394adeb247c1b509001bfc0d8586862997ab945b5563aad92c1a7096bad0b4"
+            },
+            "wheel_unpacked_file_count": {
+              "const": 268
+            },
+            "sdist_unpacked_file_count": {
+              "const": 2172
+            },
+            "cross_environment_carrier_hash_parity": {
+              "const": false
+            },
+            "wheel_unpacked_content_parity": {
+              "const": true
+            },
+            "sdist_unpacked_content_parity": {
+              "const": true
+            },
+            "sdist_external_verifier_checkout_present": {
+              "const": false
+            },
+            "workflow_package_bundle_validation_passed": {
+              "const": true
+            },
+            "local_exact_bundle_record_id": {
+              "const": "sha256:b3025e37622c12f8604639d0be7e81a408be6c41456665711d4bb9fcafe30b74"
+            },
+            "local_exact_bundle_subject_digest": {
+              "const": "sha256:1d005aa8fe8cabef923f91776064b63619f489485207de6911e1e9525fc3bbf4"
+            },
+            "local_exact_bundle_subjects_digest": {
+              "const": "sha256:5c492ea3bcb1c9f43fb9f84789792fb9086f6aebe722c91514894db0aa09ef9e"
+            },
+            "verified_controls": {
+              "const": [
+                "abi_signature",
+                "sbom",
+                "slsa_in_toto"
+              ]
+            },
+            "agent_consumer_trust_verdict": {
+              "const": "allow"
+            },
+            "release_consumer_trust_verdict": {
+              "const": "manual_review_required"
+            },
+            "release_consumer_manual_review_reason": {
+              "const": "production_consumer_requires_release_trust_root"
+            },
+            "public_release_python_distribution_consumption_claimed": {
+              "const": false
+            },
+            "claim_limit": {
+              "const": "The exact workflow wheel and sdist are hash-bound, unpack to the same files as a clean source build, pass installed behavior and local agent-consumer artifact admission, and exclude the verifier checkout. Their archive carrier hashes vary across build environments. The Python distribution is not claimed as a public-release-trust-root production package; that separate consumer intent correctly remains manual-review-required and is not used by the live routing runtime."
+            }
+          }
+        },
+        "clean_install_passed": {
+          "const": true
+        },
+        "upgrade_passed": {
+          "const": true
+        },
+        "downgrade_passed": {
+          "const": true
+        },
+        "restore_passed": {
+          "const": true
+        }
+      }
+    },
+    "agent_os_execution_window": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "sdk_source_ref",
+        "runtime_owner_ref",
+        "release_workflow_run_id",
+        "installed_wheel_sha256",
+        "installed_artifact_byte_identical_to_final_release_replay",
+        "routing_bundle_source_ref",
+        "cycles",
+        "execution_cycles_passed",
+        "evidence_complete_closeouts",
+        "portability_regression_found",
+        "portability_regression",
+        "portability_regression_repaired",
+        "repair_decision",
+        "repair",
+        "post_repair_cycles_passed",
+        "claim_limit"
+      ],
+      "properties": {
+        "sdk_source_ref": {
+          "const": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb"
+        },
+        "runtime_owner_ref": {
+          "const": "c779d1413690ec11b5df7b6fc638e2a8b95510a5"
+        },
+        "release_workflow_run_id": {
+          "const": 30456244099
+        },
+        "installed_wheel_sha256": {
+          "const": "sha256:e9af2e6674e30bc1fd81d142cd70b3149c12d11dfc6db5d1564d30028ec5d236"
+        },
+        "installed_artifact_byte_identical_to_final_release_replay": {
+          "const": true
+        },
+        "routing_bundle_source_ref": {
+          "const": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d"
+        },
+        "cycles": {
+          "const": [
+            {
+              "case": "governed_runtime",
+              "test_id": "test_public_compiler_v3_c5_chain_closes_real_governed_runtime",
+              "suite_seconds": 23.845,
+              "junit_sha256": "sha256:156e13b8be7d58656ce3e7378da13dd7a2ab5da11c65d1e7f53ed1869e9cd671",
+              "result": "passed_with_evidence_complete_closeout"
+            },
+            {
+              "case": "a2a_return",
+              "test_id": "test_a2a_return_lane_completes_a_public_compiler_v3_c5_chain",
+              "suite_seconds": 2.647,
+              "junit_sha256": "sha256:1266919ec0fc8236c6ed47ea31d1b5b80ce348e8df5ff5b55104d3bdb3036d93",
+              "result": "passed_with_typed_return_and_closeout"
+            },
+            {
+              "case": "runtime_degradation",
+              "test_id": "test_runtime_degradation_lane_restores_a_public_compiler_v3_c5_chain",
+              "suite_seconds": 25.946,
+              "junit_sha256": "sha256:f05510e74105050e9328cde34cfd1ad9322ac8288b7b0ab4aa00e4e9091d13c2",
+              "result": "passed_with_pause_restore_resume_and_closeout"
+            }
+          ]
+        },
+        "execution_cycles_passed": {
+          "const": 3
+        },
+        "evidence_complete_closeouts": {
+          "const": 3
+        },
+        "portability_regression_found": {
+          "const": true
+        },
+        "portability_regression": {
+          "const": "The admitted aoa-playbooks trust record was host-generated dist state rather than a durable Git or package input, so a clean installed-wheel runtime could not materialize the exact plan source."
+        },
+        "portability_regression_repaired": {
+          "const": true
+        },
+        "repair_decision": {
+          "const": "AOA-SDK-D-0091"
+        },
+        "repair": {
+          "const": "Package the exact admitted public-safe trust-record bytes as a lower-authority SDK delivery projection and fail closed on digest, identity, lifecycle, subject-store, or control mismatch."
+        },
+        "post_repair_cycles_passed": {
+          "const": true
+        },
+        "claim_limit": {
+          "const": "These are real disposable adapter cycles with governed repository mutation, typed A2A return, and degradation recovery. They prove SDK orchestration and evidence-complete closeout, not model quality or stronger-owner eval verdicts."
+        }
+      }
+    },
+    "live_runtime_evidence": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "observed_at_utc",
+        "runtime_owner_ref",
+        "mirror_manifest_ref",
+        "mirror_manifest_sha256",
+        "mirror_generated_at_utc",
+        "route_api_healthy",
+        "rag_api_healthy",
+        "required_file_count",
+        "mirror_source_ref",
+        "producer_posture",
+        "activation_mode",
+        "trust_record_id",
+        "subject_digest",
+        "trust_verdict",
+        "predecessor_operationally_required",
+        "sdk_runtime_rollback_primary",
+        "predecessor_implementation_required_for_rollback",
+        "sdk_runtime_rollback_root_name",
+        "archive_authorized"
+      ],
+      "properties": {
+        "observed_at_utc": {
+          "const": "2026-07-29T13:13:11Z"
+        },
+        "runtime_owner_ref": {
+          "const": "c779d1413690ec11b5df7b6fc638e2a8b95510a5"
+        },
+        "mirror_manifest_ref": {
+          "const": "abyss-stack:Knowledge/federation/aoa-routing/manifest/federation_mirror_manifest.json"
+        },
+        "mirror_manifest_sha256": {
+          "const": "sha256:51eb7f03bf13df386ffb86cffae4618aad4c3aef237beada80854cadc64243c5"
+        },
+        "mirror_generated_at_utc": {
+          "const": "2026-07-29T10:24:54.302075+00:00"
+        },
+        "route_api_healthy": {
+          "const": true
+        },
+        "rag_api_healthy": {
+          "const": true
+        },
+        "required_file_count": {
+          "const": 23
+        },
+        "mirror_source_ref": {
+          "const": "e4ffd26ed9e50125be584c00839ee6a8f7016a0d"
+        },
+        "producer_posture": {
+          "const": "sdk_canonical"
+        },
+        "activation_mode": {
+          "const": "authorized_live_cutover"
+        },
+        "trust_record_id": {
+          "const": "sha256:ffe9c974882b0033248b0733c6d1223d9a0108d911d493d673b31286f0f2161e"
+        },
+        "subject_digest": {
+          "const": "sha256:4b18aa61850afe3859ca2e3a221a6710a34dc45ea47d9321126abb1ebbe1671b"
+        },
+        "trust_verdict": {
+          "const": "allow"
+        },
+        "predecessor_operationally_required": {
+          "const": false
+        },
+        "sdk_runtime_rollback_primary": {
+          "const": true
+        },
+        "predecessor_implementation_required_for_rollback": {
+          "const": false
+        },
+        "sdk_runtime_rollback_root_name": {
+          "const": "aoa-routing.sdk-rollback-v0.8.0"
+        },
+        "archive_authorized": {
+          "const": false
+        }
+      }
+    },
+    "e1_outcome": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "report_sha256",
+        "status",
+        "structural_process_cost_reduced",
+        "direct_ci_runner_time_reduced",
+        "direct_ci_runner_time_regression_fraction",
+        "g13_gate",
+        "post_merge_cost_report_complete"
+      ],
+      "properties": {
+        "report_sha256": {
+          "const": "sha256:92f9a2c4742b3d60d3eb95fd56da5a55865e3e4863d7a96df637aaf11cf3936f"
+        },
+        "status": {
+          "const": "complete_mixed_verdict"
+        },
+        "structural_process_cost_reduced": {
+          "const": true
+        },
+        "direct_ci_runner_time_reduced": {
+          "const": false
+        },
+        "direct_ci_runner_time_regression_fraction": {
+          "const": 0.231
+        },
+        "g13_gate": {
+          "const": "pass_with_ci_runner_time_regression"
+        },
+        "post_merge_cost_report_complete": {
+          "const": true
+        }
+      }
+    },
+    "compatibility_exit": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "criteria",
+        "required_validation_cycles",
+        "completed_post_landing_validation_cycles",
+        "compatibility_window_exited",
+        "operational_predecessor_rollback_retired"
+      ],
+      "properties": {
+        "criteria": {
+          "const": [
+            {
+              "id": "all_registered_consumers_green",
+              "exit_satisfied": true,
+              "evidence": "All thirteen migrations are landed and owner validation passed; aoa-kag post-merge run 30445769702 completed successfully."
+            },
+            {
+              "id": "direct_checkout_consumer_zero",
+              "exit_satisfied": true,
+              "evidence": "All seventeen registered consumers and seven additional organization repositories have zero active direct predecessor checkout dependencies."
+            },
+            {
+              "id": "install_upgrade_downgrade_rollback",
+              "exit_satisfied": true,
+              "evidence": "Exact v0.8.0 and final v0.9.0 workflow wheels passed clean install, upgrade, downgrade, and restored v0.9.0 snapshot loading."
+            },
+            {
+              "id": "two_consecutive_sdk_validation_cycles",
+              "exit_satisfied": true,
+              "evidence": "Five aoa-sdk main Repo Validation runs passed at or after the SDK migration landing 780ac06d, including the final release-workflow repair at 956c32cd; three earlier runs are retained separately as pre-migration baseline evidence."
+            },
+            {
+              "id": "runtime_mirror_and_trust_identify_sdk",
+              "exit_satisfied": true,
+              "evidence": "Live route and RAG APIs are healthy at SDK source e4ffd26e with SDK canonical posture, authorized cutover, exact subject store, and trust allow."
+            },
+            {
+              "id": "no_high_severity_regression",
+              "exit_satisfied": true,
+              "evidence": "The clean-runtime trust-record defect was repaired under D-0091. Immutable-tag replay then exposed and repaired shallow-history, verifier-lint-scope, and verifier-in-sdist defects; the full 729-test gate, clean final replay, strict postpublish audit, and three exact-wheel Agent OS cycles passed."
+            }
+          ]
+        },
+        "required_validation_cycles": {
+          "const": 2
+        },
+        "completed_post_landing_validation_cycles": {
+          "const": 5
+        },
+        "compatibility_window_exited": {
+          "const": true
+        },
+        "operational_predecessor_rollback_retired": {
+          "const": true
+        }
+      }
+    },
+    "predecessor": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "repository_id",
+        "repository_node_id",
+        "current_main_ref",
+        "latest_release_tag",
+        "latest_release_url",
+        "github_archived",
+        "preserved",
+        "posture",
+        "operational_runtime_rollback_required",
+        "archive_ready",
+        "archive_authorized",
+        "deprecation_release_executed",
+        "github_archive_executed",
+        "irreversible_action_taken",
+        "approval_rule"
+      ],
+      "properties": {
+        "repo": {
+          "const": "8Dionysus/aoa-routing"
+        },
+        "repository_id": {
+          "const": 1186624390
+        },
+        "repository_node_id": {
+          "const": "R_kgDORrpzhg"
+        },
+        "current_main_ref": {
+          "const": "19c2629a207978a118f7db81d89f44748b2e5235"
+        },
+        "latest_release_tag": {
+          "const": "v0.3.0"
+        },
+        "latest_release_url": {
+          "const": "https://github.com/8Dionysus/aoa-routing/releases/tag/v0.3.0"
+        },
+        "github_archived": {
+          "const": false
+        },
+        "preserved": {
+          "const": true
+        },
+        "posture": {
+          "const": "maintenance_only_compatibility_security_deprecation"
+        },
+        "operational_runtime_rollback_required": {
+          "const": false
+        },
+        "archive_ready": {
+          "const": false
+        },
+        "archive_authorized": {
+          "const": false
+        },
+        "deprecation_release_executed": {
+          "const": false
+        },
+        "github_archive_executed": {
+          "const": false
+        },
+        "irreversible_action_taken": {
+          "const": false
+        },
+        "approval_rule": {
+          "const": "Only after a subsequent receipt binds a successful aoa-sdk main validation run containing this X1 report may a separate exact operator approval naming repository ID 1186624390 authorize the deprecation-release, About-banner, and GitHub-archive sequence."
+        }
+      }
+    },
+    "remaining_external_gates": {
+      "type": "array",
+      "minItems": 2,
+      "maxItems": 2,
+      "prefixItems": [
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "target",
+            "required",
+            "satisfied",
+            "reason"
+          ],
+          "properties": {
+            "id": {
+              "const": "x1_report_postmerge_validation"
+            },
+            "kind": {
+              "const": "postmerge_validation_evidence"
+            },
+            "target": {
+              "const": "github:8Dionysus/aoa-sdk:main:x1-report-containing-commit"
+            },
+            "required": {
+              "const": true
+            },
+            "satisfied": {
+              "const": false
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 120
+            }
+          }
+        },
+        {
+          "type": "object",
+          "additionalProperties": false,
+          "required": [
+            "id",
+            "kind",
+            "target",
+            "required",
+            "satisfied",
+            "reason"
+          ],
+          "properties": {
+            "id": {
+              "const": "exact_operator_archive_approval"
+            },
+            "kind": {
+              "const": "irreversible_external_authority"
+            },
+            "target": {
+              "const": "github:repository:1186624390:8Dionysus/aoa-routing"
+            },
+            "required": {
+              "const": true
+            },
+            "satisfied": {
+              "const": false
+            },
+            "reason": {
+              "type": "string",
+              "minLength": 80
+            }
+          }
+        }
+      ],
+      "items": false
+    },
+    "verdict": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "landed_direct_checkout_consumer_zero",
+        "all_consumers_landed_green",
+        "post_merge_cost_report_complete",
+        "real_execution_closeout_window_complete",
+        "compatibility_window_exited",
+        "operational_predecessor_rollback_retired",
+        "archive_ready",
+        "archive_authorized",
+        "irreversible_action_taken",
+        "claim_limit"
+      ],
+      "properties": {
+        "landed_direct_checkout_consumer_zero": {
+          "const": true
+        },
+        "all_consumers_landed_green": {
+          "const": true
+        },
+        "post_merge_cost_report_complete": {
+          "const": true
+        },
+        "real_execution_closeout_window_complete": {
+          "const": true
+        },
+        "compatibility_window_exited": {
+          "const": true
+        },
+        "operational_predecessor_rollback_retired": {
+          "const": true
+        },
+        "archive_ready": {
+          "const": false
+        },
+        "archive_authorized": {
+          "const": false
+        },
+        "irreversible_action_taken": {
+          "const": false
+        },
+        "claim_limit": {
+          "type": "string",
+          "minLength": 140
+        }
+      }
+    }
+  },
+  "$defs": {
+    "sha": {
+      "type": "string",
+      "pattern": "^[0-9a-f]{40}$"
+    },
+    "sha256": {
+      "type": "string",
+      "pattern": "^sha256:[0-9a-f]{64}$"
+    },
+    "consumer": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "change_mode",
+        "migration_ref",
+        "current_main_ref",
+        "direct_predecessor_checkout_dependencies",
+        "landed_or_classified",
+        "validation"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "minLength": 3
+        },
+        "change_mode": {
+          "enum": [
+            "landed_migration",
+            "unchanged_classification"
+          ]
+        },
+        "migration_ref": {
+          "oneOf": [
+            {
+              "$ref": "#/$defs/sha"
+            },
+            {
+              "type": "null"
+            }
+          ]
+        },
+        "current_main_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "direct_predecessor_checkout_dependencies": {
+          "const": 0
+        },
+        "landed_or_classified": {
+          "const": true
+        },
+        "validation": {
+          "type": "string",
+          "minLength": 30
+        }
+      }
+    },
+    "classification": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "repo",
+        "current_main_ref",
+        "direct_predecessor_checkout_dependencies",
+        "classification"
+      ],
+      "properties": {
+        "repo": {
+          "type": "string",
+          "minLength": 3
+        },
+        "current_main_ref": {
+          "$ref": "#/$defs/sha"
+        },
+        "direct_predecessor_checkout_dependencies": {
+          "const": 0
+        },
+        "classification": {
+          "type": "string",
+          "minLength": 30
+        }
+      }
+    },
+    "criterion": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "id",
+        "exit_satisfied",
+        "evidence"
+      ],
+      "properties": {
+        "id": {
+          "type": "string",
+          "minLength": 8
+        },
+        "exit_satisfied": {
+          "const": true
+        },
+        "evidence": {
+          "type": "string",
+          "minLength": 40
+        }
+      }
+    }
+  }
+}

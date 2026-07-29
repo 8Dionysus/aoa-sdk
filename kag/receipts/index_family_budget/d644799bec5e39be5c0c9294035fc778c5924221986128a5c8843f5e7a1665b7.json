@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 7866674,
+  "allowed_tracked_bytes": 19104649,
+  "approved_by": "repository-owner",
+  "base_ref": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
+  "changed_generated_bytes": 7866674,
+  "changed_generated_files": 160,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "d644799bec5e39be5c0c9294035fc778c5924221986128a5c8843f5e7a1665b7",
+  "reason": "Bind X1 scope evidence, exact consumer census membership, and critical release/runtime evidence in the public schema.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19104649,
+  "tracked_bytes_max": 15728640
+}

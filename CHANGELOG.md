@@ -9,6 +9,16 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
+- Complete the X1 landed consumer-zero report: all 17 known consumers are
+  landed or classified, 24 current repository heads have zero active
+  predecessor checkout dependency, package upgrade/downgrade/restore and
+  three post-repair Agent OS cycles pass, live rollback is SDK-only, and all
+  compatibility-exit criteria are satisfied.
+- Keep `aoa-routing` archive readiness false until a subsequent receipt binds
+  the successful `aoa-sdk` main validation containing this X1 report. The
+  evidence and schema also keep deprecation release, About metadata, GitHub
+  archive, and every irreversible action false until separate exact operator
+  approval after that receipt.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
