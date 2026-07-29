@@ -66,6 +66,15 @@ def test_release_artifacts_replay_fetches_succession_evidence_history() -> None:
         "refs/tags/routing-succession-e1-evidence-20260728'"
     )
 
+    ruff_step = next(
+        step
+        for step in steps
+        if isinstance(step, dict) and step.get("name") == "Run Ruff"
+    )
+    assert ruff_step["run"] == (
+        "python -m ruff check . --extend-exclude .abyss-machine-verifier"
+    )
+
 
 def test_latest_sibling_workflow_checks_out_every_matrix_repo() -> None:
     matrix = load_json(

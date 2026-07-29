@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 450227,
+  "allowed_tracked_bytes": 19040669,
+  "approved_by": "repository-owner",
+  "base_ref": "0d9efa61e3ab1fd3abf8facdd194a1b2025193b6",
+  "changed_generated_bytes": 450227,
+  "changed_generated_files": 8,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "9325a02be0002ba5ea8bf54154bebb466938f77ae29979cb4ee6f738b76610f0",
+  "reason": "Release artifact replay now reaches Ruff; exclude the pinned external verifier checkout from SDK lint scope and bind regression coverage.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "tracked_size",
+  "tracked_bytes": 19040669,
+  "tracked_bytes_max": 15728640
+}
