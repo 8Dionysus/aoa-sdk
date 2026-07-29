@@ -14,10 +14,11 @@ Tracking starts with the community-docs baseline for this repository.
   predecessor checkout dependency, package upgrade/downgrade/restore and
   three post-repair Agent OS cycles pass, live rollback is SDK-only, and all
   compatibility-exit criteria are satisfied.
-- Mark `aoa-routing` archive-ready while preserving it as public,
-  maintenance-only, and unarchived. The final evidence and schema keep
-  deprecation release, About metadata, GitHub archive, and every irreversible
-  action false until separate exact operator approval.
+- Keep `aoa-routing` archive readiness false until a subsequent receipt binds
+  the successful `aoa-sdk` main validation containing this X1 report. The
+  evidence and schema also keep deprecation release, About metadata, GitHub
+  archive, and every irreversible action false until separate exact operator
+  approval after that receipt.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.

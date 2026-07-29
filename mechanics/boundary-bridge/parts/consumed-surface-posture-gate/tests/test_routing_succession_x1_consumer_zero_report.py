@@ -118,7 +118,7 @@ def test_x1_final_report_proves_current_main_consumer_zero() -> None:
     assert census["result"] == "landed_consumer_zero"
 
 
-def test_x1_requires_landed_postmerge_validation_and_exact_package_cycle() -> None:
+def test_x1_records_prior_validation_and_pending_own_postmerge_cycle() -> None:
     evidence = load_evidence()
     validation = evidence["post_landing_validation"]
     package = evidence["package_compatibility"]
@@ -144,7 +144,15 @@ def test_x1_requires_landed_postmerge_validation_and_exact_package_cycle() -> No
         "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30456244099",
     }
     assert validation["strict_postpublish_audit_passed"] is True
-    assert validation["all_required_validation_green"] is True
+    assert validation["x1_report_postmerge_validation"] == {
+        "required": True,
+        "status": "pending",
+        "landed_main_ref": None,
+        "run_id": None,
+        "conclusion": None,
+        "claim_limit": validation["x1_report_postmerge_validation"]["claim_limit"],
+    }
+    assert validation["all_required_validation_green"] is False
 
     assert package["sdk_source_ref"] == ("b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb")
     assert package["new_wheel_sha256"] == (
@@ -264,6 +272,7 @@ def test_x1_exits_compatibility_with_sdk_only_operational_rollback() -> None:
     assert runtime["predecessor_operationally_required"] is False
     assert runtime["sdk_runtime_rollback_primary"] is True
     assert runtime["predecessor_implementation_required_for_rollback"] is False
+    assert runtime["archive_authorized"] is False
 
     assert e1["status"] == "complete_mixed_verdict"
     assert e1["structural_process_cost_reduced"] is True
@@ -286,7 +295,7 @@ def test_x1_exits_compatibility_with_sdk_only_operational_rollback() -> None:
     assert compatibility["operational_predecessor_rollback_retired"] is True
 
 
-def test_x1_is_archive_ready_but_supplies_no_archive_authority() -> None:
+def test_x1_remains_postmerge_pending_and_supplies_no_archive_authority() -> None:
     evidence = load_evidence()
     predecessor = evidence["predecessor"]
     gates = evidence["remaining_external_gates"]
@@ -304,7 +313,7 @@ def test_x1_is_archive_ready_but_supplies_no_archive_authority() -> None:
     )
     assert predecessor["github_archived"] is False
     assert predecessor["preserved"] is True
-    assert predecessor["archive_ready"] is True
+    assert predecessor["archive_ready"] is False
     assert predecessor["archive_authorized"] is False
     assert predecessor["deprecation_release_executed"] is False
     assert predecessor["github_archive_executed"] is False
@@ -312,18 +321,26 @@ def test_x1_is_archive_ready_but_supplies_no_archive_authority() -> None:
 
     assert gates == [
         {
+            "id": "x1_report_postmerge_validation",
+            "kind": "postmerge_validation_evidence",
+            "target": "github:8Dionysus/aoa-sdk:main:x1-report-containing-commit",
+            "required": True,
+            "satisfied": False,
+            "reason": gates[0]["reason"],
+        },
+        {
             "id": "exact_operator_archive_approval",
             "kind": "irreversible_external_authority",
             "target": "github:repository:1186624390:8Dionysus/aoa-routing",
             "required": True,
             "satisfied": False,
-            "reason": gates[0]["reason"],
+            "reason": gates[1]["reason"],
         }
     ]
     assert verdict["landed_direct_checkout_consumer_zero"] is True
     assert verdict["all_consumers_landed_green"] is True
     assert verdict["compatibility_window_exited"] is True
-    assert verdict["archive_ready"] is True
+    assert verdict["archive_ready"] is False
     assert verdict["archive_authorized"] is False
     assert verdict["irreversible_action_taken"] is False
 
@@ -333,6 +350,7 @@ def test_x1_schema_rejects_archive_authorization_or_executed_actions() -> None:
 
     mutations = [
         ("github_archived", True),
+        ("archive_ready", True),
         ("archive_authorized", True),
         ("deprecation_release_executed", True),
         ("github_archive_executed", True),
@@ -347,6 +365,18 @@ def test_x1_schema_rejects_archive_authorization_or_executed_actions() -> None:
     verdict_candidate["verdict"]["archive_authorized"] = True
     assert list(validator().iter_errors(verdict_candidate))
 
+    ready_candidate = deepcopy(evidence)
+    ready_candidate["verdict"]["archive_ready"] = True
+    assert list(validator().iter_errors(ready_candidate))
+
+    runtime_candidate = deepcopy(evidence)
+    runtime_candidate["live_runtime_evidence"]["archive_authorized"] = True
+    assert list(validator().iter_errors(runtime_candidate))
+
     approved_candidate = deepcopy(evidence)
     approved_candidate["remaining_external_gates"][0]["satisfied"] = True
     assert list(validator().iter_errors(approved_candidate))
+
+    operator_candidate = deepcopy(evidence)
+    operator_candidate["remaining_external_gates"][1]["satisfied"] = True
+    assert list(validator().iter_errors(operator_candidate))

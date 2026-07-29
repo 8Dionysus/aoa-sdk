@@ -137,13 +137,14 @@ The current landed surface includes:
   reduction, exposes a 23.1% landed median CI runner-time regression, and
   leaves direct task-latency, token, long-run reliability, and consumer-zero
   claims outside E1;
-- the final
+- the post-merge-validation-gated
   [X1 consumer-zero report](mechanics/boundary-bridge/parts/consumed-surface-posture-gate/docs/routing-succession-x1-consumer-zero-report.md),
   which proves 17/17 landed or classified consumers, zero active predecessor
   checkout dependencies across 24 current heads, exact package and
   post-repair Agent OS cycles, compatibility exit, and SDK-only operational
-  rollback while leaving `aoa-routing` preserved and every irreversible
-  archive action operator-gated;
+  rollback while keeping archive readiness false until its own landed
+  `aoa-sdk` main validation is receipt-bound and leaving every irreversible
+  archive action operator-gated afterward;
 - the callable
   [C1 route resolution control plane](mechanics/boundary-bridge/parts/route-resolution-control-plane/README.md),
   which validates the exact live G5 snapshot, intersects routing entries with

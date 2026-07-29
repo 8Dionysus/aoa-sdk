@@ -82,14 +82,19 @@
   without mistaking those records for active checkout dependencies.
 - Requires all evidence-based compatibility exit conditions and post-landing
   observations before rollback retirement or archive readiness.
-- Requires landed owner refs, green post-merge validation, current-main
-  direct-checkout consumer-zero, exact package compatibility, post-repair
-  Agent OS cycles, live SDK-only rollback evidence, and an honest E1 verdict
-  before the final X1 report may claim compatibility exit or archive
-  readiness.
+- Requires landed owner refs and their green post-merge validation,
+  current-main direct-checkout consumer-zero, exact package compatibility,
+  post-repair Agent OS cycles, live SDK-only rollback evidence, and an honest
+  E1 verdict before the X1 report may claim compatibility exit. Archive
+  readiness additionally requires the X1 report's own post-merge validation
+  receipt.
 - Keeps archive readiness distinct from archive authority and requires the
   final X1 schema to reject deprecation-release, metadata, archive, or other
   irreversible-action execution before separate exact operator approval.
+- Requires the first landed X1 report to remain
+  `postmerge_validation_pending` and `archive_ready=false`; only a subsequent
+  receipt bound to its successful `aoa-sdk` main validation may close that
+  evidence gate.
 - Admits the current owner shortlist `guard` kind without removing the legacy
   `seed` compatibility value or taking ownership of either meaning.
 

@@ -1,7 +1,7 @@
 {
   "schema_version": "aoa_sdk_routing_succession_x1_consumer_zero_report_v1",
   "observed_at_utc": "2026-07-29T13:46:44Z",
-  "status": "archive_ready_operator_approval_required",
+  "status": "postmerge_validation_pending",
   "scope": {
     "r0_baseline_ref": "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/evidence/routing-succession-r0-baseline.json",
     "r0_baseline_sha256": "sha256:ee28bc71bd083c0e1a35ca42ea0debb326d8f1ca312189a9c854de447e0b8219",
@@ -10,7 +10,7 @@
     "sdk_landed_control_plane_ref": "780ac06d1739246d6402445e6ec43ef39a97b90a",
     "sdk_final_evidence_ref": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
     "observation_class": "exact landed main refs, owner PR and CI evidence, immutable-tag release replay artifacts, exact installed wheels, live SDK-canonical runtime health, and post-repair Agent OS lifecycle cycles",
-    "claim_boundary": "X1 proves landed direct-checkout consumer-zero, compatibility exit, operational predecessor rollback retirement, and archive readiness. It does not authorize a deprecation release, repository metadata mutation, GitHub archival, deletion, rename, or any other irreversible predecessor action."
+    "claim_boundary": "X1 proves landed direct-checkout consumer-zero, compatibility exit, operational predecessor rollback retirement, and every substantive archive-readiness prerequisite, but keeps archive readiness pending its own successful post-merge main validation receipt. It does not authorize a deprecation release, repository metadata mutation, GitHub archival, deletion, rename, or any other irreversible predecessor action."
   },
   "consumer_accounting": {
     "r0_registered_consumers": 16,
@@ -412,7 +412,15 @@
       "url": "https://github.com/8Dionysus/aoa-sdk/actions/runs/30456244099"
     },
     "strict_postpublish_audit_passed": true,
-    "all_required_validation_green": true
+    "x1_report_postmerge_validation": {
+      "required": true,
+      "status": "pending",
+      "landed_main_ref": null,
+      "run_id": null,
+      "conclusion": null,
+      "claim_limit": "The X1 report cannot claim archive readiness until a subsequent receipt binds a successful aoa-sdk main validation run containing this report."
+    },
+    "all_required_validation_green": false
   },
   "package_compatibility": {
     "sdk_source_ref": "b24800bf0e9d2fa8470d7bb674dd33f6ae9e6acb",
@@ -600,14 +608,22 @@
     "preserved": true,
     "posture": "maintenance_only_compatibility_security_deprecation",
     "operational_runtime_rollback_required": false,
-    "archive_ready": true,
+    "archive_ready": false,
     "archive_authorized": false,
     "deprecation_release_executed": false,
     "github_archive_executed": false,
     "irreversible_action_taken": false,
-    "approval_rule": "Only a separate exact operator approval naming repository ID 1186624390 and this final X1 report may authorize the deprecation-release, About-banner, and GitHub-archive sequence."
+    "approval_rule": "Only after a subsequent receipt binds a successful aoa-sdk main validation run containing this X1 report may a separate exact operator approval naming repository ID 1186624390 authorize the deprecation-release, About-banner, and GitHub-archive sequence."
   },
   "remaining_external_gates": [
+    {
+      "id": "x1_report_postmerge_validation",
+      "kind": "postmerge_validation_evidence",
+      "target": "github:8Dionysus/aoa-sdk:main:x1-report-containing-commit",
+      "required": true,
+      "satisfied": false,
+      "reason": "The X1 report must land first, then a subsequent receipt must bind a successful Repo Validation run on the aoa-sdk main commit containing this report before archive readiness can be claimed."
+    },
     {
       "id": "exact_operator_archive_approval",
       "kind": "irreversible_external_authority",
@@ -624,9 +640,9 @@
     "real_execution_closeout_window_complete": true,
     "compatibility_window_exited": true,
     "operational_predecessor_rollback_retired": true,
-    "archive_ready": true,
+    "archive_ready": false,
     "archive_authorized": false,
     "irreversible_action_taken": false,
-    "claim_limit": "Every in-scope consumer, validation, runtime, exact-wheel lifecycle, immutable-tag release replay, and compatibility-exit requirement is green. The package artifact is admitted for the agent-consumer intent used here; no public-release-trust-root Python distribution consumption is claimed. The only remaining goal gate is separate exact operator authority for repository ID 1186624390; this report supplies no authority to publish the predecessor deprecation release, edit its metadata, archive, delete, rename, or otherwise irreversibly mutate aoa-routing."
+    "claim_limit": "Every substantive in-scope consumer, runtime, exact-wheel lifecycle, immutable-tag release replay, and compatibility-exit prerequisite is green. The package artifact is admitted for the agent-consumer intent used here; no public-release-trust-root Python distribution consumption is claimed. This report remains archive_ready=false until a subsequent receipt binds its own successful post-merge main validation. Separate exact operator authority for repository ID 1186624390 remains required afterward; this report supplies no authority to publish the predecessor deprecation release, edit its metadata, archive, delete, rename, or otherwise irreversibly mutate aoa-routing."
   }
 }

@@ -98,8 +98,9 @@ consumer and 24-current-head census, thirteen exact owner landings, eight SDK
 main cycles, `aoa-kag` post-merge success, the clean immutable-tag release
 replay, exact wheel install/upgrade/downgrade/restore, three post-repair Agent
 OS cycles, live SDK-only rollback, mixed E1 result, all six compatibility-exit
-criteria, and archive readiness. It also proves the schema rejects archive
-authorization or any executed irreversible predecessor action.
+criteria, and the explicit pending post-merge validation gate. It also proves
+the schema rejects premature archive readiness, live-runtime or report archive
+authorization, and any executed irreversible predecessor action.
 
 For full Boundary Bridge coverage, also run:
 

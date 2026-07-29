@@ -1,6 +1,6 @@
 # Routing Succession X1 Consumer-Zero Report
 
-Status: archive ready; exact operator approval still required.
+Status: post-merge validation pending; archive readiness is false.
 
 Machine-readable evidence:
 [`../evidence/routing-succession-x1-consumer-zero-report.json`](../evidence/routing-succession-x1-consumer-zero-report.json).
@@ -30,6 +30,13 @@ PRs. Eight consecutive post-landing `aoa-sdk` main validations passed, and the
 landed `aoa-kag` provider succession passed both its pre-merge 23-provider
 release audit and post-merge run `30445769702`. The final report records these
 as owner evidence; it does not convert them into SDK-owned meaning.
+
+Those validations end at parent `956c32cd`; none can prove a report that had
+not yet landed. This report therefore keeps
+`x1_report_postmerge_validation.status=pending`,
+`all_required_validation_green=false`, and `archive_ready=false`. A subsequent
+receipt must bind a successful `aoa-sdk` main validation run containing this
+report before the archive-readiness claim can change.
 
 An exact package cycle exercised the preceding `0.8.0` and final `0.9.0`
 workflow wheels:
@@ -126,15 +133,18 @@ All six compatibility-exit criteria are satisfied:
 6. the discovered portability regression is repaired with post-repair proof.
 
 Repository `8Dionysus/aoa-routing`, numeric ID `1186624390`, node ID
-`R_kgDORrpzhg`, is therefore archive-ready but remains public, unarchived,
-preserved, and maintenance-only at `main`
+`R_kgDORrpzhg`, has satisfied the substantive consumer, compatibility,
+runtime, release-replay, and rollback prerequisites but is not yet
+archive-ready. It remains public, unarchived, preserved, and maintenance-only
+at `main`
 `19c2629a207978a118f7db81d89f44748b2e5235`; its latest release remains
-`v0.3.0`. The report deliberately keeps
+`v0.3.0`. The report deliberately keeps `archive_ready=false`,
 `archive_authorized=false`, `deprecation_release_executed=false`,
 `github_archive_executed=false`, and `irreversible_action_taken=false`.
 
-After this report lands and its post-merge validation passes, the only
-remaining external gate is a separate exact operator approval naming
-repository ID `1186624390` and the landed X1 report. Without it, no
-deprecation release, About-banner mutation, GitHub archive, deletion, rename,
-or other irreversible predecessor action is authorized.
+Two gates remain in sequence. First, this report must land and a subsequent
+receipt must bind its successful `aoa-sdk` main validation. Only then does the
+remaining gate become a separate exact operator approval naming repository ID
+`1186624390` and the landed X1 evidence. Without both, no deprecation release,
+About-banner mutation, GitHub archive, deletion, rename, or other irreversible
+predecessor action is authorized.

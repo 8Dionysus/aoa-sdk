@@ -26,10 +26,12 @@ whether sibling-owned surfaces are safe to read before SDK facades trust them.
   distinguishes local direct-checkout consumer-zero from landed
   consumer-zero, and keeps compatibility exit, rollback retirement, and
   archive authority false
-- a final X1 landed report that binds all 17 consumers and 7 zero-reference
+- an X1 landed report that binds all 17 consumers and 7 zero-reference
   repositories at current `main`, exact package and Agent OS cycles, live
   SDK-only rollback, the mixed E1 result, compatibility exit, and archive
-  readiness while keeping every irreversible-action authority false
+  prerequisites while keeping archive readiness and every
+  irreversible-action authority false until its own successful post-merge
+  main validation is bound by a subsequent receipt
 - the accepted routing succession target model, authority matrix,
   compatibility policy, and repository state machine without moving producer
   code or switching live authority
@@ -110,9 +112,11 @@ G5 candidate adds native SDK producer identity for trust and canary review.
 The release candidate adds exact public release trust without switch
 authority. The G5 receipt makes the SDK canonical and starts the compatibility
 window. Stronger-owner admission, live cutover, landed consumer-zero,
-compatibility exit, and SDK-only operational rollback proof are complete. The
-predecessor repository remains preserved and unarchived; only an exact
-operator approval can authorize its deprecation-release and archive sequence.
+compatibility exit, and SDK-only operational rollback proof are complete.
+Archive readiness still requires a subsequent receipt for the main validation
+containing this X1 report. The predecessor repository remains preserved and
+unarchived; only after that receipt can an exact operator approval authorize
+its deprecation-release and archive sequence.
 
 ## Validation
 
