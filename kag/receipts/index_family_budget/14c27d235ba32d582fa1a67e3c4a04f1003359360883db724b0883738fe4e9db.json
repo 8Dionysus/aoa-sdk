@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 1951941,
+  "allowed_tracked_bytes": 18852095,
+  "approved_by": "repository-owner",
+  "base_ref": "ac6c1e5f7dd824ebaa6a583c4bb8965e3ca194a0",
+  "changed_generated_bytes": 1951941,
+  "changed_generated_files": 34,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "14c27d235ba32d582fa1a67e3c4a04f1003359360883db724b0883738fe4e9db",
+  "reason": "Restore the required source-linked SDK provider inventory index and its owner regression guard after routing succession exposed the missing provider record.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 18852095,
+  "tracked_bytes_max": 15728640
+}
