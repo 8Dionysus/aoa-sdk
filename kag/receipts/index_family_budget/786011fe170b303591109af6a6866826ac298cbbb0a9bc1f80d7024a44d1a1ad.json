@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 7864692,
+  "allowed_tracked_bytes": 19102667,
+  "approved_by": "repository-owner",
+  "base_ref": "956c32cd4db6f49948a0ddeacfafb59fe8807ae7",
+  "changed_generated_bytes": 7864692,
+  "changed_generated_files": 160,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "786011fe170b303591109af6a6866826ac298cbbb0a9bc1f80d7024a44d1a1ad",
+  "reason": "Correct X1 validation chronology by separating three pre-migration baseline runs from five post-landing SDK main cycles.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19102667,
+  "tracked_bytes_max": 15728640
+}
