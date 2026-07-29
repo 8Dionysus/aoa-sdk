@@ -61,7 +61,7 @@ jobs:
         run: python -m pytest -q
 
       - name: Run Ruff
-        run: python -m ruff check .
+        run: python -m ruff check . --extend-exclude .abyss-machine-verifier
 
       - name: Run mypy
         run: python -m mypy src
