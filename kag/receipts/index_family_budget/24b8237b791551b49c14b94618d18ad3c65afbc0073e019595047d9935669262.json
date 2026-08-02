@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 14523651,
+  "allowed_tracked_bytes": 19441184,
+  "approved_by": "repository-owner",
+  "base_ref": "9d459f82d482a7a6374de8d8cee6d416165603b5",
+  "changed_generated_bytes": 14523651,
+  "changed_generated_files": 300,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "24b8237b791551b49c14b94618d18ad3c65afbc0073e019595047d9935669262",
+  "reason": "Refresh the portable family after adding resumable content-addressed organ admission transactions; this receipt admits only the measured generated delta and does not raise standing budgets.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19441184,
+  "tracked_bytes_max": 15728640
+}

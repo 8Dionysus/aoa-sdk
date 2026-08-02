@@ -22,7 +22,11 @@ or runtime executor.
 - immutable activation candidates with `execution_authorized=false`;
 - a minimal typed result envelope around owner-specific payloads;
 - a content-addressed owner-result review contract that binds one private
-  runtime capture to an owner schema and freshness assessment.
+  runtime capture to an owner schema and freshness assessment;
+- a resumable, content-addressed admission receipt chain and exact registry
+  transition preview for one organ capability contour;
+- a separate owner-plus-operator authorization receipt that still performs no
+  registry write or effect activation.
 
 ## Owner
 
@@ -38,7 +42,9 @@ the first two; acceptance stays a separate axis.
 Read [the detailed contract](docs/organ-access.md), then validate the
 public-safe shadow example. Runtime observation and execution move to
 `abyss-stack`; owner admission needs stronger owner evidence and must not be
-inferred from this SDK projection.
+inferred from this SDK projection. The admission transaction validates
+externally issued owner/runtime/proof receipts; it never runs those validators
+or issues their verdicts.
 
 ## Validation
 

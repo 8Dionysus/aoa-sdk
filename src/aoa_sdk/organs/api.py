@@ -19,9 +19,19 @@ from ..contracts.organs import (
     FreshnessState,
     OrganActivationPlan,
     OrganProjectionEntry,
+    OrganRecord,
     OrganRegistryProjection,
     PolicyFamily,
     RegistryState,
+)
+from ..contracts.organ_admission import (
+    AdmissionDecisionReceipt,
+    AdmissionEvidenceReceipt,
+    OrganAdmissionAuthorization,
+    OrganAdmissionBaselineAudit,
+    OrganAdmissionCandidate,
+    OrganAdmissionRequest,
+    OrganAdmissionRun,
 )
 from ..contracts.organ_orchestration import (
     CrossOrganOrchestrationRequest,
@@ -33,6 +43,14 @@ from .orchestration import (
     advance_orchestration,
     start_orchestration,
     validate_orchestration_run,
+)
+from .admission import (
+    advance_admission,
+    audit_admission_baseline,
+    authorize_registry_transition,
+    build_admission_candidate,
+    start_admission,
+    validate_admission_run,
 )
 from .registry import (
     OrganRegistryError,
@@ -216,6 +234,81 @@ class OrgansAPI:
         """Rebuild and validate a complete or partial orchestration chain."""
 
         return validate_orchestration_run(run)
+
+    def start_admission(
+        self,
+        request: OrganAdmissionRequest,
+    ) -> OrganAdmissionRun:
+        """Anchor an immutable admission run to the current registry."""
+
+        return start_admission(request, self.projection())
+
+    def audit_admission_baseline(
+        self,
+        organ_id: str,
+        capability_id: str,
+        *,
+        evaluated_at: datetime | None = None,
+    ) -> OrganAdmissionBaselineAudit:
+        """Inspect current admission axes without refreshing any evidence."""
+
+        return audit_admission_baseline(
+            self.projection(),
+            organ_id=organ_id,
+            capability_id=capability_id,
+            evaluated_at=evaluated_at,
+        )
+
+    @staticmethod
+    def advance_admission(
+        run: OrganAdmissionRun,
+        evidence: AdmissionEvidenceReceipt,
+    ) -> OrganAdmissionRun:
+        """Append one externally issued owner evidence receipt."""
+
+        return advance_admission(run, evidence)
+
+    @staticmethod
+    def validate_admission(run: OrganAdmissionRun) -> OrganAdmissionRun:
+        """Rebuild a persisted admission chain without executing validators."""
+
+        return validate_admission_run(run)
+
+    def build_admission_candidate(
+        self,
+        run: OrganAdmissionRun,
+        *,
+        evaluated_at: datetime | None = None,
+    ) -> OrganAdmissionCandidate:
+        """Preview one compare-and-swap without writing the registry."""
+
+        return build_admission_candidate(
+            run,
+            self.projection(),
+            evaluated_at=evaluated_at,
+        )
+
+    def authorize_registry_transition(
+        self,
+        run: OrganAdmissionRun,
+        candidate: OrganAdmissionCandidate,
+        owner_decision: AdmissionDecisionReceipt,
+        operator_decision: AdmissionDecisionReceipt,
+        target_record: OrganRecord,
+        *,
+        evaluated_at: datetime | None = None,
+    ) -> OrganAdmissionAuthorization:
+        """Validate separate decisions for an exact non-executed registry update."""
+
+        return authorize_registry_transition(
+            run,
+            candidate,
+            owner_decision,
+            operator_decision,
+            target_record,
+            self.projection(),
+            evaluated_at=evaluated_at,
+        )
 
     @staticmethod
     def _find_capability(

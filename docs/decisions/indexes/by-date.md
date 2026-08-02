@@ -125,3 +125,7 @@
 ## 2026-07-29
 
 - [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
+
+## 2026-08-01
+
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)

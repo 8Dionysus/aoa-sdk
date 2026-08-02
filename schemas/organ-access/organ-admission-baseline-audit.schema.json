@@ -1,0 +1,252 @@
+{
+  "$defs": {
+    "AdmissionAxisAudit": {
+      "additionalProperties": false,
+      "properties": {
+        "axis": {
+          "enum": [
+            "declared",
+            "owner_reviewed",
+            "packaged",
+            "exported",
+            "deployed",
+            "process_alive",
+            "endpoint_ready",
+            "registry_indexed",
+            "consumer_registered",
+            "schema_observed",
+            "call_succeeded",
+            "result_grounded",
+            "freshness_satisfied",
+            "owner_accepted",
+            "cross_organ_proven",
+            "rollback_proven"
+          ],
+          "title": "Axis",
+          "type": "string"
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Evidence Ref"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "observed_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed At"
+        },
+        "owner": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Owner"
+        },
+        "revision": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Revision"
+        },
+        "state": {
+          "enum": [
+            "current",
+            "missing",
+            "expired"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "axis",
+        "state"
+      ],
+      "title": "AdmissionAxisAudit",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:organ-admission-baseline-audit.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "admission_current": {
+      "title": "Admission Current",
+      "type": "boolean"
+    },
+    "audit_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Audit Id",
+      "type": "string"
+    },
+    "axis_audits": {
+      "items": {
+        "$ref": "#/$defs/AdmissionAxisAudit"
+      },
+      "title": "Axis Audits",
+      "type": "array"
+    },
+    "capability_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Capability Id",
+      "type": "string"
+    },
+    "capability_present": {
+      "title": "Capability Present",
+      "type": "boolean"
+    },
+    "central_proof_computed_by_sdk": {
+      "const": false,
+      "default": false,
+      "title": "Central Proof Computed By Sdk",
+      "type": "boolean"
+    },
+    "entry_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Entry Digest",
+      "type": "string"
+    },
+    "evaluated_at": {
+      "format": "date-time",
+      "title": "Evaluated At",
+      "type": "string"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "owner_acceptance_inferred_by_sdk": {
+      "const": false,
+      "default": false,
+      "title": "Owner Acceptance Inferred By Sdk",
+      "type": "boolean"
+    },
+    "owner_validators_executed_by_sdk": {
+      "const": false,
+      "default": false,
+      "title": "Owner Validators Executed By Sdk",
+      "type": "boolean"
+    },
+    "projection_expires_at": {
+      "format": "date-time",
+      "title": "Projection Expires At",
+      "type": "string"
+    },
+    "reason_codes": {
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "registry_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Registry Digest",
+      "type": "string"
+    },
+    "registry_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Registry Id",
+      "type": "string"
+    },
+    "registry_mutated_by_sdk": {
+      "const": false,
+      "default": false,
+      "title": "Registry Mutated By Sdk",
+      "type": "boolean"
+    },
+    "registry_state": {
+      "enum": [
+        "declared",
+        "package_candidate",
+        "deploy_candidate",
+        "shadow",
+        "admitted",
+        "suspended",
+        "deprecated",
+        "retired"
+      ],
+      "title": "Registry State",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "aoa_organ_admission_baseline_audit_v1",
+      "default": "aoa_organ_admission_baseline_audit_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "current",
+        "refresh_required",
+        "capability_absent",
+        "not_admitted"
+      ],
+      "title": "Status",
+      "type": "string"
+    }
+  },
+  "required": [
+    "audit_id",
+    "registry_id",
+    "registry_digest",
+    "entry_digest",
+    "organ_id",
+    "capability_id",
+    "registry_state",
+    "status",
+    "evaluated_at",
+    "projection_expires_at",
+    "capability_present",
+    "axis_audits",
+    "reason_codes",
+    "admission_current"
+  ],
+  "title": "OrganAdmissionBaselineAudit",
+  "type": "object"
+}

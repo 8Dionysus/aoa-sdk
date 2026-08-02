@@ -56,6 +56,13 @@ ROOT_TECHNICAL_DISTRICT_FILES = {
         {
             "schemas/AGENTS.md",
             "schemas/workspace-control-plane.schema.json",
+            "schemas/organ-access/organ-admission-authorization.schema.json",
+            "schemas/organ-access/organ-admission-baseline-audit.schema.json",
+            "schemas/organ-access/organ-admission-candidate.schema.json",
+            "schemas/organ-access/organ-admission-decision.schema.json",
+            "schemas/organ-access/organ-admission-evidence.schema.json",
+            "schemas/organ-access/organ-admission-request.schema.json",
+            "schemas/organ-access/organ-admission-run.schema.json",
             "schemas/organ-access/organ-activation-plan.schema.json",
             "schemas/organ-access/organ-activation-request.schema.json",
             "schemas/organ-access/organ-compatibility-observation.schema.json",

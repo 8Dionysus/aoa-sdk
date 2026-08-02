@@ -15,8 +15,13 @@ contours, secret rejection, admission gates, deterministic projection,
 suspension, catalog byte budgets, explicit workspace configuration,
 candidate-only activation, schema drift, approvals, exact external targets,
 typed owner payloads, owner-bounded result review, content-addressed review
-receipts, and CLI discovery.
+receipts, CLI discovery, resumable admission, idempotent replay, typed stops,
+owner/proof/acceptance separation, registry drift, separate owner/operator
+decisions, non-mutating transition authorization, and projection-owned index
+evidence, plus current-versus-expired baseline auditing.
 
 Runtime deployment, consumer pairing, live freshness, grounded results,
 central proof, owner acceptance, and rollback are separate evidence axes and
-are not claimed here.
+are not claimed here. The admission tests prove transaction behavior with
+synthetic owner-issued receipts; actual contour admission still requires live
+owner-native evidence.

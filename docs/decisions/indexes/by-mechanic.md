@@ -71,6 +71,7 @@
 - [AOA-SDK-D-0089 - Project Runtime Approvals Before Plan Compilation](../AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md`)
 - [AOA-SDK-D-0090 - Bind Owner Result Review After Runtime Capture](../AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md) (`docs/decisions/AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md`)
 - [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
 
 ## checkpoint
 

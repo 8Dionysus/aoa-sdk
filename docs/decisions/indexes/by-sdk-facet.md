@@ -114,6 +114,7 @@
 
 - [AOA-SDK-D-0024 - Checkpoint Test Surface Localization](../AOA-SDK-D-0024-checkpoint-test-surface-localization.md) (`docs/decisions/AOA-SDK-D-0024-checkpoint-test-surface-localization.md`)
 - [AOA-SDK-D-0080 - Host-Visible Cross-Organ Orchestration](../AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md) (`docs/decisions/AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md`)
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
 
 ## CLI command surface
 
@@ -156,6 +157,7 @@
 - [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) (`docs/decisions/AOA-SDK-D-0031-public-support-sibling-canary-localization.md`)
 - [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
 - [AOA-SDK-D-0090 - Bind Owner Result Review After Runtime Capture](../AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md) (`docs/decisions/AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md`)
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
 
 ## compatibility input
 
@@ -205,6 +207,7 @@
 - [AOA-SDK-D-0087 - Admit Typed Scenario Artifacts as Runtime Requests](../AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md) (`docs/decisions/AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md`)
 - [AOA-SDK-D-0089 - Project Runtime Approvals Before Plan Compilation](../AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md`)
 - [AOA-SDK-D-0090 - Bind Owner Result Review After Runtime Capture](../AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md) (`docs/decisions/AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md`)
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
 
 ## control-plane routing
 

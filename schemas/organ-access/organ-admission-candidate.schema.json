@@ -1,0 +1,293 @@
+{
+  "$defs": {
+    "AdmissionTarget": {
+      "additionalProperties": false,
+      "properties": {
+        "capability_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Capability Id",
+          "type": "string"
+        },
+        "credential_class": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Credential Class",
+          "type": "string"
+        },
+        "organ_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Organ Id",
+          "type": "string"
+        },
+        "policy_family": {
+          "enum": [
+            "read",
+            "candidate",
+            "internal_effect",
+            "external_effect"
+          ],
+          "title": "Policy Family",
+          "type": "string"
+        },
+        "primitive_ids": {
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Primitive Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "organ_id",
+        "capability_id",
+        "primitive_ids",
+        "policy_family",
+        "credential_class"
+      ],
+      "title": "AdmissionTarget",
+      "type": "object"
+    },
+    "OrganOwners": {
+      "additionalProperties": false,
+      "properties": {
+        "acceptance_owner": {
+          "minLength": 1,
+          "title": "Acceptance Owner",
+          "type": "string"
+        },
+        "access_owner": {
+          "minLength": 1,
+          "title": "Access Owner",
+          "type": "string"
+        },
+        "control_owner": {
+          "const": "aoa-sdk",
+          "default": "aoa-sdk",
+          "title": "Control Owner",
+          "type": "string"
+        },
+        "proof_owner": {
+          "minLength": 1,
+          "title": "Proof Owner",
+          "type": "string"
+        },
+        "runtime_owner": {
+          "minLength": 1,
+          "title": "Runtime Owner",
+          "type": "string"
+        },
+        "source_owner": {
+          "minLength": 1,
+          "title": "Source Owner",
+          "type": "string"
+        }
+      },
+      "required": [
+        "source_owner",
+        "access_owner",
+        "runtime_owner",
+        "proof_owner",
+        "acceptance_owner"
+      ],
+      "title": "OrganOwners",
+      "type": "object"
+    },
+    "RegistryTransitionPreview": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "add_capability",
+            "replace_capability",
+            "refresh_admission"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "base_entry_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Base Entry Digest",
+          "type": "string"
+        },
+        "base_registry_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Base Registry Digest",
+          "type": "string"
+        },
+        "capability_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Capability Id",
+          "type": "string"
+        },
+        "compare_and_swap_required": {
+          "const": true,
+          "default": true,
+          "title": "Compare And Swap Required",
+          "type": "boolean"
+        },
+        "from_state": {
+          "enum": [
+            "declared",
+            "package_candidate",
+            "deploy_candidate",
+            "shadow",
+            "admitted",
+            "suspended",
+            "deprecated",
+            "retired"
+          ],
+          "title": "From State",
+          "type": "string"
+        },
+        "organ_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Organ Id",
+          "type": "string"
+        },
+        "proposed_state": {
+          "const": "admitted",
+          "default": "admitted",
+          "title": "Proposed State",
+          "type": "string"
+        },
+        "registry_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Registry Id",
+          "type": "string"
+        },
+        "registry_mutation_performed": {
+          "const": false,
+          "default": false,
+          "title": "Registry Mutation Performed",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "registry_id",
+        "base_registry_digest",
+        "base_entry_digest",
+        "organ_id",
+        "capability_id",
+        "from_state",
+        "action"
+      ],
+      "title": "RegistryTransitionPreview",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:organ-admission-candidate.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "consumer_owner": {
+      "minLength": 1,
+      "title": "Consumer Owner",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "effect_activation_authorized": {
+      "const": false,
+      "default": false,
+      "title": "Effect Activation Authorized",
+      "type": "boolean"
+    },
+    "evidence_ids": {
+      "items": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Evidence Ids",
+      "type": "array"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "operator_decision_required": {
+      "const": true,
+      "default": true,
+      "title": "Operator Decision Required",
+      "type": "boolean"
+    },
+    "operator_owner": {
+      "minLength": 1,
+      "title": "Operator Owner",
+      "type": "string"
+    },
+    "owner_decision_required": {
+      "const": true,
+      "default": true,
+      "title": "Owner Decision Required",
+      "type": "boolean"
+    },
+    "owners": {
+      "$ref": "#/$defs/OrganOwners"
+    },
+    "preview": {
+      "$ref": "#/$defs/RegistryTransitionPreview"
+    },
+    "registry_mutation_performed": {
+      "const": false,
+      "default": false,
+      "title": "Registry Mutation Performed",
+      "type": "boolean"
+    },
+    "registry_update_authorized": {
+      "const": false,
+      "default": false,
+      "title": "Registry Update Authorized",
+      "type": "boolean"
+    },
+    "request_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Request Digest",
+      "type": "string"
+    },
+    "run_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Run Id",
+      "type": "string"
+    },
+    "run_snapshot_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Run Snapshot Digest",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "aoa_organ_admission_candidate_v1",
+      "default": "aoa_organ_admission_candidate_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "target": {
+      "$ref": "#/$defs/AdmissionTarget"
+    }
+  },
+  "required": [
+    "candidate_id",
+    "run_id",
+    "run_snapshot_digest",
+    "request_digest",
+    "target",
+    "owners",
+    "consumer_owner",
+    "operator_owner",
+    "evidence_ids",
+    "preview",
+    "created_at",
+    "expires_at"
+  ],
+  "title": "OrganAdmissionCandidate",
+  "type": "object"
+}

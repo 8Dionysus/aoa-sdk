@@ -1,0 +1,99 @@
+{
+  "$id": "urn:aoa-sdk:organ-access:organ-admission-decision.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "candidate_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Candidate Id",
+      "type": "string"
+    },
+    "contains_secrets": {
+      "const": false,
+      "default": false,
+      "title": "Contains Secrets",
+      "type": "boolean"
+    },
+    "decided_at": {
+      "format": "date-time",
+      "title": "Decided At",
+      "type": "string"
+    },
+    "decision": {
+      "enum": [
+        "accepted",
+        "rejected"
+      ],
+      "title": "Decision",
+      "type": "string"
+    },
+    "decision_artifact_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Decision Artifact Digest",
+      "type": "string"
+    },
+    "decision_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Decision Id",
+      "type": "string"
+    },
+    "decision_kind": {
+      "enum": [
+        "owner",
+        "operator"
+      ],
+      "title": "Decision Kind",
+      "type": "string"
+    },
+    "decision_ref": {
+      "maxLength": 512,
+      "minLength": 3,
+      "title": "Decision Ref",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "issuer": {
+      "minLength": 1,
+      "title": "Issuer",
+      "type": "string"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "registry_mutation_performed": {
+      "const": false,
+      "default": false,
+      "title": "Registry Mutation Performed",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "aoa_organ_admission_decision_v1",
+      "default": "aoa_organ_admission_decision_v1",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "candidate_id",
+    "decision_kind",
+    "issuer",
+    "decision",
+    "decision_ref",
+    "decision_artifact_digest",
+    "decided_at",
+    "expires_at",
+    "decision_id"
+  ],
+  "title": "AdmissionDecisionReceipt",
+  "type": "object"
+}

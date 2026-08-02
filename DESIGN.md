@@ -167,6 +167,9 @@ MCP is one adapter, not its owner model.
 
 ```text
 owner records + private desired state + stack observations + proof refs
+  -> resumable owner-bounded admission receipt chain
+  -> separate owner/operator transition authorization
+  -> workspace-owned registry source update
   -> validated registry projection
   -> catalog
   -> inspect organ
@@ -192,6 +195,14 @@ The registry is deny-by-default. It can suppress discovery, compare desired
 and observed schemas, and route a consumer to a direct owner endpoint. It
 cannot infer domain truth, proof, freshness, or acceptance from its own fields,
 and it is not a proxy for owner tools.
+
+The admission transaction is a pure SDK control-plane state machine. It binds
+externally issued owner/runtime/proof evidence one stage at a time, supports
+deterministic resume and exact replay, previews a compare-and-swap against the
+current private registry, and validates separate owner/operator decisions. It
+does not run owner validators, write the registry, infer acceptance, or
+activate any effect. The compiler, not the owner source record, owns the
+derived `registry_indexed` projection evidence.
 
 ## Cross-Organ Orchestration
 

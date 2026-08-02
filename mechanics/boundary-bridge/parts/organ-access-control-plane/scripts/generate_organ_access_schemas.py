@@ -21,6 +21,15 @@ from aoa_sdk.contracts.organs import (  # noqa: E402
     OrganResultEnvelope,
     OrganResultMetadata,
 )
+from aoa_sdk.contracts.organ_admission import (  # noqa: E402
+    AdmissionDecisionReceipt,
+    AdmissionEvidenceReceipt,
+    OrganAdmissionAuthorization,
+    OrganAdmissionBaselineAudit,
+    OrganAdmissionCandidate,
+    OrganAdmissionRequest,
+    OrganAdmissionRun,
+)
 
 
 OUTPUTS = {
@@ -33,6 +42,13 @@ OUTPUTS = {
     "organ-result-metadata.schema.json": OrganResultMetadata,
     "organ-result-envelope.schema.json": OrganResultEnvelope,
     "organ-owner-result-review.schema.json": OwnerResultReviewReceipt,
+    "organ-admission-request.schema.json": OrganAdmissionRequest,
+    "organ-admission-evidence.schema.json": AdmissionEvidenceReceipt,
+    "organ-admission-run.schema.json": OrganAdmissionRun,
+    "organ-admission-candidate.schema.json": OrganAdmissionCandidate,
+    "organ-admission-decision.schema.json": AdmissionDecisionReceipt,
+    "organ-admission-authorization.schema.json": OrganAdmissionAuthorization,
+    "organ-admission-baseline-audit.schema.json": OrganAdmissionBaselineAudit,
 }
 
 

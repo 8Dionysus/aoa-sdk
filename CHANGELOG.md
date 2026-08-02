@@ -9,6 +9,12 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
+- Add the D-0092 resumable organ-admission transaction: strict request,
+  baseline, evidence, candidate, authorization, decision, and run contracts
+  preserve issuer and expiry, refuse to mint proof or owner acceptance, preview
+  registry transitions, and require a separate authorized apply step before
+  the private registry can change.
+
 - Complete the X1 landed consumer-zero report: all 17 known consumers are
   landed or classified, 24 current repository heads have zero active
   predecessor checkout dependency, package upgrade/downgrade/restore and

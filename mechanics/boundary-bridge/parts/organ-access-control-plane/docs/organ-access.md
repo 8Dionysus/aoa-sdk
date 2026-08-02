@@ -19,6 +19,10 @@ owner contract + OS-private desired state + stack observations + eval refs
   -> private content-addressed runtime capture
   -> source/acceptance-owner grounding and freshness review
   -> owner-qualified result envelope and runtime receipt
+  -> resumable owner/runtime/proof admission evidence chain
+  -> immutable registry transition preview
+  -> separate owner and operator decision receipts
+  -> exact compare-and-swap authorization with no SDK write
 ```
 
 The concrete registry instance belongs to the configured OS workspace or
@@ -72,6 +76,12 @@ consumer compatibility, activation preconditions, exact owner freshness, and
 the required maturity evidence including rollback proof. Schema or deploy
 drift blocks compilation.
 
+`registry_indexed` is deliberately projection-owned. An owner source record
+cannot prove that a compiler has indexed itself. During deterministic
+compilation, `aoa-sdk` replaces that one projection axis with an expiring
+source-digest-bound index receipt; all semantic, runtime, proof, freshness,
+acceptance, and rollback axes remain externally owner-issued.
+
 `OrganResultEnvelope[T]` normalizes only access metadata: owners, revisions,
 schema digests, watermark, freshness/TTL/cache policy, evidence, effect state,
 warnings, receipt, and trace ID. `T` remains the organ owner's typed payload;
@@ -99,6 +109,44 @@ the owner verifier or choose `grounded`, `rejected`, or `blocked`. The receipt
 has structurally false claims for owner acceptance, central proof, admission,
 cross-organ proof, and rollback. `aoa-evals` may consume a verified receipt as
 one exact evidence input, but must not infer those other axes.
+
+## Resumable admission transaction
+
+`aoa organs admission-audit ORGAN_ID CAPABILITY_ID` first reports whether the
+current registry state is genuinely current, distinguishing an absent
+capability, non-admitted state, missing axes, and expired evidence without
+refreshing anything.
+
+`aoa organs admission-*` carries one explicit organ capability contour through
+the required receipt sequence:
+
+```text
+owner source -> reviewed revision -> package -> deploy manifest
+-> deployed bytes -> process -> endpoint -> observed schema -> auth contour
+-> consumer registration -> authenticated canary -> owner grounding/freshness
+-> central proof -> owner result acceptance -> rollback proof
+-> registry transition candidate
+```
+
+Every stage is content-addressed, binds the previous run snapshot, names its
+issuer and owner-native validator, carries exact subject/evidence/schema
+digests, and expires no later than the request. Exact replay is idempotent;
+conflicting replay, wrong order, wrong owner, stale evidence, registry drift,
+or a blocked/rejected receipt fails closed. A persisted run can be reloaded and
+rebuilt without calling any owner.
+
+The candidate is only a comparison against the current registry entry. It has
+`registry_update_authorized=false`, records no mutation, and cannot activate
+an effect. A later authorization requires two independently addressed receipts:
+one from the acceptance owner and one from the OS operator. It also validates
+the exact owner-authored admitted `OrganRecord` and current registry digest.
+Even then, the SDK returns a short-lived compare-and-swap authorization with
+`registry_mutation_performed=false`; the workspace owner performs the write and
+must verify the post-update projection separately.
+
+The shared transaction schema transports references to owner-native validators
+and receipts. It does not replace owner payload, proof, acceptance, deployment,
+or rollback schemas.
 
 ## Reproducible example
 

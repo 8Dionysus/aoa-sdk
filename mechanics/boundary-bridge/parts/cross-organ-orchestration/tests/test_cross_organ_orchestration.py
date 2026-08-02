@@ -8,10 +8,12 @@ from pydantic import ValidationError
 from typer.testing import CliRunner
 
 from aoa_sdk.cli.main import app
+from aoa_sdk.contracts.control_plane import canonical_digest
 from aoa_sdk.contracts.organ_orchestration import (
     CrossOrganOrchestrationRequest,
     CrossOrganOrchestrationRun,
     CrossOrganStageObservation,
+    HostVisibleStageReceipt,
 )
 from aoa_sdk.organs.orchestration import (
     OrganOrchestrationError,
@@ -39,6 +41,20 @@ def _request() -> CrossOrganOrchestrationRequest:
 def _accepted() -> CrossOrganOrchestrationRun:
     return CrossOrganOrchestrationRun.model_validate(
         _payload("cross-organ.accepted-shape.example.json")
+    )
+
+
+def _observation_payload(stage_index: int) -> dict:
+    return _accepted().stages[stage_index].observation.model_dump(mode="json")
+
+
+def _rehash_receipt(observation_payload: dict) -> None:
+    receipt_payload = observation_payload["receipt"]
+    receipt_payload["receipt_digest"] = "sha256:" + ("0" * 64)
+    receipt = HostVisibleStageReceipt.model_validate(receipt_payload)
+    receipt_payload["receipt_digest"] = canonical_digest(
+        receipt,
+        exclude={"receipt_digest"},
     )
 
 
@@ -115,9 +131,6 @@ def test_acceptance_requires_explicit_owner_review_and_exact_owner_receipt() -> 
     final_payload["receipt"]["owner_receipt_refs"] = []
     receipt = final_payload["receipt"]
     receipt["receipt_digest"] = "sha256:" + ("0" * 64)
-    from aoa_sdk.contracts.control_plane import canonical_digest
-    from aoa_sdk.contracts.organ_orchestration import HostVisibleStageReceipt
-
     receipt_model = HostVisibleStageReceipt.model_validate(receipt)
     receipt["receipt_digest"] = canonical_digest(
         receipt_model,
@@ -140,6 +153,103 @@ def test_stale_evidence_and_model_confidence_cannot_proceed() -> None:
     final["model_confidence_is_acceptance_authority"] = True
     with pytest.raises(ValidationError, match="False"):
         CrossOrganStageObservation.model_validate(final)
+
+
+def test_malformed_memo_candidate_and_schema_drift_fail_closed() -> None:
+    first = _accepted().stages[0].observation
+    run = advance_orchestration(start_orchestration(_request()), first)
+
+    malformed_payload = _observation_payload(1)
+    malformed_payload["output_ref"]["ref_kind"] = "eval_request"
+    malformed = CrossOrganStageObservation.model_validate(malformed_payload)
+    with pytest.raises(OrganOrchestrationError, match="output kind"):
+        advance_orchestration(run, malformed)
+
+    drift_payload = _observation_payload(1)
+    drift_digest = "sha256:" + ("9" * 64)
+    drift_payload["output_schema_identity"]["schema_digest"] = drift_digest
+    drift_payload["output_ref"]["schema_identity"]["schema_digest"] = drift_digest
+    drifted = CrossOrganStageObservation.model_validate(drift_payload)
+    with pytest.raises(OrganOrchestrationError, match="schema identity drifted"):
+        advance_orchestration(run, drifted)
+
+
+def test_wrong_owner_and_expired_receipt_fail_closed() -> None:
+    run = advance_orchestration(
+        start_orchestration(_request()),
+        _accepted().stages[0].observation,
+    )
+
+    wrong_owner_payload = _observation_payload(1)
+    wrong_owner_payload["stage_owner"] = "not-aoa-memo"
+    wrong_owner_payload["output_ref"]["owner"] = "not-aoa-memo"
+    wrong_owner_payload["output_ref"]["schema_identity"]["owner"] = (
+        "not-aoa-memo"
+    )
+    wrong_owner_payload["output_schema_identity"]["owner"] = "not-aoa-memo"
+    wrong_owner = CrossOrganStageObservation.model_validate(wrong_owner_payload)
+    with pytest.raises(OrganOrchestrationError, match="wrong owner"):
+        advance_orchestration(run, wrong_owner)
+
+    expired_receipt_payload = _observation_payload(1)
+    expired_receipt_payload["expires_at"] = "2026-07-26T12:20:00Z"
+    expired_receipt_payload["receipt"]["issued_at"] = "2026-07-26T12:20:00Z"
+    _rehash_receipt(expired_receipt_payload)
+    expired_receipt = CrossOrganStageObservation.model_validate(
+        expired_receipt_payload
+    )
+    with pytest.raises(OrganOrchestrationError, match="after stage expiry"):
+        advance_orchestration(run, expired_receipt)
+
+
+def test_eval_rejection_stops_before_owner_acceptance() -> None:
+    expected = _accepted()
+    run = start_orchestration(_request())
+    for stage in expected.stages[:3]:
+        run = advance_orchestration(run, stage.observation)
+
+    rejected_payload = _observation_payload(3)
+    rejected_payload["next_owner"] = None
+    rejected_payload["transition_state"] = "denied"
+    rejected_payload["stop_reason_codes"] = ["eval_rejected"]
+    rejected_payload["receipt"]["outcome"] = "denied"
+    _rehash_receipt(rejected_payload)
+    rejected = CrossOrganStageObservation.model_validate(rejected_payload)
+
+    stopped = advance_orchestration(run, rejected)
+    assert stopped.state == "denied"
+    assert stopped.next_stage_kind is None
+    assert stopped.next_owner is None
+    assert stopped.stop_reason_codes == ("eval_rejected",)
+    with pytest.raises(OrganOrchestrationError, match="terminal orchestration state"):
+        advance_orchestration(stopped, expected.stages[4].observation)
+
+
+def test_exact_replay_is_idempotent_and_advanced_snapshot_replay_is_denied() -> None:
+    request = _request()
+    initial = start_orchestration(request)
+    first = _accepted().stages[0].observation
+
+    advanced = advance_orchestration(initial, first)
+    assert advance_orchestration(start_orchestration(request), first) == advanced
+    with pytest.raises(OrganOrchestrationError, match="out of order"):
+        advance_orchestration(advanced, first)
+
+
+def test_serialized_restart_resumes_from_the_exact_snapshot() -> None:
+    expected = _accepted()
+    after_first = advance_orchestration(
+        start_orchestration(_request()),
+        expected.stages[0].observation,
+    )
+    restored = CrossOrganOrchestrationRun.model_validate_json(
+        after_first.model_dump_json()
+    )
+
+    assert validate_orchestration_run(restored) == after_first
+    assert advance_orchestration(restored, expected.stages[1].observation) == (
+        advance_orchestration(after_first, expected.stages[1].observation)
+    )
 
 
 def test_cli_starts_advances_and_validates_without_owner_execution(
