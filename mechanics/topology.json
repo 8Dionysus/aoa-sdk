@@ -167,6 +167,7 @@
       "cross-organ-orchestration",
       "route-resolution-control-plane",
       "plan-compilation-control-plane",
+      "agent-incarnation-binding",
       "runner-lifecycle-control-plane",
       "evidence-closeout-chain"
     ],
@@ -341,7 +342,7 @@
     {
       "slug": "boundary-bridge",
       "name_type": "shared",
-      "operation": "Keep SDK typed facades, consumed-surface posture gates, canonical routing succession evidence, receipt-bound C1 route resolution, exact-contour C2 plan compilation, explicit-adapter C3 lifecycle coordination, immutable C5 evidence composition, passive skill environment inspection, organ access, host-visible cross-organ receipt chains, and owner-layer signal handoffs bounded while sibling repositories retain meaning and runtime owners retain execution.",
+      "operation": "Keep SDK typed facades, consumed-surface posture gates, canonical routing succession evidence, receipt-bound C1 route resolution, exact-contour C2 plan compilation, post-compile incarnation binding, explicit-adapter C3 lifecycle coordination, immutable C5 evidence composition, passive skill environment inspection, organ access, host-visible cross-organ receipt chains, and owner-layer signal handoffs bounded while sibling repositories retain meaning and runtime owners retain execution.",
       "source_surfaces": [
         "docs/boundaries.md",
         "src/aoa_sdk/AGENTS.md",
@@ -387,6 +388,9 @@
         "mechanics/boundary-bridge/parts/cross-organ-orchestration",
         "mechanics/boundary-bridge/parts/route-resolution-control-plane",
         "mechanics/boundary-bridge/parts/plan-compilation-control-plane",
+        "mechanics/boundary-bridge/parts/agent-incarnation-binding",
+        "src/aoa_sdk/contracts/incarnation.py",
+        "src/aoa_sdk/control_plane/incarnation.py",
         "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane",
         "mechanics/boundary-bridge/parts/evidence-closeout-chain",
         "schemas/organ-access",
@@ -425,12 +429,15 @@
         "cross-organ-orchestration",
         "route-resolution-control-plane",
         "plan-compilation-control-plane",
+        "agent-incarnation-binding",
         "runner-lifecycle-control-plane",
         "evidence-closeout-chain"
       ],
       "validation": [
         "python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py mechanics/boundary-bridge/parts/organ-access-control-plane/tests mechanics/boundary-bridge/parts/cross-organ-orchestration/tests mechanics/boundary-bridge/parts/route-resolution-control-plane/tests mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests mechanics/boundary-bridge/parts/evidence-closeout-chain/tests",
         "python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/generate_plan_compilation_examples.py --check",
+        "python mechanics/boundary-bridge/parts/agent-incarnation-binding/scripts/generate_agent_incarnation_schema.py --check",
+        "python -m pytest -q mechanics/boundary-bridge/parts/agent-incarnation-binding/tests",
         "python -m build && python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py",
         "python -m build && python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py",
         "python -m build && python mechanics/boundary-bridge/parts/evidence-closeout-chain/scripts/verify_evidence_chain_wheel.py",

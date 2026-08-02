@@ -30,8 +30,9 @@ mean.
   consumer-zero, Runner delivery, and repository archival.
 - Keep C1 route resolution receipt-bound, deterministic, explainable, and
   non-activating. Keep C2 plan compilation pinned to an admitted owner contour,
-  reviewed inputs, and explicit conditions. Keep C3 lifecycle coordination in
-  its own explicit-adapter part with a non-executing reference witness.
+  reviewed inputs, and explicit conditions. Keep post-compile incarnation
+  binding exact and model-selection-free. Keep C3 lifecycle coordination in its
+  own explicit-adapter part with a non-executing reference witness.
 - Keep cross-organ orchestration host-visible and one-stage-at-a-time. Owner
   calls, credentials, retries, acceptance, and runtime effects remain outside
   the SDK; every transition binds the prior snapshot and exact owner receipt.

@@ -22,6 +22,8 @@ repositories remain authoritative.
 - The host owns skill discovery and execution; KAG and the executing agent own
   semantic retrieval and task-local composition.
 - `aoa-agents` owns role contracts, phase seams, and handoff doctrine.
+- `aoa-models` owns model identities, exact realizations, scoped claims,
+  studies, and informational fit projections.
 - `aoa-playbooks` owns scenario composition surfaces.
 - `aoa-memo` owns recall and memory objects.
 - `aoa-evals` owns proof surfaces and verdict meaning.
@@ -43,6 +45,10 @@ repositories remain authoritative.
   `aoa-playbooks` contour/schema pin, preserves reviewed input and condition
   provenance, and emits a runtime-neutral `RunPlan` without adapter selection
   or execution
+- the post-compile `AgentIncarnationBinding`, which validates exact
+  owner-qualified task, role, model-realization, runtime/tool, workspace,
+  permission, continuation, and wake refs against one immutable `RunPlan`
+  without selecting a model or interpreting model fit
 - the C3 `AoARunner` lifecycle client, which binds a caller-supplied adapter,
   validates exact runtime observations, approvals, bounded retries, receipts,
   event continuity, outcomes, restore, and closeout without executing a step
@@ -113,6 +119,8 @@ repositories remain authoritative.
 ## aoa-sdk Should Not Absorb
 
 - activation or model/tool execution from the runtime owner
+- model identity, realization, fit-claim, study, or model-selection meaning
+  from `aoa-models`, the caller, or `aoa-evals`
 - live runtime execution from the canonical receipt, release archive,
   attestation, trust record, copied runtime mirror, or schema-valid canary
   without the runtime owner's separate cutover receipt

@@ -14,6 +14,13 @@ For compilation, an explicit scenario selector projects that lane's exact
 runtime approval requirements; the A2A and degradation lanes project none,
 while bounded mutation projects `plan_freeze` and `landing`.
 
+`load_abyss_stack_external_codex_runtime_profile()` separately hashes and
+projects the exact `abyss_stack_external_codex_agent_v1` descriptor used by a
+post-compile `AgentIncarnationBinding`. It exposes compatibility and runtime
+provenance only, and rejects a descriptor that weakens the runtime-owned Linux
+subreaper/parent-death containment identity. It does not select a model,
+reasoning effort, tool profile, task family, or launch transport.
+
 `abyss-stack` remains the stronger owner of the bridge ABI, runtime policy,
 durable lifecycle state, approvals, real plan-step execution, evidence, and
 runtime outcome.

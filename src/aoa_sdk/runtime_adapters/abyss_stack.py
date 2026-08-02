@@ -48,6 +48,12 @@ ABYSS_STACK_PROFILE_SCHEMA_VERSION: Literal[
 ABYSS_STACK_BRIDGE_RESPONSE_VERSION: Literal[
     "abyss_stack_agent_os_bridge_response_v1"
 ] = "abyss_stack_agent_os_bridge_response_v1"
+ABYSS_STACK_EXTERNAL_CODEX_ADAPTER_VERSION: Literal[
+    "abyss_stack_external_codex_agent_v1"
+] = "abyss_stack_external_codex_agent_v1"
+ABYSS_STACK_EXTERNAL_CODEX_PROFILE_SCHEMA_VERSION: Literal[
+    "abyss_stack_external_codex_runtime_profile_v1"
+] = "abyss_stack_external_codex_runtime_profile_v1"
 
 AbyssStackOperation = Literal[
     "observe_snapshot",
@@ -102,6 +108,153 @@ class RuntimeABILocation(_StrictAdapterModel):
         if not Path(self.local_path).is_absolute():
             raise ValueError("runtime ABI location must be an absolute path")
         return self
+
+
+def load_abyss_stack_external_codex_runtime_profile(
+    descriptor_path: str | Path,
+) -> RuntimeProfile:
+    """Load the exact non-selecting profile for an external Codex process.
+
+    The SDK projects runtime compatibility and provenance only.  Model choice,
+    reasoning effort, tool-profile selection, launch, and model-fit judgment
+    remain explicit caller/runtime/aoa-models responsibilities.
+    """
+
+    path = Path(descriptor_path)
+    if not path.is_absolute():
+        raise AbyssStackAdapterError(
+            "external Codex runtime profile path must be absolute"
+        )
+    try:
+        raw = path.read_bytes()
+        descriptor = json.loads(raw)
+    except (OSError, json.JSONDecodeError) as exc:
+        raise AbyssStackAdapterError(
+            "external Codex runtime profile descriptor is unavailable"
+        ) from exc
+    required_fields = {
+        "$schema",
+        "schema_version",
+        "profile_id",
+        "runtime_owner",
+        "adapter_id",
+        "adapter_protocol_version",
+        "transport",
+        "source_ref",
+        "schema_ref",
+        "supported_plan_schema_versions",
+        "supported_event_schema_versions",
+        "supported_effect_classes",
+        "process_containment",
+        "codex_cli",
+        "model_admission",
+        "tool_profiles",
+        "task_families",
+        "result_schema_ref",
+        "boundaries",
+    }
+    boundaries = descriptor.get("boundaries") if isinstance(descriptor, dict) else None
+    process_containment = (
+        descriptor.get("process_containment")
+        if isinstance(descriptor, dict)
+        else None
+    )
+    if (
+        not isinstance(descriptor, dict)
+        or set(descriptor) != required_fields
+        or descriptor.get("schema_version")
+        != ABYSS_STACK_EXTERNAL_CODEX_PROFILE_SCHEMA_VERSION
+        or descriptor.get("profile_id")
+        != "runtime-profile:abyss-stack-external-codex-agent-v1"
+        or descriptor.get("runtime_owner") != "abyss-stack"
+        or descriptor.get("adapter_id")
+        != ABYSS_STACK_EXTERNAL_CODEX_ADAPTER_VERSION
+        or descriptor.get("adapter_protocol_version")
+        != "aoa_runtime_adapter_v1"
+        or descriptor.get("transport") != "codex_exec_jsonl_v1"
+        or not isinstance(descriptor.get("source_ref"), str)
+        or not descriptor["source_ref"]
+        or not isinstance(descriptor.get("schema_ref"), str)
+        or not descriptor["schema_ref"]
+        or not isinstance(boundaries, dict)
+        or boundaries.get("launches_separate_os_process") is not True
+        or boundaries.get("uses_builtin_codex_subagents") is not False
+        or boundaries.get("uses_tui_transport") is not False
+        or boundaries.get("model_fit_authority") is not False
+        or boundaries.get("owner_acceptance_authority") is not False
+        or boundaries.get("external_effects_enabled") is not False
+        or process_containment
+        != {
+            "strategy": "linux_subreaper_supervisor_v1",
+            "supervisor_ref": "external_codex_supervisor.py",
+            "parent_death_signal": "SIGTERM",
+            "term_timeout_seconds": 3.0,
+            "kill_timeout_seconds": 3.0,
+            "probe_executable": "/usr/bin/true",
+        }
+    ):
+        raise AbyssStackAdapterError(
+            "external Codex runtime profile descriptor identity is invalid"
+        )
+    for key in (
+        "supported_plan_schema_versions",
+        "supported_event_schema_versions",
+        "supported_effect_classes",
+    ):
+        values = descriptor.get(key)
+        if (
+            not isinstance(values, list)
+            or not values
+            or any(not isinstance(item, str) or not item for item in values)
+            or len(values) != len(set(values))
+        ):
+            raise AbyssStackAdapterError(
+                f"external Codex runtime profile {key} is invalid"
+            )
+    if "aoa_control_plane_v1" not in descriptor["supported_plan_schema_versions"]:
+        raise AbyssStackAdapterError(
+            "external Codex runtime profile does not admit this plan schema"
+        )
+    if "aoa_control_plane_v1" not in descriptor["supported_event_schema_versions"]:
+        raise AbyssStackAdapterError(
+            "external Codex runtime profile omits control-plane events"
+        )
+    if not set(descriptor["supported_effect_classes"]).issubset(
+        {"read_only", "repo_mutation"}
+    ):
+        raise AbyssStackAdapterError(
+            "external Codex runtime profile admits unsupported effect classes"
+        )
+    try:
+        provenance = ProvenanceRef(
+            owner_repo="abyss-stack",
+            artifact_ref=(
+                "mechanics/governed-execution/parts/external-codex-agent/"
+                "runtime-profile.v1.json"
+            ),
+            source_ref=descriptor["source_ref"],
+            artifact_digest="sha256:" + hashlib.sha256(raw).hexdigest(),
+            schema_ref=descriptor["schema_ref"],
+            schema_version=descriptor["schema_version"],
+        )
+        return RuntimeProfile(
+            profile_id=descriptor["profile_id"],
+            runtime_owner=descriptor["runtime_owner"],
+            adapter_id=descriptor["adapter_id"],
+            adapter_protocol_version=descriptor["adapter_protocol_version"],
+            supported_plan_schema_versions=tuple(
+                descriptor["supported_plan_schema_versions"]
+            ),
+            supported_event_schema_versions=tuple(
+                descriptor["supported_event_schema_versions"]
+            ),
+            supported_effect_classes=tuple(descriptor["supported_effect_classes"]),
+            provenance=provenance,
+        )
+    except (KeyError, TypeError, ValueError) as exc:
+        raise AbyssStackAdapterError(
+            "external Codex runtime profile violates the SDK projection"
+        ) from exc
 
 
 def load_abyss_stack_runtime_profile(
