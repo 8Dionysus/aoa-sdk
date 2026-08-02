@@ -80,6 +80,11 @@ the receipt-gated live cutover has executed. The current direction is bounded
 compatibility proof plus separately landable C1-C5 Agent OS control-plane
 slices, followed by an independently released Runner.
 
+Organ access now follows the same explicit control-plane direction: discovery
+and evidence collection feed a resumable non-mutating admission run, while
+central proof, owner acceptance, operator authorization, registry apply, and
+runtime effects remain separate owner transactions.
+
 The current repo-wide program is staged routing producer succession. The
 target is accepted in `AOA-SDK-D-0071`, the R2 typed control-plane, lifecycle,
 approval, event, and adapter contracts are explicit, the disposable R3

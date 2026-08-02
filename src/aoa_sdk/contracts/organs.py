@@ -354,6 +354,7 @@ class CredentialContours(StrictOrganModel):
 class PrimitiveContract(StrictOrganModel):
     primitive_id: Identifier
     kind: PrimitiveKind
+    mcp_name: NonEmptyStr | None = None
     effect_class: EffectClass
     policy_family: PolicyFamily
     input_schema_ref: SecretFreeRef | None = None
@@ -565,7 +566,6 @@ class OrganRecord(StrictOrganModel):
                 "deployed",
                 "process_alive",
                 "endpoint_ready",
-                "registry_indexed",
                 "consumer_registered",
                 "schema_observed",
                 "call_succeeded",

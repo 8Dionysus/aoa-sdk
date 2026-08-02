@@ -28,6 +28,7 @@
               "input_schema_ref": "owner://aoa-decisions/schema/input",
               "kind": "tool",
               "maximum_blast_radius": "read-only owner response",
+              "mcp_name": null,
               "output_schema_ref": "owner://aoa-decisions/schema/output",
               "policy_family": "read",
               "primitive_id": "retrieve-decision",
@@ -142,9 +143,15 @@
           "state": "not_asserted"
         },
         "registry_indexed": {
-          "evidence": null,
-          "freshness_policy": null,
-          "state": "not_asserted"
+          "evidence": {
+            "evidence_ref": "registry://abyss-wave1-example/sha256:f1fb328219456667499be1d2afb76f4355ddc1ef6c3d167e3536a79c9eec87bb/aoa-decisions",
+            "expires_at": "2027-01-01T00:00:00Z",
+            "observed_at": "2026-07-25T12:00:00Z",
+            "owner": "aoa-sdk",
+            "revision": "sha256:f1fb328219456667499be1d2afb76f4355ddc1ef6c3d167e3536a79c9eec87bb"
+          },
+          "freshness_policy": "registry-projection-expiry-v1",
+          "state": "asserted"
         },
         "result_grounded": {
           "evidence": null,
@@ -210,6 +217,7 @@
               "input_schema_ref": "owner://aoa-kag/schema/input",
               "kind": "tool",
               "maximum_blast_radius": "read-only owner response",
+              "mcp_name": null,
               "output_schema_ref": "owner://aoa-kag/schema/output",
               "policy_family": "read",
               "primitive_id": "retrieve-knowledge",
@@ -324,9 +332,15 @@
           "state": "not_asserted"
         },
         "registry_indexed": {
-          "evidence": null,
-          "freshness_policy": null,
-          "state": "not_asserted"
+          "evidence": {
+            "evidence_ref": "registry://abyss-wave1-example/sha256:f1fb328219456667499be1d2afb76f4355ddc1ef6c3d167e3536a79c9eec87bb/aoa-kag",
+            "expires_at": "2027-01-01T00:00:00Z",
+            "observed_at": "2026-07-25T12:00:00Z",
+            "owner": "aoa-sdk",
+            "revision": "sha256:f1fb328219456667499be1d2afb76f4355ddc1ef6c3d167e3536a79c9eec87bb"
+          },
+          "freshness_policy": "registry-projection-expiry-v1",
+          "state": "asserted"
         },
         "result_grounded": {
           "evidence": null,
@@ -392,6 +406,7 @@
               "input_schema_ref": "owner://aoa-stats/schema/input",
               "kind": "tool",
               "maximum_blast_radius": "read-only owner response",
+              "mcp_name": null,
               "output_schema_ref": "owner://aoa-stats/schema/output",
               "policy_family": "read",
               "primitive_id": "inspect-measurement",
@@ -506,9 +521,15 @@
           "state": "not_asserted"
         },
         "registry_indexed": {
-          "evidence": null,
-          "freshness_policy": null,
-          "state": "not_asserted"
+          "evidence": {
+            "evidence_ref": "registry://abyss-wave1-example/sha256:f1fb328219456667499be1d2afb76f4355ddc1ef6c3d167e3536a79c9eec87bb/aoa-stats",
+            "expires_at": "2027-01-01T00:00:00Z",
+            "observed_at": "2026-07-25T12:00:00Z",
+            "owner": "aoa-sdk",
+            "revision": "sha256:f1fb328219456667499be1d2afb76f4355ddc1ef6c3d167e3536a79c9eec87bb"
+          },
+          "freshness_policy": "registry-projection-expiry-v1",
+          "state": "asserted"
         },
         "result_grounded": {
           "evidence": null,
@@ -551,9 +572,9 @@
     }
   ],
   "expires_at": "2027-01-01T00:00:00Z",
-  "projection_digest": "sha256:a3d73ce68508eadeae47dc4f2a9ab02af156dea48ed95c30686f69eac8759a29",
+  "projection_digest": "sha256:b6698f5c5d329f223ec2747d85291f0412a8c75f0c294976739785c75ec9fb17",
   "registry_id": "abyss-wave1-example",
   "schema_version": "aoa_organ_registry_projection_v1",
-  "source_digest": "sha256:f5793502694b5269fa63aed01fc1c47f8b3a57580707fdd9c6fffec985ec70c7",
+  "source_digest": "sha256:f1fb328219456667499be1d2afb76f4355ddc1ef6c3d167e3536a79c9eec87bb",
   "workspace_owner": "os-abyss"
 }

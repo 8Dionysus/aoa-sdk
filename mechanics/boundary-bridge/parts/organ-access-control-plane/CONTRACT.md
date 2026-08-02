@@ -4,6 +4,8 @@
 
 - strict organ, result-envelope, registry, compatibility, and activation-plan
   models;
+- optional exact `mcp_name` bindings from owner primitive identity to the
+  server-visible tool, resource, template, or prompt name;
 - strict runtime-capture and owner-result-review models plus deterministic
   receipt addressing;
 - explicit registry-path resolution without repository/process discovery;
@@ -12,7 +14,15 @@
 - fail-closed policy, credential-class, schema, freshness, maturity, consumer,
   precondition, approval, expiry, and rollback checks;
 - a protocol-independent direct-owner connection descriptor with no execution
-  method.
+  method;
+- immutable admission request, evidence, run, candidate, decision, and
+  authorization contracts for one exact organ capability contour;
+- deterministic replay, resume, expiry, owner/issuer, current-registry
+  compare-and-swap, and transition-preview checks;
+- separate consumer-registration and final registry-operator owners, so a
+  consumer receipt cannot stand in for operator authorization;
+- projection-owned `registry_indexed` evidence, avoiding a circular source
+  claim before the compiler has actually indexed the record.
 
 ## Stronger owner split
 
@@ -40,3 +50,10 @@
   captures bytes; the source or acceptance owner reviews their meaning.
 - No `owner_accepted`, central-proof, admission, cross-organ, execution, or
   rollback claim from an owner grounding/freshness review.
+- No central proof or owner acceptance issued by `aoa-sdk`.
+- No registry mutation from an incomplete, blocked, expired, replay-conflicted,
+  or drifted admission run.
+- No registry write from an admission candidate. A target record requires
+  separate owner and operator decisions and exact compare-and-swap validation.
+- No effect activation from read, candidate, admission, or registry-transition
+  authorization.

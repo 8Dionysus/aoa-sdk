@@ -35,6 +35,9 @@ mean.
 - Keep cross-organ orchestration host-visible and one-stage-at-a-time. Owner
   calls, credentials, retries, acceptance, and runtime effects remain outside
   the SDK; every transition binds the prior snapshot and exact owner receipt.
+- Keep organ admission resumable and non-mutating: every stage binds an
+  owner-native receipt, exact replay is idempotent, and separate owner/operator
+  decisions authorize only one expiring compare-and-swap preview.
 
 ## Next Work
 

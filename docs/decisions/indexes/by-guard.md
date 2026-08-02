@@ -121,6 +121,10 @@
 
 - [AOA-SDK-D-0056 - CLI Command Family Route Modules](../AOA-SDK-D-0056-cli-command-family-route-modules.md) (`docs/decisions/AOA-SDK-D-0056-cli-command-family-route-modules.md`)
 
+## compare and swap
+
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
+
 ## compatibility
 
 - [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) (`docs/decisions/AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md`)
@@ -143,10 +147,18 @@
 
 - [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
 
+## content addressing
+
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
+
 ## decision drift
 
 - [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) (`docs/decisions/AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md`)
 - [AOA-SDK-D-0066 - Decision Index Read Model Symmetry](../AOA-SDK-D-0066-decision-index-read-model-symmetry.md) (`docs/decisions/AOA-SDK-D-0066-decision-index-read-model-symmetry.md`)
+
+## deny by default
+
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
 
 ## deny-by-default admission
 
@@ -417,6 +429,7 @@
 - [AOA-SDK-D-0079 - Expose Organ Discovery Through Workspace MCP](../AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md) (`docs/decisions/AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md`)
 - [AOA-SDK-D-0080 - Host-Visible Cross-Organ Orchestration](../AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md) (`docs/decisions/AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md`)
 - [AOA-SDK-D-0090 - Bind Owner Result Review After Runtime Capture](../AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md) (`docs/decisions/AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md`)
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
 
 ## owner follow-through
 
@@ -557,6 +570,7 @@
 - [AOA-SDK-D-0073 - Replay Release Evidence From an Immutable Tag](../AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md) (`docs/decisions/AOA-SDK-D-0073-replay-release-evidence-from-an-immutable-tag.md`)
 - [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
 - [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
 
 ## root route law
 

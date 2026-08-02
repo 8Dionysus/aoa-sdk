@@ -11,7 +11,17 @@ from ..contracts.organs import (
     ActivationRequest,
     EffectClass,
     FreshnessState,
+    OrganRecord,
     PolicyFamily,
+)
+from ..contracts.organ_admission import (
+    AdmissionDecisionReceipt,
+    AdmissionDecisionStatement,
+    AdmissionEvidenceReceipt,
+    AdmissionEvidenceStatement,
+    OrganAdmissionCandidate,
+    OrganAdmissionRequest,
+    OrganAdmissionRun,
 )
 from ..contracts.organ_orchestration import (
     CrossOrganOrchestrationRequest,
@@ -19,11 +29,14 @@ from ..contracts.organ_orchestration import (
     CrossOrganStageObservation,
 )
 from ..organs import (
+    OrganAdmissionError,
     OrganOrchestrationError,
     OrganRegistryError,
     OrgansAPI,
     compile_registry,
     load_registry_source,
+    materialize_admission_decision,
+    materialize_admission_evidence,
 )
 from ..workspace.discovery import Workspace
 
@@ -64,6 +77,10 @@ def _write_or_emit(value: Any, output: str | None) -> None:
         {
             "written": str(destination),
             "snapshot_digest": payload.get("snapshot_digest"),
+            "candidate_id": payload.get("candidate_id"),
+            "authorization_id": payload.get("authorization_id"),
+            "evidence_id": payload.get("evidence_id"),
+            "decision_id": payload.get("decision_id"),
             "owner_tools_executed_by_sdk": False,
         }
     )
@@ -220,6 +237,201 @@ def organs_plan(
     ) as exc:
         _fail(exc)
     _emit(plan)
+
+
+@organs_app.command("admission-address-evidence")
+def organs_admission_address_evidence(
+    statement: str = typer.Argument(
+        ...,
+        help="Externally issued admission evidence statement JSON path.",
+    ),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        payload = json.loads(Path(statement).read_text(encoding="utf-8"))
+        receipt = materialize_admission_evidence(
+            AdmissionEvidenceStatement.model_validate(payload)
+        )
+    except (OSError, json.JSONDecodeError, OrganAdmissionError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(receipt, output)
+
+
+@organs_app.command("admission-audit")
+def organs_admission_audit(
+    organ_id: str = typer.Argument(...),
+    capability_id: str = typer.Argument(...),
+    root: str = typer.Option(".", "--root"),
+    registry: str | None = typer.Option(None, "--registry"),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        audit = _api(root, registry).audit_admission_baseline(
+            organ_id,
+            capability_id,
+        )
+    except (OrganAdmissionError, OrganRegistryError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(audit, output)
+
+
+@organs_app.command("admission-start")
+def organs_admission_start(
+    request: str = typer.Argument(..., help="Admission request JSON path."),
+    root: str = typer.Option(".", "--root"),
+    registry: str | None = typer.Option(None, "--registry"),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        payload = json.loads(Path(request).read_text(encoding="utf-8"))
+        run = _api(root, registry).start_admission(
+            OrganAdmissionRequest.model_validate(payload)
+        )
+    except (
+        OSError,
+        json.JSONDecodeError,
+        OrganAdmissionError,
+        OrganRegistryError,
+        ValidationError,
+    ) as exc:
+        _fail(exc)
+    _write_or_emit(run, output)
+
+
+@organs_app.command("admission-advance")
+def organs_admission_advance(
+    run_path: str = typer.Argument(..., help="Current admission run JSON path."),
+    evidence: str = typer.Argument(..., help="Admission evidence receipt JSON path."),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        run_payload = json.loads(Path(run_path).read_text(encoding="utf-8"))
+        evidence_payload = json.loads(Path(evidence).read_text(encoding="utf-8"))
+        run = OrgansAPI.advance_admission(
+            OrganAdmissionRun.model_validate(run_payload),
+            AdmissionEvidenceReceipt.model_validate(evidence_payload),
+        )
+    except (OSError, json.JSONDecodeError, OrganAdmissionError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(run, output)
+
+
+@organs_app.command("admission-validate")
+def organs_admission_validate(
+    run_path: str = typer.Argument(..., help="Admission run JSON path."),
+) -> None:
+    try:
+        payload = json.loads(Path(run_path).read_text(encoding="utf-8"))
+        run = OrgansAPI.validate_admission(
+            OrganAdmissionRun.model_validate(payload)
+        )
+    except (OSError, json.JSONDecodeError, OrganAdmissionError, ValidationError) as exc:
+        _fail(exc)
+    _emit(
+        {
+            "valid": True,
+            "run_id": run.run_id,
+            "snapshot_digest": run.snapshot_digest,
+            "state": run.state,
+            "next_stage": run.next_stage,
+            "next_owner": run.next_owner,
+            "registry_mutated_by_sdk": False,
+            "central_proof_computed_by_sdk": False,
+            "owner_acceptance_inferred_by_sdk": False,
+        }
+    )
+
+
+@organs_app.command("admission-candidate")
+def organs_admission_candidate(
+    run_path: str = typer.Argument(..., help="Complete admission run JSON path."),
+    root: str = typer.Option(".", "--root"),
+    registry: str | None = typer.Option(None, "--registry"),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        payload = json.loads(Path(run_path).read_text(encoding="utf-8"))
+        candidate = _api(root, registry).build_admission_candidate(
+            OrganAdmissionRun.model_validate(payload)
+        )
+    except (
+        OSError,
+        json.JSONDecodeError,
+        OrganAdmissionError,
+        OrganRegistryError,
+        ValidationError,
+    ) as exc:
+        _fail(exc)
+    _write_or_emit(candidate, output)
+
+
+@organs_app.command("admission-address-decision")
+def organs_admission_address_decision(
+    statement: str = typer.Argument(
+        ...,
+        help="Externally issued owner/operator decision statement JSON path.",
+    ),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        payload = json.loads(Path(statement).read_text(encoding="utf-8"))
+        receipt = materialize_admission_decision(
+            AdmissionDecisionStatement.model_validate(payload)
+        )
+    except (OSError, json.JSONDecodeError, OrganAdmissionError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(receipt, output)
+
+
+@organs_app.command("admission-authorize")
+def organs_admission_authorize(
+    run_path: str = typer.Argument(..., help="Complete admission run JSON path."),
+    candidate_path: str = typer.Argument(..., help="Admission candidate JSON path."),
+    owner_decision_path: str = typer.Argument(..., help="Owner decision receipt path."),
+    operator_decision_path: str = typer.Argument(
+        ...,
+        help="Operator decision receipt path.",
+    ),
+    target_record_path: str = typer.Argument(
+        ...,
+        help="Exact admitted target OrganRecord JSON path.",
+    ),
+    root: str = typer.Option(".", "--root"),
+    registry: str | None = typer.Option(None, "--registry"),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        run = OrganAdmissionRun.model_validate(
+            json.loads(Path(run_path).read_text(encoding="utf-8"))
+        )
+        candidate = OrganAdmissionCandidate.model_validate(
+            json.loads(Path(candidate_path).read_text(encoding="utf-8"))
+        )
+        owner_decision = AdmissionDecisionReceipt.model_validate(
+            json.loads(Path(owner_decision_path).read_text(encoding="utf-8"))
+        )
+        operator_decision = AdmissionDecisionReceipt.model_validate(
+            json.loads(Path(operator_decision_path).read_text(encoding="utf-8"))
+        )
+        target_record = OrganRecord.model_validate(
+            json.loads(Path(target_record_path).read_text(encoding="utf-8"))
+        )
+        authorization = _api(root, registry).authorize_registry_transition(
+            run,
+            candidate,
+            owner_decision,
+            operator_decision,
+            target_record,
+        )
+    except (
+        OSError,
+        json.JSONDecodeError,
+        OrganAdmissionError,
+        OrganRegistryError,
+        ValidationError,
+    ) as exc:
+        _fail(exc)
+    _write_or_emit(authorization, output)
 
 
 @organs_app.command("orchestration-start")

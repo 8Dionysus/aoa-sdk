@@ -322,6 +322,10 @@
 
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
 
+## organ admission
+
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
+
 ## organ discovery
 
 - [AOA-SDK-D-0079 - Expose Organ Discovery Through Workspace MCP](../AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md) (`docs/decisions/AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md`)
@@ -375,6 +379,7 @@
 ## private registry
 
 - [AOA-SDK-D-0075 - Owner-Bounded Organ Access Control Plane](../AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md) (`docs/decisions/AOA-SDK-D-0075-owner-bounded-organ-access-control-plane.md`)
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
 
 ## progressive disclosure
 
@@ -609,6 +614,10 @@
 - [AOA-SDK-D-0043 - SDK Source Home Tree](../AOA-SDK-D-0043-sdk-source-home-tree.md) (`docs/decisions/AOA-SDK-D-0043-sdk-source-home-tree.md`)
 - [AOA-SDK-D-0044 - Mechanics Root Doc Slimming](../AOA-SDK-D-0044-mechanics-root-doc-slimming.md) (`docs/decisions/AOA-SDK-D-0044-mechanics-root-doc-slimming.md`)
 - [AOA-SDK-D-0047 - Docs Map And Stale Flat Docs Retirement](../AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md) (`docs/decisions/AOA-SDK-D-0047-docs-map-and-stale-flat-docs-retirement.md`)
+
+## transition receipt
+
+- [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
 
 ## typed model
 

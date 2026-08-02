@@ -101,6 +101,9 @@ repositories remain authoritative.
 - deterministic validation of a host-visible, one-stage-at-a-time KAG,
   memo-candidate, eval, and explicit owner-acceptance receipt chain without
   owner invocation
+- deterministic collection and replay of owner-issued organ-admission
+  evidence, plus non-mutating registry transition preview and separate
+  owner/operator decision validation
 - exact composition and lookup of owner-qualified evidence refs without
   copying, reinterpreting, or superseding their canonical payloads
 - passive skill-environment inspection and exact owner-profile user bootstrap
@@ -137,6 +140,8 @@ repositories remain authoritative.
 - admission inferred from repository, package, process, endpoint, consumer
   registration, or successful-call presence
 - automatic activation from discovery or an activation plan
+- registry mutation, proof computation, owner acceptance, or effect activation
+  from an admission run, candidate, or SDK authorization receipt
 - owner-specific capability semantics flattened into one universal payload
 - proof, memory, source, runtime, or external-effect acceptance
 - hidden MCP server chaining, owner-tool invocation, proof computation,
