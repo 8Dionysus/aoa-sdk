@@ -26,6 +26,9 @@ Active part homes:
 - `plan-compilation-control-plane/` compiles C2 runtime-neutral plans from an
   exact admitted `aoa-playbooks` contour and reviewed owner-qualified bindings
   without selecting an adapter, activating a capability, or executing work.
+- `agent-incarnation-binding/` binds one already-compiled plan to exact
+  task, role, model-realization, runtime, workspace, permission, continuation,
+  and wake refs without selecting a model or launching a process.
 - `runner-lifecycle-control-plane/` coordinates C3 lifecycle state through one
   caller-supplied adapter, validates exact runtime evidence, and carries a
   deterministic reference adapter that executes no plan steps.

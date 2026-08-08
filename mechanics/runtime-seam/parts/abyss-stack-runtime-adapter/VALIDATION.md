@@ -19,6 +19,11 @@ snapshot location rejection, typed Runner delegation through a transport
 double, no-shell subprocess argument shape, response-version checking, and
 transport-error closure.
 
+The agent-incarnation focused suite additionally proves the external-Codex
+descriptor projection, owner digest, boundary and containment weakening
+rejection, and the stop-line
+between runtime-profile compatibility and model selection.
+
 Real runtime execution proof remains paired with the runtime owner at
 `repo:abyss-stack/mechanics/governed-execution/parts/agent-os-adapter/tests`.
 An SDK-only green suite or installed-wheel probe is not invocation proof.

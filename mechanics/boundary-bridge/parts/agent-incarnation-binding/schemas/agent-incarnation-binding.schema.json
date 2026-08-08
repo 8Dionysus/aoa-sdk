@@ -1,0 +1,618 @@
+{
+  "$defs": {
+    "ContentRef": {
+      "additionalProperties": false,
+      "description": "Content-addressed reference to another control-plane object.",
+      "properties": {
+        "digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Digest",
+          "type": "string"
+        },
+        "object_id": {
+          "minLength": 1,
+          "title": "Object Id",
+          "type": "string"
+        },
+        "owner_repo": {
+          "minLength": 1,
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "schema_version": {
+          "minLength": 1,
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "object_id",
+        "owner_repo",
+        "schema_version",
+        "digest"
+      ],
+      "title": "ContentRef",
+      "type": "object"
+    },
+    "ContinuationObligation": {
+      "additionalProperties": false,
+      "description": "Compact durable state required after the parent inference yields.",
+      "properties": {
+        "continuation_id": {
+          "minLength": 1,
+          "title": "Continuation Id",
+          "type": "string"
+        },
+        "deferred_parent_decisions": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Deferred Parent Decisions",
+          "type": "array"
+        },
+        "delegated_obligation": {
+          "minLength": 1,
+          "title": "Delegated Obligation",
+          "type": "string"
+        },
+        "delegation_reason": {
+          "minLength": 1,
+          "title": "Delegation Reason",
+          "type": "string"
+        },
+        "established_decision_refs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "title": "Established Decision Refs",
+          "type": "array"
+        },
+        "exact_child_identity": {
+          "minLength": 1,
+          "title": "Exact Child Identity",
+          "type": "string"
+        },
+        "expected_output": {
+          "minLength": 1,
+          "title": "Expected Output",
+          "type": "string"
+        },
+        "immutable_input_refs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "minItems": 1,
+          "title": "Immutable Input Refs",
+          "type": "array"
+        },
+        "invariants": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Invariants",
+          "type": "array"
+        },
+        "owner_scope": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Owner Scope",
+          "type": "array"
+        },
+        "parent_objective_ref": {
+          "$ref": "#/$defs/ProvenanceRef"
+        },
+        "return_owner": {
+          "$ref": "#/$defs/ProvenanceRef"
+        },
+        "rollback_reentry_anchor": {
+          "$ref": "#/$defs/ProvenanceRef"
+        },
+        "stop_condition_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Stop Condition Ids",
+          "type": "array"
+        },
+        "validation_refs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "minItems": 1,
+          "title": "Validation Refs",
+          "type": "array"
+        },
+        "wake_condition_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Wake Condition Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "continuation_id",
+        "parent_objective_ref",
+        "established_decision_refs",
+        "delegated_obligation",
+        "delegation_reason",
+        "exact_child_identity",
+        "owner_scope",
+        "immutable_input_refs",
+        "expected_output",
+        "validation_refs",
+        "deferred_parent_decisions",
+        "invariants",
+        "stop_condition_ids",
+        "wake_condition_ids",
+        "return_owner",
+        "rollback_reentry_anchor"
+      ],
+      "title": "ContinuationObligation",
+      "type": "object"
+    },
+    "IncarnationPermissionPosture": {
+      "additionalProperties": false,
+      "description": "Exact effect and sandbox ceiling requested for one incarnation.",
+      "properties": {
+        "allowed_effect_classes": {
+          "items": {
+            "enum": [
+              "read_only",
+              "repo_mutation",
+              "runtime_mutation",
+              "external"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Allowed Effect Classes",
+          "type": "array"
+        },
+        "approval_policy": {
+          "enum": [
+            "never",
+            "on_request",
+            "on_failure",
+            "untrusted"
+          ],
+          "title": "Approval Policy",
+          "type": "string"
+        },
+        "external_effects": {
+          "default": false,
+          "title": "External Effects",
+          "type": "boolean"
+        },
+        "network_access": {
+          "enum": [
+            "disabled",
+            "allowlisted",
+            "enabled"
+          ],
+          "title": "Network Access",
+          "type": "string"
+        },
+        "sandbox_mode": {
+          "enum": [
+            "read_only",
+            "workspace_write",
+            "danger_full_access"
+          ],
+          "title": "Sandbox Mode",
+          "type": "string"
+        },
+        "secret_access": {
+          "default": false,
+          "title": "Secret Access",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "sandbox_mode",
+        "approval_policy",
+        "allowed_effect_classes",
+        "network_access"
+      ],
+      "title": "IncarnationPermissionPosture",
+      "type": "object"
+    },
+    "IncarnationStopCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "condition_id": {
+          "minLength": 1,
+          "title": "Condition Id",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "kind": {
+          "enum": [
+            "authority_boundary",
+            "scope_boundary",
+            "validation_failure",
+            "ambiguity",
+            "external_effect_required",
+            "runtime_failure",
+            "custom"
+          ],
+          "title": "Kind",
+          "type": "string"
+        },
+        "terminal": {
+          "default": true,
+          "title": "Terminal",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "condition_id",
+        "kind",
+        "description"
+      ],
+      "title": "IncarnationStopCondition",
+      "type": "object"
+    },
+    "IncarnationToolProfile": {
+      "additionalProperties": false,
+      "description": "Owner-qualified tool surface; no implicit user configuration.",
+      "properties": {
+        "inherit_user_configuration": {
+          "const": false,
+          "default": false,
+          "title": "Inherit User Configuration",
+          "type": "boolean"
+        },
+        "profile_id": {
+          "minLength": 1,
+          "title": "Profile Id",
+          "type": "string"
+        },
+        "profile_ref": {
+          "$ref": "#/$defs/ProvenanceRef"
+        },
+        "required_mcp_server_ids": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Required Mcp Server Ids",
+          "type": "array"
+        },
+        "required_tool_ids": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Required Tool Ids",
+          "type": "array"
+        }
+      },
+      "required": [
+        "profile_id",
+        "profile_ref",
+        "required_tool_ids"
+      ],
+      "title": "IncarnationToolProfile",
+      "type": "object"
+    },
+    "IncarnationUsageMetering": {
+      "additionalProperties": false,
+      "description": "Observe actual agent usage without turning observations into ceilings.",
+      "properties": {
+        "cost_interpretation": {
+          "const": "measurement_owner",
+          "default": "measurement_owner",
+          "title": "Cost Interpretation",
+          "type": "string"
+        },
+        "dimensions": {
+          "items": {
+            "enum": [
+              "input_tokens",
+              "cached_input_tokens",
+              "output_tokens",
+              "active_wall_seconds",
+              "turn_count",
+              "output_bytes",
+              "executed_commands"
+            ],
+            "type": "string"
+          },
+          "maxItems": 7,
+          "minItems": 7,
+          "title": "Dimensions",
+          "type": "array"
+        },
+        "execution_limit_policy": {
+          "const": "none",
+          "default": "none",
+          "title": "Execution Limit Policy",
+          "type": "string"
+        },
+        "metering_regime": {
+          "minLength": 1,
+          "title": "Metering Regime",
+          "type": "string"
+        },
+        "mode": {
+          "const": "observe_only",
+          "default": "observe_only",
+          "title": "Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "metering_regime",
+        "dimensions"
+      ],
+      "title": "IncarnationUsageMetering",
+      "type": "object"
+    },
+    "ProvenanceRef": {
+      "additionalProperties": false,
+      "description": "Exact owner-qualified provenance for a source or projected artifact.",
+      "properties": {
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        },
+        "artifact_ref": {
+          "minLength": 1,
+          "title": "Artifact Ref",
+          "type": "string"
+        },
+        "owner_repo": {
+          "minLength": 1,
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "schema_ref": {
+          "minLength": 1,
+          "title": "Schema Ref",
+          "type": "string"
+        },
+        "schema_version": {
+          "minLength": 1,
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner_repo",
+        "artifact_ref",
+        "source_ref",
+        "artifact_digest",
+        "schema_ref",
+        "schema_version"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    },
+    "WakeCondition": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "continue_without_parent",
+            "activate_review_role",
+            "wake_parent",
+            "stop"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "condition_id": {
+          "minLength": 1,
+          "title": "Condition Id",
+          "type": "string"
+        },
+        "description": {
+          "minLength": 1,
+          "title": "Description",
+          "type": "string"
+        },
+        "event_kind": {
+          "minLength": 1,
+          "title": "Event Kind",
+          "type": "string"
+        }
+      },
+      "required": [
+        "condition_id",
+        "event_kind",
+        "action",
+        "description"
+      ],
+      "title": "WakeCondition",
+      "type": "object"
+    },
+    "WakeEscalationPolicy": {
+      "additionalProperties": false,
+      "description": "Event-shaped re-entry policy; child completion alone has no fixed action.",
+      "properties": {
+        "conditions": {
+          "items": {
+            "$ref": "#/$defs/WakeCondition"
+          },
+          "minItems": 1,
+          "title": "Conditions",
+          "type": "array"
+        },
+        "default_action": {
+          "enum": [
+            "continue_without_parent",
+            "activate_review_role",
+            "wake_parent",
+            "stop"
+          ],
+          "title": "Default Action",
+          "type": "string"
+        },
+        "escalation_conditions": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Escalation Conditions",
+          "type": "array"
+        },
+        "mode": {
+          "const": "event_filtered_reentry",
+          "default": "event_filtered_reentry",
+          "title": "Mode",
+          "type": "string"
+        }
+      },
+      "required": [
+        "default_action",
+        "conditions",
+        "escalation_conditions"
+      ],
+      "title": "WakeEscalationPolicy",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:agent-incarnation-binding:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "One exact, non-executing binding across task, role, model, and runtime.",
+  "properties": {
+    "binding_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Binding Digest",
+      "type": "string"
+    },
+    "binding_id": {
+      "minLength": 1,
+      "title": "Binding Id",
+      "type": "string"
+    },
+    "causation_id": {
+      "minLength": 1,
+      "title": "Causation Id",
+      "type": "string"
+    },
+    "continuation": {
+      "$ref": "#/$defs/ContinuationObligation"
+    },
+    "correlation_id": {
+      "minLength": 1,
+      "title": "Correlation Id",
+      "type": "string"
+    },
+    "expected_result_schema_ref": {
+      "$ref": "#/$defs/ProvenanceRef"
+    },
+    "incarnation_id": {
+      "minLength": 1,
+      "title": "Incarnation Id",
+      "type": "string"
+    },
+    "model_realization_ref": {
+      "$ref": "#/$defs/ProvenanceRef"
+    },
+    "permission_posture": {
+      "$ref": "#/$defs/IncarnationPermissionPosture"
+    },
+    "provenance": {
+      "$ref": "#/$defs/ProvenanceRef"
+    },
+    "role_contract_ref": {
+      "$ref": "#/$defs/ProvenanceRef"
+    },
+    "role_id": {
+      "minLength": 1,
+      "title": "Role Id",
+      "type": "string"
+    },
+    "run_plan_ref": {
+      "$ref": "#/$defs/ContentRef"
+    },
+    "runtime_profile_ref": {
+      "$ref": "#/$defs/ProvenanceRef"
+    },
+    "schema_version": {
+      "const": "aoa_agent_incarnation_binding_v1",
+      "default": "aoa_agent_incarnation_binding_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "stop_conditions": {
+      "items": {
+        "$ref": "#/$defs/IncarnationStopCondition"
+      },
+      "minItems": 1,
+      "title": "Stop Conditions",
+      "type": "array"
+    },
+    "task_request_ref": {
+      "$ref": "#/$defs/ProvenanceRef"
+    },
+    "tool_profile": {
+      "$ref": "#/$defs/IncarnationToolProfile"
+    },
+    "trace_id": {
+      "minLength": 1,
+      "title": "Trace Id",
+      "type": "string"
+    },
+    "usage_metering": {
+      "$ref": "#/$defs/IncarnationUsageMetering"
+    },
+    "wake_policy": {
+      "$ref": "#/$defs/WakeEscalationPolicy"
+    },
+    "workspace_source_ref": {
+      "$ref": "#/$defs/ProvenanceRef"
+    }
+  },
+  "required": [
+    "binding_id",
+    "incarnation_id",
+    "correlation_id",
+    "causation_id",
+    "trace_id",
+    "run_plan_ref",
+    "task_request_ref",
+    "role_id",
+    "role_contract_ref",
+    "model_realization_ref",
+    "runtime_profile_ref",
+    "workspace_source_ref",
+    "permission_posture",
+    "tool_profile",
+    "usage_metering",
+    "stop_conditions",
+    "expected_result_schema_ref",
+    "continuation",
+    "wake_policy",
+    "binding_digest",
+    "provenance"
+  ],
+  "title": "AgentIncarnationBinding",
+  "type": "object"
+}

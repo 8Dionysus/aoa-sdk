@@ -14,8 +14,9 @@ sibling repositories retain meaning.
 Use this mechanic when a typed facade, registry, consumed-surface posture gate,
 skill environment inspector, technique promotion readiness reader, owner-layer signal
 handoff, explicit cross-organ receipt chain, route hint, deterministic route
-resolution, stats read, or sibling-owned generated reader changes, or when
-lifecycle boundary or the cross-owner evidence/closeout composition changes.
+resolution, stats read, or sibling-owned generated reader changes, or when a
+post-compile incarnation binding, lifecycle boundary, or the cross-owner
+evidence/closeout composition changes.
 
 ### SDK owns
 
@@ -31,6 +32,9 @@ lifecycle boundary or the cross-owner evidence/closeout composition changes.
   without activation
 - deterministic compilation of an exact reviewed scenario binding from an
   admitted owner contour into a runtime-neutral plan without execution
+- deterministic post-compile binding of exact task, role, model-realization,
+  runtime, workspace, permission, continuation, and wake refs without model
+  selection or execution
 - deterministic validation of a host-visible KAG-to-memory-to-eval-to-owner
   receipt chain without invoking an owner tool
 - explicit-adapter lifecycle admission and reconciliation without plan-step
@@ -42,7 +46,7 @@ lifecycle boundary or the cross-owner evidence/closeout composition changes.
 
 ### Stronger owner split
 
-`aoa-skills`, `aoa-evals`, `aoa-memo`, `aoa-agents`, `aoa-playbooks`,
+`aoa-skills`, `aoa-evals`, `aoa-memo`, `aoa-agents`, `aoa-models`, `aoa-playbooks`,
 `aoa-techniques`, stats/KAG owners, and other active sibling repos retain their
 domain meaning. Archived `aoa-routing` retains historical predecessor and ABI
 provenance; current routing producer and ABI ownership belong to `aoa-sdk`.
@@ -73,6 +77,7 @@ provenance; current routing producer and ABI ownership belong to `aoa-sdk`.
 - `src/aoa_sdk/techniques/`
 - `mechanics/boundary-bridge/parts/route-resolution-control-plane/`
 - `mechanics/boundary-bridge/parts/plan-compilation-control-plane/`
+- `mechanics/boundary-bridge/parts/agent-incarnation-binding/`
 - `mechanics/boundary-bridge/parts/cross-organ-orchestration/`
 - `mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/`
 - `mechanics/boundary-bridge/parts/evidence-closeout-chain/`
@@ -92,6 +97,7 @@ provenance; current routing producer and ABI ownership belong to `aoa-sdk`.
 - organ-access-control-plane
 - route-resolution-control-plane
 - plan-compilation-control-plane
+- agent-incarnation-binding
 - cross-organ-orchestration
 - runner-lifecycle-control-plane
 - evidence-closeout-chain

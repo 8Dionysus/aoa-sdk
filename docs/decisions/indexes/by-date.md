@@ -129,3 +129,4 @@
 ## 2026-08-01
 
 - [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
+- [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)

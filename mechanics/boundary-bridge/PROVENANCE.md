@@ -9,6 +9,7 @@
 - `src/aoa_sdk/errors.py`
 - `src/aoa_sdk/models.py`
 - `src/aoa_sdk/contracts/control_plane.py`
+- `src/aoa_sdk/contracts/incarnation.py`
 - `src/aoa_sdk/contracts/organ_orchestration.py`
 - `src/aoa_sdk/contracts/evidence_chain.py`
 - `src/aoa_sdk/agents/`
@@ -75,6 +76,8 @@
 - `mechanics/boundary-bridge/parts/route-resolution-control-plane/`
 - `src/aoa_sdk/control_plane/planning/`
 - `mechanics/boundary-bridge/parts/plan-compilation-control-plane/`
+- `src/aoa_sdk/control_plane/incarnation.py`
+- `mechanics/boundary-bridge/parts/agent-incarnation-binding/`
 - `src/aoa_sdk/control_plane/runner/`
 - `mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/`
 - `src/aoa_sdk/control_plane/evidence_chain.py`

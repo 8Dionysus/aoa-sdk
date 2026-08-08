@@ -25,6 +25,16 @@ supplies an exact `scenario_id`, the loader also projects only that
 compatibility entry's runtime-owned approval requirements into the profile;
 it grants none of them.
 
+For an external Codex incarnation,
+`load_abyss_stack_external_codex_runtime_profile()` accepts only one absolute
+descriptor path with the exact external-process adapter identity, control-plane
+compatibility, owner provenance, and false built-in-subagent/TUI/model-fit/
+acceptance/external-effect boundaries. The descriptor must also retain the
+runtime-owned Linux subreaper and parent-death containment identity; the
+SDK validates that compatibility coordinate but does not execute it. It returns
+a `RuntimeProfile` with no runtime approvals. The caller still chooses and binds the exact
+`aoa-models` realization and runtime tool-profile entry after compilation.
+
 ## Transport
 
 `AbyssStackSubprocessTransport` invokes:

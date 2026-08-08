@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 14407545,
+  "allowed_tracked_bytes": 19587559,
+  "approved_by": "repository-owner",
+  "base_ref": "c147de839776cf2ee64663fa469b9deb2e460460",
+  "changed_generated_bytes": 14407545,
+  "changed_generated_files": 289,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "fee4edae5d5e7004394db9773fffda4616d0ebbb4ffa4bb100ade6ca090588f0",
+  "reason": "Regenerate the portable family after binding task inputs and permission classes to the exact role steps; tracked size remains within the standing cap.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 19587559,
+  "tracked_bytes_max": 15728640
+}
