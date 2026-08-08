@@ -1,0 +1,575 @@
+{
+  "$defs": {
+    "ConsumerCompatibility": {
+      "additionalProperties": false,
+      "properties": {
+        "consumer_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Consumer Id",
+          "type": "string"
+        },
+        "evidence_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QualifiedEvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "observed_schema_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Observed Schema Digest"
+        },
+        "protocol_versions": {
+          "default": [],
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Protocol Versions",
+          "type": "array"
+        },
+        "support_state": {
+          "enum": [
+            "supported",
+            "shadow",
+            "blocked",
+            "unknown"
+          ],
+          "title": "Support State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "consumer_id",
+        "support_state"
+      ],
+      "title": "ConsumerCompatibility",
+      "type": "object"
+    },
+    "ContourLastGoodState": {
+      "additionalProperties": false,
+      "description": "A separately evidenced rollback target, never an admission shortcut.",
+      "properties": {
+        "credential_class": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Credential Class",
+          "type": "string"
+        },
+        "endpoint_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Endpoint Ref",
+          "type": "string"
+        },
+        "evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/QualifiedEvidenceRef"
+          },
+          "minItems": 1,
+          "title": "Evidence Refs",
+          "type": "array"
+        },
+        "expires_at": {
+          "format": "date-time",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "principal_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Principal Id",
+          "type": "string"
+        },
+        "protocol_version": {
+          "minLength": 1,
+          "title": "Protocol Version",
+          "type": "string"
+        },
+        "recorded_at": {
+          "format": "date-time",
+          "title": "Recorded At",
+          "type": "string"
+        },
+        "rollback_executed": {
+          "const": false,
+          "default": false,
+          "title": "Rollback Executed",
+          "type": "boolean"
+        },
+        "runtime_identity": {
+          "$ref": "#/$defs/ContourRuntimeIdentity"
+        },
+        "server_schema_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Server Schema Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "recorded_at",
+        "expires_at",
+        "protocol_version",
+        "endpoint_ref",
+        "credential_class",
+        "principal_id",
+        "server_schema_digest",
+        "runtime_identity",
+        "evidence_refs"
+      ],
+      "title": "ContourLastGoodState",
+      "type": "object"
+    },
+    "ContourRuntimeIdentity": {
+      "additionalProperties": false,
+      "description": "Non-secret identities required to bind one deployed contour.",
+      "properties": {
+        "dependency_graph_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dependency Graph Digest"
+        },
+        "deployed_tree_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deployed Tree Digest"
+        },
+        "deployment_manifest_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deployment Manifest Digest"
+        },
+        "deployment_manifest_ref": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deployment Manifest Ref"
+        },
+        "deployment_revision": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deployment Revision"
+        },
+        "package_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Package Digest"
+        },
+        "package_name": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Package Name",
+          "type": "string"
+        },
+        "package_version": {
+          "minLength": 1,
+          "title": "Package Version",
+          "type": "string"
+        },
+        "process_identity": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Process Identity"
+        },
+        "process_ref": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Process Ref"
+        },
+        "source_revision": {
+          "minLength": 1,
+          "title": "Source Revision",
+          "type": "string"
+        },
+        "source_tree_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Tree Digest"
+        }
+      },
+      "required": [
+        "source_revision",
+        "package_name",
+        "package_version"
+      ],
+      "title": "ContourRuntimeIdentity",
+      "type": "object"
+    },
+    "MaturityEvidence": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/QualifiedEvidenceRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "freshness_policy": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Freshness Policy"
+        },
+        "state": {
+          "enum": [
+            "asserted",
+            "not_asserted",
+            "not_applicable"
+          ],
+          "title": "State",
+          "type": "string"
+        }
+      },
+      "required": [
+        "state"
+      ],
+      "title": "MaturityEvidence",
+      "type": "object"
+    },
+    "OrganMaturityVector": {
+      "additionalProperties": false,
+      "properties": {
+        "call_succeeded": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "consumer_registered": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "cross_organ_proven": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "declared": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "deployed": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "endpoint_ready": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "exported": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "freshness_satisfied": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "owner_accepted": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "owner_reviewed": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "packaged": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "process_alive": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "registry_indexed": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "result_grounded": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "rollback_proven": {
+          "$ref": "#/$defs/MaturityEvidence"
+        },
+        "schema_observed": {
+          "$ref": "#/$defs/MaturityEvidence"
+        }
+      },
+      "required": [
+        "declared",
+        "owner_reviewed",
+        "packaged",
+        "exported",
+        "deployed",
+        "process_alive",
+        "endpoint_ready",
+        "registry_indexed",
+        "consumer_registered",
+        "schema_observed",
+        "call_succeeded",
+        "result_grounded",
+        "freshness_satisfied",
+        "owner_accepted",
+        "cross_organ_proven",
+        "rollback_proven"
+      ],
+      "title": "OrganMaturityVector",
+      "type": "object"
+    },
+    "QualifiedEvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "title": "Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "evidence_ref",
+        "revision",
+        "observed_at"
+      ],
+      "title": "QualifiedEvidenceRef",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:organ-contour-admission-revision.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Operator-issued CAS transition for one fully evidenced contour.\n\nThe revision carries already-issued evidence.  It cannot execute owner\ntools, infer acceptance, authorize effects, or admit a different contour.",
+  "properties": {
+    "acceptance_ref": {
+      "$ref": "#/$defs/QualifiedEvidenceRef"
+    },
+    "admission_authorized": {
+      "const": true,
+      "title": "Admission Authorized",
+      "type": "boolean"
+    },
+    "consumer_compatibility": {
+      "$ref": "#/$defs/ConsumerCompatibility"
+    },
+    "contains_secrets": {
+      "const": false,
+      "default": false,
+      "title": "Contains Secrets",
+      "type": "boolean"
+    },
+    "contour_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Contour Id",
+      "type": "string"
+    },
+    "cross_organ_asserted": {
+      "const": false,
+      "default": false,
+      "title": "Cross Organ Asserted",
+      "type": "boolean"
+    },
+    "effect_authorized": {
+      "const": false,
+      "default": false,
+      "title": "Effect Authorized",
+      "type": "boolean"
+    },
+    "expected_contour_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Expected Contour Digest",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "freshness_evidence": {
+      "$ref": "#/$defs/QualifiedEvidenceRef"
+    },
+    "issued_at": {
+      "format": "date-time",
+      "title": "Issued At",
+      "type": "string"
+    },
+    "last_good": {
+      "$ref": "#/$defs/ContourLastGoodState"
+    },
+    "maturity": {
+      "$ref": "#/$defs/OrganMaturityVector"
+    },
+    "operator_evidence": {
+      "$ref": "#/$defs/QualifiedEvidenceRef"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "owner_watermark": {
+      "minLength": 1,
+      "title": "Owner Watermark",
+      "type": "string"
+    },
+    "owner_watermark_evidence": {
+      "$ref": "#/$defs/QualifiedEvidenceRef"
+    },
+    "proof_ref": {
+      "$ref": "#/$defs/QualifiedEvidenceRef"
+    },
+    "revision_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Revision Digest",
+      "type": "string"
+    },
+    "revision_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Revision Id",
+      "type": "string"
+    },
+    "rollback_executed": {
+      "const": false,
+      "default": false,
+      "title": "Rollback Executed",
+      "type": "boolean"
+    },
+    "rollback_ref": {
+      "$ref": "#/$defs/QualifiedEvidenceRef"
+    },
+    "schema_version": {
+      "const": "aoa_organ_contour_admission_revision_v1",
+      "default": "aoa_organ_contour_admission_revision_v1",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "revision_id",
+    "revision_digest",
+    "organ_id",
+    "contour_id",
+    "expected_contour_digest",
+    "issued_at",
+    "expires_at",
+    "operator_evidence",
+    "proof_ref",
+    "acceptance_ref",
+    "rollback_ref",
+    "freshness_evidence",
+    "owner_watermark",
+    "owner_watermark_evidence",
+    "consumer_compatibility",
+    "last_good",
+    "maturity",
+    "admission_authorized"
+  ],
+  "title": "OrganContourAdmissionRevision",
+  "type": "object"
+}

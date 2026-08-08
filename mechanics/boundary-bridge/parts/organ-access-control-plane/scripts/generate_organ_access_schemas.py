@@ -32,7 +32,9 @@ from aoa_sdk.contracts.organ_admission import (  # noqa: E402
     OrganAdmissionRun,
 )
 from aoa_sdk.contracts.organ_registry_v2 import (  # noqa: E402
+    OrganContourAdmissionRevision,
     OrganContourSupplement,
+    OrganContourShapeRevision,
     OrganContourRecord,
     OrganRegistryProjectionV2,
     OrganRegistryRuntimeOverlay,
@@ -67,6 +69,10 @@ OUTPUTS = {
     "organ-admission-baseline-audit.schema.json": OrganAdmissionBaselineAudit,
     "organ-contour-v2.schema.json": OrganContourRecord,
     "organ-contour-supplement.schema.json": OrganContourSupplement,
+    "organ-contour-shape-revision.schema.json": OrganContourShapeRevision,
+    "organ-contour-admission-revision.schema.json": (
+        OrganContourAdmissionRevision
+    ),
     "organ-registry-source-v2.schema.json": OrganRegistrySourceV2,
     "organ-registry-projection-v2.schema.json": OrganRegistryProjectionV2,
     "organ-registry-runtime-overlay.schema.json": OrganRegistryRuntimeOverlay,
@@ -82,6 +88,8 @@ OUTPUTS = {
 PART_LOCAL_OUTPUTS = {
     "organ-contour-v2.schema.json",
     "organ-contour-supplement.schema.json",
+    "organ-contour-shape-revision.schema.json",
+    "organ-contour-admission-revision.schema.json",
     "organ-registry-source-v2.schema.json",
     "organ-registry-projection-v2.schema.json",
     "organ-registry-runtime-overlay.schema.json",

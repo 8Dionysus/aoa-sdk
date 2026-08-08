@@ -50,5 +50,10 @@ adapter boundary, and model-neutral actor-incarnation binding. It does not
 admit a runtime contour, mint proof or owner acceptance, enable MCP Tasks in
 production, or move owner execution into the SDK.
 
+`v0.10.1` adds the first native registry-v2 contour admission transaction:
+source-owner shape correction plus a content-addressed, predecessor-bound CAS
+that consumes independent runtime, consumer, proof, acceptance, rollback, and
+operator receipts while keeping cross-organ and effect authority false.
+
 Use that part when changing release audit, publish helper behavior, changelog
 publication shape, or release validation.

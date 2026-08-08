@@ -60,7 +60,21 @@ inferred from this SDK projection. The admission transaction validates
 externally issued owner/runtime/proof receipts; it never runs those validators
 or issues their verdicts.
 
-The v2 registry and Keeper remain compatible control-plane additions. A live
+The v2 registry and Keeper remain compatible control-plane additions. An
+expired predecessor can become fresh desired state only through the explicit
+shadow rebase: it preserves declared contour shape and boundaries while
+removing every admission, endpoint, runtime, freshness, consumer, proof,
+acceptance, maturity, and last-good claim. It cannot reset a still-current
+source or mint an expiry longer than the bounded rebase TTL. A source-owner
+shape revision may replace one exact predecessor contour by digest, but the
+replacement is also forced to bare shadow and cannot carry any cleared claim.
+A contour enters `admitted` only through a separately content-addressed
+operator revision bound by compare-and-swap to that exact shadow. The SDK
+checks evidence owners and lifetimes for all non-cross-organ maturity axes,
+requires distinct proof, owner acceptance, rollback, consumer, and operator
+receipts, and records a compatible last-good target. It still performs no
+owner tool call, registry publication, rollback, or effect activation.
+A live
 runtime overlay may bind exact package/process/endpoint identity but cannot
 repair expired source, proof, acceptance, consumer, or registry evidence. The
 Keeper serializes each complete import/plan/state transaction so concurrent

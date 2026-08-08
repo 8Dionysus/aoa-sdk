@@ -161,6 +161,10 @@
 
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
 
+## contour admission
+
+- [AOA-SDK-D-0095 - Admit One Contour Through Content-Addressed CAS](../AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md) (`docs/decisions/AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md`)
+
 ## control-plane
 
 - [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
@@ -335,6 +339,10 @@
 
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
 
+## operator decision
+
+- [AOA-SDK-D-0095 - Admit One Contour Through Content-Addressed CAS](../AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md) (`docs/decisions/AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md`)
+
 ## organ admission
 
 - [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
@@ -346,6 +354,7 @@
 ## organ registry
 
 - [AOA-SDK-D-0094 - Separate Contour Admission, Keeper Evidence, and Owner Tasks](../AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md) (`docs/decisions/AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md`)
+- [AOA-SDK-D-0095 - Admit One Contour Through Content-Addressed CAS](../AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md) (`docs/decisions/AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md`)
 
 ## owner boundary
 

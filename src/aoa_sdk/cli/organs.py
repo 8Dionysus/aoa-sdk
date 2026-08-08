@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import json
+from datetime import datetime, timezone
 from pathlib import Path
 from typing import Any
 
@@ -29,7 +30,9 @@ from ..contracts.admission_keeper import (
     AdmissionKeeperState,
 )
 from ..contracts.organ_registry_v2 import (
+    OrganContourAdmissionRevision,
     OrganContourSupplement,
+    OrganContourShapeRevision,
     OrganRegistryRuntimeOverlay,
 )
 from ..contracts.organ_orchestration import (
@@ -38,9 +41,11 @@ from ..contracts.organ_orchestration import (
     CrossOrganStageObservation,
 )
 from ..organs import (
+    apply_contour_admission_revision,
     AdmissionKeeperError,
     KeeperEvidenceStore,
     apply_contour_supplement,
+    apply_contour_shape_revision,
     apply_registry_runtime_overlay,
     OrganAdmissionError,
     OrganOrchestrationError,
@@ -55,10 +60,13 @@ from ..organs import (
     materialize_admission_evidence,
     materialize_keeper_spec,
     migrate_registry_file_v1_to_v2,
+    migrate_registry_v1_to_v2,
     plan_keeper_refresh,
+    rebase_expired_registry_v2_to_shadow,
     run_keeper_cycle,
 )
 from ..workspace.discovery import Workspace
+from ..organs.registry import sha256_digest
 
 
 organs_app = typer.Typer(
@@ -223,6 +231,186 @@ def organs_registry_migrate_v2(
     except (OrganRegistryError, ValidationError) as exc:
         _fail(exc)
     _write_or_emit(migrated, output)
+
+
+def _parse_timestamp(value: str, *, field: str) -> datetime:
+    try:
+        parsed = datetime.fromisoformat(value.replace("Z", "+00:00"))
+    except ValueError as exc:
+        raise OrganRegistryError(f"{field} must be an RFC 3339 timestamp") from exc
+    if parsed.tzinfo is None or parsed.utcoffset() is None:
+        raise OrganRegistryError(f"{field} must include a timezone offset")
+    return parsed
+
+
+@organs_app.command("registry-rebase-expired-v2")
+def organs_registry_rebase_expired_v2(
+    registry: str = typer.Argument(..., help="Expired v1 or v2 registry JSON."),
+    owner_decision_ref: str = typer.Option(
+        ...,
+        "--owner-decision-ref",
+        help="Workspace-owner decision authorizing claim reset to shadow.",
+    ),
+    authored_at: str = typer.Option(..., "--authored-at"),
+    expires_at: str = typer.Option(..., "--expires-at"),
+    migration_decision_ref: str | None = typer.Option(
+        None,
+        "--migration-decision-ref",
+        help="Required only when the predecessor uses registry schema v1.",
+    ),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        path = Path(registry).expanduser().resolve(strict=False)
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        schema_version = payload.get("schema_version")
+        if schema_version == "aoa_organ_registry_source_v2":
+            source = load_registry_source_v2(path)
+        elif schema_version == "aoa_organ_registry_source_v1":
+            if migration_decision_ref is None:
+                raise OrganRegistryError(
+                    "v1 shadow rebase requires --migration-decision-ref"
+                )
+            source = migrate_registry_v1_to_v2(
+                load_registry_source(path),
+                migration_decision_ref=migration_decision_ref,
+            )
+        else:
+            raise OrganRegistryError("registry schema is neither supported v1 nor v2")
+        rebased = rebase_expired_registry_v2_to_shadow(
+            source,
+            authored_at=_parse_timestamp(authored_at, field="authored_at"),
+            expires_at=_parse_timestamp(expires_at, field="expires_at"),
+            owner_decision_ref=owner_decision_ref,
+        )
+        compile_registry_v2(rebased)
+    except (OSError, json.JSONDecodeError, OrganRegistryError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(rebased, output)
+
+
+@organs_app.command("registry-runtime-overlay-apply")
+def organs_registry_runtime_overlay_apply(
+    registry: str = typer.Argument(..., help="Current v2 registry JSON."),
+    runtime_overlay: str = typer.Argument(..., help="Exact runtime overlay JSON."),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        source = load_registry_source_v2(registry)
+        overlay_path = Path(runtime_overlay).expanduser().resolve(strict=False)
+        if not overlay_path.is_file() or overlay_path.is_symlink():
+            raise OrganRegistryError(
+                "runtime overlay must be a regular non-symlink file"
+            )
+        overlay = OrganRegistryRuntimeOverlay.model_validate_json(
+            overlay_path.read_bytes()
+        )
+        updated = apply_registry_runtime_overlay(
+            source,
+            overlay,
+            applied_at=datetime.now(timezone.utc),
+        )
+        compile_registry_v2(updated)
+    except (OSError, OrganRegistryError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(updated, output)
+
+
+@organs_app.command("registry-contour-shape-apply")
+def organs_registry_contour_shape_apply(
+    registry: str = typer.Argument(..., help="Current v2 registry JSON."),
+    shape_revision: str = typer.Argument(
+        ..., help="Owner-issued contour shape revision JSON."
+    ),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        source = load_registry_source_v2(registry)
+        revision_path = Path(shape_revision).expanduser().resolve(strict=False)
+        if not revision_path.is_file() or revision_path.is_symlink():
+            raise OrganRegistryError(
+                "shape revision must be a regular non-symlink file"
+            )
+        revision = OrganContourShapeRevision.model_validate_json(
+            revision_path.read_bytes()
+        )
+        updated = apply_contour_shape_revision(source, revision)
+        compile_registry_v2(updated)
+    except (OSError, OrganRegistryError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(updated, output)
+
+
+@organs_app.command("registry-contour-admission-apply")
+def organs_registry_contour_admission_apply(
+    registry: str = typer.Argument(..., help="Current v2 registry JSON."),
+    admission_revision: str = typer.Argument(
+        ..., help="Content-addressed operator admission revision JSON."
+    ),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        source = load_registry_source_v2(registry)
+        revision_path = Path(admission_revision).expanduser().resolve(strict=False)
+        if not revision_path.is_file() or revision_path.is_symlink():
+            raise OrganRegistryError(
+                "admission revision must be a regular non-symlink file"
+            )
+        revision = OrganContourAdmissionRevision.model_validate_json(
+            revision_path.read_bytes()
+        )
+        updated = apply_contour_admission_revision(source, revision)
+        compile_registry_v2(updated)
+    except (OSError, OrganRegistryError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(updated, output)
+
+
+@organs_app.command("registry-contour-admission-operator-decision")
+def organs_registry_contour_admission_operator_decision(
+    registry: str = typer.Argument(..., help="Current v2 registry JSON."),
+    organ_id: str = typer.Argument(...),
+    contour_id: str = typer.Argument(...),
+    decision_ref: str = typer.Option(..., "--decision-ref"),
+    expires_at: str = typer.Option(..., "--expires-at"),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        source = load_registry_source_v2(registry)
+        records = [item for item in source.records if item.organ_id == organ_id]
+        if len(records) != 1:
+            raise OrganRegistryError("operator decision organ is absent or ambiguous")
+        contours = [
+            item for item in records[0].contours if item.contour_id == contour_id
+        ]
+        if len(contours) != 1:
+            raise OrganRegistryError(
+                "operator decision contour is absent or ambiguous"
+            )
+        contour = contours[0]
+        if contour.registry_state != "shadow":
+            raise OrganRegistryError(
+                "operator decision can only address a shadow contour"
+            )
+        decided_at = datetime.now(timezone.utc)
+        contour_digest = sha256_digest(contour.model_dump(mode="json"))
+        receipt = materialize_admission_decision(
+            AdmissionDecisionStatement(
+                candidate_id=contour_digest,
+                decision_kind="operator",
+                issuer=source.workspace_owner,
+                decision="accepted",
+                decision_ref=decision_ref,
+                decision_artifact_digest=contour_digest,
+                decided_at=decided_at,
+                expires_at=_parse_timestamp(expires_at, field="expires_at"),
+            )
+        )
+    except (OrganAdmissionError, OrganRegistryError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(receipt, output)
+    if output is not None:
+        Path(output).expanduser().resolve(strict=False).chmod(0o600)
 
 
 def _load_keeper_nodes(path: str | None) -> tuple[AdmissionEvidenceNode, ...]:

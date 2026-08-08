@@ -31,6 +31,7 @@ from .organs import (
     PolicyFamily,
     QualifiedEvidenceRef,
     RegistryState,
+    RevisionIdentity,
     SecretFreeRef,
     StrictOrganModel,
 )
@@ -51,6 +52,12 @@ ORGAN_REGISTRY_RUNTIME_OVERLAY_V1: Literal[
 ORGAN_CONTOUR_SUPPLEMENT_V1: Literal["aoa_organ_contour_supplement_v1"] = (
     "aoa_organ_contour_supplement_v1"
 )
+ORGAN_CONTOUR_SHAPE_REVISION_V1: Literal[
+    "aoa_organ_contour_shape_revision_v1"
+] = "aoa_organ_contour_shape_revision_v1"
+ORGAN_CONTOUR_ADMISSION_REVISION_V1: Literal[
+    "aoa_organ_contour_admission_revision_v1"
+] = "aoa_organ_contour_admission_revision_v1"
 
 AuthorityClass: TypeAlias = Literal[
     "read",
@@ -109,6 +116,69 @@ class ContourLastGoodState(StrictOrganModel):
     def validate_expiry(self) -> "ContourLastGoodState":
         if self.expires_at <= self.recorded_at:
             raise ValueError("contour last-good expiry must follow recording")
+        return self
+
+
+class OrganContourAdmissionRevision(StrictOrganModel):
+    """Operator-issued CAS transition for one fully evidenced contour.
+
+    The revision carries already-issued evidence.  It cannot execute owner
+    tools, infer acceptance, authorize effects, or admit a different contour.
+    """
+
+    schema_version: Literal["aoa_organ_contour_admission_revision_v1"] = (
+        ORGAN_CONTOUR_ADMISSION_REVISION_V1
+    )
+    revision_id: Identifier
+    revision_digest: Digest
+    organ_id: Identifier
+    contour_id: Identifier
+    expected_contour_digest: Digest
+    issued_at: datetime
+    expires_at: datetime
+    operator_evidence: QualifiedEvidenceRef
+    proof_ref: QualifiedEvidenceRef
+    acceptance_ref: QualifiedEvidenceRef
+    rollback_ref: QualifiedEvidenceRef
+    freshness_evidence: QualifiedEvidenceRef
+    owner_watermark: NonEmptyStr
+    owner_watermark_evidence: QualifiedEvidenceRef
+    consumer_compatibility: ConsumerCompatibility
+    last_good: ContourLastGoodState
+    maturity: OrganMaturityVector
+    admission_authorized: Literal[True]
+    effect_authorized: Literal[False] = False
+    cross_organ_asserted: Literal[False] = False
+    rollback_executed: Literal[False] = False
+    contains_secrets: Literal[False] = False
+
+    @field_validator("issued_at", "expires_at")
+    @classmethod
+    def require_aware_admission_time(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("contour admission timestamps must be timezone-aware")
+        return value
+
+    @model_validator(mode="after")
+    def validate_admission_ceiling(self) -> "OrganContourAdmissionRevision":
+        if self.expires_at <= self.issued_at:
+            raise ValueError("contour admission expiry must follow issuance")
+        required = tuple(
+            name
+            for name in OrganMaturityVector.model_fields
+            if name != "cross_organ_proven"
+        )
+        if any(getattr(self.maturity, name).state != "asserted" for name in required):
+            raise ValueError("contour admission requires every non-cross-organ axis")
+        if self.maturity.cross_organ_proven.state != "not_asserted":
+            raise ValueError("contour admission cannot assert cross-organ benefit")
+        if (
+            self.consumer_compatibility.support_state != "supported"
+            or self.consumer_compatibility.evidence_ref is None
+            or not self.consumer_compatibility.protocol_versions
+            or self.consumer_compatibility.observed_schema_digest is None
+        ):
+            raise ValueError("contour admission requires one exact supported consumer")
         return self
 
 
@@ -275,8 +345,37 @@ class ContourRuntimeOverlay(StrictOrganModel):
     runtime_evidence_refs: Annotated[
         tuple[QualifiedEvidenceRef, ...], Field(min_length=1)
     ]
+    canary_evidence: ContourCanaryEvidence | None = None
     observation_route: SecretFreeRef
     rollback_route: SecretFreeRef
+
+
+class ContourCanaryEvidence(StrictOrganModel):
+    """Authenticated runtime-attestation locator validated before projection.
+
+    The registry projection retains the qualified runtime evidence refs, not
+    this runtime-owner verification metadata.
+    """
+
+    receipt_ref: SecretFreeRef
+    receipt_id: Digest
+    observed_at: datetime
+    expires_at: datetime
+    deployment_manifest_id: Digest
+    public_key_ref: SecretFreeRef
+
+    @field_validator("observed_at", "expires_at")
+    @classmethod
+    def require_aware_canary_time(cls, value: datetime) -> datetime:
+        if value.tzinfo is None or value.utcoffset() is None:
+            raise ValueError("contour canary timestamps must be timezone-aware")
+        return value
+
+    @model_validator(mode="after")
+    def validate_canary_expiry(self) -> "ContourCanaryEvidence":
+        if self.expires_at <= self.observed_at:
+            raise ValueError("contour canary expiry must follow observation")
+        return self
 
 
 class OrganRegistryRuntimeOverlay(StrictOrganModel):
@@ -369,6 +468,36 @@ class OrganContourSupplement(StrictOrganModel):
         if len(identities) != len(set(identities)):
             raise ValueError("supplement contour identities must be unique")
         return value
+
+
+class OrganContourShapeRevision(StrictOrganModel):
+    """Owner-authored replacement shape that cannot preserve contour claims."""
+
+    schema_version: Literal["aoa_organ_contour_shape_revision_v1"] = (
+        ORGAN_CONTOUR_SHAPE_REVISION_V1
+    )
+    revision_id: Identifier
+    organ_id: Identifier
+    source_owner: NonEmptyStr
+    source_revision: RevisionIdentity
+    source_evidence: QualifiedEvidenceRef
+    owner_decision_ref: SecretFreeRef
+    expected_contour_digest: Digest
+    contour: ContourSupplementEntry
+    admission_asserted: Literal[False] = False
+    runtime_identity_asserted: Literal[False] = False
+    proof_asserted: Literal[False] = False
+    acceptance_asserted: Literal[False] = False
+    currentness_refreshed: Literal[False] = False
+    contains_secrets: Literal[False] = False
+
+    @model_validator(mode="after")
+    def validate_revision_owner(self) -> "OrganContourShapeRevision":
+        if self.source_evidence.owner != self.source_owner:
+            raise ValueError("shape revision evidence must come from its source owner")
+        if self.source_evidence.revision != self.source_revision.revision:
+            raise ValueError("shape revision evidence must bind its source revision")
+        return self
 
 
 class OrganContourProjectionEntry(StrictOrganModel):

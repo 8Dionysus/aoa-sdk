@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 14801077,
+  "allowed_tracked_bytes": 20204873,
+  "approved_by": "repository-owner",
+  "base_ref": "284a8d4612c351b627f671089fee37150178e87b",
+  "changed_generated_bytes": 14801077,
+  "changed_generated_files": 286,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "e247aeae8099c144df7a36f4b94b87a7d7b28f624f84d0cbfba574a86362ba32",
+  "reason": "Refresh the portable family for native registry-v2 contour admission and its bounded public release surfaces; the receipt admits only the measured deterministic generated delta and does not raise standing budgets.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20204873,
+  "tracked_bytes_max": 15728640
+}
