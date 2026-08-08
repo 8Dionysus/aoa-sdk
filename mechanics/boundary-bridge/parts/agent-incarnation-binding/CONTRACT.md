@@ -14,7 +14,10 @@
   widening, implicit user config, and false continuation.
 - an owner-subordinate loader that hashes and projects the exact
   `abyss-stack_external_codex_agent_v1` runtime descriptor without selecting a
-  model or interpreting its model-admission entries.
+  model or interpreting its model-admission entries;
+- compatibility validation for generic execution postures only. Domain task
+  families such as landing, eval, stats, or memo remain owner/runtime labels
+  and are not enumerated or selected by the SDK adapter.
 
 ## Stronger owner split
 
