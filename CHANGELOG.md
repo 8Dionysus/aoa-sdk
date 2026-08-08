@@ -7,18 +7,32 @@ Tracking starts with the community-docs baseline for this repository.
 
 ## [Unreleased]
 
+- Add future changes here after the release tag lands.
+- Dated release sections own exact reconciliation spans, complete commit
+  inventories, and validation evidence.
+
+## [0.10.1] - 2026-08-08
+
 ### Summary
 
-- Add future changes here after the release tag lands.
+- Add a fail-closed expired-registry shadow rebase for v2 bootstrap. It keeps
+  declared contour shape and authority boundaries while clearing all inherited
+  admission, runtime, freshness, consumer, proof, acceptance, maturity, and
+  rollback claims; current predecessors and TTLs over 24 hours are rejected.
+- Add source-owner contour shape correction and a native content-addressed v2
+  contour admission CAS. The latter requires current independently issued
+  runtime, consumer, central-proof, owner-acceptance, rollback, and operator
+  receipts, admits only one exact shadow contour, preserves the cross-organ
+  and effect ceilings, and never publishes the registry by itself.
 
 ### Validation
 
-- Record validation with the change that will become the next dated release.
+- Focused organ-control tests, schema/example parity, mypy, and ruff.
 
 ### Notes
 
-- Dated release sections own exact reconciliation spans, complete commit
-  inventories, and validation evidence.
+- The release adds admission mechanics only; publication and effect authority
+  remain separate operator-owned transitions.
 
 ## [0.10.0] - 2026-08-08
 

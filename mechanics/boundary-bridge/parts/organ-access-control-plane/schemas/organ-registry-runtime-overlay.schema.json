@@ -1,5 +1,53 @@
 {
   "$defs": {
+    "ContourCanaryEvidence": {
+      "additionalProperties": false,
+      "description": "Authenticated runtime-attestation locator validated before projection.\n\nThe registry projection retains the qualified runtime evidence refs, not\nthis runtime-owner verification metadata.",
+      "properties": {
+        "deployment_manifest_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Deployment Manifest Id",
+          "type": "string"
+        },
+        "expires_at": {
+          "format": "date-time",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "public_key_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Public Key Ref",
+          "type": "string"
+        },
+        "receipt_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Receipt Id",
+          "type": "string"
+        },
+        "receipt_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Receipt Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "receipt_ref",
+        "receipt_id",
+        "observed_at",
+        "expires_at",
+        "deployment_manifest_id",
+        "public_key_ref"
+      ],
+      "title": "ContourCanaryEvidence",
+      "type": "object"
+    },
     "ContourRuntimeIdentity": {
       "additionalProperties": false,
       "description": "Non-secret identities required to bind one deployed contour.",
@@ -151,6 +199,17 @@
       "additionalProperties": false,
       "description": "Explicit runtime binding; never an admission or evidence refresh.",
       "properties": {
+        "canary_evidence": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContourCanaryEvidence"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "contour_id": {
           "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
           "title": "Contour Id",

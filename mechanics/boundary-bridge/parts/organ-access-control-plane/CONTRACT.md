@@ -29,6 +29,16 @@
 - compatibility migration that preserves v1 claims and expiry, plus
   shadow-only contour supplements and evidence-bound runtime overlays that
   cannot refresh proof, acceptance, or admission;
+- an explicit expired-source shadow rebase that retains declared contour
+  shape and authority boundaries while clearing every current/admitted claim,
+  and refuses both current predecessors and unbounded replacement TTLs;
+- a source-owner contour shape revision with exact predecessor CAS that can
+  correct tool bindings or declared contour shape only by producing a new
+  bare shadow with no inherited current/admitted claim;
+- a content-addressed, operator-issued contour admission revision that CAS
+  binds one shadow predecessor and requires independently owner-qualified
+  source, runtime, consumer, proof, acceptance, rollback, and currentness
+  evidence while keeping effect and cross-organ authority false;
 - immutable content-addressed Admission Keeper nodes, dependency-aware reuse,
   incremental plans, resumable cycles, one exclusive cycle lock across the
   import/plan/state transaction, and compare-and-swap state publication;

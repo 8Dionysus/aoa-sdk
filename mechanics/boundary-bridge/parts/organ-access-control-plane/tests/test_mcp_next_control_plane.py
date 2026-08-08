@@ -13,14 +13,24 @@ from aoa_sdk.contracts.admission_keeper import (
 )
 from aoa_sdk.contracts.control_plane import canonical_digest
 from aoa_sdk.contracts.organ_registry_v2 import (
+    ContourLastGoodState,
     ContourSupplementEntry,
     ContourRuntimeIdentity,
     ContourRuntimeOverlay,
+    OrganContourAdmissionRevision,
     OrganContourSupplement,
+    OrganContourShapeRevision,
     OrganRegistryRuntimeOverlay,
 )
 from aoa_sdk.contracts.tasks import TaskInputRequest
-from aoa_sdk.contracts.organs import QualifiedEvidenceRef
+from aoa_sdk.contracts.organs import (
+    ConsumerCompatibility,
+    EndpointContract,
+    MaturityEvidence,
+    OrganMaturityVector,
+    QualifiedEvidenceRef,
+    RevisionIdentity,
+)
 from aoa_sdk.organs import (
     AdmissionKeeperError,
     FileTaskStore,
@@ -28,9 +38,12 @@ from aoa_sdk.organs import (
     MCPTaskRequestContext,
     MCPTasksAdapter,
     MCPTasksAdapterError,
+    OrganRegistryError,
     TASKS_EXTENSION_ID,
     TaskStoreError,
+    apply_contour_admission_revision,
     apply_contour_supplement,
+    apply_contour_shape_revision,
     apply_registry_runtime_overlay,
     build_keeper_state,
     compile_registry_v2,
@@ -39,6 +52,7 @@ from aoa_sdk.organs import (
     materialize_keeper_spec,
     migrate_registry_v1_to_v2,
     plan_keeper_refresh,
+    rebase_expired_registry_v2_to_shadow,
     run_keeper_cycle,
 )
 from aoa_sdk.organs.registry import sha256_digest
@@ -75,6 +89,75 @@ def test_v1_registry_migrates_to_independent_contour_projection() -> None:
     )
     assert migrated.expires_at == source.expires_at
     assert all(item.contour.last_good is None for item in projection.entries)
+
+
+def test_expired_registry_rebase_preserves_shape_but_carries_no_claims() -> None:
+    source = load_registry_source(EXAMPLE)
+    expired = source.model_copy(update={"expires_at": NOW - timedelta(minutes=1)})
+    migrated = migrate_registry_v1_to_v2(
+        expired,
+        migration_decision_ref="owner://aoa-sdk/decision/contour-registry-v2",
+    )
+    rebased = rebase_expired_registry_v2_to_shadow(
+        migrated,
+        authored_at=NOW,
+        expires_at=NOW + timedelta(minutes=10),
+        owner_decision_ref="owner://os-abyss/decision/reset-expired-claims",
+    )
+
+    assert rebased.expires_at == NOW + timedelta(minutes=10)
+    assert len(rebased.records) == len(migrated.records)
+    assert [item.organ_id for item in rebased.records] == [
+        item.organ_id for item in migrated.records
+    ]
+    for before_record, after_record in zip(migrated.records, rebased.records):
+        assert [item.contour_id for item in after_record.contours] == [
+            item.contour_id for item in before_record.contours
+        ]
+        for before, after in zip(before_record.contours, after_record.contours):
+            assert after.registry_state == "shadow"
+            assert after.endpoint is None
+            assert after.principal_id == before.principal_id
+            assert after.credential_class == before.credential_class
+            assert after.allowlist == before.allowlist
+            assert after.capabilities == before.capabilities
+            assert after.runtime_identity.package_version == "unobserved"
+            assert not after.runtime_identity_evidence
+            assert after.freshness_state == "unknown"
+            assert after.freshness_evidence is None
+            assert after.eval_status == "not_run"
+            assert not after.proof_refs
+            assert not after.acceptance_refs
+            assert not after.consumer_compatibility
+            assert not after.activation_preconditions
+            assert after.currentness == "unknown"
+            assert after.last_good is None
+            assert all(value.state == "not_asserted" for _, value in after.maturity)
+    compile_registry_v2(rebased, compiled_at=NOW)
+
+
+def test_shadow_rebase_rejects_current_source_and_unbounded_ttl() -> None:
+    source = load_registry_source(EXAMPLE)
+    migrated = migrate_registry_v1_to_v2(
+        source,
+        migration_decision_ref="owner://aoa-sdk/decision/contour-registry-v2",
+    )
+    with pytest.raises(OrganRegistryError, match="only an expired registry"):
+        rebase_expired_registry_v2_to_shadow(
+            migrated,
+            authored_at=NOW,
+            expires_at=NOW + timedelta(minutes=10),
+            owner_decision_ref="owner://os-abyss/decision/reset-expired-claims",
+        )
+
+    expired = migrated.model_copy(update={"expires_at": NOW - timedelta(minutes=1)})
+    with pytest.raises(OrganRegistryError, match="TTL exceeds"):
+        rebase_expired_registry_v2_to_shadow(
+            expired,
+            authored_at=NOW,
+            expires_at=NOW + timedelta(days=2),
+            owner_decision_ref="owner://os-abyss/decision/reset-expired-claims",
+        )
 
 
 def test_runtime_overlay_corrects_identity_without_upgrading_owner_claims() -> None:
@@ -180,6 +263,247 @@ def test_owner_supplement_adds_only_an_unadmitted_contour_shape() -> None:
         value.state == "not_asserted"
         for _, value in added.maturity
     )
+
+
+def test_owner_shape_revision_replaces_exact_predecessor_without_claims() -> None:
+    source = load_registry_source(EXAMPLE)
+    migrated = migrate_registry_v1_to_v2(
+        source,
+        migration_decision_ref="owner://aoa-sdk/decision/contour-registry-v2",
+    )
+    record = migrated.records[0]
+    existing = record.contours[0]
+    primitive = existing.capabilities[0].primitives[0].model_copy(
+        update={"mcp_name": "kag_discover"}
+    )
+    capability = existing.capabilities[0].model_copy(
+        update={"primitives": (primitive,)}
+    )
+    revision = OrganContourShapeRevision(
+        revision_id="kag-read-tool-binding-v1",
+        organ_id=record.organ_id,
+        source_owner=record.owners.source_owner,
+        source_revision=RevisionIdentity(
+            revision="owner-revision-two",
+            digest=digest("owner-tree-two"),
+        ),
+        source_evidence=QualifiedEvidenceRef(
+            owner=record.owners.source_owner,
+            evidence_ref="owner://aoa-kag/source/revision-two",
+            revision="owner-revision-two",
+            observed_at=migrated.authored_at,
+            expires_at=migrated.expires_at,
+        ),
+        owner_decision_ref="owner://aoa-kag/decision/kag-read-tool-binding-v1",
+        expected_contour_digest=sha256_digest(existing.model_dump(mode="json")),
+        contour=ContourSupplementEntry(
+            contour_id=existing.contour_id,
+            authority_class=existing.authority_class,
+            policy_family=existing.policy_family,
+            credential_class=existing.credential_class,
+            principal_id=existing.principal_id,
+            capabilities=(capability,),
+            observation_route=existing.observation_route,
+            rollback_route=existing.rollback_route,
+        ),
+    )
+
+    revised = apply_contour_shape_revision(migrated, revision)
+    updated = revised.records[0].contours[0]
+    assert updated.allowlist == ("kag_discover",)
+    assert updated.capabilities[0].primitives[0].mcp_name == "kag_discover"
+    assert updated.runtime_identity.source_revision == "owner-revision-two"
+    assert updated.registry_state == "shadow"
+    assert updated.endpoint is None
+    assert not updated.runtime_identity_evidence
+    assert not updated.proof_refs
+    assert not updated.acceptance_refs
+    assert not updated.activation_preconditions
+    assert all(value.state == "not_asserted" for _, value in updated.maturity)
+
+    drifted = revision.model_copy(
+        update={"expected_contour_digest": digest("wrong-predecessor")}
+    )
+    with pytest.raises(OrganRegistryError, match="predecessor digest conflicts"):
+        apply_contour_shape_revision(migrated, drifted)
+
+
+def test_contour_admission_is_content_addressed_cas_and_owner_bounded() -> None:
+    source = load_registry_source(EXAMPLE)
+    migrated = migrate_registry_v1_to_v2(
+        source,
+        migration_decision_ref="owner://aoa-sdk/decision/contour-registry-v2",
+    )
+    record = migrated.records[0]
+    contour = record.contours[0]
+    endpoint = EndpointContract(
+        adapter_id="aoa-kag-mcp-direct",
+        transport="streamable-http",
+        endpoint_ref="http://127.0.0.1:5425/mcp",
+        protocol_versions=("2025-11-25",),
+        server_schema_digest=digest("server-schema"),
+    )
+    runtime = ContourRuntimeIdentity(
+        source_revision=contour.runtime_identity.source_revision,
+        source_tree_digest=contour.runtime_identity.source_tree_digest,
+        package_name="aoa-kag-mcp",
+        package_version="0.1.0",
+        package_digest=digest("package"),
+        deployment_revision="stack-revision",
+        deployment_manifest_ref="owner://abyss-stack/deployment/manifest",
+        deployment_manifest_digest=digest("manifest"),
+        deployed_tree_digest=digest("package"),
+        process_ref="owner://abyss-stack/process/aoa-kag",
+        process_identity="systemd:aoa-kag:1",
+    )
+    runtime_ref = QualifiedEvidenceRef(
+        owner=record.owners.runtime_owner,
+        evidence_ref="owner://abyss-stack/runtime/aoa-kag",
+        revision=digest("manifest"),
+        observed_at=migrated.authored_at,
+        expires_at=migrated.expires_at,
+    )
+    overlaid = apply_registry_runtime_overlay(
+        migrated,
+        OrganRegistryRuntimeOverlay(
+            overlay_id="kag-runtime-before-admission",
+            authored_at=migrated.authored_at,
+            expires_at=migrated.expires_at,
+            owner_decision_ref="owner://abyss-stack/decision/kag-runtime",
+            contours=(
+                ContourRuntimeOverlay(
+                    organ_id=record.organ_id,
+                    contour_id=contour.contour_id,
+                    principal_id=contour.principal_id,
+                    endpoint=endpoint,
+                    runtime_identity=runtime,
+                    runtime_evidence_refs=(runtime_ref,),
+                    observation_route=contour.observation_route,
+                    rollback_route=contour.rollback_route,
+                ),
+            ),
+        ),
+    )
+    contour = overlaid.records[0].contours[0]
+    issued_at = migrated.authored_at + timedelta(minutes=1)
+
+    def evidence(owner: str, name: str) -> QualifiedEvidenceRef:
+        return QualifiedEvidenceRef(
+            owner=owner,
+            evidence_ref=f"owner://{owner}/evidence/{name}",
+            revision=digest(name),
+            observed_at=migrated.authored_at,
+            expires_at=migrated.expires_at,
+        )
+
+    source_ref = evidence(record.owners.source_owner, "source")
+    runtime_axis = evidence(record.owners.runtime_owner, "runtime")
+    control_ref = evidence(record.owners.control_owner, "registry")
+    owner_ref = evidence(record.owners.acceptance_owner, "owner-review")
+    proof_ref = evidence(record.owners.proof_owner, "central-proof")
+    acceptance_ref = evidence(record.owners.acceptance_owner, "acceptance")
+    rollback_ref = evidence(record.owners.proof_owner, "rollback")
+    consumer_ref = evidence("8Dionysus", "consumer")
+    operator_ref = evidence(overlaid.workspace_owner, "operator-admission")
+    axis_refs = {
+        "declared": source_ref,
+        "owner_reviewed": owner_ref,
+        "packaged": runtime_axis,
+        "exported": runtime_axis,
+        "deployed": runtime_axis,
+        "process_alive": runtime_axis,
+        "endpoint_ready": runtime_axis,
+        "registry_indexed": control_ref,
+        "consumer_registered": consumer_ref,
+        "schema_observed": runtime_axis,
+        "call_succeeded": runtime_axis,
+        "result_grounded": owner_ref,
+        "freshness_satisfied": owner_ref,
+        "owner_accepted": acceptance_ref,
+        "rollback_proven": rollback_ref,
+    }
+    maturity = OrganMaturityVector(
+        **{
+            name: (
+                MaturityEvidence(state="not_asserted")
+                if name == "cross_organ_proven"
+                else MaturityEvidence(
+                    state="asserted",
+                    evidence=axis_refs[name],
+                    freshness_policy="exact-admission-evidence-v1",
+                )
+            )
+            for name in OrganMaturityVector.model_fields
+        }
+    )
+    consumer = ConsumerCompatibility(
+        consumer_id="codex",
+        support_state="supported",
+        protocol_versions=endpoint.protocol_versions,
+        observed_schema_digest=endpoint.server_schema_digest,
+        evidence_ref=consumer_ref,
+    )
+    last_good = ContourLastGoodState(
+        recorded_at=migrated.authored_at,
+        expires_at=migrated.expires_at,
+        protocol_version=endpoint.protocol_versions[0],
+        endpoint_ref=endpoint.endpoint_ref,
+        credential_class=contour.credential_class,
+        principal_id=contour.principal_id,
+        server_schema_digest=endpoint.server_schema_digest,
+        runtime_identity=runtime,
+        evidence_refs=(runtime_axis, rollback_ref),
+    )
+    payload = {
+        "revision_id": "kag-read-admission-v1",
+        "revision_digest": digest("placeholder"),
+        "organ_id": record.organ_id,
+        "contour_id": contour.contour_id,
+        "expected_contour_digest": sha256_digest(contour.model_dump(mode="json")),
+        "issued_at": issued_at,
+        "expires_at": migrated.expires_at,
+        "operator_evidence": operator_ref,
+        "proof_ref": proof_ref,
+        "acceptance_ref": acceptance_ref,
+        "rollback_ref": rollback_ref,
+        "freshness_evidence": owner_ref,
+        "owner_watermark": "aoa-kag-source-index:test",
+        "owner_watermark_evidence": owner_ref,
+        "consumer_compatibility": consumer,
+        "last_good": last_good,
+        "maturity": maturity,
+        "admission_authorized": True,
+    }
+    unsigned = OrganContourAdmissionRevision.model_validate(payload).model_dump(
+        mode="json", exclude={"revision_digest"}
+    )
+    payload["revision_digest"] = sha256_digest(unsigned)
+    revision = OrganContourAdmissionRevision.model_validate(payload)
+
+    admitted_source = apply_contour_admission_revision(
+        overlaid,
+        revision,
+        applied_at=issued_at + timedelta(seconds=1),
+    )
+    admitted = admitted_source.records[0].contours[0]
+
+    assert admitted.registry_state == "admitted"
+    assert admitted.currentness == "current"
+    assert admitted.eval_status == "passed"
+    assert admitted.proof_refs == (proof_ref,)
+    assert admitted.acceptance_refs == (acceptance_ref,)
+    assert admitted.last_good == last_good
+    assert admitted.maturity.cross_organ_proven.state == "not_asserted"
+    assert admitted.revisions.consumer_schema is not None
+    compile_registry_v2(admitted_source, compiled_at=issued_at)
+
+    tampered = revision.model_copy(update={"owner_watermark": "tampered"})
+    with pytest.raises(OrganRegistryError, match="content address is invalid"):
+        apply_contour_admission_revision(
+            overlaid,
+            tampered,
+            applied_at=issued_at + timedelta(seconds=1),
+        )
 
 
 def test_task_store_is_durable_principal_bound_cas_and_idempotent(tmp_path: Path) -> None:

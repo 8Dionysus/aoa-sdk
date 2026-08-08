@@ -24,13 +24,16 @@ from .orchestration import (
 )
 from .registry import OrganRegistryError, compile_registry, load_registry_source
 from .registry_v2 import (
+    apply_contour_admission_revision,
     apply_contour_supplement,
+    apply_contour_shape_revision,
     apply_registry_runtime_overlay,
     assert_projection_v2_digest,
     compile_registry_v2,
     load_registry_source_v2,
     migrate_registry_file_v1_to_v2,
     migrate_registry_v1_to_v2,
+    rebase_expired_registry_v2_to_shadow,
 )
 from .admission_keeper import (
     AdmissionKeeperError,
@@ -77,7 +80,9 @@ __all__ = [
     "TaskStoreStatus",
     "TASKS_EXTENSION_ID",
     "advance_admission",
+    "apply_contour_admission_revision",
     "apply_contour_supplement",
+    "apply_contour_shape_revision",
     "apply_registry_runtime_overlay",
     "advance_orchestration",
     "audit_admission_baseline",
@@ -101,6 +106,7 @@ __all__ = [
     "materialize_owner_result_review",
     "migrate_registry_file_v1_to_v2",
     "migrate_registry_v1_to_v2",
+    "rebase_expired_registry_v2_to_shadow",
     "plan_keeper_refresh",
     "run_keeper_cycle",
     "start_admission",

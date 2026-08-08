@@ -148,6 +148,63 @@ The shared transaction schema transports references to owner-native validators
 and receipts. It does not replace owner payload, proof, acceptance, deployment,
 or rollback schemas.
 
+## Registry v2 bootstrap after expiry
+
+`registry-migrate-v2` is a compatibility transform: it preserves the v1
+claims and expiry and therefore cannot make an expired registry current. Use
+`registry-rebase-expired-v2` only when the configured predecessor has already
+expired and the workspace owner has explicitly authorized a claim reset:
+
+The owner command is `aoa organs registry-rebase-expired-v2`; its CLI help
+names the required migration decision, owner decision, bounded lifetime, and
+private candidate output arguments.
+
+The result is fresh *desired shape*, not refreshed admission. Every contour is
+`shadow`; endpoint, runtime evidence, proof, acceptance, consumer observation,
+freshness, maturity assertions, activation preconditions, and last-good state
+are absent. Stronger owners must issue new evidence before the workspace owner
+can admit one exact contour. A runtime overlay may add observed identity after
+the reset, but cannot restore any cleared claim. Apply one still-live overlay
+through the separate checked boundary:
+
+The separate checked boundary is `aoa organs
+registry-runtime-overlay-apply`; its CLI help owns the exact source, overlay,
+and candidate-output arguments.
+
+The command rejects missing, symlinked, future-dated, or expired overlays.
+
+If an expired predecessor's declared contour shape is itself stale, the source
+owner must issue an `aoa_organ_contour_shape_revision_v1`. Apply it with
+`registry-contour-shape-apply`. The revision is compare-and-swap bound to the
+exact predecessor contour digest and its owner evidence must bind the new
+source revision. Even a valid replacement is forced to bare `shadow`; this is
+a shape correction, never an admission refresh.
+
+## Registry v2 contour admission
+
+V1 organ-level authorization cannot mutate a v2 contour. For v2, first issue a
+content-addressed operator decision against the exact shadow contour digest:
+
+The operator command is `aoa organs
+registry-contour-admission-operator-decision`; its CLI help owns the exact
+registry, organ, contour, decision reference, expiry, and private-output
+arguments.
+
+The runtime owner may then compose, but not issue, an
+`aoa_organ_contour_admission_revision_v1` from exact live source, runtime,
+consumer, current canary, central proof, owner acceptance, and separately
+grounded last-known-good/rollback evidence plus that operator receipt. Apply
+the revision only while every referenced receipt is current:
+
+The apply command is `aoa organs registry-contour-admission-apply`; its CLI
+help owns the exact predecessor, revision, and candidate-output arguments.
+
+The transition is content-addressed and compare-and-swap bound. It asserts all
+required read-contour maturity axes except `cross_organ_proven`, retains
+`effect_authorized=false`, and writes no production registry itself. A
+separate operator-controlled publication and postcondition check remain
+required.
+
 ## Reproducible example
 
 `../examples/organ_registry.wave1-shadow.example.json` is a public-safe,

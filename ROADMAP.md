@@ -90,6 +90,8 @@ Admission Keeper, durable owner TaskStore, and replaceable experimental MCP
 Tasks adapter boundary. It also adds model-neutral actor-incarnation binding.
 None of those surfaces moves owner truth, proof, acceptance, runtime execution,
 or effect authority into the SDK.
+`v0.10.1` adds the first native content-addressed admission CAS for one exact
+registry-v2 contour without widening cross-organ or effect authority.
 
 The current repo-wide program is staged routing producer succession. The
 target is accepted in `AOA-SDK-D-0071`, the R2 typed control-plane, lifecycle,
