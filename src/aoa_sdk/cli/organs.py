@@ -23,20 +23,40 @@ from ..contracts.organ_admission import (
     OrganAdmissionRequest,
     OrganAdmissionRun,
 )
+from ..contracts.admission_keeper import (
+    AdmissionEvidenceNode,
+    AdmissionKeeperSpec,
+    AdmissionKeeperState,
+)
+from ..contracts.organ_registry_v2 import (
+    OrganContourSupplement,
+    OrganRegistryRuntimeOverlay,
+)
 from ..contracts.organ_orchestration import (
     CrossOrganOrchestrationRequest,
     CrossOrganOrchestrationRun,
     CrossOrganStageObservation,
 )
 from ..organs import (
+    AdmissionKeeperError,
+    KeeperEvidenceStore,
+    apply_contour_supplement,
+    apply_registry_runtime_overlay,
     OrganAdmissionError,
     OrganOrchestrationError,
     OrganRegistryError,
     OrgansAPI,
     compile_registry,
+    compile_registry_v2,
+    build_keeper_state,
     load_registry_source,
+    load_registry_source_v2,
     materialize_admission_decision,
     materialize_admission_evidence,
+    materialize_keeper_spec,
+    migrate_registry_file_v1_to_v2,
+    plan_keeper_refresh,
+    run_keeper_cycle,
 )
 from ..workspace.discovery import Workspace
 
@@ -79,6 +99,8 @@ def _write_or_emit(value: Any, output: str | None) -> None:
             "snapshot_digest": payload.get("snapshot_digest"),
             "candidate_id": payload.get("candidate_id"),
             "authorization_id": payload.get("authorization_id"),
+            "plan_id": payload.get("plan_id"),
+            "state_id": payload.get("state_id"),
             "evidence_id": payload.get("evidence_id"),
             "decision_id": payload.get("decision_id"),
             "owner_tools_executed_by_sdk": False,
@@ -138,6 +160,166 @@ def organs_compile(
             "execution_authorized": False,
         }
     )
+
+
+@organs_app.command("registry-v2-validate")
+def organs_registry_v2_validate(
+    registry: str = typer.Argument(..., help="Explicit contour-addressed registry JSON."),
+) -> None:
+    try:
+        source = load_registry_source_v2(registry)
+        projection = compile_registry_v2(source)
+    except (OrganRegistryError, ValidationError) as exc:
+        _fail(exc)
+    _emit(
+        {
+            "valid": True,
+            "registry_id": source.registry_id,
+            "organ_count": len(source.records),
+            "contour_count": len(projection.entries),
+            "source_digest": projection.source_digest,
+            "projection_digest": projection.projection_digest,
+            "registry_mutation_performed": False,
+        }
+    )
+
+
+@organs_app.command("registry-migrate-v2")
+def organs_registry_migrate_v2(
+    registry: str = typer.Argument(..., help="Existing v1 registry JSON."),
+    migration_decision_ref: str = typer.Option(
+        ...,
+        "--migration-decision-ref",
+        help="Owner-reviewed decision authorizing only the shape migration.",
+    ),
+    output: str | None = typer.Option(None, "--output"),
+    runtime_overlay: str | None = typer.Option(
+        None,
+        "--runtime-overlay",
+        help="Owner-reviewed exact runtime bindings; does not refresh admission.",
+    ),
+    contour_supplement: list[str] | None = typer.Option(
+        None,
+        "--contour-supplement",
+        help="Owner supplement adding only new shadow contour shapes; repeatable.",
+    ),
+) -> None:
+    try:
+        migrated = migrate_registry_file_v1_to_v2(
+            registry,
+            migration_decision_ref=migration_decision_ref,
+        )
+        for supplement_path in contour_supplement or []:
+            supplement = OrganContourSupplement.model_validate_json(
+                Path(supplement_path).read_bytes()
+            )
+            migrated = apply_contour_supplement(migrated, supplement)
+        if runtime_overlay is not None:
+            overlay = OrganRegistryRuntimeOverlay.model_validate_json(
+                Path(runtime_overlay).read_bytes()
+            )
+            migrated = apply_registry_runtime_overlay(migrated, overlay)
+        compile_registry_v2(migrated)
+    except (OrganRegistryError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(migrated, output)
+
+
+def _load_keeper_nodes(path: str | None) -> tuple[AdmissionEvidenceNode, ...]:
+    if path is None:
+        return ()
+    root = Path(path).expanduser().resolve(strict=False)
+    if not root.is_dir() or root.is_symlink():
+        raise OSError("keeper node path must be a non-symlink directory")
+    return tuple(
+        AdmissionEvidenceNode.model_validate_json(candidate.read_bytes())
+        for candidate in sorted(root.glob("*.json"))
+        if candidate.is_file() and not candidate.is_symlink()
+    )
+
+
+@organs_app.command("keeper-plan")
+def organs_keeper_plan(
+    spec_path: str = typer.Argument(..., help="Admission Keeper spec JSON."),
+    nodes: str | None = typer.Option(None, "--nodes"),
+    prior_state: str | None = typer.Option(None, "--prior-state"),
+    renewal_margin_seconds: int = typer.Option(60, "--renewal-margin-seconds"),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        spec = materialize_keeper_spec(
+            AdmissionKeeperSpec.model_validate_json(Path(spec_path).read_bytes())
+        )
+        prior = (
+            AdmissionKeeperState.model_validate_json(Path(prior_state).read_bytes())
+            if prior_state is not None
+            else None
+        )
+        result = plan_keeper_refresh(
+            spec,
+            nodes=_load_keeper_nodes(nodes),
+            prior_state=prior,
+            renewal_margin_seconds=renewal_margin_seconds,
+        )
+    except (OSError, AdmissionKeeperError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(result, output)
+
+
+@organs_app.command("keeper-state")
+def organs_keeper_state(
+    spec_path: str = typer.Argument(..., help="Admission Keeper spec JSON."),
+    nodes: str = typer.Option(..., "--nodes"),
+    prior_state: str | None = typer.Option(None, "--prior-state"),
+    last_good_ref: str | None = typer.Option(None, "--last-good-ref"),
+    last_good_digest: str | None = typer.Option(None, "--last-good-digest"),
+    output: str | None = typer.Option(None, "--output"),
+) -> None:
+    try:
+        spec = materialize_keeper_spec(
+            AdmissionKeeperSpec.model_validate_json(Path(spec_path).read_bytes())
+        )
+        prior = (
+            AdmissionKeeperState.model_validate_json(Path(prior_state).read_bytes())
+            if prior_state is not None
+            else None
+        )
+        result = build_keeper_state(
+            spec,
+            nodes=_load_keeper_nodes(nodes),
+            prior_state=prior,
+            last_good_state_ref=last_good_ref,
+            last_good_state_digest=last_good_digest,
+        )
+    except (OSError, AdmissionKeeperError, ValidationError) as exc:
+        _fail(exc)
+    _write_or_emit(result, output)
+
+
+@organs_app.command("keeper-cycle")
+def organs_keeper_cycle(
+    spec_path: str = typer.Argument(..., help="Admission Keeper spec JSON."),
+    store_root: str = typer.Option(..., "--store-root"),
+    inbox: str | None = typer.Option(None, "--inbox"),
+    renewal_margin_seconds: int = typer.Option(60, "--renewal-margin-seconds"),
+) -> None:
+    try:
+        spec = AdmissionKeeperSpec.model_validate_json(Path(spec_path).read_bytes())
+        inbox_paths: tuple[Path, ...] = ()
+        if inbox is not None:
+            inbox_root = Path(inbox).expanduser().resolve(strict=False)
+            if inbox_root.is_symlink() or not inbox_root.is_dir():
+                raise OSError("keeper inbox must be a non-symlink directory")
+            inbox_paths = tuple(sorted(inbox_root.glob("*.json")))
+        result = run_keeper_cycle(
+            spec,
+            store=KeeperEvidenceStore(store_root),
+            inbox_paths=inbox_paths,
+            renewal_margin_seconds=renewal_margin_seconds,
+        )
+    except (OSError, AdmissionKeeperError, ValidationError) as exc:
+        _fail(exc)
+    _emit(result)
 
 
 @organs_app.command("catalog")

@@ -1,0 +1,116 @@
+{
+  "$id": "urn:aoa-sdk:organ-access:owner-task-audit.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "action": {
+      "enum": [
+        "create",
+        "get",
+        "apply_input",
+        "request_cancel",
+        "complete",
+        "fail",
+        "expire"
+      ],
+      "title": "Action",
+      "type": "string"
+    },
+    "audit_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Audit Id",
+      "type": "string"
+    },
+    "authority_granted_by_task_id": {
+      "const": false,
+      "default": false,
+      "title": "Authority Granted By Task Id",
+      "type": "boolean"
+    },
+    "contour_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Contour Id",
+      "type": "string"
+    },
+    "occurred_at": {
+      "format": "date-time",
+      "title": "Occurred At",
+      "type": "string"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "outcome": {
+      "enum": [
+        "applied",
+        "idempotent",
+        "denied"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "owner_execution_performed_by_sdk": {
+      "const": false,
+      "default": false,
+      "title": "Owner Execution Performed By Sdk",
+      "type": "boolean"
+    },
+    "principal_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Principal Id",
+      "type": "string"
+    },
+    "prior_revision": {
+      "minimum": 0,
+      "title": "Prior Revision",
+      "type": "integer"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "record_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Record Digest",
+      "type": "string"
+    },
+    "resulting_revision": {
+      "minimum": 1,
+      "title": "Resulting Revision",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "aoa_owner_task_audit_v1",
+      "default": "aoa_owner_task_audit_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "task_id_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Task Id Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "audit_id",
+    "task_id_digest",
+    "principal_id",
+    "organ_id",
+    "contour_id",
+    "action",
+    "prior_revision",
+    "resulting_revision",
+    "occurred_at",
+    "outcome",
+    "record_digest"
+  ],
+  "title": "TaskAuditReceipt",
+  "type": "object"
+}

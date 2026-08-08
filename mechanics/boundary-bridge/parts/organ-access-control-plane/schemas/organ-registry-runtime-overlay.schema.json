@@ -1,0 +1,411 @@
+{
+  "$defs": {
+    "ContourRuntimeIdentity": {
+      "additionalProperties": false,
+      "description": "Non-secret identities required to bind one deployed contour.",
+      "properties": {
+        "dependency_graph_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Dependency Graph Digest"
+        },
+        "deployed_tree_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deployed Tree Digest"
+        },
+        "deployment_manifest_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deployment Manifest Digest"
+        },
+        "deployment_manifest_ref": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deployment Manifest Ref"
+        },
+        "deployment_revision": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Deployment Revision"
+        },
+        "package_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Package Digest"
+        },
+        "package_name": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Package Name",
+          "type": "string"
+        },
+        "package_version": {
+          "minLength": 1,
+          "title": "Package Version",
+          "type": "string"
+        },
+        "process_identity": {
+          "anyOf": [
+            {
+              "minLength": 1,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Process Identity"
+        },
+        "process_ref": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Process Ref"
+        },
+        "source_revision": {
+          "minLength": 1,
+          "title": "Source Revision",
+          "type": "string"
+        },
+        "source_tree_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Source Tree Digest"
+        }
+      },
+      "required": [
+        "source_revision",
+        "package_name",
+        "package_version"
+      ],
+      "title": "ContourRuntimeIdentity",
+      "type": "object"
+    },
+    "ContourRuntimeOverlay": {
+      "additionalProperties": false,
+      "description": "Explicit runtime binding; never an admission or evidence refresh.",
+      "properties": {
+        "contour_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Contour Id",
+          "type": "string"
+        },
+        "endpoint": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/EndpointContract"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "observation_route": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Observation Route",
+          "type": "string"
+        },
+        "organ_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Organ Id",
+          "type": "string"
+        },
+        "principal_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Principal Id",
+          "type": "string"
+        },
+        "rollback_route": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Rollback Route",
+          "type": "string"
+        },
+        "runtime_evidence_refs": {
+          "items": {
+            "$ref": "#/$defs/QualifiedEvidenceRef"
+          },
+          "minItems": 1,
+          "title": "Runtime Evidence Refs",
+          "type": "array"
+        },
+        "runtime_identity": {
+          "$ref": "#/$defs/ContourRuntimeIdentity"
+        }
+      },
+      "required": [
+        "organ_id",
+        "contour_id",
+        "principal_id",
+        "runtime_identity",
+        "runtime_evidence_refs",
+        "observation_route",
+        "rollback_route"
+      ],
+      "title": "ContourRuntimeOverlay",
+      "type": "object"
+    },
+    "EndpointContract": {
+      "additionalProperties": false,
+      "properties": {
+        "adapter_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Adapter Id",
+          "type": "string"
+        },
+        "adapter_protocol_version": {
+          "const": "aoa_organ_adapter_v1",
+          "default": "aoa_organ_adapter_v1",
+          "title": "Adapter Protocol Version",
+          "type": "string"
+        },
+        "connection_mode": {
+          "const": "direct_owner",
+          "default": "direct_owner",
+          "title": "Connection Mode",
+          "type": "string"
+        },
+        "endpoint_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Endpoint Ref",
+          "type": "string"
+        },
+        "protocol_versions": {
+          "items": {
+            "minLength": 1,
+            "type": "string"
+          },
+          "title": "Protocol Versions",
+          "type": "array"
+        },
+        "server_schema_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Server Schema Digest"
+        },
+        "transport": {
+          "enum": [
+            "stdio",
+            "streamable-http",
+            "owner-api",
+            "none"
+          ],
+          "title": "Transport",
+          "type": "string"
+        }
+      },
+      "required": [
+        "adapter_id",
+        "transport",
+        "endpoint_ref",
+        "protocol_versions"
+      ],
+      "title": "EndpointContract",
+      "type": "object"
+    },
+    "QualifiedEvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "title": "Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "evidence_ref",
+        "revision",
+        "observed_at"
+      ],
+      "title": "QualifiedEvidenceRef",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:organ-registry-runtime-overlay.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "description": "Owner-reviewed exact runtime identities applied to a v2 shape migration.",
+  "properties": {
+    "acceptance_asserted": {
+      "const": false,
+      "default": false,
+      "title": "Acceptance Asserted",
+      "type": "boolean"
+    },
+    "admission_asserted": {
+      "const": false,
+      "default": false,
+      "title": "Admission Asserted",
+      "type": "boolean"
+    },
+    "authored_at": {
+      "format": "date-time",
+      "title": "Authored At",
+      "type": "string"
+    },
+    "contains_secrets": {
+      "const": false,
+      "default": false,
+      "title": "Contains Secrets",
+      "type": "boolean"
+    },
+    "contours": {
+      "items": {
+        "$ref": "#/$defs/ContourRuntimeOverlay"
+      },
+      "minItems": 1,
+      "title": "Contours",
+      "type": "array"
+    },
+    "currentness_refreshed": {
+      "const": false,
+      "default": false,
+      "title": "Currentness Refreshed",
+      "type": "boolean"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "overlay_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Overlay Id",
+      "type": "string"
+    },
+    "owner_decision_ref": {
+      "maxLength": 512,
+      "minLength": 3,
+      "title": "Owner Decision Ref",
+      "type": "string"
+    },
+    "proof_asserted": {
+      "const": false,
+      "default": false,
+      "title": "Proof Asserted",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "aoa_organ_registry_runtime_overlay_v1",
+      "default": "aoa_organ_registry_runtime_overlay_v1",
+      "title": "Schema Version",
+      "type": "string"
+    }
+  },
+  "required": [
+    "overlay_id",
+    "authored_at",
+    "expires_at",
+    "owner_decision_ref",
+    "contours"
+  ],
+  "title": "OrganRegistryRuntimeOverlay",
+  "type": "object"
+}

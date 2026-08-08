@@ -1,0 +1,547 @@
+{
+  "$defs": {
+    "AdmissionKeeperRefreshPlan": {
+      "additionalProperties": false,
+      "properties": {
+        "blocked_stage_count": {
+          "minimum": 0,
+          "title": "Blocked Stage Count",
+          "type": "integer"
+        },
+        "contour_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Contour Id",
+          "type": "string"
+        },
+        "full_refresh_cost": {
+          "minimum": 0,
+          "title": "Full Refresh Cost",
+          "type": "integer"
+        },
+        "organ_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Organ Id",
+          "type": "string"
+        },
+        "plan_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Plan Id",
+          "type": "string"
+        },
+        "planned_at": {
+          "format": "date-time",
+          "title": "Planned At",
+          "type": "string"
+        },
+        "planned_refresh_cost": {
+          "minimum": 0,
+          "title": "Planned Refresh Cost",
+          "type": "integer"
+        },
+        "prior_state_id": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Prior State Id"
+        },
+        "refresh_before": {
+          "format": "date-time",
+          "title": "Refresh Before",
+          "type": "string"
+        },
+        "refreshed_stage_count": {
+          "minimum": 0,
+          "title": "Refreshed Stage Count",
+          "type": "integer"
+        },
+        "registry_mutation_authorized": {
+          "const": false,
+          "default": false,
+          "title": "Registry Mutation Authorized",
+          "type": "boolean"
+        },
+        "reused_stage_count": {
+          "minimum": 0,
+          "title": "Reused Stage Count",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "aoa_admission_keeper_plan_v1",
+          "default": "aoa_admission_keeper_plan_v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "spec_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Spec Id",
+          "type": "string"
+        },
+        "steps": {
+          "items": {
+            "$ref": "#/$defs/KeeperRefreshStep"
+          },
+          "title": "Steps",
+          "type": "array"
+        }
+      },
+      "required": [
+        "plan_id",
+        "spec_id",
+        "organ_id",
+        "contour_id",
+        "planned_at",
+        "refresh_before",
+        "steps",
+        "full_refresh_cost",
+        "planned_refresh_cost",
+        "reused_stage_count",
+        "refreshed_stage_count",
+        "blocked_stage_count"
+      ],
+      "title": "AdmissionKeeperRefreshPlan",
+      "type": "object"
+    },
+    "AdmissionKeeperStageState": {
+      "additionalProperties": false,
+      "properties": {
+        "current": {
+          "default": false,
+          "title": "Current",
+          "type": "boolean"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "node_id": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Node Id"
+        },
+        "outcome": {
+          "anyOf": [
+            {
+              "enum": [
+                "passed",
+                "blocked",
+                "rejected",
+                "revoked"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Outcome"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "stage": {
+          "enum": [
+            "owner_source",
+            "package",
+            "deployment",
+            "process",
+            "endpoint",
+            "credential",
+            "schema",
+            "authenticated_canary",
+            "owner_grounding",
+            "central_proof",
+            "owner_acceptance",
+            "rollback",
+            "registry_admission",
+            "consumer_observation"
+          ],
+          "title": "Stage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stage"
+      ],
+      "title": "AdmissionKeeperStageState",
+      "type": "object"
+    },
+    "AdmissionKeeperState": {
+      "additionalProperties": false,
+      "properties": {
+        "admission_current": {
+          "title": "Admission Current",
+          "type": "boolean"
+        },
+        "blocker_codes": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+            "type": "string"
+          },
+          "title": "Blocker Codes",
+          "type": "array"
+        },
+        "contour_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Contour Id",
+          "type": "string"
+        },
+        "currentness": {
+          "items": {
+            "enum": [
+              "live",
+              "observed",
+              "verified",
+              "admitted",
+              "stale_readable",
+              "candidate",
+              "blocked",
+              "last_good"
+            ],
+            "type": "string"
+          },
+          "title": "Currentness",
+          "type": "array"
+        },
+        "immutable_evidence_only": {
+          "const": true,
+          "default": true,
+          "title": "Immutable Evidence Only",
+          "type": "boolean"
+        },
+        "last_good_state_digest": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Good State Digest"
+        },
+        "last_good_state_ref": {
+          "anyOf": [
+            {
+              "maxLength": 512,
+              "minLength": 3,
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Last Good State Ref"
+        },
+        "next_safe_stage": {
+          "anyOf": [
+            {
+              "enum": [
+                "owner_source",
+                "package",
+                "deployment",
+                "process",
+                "endpoint",
+                "credential",
+                "schema",
+                "authenticated_canary",
+                "owner_grounding",
+                "central_proof",
+                "owner_acceptance",
+                "rollback",
+                "registry_admission",
+                "consumer_observation"
+              ],
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Next Safe Stage"
+        },
+        "organ_id": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Organ Id",
+          "type": "string"
+        },
+        "owner_acceptance_issued_by_keeper": {
+          "const": false,
+          "default": false,
+          "title": "Owner Acceptance Issued By Keeper",
+          "type": "boolean"
+        },
+        "proof_verdict_issued_by_keeper": {
+          "const": false,
+          "default": false,
+          "title": "Proof Verdict Issued By Keeper",
+          "type": "boolean"
+        },
+        "revision": {
+          "minimum": 1,
+          "title": "Revision",
+          "type": "integer"
+        },
+        "schema_version": {
+          "const": "aoa_admission_keeper_state_v1",
+          "default": "aoa_admission_keeper_state_v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "spec_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Spec Id",
+          "type": "string"
+        },
+        "stages": {
+          "items": {
+            "$ref": "#/$defs/AdmissionKeeperStageState"
+          },
+          "title": "Stages",
+          "type": "array"
+        },
+        "state_id": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "State Id",
+          "type": "string"
+        },
+        "timestamps_extended_in_place": {
+          "const": false,
+          "default": false,
+          "title": "Timestamps Extended In Place",
+          "type": "boolean"
+        },
+        "transaction_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Transaction Ref",
+          "type": "string"
+        },
+        "updated_at": {
+          "format": "date-time",
+          "title": "Updated At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "state_id",
+        "revision",
+        "spec_id",
+        "organ_id",
+        "contour_id",
+        "transaction_ref",
+        "updated_at",
+        "stages",
+        "currentness",
+        "admission_current"
+      ],
+      "title": "AdmissionKeeperState",
+      "type": "object"
+    },
+    "KeeperRefreshStep": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "reuse",
+            "refresh",
+            "blocked"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "cost_weight": {
+          "minimum": 0,
+          "title": "Cost Weight",
+          "type": "integer"
+        },
+        "dependency_node_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Dependency Node Ids",
+          "type": "array"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "prior_node_id": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Prior Node Id"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "stage": {
+          "enum": [
+            "owner_source",
+            "package",
+            "deployment",
+            "process",
+            "endpoint",
+            "credential",
+            "schema",
+            "authenticated_canary",
+            "owner_grounding",
+            "central_proof",
+            "owner_acceptance",
+            "rollback",
+            "registry_admission",
+            "consumer_observation"
+          ],
+          "title": "Stage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stage",
+        "action",
+        "owner",
+        "cost_weight"
+      ],
+      "title": "KeeperRefreshStep",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:organ-admission-keeper-cycle.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "acceptance_inferred": {
+      "const": false,
+      "default": false,
+      "title": "Acceptance Inferred",
+      "type": "boolean"
+    },
+    "contour_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Contour Id",
+      "type": "string"
+    },
+    "cycle_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Cycle Id",
+      "type": "string"
+    },
+    "generated_at": {
+      "format": "date-time",
+      "title": "Generated At",
+      "type": "string"
+    },
+    "imported_node_ids": {
+      "items": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Imported Node Ids",
+      "type": "array"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "owner_tools_executed_by_sdk": {
+      "const": false,
+      "default": false,
+      "title": "Owner Tools Executed By Sdk",
+      "type": "boolean"
+    },
+    "plan": {
+      "$ref": "#/$defs/AdmissionKeeperRefreshPlan"
+    },
+    "proof_verdict_inferred": {
+      "const": false,
+      "default": false,
+      "title": "Proof Verdict Inferred",
+      "type": "boolean"
+    },
+    "registry_mutation_performed": {
+      "const": false,
+      "default": false,
+      "title": "Registry Mutation Performed",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "aoa_admission_keeper_cycle_v1",
+      "default": "aoa_admission_keeper_cycle_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "state": {
+      "$ref": "#/$defs/AdmissionKeeperState"
+    },
+    "transaction_ref": {
+      "maxLength": 512,
+      "minLength": 3,
+      "title": "Transaction Ref",
+      "type": "string"
+    }
+  },
+  "required": [
+    "cycle_id",
+    "generated_at",
+    "organ_id",
+    "contour_id",
+    "transaction_ref",
+    "imported_node_ids",
+    "plan",
+    "state"
+  ],
+  "title": "AdmissionKeeperCycle",
+  "type": "object"
+}

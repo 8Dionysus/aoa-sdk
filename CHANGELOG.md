@@ -9,6 +9,26 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
+- Add future changes here after the release tag lands.
+
+### Validation
+
+- Record validation with the change that will become the next dated release.
+
+### Notes
+
+- Dated release sections own exact reconciliation spans, complete commit
+  inventories, and validation evidence.
+
+## [0.10.0] - 2026-08-08
+
+### Summary
+
+- Add D-0094 multi-contour organ registry v2, non-admitting runtime overlays,
+  shadow-only owner supplements, an incremental content-addressed Admission
+  Keeper with fail-closed expiry and CAS state, and a principal-bound durable
+  TaskStore below any experimental MCP Tasks adapter.
+
 - Add the D-0092 resumable organ-admission transaction: strict request,
   baseline, evidence, candidate, authorization, decision, and run contracts
   preserve issuer and expiry, refuse to mint proof or owner acceptance, preview
@@ -29,9 +49,28 @@ Tracking starts with the community-docs baseline for this repository.
   repository while recording its GitHub archive state, verify the live
   SDK-canonical route and RAG path, and retain the stale KAG runtime slice as
   an explicit non-blocking derived-projection residual.
-- Add future changes here after the release tag lands.
-- Dated release sections own exact reconciliation spans, complete commit
-  inventories, and validation evidence.
+- Add model-neutral actor-incarnation bindings after plan compilation, with
+  explicit provider, model, runtime-adapter, policy, and evidence identities
+  that remain below runtime execution and owner authority.
+
+### Validation
+
+- The repository release battery, full test suite, lint gate, type gate,
+  package build, and installed-wheel release checks pass on the exact
+  release-prep commit.
+- Installed-wheel organ control-plane tests, cross-repository
+  `abyss-stack-mcp` tests, artifact-bundle validation, and production-intent
+  trust-gate classification.
+
+### Notes
+
+- The SDK supplies bounded control-plane mechanics. It does not issue owner
+  acceptance, proof verdicts, runtime admission, or effect authorization.
+- The MCP Tasks adapter remains experimental and feature-gated; current Codex
+  wire capability is absent and production enablement remains false.
+- A locally built wheel is suitable for isolated verification but is not a
+  production public-release trust root until this exact version is published
+  and admitted by the consumer policy.
 
 ## [0.9.0] - 2026-07-29
 

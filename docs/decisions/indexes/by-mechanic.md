@@ -73,6 +73,7 @@
 - [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 - [AOA-SDK-D-0092 - Make Organ Admission Resumable and Non-Mutating](../AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md) (`docs/decisions/AOA-SDK-D-0092-make-organ-admission-resumable-and-non-mutating.md`)
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
+- [AOA-SDK-D-0094 - Separate Contour Admission, Keeper Evidence, and Owner Tasks](../AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md) (`docs/decisions/AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md`)
 
 ## checkpoint
 

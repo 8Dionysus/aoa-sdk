@@ -85,6 +85,12 @@ and evidence collection feed a resumable non-mutating admission run, while
 central proof, owner acceptance, operator authorization, registry apply, and
 runtime effects remain separate owner transactions.
 
+`v0.10.0` packages that direction as a multi-contour registry, incremental
+Admission Keeper, durable owner TaskStore, and replaceable experimental MCP
+Tasks adapter boundary. It also adds model-neutral actor-incarnation binding.
+None of those surfaces moves owner truth, proof, acceptance, runtime execution,
+or effect authority into the SDK.
+
 The current repo-wide program is staged routing producer succession. The
 target is accepted in `AOA-SDK-D-0071`, the R2 typed control-plane, lifecycle,
 approval, event, and adapter contracts are explicit, the disposable R3

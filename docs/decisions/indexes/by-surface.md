@@ -25,6 +25,10 @@
 - [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 - [AOA-SDK-D-0087 - Admit Typed Scenario Artifacts as Runtime Requests](../AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md) (`docs/decisions/AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md`)
 
+## admission maintenance
+
+- [AOA-SDK-D-0094 - Separate Contour Admission, Keeper Evidence, and Owner Tasks](../AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md) (`docs/decisions/AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md`)
+
 ## agent guidance
 
 - [AOA-SDK-D-0002 - Root Design Surfaces Before Mechanics](../AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md) (`docs/decisions/AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md`)
@@ -197,6 +201,10 @@
 
 - [AOA-SDK-D-0001 - Decision Rationale Lane Before Mechanics](../AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md) (`docs/decisions/AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md`)
 
+## durable task control
+
+- [AOA-SDK-D-0094 - Separate Contour Admission, Keeper Evidence, and Owner Tasks](../AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md) (`docs/decisions/AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md`)
+
 ## ecosystem-carrier
 
 - [AOA-SDK-D-0064 - Checkpoint Carrier Candidate Intelligence](../AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md) (`docs/decisions/AOA-SDK-D-0064-checkpoint-carrier-candidate-intelligence.md`)
@@ -334,6 +342,10 @@
 ## organ discovery
 
 - [AOA-SDK-D-0079 - Expose Organ Discovery Through Workspace MCP](../AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md) (`docs/decisions/AOA-SDK-D-0079-expose-organ-discovery-through-workspace-mcp.md`)
+
+## organ registry
+
+- [AOA-SDK-D-0094 - Separate Contour Admission, Keeper Evidence, and Owner Tasks](../AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md) (`docs/decisions/AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md`)
 
 ## owner boundary
 

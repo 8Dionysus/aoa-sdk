@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 15099715,
+  "allowed_tracked_bytes": 20078037,
+  "approved_by": "repository-owner",
+  "base_ref": "b4cf8d00807bbca590a40714c19b725f4d42d12a",
+  "changed_generated_bytes": 15099715,
+  "changed_generated_files": 302,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "299e975f705892a9a96307ffaea5471274c6f4770ea79563eb84fd1e61820ddf",
+  "reason": "Refresh the portable family for the v0.10.0 multi-contour admission, Keeper, TaskStore, MCP Tasks adapter, and actor-incarnation control-plane release surfaces.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20078037,
+  "tracked_bytes_max": 15728640
+}
