@@ -44,5 +44,11 @@ completed mixed E1 report. It does not change `aoa_routing_thin_router_v1`,
 move runtime execution into the SDK, supply an eval verdict, or authorize an
 irreversible predecessor action.
 
+`v0.10.0` publishes the multi-contour organ registry, incremental Admission
+Keeper, principal-bound durable TaskStore, replaceable experimental MCP Tasks
+adapter boundary, and model-neutral actor-incarnation binding. It does not
+admit a runtime contour, mint proof or owner acceptance, enable MCP Tasks in
+production, or move owner execution into the SDK.
+
 Use that part when changing release audit, publish helper behavior, changelog
 publication shape, or release validation.
