@@ -1,0 +1,195 @@
+{
+  "$defs": {
+    "KeeperRefreshStep": {
+      "additionalProperties": false,
+      "properties": {
+        "action": {
+          "enum": [
+            "reuse",
+            "refresh",
+            "blocked"
+          ],
+          "title": "Action",
+          "type": "string"
+        },
+        "cost_weight": {
+          "minimum": 0,
+          "title": "Cost Weight",
+          "type": "integer"
+        },
+        "dependency_node_ids": {
+          "default": [],
+          "items": {
+            "pattern": "^sha256:[0-9a-f]{64}$",
+            "type": "string"
+          },
+          "title": "Dependency Node Ids",
+          "type": "array"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "prior_node_id": {
+          "anyOf": [
+            {
+              "pattern": "^sha256:[0-9a-f]{64}$",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Prior Node Id"
+        },
+        "reason_codes": {
+          "default": [],
+          "items": {
+            "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+            "type": "string"
+          },
+          "title": "Reason Codes",
+          "type": "array"
+        },
+        "stage": {
+          "enum": [
+            "owner_source",
+            "package",
+            "deployment",
+            "process",
+            "endpoint",
+            "credential",
+            "schema",
+            "authenticated_canary",
+            "owner_grounding",
+            "central_proof",
+            "owner_acceptance",
+            "rollback",
+            "registry_admission",
+            "consumer_observation"
+          ],
+          "title": "Stage",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stage",
+        "action",
+        "owner",
+        "cost_weight"
+      ],
+      "title": "KeeperRefreshStep",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:organ-admission-keeper-plan.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "blocked_stage_count": {
+      "minimum": 0,
+      "title": "Blocked Stage Count",
+      "type": "integer"
+    },
+    "contour_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Contour Id",
+      "type": "string"
+    },
+    "full_refresh_cost": {
+      "minimum": 0,
+      "title": "Full Refresh Cost",
+      "type": "integer"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "plan_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Plan Id",
+      "type": "string"
+    },
+    "planned_at": {
+      "format": "date-time",
+      "title": "Planned At",
+      "type": "string"
+    },
+    "planned_refresh_cost": {
+      "minimum": 0,
+      "title": "Planned Refresh Cost",
+      "type": "integer"
+    },
+    "prior_state_id": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Prior State Id"
+    },
+    "refresh_before": {
+      "format": "date-time",
+      "title": "Refresh Before",
+      "type": "string"
+    },
+    "refreshed_stage_count": {
+      "minimum": 0,
+      "title": "Refreshed Stage Count",
+      "type": "integer"
+    },
+    "registry_mutation_authorized": {
+      "const": false,
+      "default": false,
+      "title": "Registry Mutation Authorized",
+      "type": "boolean"
+    },
+    "reused_stage_count": {
+      "minimum": 0,
+      "title": "Reused Stage Count",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "aoa_admission_keeper_plan_v1",
+      "default": "aoa_admission_keeper_plan_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "spec_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Spec Id",
+      "type": "string"
+    },
+    "steps": {
+      "items": {
+        "$ref": "#/$defs/KeeperRefreshStep"
+      },
+      "title": "Steps",
+      "type": "array"
+    }
+  },
+  "required": [
+    "plan_id",
+    "spec_id",
+    "organ_id",
+    "contour_id",
+    "planned_at",
+    "refresh_before",
+    "steps",
+    "full_refresh_cost",
+    "planned_refresh_cost",
+    "reused_stage_count",
+    "refreshed_stage_count",
+    "blocked_stage_count"
+  ],
+  "title": "AdmissionKeeperRefreshPlan",
+  "type": "object"
+}

@@ -23,6 +23,18 @@
   consumer receipt cannot stand in for operator authorization;
 - projection-owned `registry_indexed` evidence, avoiding a circular source
   claim before the compiler has actually indexed the record.
+- a v2 registry whose admission identity is `(organ_id, contour_id)`, with
+  separate endpoint, credential, authority, evidence, currentness, rollback,
+  and last-good state for every contour;
+- compatibility migration that preserves v1 claims and expiry, plus
+  shadow-only contour supplements and evidence-bound runtime overlays that
+  cannot refresh proof, acceptance, or admission;
+- immutable content-addressed Admission Keeper nodes, dependency-aware reuse,
+  incremental plans, resumable cycles, one exclusive cycle lock across the
+  import/plan/state transaction, and compare-and-swap state publication;
+- a protocol-independent, principal-bound durable TaskStore with opaque IDs,
+  CAS transitions, idempotency, bounded payloads, quota, TTL, cancellation,
+  recovery, append-only audit records, and non-symlink store/lock boundaries.
 
 ## Stronger owner split
 
@@ -57,3 +69,9 @@
   separate owner and operator decisions and exact compare-and-swap validation.
 - No effect activation from read, candidate, admission, or registry-transition
   authorization.
+- No admission/currentness refresh from a runtime overlay, live process, or
+  Keeper execution alone.
+- No owner result, proof verdict, acceptance, or registry write minted by the
+  Keeper.
+- No authorization or admission inference from a task ID or terminal task
+  state.

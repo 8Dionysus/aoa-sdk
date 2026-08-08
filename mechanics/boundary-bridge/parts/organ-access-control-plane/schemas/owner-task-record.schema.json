@@ -1,0 +1,320 @@
+{
+  "$defs": {
+    "AcceptedTaskInput": {
+      "additionalProperties": false,
+      "properties": {
+        "accepted_at": {
+          "format": "date-time",
+          "title": "Accepted At",
+          "type": "string"
+        },
+        "input_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Input Digest",
+          "type": "string"
+        },
+        "input_key": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Input Key",
+          "type": "string"
+        },
+        "request_key": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Request Key",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_key",
+        "input_key",
+        "input_digest",
+        "accepted_at"
+      ],
+      "title": "AcceptedTaskInput",
+      "type": "object"
+    },
+    "TaskInputRequest": {
+      "additionalProperties": false,
+      "properties": {
+        "expires_at": {
+          "format": "date-time",
+          "title": "Expires At",
+          "type": "string"
+        },
+        "input_schema_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Input Schema Digest",
+          "type": "string"
+        },
+        "input_schema_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Input Schema Ref",
+          "type": "string"
+        },
+        "prompt_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Prompt Ref",
+          "type": "string"
+        },
+        "request_key": {
+          "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+          "title": "Request Key",
+          "type": "string"
+        },
+        "requested_at": {
+          "format": "date-time",
+          "title": "Requested At",
+          "type": "string"
+        }
+      },
+      "required": [
+        "request_key",
+        "prompt_ref",
+        "input_schema_ref",
+        "input_schema_digest",
+        "requested_at",
+        "expires_at"
+      ],
+      "title": "TaskInputRequest",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:owner-task-record.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "accepted_inputs": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/AcceptedTaskInput"
+      },
+      "title": "Accepted Inputs",
+      "type": "array"
+    },
+    "arguments_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Arguments Digest",
+      "type": "string"
+    },
+    "audit_refs": {
+      "default": [],
+      "items": {
+        "maxLength": 512,
+        "minLength": 3,
+        "type": "string"
+      },
+      "title": "Audit Refs",
+      "type": "array"
+    },
+    "authority_escalation_allowed": {
+      "const": false,
+      "default": false,
+      "title": "Authority Escalation Allowed",
+      "type": "boolean"
+    },
+    "cancellation_outcome": {
+      "default": "not_requested",
+      "enum": [
+        "not_requested",
+        "pending",
+        "accepted",
+        "too_late",
+        "rejected"
+      ],
+      "title": "Cancellation Outcome",
+      "type": "string"
+    },
+    "cancellation_requested_at": {
+      "anyOf": [
+        {
+          "format": "date-time",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Cancellation Requested At"
+    },
+    "contour_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Contour Id",
+      "type": "string"
+    },
+    "created_at": {
+      "format": "date-time",
+      "title": "Created At",
+      "type": "string"
+    },
+    "error_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error Digest"
+    },
+    "error_ref": {
+      "anyOf": [
+        {
+          "maxLength": 512,
+          "minLength": 3,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Error Ref"
+    },
+    "evidence_refs": {
+      "default": [],
+      "items": {
+        "maxLength": 512,
+        "minLength": 3,
+        "type": "string"
+      },
+      "title": "Evidence Refs",
+      "type": "array"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "idempotency_key": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Idempotency Key",
+      "type": "string"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "outstanding_inputs": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/TaskInputRequest"
+      },
+      "title": "Outstanding Inputs",
+      "type": "array"
+    },
+    "owner_run_ref": {
+      "maxLength": 512,
+      "minLength": 3,
+      "title": "Owner Run Ref",
+      "type": "string"
+    },
+    "poll_interval_ms": {
+      "maximum": 3600000,
+      "minimum": 100,
+      "title": "Poll Interval Ms",
+      "type": "integer"
+    },
+    "principal_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Principal Id",
+      "type": "string"
+    },
+    "result_digest": {
+      "anyOf": [
+        {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Result Digest"
+    },
+    "result_ref": {
+      "anyOf": [
+        {
+          "maxLength": 512,
+          "minLength": 3,
+          "type": "string"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null,
+      "title": "Result Ref"
+    },
+    "revision": {
+      "minimum": 1,
+      "title": "Revision",
+      "type": "integer"
+    },
+    "schema_version": {
+      "const": "aoa_owner_task_v1",
+      "default": "aoa_owner_task_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "status": {
+      "enum": [
+        "working",
+        "input_required",
+        "completed",
+        "failed",
+        "cancelled",
+        "expired"
+      ],
+      "title": "Status",
+      "type": "string"
+    },
+    "task_id": {
+      "maxLength": 128,
+      "minLength": 43,
+      "title": "Task Id",
+      "type": "string"
+    },
+    "task_id_is_authorization": {
+      "const": false,
+      "default": false,
+      "title": "Task Id Is Authorization",
+      "type": "boolean"
+    },
+    "tool_name": {
+      "minLength": 1,
+      "title": "Tool Name",
+      "type": "string"
+    },
+    "updated_at": {
+      "format": "date-time",
+      "title": "Updated At",
+      "type": "string"
+    }
+  },
+  "required": [
+    "task_id",
+    "principal_id",
+    "organ_id",
+    "contour_id",
+    "tool_name",
+    "arguments_digest",
+    "owner_run_ref",
+    "idempotency_key",
+    "status",
+    "revision",
+    "created_at",
+    "updated_at",
+    "expires_at",
+    "poll_interval_ms"
+  ],
+  "title": "OwnerTaskRecord",
+  "type": "object"
+}

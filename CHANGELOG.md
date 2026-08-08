@@ -9,6 +9,11 @@ Tracking starts with the community-docs baseline for this repository.
 
 ### Summary
 
+- Add D-0094 multi-contour organ registry v2, non-admitting runtime overlays,
+  shadow-only owner supplements, an incremental content-addressed Admission
+  Keeper with fail-closed expiry and CAS state, and a principal-bound durable
+  TaskStore below any experimental MCP Tasks adapter.
+
 - Add the D-0092 resumable organ-admission transaction: strict request,
   baseline, evidence, candidate, authorization, decision, and run contracts
   preserve issuer and expiry, refuse to mint proof or owner acceptance, preview

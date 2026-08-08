@@ -27,6 +27,20 @@ or runtime executor.
   transition preview for one organ capability contour;
 - a separate owner-plus-operator authorization receipt that still performs no
   registry write or effect activation.
+- a multi-contour v2 registry projection with non-admitting migration,
+  supplement, and runtime-overlay boundaries;
+- an incremental Admission Keeper evidence graph that plans and records owner-
+  issued evidence without issuing it;
+- a durable protocol-independent TaskStore for owner-bounded long operations,
+  without MCP extension authority;
+- a private aggregate TaskStore status for active load, quotas, outstanding
+  input, pending cancellation, unpersisted expiry, and bounded orphan
+  candidates, without task or principal enumeration.
+
+The v2 contour, Keeper, and TaskStore JSON Schemas live in this part's
+`schemas/` directory. The generator retains only the pre-existing v1 organ
+access schemas in the legacy root `schemas/organ-access/` surface and rejects
+any competing v2 copy there.
 
 ## Owner
 
@@ -45,6 +59,19 @@ public-safe shadow example. Runtime observation and execution move to
 inferred from this SDK projection. The admission transaction validates
 externally issued owner/runtime/proof receipts; it never runs those validators
 or issues their verdicts.
+
+The v2 registry and Keeper remain compatible control-plane additions. A live
+runtime overlay may bind exact package/process/endpoint identity but cannot
+repair expired source, proof, acceptance, consumer, or registry evidence. The
+Keeper serializes each complete import/plan/state transaction so concurrent
+event and timer triggers cannot both win the same CAS boundary; its root,
+internal stores, and lock must remain regular non-symlink paths. The
+TaskStore persists and reauthorizes a handle for owner work; the owner run and
+its result remain authoritative outside the SDK store. Its aggregate status is
+operational evidence only: it emits no task ID or principal ID and cannot turn
+a completed task into owner acceptance, proof, or admission. TaskStore roots,
+record/audit directories, and the opened lock descriptor are likewise checked
+fail-closed against symlink substitution.
 
 ## Validation
 

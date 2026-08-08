@@ -1,0 +1,198 @@
+{
+  "$defs": {
+    "QualifiedEvidenceRef": {
+      "additionalProperties": false,
+      "properties": {
+        "evidence_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Evidence Ref",
+          "type": "string"
+        },
+        "expires_at": {
+          "anyOf": [
+            {
+              "format": "date-time",
+              "type": "string"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null,
+          "title": "Expires At"
+        },
+        "observed_at": {
+          "format": "date-time",
+          "title": "Observed At",
+          "type": "string"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "revision": {
+          "minLength": 1,
+          "title": "Revision",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner",
+        "evidence_ref",
+        "revision",
+        "observed_at"
+      ],
+      "title": "QualifiedEvidenceRef",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:organ-admission-keeper-node.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "acceptance_inferred": {
+      "const": false,
+      "default": false,
+      "title": "Acceptance Inferred",
+      "type": "boolean"
+    },
+    "contains_secrets": {
+      "const": false,
+      "default": false,
+      "title": "Contains Secrets",
+      "type": "boolean"
+    },
+    "contour_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Contour Id",
+      "type": "string"
+    },
+    "dependency_node_ids": {
+      "items": {
+        "pattern": "^sha256:[0-9a-f]{64}$",
+        "type": "string"
+      },
+      "title": "Dependency Node Ids",
+      "type": "array"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "node_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Node Id",
+      "type": "string"
+    },
+    "observed_at": {
+      "format": "date-time",
+      "title": "Observed At",
+      "type": "string"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "outcome": {
+      "enum": [
+        "passed",
+        "blocked",
+        "rejected",
+        "revoked"
+      ],
+      "title": "Outcome",
+      "type": "string"
+    },
+    "owner": {
+      "minLength": 1,
+      "title": "Owner",
+      "type": "string"
+    },
+    "proof_verdict_inferred": {
+      "const": false,
+      "default": false,
+      "title": "Proof Verdict Inferred",
+      "type": "boolean"
+    },
+    "reason_codes": {
+      "default": [],
+      "items": {
+        "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+        "type": "string"
+      },
+      "title": "Reason Codes",
+      "type": "array"
+    },
+    "receipt": {
+      "$ref": "#/$defs/QualifiedEvidenceRef"
+    },
+    "registry_mutation_performed": {
+      "const": false,
+      "default": false,
+      "title": "Registry Mutation Performed",
+      "type": "boolean"
+    },
+    "schema_version": {
+      "const": "aoa_admission_keeper_node_v1",
+      "default": "aoa_admission_keeper_node_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "spec_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Spec Id",
+      "type": "string"
+    },
+    "stage": {
+      "enum": [
+        "owner_source",
+        "package",
+        "deployment",
+        "process",
+        "endpoint",
+        "credential",
+        "schema",
+        "authenticated_canary",
+        "owner_grounding",
+        "central_proof",
+        "owner_acceptance",
+        "rollback",
+        "registry_admission",
+        "consumer_observation"
+      ],
+      "title": "Stage",
+      "type": "string"
+    },
+    "stage_spec_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Stage Spec Digest",
+      "type": "string"
+    },
+    "subject_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Subject Digest",
+      "type": "string"
+    }
+  },
+  "required": [
+    "spec_id",
+    "organ_id",
+    "contour_id",
+    "stage",
+    "stage_spec_digest",
+    "dependency_node_ids",
+    "owner",
+    "subject_digest",
+    "receipt",
+    "observed_at",
+    "expires_at",
+    "outcome",
+    "node_id"
+  ],
+  "title": "AdmissionEvidenceNode",
+  "type": "object"
+}

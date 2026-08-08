@@ -1,0 +1,180 @@
+{
+  "$defs": {
+    "KeeperStageSpec": {
+      "additionalProperties": false,
+      "properties": {
+        "automatic_execution_allowed": {
+          "default": true,
+          "title": "Automatic Execution Allowed",
+          "type": "boolean"
+        },
+        "cost_weight": {
+          "default": 1,
+          "maximum": 10000,
+          "minimum": 1,
+          "title": "Cost Weight",
+          "type": "integer"
+        },
+        "dependency_stages": {
+          "default": [],
+          "items": {
+            "enum": [
+              "owner_source",
+              "package",
+              "deployment",
+              "process",
+              "endpoint",
+              "credential",
+              "schema",
+              "authenticated_canary",
+              "owner_grounding",
+              "central_proof",
+              "owner_acceptance",
+              "rollback",
+              "registry_admission",
+              "consumer_observation"
+            ],
+            "type": "string"
+          },
+          "title": "Dependency Stages",
+          "type": "array"
+        },
+        "maximum_age_seconds": {
+          "exclusiveMinimum": 0,
+          "title": "Maximum Age Seconds",
+          "type": "integer"
+        },
+        "owner": {
+          "minLength": 1,
+          "title": "Owner",
+          "type": "string"
+        },
+        "stage": {
+          "enum": [
+            "owner_source",
+            "package",
+            "deployment",
+            "process",
+            "endpoint",
+            "credential",
+            "schema",
+            "authenticated_canary",
+            "owner_grounding",
+            "central_proof",
+            "owner_acceptance",
+            "rollback",
+            "registry_admission",
+            "consumer_observation"
+          ],
+          "title": "Stage",
+          "type": "string"
+        },
+        "subject_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Subject Digest",
+          "type": "string"
+        },
+        "validator_ref": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Validator Ref",
+          "type": "string"
+        },
+        "validator_revision": {
+          "minLength": 1,
+          "title": "Validator Revision",
+          "type": "string"
+        },
+        "validator_schema_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Validator Schema Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "stage",
+        "owner",
+        "validator_ref",
+        "validator_revision",
+        "validator_schema_digest",
+        "subject_digest",
+        "maximum_age_seconds"
+      ],
+      "title": "KeeperStageSpec",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:organ-access:organ-admission-keeper-spec.schema.json",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "additionalProperties": false,
+  "properties": {
+    "authored_at": {
+      "format": "date-time",
+      "title": "Authored At",
+      "type": "string"
+    },
+    "contour_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Contour Id",
+      "type": "string"
+    },
+    "expires_at": {
+      "format": "date-time",
+      "title": "Expires At",
+      "type": "string"
+    },
+    "organ_id": {
+      "pattern": "^[a-z0-9][a-z0-9._-]{1,127}$",
+      "title": "Organ Id",
+      "type": "string"
+    },
+    "registry_anchor_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Registry Anchor Digest",
+      "type": "string"
+    },
+    "schema_version": {
+      "const": "aoa_admission_keeper_spec_v1",
+      "default": "aoa_admission_keeper_spec_v1",
+      "title": "Schema Version",
+      "type": "string"
+    },
+    "spec_id": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Spec Id",
+      "type": "string"
+    },
+    "stages": {
+      "items": {
+        "$ref": "#/$defs/KeeperStageSpec"
+      },
+      "minItems": 1,
+      "title": "Stages",
+      "type": "array"
+    },
+    "target_record_digest": {
+      "pattern": "^sha256:[0-9a-f]{64}$",
+      "title": "Target Record Digest",
+      "type": "string"
+    },
+    "transaction_ref": {
+      "maxLength": 512,
+      "minLength": 3,
+      "title": "Transaction Ref",
+      "type": "string"
+    }
+  },
+  "required": [
+    "spec_id",
+    "organ_id",
+    "contour_id",
+    "transaction_ref",
+    "registry_anchor_digest",
+    "target_record_digest",
+    "authored_at",
+    "expires_at",
+    "stages"
+  ],
+  "title": "AdmissionKeeperSpec",
+  "type": "object"
+}
