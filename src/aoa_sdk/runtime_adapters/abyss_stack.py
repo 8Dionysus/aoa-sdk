@@ -52,8 +52,8 @@ ABYSS_STACK_EXTERNAL_CODEX_ADAPTER_VERSION: Literal[
     "abyss_stack_external_codex_agent_v1"
 ] = "abyss_stack_external_codex_agent_v1"
 ABYSS_STACK_EXTERNAL_CODEX_PROFILE_SCHEMA_VERSION: Literal[
-    "abyss_stack_external_codex_runtime_profile_v1"
-] = "abyss_stack_external_codex_runtime_profile_v1"
+    "abyss_stack_external_codex_runtime_profile_v2"
+] = "abyss_stack_external_codex_runtime_profile_v2"
 
 AbyssStackOperation = Literal[
     "observe_snapshot",
@@ -149,13 +149,19 @@ def load_abyss_stack_external_codex_runtime_profile(
         "codex_cli",
         "model_admission",
         "tool_profiles",
-        "task_families",
+        "execution_postures",
+        "owner_contracts",
         "result_schema_ref",
         "boundaries",
     }
     boundaries = descriptor.get("boundaries") if isinstance(descriptor, dict) else None
     process_containment = (
         descriptor.get("process_containment")
+        if isinstance(descriptor, dict)
+        else None
+    )
+    owner_contracts = (
+        descriptor.get("owner_contracts")
         if isinstance(descriptor, dict)
         else None
     )
@@ -177,6 +183,9 @@ def load_abyss_stack_external_codex_runtime_profile(
         or not isinstance(descriptor.get("schema_ref"), str)
         or not descriptor["schema_ref"]
         or not isinstance(boundaries, dict)
+        or not isinstance(owner_contracts, dict)
+        or set(owner_contracts)
+        != {"owner_execution_request_schema", "task_local_dag_schema"}
         or boundaries.get("launches_separate_os_process") is not True
         or boundaries.get("uses_builtin_codex_subagents") is not False
         or boundaries.get("uses_tui_transport") is not False
@@ -200,6 +209,7 @@ def load_abyss_stack_external_codex_runtime_profile(
         "supported_plan_schema_versions",
         "supported_event_schema_versions",
         "supported_effect_classes",
+        "execution_postures",
     ):
         values = descriptor.get(key)
         if (
@@ -224,6 +234,12 @@ def load_abyss_stack_external_codex_runtime_profile(
     ):
         raise AbyssStackAdapterError(
             "external Codex runtime profile admits unsupported effect classes"
+        )
+    if not set(descriptor["execution_postures"]).issubset(
+        {"bounded_execution", "independent_review", "closeout", "ambiguity_stop"}
+    ):
+        raise AbyssStackAdapterError(
+            "external Codex runtime profile admits unsupported execution postures"
         )
     try:
         provenance = ProvenanceRef(

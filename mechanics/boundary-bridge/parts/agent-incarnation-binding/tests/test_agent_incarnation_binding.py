@@ -316,7 +316,7 @@ def test_incarnation_rejects_plan_bytes_with_a_stale_digest() -> None:
 def _external_codex_descriptor() -> dict[str, object]:
     return {
         "$schema": "schemas/external-codex-runtime-profile.schema.json",
-        "schema_version": "abyss_stack_external_codex_runtime_profile_v1",
+        "schema_version": "abyss_stack_external_codex_runtime_profile_v2",
         "profile_id": "runtime-profile:abyss-stack-external-codex-agent-v1",
         "runtime_owner": "abyss-stack",
         "adapter_id": "abyss_stack_external_codex_agent_v1",
@@ -341,7 +341,23 @@ def _external_codex_descriptor() -> dict[str, object]:
         "codex_cli": {"required_version": "codex-cli 0.146.0"},
         "model_admission": [{"model_slug": "gpt-5.6-luna"}],
         "tool_profiles": [{"profile_id": "fixture-read-only"}],
-        "task_families": ["landing_readiness"],
+        "execution_postures": ["bounded_execution", "independent_review"],
+        "owner_contracts": {
+            "owner_execution_request_schema": {
+                "owner_repo": "aoa-agents",
+                "artifact_ref": "skills/aoa-summon/references/summon-request-v3.schema.json",
+                "source_ref": "a" * 40,
+                "digest": "sha256:" + "1" * 64,
+                "schema_version": "summon-request-v3",
+            },
+            "task_local_dag_schema": {
+                "owner_repo": "aoa-skills",
+                "artifact_ref": "schemas/task_local_dag_v2.schema.json",
+                "source_ref": "b" * 40,
+                "digest": "sha256:" + "2" * 64,
+                "schema_version": "aoa-task-local-dag-v2",
+            },
+        },
         "result_schema_ref": "schemas/external-codex-report.schema.json",
         "boundaries": {
             "launches_separate_os_process": True,
@@ -398,4 +414,16 @@ def test_external_codex_runtime_profile_loader_rejects_weaker_containment(
     path.write_text(json.dumps(descriptor) + "\n", encoding="utf-8")
 
     with pytest.raises(AbyssStackAdapterError, match="identity is invalid"):
+        load_abyss_stack_external_codex_runtime_profile(path)
+
+
+def test_external_codex_runtime_profile_loader_rejects_domain_specific_posture(
+    tmp_path: Path,
+) -> None:
+    descriptor = _external_codex_descriptor()
+    descriptor["execution_postures"] = ["landing_readiness"]
+    path = tmp_path / "runtime-profile.json"
+    path.write_text(json.dumps(descriptor) + "\n", encoding="utf-8")
+
+    with pytest.raises(AbyssStackAdapterError, match="unsupported execution postures"):
         load_abyss_stack_external_codex_runtime_profile(path)
