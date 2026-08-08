@@ -79,9 +79,11 @@ def _binding(
     *,
     task_request_ref: ProvenanceRef | None = None,
     model_realization_ref: ProvenanceRef | None = None,
+    role_id: str = "architect",
+    permission_posture: IncarnationPermissionPosture | None = None,
 ) -> AgentIncarnationBinding:
     role = next(
-        item for item in plan.scenario_binding.agent_refs if item.agent_id == "architect"
+        item for item in plan.scenario_binding.agent_refs if item.agent_id == role_id
     )
     task_request = task_request_ref or _task_request(plan)
     workspace_source = _source(plan, "fixture-requester")
@@ -149,7 +151,8 @@ def _binding(
         model_realization_ref=model_realization_ref
         or _ref("aoa-models", "source/model-realizations/gpt-5.6-luna-max.json"),
         workspace_source_ref=workspace_source,
-        permission_posture=IncarnationPermissionPosture(
+        permission_posture=permission_posture
+        or IncarnationPermissionPosture(
             sandbox_mode="read_only",
             approval_policy="never",
             allowed_effect_classes=("read_only",),
@@ -214,6 +217,34 @@ def test_task_request_must_be_an_active_pinned_plan_input() -> None:
     plan = _plan()
     with pytest.raises(IncarnationBindingError, match="exact scenario input"):
         _binding(plan, task_request_ref=_ref("requester", "requests/not-in-plan.json"))
+
+
+def test_task_request_must_be_consumed_by_a_step_assigned_to_the_role() -> None:
+    plan = _plan()
+
+    with pytest.raises(
+        IncarnationBindingError,
+        match="active plan step assigned to the role",
+    ):
+        _binding(plan, role_id="evaluator")
+
+
+def test_permission_classes_cannot_exceed_the_role_bound_plan_steps() -> None:
+    plan = _plan()
+
+    with pytest.raises(
+        IncarnationBindingError,
+        match="must exactly match",
+    ):
+        _binding(
+            plan,
+            permission_posture=IncarnationPermissionPosture(
+                sandbox_mode="workspace_write",
+                approval_policy="never",
+                allowed_effect_classes=("read_only", "repo_mutation"),
+                network_access="disabled",
+            ),
+        )
 
 
 def test_model_realization_owner_cannot_drift() -> None:

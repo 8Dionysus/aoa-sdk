@@ -180,8 +180,12 @@ def assert_agent_incarnation_binding_matches_plan(
     }
     if binding.task_request_ref not in admitted_inputs:
         raise IncarnationBindingError("task request is not an exact scenario input")
-    if not any(binding.task_request_ref in step.input_refs for step in plan.steps):
-        raise IncarnationBindingError("task request is not bound to an active plan step")
+    role = matching_agents[0]
+    role_steps = tuple(step for step in plan.steps if role in step.agent_refs)
+    if not any(binding.task_request_ref in step.input_refs for step in role_steps):
+        raise IncarnationBindingError(
+            "task request is not bound to an active plan step assigned to the role"
+        )
 
     snapshot_sources = set(plan.snapshot.source_refs)
     if binding.workspace_source_ref not in snapshot_sources:
@@ -193,16 +197,11 @@ def assert_agent_incarnation_binding_matches_plan(
     if binding.task_request_ref not in binding.continuation.immutable_input_refs:
         raise IncarnationBindingError("continuation must preserve the task request")
 
-    role = matching_agents[0]
-    role_effects = {
-        step.effect_class
-        for step in plan.steps
-        if role in step.agent_refs
-    }
+    role_effects = {step.effect_class for step in role_steps}
     allowed_effects = set(binding.permission_posture.allowed_effect_classes)
-    if not role_effects.issubset(allowed_effects):
+    if role_effects != allowed_effects:
         raise IncarnationBindingError(
-            "incarnation permission ceiling does not cover its role-bound plan steps"
+            "incarnation permission classes must exactly match its role-bound plan steps"
         )
     if "external" in role_effects:
         external_steps = {
