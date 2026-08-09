@@ -29,7 +29,7 @@ jobs:
           path: .aoa-stats-validator
 
       - name: Check repo-local KAG index family
-        uses: 8Dionysus/aoa-kag/.github/actions/repo-local-kag-index@58ab52ffc06bab5cc28842a0b4336c6efa16b6ff
+        uses: 8Dionysus/aoa-kag/.github/actions/repo-local-kag-index@30ce3b8f33ed27ef3888c214b9e9e5cd0f50f80e
         with:
           history-ref: ${{ github.event.pull_request.base.sha || github.event.before || format('{0}^', github.sha) }}
           event-history-ref: ${{ github.event.pull_request.base.sha || github.event.before || format('{0}^', github.sha) }}
