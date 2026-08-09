@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 6948485,
+  "allowed_tracked_bytes": 20215124,
+  "approved_by": "repository-owner",
+  "base_ref": "34ff083902a1a42d7f6eaeb4bc55542f1e4b77e0",
+  "changed_generated_bytes": 6948485,
+  "changed_generated_files": 135,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "6fe4dd1f27d551616a6ef37234b0de6b9ae626b85c96905168386bf567768d64",
+  "reason": "MCP admission review correction documents expired admitted refresh boundary",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20215124,
+  "tracked_bytes_max": 15728640
+}

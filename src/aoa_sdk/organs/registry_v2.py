@@ -423,8 +423,14 @@ def apply_contour_admission_revision(
     if len(contours) != 1:
         raise OrganRegistryError("admission revision contour is absent or ambiguous")
     contour = contours[0]
-    if contour.registry_state != "shadow":
-        raise OrganRegistryError("only a shadow contour can enter admission")
+    refreshes_expired_admission = (
+        contour.registry_state == "admitted"
+        and timestamp >= contour.currentness_expires_at
+    )
+    if contour.registry_state != "shadow" and not refreshes_expired_admission:
+        raise OrganRegistryError(
+            "only a shadow or expired admitted contour can enter admission"
+        )
     if sha256_digest(contour.model_dump(mode="json")) != revision.expected_contour_digest:
         raise OrganRegistryError("admission revision predecessor digest conflicts")
     if contour.endpoint is None:
@@ -435,7 +441,10 @@ def apply_contour_admission_revision(
         or runtime.deployment_revision is None
         or runtime.deployed_tree_digest is None
         or runtime.deployment_manifest_digest is None
-        or contour.revisions.consumer_schema is not None
+        or (
+            contour.registry_state == "shadow"
+            and contour.revisions.consumer_schema is not None
+        )
     ):
         raise OrganRegistryError(
             "admission contour needs exact runtime identity and an unclaimed consumer slot"

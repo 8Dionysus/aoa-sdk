@@ -183,7 +183,10 @@ a shape correction, never an admission refresh.
 ## Registry v2 contour admission
 
 V1 organ-level authorization cannot mutate a v2 contour. For v2, first issue a
-content-addressed operator decision against the exact shadow contour digest:
+content-addressed operator decision against the exact shadow contour digest, or
+against an admitted contour only after its currentness window has actually
+expired according to the admission-composition clock. A future-dated decision
+cannot refresh a still-current admitted contour:
 
 The operator command is `aoa organs
 registry-contour-admission-operator-decision`; its CLI help owns the exact

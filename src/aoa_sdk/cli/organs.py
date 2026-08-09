@@ -388,11 +388,15 @@ def organs_registry_contour_admission_operator_decision(
                 "operator decision contour is absent or ambiguous"
             )
         contour = contours[0]
-        if contour.registry_state != "shadow":
-            raise OrganRegistryError(
-                "operator decision can only address a shadow contour"
-            )
         decided_at = datetime.now(timezone.utc)
+        refreshes_expired_admission = (
+            contour.registry_state == "admitted"
+            and decided_at >= contour.currentness_expires_at
+        )
+        if contour.registry_state != "shadow" and not refreshes_expired_admission:
+            raise OrganRegistryError(
+                "operator decision can only address a shadow or expired admitted contour"
+            )
         contour_digest = sha256_digest(contour.model_dump(mode="json"))
         receipt = materialize_admission_decision(
             AdmissionDecisionStatement(

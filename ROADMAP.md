@@ -92,6 +92,8 @@ None of those surfaces moves owner truth, proof, acceptance, runtime execution,
 or effect authority into the SDK.
 `v0.10.1` adds the first native content-addressed admission CAS for one exact
 registry-v2 contour without widening cross-organ or effect authority.
+`v0.10.2` applies that same CAS and evidence ceiling to refresh an expired
+admitted contour while rejecting refresh of a still-current admission.
 
 The current repo-wide program is staged routing producer succession. The
 target is accepted in `AOA-SDK-D-0071`, the R2 typed control-plane, lifecycle,

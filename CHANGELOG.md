@@ -11,6 +11,25 @@ Tracking starts with the community-docs baseline for this repository.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
 
+## [0.10.2] - 2026-08-08
+
+### Summary
+
+- Allow a full content-addressed admission revision to refresh an already
+  admitted contour only after its currentness window expires. The refresh
+  retains the same owner, proof, acceptance, rollback, operator, CAS, and
+  no-effect gates as first admission; current admitted contours remain denied.
+
+### Validation
+
+- Focused organ-control tests, including current-admission rejection and
+  expired-admission refresh.
+
+### Notes
+
+- This closes an admission-maintenance gap without making expiry itself an
+  authorization or weakening the deny-by-default registry boundary.
+
 ## [0.10.1] - 2026-08-08
 
 ### Summary

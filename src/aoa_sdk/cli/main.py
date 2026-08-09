@@ -31,7 +31,7 @@ app.add_typer(route_app, name="route")
 
 @app.command()
 def version() -> None:
-    print("aoa-sdk 0.10.1")
+    print("aoa-sdk 0.10.2")
 
 
 if __name__ == "__main__":
