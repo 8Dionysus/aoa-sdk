@@ -505,6 +505,51 @@ def test_contour_admission_is_content_addressed_cas_and_owner_bounded() -> None:
             applied_at=issued_at + timedelta(seconds=1),
         )
 
+    with pytest.raises(OrganRegistryError, match="shadow or expired admitted"):
+        apply_contour_admission_revision(
+            admitted_source,
+            revision,
+            applied_at=issued_at + timedelta(seconds=2),
+        )
+
+    expired_at = issued_at + timedelta(seconds=10)
+    expired_contour = admitted.model_copy(
+        update={"currentness_expires_at": expired_at}
+    )
+    expired_source = admitted_source.model_copy(
+        update={
+            "records": (
+                admitted_source.records[0].model_copy(
+                    update={"contours": (expired_contour,)}
+                ),
+            )
+        }
+    )
+    refresh_payload = revision.model_copy(
+        update={
+            "expected_contour_digest": sha256_digest(
+                expired_contour.model_dump(mode="json")
+            ),
+            "issued_at": expired_at,
+            "revision_digest": digest("placeholder-refresh"),
+        }
+    ).model_dump(mode="json")
+    refresh_payload["revision_digest"] = sha256_digest(
+        OrganContourAdmissionRevision.model_validate(refresh_payload).model_dump(
+            mode="json", exclude={"revision_digest"}
+        )
+    )
+    refreshed_source = apply_contour_admission_revision(
+        expired_source,
+        OrganContourAdmissionRevision.model_validate(refresh_payload),
+        applied_at=expired_at + timedelta(seconds=1),
+    )
+    refreshed = refreshed_source.records[0].contours[0]
+    assert refreshed.registry_state == "admitted"
+    assert refreshed.currentness == "current"
+    assert refreshed.currentness_expires_at == migrated.expires_at
+    assert refreshed.revisions.consumer_schema is not None
+
 
 def test_task_store_is_durable_principal_bound_cas_and_idempotent(tmp_path: Path) -> None:
     store = FileTaskStore(tmp_path / "tasks")
