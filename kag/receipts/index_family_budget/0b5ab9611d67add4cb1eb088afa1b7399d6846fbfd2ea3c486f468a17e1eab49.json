@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 6917898,
+  "allowed_tracked_bytes": 20214187,
+  "approved_by": "repository-owner",
+  "base_ref": "34ff083902a1a42d7f6eaeb4bc55542f1e4b77e0",
+  "changed_generated_bytes": 6917898,
+  "changed_generated_files": 132,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "0b5ab9611d67add4cb1eb088afa1b7399d6846fbfd2ea3c486f468a17e1eab49",
+  "reason": "Refresh the aoa-sdk portable family for v0.10.2 admission maintenance; the standing tracked-byte exceedance predates this bounded refresh change.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20214187,
+  "tracked_bytes_max": 15728640
+}
