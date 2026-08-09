@@ -36,7 +36,8 @@
   correct tool bindings or declared contour shape only by producing a new
   bare shadow with no inherited current/admitted claim;
 - a content-addressed, operator-issued contour admission revision that CAS
-  binds one shadow predecessor and requires independently owner-qualified
+  binds one shadow predecessor or one already-expired admitted predecessor,
+  rejects refresh of a still-current admitted contour, and requires independently owner-qualified
   source, runtime, consumer, proof, acceptance, rollback, and currentness
   evidence while keeping effect and cross-organ authority false;
 - immutable content-addressed Admission Keeper nodes, dependency-aware reuse,
