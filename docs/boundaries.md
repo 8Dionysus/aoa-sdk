@@ -45,7 +45,7 @@ repositories remain authoritative.
   `aoa-playbooks` contour/schema pin, preserves reviewed input and condition
   provenance, and emits a runtime-neutral `RunPlan` without adapter selection
   or execution
-- the post-compile `AgentIncarnationBinding`, which validates exact
+- the post-compile `AgentIncarnationBindingV2`, which validates exact
   owner-qualified task, role, model-realization, runtime/tool, workspace,
   permission, continuation, and wake refs against one immutable `RunPlan`
   without selecting a model or interpreting model fit

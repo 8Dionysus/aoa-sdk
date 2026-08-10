@@ -135,3 +135,7 @@
 
 - [AOA-SDK-D-0094 - Separate Contour Admission, Keeper Evidence, and Owner Tasks](../AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md) (`docs/decisions/AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md`)
 - [AOA-SDK-D-0095 - Admit One Contour Through Content-Addressed CAS](../AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md) (`docs/decisions/AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md`)
+
+## 2026-08-10
+
+- [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)

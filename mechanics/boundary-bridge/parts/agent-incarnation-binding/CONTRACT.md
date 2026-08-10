@@ -2,7 +2,10 @@
 
 ## SDK owns
 
-- `aoa_agent_incarnation_binding_v1` shape and canonical digest;
+- byte-compatible `aoa_agent_incarnation_binding_v1` historical-read shape;
+- required `aoa_agent_incarnation_binding_v2` obligation, mandate,
+  role-resolution, fit-query-result, fit-projection, realization, runtime, and
+  canonical-digest chain for new external actors;
 - exact cross-object validation against one `RunPlan`;
 - validation of the plan snapshot and plan canonical digest before the
   incarnation can rely on its plan ref;
@@ -39,7 +42,8 @@ RunPlan
   + exact runtime/tool profile
   + exact workspace source
   + bounded permission plus observe-only metering, stop and wake policies
-  -> AgentIncarnationBinding
+  -> AgentIncarnationBindingV2 for a new external actor
+  -> AgentIncarnationBinding only when reading historical v1 evidence
   -> runtime-owner delivery binding
 ```
 
@@ -52,6 +56,8 @@ model-fit claim, or grant an effect.
 - The model slug is not copied into role or plan truth.
 - A schema-valid binding is not activation, execution, persistence, proof,
   acceptance, landing, or net benefit.
+- Historical v1 compatibility is not admission for a new external actor that
+  requires the evidence-complete v2 chain.
 - Parent/child words in a task request remain first-route compatibility terms,
   not permanent A2A social ontology.
 - External effects require matching plan steps and explicit approval bindings;

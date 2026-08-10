@@ -20,11 +20,14 @@ from .incarnation import (
     assert_agent_incarnation_binding_digest,
     assert_agent_incarnation_binding_matches_plan,
     build_agent_incarnation_binding,
+    build_agent_incarnation_binding_v2,
     load_model_realization_ref,
 )
 from ..contracts.incarnation import (
     AGENT_INCARNATION_BINDING_VERSION,
+    AGENT_INCARNATION_BINDING_V2_VERSION,
     AgentIncarnationBinding,
+    AgentIncarnationBindingV2,
     ContinuationObligation,
     IncarnationPermissionPosture,
     IncarnationStopCondition,
@@ -40,7 +43,9 @@ __all__ = [
     "EvidenceChainError",
     "EvidenceChainRepository",
     "AGENT_INCARNATION_BINDING_VERSION",
+    "AGENT_INCARNATION_BINDING_V2_VERSION",
     "AgentIncarnationBinding",
+    "AgentIncarnationBindingV2",
     "ContinuationObligation",
     "IncarnationPermissionPosture",
     "IncarnationStopCondition",
@@ -57,5 +62,6 @@ __all__ = [
     "assert_agent_incarnation_binding_digest",
     "assert_agent_incarnation_binding_matches_plan",
     "build_agent_incarnation_binding",
+    "build_agent_incarnation_binding_v2",
     "load_model_realization_ref",
 ]

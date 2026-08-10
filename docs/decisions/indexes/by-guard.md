@@ -131,6 +131,7 @@
 
 - [AOA-SDK-D-0035 - Diagnostic Catalog Compatibility Path Canonicalization](../AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md) (`docs/decisions/AOA-SDK-D-0035-diagnostic-catalog-compatibility-path-canonicalization.md`)
 - [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
+- [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 
 ## compatibility alias
 
@@ -220,6 +221,7 @@
 - [AOA-SDK-D-0090 - Bind Owner Result Review After Runtime Capture](../AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md) (`docs/decisions/AOA-SDK-D-0090-bind-owner-result-review-after-runtime-capture.md`)
 - [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
+- [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 
 ## exact recovery
 
@@ -359,6 +361,10 @@
 
 - [AOA-SDK-D-0085 - Resolve Scenario Capabilities Before Compilation](../AOA-SDK-D-0085-resolve-scenario-capabilities-before-compilation.md) (`docs/decisions/AOA-SDK-D-0085-resolve-scenario-capabilities-before-compilation.md`)
 
+## model-fit evidence
+
+- [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
+
 ## nested agents
 
 - [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) (`docs/decisions/AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md`)
@@ -461,6 +467,7 @@
 - [AOA-SDK-D-0087 - Admit Typed Scenario Artifacts as Runtime Requests](../AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md) (`docs/decisions/AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md`)
 - [AOA-SDK-D-0089 - Project Runtime Approvals Before Plan Compilation](../AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md`)
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
+- [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 
 ## owner scope
 

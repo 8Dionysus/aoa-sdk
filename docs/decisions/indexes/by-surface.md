@@ -148,6 +148,7 @@
 - [AOA-SDK-D-0070 - Admit the Titan Helper Skill Family](../AOA-SDK-D-0070-titan-owner-skill-family.md) (`docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md`)
 - [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
 - [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
+- [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 
 ## compatibility accounting
 
@@ -334,6 +335,7 @@
 - [AOA-SDK-D-0086 - Keep Route Callers Distinct from Providers](../AOA-SDK-D-0086-keep-route-callers-distinct-from-providers.md) (`docs/decisions/AOA-SDK-D-0086-keep-route-callers-distinct-from-providers.md`)
 - [AOA-SDK-D-0089 - Project Runtime Approvals Before Plan Compilation](../AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md`)
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
+- [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 
 ## models
 
@@ -430,6 +432,7 @@
 - [AOA-SDK-D-0087 - Admit Typed Scenario Artifacts as Runtime Requests](../AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md) (`docs/decisions/AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md`)
 - [AOA-SDK-D-0089 - Project Runtime Approvals Before Plan Compilation](../AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md`)
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
+- [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 
 ## public API naming
 
@@ -532,6 +535,7 @@
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
 - [AOA-SDK-D-0089 - Project Runtime Approvals Before Plan Compilation](../AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0089-project-runtime-approvals-before-plan-compilation.md`)
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
+- [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 
 ## runtime entrypoint
 
