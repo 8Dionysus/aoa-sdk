@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 14666925,
+  "allowed_tracked_bytes": 20275171,
+  "approved_by": "repository-owner",
+  "base_ref": "459231bc69f39ca0e16e30849bc8e5237068e950",
+  "changed_generated_bytes": 14666925,
+  "changed_generated_files": 279,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "222341d2be9e1480198b08aa3592f43fb73c3e9d9fd6e49ac385ad221a7877f8",
+  "reason": "Refresh the SDK portable family after adding AgentIncarnationBindingV2 and its exact obligation, role-resolution, model-fit, DAG, responsibility, and source-evidence bindings; this receipt admits the measured family identity and tracked size without weakening canonical proof.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20275171,
+  "tracked_bytes_max": 15728640
+}
