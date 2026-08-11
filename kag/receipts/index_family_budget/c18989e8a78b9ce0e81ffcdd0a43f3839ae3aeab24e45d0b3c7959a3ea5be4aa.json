@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 14940286,
+  "allowed_tracked_bytes": 20566736,
+  "approved_by": "repository-owner",
+  "base_ref": "2bf66a23f08acf4af40c3c8d1754b7842652163a",
+  "changed_generated_bytes": 14940286,
+  "changed_generated_files": 273,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "c18989e8a78b9ce0e81ffcdd0a43f3839ae3aeab24e45d0b3c7959a3ea5be4aa",
+  "reason": "Refresh the derived aoa-sdk KAG family after exporting the explicit owner-root validation scheduler ABI; this receipt accepts only the measured generated delta and does not claim sibling adoption, partial-routing authority, receipt reuse, central eval verdict, or runtime health.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20566736,
+  "tracked_bytes_max": 15728640
+}
