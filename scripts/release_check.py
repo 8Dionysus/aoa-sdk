@@ -1,12 +1,19 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import argparse
 import os
 import subprocess
 import sys
 from pathlib import Path
+from typing import Sequence
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
+VALIDATION_MODE_ENV = "AOA_SDK_VALIDATION_MODE"
+GRAPH_RUNNER = (
+    "mechanics/release-support/parts/validation-evidence-graph/"
+    "scripts/validation_graph.py"
+)
 
 COMMANDS = [
     (
@@ -150,12 +157,54 @@ def run_step(label: str, command: list[str]) -> int:
     return 0
 
 
-def main() -> int:
+def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
+    parser = argparse.ArgumentParser(description="Run the complete aoa-sdk validation gate.")
+    parser.add_argument(
+        "--mode",
+        choices=("graph", "serial"),
+        default=os.environ.get(VALIDATION_MODE_ENV, "graph"),
+        help=(
+            "graph is the accepted bounded scheduler; serial is the exact "
+            f"completeness oracle and rollback (default: ${VALIDATION_MODE_ENV} or graph)"
+        ),
+    )
+    parser.add_argument(
+        "--receipt",
+        type=Path,
+        help="Atomic full-graph receipt path; serial rollback emits logs only.",
+    )
+    parser.add_argument(
+        "--max-workers",
+        type=int,
+        help="Explicit graph worker override; the accepted manifest default is three.",
+    )
+    return parser.parse_args(argv)
+
+
+def run_serial() -> int:
     for label, command in COMMANDS:
         exit_code = run_step(label, command)
         if exit_code != 0:
             return exit_code
     return 0
+
+
+def main(argv: Sequence[str] | None = None) -> int:
+    args = parse_args(argv)
+    print(f"[mode] {args.mode}", flush=True)
+    if args.mode == "serial":
+        if args.receipt is not None:
+            print("[receipt] serial rollback emits no graph receipt", flush=True)
+        if args.max_workers is not None:
+            print("[workers] serial rollback ignores graph worker overrides", flush=True)
+        return run_serial()
+
+    command = [sys.executable, GRAPH_RUNNER, "--profile", "full"]
+    if args.receipt is not None:
+        command.extend(("--receipt", str(args.receipt)))
+    if args.max_workers is not None:
+        command.extend(("--max-workers", str(args.max_workers)))
+    return run_step("run full claim/evidence validation graph", command)
 
 
 if __name__ == "__main__":

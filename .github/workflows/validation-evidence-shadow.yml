@@ -1,15 +1,14 @@
-name: Validation Evidence Shadow
+name: Validation Serial Oracle
 
 on:
-  pull_request:
   workflow_dispatch:
 
 permissions:
   contents: read
 
 jobs:
-  validation_evidence_shadow:
-    name: Validation Evidence Shadow
+  serial_oracle:
+    name: Validation Serial Oracle
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -55,23 +54,19 @@ jobs:
           python -m pytest -q
           mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_g4_evidence.py
 
-      - name: Run validation evidence graph
+      - name: Run serial completeness oracle
         env:
           ABYSS_MACHINE_REPO_ROOT: .abyss-machine-verifier
           AOA_STATS_ROOT: .aoa-stats-validator
         run: |
           /usr/bin/time -v \
-            -o "$RUNNER_TEMP/validation-evidence-time.txt" \
-            python mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py \
-              --profile full \
-              --receipt "$RUNNER_TEMP/validation-evidence-receipt.json"
+            -o "$RUNNER_TEMP/validation-serial-time.txt" \
+            python scripts/release_check.py --mode serial
 
-      - name: Upload shadow evidence
+      - name: Upload serial timing
         if: always()
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
-          name: validation-evidence-shadow-${{ github.run_id }}-${{ github.run_attempt }}
-          path: |
-            ${{ runner.temp }}/validation-evidence-receipt.json
-            ${{ runner.temp }}/validation-evidence-time.txt
+          name: validation-serial-oracle-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/validation-serial-time.txt
           if-no-files-found: warn

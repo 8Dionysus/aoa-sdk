@@ -216,6 +216,7 @@
 - [AOA-SDK-D-0094 - Separate Contour Admission, Keeper Evidence, and Owner Tasks](../AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md) (`docs/decisions/AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md`)
 - [AOA-SDK-D-0095 - Admit One Contour Through Content-Addressed CAS](../AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md) (`docs/decisions/AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md`)
 - [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
+- [AOA-SDK-D-0097 - Use a bounded claim/evidence DAG for full validation](../AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md) (`docs/decisions/AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md`)
 
 ## control-plane routing
 
@@ -482,6 +483,7 @@
 - [AOA-SDK-D-0018 - Release Support Part Localization](../AOA-SDK-D-0018-release-support-part-localization.md) (`docs/decisions/AOA-SDK-D-0018-release-support-part-localization.md`)
 - [AOA-SDK-D-0027 - Public Support CI Posture Test Localization](../AOA-SDK-D-0027-public-support-ci-posture-test-localization.md) (`docs/decisions/AOA-SDK-D-0027-public-support-ci-posture-test-localization.md`)
 - [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) (`docs/decisions/AOA-SDK-D-0031-public-support-sibling-canary-localization.md`)
+- [AOA-SDK-D-0097 - Use a bounded claim/evidence DAG for full validation](../AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md) (`docs/decisions/AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md`)
 
 ## request payload
 
@@ -681,6 +683,10 @@
 ## typed facades
 
 - [AOA-SDK-D-0025 - Consumed Surface Posture Gate Test Localization](../AOA-SDK-D-0025-consumed-surface-posture-gate-test-localization.md) (`docs/decisions/AOA-SDK-D-0025-consumed-surface-posture-gate-test-localization.md`)
+
+## validation
+
+- [AOA-SDK-D-0097 - Use a bounded claim/evidence DAG for full validation](../AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md) (`docs/decisions/AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md`)
 
 ## validation authority
 

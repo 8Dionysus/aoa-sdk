@@ -1,7 +1,7 @@
 ---
 schema_version: local_eval_suite_note_v1
 owner_repo: aoa-sdk
-status: draft
+status: reviewed
 authority_boundary: owner-local evidence support only; no verdict, scoring, regression, or proof doctrine authority
 ---
 
@@ -22,10 +22,10 @@ owner gate.
 
 ## Compared methods
 
-The fixed oracle is the unchanged serial `scripts/release_check.py` battery
-plus explicit workflow prerequisites. Every candidate is compared against the
-same source commit, interpreter/dependency identity, claim set, and effective
-test/evidence corpus:
+The fixed oracle is the retained serial mode and command inventory of
+`scripts/release_check.py` plus explicit workflow prerequisites. Every
+candidate is compared against the same source commit, interpreter/dependency
+identity, claim set, and effective test/evidence corpus:
 
 1. serial execution;
 2. ordinary pytest and the complete isolated G11 wrapper as two DAG nodes;
@@ -82,8 +82,8 @@ may be retained separately when it has a clear bounded benefit.
 
 ### Regression and no-miss
 
-- the serial command inventory remains the completeness oracle until owner
-  review explicitly supersedes it;
+- the serial command inventory remains the completeness oracle and exact
+  rollback after owner-reviewed graph promotion;
 - seeded edits across source, tests, schemas, generated companions, workflow,
   package, docs, eval, and unknown paths compare shadow selection with the full
   oracle;
@@ -140,6 +140,25 @@ These runs occurred under live host conditions and need interleaved repetition
 plus hosted CI pairs. They justify the static-DAG pilot; they do not yet select
 an OS-wide default.
 
+## Hosted observations and local selection
+
+Three corrected same-tree GitHub pairs on CPython 3.12.13 completed with no
+serial or graph failure and no graph evidence miss:
+
+| attempt | serial core | graph receipt | serial job | graph job |
+| ---: | ---: | ---: | ---: | ---: |
+| 1 | 96 s | 57.545 s | 174 s | 115 s |
+| 2 | 135 s | 65.899 s | 193 s | 130 s |
+| 3 | 137 s | 67.373 s | 197 s | 131 s |
+
+Every graph receipt was full-profile, sufficient, stable, 14/14, and free of
+missing, unreadable, or integrity-blocked inputs. Median core duration changed
+from 135 to 65.899 seconds. This satisfies the suite's owner-local admission
+rule and selects the three-worker full graph for the SDK gate while retaining
+the serial command inventory as oracle and rollback. The detailed negative
+witness, exact identities, resource limits, and proof ceiling are recorded in
+`evals/reports/aoa-validation-evidence-graph.report.md`.
+
 ## Cleanup and effects
 
 The suite creates only normal test/build temporaries and an explicitly named
@@ -156,7 +175,7 @@ serial-command inventory regression, receipt digests, and shadow-only routing
 are mandatory guards. Hosted green status alone is not enough: receipts and
 the paired oracle comparison must agree.
 
-This local design can support a bounded scheduling and sufficiency claim for
+This local suite supports a bounded scheduling and sufficiency decision for
 the pinned `aoa-sdk` gate. It does not prove central eval acceptance, safe
 partial routing, safe cross-run reuse, sibling-owner adoption, AbyssOS-wide
 benefit, production runtime health, or real-session time-to-merge reduction.

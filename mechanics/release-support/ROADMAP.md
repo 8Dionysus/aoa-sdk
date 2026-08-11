@@ -10,9 +10,10 @@ claim publication state before external proof exists.
 - Keep release audit and publish helper behavior, public support CI posture,
   build validation, changelog support, and sibling canary support routed through
   active `parts/`.
-- Keep validation latency work claim/evidence-based: preserve the full proof
-  boundary, compare schedulers, and retain shadow-only posture for partial
-  routing and reuse until no-miss evidence exists.
+- Keep the promoted full validation graph claim/evidence-based: preserve the
+  serial oracle and full proof boundary, continue scheduler comparisons, and
+  retain shadow-only posture for partial routing and reuse until their own
+  no-miss evidence exists.
 - Keep README, changelog, release docs, release-support parts, generated
   companions, and GitHub validation aligned without duplicating chronology.
 - Keep sibling canaries drift-aware and explicit about what they do not prove.

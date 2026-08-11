@@ -47,8 +47,10 @@ Former root sibling-canary script, matrix, and regression moved into
 `scripts/` and root `tests/` paths are provenance only.
 
 The validation evidence graph is born part-local. It has no former root
-compatibility path: the serial `scripts/release_check.py` remains the
-completeness oracle until an owner-reviewed gate switch lands.
+compatibility path. After the reviewed hosted comparison, root
+`scripts/release_check.py` defaults to the full graph while its retained
+ordered command inventory remains the exact serial completeness oracle and
+rollback.
 
 OS Abyss package artifact bundle validation is part-local to
 `release-audit-publish-helper`; root `scripts/release_check.py` only

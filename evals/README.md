@@ -19,7 +19,7 @@ packets, but they do not become bounded proof by location alone.
 ## Current Status
 
 Active. The first executable owner-local suite covers the Agent OS
-control-plane G11 pressure. A second draft suite designs comparative evidence
-for the validation claim/evidence graph. Both keep local mechanical evidence
-separate from central verdict authority and route any portable proof adoption
-to `aoa-evals`.
+control-plane G11 pressure. A second reviewed local suite and report compare
+serial, worker, sharding, and claim/evidence graph validation methods. Both
+keep local mechanical evidence separate from central verdict authority and
+route any portable proof adoption to `aoa-evals`.

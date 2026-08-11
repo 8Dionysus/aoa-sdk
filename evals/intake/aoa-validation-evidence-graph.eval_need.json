@@ -30,6 +30,7 @@
   ],
   "candidate_evidence_refs": [
     "evals/suites/aoa-validation-evidence-graph.suite.md",
+    "evals/reports/aoa-validation-evidence-graph.report.md",
     "mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py",
     "mechanics/release-support/parts/validation-evidence-graph/config/validation_graph.json",
     "mechanics/release-support/parts/validation-evidence-graph/tests/test_validation_graph.py"

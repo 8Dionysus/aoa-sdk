@@ -28,14 +28,16 @@ execution adapter.
 
 ## Current posture
 
-The full profile is eligible for owner-gate trials only when every declared
-node passes. Path routing remains `shadow_only` and can never authorize the
-owner gate. Cross-run receipt reuse is intentionally absent until exact input,
-environment, freshness, and tamper rules have their own accepted cases.
+The reviewed three-worker full profile is the default implementation behind
+`scripts/release_check.py` and `Repo Validation`. Every declared node must pass
+and the retained serial command inventory remains the exact completeness
+oracle and rollback. Path routing remains `shadow_only` and can never authorize
+the owner gate. Cross-run receipt reuse is intentionally absent until exact
+input, environment, freshness, and tamper rules have their own accepted cases.
 
 ## Next route
 
-Compare serial, bounded DAG, worker, static shard, routing, and reuse methods
-under the local eval design. Route any portable eval or central verdict to
+Continue comparing the promoted graph with the serial oracle and evaluate
+routing and reuse methods under the local eval design. Route any portable eval or central verdict to
 `aoa-evals`, measurement grammar to `aoa-stats`, host resource admission to
 `abyss-machine`, and any sibling adoption back to that repository's owner.

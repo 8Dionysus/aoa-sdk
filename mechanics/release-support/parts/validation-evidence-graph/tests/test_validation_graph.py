@@ -157,11 +157,11 @@ def test_full_graph_preserves_every_non_pytest_release_check_command() -> None:
         assert commands.count(normalized(command)) == 1, label
 
 
-def test_shadow_workflow_matches_serial_setup_and_explicit_prerequisites() -> None:
-    serial = workflow_steps(".github/workflows/repo-validation.yml", "release_audit")
-    shadow = workflow_steps(
+def test_manual_serial_oracle_matches_primary_setup_and_explicit_prerequisites() -> None:
+    primary = workflow_steps(".github/workflows/repo-validation.yml", "release_audit")
+    oracle = workflow_steps(
         ".github/workflows/validation-evidence-shadow.yml",
-        "validation_evidence_shadow",
+        "serial_oracle",
     )
     common_steps = (
         "Checkout",
@@ -175,7 +175,72 @@ def test_shadow_workflow_matches_serial_setup_and_explicit_prerequisites() -> No
     )
 
     for name in common_steps:
-        assert shadow[name] == serial[name]
+        assert oracle[name] == primary[name]
+
+    workflow_text = (REPO_ROOT / ".github/workflows/validation-evidence-shadow.yml").read_text(
+        encoding="utf-8"
+    )
+    assert "pull_request:" not in workflow_text
+    assert "workflow_dispatch:" in workflow_text
+    assert "python scripts/release_check.py --mode serial" in workflow_text
+
+
+def test_release_check_defaults_to_full_graph_and_forwards_receipt(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    calls: list[tuple[str, list[str]]] = []
+    monkeypatch.delenv(release_check.VALIDATION_MODE_ENV, raising=False)
+    monkeypatch.setattr(
+        release_check,
+        "run_step",
+        lambda label, command: calls.append((label, command)) or 0,
+    )
+    receipt = tmp_path / "receipt.json"
+
+    assert release_check.main(["--receipt", str(receipt)]) == 0
+    assert calls == [
+        (
+            "run full claim/evidence validation graph",
+            [
+                sys.executable,
+                release_check.GRAPH_RUNNER,
+                "--profile",
+                "full",
+                "--receipt",
+                str(receipt),
+            ],
+        )
+    ]
+
+
+def test_release_check_retains_exact_serial_rollback(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, list[str]]] = []
+    monkeypatch.setenv(release_check.VALIDATION_MODE_ENV, "serial")
+    monkeypatch.setattr(
+        release_check,
+        "run_step",
+        lambda label, command: calls.append((label, command)) or 0,
+    )
+
+    assert release_check.main([]) == 0
+    assert calls == release_check.COMMANDS
+
+
+def test_explicit_graph_mode_overrides_serial_environment(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    calls: list[tuple[str, list[str]]] = []
+    monkeypatch.setenv(release_check.VALIDATION_MODE_ENV, "serial")
+    monkeypatch.setattr(
+        release_check,
+        "run_step",
+        lambda label, command: calls.append((label, command)) or 0,
+    )
+
+    assert release_check.main(["--mode", "graph", "--max-workers", "1"]) == 0
+    assert calls[0][1][-2:] == ["--max-workers", "1"]
 
 
 def test_g11_shards_cover_every_exact_case_once_and_keep_ordinary_suite_separate() -> None:

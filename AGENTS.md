@@ -206,6 +206,10 @@ python -m build
 python scripts/release_check.py
 ```
 
+`python scripts/release_check.py` runs the accepted full claim/evidence graph.
+Use `python scripts/release_check.py --mode serial` only for the retained exact
+completeness oracle, rollback, or an explicit comparison run.
+
 ## Report
 
 State which typed facade, discovery rule, compatibility surface, CLI behavior, checkpoint boundary, or handoff helper changed, whether anything moved closer to activation, and what validation ran.
