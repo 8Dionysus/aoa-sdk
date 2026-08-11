@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 7952973,
+  "allowed_tracked_bytes": 20476989,
+  "approved_by": "repository-owner",
+  "base_ref": "70fda8622cd8bc69fcddbdfb8bd53e80d123510f",
+  "changed_generated_bytes": 7952973,
+  "changed_generated_files": 151,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "90311f7a69f97abb509a52ae490fdb7d9b0e704a66e0648994c4cd399d855e4f",
+  "reason": "Refresh the derived repo-local KAG family after the first hosted shadow pair exposed Python 3.12 recursive-glob drift and nested verifier checkout identities; this receipt accepts only the measured follow-up delta without raising standing budgets, promoting shadow routing, weakening the serial oracle, claiming central proof, or widening rollout and completion claims.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20476989,
+  "tracked_bytes_max": 15728640
+}
