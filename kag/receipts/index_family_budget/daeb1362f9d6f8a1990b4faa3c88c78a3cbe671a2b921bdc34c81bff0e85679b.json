@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 15072075,
+  "allowed_tracked_bytes": 20527296,
+  "approved_by": "repository-owner",
+  "base_ref": "70fda8622cd8bc69fcddbdfb8bd53e80d123510f",
+  "changed_generated_bytes": 15072075,
+  "changed_generated_files": 290,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "daeb1362f9d6f8a1990b4faa3c88c78a3cbe671a2b921bdc34c81bff0e85679b",
+  "reason": "Refresh the derived repo-local KAG family after the owner-reviewed hosted comparison selected the full three-worker claim/evidence graph as the aoa-sdk default while retaining the exact serial rollback; this receipt accepts only the measured promotion delta without authorizing partial routing, cross-run reuse, a central verdict, sibling adoption, OS-wide completion, or broader proof claims.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20527296,
+  "tracked_bytes_max": 15728640
+}
