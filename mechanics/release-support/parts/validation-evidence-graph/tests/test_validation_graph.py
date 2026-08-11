@@ -4,6 +4,7 @@ import copy
 import datetime as dt
 import hashlib
 import json
+import subprocess
 import sys
 import time
 from pathlib import Path
@@ -257,9 +258,10 @@ def test_scheduler_runs_independent_nodes_concurrently_and_fans_in_in_manifest_o
     )
     elapsed = time.monotonic() - started
 
-    assert elapsed < 0.5
     assert [result["id"] for result in results] == activated
     assert {result["status"] for result in results} == {"passed"}
+    sequential_duration = sum(result["duration_seconds"] for result in results)
+    assert elapsed < sequential_duration - 0.15
 
 
 def test_failed_evidence_node_yields_a_bound_insufficient_receipt(tmp_path: Path) -> None:
@@ -311,6 +313,37 @@ def test_input_identity_changes_with_exact_file_content(tmp_path: Path) -> None:
 
     assert before["file_count"] == after["file_count"] == 1
     assert before["sha256"] != after["sha256"]
+
+
+def test_input_identity_binds_nested_git_checkout(tmp_path: Path) -> None:
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    nested = tmp_path / ".validator"
+    nested.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=nested, check=True)
+    (nested / "proof.txt").write_text("proof\n", encoding="utf-8")
+    subprocess.run(["git", "add", "proof.txt"], cwd=nested, check=True)
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=Validation Test",
+            "-c",
+            "user.email=validation@example.invalid",
+            "commit",
+            "-qm",
+            "fixture",
+        ],
+        cwd=nested,
+        check=True,
+    )
+
+    identity = validation_graph.input_identity(tmp_path, ["**"])
+
+    assert identity["file_count"] == 0
+    assert identity["nested_repository_count"] == 1
+    assert identity["nested_repositories"][0]["path"] == ".validator"
+    assert identity["nested_repositories"][0]["dirty"] is False
+    assert identity["unreadable"] == []
 
 
 def test_recursive_route_patterns_cover_arbitrary_depth() -> None:
@@ -381,3 +414,50 @@ def test_repository_drift_blocks_an_otherwise_green_receipt(tmp_path: Path) -> N
     assert receipt["decision"]["integrity_blockers"] == [
         "repository_identity_changed_during_run"
     ]
+
+
+def test_missing_repository_identity_fails_closed(tmp_path: Path) -> None:
+    manifest = minimal_manifest()
+    manifest_path = tmp_path / "graph.json"
+    manifest_bytes = json.dumps(manifest).encode()
+    manifest_path.write_bytes(manifest_bytes)
+    claims = manifest["profiles"]["full"]
+    activated = validation_graph.activate_nodes(manifest, claims)
+    node_results = [
+        {
+            "id": node["id"],
+            "tier": node["tier"],
+            "status": "passed",
+            "duration_seconds": 0.01,
+            "input_identity": {
+                "patterns": node["inputs"],
+                "file_count": 1,
+                "sha256": "0" * 64,
+                "unreadable": [],
+            },
+            "provides_evidence": node["provides_evidence"],
+            "steps": [],
+        }
+        for node in manifest["nodes"]
+    ]
+    missing_identity = validation_graph.repository_identity(tmp_path)
+
+    receipt = validation_graph.build_receipt(
+        manifest,
+        manifest_path=manifest_path,
+        claims=claims,
+        activated=activated,
+        route={"mode": "profile", "authoritative": True},
+        node_results=node_results,
+        repo_root=tmp_path,
+        max_workers=2,
+        started_at=dt.datetime.now(dt.UTC),
+        elapsed_seconds=0.1,
+        initial_repository_identity=missing_identity,
+        initial_manifest_sha256=hashlib.sha256(manifest_bytes).hexdigest(),
+        initial_environment_identity={},
+    )
+
+    assert receipt["repository_identity"]["stable"] is True
+    assert receipt["decision"]["sufficient"] is False
+    assert "repository_identity_unavailable" in receipt["decision"]["integrity_blockers"]

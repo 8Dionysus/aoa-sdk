@@ -474,18 +474,40 @@ def repository_identity(repo_root: Path) -> dict[str, Any]:
 
 
 def input_identity(repo_root: Path, patterns: Sequence[str]) -> dict[str, Any]:
-    tracked = _git(
-        ["ls-files", "--cached", "--others", "--exclude-standard", "-z"],
-        repo_root,
+    listing = subprocess.run(
+        ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
+        cwd=repo_root,
+        check=False,
+        capture_output=True,
     )
+    has_git_listing = listing.returncode == 0
+    tracked = listing.stdout if has_git_listing else b""
     candidates = {
-        os.fsdecode(raw_path) for raw_path in tracked.split(b"\0") if raw_path
+        os.fsdecode(raw_path).rstrip("/")
+        for raw_path in tracked.split(b"\0")
+        if raw_path
     }
     for pattern in patterns:
         if pattern == "**":
+            if not has_git_listing:
+                for path in repo_root.rglob("*"):
+                    if ".git" in path.relative_to(repo_root).parts:
+                        continue
+                    if path.is_file() or path.is_symlink():
+                        candidates.add(path.relative_to(repo_root).as_posix())
             continue
         try:
-            for path in repo_root.glob(pattern):
+            if pattern.endswith("/**"):
+                prefix = pattern[:-3].rstrip("/")
+                expansion_root = repo_root / prefix
+                expanded = (
+                    [expansion_root]
+                    if expansion_root.is_file() or expansion_root.is_symlink()
+                    else expansion_root.rglob("*")
+                )
+            else:
+                expanded = repo_root.glob(pattern)
+            for path in expanded:
                 if path.is_file() or path.is_symlink():
                     candidates.add(path.relative_to(repo_root).as_posix())
         except (OSError, ValueError) as exc:
@@ -498,17 +520,37 @@ def input_identity(repo_root: Path, patterns: Sequence[str]) -> dict[str, Any]:
     )
     hasher = hashlib.sha256()
     unreadable: list[str] = []
+    nested_repositories: list[dict[str, Any]] = []
+    file_count = 0
     for rel_path in selected:
         path = repo_root / rel_path
         hasher.update(rel_path.encode())
         hasher.update(b"\0")
         try:
             if path.is_symlink():
+                file_count += 1
                 hasher.update(b"symlink\0")
                 hasher.update(os.readlink(path).encode())
             elif path.is_file():
+                file_count += 1
                 hasher.update(b"file\0")
                 hasher.update(path.read_bytes())
+            elif path.is_dir():
+                nested_identity = repository_identity(path)
+                if nested_identity["git_commit"] is None:
+                    hasher.update(b"unexpected-directory\0")
+                    unreadable.append(rel_path)
+                else:
+                    record = {"path": rel_path, **nested_identity}
+                    nested_repositories.append(record)
+                    hasher.update(b"nested-git-repository\0")
+                    hasher.update(
+                        json.dumps(
+                            record,
+                            sort_keys=True,
+                            separators=(",", ":"),
+                        ).encode()
+                    )
             else:
                 hasher.update(b"missing\0")
                 unreadable.append(rel_path)
@@ -518,7 +560,9 @@ def input_identity(repo_root: Path, patterns: Sequence[str]) -> dict[str, Any]:
         hasher.update(b"\0")
     return {
         "patterns": list(patterns),
-        "file_count": len(selected),
+        "file_count": file_count,
+        "nested_repository_count": len(nested_repositories),
+        "nested_repositories": nested_repositories,
         "sha256": hasher.hexdigest(),
         "unreadable": unreadable,
     }
@@ -795,6 +839,10 @@ def build_receipt(
     final_repository_identity = repository_identity(repo_root)
     final_manifest_sha256 = _sha256(manifest_path.read_bytes())
     repository_stable = initial_repository_identity == final_repository_identity
+    repository_bound = all(
+        identity.get("git_commit") is not None and identity.get("git_tree") is not None
+        for identity in (initial_repository_identity, final_repository_identity)
+    )
     manifest_stable = initial_manifest_sha256 == final_manifest_sha256
     unreadable_inputs = sorted(
         {
@@ -805,6 +853,8 @@ def build_receipt(
         }
     )
     integrity_blockers: list[str] = []
+    if not repository_bound:
+        integrity_blockers.append("repository_identity_unavailable")
     if not repository_stable:
         integrity_blockers.append("repository_identity_changed_during_run")
     if not manifest_stable:

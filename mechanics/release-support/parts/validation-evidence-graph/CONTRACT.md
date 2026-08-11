@@ -19,6 +19,7 @@
   sufficient.
 - Partial and shadow receipts cannot authorize the full owner gate.
 - Receipt identity binds source state, manifest, commands, environment,
+  and clean or dirty identities of nested Git verifier checkouts,
   evidence, and outcomes.
 
 ## Stop-lines
