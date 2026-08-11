@@ -8,9 +8,10 @@ import jsonschema
 import pytest
 from pydantic import ValidationError
 
-from aoa_sdk.contracts.control_plane import ProvenanceRef, RunPlan
+from aoa_sdk.contracts.control_plane import ContentRef, ProvenanceRef, RunPlan
 from aoa_sdk.control_plane import (
     AgentIncarnationBinding,
+    AgentIncarnationBindingV2,
     ContinuationObligation,
     IncarnationBindingError,
     IncarnationPermissionPosture,
@@ -23,6 +24,7 @@ from aoa_sdk.control_plane import (
     assert_agent_incarnation_binding_digest,
     assert_agent_incarnation_binding_matches_plan,
     build_agent_incarnation_binding,
+    build_agent_incarnation_binding_v2,
     load_model_realization_ref,
 )
 from aoa_sdk.runtime_adapters import (
@@ -42,6 +44,11 @@ SCHEMA_PATH = (
     / "mechanics/boundary-bridge/parts/agent-incarnation-binding/schemas"
     / "agent-incarnation-binding.schema.json"
 )
+SCHEMA_V2_PATH = (
+    ROOT
+    / "mechanics/boundary-bridge/parts/agent-incarnation-binding/schemas"
+    / "agent-incarnation-binding-v2.schema.json"
+)
 ZERO_DIGEST = "sha256:" + "0" * 64
 
 
@@ -53,6 +60,30 @@ def _ref(owner_repo: str, artifact_ref: str) -> ProvenanceRef:
         artifact_digest=ZERO_DIGEST,
         schema_ref="schemas/fixture.schema.json",
         schema_version="fixture-v1",
+    )
+
+
+def _content_ref(
+    owner_repo: str,
+    object_id: str,
+    schema_version: str,
+) -> ContentRef:
+    return ContentRef(
+        object_id=object_id,
+        owner_repo=owner_repo,
+        schema_version=schema_version,
+        digest=ZERO_DIGEST,
+    )
+
+
+def _model_fit_projection_ref() -> ProvenanceRef:
+    return ProvenanceRef(
+        owner_repo="aoa-models",
+        artifact_ref="generated/model-fit-projections/luna-max-readonly.json",
+        source_ref="fixture-source-ref",
+        artifact_digest=ZERO_DIGEST,
+        schema_ref="schemas/model-fit-projection.schema.json",
+        schema_version="aoa_model_fit_projection_v1",
     )
 
 
@@ -183,6 +214,51 @@ def _binding(
     )
 
 
+def _binding_v2(plan: RunPlan) -> AgentIncarnationBindingV2:
+    legacy = _binding(plan)
+    return build_agent_incarnation_binding_v2(
+        plan,
+        binding_id=legacy.binding_id,
+        incarnation_id=legacy.incarnation_id,
+        causation_id=legacy.causation_id,
+        trace_id=legacy.trace_id,
+        task_request_ref=legacy.task_request_ref,
+        role_id=legacy.role_id,
+        role_contract_ref=legacy.role_contract_ref,
+        model_realization_ref=legacy.model_realization_ref,
+        workspace_source_ref=legacy.workspace_source_ref,
+        permission_posture=legacy.permission_posture,
+        tool_profile=legacy.tool_profile,
+        usage_metering=legacy.usage_metering,
+        stop_conditions=legacy.stop_conditions,
+        expected_result_schema_ref=legacy.expected_result_schema_ref,
+        continuation=legacy.continuation,
+        wake_policy=legacy.wake_policy,
+        agent_obligation_ref=_content_ref(
+            "aoa-agents",
+            "obligation:fixture:landing-review",
+            "agent-obligation-v1",
+        ),
+        actor_mandate_ref=_content_ref(
+            "aoa-agents",
+            "mandate:fixture:landing-reviewer",
+            "actor-mandate-v1",
+        ),
+        role_resolution_ref=_content_ref(
+            "aoa-agents",
+            "role-resolution:evaluator:release-readiness:deep",
+            "aoa_role_resolution_v1",
+        ),
+        model_fit_query_result_ref=_content_ref(
+            "aoa-models",
+            "model-fit-query-result:fixture",
+            "aoa_model_fit_query_result_v2",
+        ),
+        model_fit_projection_ref=_model_fit_projection_ref(),
+        provenance=legacy.provenance,
+    )
+
+
 def test_binding_matches_exact_plan_and_generated_schema() -> None:
     plan = _plan()
     binding = _binding(plan)
@@ -196,6 +272,73 @@ def test_binding_matches_exact_plan_and_generated_schema() -> None:
     assert binding.usage_metering.mode == "observe_only"
     assert binding.usage_metering.execution_limit_policy == "none"
     assert binding.wake_policy.mode == "event_filtered_reentry"
+
+
+def test_v2_binding_requires_complete_obligation_and_model_fit_chain() -> None:
+    plan = _plan()
+    binding = _binding_v2(plan)
+
+    assert binding.schema_version == "aoa_agent_incarnation_binding_v2"
+    assert binding.agent_obligation_ref.owner_repo == "aoa-agents"
+    assert binding.actor_mandate_ref.owner_repo == "aoa-agents"
+    assert binding.role_resolution_ref.schema_version == "aoa_role_resolution_v1"
+    assert (
+        binding.model_fit_query_result_ref.schema_version
+        == "aoa_model_fit_query_result_v2"
+    )
+    assert binding.model_fit_projection_ref.owner_repo == "aoa-models"
+    assert_agent_incarnation_binding_digest(binding)
+    schema = json.loads(SCHEMA_V2_PATH.read_text(encoding="utf-8"))
+    jsonschema.Draft202012Validator(schema).validate(binding.model_dump(mode="json"))
+
+
+@pytest.mark.parametrize(
+    ("field", "replacement", "message"),
+    (
+        (
+            "agent_obligation_ref",
+            _content_ref("aoa-models", "wrong-owner", "agent-obligation-v1"),
+            "agent obligation must retain exact",
+        ),
+        (
+            "actor_mandate_ref",
+            _content_ref("aoa-agents", "old-mandate", "actor-mandate-v0"),
+            "actor mandate must retain exact",
+        ),
+        (
+            "model_fit_query_result_ref",
+            _content_ref(
+                "aoa-models",
+                "unbound-fit-result",
+                "aoa_model_fit_query_result_v1",
+            ),
+            "model-fit query result must retain exact",
+        ),
+    ),
+)
+def test_v2_binding_rejects_owner_or_contract_drift(
+    field: str,
+    replacement: ContentRef,
+    message: str,
+) -> None:
+    binding = _binding_v2(_plan())
+
+    with pytest.raises(ValidationError, match=message):
+        AgentIncarnationBindingV2.model_validate(
+            binding.model_dump(mode="python") | {field: replacement}
+        )
+
+
+def test_v2_binding_rejects_projection_from_another_model_source() -> None:
+    binding = _binding_v2(_plan())
+    drifted = binding.model_fit_projection_ref.model_copy(
+        update={"source_ref": "another-model-source-ref"}
+    )
+
+    with pytest.raises(ValidationError, match="must share one aoa-models source ref"):
+        AgentIncarnationBindingV2.model_validate(
+            binding.model_dump(mode="python") | {"model_fit_projection_ref": drifted}
+        )
 
 
 def test_metering_cannot_omit_a_runtime_dimension() -> None:

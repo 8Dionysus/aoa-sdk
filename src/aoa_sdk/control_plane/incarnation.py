@@ -16,6 +16,7 @@ from ..contracts.control_plane import (
 )
 from ..contracts.incarnation import (
     AgentIncarnationBinding,
+    AgentIncarnationBindingV2,
     ContinuationObligation,
     IncarnationPermissionPosture,
     IncarnationStopCondition,
@@ -48,7 +49,9 @@ def load_model_realization_ref(
         raw = location.read_bytes()
         payload = json.loads(raw)
     except (OSError, json.JSONDecodeError) as exc:
-        raise IncarnationBindingError("model realization is unavailable or invalid JSON") from exc
+        raise IncarnationBindingError(
+            "model realization is unavailable or invalid JSON"
+        ) from exc
     if (
         not isinstance(payload, dict)
         or payload.get("kind") != "ModelRealization"
@@ -133,7 +136,81 @@ def build_agent_incarnation_binding(
     return binding
 
 
-def assert_agent_incarnation_binding_digest(binding: AgentIncarnationBinding) -> None:
+def build_agent_incarnation_binding_v2(
+    plan: RunPlan,
+    *,
+    binding_id: str,
+    incarnation_id: str,
+    causation_id: str,
+    trace_id: str,
+    task_request_ref: ProvenanceRef,
+    role_id: str,
+    role_contract_ref: ProvenanceRef,
+    model_realization_ref: ProvenanceRef,
+    workspace_source_ref: ProvenanceRef,
+    permission_posture: IncarnationPermissionPosture,
+    tool_profile: IncarnationToolProfile,
+    usage_metering: IncarnationUsageMetering,
+    stop_conditions: tuple[IncarnationStopCondition, ...],
+    expected_result_schema_ref: ProvenanceRef,
+    continuation: ContinuationObligation,
+    wake_policy: WakeEscalationPolicy,
+    agent_obligation_ref: ContentRef,
+    actor_mandate_ref: ContentRef,
+    role_resolution_ref: ContentRef,
+    model_fit_query_result_ref: ContentRef,
+    model_fit_projection_ref: ProvenanceRef,
+    provenance: ProvenanceRef,
+) -> AgentIncarnationBindingV2:
+    """Build a new evidence-complete binding without weakening v1 receipts."""
+
+    legacy = build_agent_incarnation_binding(
+        plan,
+        binding_id=binding_id,
+        incarnation_id=incarnation_id,
+        causation_id=causation_id,
+        trace_id=trace_id,
+        task_request_ref=task_request_ref,
+        role_id=role_id,
+        role_contract_ref=role_contract_ref,
+        model_realization_ref=model_realization_ref,
+        workspace_source_ref=workspace_source_ref,
+        permission_posture=permission_posture,
+        tool_profile=tool_profile,
+        usage_metering=usage_metering,
+        stop_conditions=stop_conditions,
+        expected_result_schema_ref=expected_result_schema_ref,
+        continuation=continuation,
+        wake_policy=wake_policy,
+        provenance=provenance,
+    )
+    binding = AgentIncarnationBindingV2.model_validate(
+        legacy.model_dump(mode="python")
+        | {
+            "schema_version": "aoa_agent_incarnation_binding_v2",
+            "agent_obligation_ref": agent_obligation_ref,
+            "actor_mandate_ref": actor_mandate_ref,
+            "role_resolution_ref": role_resolution_ref,
+            "model_fit_query_result_ref": model_fit_query_result_ref,
+            "model_fit_projection_ref": model_fit_projection_ref,
+            "binding_digest": _ZERO_DIGEST,
+        }
+    )
+    binding = binding.model_copy(
+        update={
+            "binding_digest": canonical_digest(
+                binding,
+                exclude={"binding_digest"},
+            )
+        }
+    )
+    assert_agent_incarnation_binding_matches_plan(binding, plan)
+    return binding
+
+
+def assert_agent_incarnation_binding_digest(
+    binding: AgentIncarnationBinding | AgentIncarnationBindingV2,
+) -> None:
     expected = canonical_digest(binding, exclude={"binding_digest"})
     if binding.binding_digest != expected:
         raise IncarnationBindingError(
@@ -142,7 +219,7 @@ def assert_agent_incarnation_binding_digest(binding: AgentIncarnationBinding) ->
 
 
 def assert_agent_incarnation_binding_matches_plan(
-    binding: AgentIncarnationBinding,
+    binding: AgentIncarnationBinding | AgentIncarnationBindingV2,
     plan: RunPlan,
 ) -> None:
     """Fail closed when a model/role/task binding drifts from its exact plan."""
@@ -157,11 +234,15 @@ def assert_agent_incarnation_binding_matches_plan(
         digest=plan.plan_digest,
     )
     if binding.run_plan_ref != expected_plan_ref:
-        raise IncarnationBindingError("incarnation binding does not name the exact run plan")
+        raise IncarnationBindingError(
+            "incarnation binding does not name the exact run plan"
+        )
     if binding.correlation_id != plan.correlation_id:
         raise IncarnationBindingError("incarnation and run-plan correlation ids differ")
     if binding.runtime_profile_ref != plan.runtime_profile.provenance:
-        raise IncarnationBindingError("incarnation runtime profile differs from the run plan")
+        raise IncarnationBindingError(
+            "incarnation runtime profile differs from the run plan"
+        )
 
     matching_agents = [
         agent
@@ -189,7 +270,9 @@ def assert_agent_incarnation_binding_matches_plan(
 
     snapshot_sources = set(plan.snapshot.source_refs)
     if binding.workspace_source_ref not in snapshot_sources:
-        raise IncarnationBindingError("workspace source is not pinned by the plan snapshot")
+        raise IncarnationBindingError(
+            "workspace source is not pinned by the plan snapshot"
+        )
     if not set(binding.continuation.immutable_input_refs).issubset(snapshot_sources):
         raise IncarnationBindingError(
             "continuation immutable inputs must be pinned plan snapshot sources"
@@ -205,7 +288,9 @@ def assert_agent_incarnation_binding_matches_plan(
         )
     if "external" in role_effects:
         external_steps = {
-            step.step_id for step in plan.steps if role in step.agent_refs and step.effect_class == "external"
+            step.step_id
+            for step in plan.steps
+            if role in step.agent_refs and step.effect_class == "external"
         }
         approved_steps = {
             step_id
@@ -217,14 +302,19 @@ def assert_agent_incarnation_binding_matches_plan(
                 "external incarnation effects require explicit plan approval bindings"
             )
 
-    if binding.tool_profile.profile_ref.owner_repo != plan.runtime_profile.runtime_owner:
-        raise IncarnationBindingError("tool profile must remain with the selected runtime owner")
+    if (
+        binding.tool_profile.profile_ref.owner_repo
+        != plan.runtime_profile.runtime_owner
+    ):
+        raise IncarnationBindingError(
+            "tool profile must remain with the selected runtime owner"
+        )
     if binding.continuation.return_owner.owner_repo == "aoa-models":
         raise IncarnationBindingError("aoa-models cannot own runtime return acceptance")
 
 
 def agent_incarnation_binding_ref(
-    binding: AgentIncarnationBinding,
+    binding: AgentIncarnationBinding | AgentIncarnationBindingV2,
 ) -> ContentRef:
     assert_agent_incarnation_binding_digest(binding)
     return ContentRef(

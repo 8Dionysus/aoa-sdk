@@ -11,7 +11,9 @@ python scripts/validate_mechanics_topology.py
 python scripts/validate_sdk_source_home.py
 ```
 
-The focused tests prove digest binding, owner separation, exact plan/task/role
-matching, continuation completeness, effect ceilings, model-record hashing,
-runtime-profile owner projection, stale plan-digest rejection, and generated
-schema parity. Runtime execution remains paired proof in `abyss-stack`.
+The focused tests prove byte-stable v1 compatibility, required v2 obligation,
+mandate, role-resolution, fit-result and fit-projection binding, digest and
+owner separation, exact plan/task/role matching, continuation completeness,
+effect ceilings, model-record hashing, runtime-profile owner projection, stale
+plan-digest rejection, and generated v1/v2 schema parity. Runtime execution
+remains paired proof in `abyss-stack`.

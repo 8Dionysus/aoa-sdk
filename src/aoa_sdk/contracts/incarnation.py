@@ -20,9 +20,12 @@ from .control_plane import (
 )
 
 
-AGENT_INCARNATION_BINDING_VERSION: Literal[
+AGENT_INCARNATION_BINDING_VERSION: Literal["aoa_agent_incarnation_binding_v1"] = (
     "aoa_agent_incarnation_binding_v1"
-] = "aoa_agent_incarnation_binding_v1"
+)
+AGENT_INCARNATION_BINDING_V2_VERSION: Literal["aoa_agent_incarnation_binding_v2"] = (
+    "aoa_agent_incarnation_binding_v2"
+)
 
 
 class IncarnationPermissionPosture(StrictControlPlaneModel):
@@ -67,9 +70,7 @@ class IncarnationToolProfile(StrictControlPlaneModel):
     def validate_unique_tools(self) -> IncarnationToolProfile:
         if len(self.required_tool_ids) != len(set(self.required_tool_ids)):
             raise ValueError("required tool ids must be unique")
-        if len(self.required_mcp_server_ids) != len(
-            set(self.required_mcp_server_ids)
-        ):
+        if len(self.required_mcp_server_ids) != len(set(self.required_mcp_server_ids)):
             raise ValueError("required MCP server ids must be unique")
         return self
 
@@ -190,12 +191,9 @@ class ContinuationObligation(StrictControlPlaneModel):
         return self
 
 
-class AgentIncarnationBinding(StrictControlPlaneModel):
-    """One exact, non-executing binding across task, role, model, and runtime."""
+class _AgentIncarnationBindingBase(StrictControlPlaneModel):
+    """Version-neutral fields shared by exact non-executing bindings."""
 
-    schema_version: Literal["aoa_agent_incarnation_binding_v1"] = (
-        AGENT_INCARNATION_BINDING_VERSION
-    )
     binding_id: NonEmptyStr
     incarnation_id: NonEmptyStr
     correlation_id: NonEmptyStr
@@ -219,7 +217,9 @@ class AgentIncarnationBinding(StrictControlPlaneModel):
     provenance: ProvenanceRef
 
     @model_validator(mode="after")
-    def validate_owner_and_continuation_boundaries(self) -> AgentIncarnationBinding:
+    def validate_owner_and_continuation_boundaries(
+        self,
+    ) -> _AgentIncarnationBindingBase:
         if self.provenance.owner_repo != "aoa-sdk":
             raise ValueError("incarnation binding provenance must remain with aoa-sdk")
         if self.run_plan_ref.owner_repo != "aoa-sdk":
@@ -229,17 +229,95 @@ class AgentIncarnationBinding(StrictControlPlaneModel):
         if self.model_realization_ref.owner_repo != "aoa-models":
             raise ValueError("model realization meaning must remain with aoa-models")
         if self.runtime_profile_ref.owner_repo == "aoa-sdk":
-            raise ValueError("runtime profile provenance must remain with a runtime owner")
-        if self.tool_profile.profile_ref.owner_repo != self.runtime_profile_ref.owner_repo:
-            raise ValueError("tool profile and runtime profile must retain one runtime owner")
+            raise ValueError(
+                "runtime profile provenance must remain with a runtime owner"
+            )
+        if (
+            self.tool_profile.profile_ref.owner_repo
+            != self.runtime_profile_ref.owner_repo
+        ):
+            raise ValueError(
+                "tool profile and runtime profile must retain one runtime owner"
+            )
         if self.continuation.exact_child_identity != self.incarnation_id:
             raise ValueError("continuation child identity must match incarnation_id")
         stop_ids = [item.condition_id for item in self.stop_conditions]
         if len(stop_ids) != len(set(stop_ids)):
             raise ValueError("incarnation stop condition ids must be unique")
         if set(self.continuation.stop_condition_ids) != set(stop_ids):
-            raise ValueError("continuation must preserve every incarnation stop condition")
+            raise ValueError(
+                "continuation must preserve every incarnation stop condition"
+            )
         wake_ids = {item.condition_id for item in self.wake_policy.conditions}
         if set(self.continuation.wake_condition_ids) != wake_ids:
             raise ValueError("continuation must preserve every wake condition")
+        return self
+
+
+class AgentIncarnationBinding(_AgentIncarnationBindingBase):
+    """One exact, non-executing binding across task, role, model, and runtime."""
+
+    schema_version: Literal["aoa_agent_incarnation_binding_v1"] = (
+        AGENT_INCARNATION_BINDING_VERSION
+    )
+
+
+class AgentIncarnationBindingV2(_AgentIncarnationBindingBase):
+    """Evidence-complete obligation-to-incarnation binding for new actors."""
+
+    schema_version: Literal["aoa_agent_incarnation_binding_v2"] = (
+        AGENT_INCARNATION_BINDING_V2_VERSION
+    )
+    agent_obligation_ref: ContentRef
+    actor_mandate_ref: ContentRef
+    role_resolution_ref: ContentRef
+    model_fit_query_result_ref: ContentRef
+    model_fit_projection_ref: ProvenanceRef
+
+    @model_validator(mode="after")
+    def validate_obligation_and_fit_evidence(self) -> AgentIncarnationBindingV2:
+        expected_content_refs = (
+            (
+                self.agent_obligation_ref,
+                "aoa-agents",
+                "agent-obligation-v1",
+                "agent obligation",
+            ),
+            (
+                self.actor_mandate_ref,
+                "aoa-agents",
+                "actor-mandate-v1",
+                "actor mandate",
+            ),
+            (
+                self.role_resolution_ref,
+                "aoa-agents",
+                "aoa_role_resolution_v1",
+                "role resolution",
+            ),
+            (
+                self.model_fit_query_result_ref,
+                "aoa-models",
+                "aoa_model_fit_query_result_v2",
+                "model-fit query result",
+            ),
+        )
+        for ref, owner, schema_version, label in expected_content_refs:
+            if ref.owner_repo != owner or ref.schema_version != schema_version:
+                raise ValueError(
+                    f"{label} must retain exact {owner} {schema_version} ownership"
+                )
+        projection = self.model_fit_projection_ref
+        if (
+            projection.owner_repo != "aoa-models"
+            or projection.schema_version != "aoa_model_fit_projection_v1"
+            or projection.schema_ref != "schemas/model-fit-projection.schema.json"
+        ):
+            raise ValueError(
+                "model-fit projection must retain exact aoa-models projection ownership"
+            )
+        if projection.source_ref != self.model_realization_ref.source_ref:
+            raise ValueError(
+                "model realization and fit projection must share one aoa-models source ref"
+            )
         return self

@@ -17,4 +17,10 @@ The included continuation obligation carries the state needed after a parent
 inference truly yields. Its wake policy is event-filtered: child completion is
 an event, not an automatic order to wake the parent.
 
+`AgentIncarnationBindingV2` is the evidence-complete contract for new external
+actors. It additionally binds the exact `aoa-agents` obligation, actor mandate,
+and passive role-resolution result plus the content-addressed `aoa-models`
+fit-query result and projection. Historical v1 bindings remain readable, but
+do not satisfy the v2 evidence requirement for a new actor route.
+
 See [CONTRACT.md](CONTRACT.md) and [VALIDATION.md](VALIDATION.md).
