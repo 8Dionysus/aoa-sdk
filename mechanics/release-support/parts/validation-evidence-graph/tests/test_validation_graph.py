@@ -165,7 +165,6 @@ def test_manual_serial_oracle_matches_primary_setup_and_explicit_prerequisites()
     )
     common_steps = (
         "Checkout",
-        "Check repo-local KAG index family",
         "Fetch routing succession evidence history",
         "Checkout aoa-stats validator",
         "Checkout abyss-machine verifier",
@@ -176,6 +175,11 @@ def test_manual_serial_oracle_matches_primary_setup_and_explicit_prerequisites()
 
     for name in common_steps:
         assert oracle[name] == primary[name]
+
+    assert oracle["Check repo-local KAG index family"]["uses"] == primary[
+        "Check repo-local KAG index family"
+    ]["uses"]
+    assert "with" not in oracle["Check repo-local KAG index family"]
 
     workflow_text = (REPO_ROOT / ".github/workflows/validation-evidence-shadow.yml").read_text(
         encoding="utf-8"
