@@ -29,6 +29,21 @@ The first command always requests the full owner claim set. The latter two
 commands execute the retained serial completeness oracle; they are rollback
 and comparison routes, not weaker profiles.
 
+Explicit sibling-owner ABI check from a pinned `aoa-sdk` source checkout:
+
+```bash
+python /path/to/pinned-aoa-sdk/mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py \
+  --repo-root /path/to/owner-repo \
+  --manifest /path/to/owner-repo/path/to/validation_graph.json \
+  --profile full \
+  --receipt /tmp/owner-validation-receipt.json
+```
+
+The manifest must live inside the explicit owner root. The receipt binds that
+owner Git identity and the pinned SDK runner Git identity separately. This
+invocation shares scheduling mechanics only; it does not import SDK claims or
+authorize the sibling gate.
+
 Owner and topology checks:
 
 ```bash

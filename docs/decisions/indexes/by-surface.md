@@ -154,6 +154,10 @@
 
 - [AOA-SDK-D-0041 - External Stress Fallback Ref Accounting](../AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md) (`docs/decisions/AOA-SDK-D-0041-external-stress-fallback-ref-accounting.md`)
 
+## compatibility boundary
+
+- [AOA-SDK-D-0098 - Export the reference validation scheduler with an explicit owner root](../AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md) (`docs/decisions/AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md`)
+
 ## compatibility input
 
 - [AOA-SDK-D-0040 - Sibling Fallback Field Input Alias Normalization](../AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md) (`docs/decisions/AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md`)
@@ -719,10 +723,12 @@
 - [AOA-SDK-D-0032 - Root Technical District Route Card Hardening](../AOA-SDK-D-0032-root-technical-district-route-card-hardening.md) (`docs/decisions/AOA-SDK-D-0032-root-technical-district-route-card-hardening.md`)
 - [AOA-SDK-D-0036 - Root Technical District Allowlist Validation](../AOA-SDK-D-0036-root-technical-district-allowlist-validation.md) (`docs/decisions/AOA-SDK-D-0036-root-technical-district-allowlist-validation.md`)
 - [AOA-SDK-D-0097 - Use a bounded claim/evidence DAG for full validation](../AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md) (`docs/decisions/AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md`)
+- [AOA-SDK-D-0098 - Export the reference validation scheduler with an explicit owner root](../AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md) (`docs/decisions/AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md`)
 
 ## workflow
 
 - [AOA-SDK-D-0097 - Use a bounded claim/evidence DAG for full validation](../AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md) (`docs/decisions/AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md`)
+- [AOA-SDK-D-0098 - Export the reference validation scheduler with an explicit owner root](../AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md) (`docs/decisions/AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md`)
 
 ## workspace bootstrap
 

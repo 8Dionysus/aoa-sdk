@@ -13,10 +13,11 @@ names required, satisfied, and missing evidence. The default full profile
 preserves the complete `scripts/release_check.py` battery while scheduling
 independent work concurrently.
 
-Owner: `aoa-sdk` owns only its local claim set, manifest, scheduler, and
-sufficiency decision. `aoa-evals` owns central proof doctrine and verdicts;
-sibling repositories own their own claims and validators; GitHub is only an
-execution adapter.
+Owner: `aoa-sdk` owns its local claim set and the reference scheduler ABI.
+Sibling repositories may invoke that scheduler with an explicit owner
+`--repo-root`, but they still own their manifests, claims, validators, and
+sufficiency decisions. `aoa-evals` owns central proof doctrine and verdicts;
+GitHub is only an execution adapter.
 
 ## Active surfaces
 
@@ -34,10 +35,16 @@ and the retained serial command inventory remains the exact completeness
 oracle and rollback. Path routing remains `shadow_only` and can never authorize
 the owner gate. Cross-run receipt reuse is intentionally absent until exact
 input, environment, freshness, and tamper rules have their own accepted cases.
+The runner binds its own source-checkout commit, tree, worktree state, and file
+digest separately from the owner repository. An unavailable or changing runner
+identity makes a receipt insufficient.
 
 ## Next route
 
 Continue comparing the promoted graph with the serial oracle and evaluate
-routing and reuse methods under the local eval design. Route any portable eval or central verdict to
-`aoa-evals`, measurement grammar to `aoa-stats`, host resource admission to
-`abyss-machine`, and any sibling adoption back to that repository's owner.
+routing and reuse methods under the local eval design. Sibling pilots should
+reuse only the scheduler ABI, pass their repository root explicitly, and keep
+their complete serial oracle until owner-local admission. Route any portable
+eval or central verdict to `aoa-evals`, measurement grammar to `aoa-stats`,
+host resource admission to `abyss-machine`, and every sibling adoption back to
+that repository's owner.

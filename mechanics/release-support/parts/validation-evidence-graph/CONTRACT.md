@@ -21,6 +21,9 @@
 - Receipt identity binds source state, manifest, commands, environment,
   and clean or dirty identities of nested Git verifier checkouts,
   evidence, and outcomes.
+- When the reference runner executes for another owner repository, the receipt
+  binds the owner repository and runner source checkout as distinct Git
+  identities. Missing or changing runner source identity fails closed.
 
 ## Stop-lines
 
@@ -35,8 +38,9 @@
 
 ## Owner split
 
-`aoa-sdk` owns this reference implementation and only its own release claims.
-Each AbyssOS repository must author its own claims, risks, evidence providers,
-and sufficiency rule. `aoa-evals` owns comparative proof adoption,
+`aoa-sdk` owns this reference scheduler implementation and only its own release
+claims. Each AbyssOS repository must author its own claims, risks, evidence
+providers, sufficiency rule, runner pin, and admission decision. `aoa-evals`
+owns comparative proof adoption,
 `aoa-stats` owns shared measurement grammar, `abyss-machine` owns host
 admission, and GitHub owns neither source truth nor proof meaning.

@@ -143,3 +143,4 @@
 ## 2026-08-11
 
 - [AOA-SDK-D-0097 - Use a bounded claim/evidence DAG for full validation](../AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md) (`docs/decisions/AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md`)
+- [AOA-SDK-D-0098 - Export the reference validation scheduler with an explicit owner root](../AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md) (`docs/decisions/AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md`)

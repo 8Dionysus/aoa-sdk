@@ -341,6 +341,8 @@ def test_failed_evidence_node_yields_a_bound_insufficient_receipt(tmp_path: Path
 
     exit_code = validation_graph.main(
         [
+            "--repo-root",
+            str(tmp_path),
             "--manifest",
             str(manifest_path),
             "--profile",
@@ -421,6 +423,83 @@ def test_recursive_route_patterns_cover_arbitrary_depth() -> None:
     assert not validation_graph._matches("tests/test_core.py", "src/**")
 
 
+def test_explicit_owner_repo_root_is_bound_separately_from_runner_source(
+    tmp_path: Path,
+) -> None:
+    owner_root = tmp_path / "owner"
+    owner_root.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=owner_root, check=True)
+    manifest = minimal_manifest()
+    for node in manifest["nodes"]:
+        node["inputs"] = ["validation-graph.json"]
+    manifest_path = owner_root / "validation-graph.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    subprocess.run(["git", "add", "validation-graph.json"], cwd=owner_root, check=True)
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=Validation Test",
+            "-c",
+            "user.email=validation@example.invalid",
+            "commit",
+            "-qm",
+            "owner manifest",
+        ],
+        cwd=owner_root,
+        check=True,
+    )
+    receipt_path = tmp_path / "receipt.json"
+
+    exit_code = validation_graph.main(
+        [
+            "--repo-root",
+            str(owner_root),
+            "--manifest",
+            str(manifest_path),
+            "--profile",
+            "full",
+            "--receipt",
+            str(receipt_path),
+        ]
+    )
+    receipt = json.loads(receipt_path.read_text(encoding="utf-8"))
+
+    assert exit_code == 0
+    assert receipt["decision"]["sufficient"] is True
+    assert receipt["repository_identity"]["before"]["git_commit"] == subprocess.run(
+        ["git", "rev-parse", "HEAD"],
+        cwd=owner_root,
+        check=True,
+        capture_output=True,
+        text=True,
+    ).stdout.strip()
+    runner = receipt["runner_identity"]
+    assert runner["stable"] is True
+    assert runner["before"]["relative_path"] == (
+        "mechanics/release-support/parts/validation-evidence-graph/"
+        "scripts/validation_graph.py"
+    )
+    assert runner["before"]["source_repository_identity"]["git_commit"]
+
+
+def test_manifest_outside_explicit_owner_root_is_rejected(tmp_path: Path) -> None:
+    owner_root = tmp_path / "owner"
+    owner_root.mkdir()
+    manifest_path = tmp_path / "validation-graph.json"
+    manifest_path.write_text(json.dumps(minimal_manifest()), encoding="utf-8")
+
+    assert validation_graph.main(
+        [
+            "--repo-root",
+            str(owner_root),
+            "--manifest",
+            str(manifest_path),
+            "--validate-only",
+        ]
+    ) == 2
+
+
 def test_timeout_is_a_hard_failure_and_kills_the_child_group() -> None:
     result = validation_graph._run_step(
         {
@@ -482,6 +561,64 @@ def test_repository_drift_blocks_an_otherwise_green_receipt(tmp_path: Path) -> N
     assert receipt["decision"]["sufficient"] is False
     assert receipt["decision"]["integrity_blockers"] == [
         "repository_identity_changed_during_run"
+    ]
+
+
+def test_missing_runner_source_identity_fails_closed(
+    monkeypatch: pytest.MonkeyPatch, tmp_path: Path
+) -> None:
+    manifest = minimal_manifest()
+    manifest_path = tmp_path / "graph.json"
+    manifest_bytes = json.dumps(manifest).encode()
+    manifest_path.write_bytes(manifest_bytes)
+    claims = manifest["profiles"]["full"]
+    activated = validation_graph.activate_nodes(manifest, claims)
+    node_results = [
+        {
+            "id": node["id"],
+            "tier": node["tier"],
+            "status": "passed",
+            "duration_seconds": 0.01,
+            "input_identity": {
+                "patterns": node["inputs"],
+                "file_count": 1,
+                "sha256": "0" * 64,
+                "unreadable": [],
+            },
+            "provides_evidence": node["provides_evidence"],
+            "steps": [],
+        }
+        for node in manifest["nodes"]
+    ]
+    unbound_runner = validation_graph.runner_identity()
+    unbound_runner["source_repository_identity"] = None
+    monkeypatch.setattr(
+        validation_graph,
+        "runner_identity",
+        lambda: copy.deepcopy(unbound_runner),
+    )
+
+    receipt = validation_graph.build_receipt(
+        manifest,
+        manifest_path=manifest_path,
+        claims=claims,
+        activated=activated,
+        route={"mode": "profile", "authoritative": True},
+        node_results=node_results,
+        repo_root=REPO_ROOT,
+        max_workers=2,
+        started_at=dt.datetime.now(dt.UTC),
+        elapsed_seconds=0.1,
+        initial_repository_identity=validation_graph.repository_identity(REPO_ROOT),
+        initial_manifest_sha256=hashlib.sha256(manifest_bytes).hexdigest(),
+        initial_environment_identity=validation_graph.environment_identity(),
+        initial_runner_identity=unbound_runner,
+    )
+
+    assert receipt["evidence"]["missing"] == []
+    assert receipt["decision"]["sufficient"] is False
+    assert receipt["decision"]["integrity_blockers"] == [
+        "runner_identity_unavailable"
     ]
 
 

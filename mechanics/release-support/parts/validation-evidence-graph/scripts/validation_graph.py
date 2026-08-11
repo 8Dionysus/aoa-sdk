@@ -62,6 +62,12 @@ class ManifestError(ValueError):
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--manifest", type=Path, default=DEFAULT_MANIFEST)
+    parser.add_argument(
+        "--repo-root",
+        type=Path,
+        default=REPO_ROOT,
+        help="Owner repository root whose source, commands, and sufficiency are being validated.",
+    )
     parser.add_argument("--profile", help="Named owner claim profile to execute.")
     parser.add_argument(
         "--changed-path",
@@ -473,6 +479,35 @@ def repository_identity(repo_root: Path) -> dict[str, Any]:
     }
 
 
+def runner_identity() -> dict[str, Any]:
+    runner_path = Path(__file__).resolve()
+    completed = subprocess.run(
+        ["git", "-C", str(runner_path.parent), "rev-parse", "--show-toplevel"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    source_root: Path | None = None
+    if completed.returncode == 0 and completed.stdout.strip():
+        source_root = Path(completed.stdout.strip()).resolve()
+    relative_path: str | None = None
+    source_identity: dict[str, Any] | None = None
+    if source_root is not None:
+        try:
+            relative_path = runner_path.relative_to(source_root).as_posix()
+        except ValueError:
+            source_root = None
+        else:
+            source_identity = repository_identity(source_root)
+    return {
+        "path": runner_path.as_posix(),
+        "relative_path": relative_path,
+        "sha256": _sha256(runner_path.read_bytes()),
+        "source_root": source_root.as_posix() if source_root is not None else None,
+        "source_repository_identity": source_identity,
+    }
+
+
 def input_identity(repo_root: Path, patterns: Sequence[str]) -> dict[str, Any]:
     listing = subprocess.run(
         ["git", "ls-files", "--cached", "--others", "--exclude-standard", "-z"],
@@ -822,6 +857,7 @@ def build_receipt(
     initial_repository_identity: dict[str, Any],
     initial_manifest_sha256: str,
     initial_environment_identity: dict[str, Any],
+    initial_runner_identity: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     claim_by_id = {claim["id"]: claim for claim in manifest["claims"]}
     required = [
@@ -837,6 +873,9 @@ def build_receipt(
     }
     missing = sorted(set(required) - satisfied)
     final_repository_identity = repository_identity(repo_root)
+    if initial_runner_identity is None:
+        initial_runner_identity = runner_identity()
+    final_runner_identity = runner_identity()
     final_manifest_sha256 = _sha256(manifest_path.read_bytes())
     repository_stable = initial_repository_identity == final_repository_identity
     repository_bound = all(
@@ -844,6 +883,17 @@ def build_receipt(
         for identity in (initial_repository_identity, final_repository_identity)
     )
     manifest_stable = initial_manifest_sha256 == final_manifest_sha256
+    runner_stable = initial_runner_identity == final_runner_identity
+    runner_source_identities = (
+        initial_runner_identity.get("source_repository_identity"),
+        final_runner_identity.get("source_repository_identity"),
+    )
+    runner_bound = all(
+        isinstance(identity, dict)
+        and identity.get("git_commit") is not None
+        and identity.get("git_tree") is not None
+        for identity in runner_source_identities
+    )
     unreadable_inputs = sorted(
         {
             path
@@ -859,6 +909,10 @@ def build_receipt(
         integrity_blockers.append("repository_identity_changed_during_run")
     if not manifest_stable:
         integrity_blockers.append("manifest_changed_during_run")
+    if not runner_bound:
+        integrity_blockers.append("runner_identity_unavailable")
+    if not runner_stable:
+        integrity_blockers.append("runner_identity_changed_during_run")
     if unreadable_inputs:
         integrity_blockers.append("node_inputs_unreadable")
     sufficient = (
@@ -883,6 +937,11 @@ def build_receipt(
             "before": initial_repository_identity,
             "after": final_repository_identity,
             "stable": repository_stable,
+        },
+        "runner_identity": {
+            "before": initial_runner_identity,
+            "after": final_runner_identity,
+            "stable": runner_stable,
         },
         "environment_identity": initial_environment_identity,
         "started_at": started_at.isoformat(),
@@ -927,7 +986,14 @@ def _write_receipt(path: Path, receipt: dict[str, Any]) -> None:
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
     try:
+        repo_root = args.repo_root.resolve()
+        if not repo_root.is_dir():
+            raise ManifestError(f"owner repository root is not a directory: {repo_root}")
         manifest_path = args.manifest.resolve()
+        try:
+            manifest_path.relative_to(repo_root)
+        except ValueError as exc:
+            raise ManifestError("manifest must be inside --repo-root") from exc
         manifest = load_manifest(manifest_path)
         if args.validate_only:
             result = {
@@ -958,13 +1024,14 @@ def main(argv: Sequence[str] | None = None) -> int:
     started = time.monotonic()
     started_at = dt.datetime.now(dt.UTC)
     try:
-        initial_repository_identity = repository_identity(REPO_ROOT)
+        initial_repository_identity = repository_identity(repo_root)
+        initial_runner_identity = runner_identity()
         initial_manifest_sha256 = _sha256(manifest_path.read_bytes())
         initial_environment_identity = environment_identity()
         node_results = execute_nodes(
             manifest,
             activated,
-            repo_root=REPO_ROOT,
+            repo_root=repo_root,
             max_workers=max_workers,
             announce=not args.json,
         )
@@ -975,13 +1042,14 @@ def main(argv: Sequence[str] | None = None) -> int:
             activated=activated,
             route=route,
             node_results=node_results,
-            repo_root=REPO_ROOT,
+            repo_root=repo_root,
             max_workers=max_workers,
             started_at=started_at,
             elapsed_seconds=time.monotonic() - started,
             initial_repository_identity=initial_repository_identity,
             initial_manifest_sha256=initial_manifest_sha256,
             initial_environment_identity=initial_environment_identity,
+            initial_runner_identity=initial_runner_identity,
         )
     except (ManifestError, OSError, subprocess.SubprocessError) as exc:
         error = {"ok": False, "error": str(exc)}

@@ -14,6 +14,8 @@ claim publication state before external proof exists.
   serial oracle and full proof boundary, continue scheduler comparisons, and
   retain shadow-only posture for partial routing and reuse until their own
   no-miss evidence exists.
+- Keep the reference runner portable only through an explicit owner root and
+  separately bound runner identity; sibling claims and admission remain local.
 - Keep README, changelog, release docs, release-support parts, generated
   companions, and GitHub validation aligned without duplicating chronology.
 - Keep sibling canaries drift-aware and explicit about what they do not prove.
