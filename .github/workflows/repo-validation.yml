@@ -58,4 +58,15 @@ jobs:
         env:
           ABYSS_MACHINE_REPO_ROOT: .abyss-machine-verifier
           AOA_STATS_ROOT: .aoa-stats-validator
-        run: python scripts/release_check.py
+          AOA_SDK_VALIDATION_MODE: ${{ vars.AOA_SDK_VALIDATION_MODE || 'graph' }}
+        run: >-
+          python scripts/release_check.py
+          --receipt "$RUNNER_TEMP/validation-evidence-receipt.json"
+
+      - name: Upload validation evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: validation-evidence-${{ github.run_id }}-${{ github.run_attempt }}
+          path: ${{ runner.temp }}/validation-evidence-receipt.json
+          if-no-files-found: warn

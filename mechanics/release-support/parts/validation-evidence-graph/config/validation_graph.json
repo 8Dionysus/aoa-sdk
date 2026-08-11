@@ -1,0 +1,586 @@
+{
+  "schema_version": "aoa_validation_evidence_graph_v1",
+  "graph_id": "aoa-sdk-repo-validation-v1",
+  "owner_repo": "aoa-sdk",
+  "default_profile": "full",
+  "unknown_change_policy": "full",
+  "routing_status": "shadow_only",
+  "instant_budget_seconds": 1.0,
+  "max_workers": 3,
+  "claims": [
+    {
+      "id": "validation-graph-integrity",
+      "risk": "A malformed, cyclic, ambiguous, or under-specified graph could manufacture a false-green sufficiency decision.",
+      "required_evidence": [
+        "validation-graph-contract"
+      ]
+    },
+    {
+      "id": "source-contract-integrity",
+      "risk": "Authored, generated, topology, decision, stats, workspace, or routing-evidence source contracts may drift.",
+      "required_evidence": [
+        "source-contract-battery"
+      ]
+    },
+    {
+      "id": "source-behavior",
+      "risk": "SDK and mechanic behavior may regress, including cases outside a path-local change surface.",
+      "required_evidence": [
+        "ordinary-pytest-corpus"
+      ]
+    },
+    {
+      "id": "g11-isolated-fail-closed",
+      "risk": "The Agent OS control-plane corpus may pass only through shared pytest state or lose an exact adversarial case boundary.",
+      "required_evidence": [
+        "g11-isolated-cases-a",
+        "g11-isolated-cases-b"
+      ]
+    },
+    {
+      "id": "static-quality",
+      "risk": "Lint or type errors may survive behavior-only validation.",
+      "required_evidence": [
+        "ruff-clean",
+        "mypy-clean"
+      ]
+    },
+    {
+      "id": "installable-wheel",
+      "risk": "Source tests may pass while the built public wheel loses canonical routing, compiler, Runner, evidence-chain, or Agon behavior.",
+      "required_evidence": [
+        "package-built",
+        "routing-g5-wheel",
+        "plan-c2-wheel",
+        "runner-c3-wheel",
+        "evidence-c5-wheel",
+        "agon-gate-wheel"
+      ]
+    },
+    {
+      "id": "abyss-package-artifact-compatibility",
+      "risk": "The SDK distribution may violate the OS Abyss package artifact contract even when its own wheel checks pass.",
+      "required_evidence": [
+        "abyss-package-artifact-bundle"
+      ]
+    }
+  ],
+  "profiles": {
+    "instant": [
+      "validation-graph-integrity"
+    ],
+    "full": [
+      "validation-graph-integrity",
+      "source-contract-integrity",
+      "source-behavior",
+      "g11-isolated-fail-closed",
+      "static-quality",
+      "installable-wheel",
+      "abyss-package-artifact-compatibility"
+    ]
+  },
+  "routes": [
+    {
+      "id": "validation-plane",
+      "patterns": [
+        "mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py",
+        "mechanics/release-support/parts/validation-evidence-graph/config/validation_graph.json",
+        "mechanics/release-support/parts/validation-evidence-graph/tests/test_validation_graph.py",
+        "evals/intake/aoa-validation-evidence-graph.eval_need.json",
+        "evals/suites/aoa-validation-evidence-graph.suite.md"
+      ],
+      "claims": [
+        "validation-graph-integrity",
+        "source-contract-integrity",
+        "source-behavior",
+        "static-quality"
+      ]
+    },
+    {
+      "id": "python-and-mechanics",
+      "patterns": [
+        "src/**",
+        "mechanics/**",
+        "tests/**",
+        "evals/**",
+        "scripts/**"
+      ],
+      "claims": [
+        "source-contract-integrity",
+        "source-behavior",
+        "g11-isolated-fail-closed",
+        "static-quality",
+        "installable-wheel",
+        "abyss-package-artifact-compatibility"
+      ]
+    },
+    {
+      "id": "package-and-ci",
+      "patterns": [
+        "pyproject.toml",
+        ".github/**",
+        "sdk/distribution/**",
+        "docs/RELEASING.md",
+        "docs/RELEASE_CI_POSTURE.md"
+      ],
+      "claims": [
+        "source-contract-integrity",
+        "source-behavior",
+        "static-quality",
+        "installable-wheel",
+        "abyss-package-artifact-compatibility"
+      ]
+    }
+  ],
+  "nodes": [
+    {
+      "id": "validation-graph-contract",
+      "tier": "instant",
+      "priority": 100,
+      "depends_on": [],
+      "provides_evidence": [
+        "validation-graph-contract"
+      ],
+      "timeout_seconds": 10,
+      "inputs": [
+        "mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py",
+        "mechanics/release-support/parts/validation-evidence-graph/config/validation_graph.json"
+      ],
+      "steps": [
+        {
+          "id": "validate-manifest",
+          "argv": [
+            "{python}",
+            "mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py",
+            "--manifest",
+            "mechanics/release-support/parts/validation-evidence-graph/config/validation_graph.json",
+            "--validate-only"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "build-package",
+      "tier": "artifact",
+      "priority": 90,
+      "depends_on": [],
+      "provides_evidence": [
+        "package-built"
+      ],
+      "timeout_seconds": 180,
+      "inputs": [
+        "pyproject.toml",
+        "src/**",
+        "README.md",
+        "LICENSE"
+      ],
+      "steps": [
+        {
+          "id": "build-package",
+          "argv": [
+            "{python}",
+            "-m",
+            "build"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ordinary-tests",
+      "tier": "contextual",
+      "priority": 80,
+      "depends_on": [],
+      "provides_evidence": [
+        "ordinary-pytest-corpus"
+      ],
+      "timeout_seconds": 900,
+      "inputs": [
+        "**"
+      ],
+      "steps": [
+        {
+          "id": "ordinary-pytest-corpus",
+          "argv": [
+            "{python}",
+            "-m",
+            "pytest",
+            "-q",
+            "--ignore=evals/suites/test_agent_os_control_plane_g11.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g11-isolated-a",
+      "tier": "semantic",
+      "priority": 80,
+      "depends_on": [],
+      "provides_evidence": [
+        "g11-isolated-cases-a"
+      ],
+      "timeout_seconds": 480,
+      "inputs": [
+        "evals/suites/test_agent_os_control_plane_g11.py",
+        "mechanics/boundary-bridge/parts/route-resolution-control-plane/**",
+        "mechanics/boundary-bridge/parts/plan-compilation-control-plane/**",
+        "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/**",
+        "src/**"
+      ],
+      "steps": [
+        {
+          "id": "g11-cases-a",
+          "argv": [
+            "{python}",
+            "-m",
+            "pytest",
+            "-q",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[golden-plan-repeatability]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[golden-runner-lifecycle]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[missing-capability]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[ambiguous-intent]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[conflicting-routes]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[forbidden-action]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[runtime-approval-owner]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[runtime-approval-id-collision]"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "g11-isolated-b",
+      "tier": "semantic",
+      "priority": 80,
+      "depends_on": [],
+      "provides_evidence": [
+        "g11-isolated-cases-b"
+      ],
+      "timeout_seconds": 480,
+      "inputs": [
+        "evals/suites/test_agent_os_control_plane_g11.py",
+        "mechanics/boundary-bridge/parts/route-resolution-control-plane/**",
+        "mechanics/boundary-bridge/parts/plan-compilation-control-plane/**",
+        "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/**",
+        "src/**"
+      ],
+      "steps": [
+        {
+          "id": "g11-cases-b",
+          "argv": [
+            "{python}",
+            "-m",
+            "pytest",
+            "-q",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[multiple-approval-reconciliation]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[stale-route-snapshot]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[stale-runtime-observation]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[missing-event-slice]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[reordered-event-slice]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[invalid-runtime-event]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[duplicate-execution]",
+            "evals/suites/test_agent_os_control_plane_g11.py::test_g11_case[runtime-disconnect]"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "source-contracts",
+      "tier": "fast",
+      "priority": 70,
+      "depends_on": [],
+      "provides_evidence": [
+        "source-contract-battery"
+      ],
+      "timeout_seconds": 300,
+      "inputs": [
+        "**"
+      ],
+      "steps": [
+        {
+          "id": "generate-decision-indexes",
+          "argv": [
+            "{python}",
+            "scripts/generate_decision_indexes.py",
+            "--check"
+          ]
+        },
+        {
+          "id": "validate-sdk-source-home",
+          "argv": [
+            "{python}",
+            "scripts/validate_sdk_source_home.py"
+          ]
+        },
+        {
+          "id": "generate-organ-access-schemas",
+          "argv": [
+            "{python}",
+            "mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_schemas.py",
+            "--check"
+          ]
+        },
+        {
+          "id": "generate-organ-access-examples",
+          "argv": [
+            "{python}",
+            "mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_example.py",
+            "--check"
+          ]
+        },
+        {
+          "id": "validate-local-stats-port",
+          "argv": [
+            "{python}",
+            "scripts/validate_local_stats_port.py"
+          ]
+        },
+        {
+          "id": "validate-mechanics-topology",
+          "argv": [
+            "{python}",
+            "scripts/validate_mechanics_topology.py"
+          ]
+        },
+        {
+          "id": "build-source-topology-index",
+          "argv": [
+            "{python}",
+            "scripts/build_source_topology_index.py",
+            "--check"
+          ]
+        },
+        {
+          "id": "validate-source-topology-index",
+          "argv": [
+            "{python}",
+            "scripts/validate_source_topology_index.py"
+          ]
+        },
+        {
+          "id": "validate-routing-succession-e1-cost-evidence",
+          "argv": [
+            "{python}",
+            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/measure_routing_succession_e1.py",
+            "--check"
+          ]
+        },
+        {
+          "id": "build-workspace-control-plane",
+          "argv": [
+            "{python}",
+            "scripts/build_workspace_control_plane.py",
+            "--check"
+          ]
+        },
+        {
+          "id": "validate-workspace-control-plane",
+          "argv": [
+            "{python}",
+            "scripts/validate_workspace_control_plane.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "ruff",
+      "tier": "fast",
+      "priority": 60,
+      "depends_on": [],
+      "provides_evidence": [
+        "ruff-clean"
+      ],
+      "timeout_seconds": 120,
+      "inputs": [
+        "**"
+      ],
+      "steps": [
+        {
+          "id": "ruff-check",
+          "argv": [
+            "{python}",
+            "-m",
+            "ruff",
+            "check",
+            ".",
+            "--extend-exclude",
+            ".abyss-machine-verifier,.aoa-stats-validator"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "mypy",
+      "tier": "contextual",
+      "priority": 60,
+      "depends_on": [],
+      "provides_evidence": [
+        "mypy-clean"
+      ],
+      "timeout_seconds": 300,
+      "inputs": [
+        "pyproject.toml",
+        "src/**"
+      ],
+      "steps": [
+        {
+          "id": "mypy-src",
+          "argv": [
+            "{python}",
+            "-m",
+            "mypy",
+            "src"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "routing-g5-wheel",
+      "tier": "artifact",
+      "priority": 85,
+      "depends_on": [
+        "build-package"
+      ],
+      "provides_evidence": [
+        "routing-g5-wheel"
+      ],
+      "timeout_seconds": 300,
+      "inputs": [
+        "dist/**",
+        "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/**"
+      ],
+      "steps": [
+        {
+          "id": "verify-routing-g5-canonical-wheel",
+          "argv": [
+            "{python}",
+            "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "plan-c2-wheel",
+      "tier": "artifact",
+      "priority": 85,
+      "depends_on": [
+        "build-package"
+      ],
+      "provides_evidence": [
+        "plan-c2-wheel"
+      ],
+      "timeout_seconds": 300,
+      "inputs": [
+        "dist/**",
+        "mechanics/boundary-bridge/parts/plan-compilation-control-plane/**"
+      ],
+      "steps": [
+        {
+          "id": "verify-plan-compilation-wheel",
+          "argv": [
+            "{python}",
+            "mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "runner-c3-wheel",
+      "tier": "artifact",
+      "priority": 85,
+      "depends_on": [
+        "build-package"
+      ],
+      "provides_evidence": [
+        "runner-c3-wheel"
+      ],
+      "timeout_seconds": 300,
+      "inputs": [
+        "dist/**",
+        "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/**"
+      ],
+      "steps": [
+        {
+          "id": "verify-runner-wheel",
+          "argv": [
+            "{python}",
+            "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "evidence-c5-wheel",
+      "tier": "artifact",
+      "priority": 85,
+      "depends_on": [
+        "build-package"
+      ],
+      "provides_evidence": [
+        "evidence-c5-wheel"
+      ],
+      "timeout_seconds": 300,
+      "inputs": [
+        "dist/**",
+        "mechanics/boundary-bridge/parts/evidence-closeout-chain/**"
+      ],
+      "steps": [
+        {
+          "id": "verify-evidence-chain-wheel",
+          "argv": [
+            "{python}",
+            "mechanics/boundary-bridge/parts/evidence-closeout-chain/scripts/verify_evidence_chain_wheel.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "agon-gate-wheel",
+      "tier": "artifact",
+      "priority": 85,
+      "depends_on": [
+        "build-package"
+      ],
+      "provides_evidence": [
+        "agon-gate-wheel"
+      ],
+      "timeout_seconds": 300,
+      "inputs": [
+        "dist/**",
+        "mechanics/agon/parts/gate-routing-bridge/**"
+      ],
+      "steps": [
+        {
+          "id": "verify-agon-gate-routing-wheel",
+          "argv": [
+            "{python}",
+            "mechanics/agon/parts/gate-routing-bridge/scripts/verify_agon_gate_routing_wheel.py"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "abyss-package-artifact-bundle",
+      "tier": "artifact",
+      "priority": 85,
+      "depends_on": [
+        "build-package"
+      ],
+      "provides_evidence": [
+        "abyss-package-artifact-bundle"
+      ],
+      "timeout_seconds": 300,
+      "inputs": [
+        "dist/**",
+        "mechanics/release-support/parts/release-audit-publish-helper/**"
+      ],
+      "steps": [
+        {
+          "id": "validate-abyss-package-artifact-bundle",
+          "argv": [
+            "{python}",
+            "mechanics/release-support/parts/release-audit-publish-helper/scripts/validate_abyss_machine_package_artifact_bundle.py"
+          ]
+        }
+      ]
+    }
+  ]
+}

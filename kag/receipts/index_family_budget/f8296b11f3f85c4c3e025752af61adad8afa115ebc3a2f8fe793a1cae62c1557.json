@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 15070654,
+  "allowed_tracked_bytes": 20525553,
+  "approved_by": "repository-owner",
+  "base_ref": "70fda8622cd8bc69fcddbdfb8bd53e80d123510f",
+  "changed_generated_bytes": 15070654,
+  "changed_generated_files": 290,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "f8296b11f3f85c4c3e025752af61adad8afa115ebc3a2f8fe793a1cae62c1557",
+  "reason": "Refresh the derived repo-local KAG family after final rollback verification showed the manual serial oracle must let the pinned KAG action discover the default-branch merge-base instead of using HEAD^; this receipt accepts only the measured workflow-fix delta without changing the graph decision, proof boundary, routing, reuse, sibling, or completion claims.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20525553,
+  "tracked_bytes_max": 15728640
+}

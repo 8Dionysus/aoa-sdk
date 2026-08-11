@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 7946009,
+  "allowed_tracked_bytes": 20470025,
+  "approved_by": "repository-owner",
+  "base_ref": "70fda8622cd8bc69fcddbdfb8bd53e80d123510f",
+  "changed_generated_bytes": 7946009,
+  "changed_generated_files": 151,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "acf93181850e1fd3c2fb58f86732d6e8232dc80b5c07dc158ecac6aac93c6bcd",
+  "reason": "Refresh the aoa-sdk portable family for the owner-local validation evidence graph pilot and shadow A/B workflow; this receipt accepts only the measured deterministic generated delta without claiming route promotion, central proof, OS-wide rollout, cost reduction, or completion.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20470025,
+  "tracked_bytes_max": 15728640
+}
