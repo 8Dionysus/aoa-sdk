@@ -334,6 +334,7 @@ def test_scheduler_runs_independent_nodes_concurrently_and_fans_in_in_manifest_o
 
 
 def test_failed_evidence_node_yields_a_bound_insufficient_receipt(tmp_path: Path) -> None:
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
     manifest = minimal_manifest(failing=True)
     manifest_path = tmp_path / "graph.json"
     receipt_path = tmp_path / "receipt.json"
@@ -486,6 +487,7 @@ def test_explicit_owner_repo_root_is_bound_separately_from_runner_source(
 def test_manifest_outside_explicit_owner_root_is_rejected(tmp_path: Path) -> None:
     owner_root = tmp_path / "owner"
     owner_root.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=owner_root, check=True)
     manifest_path = tmp_path / "validation-graph.json"
     manifest_path.write_text(json.dumps(minimal_manifest()), encoding="utf-8")
 
@@ -493,6 +495,24 @@ def test_manifest_outside_explicit_owner_root_is_rejected(tmp_path: Path) -> Non
         [
             "--repo-root",
             str(owner_root),
+            "--manifest",
+            str(manifest_path),
+            "--validate-only",
+        ]
+    ) == 2
+
+
+def test_owner_repo_root_must_equal_git_top_level(tmp_path: Path) -> None:
+    subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
+    nested_root = tmp_path / "nested-owner"
+    nested_root.mkdir()
+    manifest_path = nested_root / "validation-graph.json"
+    manifest_path.write_text(json.dumps(minimal_manifest()), encoding="utf-8")
+
+    assert validation_graph.main(
+        [
+            "--repo-root",
+            str(nested_root),
             "--manifest",
             str(manifest_path),
             "--validate-only",

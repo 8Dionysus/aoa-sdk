@@ -24,6 +24,8 @@
 - When the reference runner executes for another owner repository, the receipt
   binds the owner repository and runner source checkout as distinct Git
   identities. Missing or changing runner source identity fails closed.
+- The explicit owner root must equal that checkout's resolved Git top-level;
+  a nested directory cannot borrow its parent repository identity.
 
 ## Stop-lines
 

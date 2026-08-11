@@ -449,6 +449,23 @@ def _git(args: Sequence[str], repo_root: Path) -> bytes:
     return completed.stdout if completed.returncode == 0 else b""
 
 
+def require_git_top_level(repo_root: Path) -> None:
+    completed = subprocess.run(
+        ["git", "-C", str(repo_root), "rev-parse", "--show-toplevel"],
+        check=False,
+        capture_output=True,
+        text=True,
+    )
+    if completed.returncode != 0 or not completed.stdout.strip():
+        raise ManifestError(f"owner repository root is not a Git checkout: {repo_root}")
+    git_top_level = Path(completed.stdout.strip()).resolve()
+    if git_top_level != repo_root:
+        raise ManifestError(
+            "--repo-root must equal the owner Git top-level: "
+            f"requested={repo_root} actual={git_top_level}"
+        )
+
+
 def repository_identity(repo_root: Path) -> dict[str, Any]:
     commit = _git(["rev-parse", "HEAD"], repo_root).decode().strip() or None
     tree = _git(["rev-parse", "HEAD^{tree}"], repo_root).decode().strip() or None
@@ -989,6 +1006,7 @@ def main(argv: Sequence[str] | None = None) -> int:
         repo_root = args.repo_root.resolve()
         if not repo_root.is_dir():
             raise ManifestError(f"owner repository root is not a directory: {repo_root}")
+        require_git_top_level(repo_root)
         manifest_path = args.manifest.resolve()
         try:
             manifest_path.relative_to(repo_root)
