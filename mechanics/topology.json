@@ -232,7 +232,8 @@
     ],
     "release-support": [
       "release-audit-publish-helper",
-      "public-support-ci-posture"
+      "public-support-ci-posture",
+      "validation-evidence-graph"
     ],
     "rpg": [
       "typed-consumer-api",
@@ -628,7 +629,7 @@
     {
       "slug": "release-support",
       "name_type": "shared",
-      "operation": "Keep changelog, release audit, CI posture, canonical SDK package trust, historical release-evidence replay, and publication support bounded and reproducible.",
+      "operation": "Keep changelog, release audit, CI posture, validation claim/evidence scheduling, canonical SDK package trust, historical release-evidence replay, and publication support bounded and reproducible.",
       "source_surfaces": [
         "CHANGELOG.md",
         "docs/RELEASING.md",
@@ -648,6 +649,11 @@
         "mechanics/release-support/parts/public-support-ci-posture/scripts/run_sibling_canary.py",
         "mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py",
         "mechanics/release-support/parts/public-support-ci-posture/tests/test_sibling_canary.py",
+        "mechanics/release-support/parts/validation-evidence-graph",
+        "mechanics/release-support/parts/validation-evidence-graph/config/validation_graph.json",
+        "mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py",
+        "mechanics/release-support/parts/validation-evidence-graph/tests/test_validation_graph.py",
+        "evals/suites/aoa-validation-evidence-graph.suite.md",
         ".github/workflows/repo-validation.yml",
         ".github/workflows/latest-sibling-canary.yml",
         "scripts/release_check.py",
@@ -655,11 +661,12 @@
       ],
       "candidate_parts": [
         "release-audit-publish-helper",
-        "public-support-ci-posture"
+        "public-support-ci-posture",
+        "validation-evidence-graph"
       ],
       "validation": [
         "python scripts/release_check.py",
-        "python -m pytest -q mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py mechanics/release-support/parts/public-support-ci-posture/tests/test_sibling_canary.py"
+        "python -m pytest -q mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py mechanics/release-support/parts/public-support-ci-posture/tests/test_sibling_canary.py mechanics/release-support/parts/validation-evidence-graph/tests/test_validation_graph.py"
       ]
     },
     {

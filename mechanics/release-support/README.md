@@ -6,8 +6,8 @@ Status: active topology with part-local payload.
 
 ### Operation
 
-Keep changelog, release audit, CI posture, build, and publication helper
-surfaces bounded and reproducible.
+Keep changelog, release audit, CI posture, build, publication helper, and
+validation-evidence surfaces bounded and reproducible.
 
 ### Trigger
 
@@ -21,6 +21,7 @@ release checks, package build behavior, or publication helper behavior changes.
 - release CI posture docs
 - release check orchestration
 - package build validation
+- owner-local claim/evidence graph scheduling and sufficiency receipts
 - OS Abyss artifact bundle validation for built package outputs
 - canonical SDK routing/package verification after G5
 - explicit immutable replay of historical routing release-candidate evidence
@@ -38,6 +39,7 @@ outside SDK helper truth until actually performed.
 - `docs/RELEASE_CI_POSTURE.md`
 - `mechanics/release-support/parts/release-audit-publish-helper/`
 - `mechanics/release-support/parts/public-support-ci-posture/`
+- `mechanics/release-support/parts/validation-evidence-graph/`
 - `.github/workflows/repo-validation.yml`
 - `.github/workflows/latest-sibling-canary.yml`
 - `.github/workflows/release-artifacts.yml`
@@ -51,11 +53,15 @@ outside SDK helper truth until actually performed.
 - `mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py`
 - `mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py`
 - `mechanics/release-support/parts/public-support-ci-posture/tests/test_sibling_canary.py`
+- `mechanics/release-support/parts/validation-evidence-graph/config/validation_graph.json`
+- `mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py`
+- `mechanics/release-support/parts/validation-evidence-graph/tests/test_validation_graph.py`
 
 ### Candidate parts
 
 - release-audit-publish-helper
 - public-support-ci-posture
+- validation-evidence-graph
 
 ### Must not claim
 

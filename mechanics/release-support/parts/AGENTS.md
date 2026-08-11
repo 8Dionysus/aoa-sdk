@@ -12,6 +12,9 @@ Active part homes:
   behavior bounded to checked release surfaces.
 - `public-support-ci-posture/` keeps public support, release claim, and CI tier
   posture explicit and short.
+- `validation-evidence-graph/` keeps validation claims, evidence dependencies,
+  bounded scheduling, and sufficiency receipts explicit without owning central
+  proof doctrine or sibling policy.
 
 Keep publication truth in tags, GitHub Releases, package indexes, and owner
 repositories. SDK release-support parts may verify and route claims; they do

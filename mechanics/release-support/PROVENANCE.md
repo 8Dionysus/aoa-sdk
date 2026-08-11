@@ -7,6 +7,7 @@
 - `docs/RELEASE_CI_POSTURE.md`
 - `mechanics/release-support/parts/release-audit-publish-helper/`
 - `mechanics/release-support/parts/public-support-ci-posture/`
+- `mechanics/release-support/parts/validation-evidence-graph/`
 - `.github/workflows/repo-validation.yml`
 - `.github/workflows/latest-sibling-canary.yml`
 - `.github/workflows/release-artifacts.yml`
@@ -44,6 +45,10 @@ name is provenance only, not an active route.
 Former root sibling-canary script, matrix, and regression moved into
 `mechanics/release-support/parts/public-support-ci-posture/`; the old
 `scripts/` and root `tests/` paths are provenance only.
+
+The validation evidence graph is born part-local. It has no former root
+compatibility path: the serial `scripts/release_check.py` remains the
+completeness oracle until an owner-reviewed gate switch lands.
 
 OS Abyss package artifact bundle validation is part-local to
 `release-audit-publish-helper`; root `scripts/release_check.py` only

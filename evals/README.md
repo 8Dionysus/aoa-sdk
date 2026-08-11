@@ -18,6 +18,8 @@ packets, but they do not become bounded proof by location alone.
 
 ## Current Status
 
-Active. The first owner-local suite covers the Agent OS control-plane G11
-pressure. It keeps deterministic SDK cases separate from fresh-context agent
-observations and routes any portable verdict or proof adoption to `aoa-evals`.
+Active. The first executable owner-local suite covers the Agent OS
+control-plane G11 pressure. A second draft suite designs comparative evidence
+for the validation claim/evidence graph. Both keep local mechanical evidence
+separate from central verdict authority and route any portable proof adoption
+to `aoa-evals`.

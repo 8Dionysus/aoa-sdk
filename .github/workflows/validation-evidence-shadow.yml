@@ -1,0 +1,77 @@
+name: Validation Evidence Shadow
+
+on:
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  validation_evidence_shadow:
+    name: Validation Evidence Shadow
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          fetch-depth: 0
+
+      - name: Check repo-local KAG index family
+        uses: 8Dionysus/aoa-kag/.github/actions/repo-local-kag-index@6a79e62c7d20b6b11406dee78f409ada4a51bb3f
+        with:
+          history-ref: ${{ github.event.pull_request.base.sha || github.event.before || format('{0}^', github.sha) }}
+          event-history-ref: ${{ github.event.pull_request.base.sha || github.event.before || format('{0}^', github.sha) }}
+
+      - name: Fetch routing succession evidence history
+        run: >-
+          git fetch --no-tags origin
+          '+refs/tags/routing-succession-e1-evidence-20260728:refs/tags/routing-succession-e1-evidence-20260728'
+
+      - name: Checkout aoa-stats validator
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/aoa-stats
+          ref: b0ffe46f5cf942d02e20ea5895e8a32a82f85da5
+          path: .aoa-stats-validator
+
+      - name: Checkout abyss-machine verifier
+        uses: actions/checkout@de0fac2e4500dabe0009e67214ff5f5447ce83dd
+        with:
+          repository: 8Dionysus/abyss-machine
+          ref: 7f1b9fcf6f5beca7203f49ffb7ec53d765d1db86
+          path: .abyss-machine-verifier
+
+      - name: Setup Python
+        uses: actions/setup-python@a309ff8b426b58ec0e2a45f0f869d46889d02405
+        with:
+          python-version: "3.12"
+
+      - name: Install dependencies
+        run: python -m pip install -e '.[dev]' build
+
+      - name: Check routing succession G4 evidence
+        run: >-
+          python -m pytest -q
+          mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_g4_evidence.py
+
+      - name: Run validation evidence graph
+        env:
+          ABYSS_MACHINE_REPO_ROOT: .abyss-machine-verifier
+          AOA_STATS_ROOT: .aoa-stats-validator
+        run: |
+          /usr/bin/time -v \
+            -o "$RUNNER_TEMP/validation-evidence-time.txt" \
+            python mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py \
+              --profile full \
+              --receipt "$RUNNER_TEMP/validation-evidence-receipt.json"
+
+      - name: Upload shadow evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: validation-evidence-shadow-${{ github.run_id }}-${{ github.run_attempt }}
+          path: |
+            ${{ runner.temp }}/validation-evidence-receipt.json
+            ${{ runner.temp }}/validation-evidence-time.txt
+          if-no-files-found: warn

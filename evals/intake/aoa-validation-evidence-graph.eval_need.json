@@ -1,0 +1,63 @@
+{
+  "schema_version": "eval_need_v1",
+  "name": "aoa-validation-evidence-graph",
+  "proof_question": "Can an owner-local claim/evidence graph reduce validation critical-path latency without omitting, weakening, misbinding, or falsely reusing any evidence required by the serial full gate?",
+  "origin_need": "AbyssOS sessions repeatedly pay long serial validation and retry costs. The optimization must preserve the full fail-closed proof boundary while comparing DAG, worker, sharding, routing, and reuse methods rather than selecting one by assumption.",
+  "summary": "Compare full serial validation with bounded graph scheduling, pytest worker strategies, static shards, shadow change routing, and exact-identity receipt reuse under no-miss, sufficiency, resource, and real-session constraints.",
+  "object_under_evaluation": "aoa-sdk owner-local validation evidence planner, runner, manifest, receipts, and scheduling candidates",
+  "category": "comparative",
+  "claim_type": "comparative",
+  "baseline_mode": "fixed-baseline",
+  "report_format": "comparative-summary",
+  "verdict_shape": "mixed",
+  "authoring_route": "candidate_evidence_packet",
+  "expected_use_when": [
+    "Selecting a validation scheduler for aoa-sdk without weakening Repo Validation",
+    "Testing the reusable owner-local claim/evidence ABI before any AbyssOS-wide rollout",
+    "Evaluating whether partial change routing or receipt reuse is safe enough to leave shadow mode"
+  ],
+  "blind_spot_notes": [
+    "A local timing win does not prove hosted CI, landing, or end-to-end session benefit.",
+    "A green selected subgraph does not prove no-miss routing until seeded positive and negative changes agree with the full serial oracle.",
+    "A matching commit alone is insufficient for receipt reuse; manifest, command, inputs, environment, and evidence identity must also match.",
+    "The local suite does not grant verdict, scoring, regression, proof doctrine, central adoption, sibling rollout, or publication authority.",
+    "Warm caches, host contention, startup variance, and nested pytest processes can invert scheduler rankings and require interleaved repeated trials."
+  ],
+  "related_eval_refs": [
+    "aoa-bounded-change-quality",
+    "aoa-scope-drift-detection",
+    "aoa-verification-honesty"
+  ],
+  "candidate_evidence_refs": [
+    "evals/suites/aoa-validation-evidence-graph.suite.md",
+    "mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py",
+    "mechanics/release-support/parts/validation-evidence-graph/config/validation_graph.json",
+    "mechanics/release-support/parts/validation-evidence-graph/tests/test_validation_graph.py"
+  ],
+  "source_refs": [
+    "scripts/release_check.py",
+    ".github/workflows/repo-validation.yml",
+    "evals/suites/test_agent_os_control_plane_g11.py"
+  ],
+  "comparison_surface": {
+    "oracle": "the unchanged serial scripts/release_check.py command battery plus its explicit workflow prerequisites",
+    "candidates": [
+      "serial",
+      "two-node ordinary-plus-G11 DAG",
+      "pytest-xdist loadfile with two and four workers",
+      "pytest-xdist test-level load",
+      "duration-balanced static shards",
+      "claim/evidence DAG with dependency-aware fan-in",
+      "shadow path-to-claim routing",
+      "exact-identity same-run receipt reuse"
+    ],
+    "primary_metrics": [
+      "critical-path wall seconds",
+      "CPU seconds",
+      "peak resident plus swap footprint",
+      "evidence no-miss rate",
+      "false-green count",
+      "real-session time to accepted merge"
+    ]
+  }
+}
