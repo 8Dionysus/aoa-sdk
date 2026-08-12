@@ -21,6 +21,7 @@ from .incarnation import (
     assert_agent_incarnation_binding_matches_plan,
     build_agent_incarnation_binding,
     build_agent_incarnation_binding_v2,
+    build_obligation_actor_run_plan,
     load_model_realization_ref,
 )
 from ..contracts.incarnation import (
@@ -63,5 +64,6 @@ __all__ = [
     "assert_agent_incarnation_binding_matches_plan",
     "build_agent_incarnation_binding",
     "build_agent_incarnation_binding_v2",
+    "build_obligation_actor_run_plan",
     "load_model_realization_ref",
 ]

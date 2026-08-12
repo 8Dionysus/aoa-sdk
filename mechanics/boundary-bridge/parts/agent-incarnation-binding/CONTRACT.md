@@ -15,6 +15,10 @@
   provenance, and return-owner fields;
 - rejection of owner drift, unpinned inputs, role mismatch, effect-ceiling
   widening, implicit user config, and false continuation.
+- deterministic compilation of one already-decided obligation actor into a
+  runtime-neutral single-step `RunPlan`, with exact task request, task-local
+  DAG, role, owner inputs, outputs, runtime profile, ABI, checkpoint, rollback,
+  and closeout refs;
 - an owner-subordinate loader that hashes and projects the exact
   `abyss-stack_external_codex_agent_v1` runtime descriptor without selecting a
   model or interpreting its model-admission entries;
@@ -49,6 +53,12 @@ RunPlan
 
 The SDK binds refs; it does not select the model, launch a process, infer a
 model-fit claim, or grant an effect.
+
+The obligation-plan helper is not a second route resolver or playbook owner.
+It accepts only already-selected refs and rejects external effects, empty or
+duplicate outputs, missing request/role/DAG inputs, and runtime/effect
+incompatibility. Domain choreography remains in the task-local DAG and domain
+procedure owner.
 
 ## Stop lines
 

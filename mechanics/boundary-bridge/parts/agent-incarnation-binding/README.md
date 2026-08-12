@@ -23,4 +23,11 @@ and passive role-resolution result plus the content-addressed `aoa-models`
 fit-query result and projection. Historical v1 bindings remain readable, but
 do not satisfy the v2 evidence requirement for a new actor route.
 
+`build_obligation_actor_run_plan` removes the task-local hand assembly that
+previously sat between those already-made owner decisions and incarnation
+binding. It accepts an exact task-local DAG, role, request, owner inputs,
+runtime profile, ABI refs, effect class, outputs, and closeout owners. It emits
+one runtime-neutral `RunPlan`; it does not infer any missing choice and admits
+only bounded read-only or repository-local mutation effects.
+
 See [CONTRACT.md](CONTRACT.md) and [VALIDATION.md](VALIDATION.md).

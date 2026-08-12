@@ -8,7 +8,7 @@ import jsonschema
 import pytest
 from pydantic import ValidationError
 
-from aoa_sdk.contracts.control_plane import ContentRef, ProvenanceRef, RunPlan
+from aoa_sdk.contracts.control_plane import AgentRef, ContentRef, ProvenanceRef, RunPlan
 from aoa_sdk.control_plane import (
     AgentIncarnationBinding,
     AgentIncarnationBindingV2,
@@ -25,6 +25,7 @@ from aoa_sdk.control_plane import (
     assert_agent_incarnation_binding_matches_plan,
     build_agent_incarnation_binding,
     build_agent_incarnation_binding_v2,
+    build_obligation_actor_run_plan,
     load_model_realization_ref,
 )
 from aoa_sdk.runtime_adapters import (
@@ -257,6 +258,110 @@ def _binding_v2(plan: RunPlan) -> AgentIncarnationBindingV2:
         model_fit_projection_ref=_model_fit_projection_ref(),
         provenance=legacy.provenance,
     )
+
+
+def test_obligation_actor_plan_compiler_preserves_exact_owner_inputs() -> None:
+    fixture_plan = _plan()
+    role = AgentRef(
+        agent_id="evaluator",
+        provenance=_ref("aoa-agents", "roles/evaluator/deep.json"),
+    )
+    task_request = _ref("aoa-sdk", "task-local/eval/summon-request.json")
+    task_dag = _ref("aoa-skills", "task-local/eval/dag.json")
+    obligation = _ref("aoa-agents", "task-local/eval/obligation.json")
+    mandate = _ref("aoa-agents", "task-local/eval/mandate.json")
+    fit = _ref("aoa-models", "task-local/eval/model-fit-result.json")
+    workspace = _ref("aoa-evals", "worktree:eval-duty")
+    compiler = _ref("aoa-sdk", "control-plane/obligation-actor-plan-v1")
+    inputs = (
+        task_request,
+        task_dag,
+        obligation,
+        mandate,
+        role.provenance,
+        fit,
+        workspace,
+    )
+
+    plan = build_obligation_actor_run_plan(
+        plan_id="run-plan:eval-duty",
+        correlation_id="correlation:eval-duty",
+        decision_ref=_content_ref(
+            "aoa-sdk",
+            "summon-decision:eval-duty",
+            "urn:aoa-sdk:a2a:summon-result:v4",
+        ),
+        scenario_binding_id="scenario-binding:eval-duty",
+        scenario_id="task-local-dag:eval-duty",
+        task_local_dag_ref=task_dag,
+        role=role,
+        task_request_ref=task_request,
+        input_refs=inputs,
+        expected_output_kinds=("eval-selection",),
+        runtime_profile=fixture_plan.runtime_profile,
+        snapshot_id="plan-snapshot:eval-duty",
+        abi_refs=fixture_plan.snapshot.abi_refs,
+        step_id="execute-eval-duty",
+        effect_class="repo_mutation",
+        producer_owner="aoa-evals",
+        checkpoint_owner=task_dag,
+        rollback_owner=workspace,
+        closeout_owner=compiler,
+        provenance=compiler,
+    )
+
+    assert plan.plan_digest != ZERO_DIGEST
+    assert plan.steps[0].agent_refs == (role,)
+    assert plan.steps[0].input_refs == inputs
+    assert plan.scenario_binding.scenario.provenance == task_dag
+    assert plan.scenario_binding.input_artifact_bindings[0].artifact_ref == task_request
+    assert plan.evidence_requirements[0].producer_owner == "aoa-evals"
+    assert "gpt-5.6-luna" not in plan.model_dump_json()
+    assert "token_budget" not in plan.model_dump_json()
+
+
+def test_obligation_actor_plan_compiler_rejects_selection_or_effect_smuggling() -> None:
+    fixture_plan = _plan()
+    role = AgentRef(
+        agent_id="evaluator",
+        provenance=_ref("aoa-agents", "roles/evaluator/deep.json"),
+    )
+    task_request = _ref("aoa-sdk", "task-local/eval/summon-request.json")
+    task_dag = _ref("aoa-skills", "task-local/eval/dag.json")
+    common = {
+        "plan_id": "run-plan:eval-duty",
+        "correlation_id": "correlation:eval-duty",
+        "decision_ref": _content_ref(
+            "aoa-sdk",
+            "summon-decision:eval-duty",
+            "urn:aoa-sdk:a2a:summon-result:v4",
+        ),
+        "scenario_binding_id": "scenario-binding:eval-duty",
+        "scenario_id": "task-local-dag:eval-duty",
+        "task_local_dag_ref": task_dag,
+        "role": role,
+        "task_request_ref": task_request,
+        "input_refs": (task_request, task_dag, role.provenance),
+        "expected_output_kinds": ("eval-selection",),
+        "runtime_profile": fixture_plan.runtime_profile,
+        "snapshot_id": "plan-snapshot:eval-duty",
+        "abi_refs": fixture_plan.snapshot.abi_refs,
+        "step_id": "execute-eval-duty",
+        "producer_owner": "aoa-evals",
+        "checkpoint_owner": task_dag,
+        "rollback_owner": task_dag,
+        "closeout_owner": task_dag,
+        "provenance": _ref("aoa-sdk", "control-plane/obligation-actor-plan-v1"),
+    }
+
+    with pytest.raises(IncarnationBindingError, match="only bounded"):
+        build_obligation_actor_run_plan(effect_class="external", **common)
+
+    with pytest.raises(IncarnationBindingError, match="non-empty and unique"):
+        build_obligation_actor_run_plan(
+            effect_class="read_only",
+            **(common | {"expected_output_kinds": ("same", "same")}),
+        )
 
 
 def test_binding_matches_exact_plan_and_generated_schema() -> None:
