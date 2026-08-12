@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 14929021,
+  "allowed_tracked_bytes": 20612139,
+  "approved_by": "repository-owner",
+  "base_ref": "b73c8aca9ef5275df0ec9e3e55d446db08823fb2",
+  "changed_generated_bytes": 14929021,
+  "changed_generated_files": 273,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "fc2d0134061a2fc4f64f42c0abadc0f39a5ec6bed1fbc87171a624cd23377ad7",
+  "reason": "Add the reviewed role-first obligation actor plan contract and its owner projections",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20612139,
+  "tracked_bytes_max": 15728640
+}

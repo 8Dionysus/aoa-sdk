@@ -5,11 +5,26 @@ from __future__ import annotations
 import hashlib
 import json
 from pathlib import Path
+from typing import Literal
 
 from ..contracts.control_plane import (
+    ABIRef,
+    AgentRef,
+    CapabilityRef,
+    CheckpointPolicy,
+    CloseoutRequirement,
     ContentRef,
+    EvidenceRequirement,
+    PlanSnapshot,
+    PlanStep,
     ProvenanceRef,
+    RetryPolicy,
+    RollbackPolicy,
     RunPlan,
+    RuntimeProfile,
+    ScenarioArtifactBinding,
+    ScenarioBinding,
+    ScenarioRef,
     assert_plan_snapshot_digest,
     assert_run_plan_digest,
     canonical_digest,
@@ -32,6 +47,185 @@ _ZERO_DIGEST = "sha256:" + "0" * 64
 
 class IncarnationBindingError(AoASDKError, ValueError):
     """One exact owner or plan invariant in an incarnation binding failed."""
+
+
+def _unique_provenance_refs(
+    values: tuple[ProvenanceRef, ...],
+) -> tuple[ProvenanceRef, ...]:
+    """Preserve order while rejecting conflicting owner/path identities."""
+
+    unique: list[ProvenanceRef] = []
+    by_key: dict[tuple[str, str], ProvenanceRef] = {}
+    for value in values:
+        key = (value.owner_repo, value.artifact_ref)
+        existing = by_key.get(key)
+        if existing is not None:
+            if existing != value:
+                raise IncarnationBindingError(
+                    "one owner artifact path has conflicting provenance"
+                )
+            continue
+        by_key[key] = value
+        unique.append(value)
+    return tuple(unique)
+
+
+def build_obligation_actor_run_plan(
+    *,
+    plan_id: str,
+    correlation_id: str,
+    decision_ref: ContentRef,
+    scenario_binding_id: str,
+    scenario_id: str,
+    task_local_dag_ref: ProvenanceRef,
+    role: AgentRef,
+    task_request_ref: ProvenanceRef,
+    input_refs: tuple[ProvenanceRef, ...],
+    expected_output_kinds: tuple[str, ...],
+    runtime_profile: RuntimeProfile,
+    snapshot_id: str,
+    abi_refs: tuple[ABIRef, ...],
+    step_id: str,
+    effect_class: Literal["read_only", "repo_mutation"],
+    producer_owner: str,
+    checkpoint_owner: ProvenanceRef,
+    rollback_owner: ProvenanceRef,
+    closeout_owner: ProvenanceRef,
+    provenance: ProvenanceRef,
+    capability_refs: tuple[CapabilityRef, ...] = (),
+) -> RunPlan:
+    """Compile one already-decided obligation actor into a runtime-neutral plan.
+
+    Every role, model-fit, runtime, workspace, procedure, responsibility, and
+    task-DAG choice remains an exact caller-supplied owner reference.  This
+    helper only removes repeated hand assembly of the SDK plan objects; it does
+    not detect an obligation, select a role/model/runtime, grant an effect, or
+    launch a process.
+    """
+
+    if effect_class not in {"read_only", "repo_mutation"}:
+        raise IncarnationBindingError(
+            "obligation actor plan supports only bounded read_only or repo_mutation effects"
+        )
+    if not expected_output_kinds or len(expected_output_kinds) != len(
+        set(expected_output_kinds)
+    ):
+        raise IncarnationBindingError(
+            "obligation actor expected output identities must be non-empty and unique"
+        )
+    if task_request_ref not in input_refs:
+        raise IncarnationBindingError(
+            "obligation actor task request must be an exact input ref"
+        )
+    if role.provenance not in input_refs:
+        raise IncarnationBindingError(
+            "obligation actor role provenance must be an exact input ref"
+        )
+    if task_local_dag_ref not in input_refs:
+        raise IncarnationBindingError(
+            "obligation actor task-local DAG must be an exact input ref"
+        )
+    if effect_class not in runtime_profile.supported_effect_classes:
+        raise IncarnationBindingError(
+            "selected runtime profile does not support the obligation effect class"
+        )
+
+    snapshot_sources = _unique_provenance_refs(
+        (
+            *input_refs,
+            runtime_profile.provenance,
+            checkpoint_owner,
+            rollback_owner,
+            closeout_owner,
+            provenance,
+        )
+    )
+    scenario = ScenarioBinding(
+        binding_id=scenario_binding_id,
+        correlation_id=correlation_id,
+        scenario=ScenarioRef(
+            scenario_id=scenario_id,
+            provenance=task_local_dag_ref,
+        ),
+        decision_ref=decision_ref,
+        agent_refs=(role,),
+        capability_refs=capability_refs,
+        input_refs=input_refs,
+        input_artifact_bindings=(
+            ScenarioArtifactBinding(
+                artifact_kind="summon_request",
+                artifact_ref=task_request_ref,
+            ),
+        ),
+        expected_artifact_kinds=expected_output_kinds,
+        provenance=provenance,
+    )
+    snapshot = PlanSnapshot(
+        snapshot_id=snapshot_id,
+        source_refs=snapshot_sources,
+        abi_refs=abi_refs,
+        snapshot_digest=_ZERO_DIGEST,
+    )
+    snapshot = snapshot.model_copy(
+        update={
+            "snapshot_digest": canonical_digest(
+                snapshot,
+                exclude={"snapshot_digest"},
+            )
+        }
+    )
+    step = PlanStep(
+        step_id=step_id,
+        operation_kind="inspect" if effect_class == "read_only" else "mutate",
+        effect_class=effect_class,
+        agent_refs=(role,),
+        capability_refs=capability_refs,
+        input_refs=input_refs,
+        expected_output_kinds=expected_output_kinds,
+    )
+    plan = RunPlan(
+        plan_id=plan_id,
+        correlation_id=correlation_id,
+        decision_ref=decision_ref,
+        scenario_binding=scenario,
+        runtime_profile=runtime_profile,
+        snapshot=snapshot,
+        steps=(step,),
+        checkpoint_policy=CheckpointPolicy(
+            owner=checkpoint_owner,
+            required_after_step_ids=(step_id,),
+        ),
+        retry_policy=RetryPolicy(max_attempts=1),
+        rollback_policy=RollbackPolicy(required=False, owner=rollback_owner),
+        evidence_requirements=tuple(
+            EvidenceRequirement(
+                requirement_id=f"output:{name}",
+                artifact_kind=name,
+                producer_owner=producer_owner,
+                required_after_step_id=step_id,
+                terminal_required=True,
+            )
+            for name in expected_output_kinds
+        ),
+        closeout_requirements=(
+            CloseoutRequirement(
+                requirement_id=f"closeout:{plan_id}",
+                owner_ref=closeout_owner,
+                required_ref_kinds=expected_output_kinds
+                + ("external_codex_agent_result",),
+            ),
+        ),
+        plan_digest=_ZERO_DIGEST,
+        provenance=provenance,
+    )
+    return plan.model_copy(
+        update={
+            "plan_digest": canonical_digest(
+                plan,
+                exclude={"plan_digest"},
+            )
+        }
+    )
 
 
 def load_model_realization_ref(
