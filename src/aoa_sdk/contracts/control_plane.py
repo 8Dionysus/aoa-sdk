@@ -13,11 +13,21 @@ import json
 import re
 from collections.abc import Iterable, Mapping
 from datetime import datetime, timezone
-from typing import Annotated, Literal, Protocol, TypeAlias, runtime_checkable
+from typing import (
+    TYPE_CHECKING,
+    Annotated,
+    Literal,
+    Protocol,
+    TypeAlias,
+    runtime_checkable,
+)
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 from ..errors import AoASDKError
+
+if TYPE_CHECKING:
+    from .agent_tool_routing import AgentToolRoutingDecision, AgentToolRoutingIntent
 
 
 CONTROL_PLANE_SCHEMA_VERSION: Literal["aoa_control_plane_v1"] = "aoa_control_plane_v1"
@@ -1565,6 +1575,10 @@ class ControlPlaneProtocol(Protocol):
     """Runtime-neutral C1/C2 control-plane behavior surface."""
 
     def resolve(self, intent: RouteIntent) -> RouteDecision: ...
+
+    def pre_tool_route(
+        self, intent: "AgentToolRoutingIntent"
+    ) -> "AgentToolRoutingDecision": ...
 
     def explain(self, decision: RouteDecision) -> RouteExplanation: ...
 

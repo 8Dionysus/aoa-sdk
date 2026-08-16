@@ -1,0 +1,4 @@
+interface:
+  display_name: "Route Agent-Tool Decisions"
+  short_description: "Pre-tool routing for responsibility boundaries"
+  default_prompt: "Use $aoa-agent-tool-routing before any agent, delegation, collaboration, or sub-agent tool decision."
