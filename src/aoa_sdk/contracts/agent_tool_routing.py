@@ -138,6 +138,10 @@ class AgentToolRoutingIntent(StrictControlPlaneModel):
                 raise ValueError(
                     "independent responsibility result must be owned by aoa-agents"
                 )
+            if self.responsibility_result_ref.schema_version != "agent-obligation-v1":
+                raise ValueError(
+                    "independent responsibility result must use agent-obligation-v1"
+                )
             if self.local_next_route is not None:
                 raise ValueError(
                     "independent responsibility cannot carry a codex-local next route"

@@ -85,6 +85,14 @@ def test_independent_result_stays_with_role_first_owner() -> None:
     assert decision.responsibility_result_ref == result
 
 
+def test_independent_result_requires_exact_obligation_schema() -> None:
+    with pytest.raises(ValidationError, match="agent-obligation-v1"):
+        _intent(
+            boundary="independent",
+            result=_ref("aoa-agents", "obligation:route-proof", "phase-binding-v1"),
+        )
+
+
 def test_local_result_routes_only_to_summon_compatibility_leaf() -> None:
     result = _ref(
         "aoa-agents",
@@ -123,3 +131,13 @@ def test_same_typed_input_produces_same_decision_identity() -> None:
     second = route_agent_tool_decision(_intent())
     assert first == second
     assert first.decision_id == second.decision_id
+
+
+def test_routing_contracts_are_available_from_public_models_module() -> None:
+    from aoa_sdk.models import (
+        AgentToolRoutingDecision as PublicDecision,
+        AgentToolRoutingIntent as PublicIntent,
+    )
+
+    assert PublicIntent is AgentToolRoutingIntent
+    assert PublicDecision.__name__ == "AgentToolRoutingDecision"
