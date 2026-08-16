@@ -5,6 +5,11 @@ stays behind external adapter boundaries.
 """
 
 from .api import ControlPlaneAPI
+from .agent_tool_routing import (
+    AGENT_TOOL_ROUTING_RESOLVER_VERSION,
+    default_agent_tool_routing_provenance,
+    route_agent_tool_decision,
+)
 from .evidence_chain import (
     EvidenceChainError,
     EvidenceChainRepository,
@@ -41,6 +46,9 @@ from ..contracts.incarnation import (
 __all__ = [
     "AoARunner",
     "ControlPlaneAPI",
+    "AGENT_TOOL_ROUTING_RESOLVER_VERSION",
+    "default_agent_tool_routing_provenance",
+    "route_agent_tool_decision",
     "EvidenceChainError",
     "EvidenceChainRepository",
     "AGENT_INCARNATION_BINDING_VERSION",

@@ -97,6 +97,10 @@ from .contracts.control_plane import (
     SessionHandle,
     StartCommand,
 )
+from .contracts.agent_tool_routing import (
+    AgentToolRoutingDecision,
+    AgentToolRoutingIntent,
+)
 from .contracts.evidence_chain import (
     CheckpointReceiptRef,
     EvidenceChain,
@@ -359,6 +363,8 @@ __all__ = [
     "CommandReceipt",
     "ContentRef",
     "ControlPlaneProtocol",
+    "AgentToolRoutingDecision",
+    "AgentToolRoutingIntent",
     "EvalRequirement",
     "EvalVerdictRef",
     "EvidenceBundleRef",

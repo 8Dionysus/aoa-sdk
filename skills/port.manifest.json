@@ -5,6 +5,14 @@
   "owner_ref": "AGENTS.md",
   "bundles": [
     {
+      "name": "aoa-agent-tool-routing",
+      "path": "skills/aoa-agent-tool-routing",
+      "version": "0.1.0",
+      "lifecycle": "admitted",
+      "visibility": "advertised",
+      "admission_ref": "docs/decisions/AOA-SDK-D-0100-pre-tool-agent-routing-owner.md"
+    },
+    {
       "name": "titan-console",
       "path": "skills/titan-console",
       "version": "0.1.2",
@@ -35,6 +43,7 @@
     "profile": "os-user-default",
     "mode": "profile-selected",
     "skills": [
+      "aoa-agent-tool-routing",
       "titan-console",
       "titan-appserver-bridge",
       "titan-memory-loom"

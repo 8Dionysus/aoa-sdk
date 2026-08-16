@@ -4,6 +4,10 @@ from __future__ import annotations
 
 from pathlib import Path
 
+from ..contracts.agent_tool_routing import (
+    AgentToolRoutingDecision,
+    AgentToolRoutingIntent,
+)
 from ..contracts.control_plane import (
     ProvenanceRef,
     RouteDecision,
@@ -25,6 +29,7 @@ from .planning import (
     resolve_scenario_ref,
 )
 from .routing.resolver import explain_route_decision, resolve_route_intent
+from .agent_tool_routing import route_agent_tool_decision
 from .routing.snapshot import (
     RoutingResolutionSnapshot,
     load_routing_resolution_snapshot,
@@ -49,6 +54,13 @@ class ControlPlaneAPI:
 
     def resolve(self, intent: RouteIntent) -> RouteDecision:
         return resolve_route_intent(intent, self.snapshot())
+
+    def pre_tool_route(
+        self, intent: AgentToolRoutingIntent
+    ) -> AgentToolRoutingDecision:
+        """Route one agent-tool boundary to its owner without invocation."""
+
+        return route_agent_tool_decision(intent)
 
     def explain(self, decision: RouteDecision) -> RouteExplanation:
         return explain_route_decision(decision)

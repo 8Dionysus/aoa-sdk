@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 15172002,
+  "allowed_tracked_bytes": 20687028,
+  "approved_by": "repository-owner",
+  "base_ref": "d364da5c76cdd54e88f68c03ca49964fd3f86313",
+  "changed_generated_bytes": 15172002,
+  "changed_generated_files": 278,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "d267262261405373839d4be2cb7d12a69305ddf537420f1a5dcee2e900e126c2",
+  "reason": "Close the SDK public routing-contract validation defect while retaining the typed pre-tool owner route.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20687028,
+  "tracked_bytes_max": 15728640
+}
