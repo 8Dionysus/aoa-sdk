@@ -32,7 +32,7 @@ from ..models import (
 )
 from ..surfaces import SurfacesAPI
 from ..workspace.discovery import Workspace
-from ..workspace.roots import KNOWN_REPOS
+from ..workspace.roots import OWNER_MUTABLE_REPOS
 from .closeout.context import (
     _closeout_candidate_clusters,
     _collect_candidate_lineage_hints,
@@ -163,7 +163,6 @@ CHECKPOINT_KINDS = (
     "owner_followthrough",
 )
 POST_COMMIT_CHECKPOINT_KINDS = ("auto", "commit", "owner_followthrough")
-OWNER_MUTABLE_REPOS = tuple(repo for repo in KNOWN_REPOS if repo != "8Dionysus")
 PROMOTION_TARGETS = ("dionysus-note", "harvest-handoff")
 
 
