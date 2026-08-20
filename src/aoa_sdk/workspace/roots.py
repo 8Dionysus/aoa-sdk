@@ -9,6 +9,7 @@ KNOWN_REPOS = (
     "aoa-evals",
     "aoa-kag",
     "aoa-stats",
+    "aoa-dashboard",
     "aoa-techniques",
     "Agents-of-Abyss",
     "Tree-of-Sophia",
@@ -34,6 +35,7 @@ WORKSPACE_REQUIRED_REPOS = (
 
 WORKSPACE_OPTIONAL_REPOS = (
     "aoa-routing",
+    "aoa-dashboard",
     "abyss-stack",
 )
 
