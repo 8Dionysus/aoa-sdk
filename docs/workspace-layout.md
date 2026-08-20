@@ -18,6 +18,9 @@ The current manifest expresses five things:
 - the expected federation root is the parent of the `aoa-sdk` checkout
 - additional source checkouts may exist under `~/src`
 - `abyss-stack` should prefer `~/src/abyss-stack`
+- `aoa-dashboard` is an optional source checkout for the derived Goal
+  Space/operator organ; discovery does not grant its access, runtime
+  admission, release publication, or checkpoint mutation authority
 - C1 route resolution reads the explicit deployed SDK-canonical routing bundle
   under the `abyss-stack` runtime mirror
 - organ discovery reads exactly one OS-private registry source under the

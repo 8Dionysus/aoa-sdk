@@ -15,12 +15,9 @@ from typing import Any, Literal
 from pydantic import BaseModel, Field
 
 from ..workspace.discovery import Workspace
-from ..workspace.roots import KNOWN_REPOS
+from ..workspace.roots import OWNER_RELEASE_REPOS
 
 NON_PUBLISHING_REPOS = ("8Dionysus", "aoa-routing")
-OWNER_RELEASE_REPOS = tuple(
-    repo for repo in KNOWN_REPOS if repo not in NON_PUBLISHING_REPOS
-)
 README_BANNER_TEMPLATE = "> Current release: `{tag}`. See [CHANGELOG](CHANGELOG.md) for release notes."
 PUBLIC_SURFACE_PREFIXES = ("docs/", "generated/", "schemas/", ".github/workflows/")
 PUBLIC_SURFACE_FILES = {"README.md", "CHANGELOG.md", "pyproject.toml", "package.json"}

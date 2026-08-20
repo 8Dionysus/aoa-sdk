@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 3262665,
+  "allowed_tracked_bytes": 20690652,
+  "approved_by": "repository-owner",
+  "base_ref": "81bd03a94eaa9b576a4f2da91c57041fcc945f58",
+  "changed_generated_bytes": 3262665,
+  "changed_generated_files": 58,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "cf0f2936a3dba6871605420a395e7214cbb14df92e01139da5058591779611f5",
+  "reason": "Register the bounded aoa-dashboard workspace organ in the SDK source topology and refresh the digest-bound portable family.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20690652,
+  "tracked_bytes_max": 15728640
+}

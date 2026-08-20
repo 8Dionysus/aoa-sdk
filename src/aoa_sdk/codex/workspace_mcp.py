@@ -90,6 +90,11 @@ REPO_HINTS: dict[str, dict[str, Any]] = {
         "surface": "summary catalogs and derived observability views",
         "entry_candidates": ["generated/summary_surface_catalog.min.json", "README.md"],
     },
+    "aoa-dashboard": {
+        "role": "goal-space-derived-organ",
+        "surface": "owner-bounded Goal Space/operator read model and non-executing annotations",
+        "entry_candidates": ["README.md", "docs/ORGAN_CONTRACT.md", "docs/BOUNDARIES.md"],
+    },
     "aoa-techniques": {
         "role": "technique-canon",
         "surface": "technique references and promotion-readiness surfaces",

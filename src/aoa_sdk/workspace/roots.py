@@ -9,6 +9,7 @@ KNOWN_REPOS = (
     "aoa-evals",
     "aoa-kag",
     "aoa-stats",
+    "aoa-dashboard",
     "aoa-techniques",
     "Agents-of-Abyss",
     "Tree-of-Sophia",
@@ -34,6 +35,43 @@ WORKSPACE_REQUIRED_REPOS = (
 
 WORKSPACE_OPTIONAL_REPOS = (
     "aoa-routing",
+    "aoa-dashboard",
+    "abyss-stack",
+)
+
+# Discovery membership is deliberately not mutation authority. Keep these
+# owner sets explicit so a newly discovered optional organ cannot become a
+# release or checkpoint target by being added to KNOWN_REPOS.
+OWNER_MUTABLE_REPOS = (
+    "aoa-sdk",
+    "aoa-routing",
+    "aoa-skills",
+    "aoa-agents",
+    "aoa-playbooks",
+    "aoa-memo",
+    "aoa-evals",
+    "aoa-kag",
+    "aoa-stats",
+    "aoa-techniques",
+    "Agents-of-Abyss",
+    "Tree-of-Sophia",
+    "Dionysus",
+    "abyss-stack",
+)
+
+OWNER_RELEASE_REPOS = (
+    "aoa-sdk",
+    "aoa-skills",
+    "aoa-agents",
+    "aoa-playbooks",
+    "aoa-memo",
+    "aoa-evals",
+    "aoa-kag",
+    "aoa-stats",
+    "aoa-techniques",
+    "Agents-of-Abyss",
+    "Tree-of-Sophia",
+    "Dionysus",
     "abyss-stack",
 )
 

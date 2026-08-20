@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 7469824,
+  "allowed_tracked_bytes": 20692527,
+  "approved_by": "repository-owner",
+  "base_ref": "81bd03a94eaa9b576a4f2da91c57041fcc945f58",
+  "changed_generated_bytes": 7469824,
+  "changed_generated_files": 135,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "808673445ea7df8d83bc70b8e4a50e4d45403064dcb5d4e6ff6a362ce3fd4f94",
+  "reason": "D1 dashboard discovery authority source-topology refresh after owner validation",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20692527,
+  "tracked_bytes_max": 15728640
+}

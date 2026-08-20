@@ -16,6 +16,10 @@ notes = "Use the git checkout for source work. The /srv path is a deployed runti
 role = "sdk_checkout"
 notes = "This repository is expected to live inside the local AoA federation workspace."
 
+[repos.aoa-dashboard]
+role = "goal-space-derived-organ"
+notes = "Optional derived Goal Space/operator organ; source identity does not imply private registry admission or runtime deployment."
+
 [control_plane]
 routing_bundle_root = "{workspace_parent}/abyss-stack/Knowledge/federation/aoa-routing"
 

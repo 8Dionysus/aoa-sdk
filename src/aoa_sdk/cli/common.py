@@ -14,10 +14,10 @@ from ..models import (
     SurfaceDetectionReport,
 )
 from ..workspace.discovery import Workspace
-from ..workspace.roots import KNOWN_REPOS
+from ..workspace.roots import KNOWN_REPOS, OWNER_MUTABLE_REPOS
 
 
-OWNER_CHECKPOINT_HOOK_REPOS = tuple(repo for repo in KNOWN_REPOS if repo != "8Dionysus")
+OWNER_CHECKPOINT_HOOK_REPOS = OWNER_MUTABLE_REPOS
 CheckpointManagedHookName: TypeAlias = Literal["post-commit", "pre-push", "pre-merge-commit"]
 CHECKPOINT_MANAGED_HOOKS: tuple[CheckpointManagedHookName, ...] = (
     "post-commit",

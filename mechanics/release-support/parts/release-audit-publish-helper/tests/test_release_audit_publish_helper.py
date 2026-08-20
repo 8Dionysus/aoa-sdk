@@ -26,6 +26,7 @@ from aoa_sdk.release.api import (
     validate_release_body,
 )
 from aoa_sdk.workspace.discovery import Workspace
+from aoa_sdk.workspace.roots import KNOWN_REPOS, WORKSPACE_OPTIONAL_REPOS
 
 
 def _repo_root() -> Path:
@@ -499,6 +500,17 @@ def test_aoa_routing_is_excluded_from_active_release_selection(
             repo="aoa-routing",
             include_all=False,
         )
+
+
+def test_dashboard_discovery_does_not_grant_mutation_authority() -> None:
+    from aoa_sdk.cli.common import OWNER_CHECKPOINT_HOOK_REPOS
+    from aoa_sdk.workspace.roots import OWNER_MUTABLE_REPOS
+
+    assert "aoa-dashboard" in KNOWN_REPOS
+    assert "aoa-dashboard" in WORKSPACE_OPTIONAL_REPOS
+    assert "aoa-dashboard" not in OWNER_MUTABLE_REPOS
+    assert "aoa-dashboard" not in OWNER_CHECKPOINT_HOOK_REPOS
+    assert "aoa-dashboard" not in OWNER_RELEASE_REPOS
 
 
 def test_routing_g5_canonical_check_rejects_input_lock_substitutions() -> None:
