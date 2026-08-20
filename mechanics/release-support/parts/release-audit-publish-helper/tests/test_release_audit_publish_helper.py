@@ -503,8 +503,8 @@ def test_aoa_routing_is_excluded_from_active_release_selection(
 
 
 def test_dashboard_discovery_does_not_grant_mutation_authority() -> None:
-    from aoa_sdk.checkpoints.registry import OWNER_MUTABLE_REPOS
     from aoa_sdk.cli.common import OWNER_CHECKPOINT_HOOK_REPOS
+    from aoa_sdk.workspace.roots import OWNER_MUTABLE_REPOS
 
     assert "aoa-dashboard" in KNOWN_REPOS
     assert "aoa-dashboard" in WORKSPACE_OPTIONAL_REPOS

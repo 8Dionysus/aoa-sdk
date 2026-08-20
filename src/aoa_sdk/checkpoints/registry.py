@@ -32,7 +32,6 @@ from ..models import (
 )
 from ..surfaces import SurfacesAPI
 from ..workspace.discovery import Workspace
-from ..workspace.roots import OWNER_MUTABLE_REPOS
 from .closeout.context import (
     _closeout_candidate_clusters,
     _collect_candidate_lineage_hints,
