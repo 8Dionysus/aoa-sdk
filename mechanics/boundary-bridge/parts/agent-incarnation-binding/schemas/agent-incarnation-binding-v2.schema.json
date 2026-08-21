@@ -227,6 +227,35 @@
       "title": "IncarnationPermissionPosture",
       "type": "object"
     },
+    "IncarnationRuntimeSubject": {
+      "additionalProperties": false,
+      "description": "Exact content-addressed runtime package admitted by the model owner.",
+      "properties": {
+        "digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Digest",
+          "type": "string"
+        },
+        "kind": {
+          "minLength": 1,
+          "pattern": "^[a-z][a-z0-9._-]*$",
+          "title": "Kind",
+          "type": "string"
+        },
+        "source": {
+          "minLength": 1,
+          "title": "Source",
+          "type": "string"
+        }
+      },
+      "required": [
+        "kind",
+        "source",
+        "digest"
+      ],
+      "title": "IncarnationRuntimeSubject",
+      "type": "object"
+    },
     "IncarnationStopCondition": {
       "additionalProperties": false,
       "properties": {
@@ -570,6 +599,9 @@
     "runtime_profile_ref": {
       "$ref": "#/$defs/ProvenanceRef"
     },
+    "runtime_subject": {
+      "$ref": "#/$defs/IncarnationRuntimeSubject"
+    },
     "schema_version": {
       "const": "aoa_agent_incarnation_binding_v2",
       "default": "aoa_agent_incarnation_binding_v2",
@@ -631,7 +663,8 @@
     "actor_mandate_ref",
     "role_resolution_ref",
     "model_fit_query_result_ref",
-    "model_fit_projection_ref"
+    "model_fit_projection_ref",
+    "runtime_subject"
   ],
   "title": "AgentIncarnationBindingV2",
   "type": "object"

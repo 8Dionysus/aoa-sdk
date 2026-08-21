@@ -5,7 +5,8 @@
 - byte-compatible `aoa_agent_incarnation_binding_v1` historical-read shape;
 - required `aoa_agent_incarnation_binding_v2` obligation, mandate,
   role-resolution, fit-query-result, fit-projection, realization, runtime, and
-  canonical-digest chain for new external actors;
+  exact content-addressed runtime-subject canonical-digest chain for new
+  external actors;
 - exact cross-object validation against one `RunPlan`;
 - validation of the plan snapshot and plan canonical digest before the
   incarnation can rely on its plan ref;
@@ -43,6 +44,7 @@ RunPlan
   + exact task request
   + exact role contract
   + exact model realization
+  + exact content-addressed runtime subject
   + exact runtime/tool profile
   + exact workspace source
   + bounded permission plus observe-only metering, stop and wake policies

@@ -34,6 +34,7 @@ from ..contracts.incarnation import (
     AgentIncarnationBindingV2,
     ContinuationObligation,
     IncarnationPermissionPosture,
+    IncarnationRuntimeSubject,
     IncarnationStopCondition,
     IncarnationToolProfile,
     IncarnationUsageMetering,
@@ -354,6 +355,7 @@ def build_agent_incarnation_binding_v2(
     role_resolution_ref: ContentRef,
     model_fit_query_result_ref: ContentRef,
     model_fit_projection_ref: ProvenanceRef,
+    runtime_subject: IncarnationRuntimeSubject,
     provenance: ProvenanceRef,
 ) -> AgentIncarnationBindingV2:
     """Build a new evidence-complete binding without weakening v1 receipts."""
@@ -387,6 +389,7 @@ def build_agent_incarnation_binding_v2(
             "role_resolution_ref": role_resolution_ref,
             "model_fit_query_result_ref": model_fit_query_result_ref,
             "model_fit_projection_ref": model_fit_projection_ref,
+            "runtime_subject": runtime_subject,
             "binding_digest": _ZERO_DIGEST,
         }
     )
