@@ -117,6 +117,10 @@ def test_compatibility_report_includes_versioned_and_unversioned_surfaces(worksp
     assert report["Dionysus.interview_session.schema"].compatible is True
     assert report["Dionysus.portrait_claim.schema"].compatible is True
     assert report["8Dionysus.public_route_map.min"].compatible is True
+    assert (
+        report["8Dionysus.public_route_map.min"].detected_version
+        == "8dionysus_public_route_map_v3"
+    )
     assert report["Agents-of-Abyss.center_entry_map.min"].compatible is True
     assert report["Tree-of-Sophia.root_entry_map.min"].compatible is True
     assert (
@@ -459,6 +463,35 @@ def test_center_entry_map_current_v2_is_compatible(workspace_root: Path) -> None
 
     assert report.compatible is True
     assert report.detected_version == "aoa_center_entry_map_v2"
+
+
+def test_public_route_map_v2_remains_compatible(workspace_root: Path) -> None:
+    target = workspace_root / "8Dionysus" / "generated" / "public_route_map.min.json"
+    target.write_text(
+        json.dumps({"schema_version": "8dionysus_public_route_map_v2"}) + "\n",
+        encoding="utf-8",
+    )
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.compatibility.check("8Dionysus.public_route_map.min")
+
+    assert report.compatible is True
+    assert report.detected_version == "8dionysus_public_route_map_v2"
+
+
+def test_public_route_map_requires_the_declared_route_shape(workspace_root: Path) -> None:
+    target = workspace_root / "8Dionysus" / "generated" / "public_route_map.min.json"
+    payload = json.loads(target.read_text(encoding="utf-8"))
+    payload.pop("routes")
+    target.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+
+    report = sdk.compatibility.check("8Dionysus.public_route_map.min")
+
+    assert report.compatible is False
+    assert "routes" in report.reason
 
 
 def test_assert_compatible_raises_on_version_mismatch(workspace_root: Path) -> None:

@@ -151,6 +151,7 @@
 ## compatibility drift
 
 - [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) (`docs/decisions/AOA-SDK-D-0031-public-support-sibling-canary-localization.md`)
+- [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
 
 ## consumer-zero
 
@@ -772,6 +773,7 @@
 ## source-owner boundary
 
 - [AOA-SDK-D-0025 - Consumed Surface Posture Gate Test Localization](../AOA-SDK-D-0025-consumed-surface-posture-gate-test-localization.md) (`docs/decisions/AOA-SDK-D-0025-consumed-surface-posture-gate-test-localization.md`)
+- [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
 
 ## stop-line discipline
 

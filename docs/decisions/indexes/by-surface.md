@@ -120,6 +120,7 @@
 ## ci
 
 - [AOA-SDK-D-0031 - Public Support Sibling Canary Localization](../AOA-SDK-D-0031-public-support-sibling-canary-localization.md) (`docs/decisions/AOA-SDK-D-0031-public-support-sibling-canary-localization.md`)
+- [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
 
 ## CI
 
@@ -161,6 +162,7 @@
 - [AOA-SDK-D-0071 - Stage Routing Producer Succession Into the SDK Control Plane](../AOA-SDK-D-0071-staged-routing-producer-succession.md) (`docs/decisions/AOA-SDK-D-0071-staged-routing-producer-succession.md`)
 - [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 - [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
+- [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
 
 ## compatibility accounting
 
@@ -398,6 +400,10 @@
 ## owner skill home
 
 - [AOA-SDK-D-0070 - Admit the Titan Helper Skill Family](../AOA-SDK-D-0070-titan-owner-skill-family.md) (`docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md`)
+
+## owner-boundary
+
+- [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
 
 ## ownership
 

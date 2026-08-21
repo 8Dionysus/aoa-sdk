@@ -79,6 +79,7 @@
 - [AOA-SDK-D-0099 - Compile obligation actor plans without selecting meaning](../AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md) (`docs/decisions/AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md`)
 - [AOA-SDK-D-0100 - SDK Pre-Tool Agent Routing Owner](../AOA-SDK-D-0100-pre-tool-agent-routing-owner.md) (`docs/decisions/AOA-SDK-D-0100-pre-tool-agent-routing-owner.md`)
 - [AOA-SDK-D-0101 - Bind the exact runtime subject in incarnation v2](../AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md`)
+- [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
 
 ## checkpoint
 
@@ -186,6 +187,7 @@
 - [AOA-SDK-D-0076 - Authorize the Receipt-bound Routing G5 Owner Switch](../AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md) (`docs/decisions/AOA-SDK-D-0076-authorize-receipt-bound-routing-g5-owner-switch.md`)
 - [AOA-SDK-D-0097 - Use a bounded claim/evidence DAG for full validation](../AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md) (`docs/decisions/AOA-SDK-D-0097-use-bounded-claim-evidence-dag-for-full-validation.md`)
 - [AOA-SDK-D-0098 - Export the reference validation scheduler with an explicit owner root](../AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md) (`docs/decisions/AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md`)
+- [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
 
 ## rpg
 

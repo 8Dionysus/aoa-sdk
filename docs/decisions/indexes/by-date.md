@@ -153,3 +153,7 @@
 ## 2026-08-20
 
 - [AOA-SDK-D-0101 - Bind the exact runtime subject in incarnation v2](../AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md`)
+
+## 2026-08-21
+
+- [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
