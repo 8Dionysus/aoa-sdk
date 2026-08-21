@@ -8,7 +8,7 @@ compatibility meaning or runtime truth into the central organ.
 
 | Measurement | Question | Reference value |
 | --- | --- | --- |
-| `aoa-sdk/federation-compatibility-version-negotiation-ratio` | What fraction of current federation compatibility rules declare explicit version negotiation? | `67 / 70` at policy blob revision `d3bd79db2e9fc3ab78296855d00a25ba4b5ededf` |
+| `aoa-sdk/federation-compatibility-version-negotiation-ratio` | What fraction of current federation compatibility rules declare explicit version negotiation? | `67 / 70` at policy blob revision `ecaf42d73aa655c896b3b0ceb1231e085e71e083` |
 
 The reference packet is a census of `SURFACE_COMPATIBILITY_RULES` in
 `src/aoa_sdk/compatibility/policy.py`. The three current strict-shape,

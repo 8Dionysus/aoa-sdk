@@ -4,15 +4,15 @@
   "contract_version": "1.0.0",
   "measurement_id": "aoa-sdk/federation-compatibility-version-negotiation-ratio",
   "writer_repo": "aoa-sdk",
-  "observation_id": "aoa-sdk:federation-compatibility-version-negotiation-ratio:d3bd79db2e9fc3ab",
-  "observed_at": "2026-07-29T04:14:31-06:00",
+  "observation_id": "aoa-sdk:federation-compatibility-version-negotiation-ratio:ecaf42d73aa655c8",
+  "observed_at": "2026-08-21T05:27:35-06:00",
   "object_ref": {
     "kind": "federation-compatibility-rule",
-    "id": "surface-compatibility-rules:d3bd79db2e9fc3ab",
-    "version": "git-blob:d3bd79db2e9fc3ab78296855d00a25ba4b5ededf"
+    "id": "surface-compatibility-rules:ecaf42d73aa655c8",
+    "version": "git-blob:ecaf42d73aa655c896b3b0ceb1231e085e71e083"
   },
   "population": {
-    "id": "current-federation-compatibility-rules:d3bd79db2e9fc3ab",
+    "id": "current-federation-compatibility-rules:ecaf42d73aa655c8",
     "definition_ref": "stats/port.manifest.json#/measurements/0/population",
     "size": 70
   },
@@ -22,9 +22,9 @@
   },
   "cohort": null,
   "window": {
-    "id": "policy-blob:d3bd79db2e9fc3ab78296855d00a25ba4b5ededf",
-    "start": "2026-07-29T04:14:31-06:00",
-    "end": "2026-07-29T04:14:31-06:00",
+    "id": "policy-blob:ecaf42d73aa655c896b3b0ceb1231e085e71e083",
+    "start": "2026-08-21T05:27:35-06:00",
+    "end": "2026-08-21T05:27:35-06:00",
     "temporality": "instant"
   },
   "dimensions": {},
@@ -54,7 +54,7 @@
       }
     ],
     "derivation_ref": "stats/README.md#current-reference-measurement",
-    "source_revision": "git-blob:d3bd79db2e9fc3ab78296855d00a25ba4b5ededf"
+    "source_revision": "git-blob:ecaf42d73aa655c896b3b0ceb1231e085e71e083"
   },
   "reporting_rule": {
     "id": "aoa-sdk/federation-compatibility-version-negotiation-ratio/reference-census",

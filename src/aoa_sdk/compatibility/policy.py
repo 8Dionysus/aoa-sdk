@@ -97,7 +97,19 @@ SURFACE_COMPATIBILITY_RULES = {
         repo="8Dionysus",
         relative_path="generated/public_route_map.min.json",
         version_field="schema_version",
-        supported_versions=["8dionysus_public_route_map_v2"],
+        supported_versions=[
+            "8dionysus_public_route_map_v2",
+            "8dionysus_public_route_map_v3",
+        ],
+        required_top_level_keys=[
+            "schema_ref",
+            "owner_repo",
+            "surface_kind",
+            "authority_ref",
+            "posture",
+            "validation_refs",
+            "routes",
+        ],
     ),
     "Agents-of-Abyss.center_entry_map.min": SurfaceCompatibilityRule(
         surface_id="Agents-of-Abyss.center_entry_map.min",
