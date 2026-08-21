@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 15101623,
+  "allowed_tracked_bytes": 20727779,
+  "approved_by": "repository-owner",
+  "base_ref": "9d20bc541e6f530b1131ce1c1f36a394dfa2eea7",
+  "changed_generated_bytes": 15101623,
+  "changed_generated_files": 276,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "f579db92bc2ea83abf73ff37623f8fabdc1c2cab801ce10bd3590fde9847664f",
+  "reason": "Bind the exact content-addressed runtime subject in incarnation v2 while inheriting the current main owner-family corpus size; this receipt admits only the exact tracked family and measured deterministic delta against PR base without raising standing budgets.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20727779,
+  "tracked_bytes_max": 15728640
+}
