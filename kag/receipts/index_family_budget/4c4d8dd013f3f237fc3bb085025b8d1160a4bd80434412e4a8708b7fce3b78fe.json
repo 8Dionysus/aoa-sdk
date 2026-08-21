@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 15093226,
+  "allowed_tracked_bytes": 20762930,
+  "approved_by": "repository-owner",
+  "base_ref": "8a349e5f8ae0d60f840378a91ecea3d101777de0",
+  "changed_generated_bytes": 15093226,
+  "changed_generated_files": 275,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "4c4d8dd013f3f237fc3bb085025b8d1160a4bd80434412e4a8708b7fce3b78fe",
+  "reason": "Refresh the owner-local portable KAG family after preserving legacy 8Dionysus route map v2 compatibility; this receipt accepts only the measured deterministic generated delta and tracked-size exceedance and does not claim sibling semantics, canary acceptance, or completion.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20762930,
+  "tracked_bytes_max": 15728640
+}
