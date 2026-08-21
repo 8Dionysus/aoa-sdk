@@ -111,6 +111,14 @@ class IncarnationUsageMetering(StrictControlPlaneModel):
         return self
 
 
+class IncarnationRuntimeSubject(StrictControlPlaneModel):
+    """Exact content-addressed runtime package admitted by the model owner."""
+
+    kind: str = Field(min_length=1, pattern=r"^[a-z][a-z0-9._-]*$")
+    source: NonEmptyStr
+    digest: Digest
+
+
 class IncarnationStopCondition(StrictControlPlaneModel):
     condition_id: NonEmptyStr
     kind: Literal[
@@ -273,6 +281,7 @@ class AgentIncarnationBindingV2(_AgentIncarnationBindingBase):
     role_resolution_ref: ContentRef
     model_fit_query_result_ref: ContentRef
     model_fit_projection_ref: ProvenanceRef
+    runtime_subject: IncarnationRuntimeSubject
 
     @model_validator(mode="after")
     def validate_obligation_and_fit_evidence(self) -> AgentIncarnationBindingV2:

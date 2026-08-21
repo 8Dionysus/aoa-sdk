@@ -20,8 +20,11 @@ an event, not an automatic order to wake the parent.
 `AgentIncarnationBindingV2` is the evidence-complete contract for new external
 actors. It additionally binds the exact `aoa-agents` obligation, actor mandate,
 and passive role-resolution result plus the content-addressed `aoa-models`
-fit-query result and projection. Historical v1 bindings remain readable, but
-do not satisfy the v2 evidence requirement for a new actor route.
+fit-query result and projection. It also carries the exact content-addressed
+runtime subject selected by that query; the subject participates in the
+binding digest so a mutable executable path cannot substitute package
+identity. Historical v1 bindings remain readable, but do not satisfy the v2
+evidence requirement for a new actor route.
 
 `build_obligation_actor_run_plan` removes the task-local hand assembly that
 previously sat between those already-made owner decisions and incarnation

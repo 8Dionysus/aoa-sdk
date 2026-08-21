@@ -15,6 +15,7 @@ from aoa_sdk.control_plane import (
     ContinuationObligation,
     IncarnationBindingError,
     IncarnationPermissionPosture,
+    IncarnationRuntimeSubject,
     IncarnationStopCondition,
     IncarnationToolProfile,
     IncarnationUsageMetering,
@@ -256,6 +257,14 @@ def _binding_v2(plan: RunPlan) -> AgentIncarnationBindingV2:
             "aoa_model_fit_query_result_v2",
         ),
         model_fit_projection_ref=_model_fit_projection_ref(),
+        runtime_subject=IncarnationRuntimeSubject(
+            kind="content_addressed_runtime_package",
+            source=(
+                "codex-cli-standalone/"
+                "x86_64-unknown-linux-musl+codex-code-mode-host"
+            ),
+            digest="sha256:" + "3" * 64,
+        ),
         provenance=legacy.provenance,
     )
 
@@ -392,6 +401,8 @@ def test_v2_binding_requires_complete_obligation_and_model_fit_chain() -> None:
         == "aoa_model_fit_query_result_v2"
     )
     assert binding.model_fit_projection_ref.owner_repo == "aoa-models"
+    assert binding.runtime_subject.kind == "content_addressed_runtime_package"
+    assert binding.runtime_subject.digest == "sha256:" + "3" * 64
     assert_agent_incarnation_binding_digest(binding)
     schema = json.loads(SCHEMA_V2_PATH.read_text(encoding="utf-8"))
     jsonschema.Draft202012Validator(schema).validate(binding.model_dump(mode="json"))
@@ -444,6 +455,36 @@ def test_v2_binding_rejects_projection_from_another_model_source() -> None:
         AgentIncarnationBindingV2.model_validate(
             binding.model_dump(mode="python") | {"model_fit_projection_ref": drifted}
         )
+
+
+def test_v2_binding_requires_a_strict_runtime_subject() -> None:
+    binding = _binding_v2(_plan())
+
+    with pytest.raises(ValidationError, match="String should match pattern"):
+        AgentIncarnationBindingV2.model_validate(
+            binding.model_dump(mode="python")
+            | {
+                "runtime_subject": {
+                    "kind": "Content Addressed Runtime",
+                    "source": "codex-cli-standalone/current",
+                    "digest": "sha256:" + "4" * 64,
+                }
+            }
+        )
+
+
+def test_v2_runtime_subject_is_covered_by_binding_digest() -> None:
+    binding = _binding_v2(_plan())
+    tampered = binding.model_copy(
+        update={
+            "runtime_subject": binding.runtime_subject.model_copy(
+                update={"digest": "sha256:" + "4" * 64}
+            )
+        }
+    )
+
+    with pytest.raises(IncarnationBindingError, match="digest mismatch"):
+        assert_agent_incarnation_binding_digest(tampered)
 
 
 def test_metering_cannot_omit_a_runtime_dimension() -> None:
