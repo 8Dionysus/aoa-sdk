@@ -131,6 +131,10 @@ class SurfaceCompatibilityRule(BaseModel):
     expected_json_kind: Literal["object", "array", "any"] = "object"
     required_top_level_keys: list[str] = Field(default_factory=list)
     required_top_level_object_keys: list[str] = Field(default_factory=list)
+    required_top_level_keys_by_version: dict[int | str, list[str]] = Field(default_factory=dict)
+    required_top_level_object_keys_by_version: dict[int | str, list[str]] = Field(
+        default_factory=dict
+    )
     notes: str = ""
 
 

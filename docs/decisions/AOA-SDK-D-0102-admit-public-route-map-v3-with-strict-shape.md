@@ -30,31 +30,33 @@ hide malformed sibling output and weaken the canary.
 
 - Keep v2 only and leave the current sibling canary failed.
 - Accept v3 by version string alone.
-- Admit v2 and v3 through the SDK compatibility gate, requiring the common
-  route-map top-level shape for both versions.
+- Admit v2 and v3 through the SDK compatibility gate, requiring the declared
+  route-map top-level shape for v3 while preserving the historical v2 shape.
 
 ## Decision
 
-Keep v2 compatibility and admit v3 only when the public route map contains
-the explicit schema, owner, surface, authority, posture, validation, and
-routes fields. The SDK records consumability; `8Dionysus` remains the owner of
-route-map meaning, generation, freshness, and validation.
+Keep v2 compatibility, including the previously accepted minimal v2 payload,
+and admit v3 only when the public route map contains the explicit schema,
+owner, surface, authority, posture, validation, and routes fields. The SDK
+records consumability; `8Dionysus` remains the owner of route-map meaning,
+generation, freshness, and validation.
 
 The SDK does not downgrade v3, rewrite sibling payloads, or infer route
 semantics. A missing required field remains a canary failure.
 
 ## Rationale
 
-The live v3 artifact and its owner schema retain the v2 top-level contract and
-route-only posture. The additive dashboard route is source-owned meaning, but
-the SDK can safely recognize the versioned envelope and enforce its common
-shape. This restores an honest canary without converting a version label into
-semantic approval.
+The live v3 artifact and its owner schema retain the v2 route-only posture, but
+the SDK cannot impose v3 fields on historical v2 payloads. The additive
+dashboard route is source-owned meaning; the SDK recognizes the versioned
+envelope and enforces the v3 shape only for v3. This restores an honest canary
+without converting a version label into semantic approval or breaking legacy
+consumers.
 
 ## Consequences
 
 - The current v3 sibling artifact is compatible with the SDK gate.
-- Historical v2 route maps remain covered by a regression test.
+- Historical minimal v2 route maps remain covered by a regression test.
 - Malformed v3-shaped payloads fail closed on missing top-level fields.
 - Future route meaning or schema changes still require an owner-first
   `8Dionysus` change followed by an SDK compatibility update.

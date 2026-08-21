@@ -101,15 +101,17 @@ SURFACE_COMPATIBILITY_RULES = {
             "8dionysus_public_route_map_v2",
             "8dionysus_public_route_map_v3",
         ],
-        required_top_level_keys=[
-            "schema_ref",
-            "owner_repo",
-            "surface_kind",
-            "authority_ref",
-            "posture",
-            "validation_refs",
-            "routes",
-        ],
+        required_top_level_keys_by_version={
+            "8dionysus_public_route_map_v3": [
+                "schema_ref",
+                "owner_repo",
+                "surface_kind",
+                "authority_ref",
+                "posture",
+                "validation_refs",
+                "routes",
+            ]
+        },
     ),
     "Agents-of-Abyss.center_entry_map.min": SurfaceCompatibilityRule(
         surface_id="Agents-of-Abyss.center_entry_map.min",
@@ -752,6 +754,20 @@ def _evaluate_data(
             f"supported versions: {rule.supported_versions!r}."
         )
     )
+    if compatible:
+        version_shape_error = _surface_shape_error(
+            rule,
+            data,
+            required_top_level_keys=rule.required_top_level_keys_by_version.get(
+                detected_version, []
+            ),
+            required_top_level_object_keys=rule.required_top_level_object_keys_by_version.get(
+                detected_version, []
+            ),
+        )
+        if version_shape_error is not None:
+            compatible = False
+            reason = version_shape_error
     return SurfaceCompatibilityCheck(
         surface_id=rule.surface_id,
         repo=rule.repo,
@@ -766,24 +782,35 @@ def _evaluate_data(
     )
 
 
-def _surface_shape_error(rule: SurfaceCompatibilityRule, data) -> str | None:
+def _surface_shape_error(
+    rule: SurfaceCompatibilityRule,
+    data,
+    *,
+    required_top_level_keys: list[str] | None = None,
+    required_top_level_object_keys: list[str] | None = None,
+) -> str | None:
     if rule.expected_json_kind == "object" and not isinstance(data, dict):
         return "Surface must load as a JSON object."
     if rule.expected_json_kind == "array" and not isinstance(data, list):
         return "Surface must load as a JSON array."
 
-    if rule.required_top_level_keys:
+    if required_top_level_keys is None:
+        required_top_level_keys = rule.required_top_level_keys
+    if required_top_level_object_keys is None:
+        required_top_level_object_keys = rule.required_top_level_object_keys
+
+    if required_top_level_keys:
         if not isinstance(data, dict):
             return "Surface must load as a JSON object with required top-level keys."
-        missing = [key for key in rule.required_top_level_keys if key not in data]
+        missing = [key for key in required_top_level_keys if key not in data]
         if missing:
             return f"Missing required top-level keys: {missing!r}."
-    if rule.required_top_level_object_keys:
+    if required_top_level_object_keys:
         if not isinstance(data, dict):
             return "Surface must load as a JSON object with required object keys."
         malformed = [
             key
-            for key in rule.required_top_level_object_keys
+            for key in required_top_level_object_keys
             if key in data and not isinstance(data[key], dict)
         ]
         if malformed:

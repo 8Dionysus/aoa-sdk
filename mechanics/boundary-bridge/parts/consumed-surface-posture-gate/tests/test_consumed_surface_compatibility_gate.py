@@ -467,11 +467,10 @@ def test_center_entry_map_current_v2_is_compatible(workspace_root: Path) -> None
 
 def test_public_route_map_v2_remains_compatible(workspace_root: Path) -> None:
     target = workspace_root / "8Dionysus" / "generated" / "public_route_map.min.json"
-    payload = json.loads(target.read_text(encoding="utf-8"))
-    payload["schema_version"] = "8dionysus_public_route_map_v2"
-    payload["schema_ref"] = "schemas/public-route-map.schema.json"
-    payload["routes"] = payload["routes"][:3]
-    target.write_text(json.dumps(payload) + "\n", encoding="utf-8")
+    target.write_text(
+        json.dumps({"schema_version": "8dionysus_public_route_map_v2"}) + "\n",
+        encoding="utf-8",
+    )
 
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
