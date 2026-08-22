@@ -11,6 +11,7 @@ import importlib.metadata
 import json
 import os
 import platform
+import re
 import signal
 import subprocess
 import sys
@@ -24,6 +25,18 @@ REPO_ROOT = Path(__file__).resolve().parents[5]
 DEFAULT_MANIFEST = Path(__file__).resolve().parents[1] / "config" / "validation_graph.json"
 SCHEMA_VERSION = "aoa_validation_evidence_graph_v1"
 RECEIPT_SCHEMA_VERSION = "aoa_validation_evidence_receipt_v1"
+RUNNER_PIN_SCHEMA_VERSION = "aoa_validation_runner_pin_v1"
+RUNNER_RELATIVE_PATH = (
+    "mechanics/release-support/parts/validation-evidence-graph/"
+    "scripts/validation_graph.py"
+)
+RUNNER_PIN_KEYS = {
+    "schema_version",
+    "owner_repo",
+    "relative_path",
+    "source_commit",
+    "file_sha256",
+}
 TIERS = {"instant", "fast", "contextual", "semantic", "full", "artifact"}
 ROOT_KEYS = {
     "schema_version",
@@ -34,6 +47,7 @@ ROOT_KEYS = {
     "routing_status",
     "instant_budget_seconds",
     "max_workers",
+    "runner_pin",
     "claims",
     "profiles",
     "routes",
@@ -123,6 +137,81 @@ def _safe_relative_pattern(value: str, location: str) -> None:
         raise ManifestError(f"{location} must be a safe repo-relative pattern")
 
 
+def _validate_runner_pin(value: Any) -> None:
+    if value is None:
+        return
+    location = "manifest.runner_pin"
+    if not isinstance(value, dict):
+        raise ManifestError(f"{location} must be an object or null")
+    issues = _unknown_keys(value, RUNNER_PIN_KEYS, location)
+    if issues:
+        raise ManifestError("; ".join(issues))
+    if value["schema_version"] != RUNNER_PIN_SCHEMA_VERSION:
+        raise ManifestError(
+            f"{location}.schema_version must be {RUNNER_PIN_SCHEMA_VERSION!r}"
+        )
+    if value["owner_repo"] != "aoa-sdk":
+        raise ManifestError(f"{location}.owner_repo must be 'aoa-sdk'")
+    relative_path = value["relative_path"]
+    if not isinstance(relative_path, str) or not relative_path:
+        raise ManifestError(f"{location}.relative_path must be non-empty")
+    _safe_relative_pattern(relative_path, f"{location}.relative_path")
+    if relative_path != RUNNER_RELATIVE_PATH:
+        raise ManifestError(
+            f"{location}.relative_path must be {RUNNER_RELATIVE_PATH!r}"
+        )
+    source_commit = value["source_commit"]
+    if not isinstance(source_commit, str) or not re.fullmatch(
+        r"[0-9a-f]{40}|[0-9a-f]{64}", source_commit
+    ):
+        raise ManifestError(
+            f"{location}.source_commit must be a 40- or 64-character lowercase Git id"
+        )
+    file_sha256 = value["file_sha256"]
+    if not isinstance(file_sha256, str) or not re.fullmatch(
+        r"sha256:[0-9a-f]{64}", file_sha256
+    ):
+        raise ManifestError(
+            f"{location}.file_sha256 must be a sha256 digest with prefix"
+        )
+
+
+def _runner_pin_blockers(
+    manifest: dict[str, Any],
+    *,
+    repo_root: Path,
+    runner_identities: Sequence[dict[str, Any]],
+) -> list[str]:
+    source_roots = {
+        identity.get("source_root")
+        for identity in runner_identities
+        if identity.get("source_root")
+    }
+    external = any(Path(root).resolve() != repo_root for root in source_roots)
+    if not external:
+        return []
+    pin = manifest.get("runner_pin")
+    if pin is None:
+        return ["runner_pin_missing"]
+    if not isinstance(pin, dict):
+        return ["runner_pin_invalid"]
+    if any(key not in pin for key in RUNNER_PIN_KEYS):
+        return ["runner_pin_invalid"]
+    expected_sha = pin["file_sha256"].removeprefix("sha256:")
+    blockers: set[str] = set()
+    for identity in runner_identities:
+        if identity.get("relative_path") != pin["relative_path"]:
+            blockers.add("runner_pin_path_mismatch")
+        if identity.get("sha256") != expected_sha:
+            blockers.add("runner_pin_file_mismatch")
+        source_identity = identity.get("source_repository_identity")
+        if not isinstance(source_identity, dict):
+            blockers.add("runner_pin_source_identity_unavailable")
+        elif source_identity.get("git_commit") != pin["source_commit"]:
+            blockers.add("runner_pin_commit_mismatch")
+    return sorted(blockers)
+
+
 def _topological_order(nodes: list[dict[str, Any]]) -> list[str]:
     by_id = {node["id"]: node for node in nodes}
     indegree = {node_id: 0 for node_id in by_id}
@@ -165,6 +254,7 @@ def validate_manifest(manifest: dict[str, Any]) -> None:
     max_workers = manifest["max_workers"]
     if not isinstance(max_workers, int) or isinstance(max_workers, bool) or not 1 <= max_workers <= 16:
         raise ManifestError("max_workers must be an integer from 1 through 16")
+    _validate_runner_pin(manifest["runner_pin"])
 
     claims = manifest["claims"]
     if not isinstance(claims, list) or not claims:
@@ -652,6 +742,20 @@ class InputIdentityCache:
 
 
 def environment_identity() -> dict[str, Any]:
+    environment_hasher = hashlib.sha256()
+    environment_hasher.update(b"aoa-validation-environment-v1\0")
+    if hasattr(os, "environb"):
+        environment_items = sorted(os.environb.items())
+    else:
+        environment_items = sorted(
+            (os.fsencode(key), os.fsencode(value))
+            for key, value in os.environ.items()
+        )
+    for key, value in environment_items:
+        environment_hasher.update(key)
+        environment_hasher.update(b"\0")
+        environment_hasher.update(value)
+        environment_hasher.update(b"\0")
     packages: dict[str, str | None] = {}
     for name in ("aoa-sdk", "build", "mypy", "pytest", "ruff"):
         try:
@@ -662,6 +766,8 @@ def environment_identity() -> dict[str, Any]:
         "python_executable": sys.executable,
         "python_version": platform.python_version(),
         "python_implementation": platform.python_implementation(),
+        "environment_sha256": f"sha256:{environment_hasher.hexdigest()}",
+        "environment_key_count": len(environment_items),
         "platform": platform.platform(),
         "ci": os.environ.get("CI"),
         "github_runner_os": os.environ.get("RUNNER_OS"),
@@ -875,6 +981,7 @@ def build_receipt(
     initial_manifest_sha256: str,
     initial_environment_identity: dict[str, Any],
     initial_runner_identity: dict[str, Any] | None = None,
+    final_environment_identity: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     claim_by_id = {claim["id"]: claim for claim in manifest["claims"]}
     required = [
@@ -893,6 +1000,8 @@ def build_receipt(
     if initial_runner_identity is None:
         initial_runner_identity = runner_identity()
     final_runner_identity = runner_identity()
+    if final_environment_identity is None:
+        final_environment_identity = environment_identity()
     final_manifest_sha256 = _sha256(manifest_path.read_bytes())
     repository_stable = initial_repository_identity == final_repository_identity
     repository_bound = all(
@@ -900,6 +1009,7 @@ def build_receipt(
         for identity in (initial_repository_identity, final_repository_identity)
     )
     manifest_stable = initial_manifest_sha256 == final_manifest_sha256
+    environment_stable = initial_environment_identity == final_environment_identity
     runner_stable = initial_runner_identity == final_runner_identity
     runner_source_identities = (
         initial_runner_identity.get("source_repository_identity"),
@@ -926,10 +1036,19 @@ def build_receipt(
         integrity_blockers.append("repository_identity_changed_during_run")
     if not manifest_stable:
         integrity_blockers.append("manifest_changed_during_run")
+    if not environment_stable:
+        integrity_blockers.append("environment_changed_during_run")
     if not runner_bound:
         integrity_blockers.append("runner_identity_unavailable")
     if not runner_stable:
         integrity_blockers.append("runner_identity_changed_during_run")
+    integrity_blockers.extend(
+        _runner_pin_blockers(
+            manifest,
+            repo_root=repo_root,
+            runner_identities=(initial_runner_identity, final_runner_identity),
+        )
+    )
     if unreadable_inputs:
         integrity_blockers.append("node_inputs_unreadable")
     sufficient = (
@@ -960,7 +1079,10 @@ def build_receipt(
             "after": final_runner_identity,
             "stable": runner_stable,
         },
+        "runner_pin": manifest["runner_pin"],
         "environment_identity": initial_environment_identity,
+        "environment_identity_after": final_environment_identity,
+        "environment_stable": environment_stable,
         "started_at": started_at.isoformat(),
         "completed_at": dt.datetime.now(dt.UTC).isoformat(),
         "elapsed_seconds": round(elapsed_seconds, 6),

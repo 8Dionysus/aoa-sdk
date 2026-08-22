@@ -15,7 +15,9 @@ claim publication state before external proof exists.
   retain shadow-only posture for partial routing and reuse until their own
   no-miss evidence exists.
 - Keep the reference runner portable only through an explicit owner root and
-  separately bound runner identity; sibling claims and admission remain local.
+  separately bound runner identity and an exact external-owner runner pin;
+  sibling claims and admission remain local. Bind the complete inherited
+  environment through a secret-safe digest and retain fail-closed drift.
 - Keep README, changelog, release docs, release-support parts, generated
   companions, and GitHub validation aligned without duplicating chronology.
 - Keep sibling canaries drift-aware and explicit about what they do not prove.

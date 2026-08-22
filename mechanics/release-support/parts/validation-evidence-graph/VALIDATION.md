@@ -44,6 +44,23 @@ owner Git identity and the pinned SDK runner Git identity separately. This
 invocation shares scheduling mechanics only; it does not import SDK claims or
 authorize the sibling gate.
 
+For an external owner, add this manifest field and replace the placeholders
+with the exact pinned SDK source values before running the command:
+
+```json
+"runner_pin": {
+  "schema_version": "aoa_validation_runner_pin_v1",
+  "owner_repo": "aoa-sdk",
+  "relative_path": "mechanics/release-support/parts/validation-evidence-graph/scripts/validation_graph.py",
+  "source_commit": "<40-or-64-lowercase-hex-git-id>",
+  "file_sha256": "sha256:<64-lowercase-hex-digest>"
+}
+```
+
+The SDK-local manifest uses `null` because its owner root and runner source
+checkout are the same. Missing or mismatched pins, or a changed inherited
+environment digest, make the receipt insufficient.
+
 Owner and topology checks:
 
 ```bash

@@ -7,6 +7,8 @@ dependency-aware validation evidence and a bounded sufficiency receipt.
 
 Input: an owner-authored claim/evidence manifest, one full or bounded claim
 profile, an optional shadow changed-path set, and the invoking environment.
+An external owner manifest also carries an exact `aoa_validation_runner_pin_v1`
+for the SDK runner source.
 
 Output: direct-argv validation execution plus one identity-bound receipt that
 names required, satisfied, and missing evidence. The default full profile
@@ -36,8 +38,11 @@ oracle and rollback. Path routing remains `shadow_only` and can never authorize
 the owner gate. Cross-run receipt reuse is intentionally absent until exact
 input, environment, freshness, and tamper rules have their own accepted cases.
 The runner binds its own source-checkout commit, tree, worktree state, and file
-digest separately from the owner repository. An unavailable or changing runner
-identity makes a receipt insufficient.
+digest separately from the owner repository. External runs additionally bind
+the exact runner pin declared by the owner manifest. The receipt records a
+secret-safe digest of the complete inherited environment before and after
+execution and the declared runner pin; unavailable or changing
+runner/environment identity makes a receipt insufficient.
 
 ## Next route
 

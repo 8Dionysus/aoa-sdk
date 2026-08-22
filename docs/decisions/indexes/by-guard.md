@@ -217,6 +217,10 @@
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
 - [AOA-SDK-D-0099 - Compile obligation actor plans without selecting meaning](../AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md) (`docs/decisions/AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md`)
 
+## environment drift
+
+- [AOA-SDK-D-0103 - Pin the Portable Validation Runner and Bind a Secret-Safe Environment](../AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md) (`docs/decisions/AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md`)
+
 ## event chain
 
 - [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
@@ -247,6 +251,10 @@
 - [AOA-SDK-D-0085 - Resolve Scenario Capabilities Before Compilation](../AOA-SDK-D-0085-resolve-scenario-capabilities-before-compilation.md) (`docs/decisions/AOA-SDK-D-0085-resolve-scenario-capabilities-before-compilation.md`)
 - [AOA-SDK-D-0094 - Separate Contour Admission, Keeper Evidence, and Owner Tasks](../AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md) (`docs/decisions/AOA-SDK-D-0094-separate-contour-admission-keeper-and-owner-tasks.md`)
 - [AOA-SDK-D-0095 - Admit One Contour Through Content-Addressed CAS](../AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md) (`docs/decisions/AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md`)
+
+## fail-closed sufficiency
+
+- [AOA-SDK-D-0103 - Pin the Portable Validation Runner and Bind a Secret-Safe Environment](../AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md) (`docs/decisions/AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md`)
 
 ## fallback removal
 
@@ -743,6 +751,10 @@
 - [AOA-SDK-D-0078 - Compile Admitted Owner Plan Contours Deterministically](../AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md) (`docs/decisions/AOA-SDK-D-0078-compile-owner-plan-contours-deterministically.md`)
 - [AOA-SDK-D-0088 - Separate Trust Record Identity from Delivered Bytes](../AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md) (`docs/decisions/AOA-SDK-D-0088-separate-trust-record-identity-from-delivered-bytes.md`)
 - [AOA-SDK-D-0091 - Package the Admitted Trust Record for Runtime Observation](../AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md) (`docs/decisions/AOA-SDK-D-0091-package-admitted-trust-record-for-runtime-observation.md`)
+
+## source identity
+
+- [AOA-SDK-D-0103 - Pin the Portable Validation Runner and Bind a Secret-Safe Environment](../AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md) (`docs/decisions/AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md`)
 
 ## source ref preservation
 
