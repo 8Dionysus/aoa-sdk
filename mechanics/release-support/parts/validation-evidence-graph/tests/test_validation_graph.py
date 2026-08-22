@@ -41,6 +41,9 @@ def load_manifest() -> dict[str, object]:
 
 def minimal_manifest(*, failing: bool = False) -> dict[str, object]:
     exit_code = "3" if failing else "0"
+    runner = validation_graph.runner_identity()
+    source_identity = runner["source_repository_identity"]
+    assert isinstance(source_identity, dict)
     return {
         "schema_version": validation_graph.SCHEMA_VERSION,
         "graph_id": "test-graph",
@@ -50,6 +53,13 @@ def minimal_manifest(*, failing: bool = False) -> dict[str, object]:
         "routing_status": "shadow_only",
         "instant_budget_seconds": 1.0,
         "max_workers": 2,
+        "runner_pin": {
+            "schema_version": validation_graph.RUNNER_PIN_SCHEMA_VERSION,
+            "owner_repo": "aoa-sdk",
+            "relative_path": runner["relative_path"],
+            "source_commit": source_identity["git_commit"],
+            "file_sha256": f"sha256:{runner['sha256']}",
+        },
         "claims": [
             {
                 "id": "graph",
@@ -127,6 +137,50 @@ def graph_commands(manifest: dict[str, object]) -> list[list[str]]:
     nodes = manifest["nodes"]
     assert isinstance(nodes, list)
     return [step["argv"] for node in nodes for step in node["steps"]]
+
+
+def commit_owner_manifest(owner_root: Path, manifest: dict[str, object]) -> Path:
+    owner_root.mkdir()
+    subprocess.run(["git", "init", "-q"], cwd=owner_root, check=True)
+    manifest_path = owner_root / "validation-graph.json"
+    manifest_path.write_text(json.dumps(manifest), encoding="utf-8")
+    subprocess.run(["git", "add", "validation-graph.json"], cwd=owner_root, check=True)
+    subprocess.run(
+        [
+            "git",
+            "-c",
+            "user.name=Validation Test",
+            "-c",
+            "user.email=validation@example.invalid",
+            "commit",
+            "-qm",
+            "owner manifest",
+        ],
+        cwd=owner_root,
+        check=True,
+    )
+    return manifest_path
+
+
+def run_external_manifest(
+    tmp_path: Path, manifest: dict[str, object]
+) -> tuple[int, dict[str, object]]:
+    owner_root = tmp_path / "owner"
+    manifest_path = commit_owner_manifest(owner_root, manifest)
+    receipt_path = tmp_path / "receipt.json"
+    exit_code = validation_graph.main(
+        [
+            "--repo-root",
+            str(owner_root),
+            "--manifest",
+            str(manifest_path),
+            "--profile",
+            "full",
+            "--receipt",
+            str(receipt_path),
+        ]
+    )
+    return exit_code, json.loads(receipt_path.read_text(encoding="utf-8"))
 
 
 def workflow_steps(relative_path: str, job_id: str) -> dict[str, dict[str, object]]:
@@ -482,6 +536,102 @@ def test_explicit_owner_repo_root_is_bound_separately_from_runner_source(
         "scripts/validation_graph.py"
     )
     assert runner["before"]["source_repository_identity"]["git_commit"]
+
+
+def test_external_owner_requires_an_explicit_runner_pin(tmp_path: Path) -> None:
+    manifest = minimal_manifest()
+    manifest["runner_pin"] = None
+
+    exit_code, receipt = run_external_manifest(tmp_path, manifest)
+
+    assert exit_code == 1
+    assert receipt["decision"]["sufficient"] is False
+    assert receipt["runner_pin"] is None
+    assert receipt["decision"]["integrity_blockers"] == ["runner_pin_missing"]
+
+
+def test_external_owner_rejects_a_runner_pin_file_mismatch(tmp_path: Path) -> None:
+    manifest = minimal_manifest()
+    pin = manifest["runner_pin"]
+    assert isinstance(pin, dict)
+    pin["file_sha256"] = "sha256:" + "0" * 64
+
+    exit_code, receipt = run_external_manifest(tmp_path, manifest)
+
+    assert exit_code == 1
+    assert receipt["decision"]["sufficient"] is False
+    assert receipt["runner_pin"]["file_sha256"] == "sha256:" + "0" * 64
+    assert receipt["decision"]["integrity_blockers"] == [
+        "runner_pin_file_mismatch"
+    ]
+
+
+def test_environment_identity_binds_values_without_serializing_them(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("AOA_VALIDATION_SECRET_TEST", "first-secret-value")
+    first = validation_graph.environment_identity()
+    monkeypatch.setenv("AOA_VALIDATION_SECRET_TEST", "second-secret-value")
+    second = validation_graph.environment_identity()
+
+    assert first["environment_sha256"] != second["environment_sha256"]
+    serialized = json.dumps(first, sort_keys=True)
+    assert "first-secret-value" not in serialized
+    assert "AOA_VALIDATION_SECRET_TEST" not in serialized
+
+
+def test_environment_drift_blocks_an_otherwise_green_receipt(
+    tmp_path: Path,
+) -> None:
+    manifest = minimal_manifest()
+    manifest_path = tmp_path / "graph.json"
+    manifest_bytes = json.dumps(manifest).encode()
+    manifest_path.write_bytes(manifest_bytes)
+    claims = manifest["profiles"]["full"]
+    activated = validation_graph.activate_nodes(manifest, claims)
+    node_results = [
+        {
+            "id": node["id"],
+            "tier": node["tier"],
+            "status": "passed",
+            "duration_seconds": 0.01,
+            "input_identity": {
+                "patterns": node["inputs"],
+                "file_count": 1,
+                "sha256": "0" * 64,
+                "unreadable": [],
+            },
+            "provides_evidence": node["provides_evidence"],
+            "steps": [],
+        }
+        for node in manifest["nodes"]
+    ]
+    initial_environment = validation_graph.environment_identity()
+    final_environment = dict(initial_environment)
+    final_environment["environment_sha256"] = "sha256:" + "f" * 64
+
+    receipt = validation_graph.build_receipt(
+        manifest,
+        manifest_path=manifest_path,
+        claims=claims,
+        activated=activated,
+        route={"mode": "profile", "authoritative": True},
+        node_results=node_results,
+        repo_root=REPO_ROOT,
+        max_workers=2,
+        started_at=dt.datetime.now(dt.UTC),
+        elapsed_seconds=0.1,
+        initial_repository_identity=validation_graph.repository_identity(REPO_ROOT),
+        initial_manifest_sha256=hashlib.sha256(manifest_bytes).hexdigest(),
+        initial_environment_identity=initial_environment,
+        final_environment_identity=final_environment,
+    )
+
+    assert receipt["environment_stable"] is False
+    assert receipt["decision"]["sufficient"] is False
+    assert receipt["decision"]["integrity_blockers"] == [
+        "environment_changed_during_run"
+    ]
 
 
 def test_manifest_outside_explicit_owner_root_is_rejected(tmp_path: Path) -> None:

@@ -157,3 +157,4 @@
 ## 2026-08-21
 
 - [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
+- [AOA-SDK-D-0103 - Pin the Portable Validation Runner and Bind a Secret-Safe Environment](../AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md) (`docs/decisions/AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md`)

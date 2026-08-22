@@ -163,6 +163,7 @@
 - [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 - [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 - [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
+- [AOA-SDK-D-0103 - Pin the Portable Validation Runner and Bind a Secret-Safe Environment](../AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md) (`docs/decisions/AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md`)
 
 ## compatibility accounting
 
@@ -404,6 +405,7 @@
 ## owner-boundary
 
 - [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
+- [AOA-SDK-D-0103 - Pin the Portable Validation Runner and Bind a Secret-Safe Environment](../AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md) (`docs/decisions/AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md`)
 
 ## ownership
 
@@ -728,6 +730,7 @@
 - [AOA-SDK-D-0066 - Decision Index Read Model Symmetry](../AOA-SDK-D-0066-decision-index-read-model-symmetry.md) (`docs/decisions/AOA-SDK-D-0066-decision-index-read-model-symmetry.md`)
 - [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 - [AOA-SDK-D-0070 - Admit the Titan Helper Skill Family](../AOA-SDK-D-0070-titan-owner-skill-family.md) (`docs/decisions/AOA-SDK-D-0070-titan-owner-skill-family.md`)
+- [AOA-SDK-D-0103 - Pin the Portable Validation Runner and Bind a Secret-Safe Environment](../AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md) (`docs/decisions/AOA-SDK-D-0103-pin-portable-runner-and-secret-safe-environment.md`)
 
 ## validation guard
 

@@ -53,8 +53,12 @@ may be retained separately when it has a clear bounded benefit.
 - the ordinary pytest node excludes only the G11 wrapper, while two static G11
   shards cover every declared exact wrapper case once;
 - independent nodes overlap and canonical fan-in remains in manifest order;
-- a full successful receipt binds source, manifest, commands, environment,
-  evidence, timings, and a sufficient full-owner decision;
+- a full successful receipt binds source, manifest, commands, the secret-safe
+  complete environment identity, evidence, timings, and a sufficient
+  full-owner decision;
+- an external owner run requires an exact SDK runner pin for path, source
+  commit, and file digest, while the SDK-local run explicitly keeps the pin
+  null because owner and runner source are the same checkout;
 - the instant profile validates graph identity and topology within its one
   second owner-local process budget.
 
@@ -76,8 +80,8 @@ may be retained separately when it has a clear bounded benefit.
 - a dependency cycle is invalid;
 - unsafe absolute/traversing paths and NUL-bearing argv are invalid;
 - a receipt or reuse candidate with a changed manifest, command, input,
-  environment, repository state, or evidence digest is rejected rather than
-  partially trusted;
+  environment digest, repository state, or evidence digest is rejected rather
+  than partially trusted;
 - two evidence producers may not silently claim the same evidence identity.
 
 ### Regression and no-miss
