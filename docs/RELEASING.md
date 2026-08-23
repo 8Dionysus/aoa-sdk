@@ -3,6 +3,13 @@
 This root file is the repo-level release preflight door required by federation
 release audit. It is not the full runbook.
 
+Release headings use the exact SemVer 2.0.0 version inside the brackets, so
+stable versions and approved prereleases such as `0.4.0-alpha.1` retain their
+full heading and derived `v0.4.0-alpha.1` tag identity. The publish helper
+passes the GitHub prerelease marker only for versions with a prerelease
+component and leaves GitHub's `latest` release stable; stable edits clear any
+stale prerelease flag while preserving stable latest behavior.
+
 Active release-support runbook:
 
 - `mechanics/release-support/parts/release-audit-publish-helper/docs/release-runbook.md`

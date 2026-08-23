@@ -28,6 +28,25 @@ RELEASE_CHECK_PATHS = (
     "scripts/release_check.py",
     "scripts/release_gate/release_check.py",
 )
+SEMVER_NUMERIC_IDENTIFIER = r"(?:0|[1-9][0-9]*)"
+SEMVER_PRERELEASE_IDENTIFIER = (
+    rf"(?:{SEMVER_NUMERIC_IDENTIFIER}|[0-9A-Za-z-]*[A-Za-z-][0-9A-Za-z-]*)"
+)
+SEMVER_BUILD_IDENTIFIER = r"[0-9A-Za-z-]+"
+SEMVER_PATTERN = (
+    rf"{SEMVER_NUMERIC_IDENTIFIER}\."
+    rf"{SEMVER_NUMERIC_IDENTIFIER}\."
+    rf"{SEMVER_NUMERIC_IDENTIFIER}"
+    rf"(?:-(?P<prerelease>{SEMVER_PRERELEASE_IDENTIFIER}"
+    rf"(?:\.{SEMVER_PRERELEASE_IDENTIFIER})*))?"
+    rf"(?:\+(?P<build>{SEMVER_BUILD_IDENTIFIER}"
+    rf"(?:\.{SEMVER_BUILD_IDENTIFIER})*))?"
+)
+RELEASE_HEADING_RE = re.compile(
+    rf"^## \[(?P<version>{SEMVER_PATTERN})\] - "
+    rf"(?P<date>[0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}})$",
+    re.M,
+)
 ReleaseAuditPhase = Literal["preflight", "postpublish", "cadence"]
 REMOTE_COMMAND_TIMEOUT_SECONDS = 60.0
 PUBLISH_COMMAND_TIMEOUT_SECONDS = 120.0
@@ -95,6 +114,12 @@ class ParsedReleaseSection:
     summary_bullets: list[str]
     has_validation: bool
     has_notes: bool
+
+    @property
+    def is_prerelease(self) -> bool:
+        """Whether the exact SemVer carries a prerelease component."""
+
+        return "-" in self.version.partition("+")[0]
 
 
 def _run(
@@ -167,7 +192,7 @@ def _git_fetch_origin(repo_root: Path) -> tuple[bool, str]:
 
 
 def _parse_latest_release(changelog_text: str) -> ParsedReleaseSection:
-    match = re.search(r"^## \[(?P<version>\d+\.\d+\.\d+)\] - (?P<date>\d{4}-\d{2}-\d{2})$", changelog_text, re.M)
+    match = RELEASE_HEADING_RE.search(changelog_text)
     if not match:
         raise ValueError("CHANGELOG.md is missing a dated latest tagged release heading")
     start = match.end()
@@ -266,7 +291,16 @@ def validate_release_body(repo: str, release: ParsedReleaseSection, body: str) -
 def _gh_release_view(repo: str, tag: str, *, cwd: Path) -> dict[str, Any] | None:
     try:
         completed = _run(
-            ["gh", "release", "view", tag, "--repo", _github_repo_slug(repo), "--json", "tagName,body,url,publishedAt"],
+            [
+                "gh",
+                "release",
+                "view",
+                tag,
+                "--repo",
+                _github_repo_slug(repo),
+                "--json",
+                "tagName,body,url,publishedAt,isPrerelease",
+            ],
             cwd=cwd,
             check=False,
             timeout=REMOTE_COMMAND_TIMEOUT_SECONDS,
@@ -283,7 +317,7 @@ def _gh_release_view(repo: str, tag: str, *, cwd: Path) -> dict[str, Any] | None
 def _gh_release_list(repo: str, *, cwd: Path) -> list[dict[str, Any]]:
     try:
         completed = _run(
-            ["gh", "release", "list", "--repo", _github_repo_slug(repo), "--limit", "10", "--json", "tagName,isLatest"],
+            ["gh", "release", "list", "--repo", _github_repo_slug(repo), "--limit", "10", "--json", "tagName,isLatest,isPrerelease"],
             cwd=cwd,
             check=False,
             timeout=REMOTE_COMMAND_TIMEOUT_SECONDS,
@@ -307,8 +341,11 @@ def _sdk_cli_version(repo_root: Path) -> str | None:
     main_py = repo_root / "src" / "aoa_sdk" / "cli" / "main.py"
     if not main_py.exists():
         return None
-    match = re.search(r'print\("aoa-sdk ([0-9]+\.[0-9]+\.[0-9]+)"\)', main_py.read_text(encoding="utf-8"))
-    return match.group(1) if match else None
+    match = re.search(
+        rf'print\("aoa-sdk (?P<version>{SEMVER_PATTERN})"\)',
+        main_py.read_text(encoding="utf-8"),
+    )
+    return match.group("version") if match else None
 
 
 def _has_exact_readme_banner(repo_root: Path, tag: str) -> bool:
@@ -736,12 +773,39 @@ class ReleaseAPI:
         release_url = release_view["url"] if release_view else None
         published_at = release_view["publishedAt"] if release_view else None
         if release_view is not None:
-            latest_tag = next((item["tagName"] for item in _gh_release_list(repo, cwd=repo_root) if item.get("isLatest")), None)
+            checks.extend(
+                [
+                    ReleaseCheck(
+                        name="release-tag",
+                        passed=release_view.get("tagName") == release.tag,
+                        detail=f"GitHub Release tag must equal {release.tag}",
+                    ),
+                    ReleaseCheck(
+                        name="prerelease-flag",
+                        passed=release_view.get("isPrerelease") == release.is_prerelease,
+                        detail=(
+                            "GitHub Release prerelease flag must match the exact "
+                            f"SemVer ({'enabled' if release.is_prerelease else 'disabled'})"
+                        ),
+                    ),
+                ]
+            )
+            latest_release = next(
+                (item for item in _gh_release_list(repo, cwd=repo_root) if item.get("isLatest")),
+                None,
+            )
+            latest_tag = latest_release.get("tagName") if latest_release else None
+            latest_is_stable = latest_release is not None and latest_release.get("isPrerelease") is False
             checks.append(
                 ReleaseCheck(
                     name="latest-tag",
-                    passed=latest_tag == release.tag,
-                    detail=f"latest GitHub Release must point at {release.tag}",
+                    passed=(latest_is_stable and (release.is_prerelease or latest_tag == release.tag)),
+                    detail=(
+                        "latest GitHub Release must remain stable while the exact "
+                        f"prerelease {release.tag} is published"
+                        if release.is_prerelease
+                        else f"latest GitHub Release must point at stable {release.tag}"
+                    ),
                 )
             )
             checks.extend(validate_release_body(repo, release, release_view.get("body", "")))
@@ -853,7 +917,10 @@ class ReleaseAPI:
 
         release_view = _gh_release_view(repo, release.tag, cwd=repo_root)
         actions.append("create GitHub Release" if release_view is None else "update GitHub Release")
-        actions.append("set GitHub Release as latest")
+        if release.is_prerelease:
+            actions.append("mark GitHub Release as prerelease and keep stable latest release")
+        else:
+            actions.append("set GitHub Release as latest")
 
         if dry_run:
             return actions, release_view["url"] if release_view else None
@@ -880,6 +947,12 @@ class ReleaseAPI:
             handle.write(notes)
             notes_path = handle.name
         try:
+            if release.is_prerelease:
+                release_flags = ["--prerelease"]
+            else:
+                release_flags = ["--latest"]
+                if release_view is not None:
+                    release_flags.append("--prerelease=false")
             if release_view is None:
                 _run(
                     [
@@ -893,7 +966,7 @@ class ReleaseAPI:
                         release.tag,
                         "--notes-file",
                         notes_path,
-                        "--latest",
+                        *release_flags,
                     ],
                     cwd=repo_root,
                     check=True,
@@ -912,7 +985,7 @@ class ReleaseAPI:
                         release.tag,
                         "--notes-file",
                         notes_path,
-                        "--latest",
+                        *release_flags,
                     ],
                     cwd=repo_root,
                     check=True,

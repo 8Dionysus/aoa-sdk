@@ -13,12 +13,14 @@ from typing import Any
 import pytest
 import yaml
 
+from aoa_sdk.release import api as release_api
 from aoa_sdk.release.api import (
     OWNER_RELEASE_REPOS,
     ReleaseAPI,
     ReleaseAuditRepoReport,
     ReleaseAuditResult,
     ReleaseRemoteStateUnknownError,
+    _sdk_cli_version,
     _parse_latest_release,
     _gh_release_view,
     _git_fetch_origin,
@@ -305,13 +307,14 @@ def _workspace_for(repo_name: str, repo_root: Path, workspace_root: Path) -> Wor
     )
 
 
-def _fresh_release_payload(repo_name: str, version: str, body: str) -> dict[str, str]:
+def _fresh_release_payload(repo_name: str, version: str, body: str) -> dict[str, Any]:
     published_at = datetime.now(UTC).replace(microsecond=0).isoformat().replace("+00:00", "Z")
     return {
         "tagName": f"v{version}",
         "body": body,
         "url": f"https://github.com/8Dionysus/{repo_name}/releases/tag/v{version}",
         "publishedAt": published_at,
+        "isPrerelease": "-" in version.partition("+")[0],
     }
 
 
@@ -848,9 +851,79 @@ def test_parse_latest_release_extracts_summary_validation_and_notes() -> None:
 
     assert release.version == "0.2.0"
     assert release.tag == "v0.2.0"
+    assert release.is_prerelease is False
     assert release.summary_bullets == ["one still one", "two"]
     assert release.has_validation is True
     assert release.has_notes is True
+
+
+def test_parse_latest_release_accepts_exact_semver_prerelease_identity() -> None:
+    release = _parse_latest_release(
+        "\n".join(
+            [
+                "# Changelog",
+                "",
+                "## [Unreleased]",
+                "",
+                "## [0.4.0-alpha.1] - 2026-08-22",
+                "",
+                "### Summary",
+                "- approved prerelease",
+                "",
+                "### Validation",
+                "- focused tests",
+                "",
+                "### Notes",
+                "- exact identity",
+                "",
+            ]
+        )
+    )
+
+    assert release.version == "0.4.0-alpha.1"
+    assert release.tag == "v0.4.0-alpha.1"
+    assert release.is_prerelease is True
+
+
+@pytest.mark.parametrize(
+    "version",
+    [
+        "01.2.3",
+        "1.2.3-alpha.01",
+        "1.2.3-alpha..1",
+        "1.2.3+build..1",
+        "v1.2.3",
+    ],
+)
+def test_parse_latest_release_rejects_non_semver_headings(version: str) -> None:
+    with pytest.raises(ValueError, match="dated latest tagged release heading"):
+        _parse_latest_release(
+            "\n".join(
+                [
+                    "# Changelog",
+                    "",
+                    "## [Unreleased]",
+                    "",
+                    f"## [{version}] - 2026-08-22",
+                ]
+            )
+        )
+
+
+def test_sdk_cli_version_preserves_prerelease_suffix(tmp_path: Path) -> None:
+    main_py = tmp_path / "src" / "aoa_sdk" / "cli" / "main.py"
+    main_py.parent.mkdir(parents=True)
+    main_py.write_text('print("aoa-sdk 0.10.2-alpha.1")\n', encoding="utf-8")
+
+    assert _sdk_cli_version(tmp_path) == "0.10.2-alpha.1"
+
+
+def test_sdk_cli_version_rejects_non_semver_prerelease_suffix(tmp_path: Path) -> None:
+    main_py = tmp_path / "src" / "aoa_sdk" / "cli" / "main.py"
+    main_py.parent.mkdir(parents=True)
+    main_py.write_text('print("aoa-sdk 0.10.2-alpha.01")\n', encoding="utf-8")
+
+    assert _sdk_cli_version(tmp_path) is None
 
 
 def test_build_release_body_uses_full_summary_bullets() -> None:
@@ -1059,6 +1132,115 @@ def test_publish_dry_run_skips_postpublish_audit(tmp_path: Path, monkeypatch: py
     assert result.repo_reports[0].postpublish_passed is False
 
 
+@pytest.mark.parametrize(
+    ("version", "expects_prerelease_flag", "expects_latest_flag"),
+    [("0.4.0-alpha.1", True, False), ("0.4.0", False, True)],
+)
+def test_publish_marks_only_prerelease_github_releases(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    version: str,
+    expects_prerelease_flag: bool,
+    expects_latest_flag: bool,
+) -> None:
+    workspace_root = tmp_path / "workspace"
+    repo_root = workspace_root / "Agents-of-Abyss"
+    remote_root = tmp_path / "aoa-origin.git"
+    _init_repo(repo_root, remote_root)
+    _write_release_surfaces(repo_root, repo_name="Agents-of-Abyss", version=version)
+    subprocess.run(["git", "-C", str(repo_root), "add", "."], check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "-C", str(repo_root), "commit", "-m", "release surfaces"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    gh_commands: list[list[str]] = []
+    original_run = release_api._run
+
+    def fake_run(
+        command: list[str],
+        *,
+        cwd: Path,
+        env: dict[str, str] | None = None,
+        check: bool = False,
+        timeout: float | None = None,
+    ) -> subprocess.CompletedProcess[str]:
+        if command and command[0] == "gh":
+            gh_commands.append(command)
+            return subprocess.CompletedProcess(command, 0, "", "")
+        return original_run(command, cwd=cwd, env=env, check=check, timeout=timeout)
+
+    monkeypatch.setattr(release_api, "_run", fake_run)
+    monkeypatch.setattr(release_api, "_gh_release_view", lambda repo, tag, cwd: None)
+
+    api = ReleaseAPI(_workspace_for("Agents-of-Abyss", repo_root, workspace_root))
+    release = _parse_latest_release((repo_root / "CHANGELOG.md").read_text(encoding="utf-8"))
+    actions, _ = api._publish_repo("Agents-of-Abyss", repo_root, release, dry_run=False)
+
+    assert len(gh_commands) == 1
+    assert ("--prerelease" in gh_commands[0]) is expects_prerelease_flag
+    assert ("--latest" in gh_commands[0]) is expects_latest_flag
+    assert ("mark GitHub Release as prerelease and keep stable latest release" in actions) is expects_prerelease_flag
+
+
+def test_publish_clears_prerelease_on_existing_stable_release(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    workspace_root = tmp_path / "workspace"
+    repo_root = workspace_root / "Agents-of-Abyss"
+    remote_root = tmp_path / "aoa-origin.git"
+    _init_repo(repo_root, remote_root)
+    _write_release_surfaces(repo_root, repo_name="Agents-of-Abyss", version="0.4.0")
+    subprocess.run(["git", "-C", str(repo_root), "add", "."], check=True, capture_output=True, text=True)
+    subprocess.run(
+        ["git", "-C", str(repo_root), "commit", "-m", "release surfaces"],
+        check=True,
+        capture_output=True,
+        text=True,
+    )
+
+    gh_commands: list[list[str]] = []
+    original_run = release_api._run
+
+    def fake_run(
+        command: list[str],
+        *,
+        cwd: Path,
+        env: dict[str, str] | None = None,
+        check: bool = False,
+        timeout: float | None = None,
+    ) -> subprocess.CompletedProcess[str]:
+        if command and command[0] == "gh":
+            gh_commands.append(command)
+            return subprocess.CompletedProcess(command, 0, "", "")
+        return original_run(command, cwd=cwd, env=env, check=check, timeout=timeout)
+
+    monkeypatch.setattr(release_api, "_run", fake_run)
+    monkeypatch.setattr(
+        release_api,
+        "_gh_release_view",
+        lambda repo, tag, cwd: {
+            "tagName": tag,
+            "body": "existing",
+            "url": "https://example.invalid/release",
+            "publishedAt": "2026-08-22T00:00:00Z",
+            "isPrerelease": True,
+        },
+    )
+
+    api = ReleaseAPI(_workspace_for("Agents-of-Abyss", repo_root, workspace_root))
+    release = _parse_latest_release((repo_root / "CHANGELOG.md").read_text(encoding="utf-8"))
+    api._publish_repo("Agents-of-Abyss", repo_root, release, dry_run=False)
+
+    assert len(gh_commands) == 1
+    assert "--latest" in gh_commands[0]
+    assert "--prerelease=false" in gh_commands[0]
+    assert "--prerelease" not in gh_commands[0]
+
+
 def test_publish_aborts_before_tag_push_when_release_view_times_out(
     tmp_path: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -1224,10 +1406,114 @@ def test_postpublish_passes_when_release_body_matches_changelog(tmp_path: Path, 
     monkeypatch.setattr("aoa_sdk.release.api._gh_release_view", lambda repo, tag, cwd: payload)
     monkeypatch.setattr(
         "aoa_sdk.release.api._gh_release_list",
-        lambda repo, cwd: [{"tagName": "v0.2.0", "isLatest": True}],
+        lambda repo, cwd: [{"tagName": "v0.2.0", "isLatest": True, "isPrerelease": False}],
     )
 
     result = api.audit(workspace_root=workspace_root, phase="postpublish", repo="Agents-of-Abyss", include_all=False, strict=True)
 
     assert result.passed is True
     assert result.repo_reports[0].release_url == payload["url"]
+
+
+def test_postpublish_accepts_prerelease_when_stable_release_remains_latest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    workspace_root = tmp_path / "workspace"
+    repo_root = workspace_root / "Agents-of-Abyss"
+    remote_root = tmp_path / "aoa-origin.git"
+    _init_repo(repo_root, remote_root)
+    _write_release_surfaces(repo_root, repo_name="Agents-of-Abyss", version="0.4.0-alpha.1")
+    _commit_and_push(repo_root, "0.4.0-alpha.1")
+
+    api = ReleaseAPI(_workspace_for("Agents-of-Abyss", repo_root, workspace_root))
+    release = _parse_latest_release((repo_root / "CHANGELOG.md").read_text(encoding="utf-8"))
+    payload = _fresh_release_payload(
+        "Agents-of-Abyss",
+        "0.4.0-alpha.1",
+        build_release_body("Agents-of-Abyss", release),
+    )
+    monkeypatch.setattr("aoa_sdk.release.api._gh_release_view", lambda repo, tag, cwd: payload)
+    monkeypatch.setattr(
+        "aoa_sdk.release.api._gh_release_list",
+        lambda repo, cwd: [{"tagName": "v0.3.0", "isLatest": True, "isPrerelease": False}],
+    )
+
+    result = api.audit(workspace_root=workspace_root, phase="postpublish", repo="Agents-of-Abyss", include_all=False, strict=True)
+
+    assert result.passed is True
+    latest_check = next(check for check in result.repo_reports[0].checks if check.name == "latest-tag")
+    assert latest_check.passed is True
+
+
+def test_postpublish_rejects_prerelease_marked_as_latest(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    workspace_root = tmp_path / "workspace"
+    repo_root = workspace_root / "Agents-of-Abyss"
+    remote_root = tmp_path / "aoa-origin.git"
+    _init_repo(repo_root, remote_root)
+    _write_release_surfaces(repo_root, repo_name="Agents-of-Abyss", version="0.4.0-alpha.1")
+    _commit_and_push(repo_root, "0.4.0-alpha.1")
+
+    api = ReleaseAPI(_workspace_for("Agents-of-Abyss", repo_root, workspace_root))
+    release = _parse_latest_release((repo_root / "CHANGELOG.md").read_text(encoding="utf-8"))
+    payload = _fresh_release_payload(
+        "Agents-of-Abyss",
+        "0.4.0-alpha.1",
+        build_release_body("Agents-of-Abyss", release),
+    )
+    monkeypatch.setattr("aoa_sdk.release.api._gh_release_view", lambda repo, tag, cwd: payload)
+    monkeypatch.setattr(
+        "aoa_sdk.release.api._gh_release_list",
+        lambda repo, cwd: [{"tagName": "v0.4.0-alpha.1", "isLatest": True, "isPrerelease": True}],
+    )
+
+    result = api.audit(workspace_root=workspace_root, phase="postpublish", repo="Agents-of-Abyss", include_all=False, strict=True)
+
+    assert result.passed is False
+    latest_check = next(check for check in result.repo_reports[0].checks if check.name == "latest-tag")
+    assert latest_check.passed is False
+
+
+@pytest.mark.parametrize(
+    ("field", "value", "check_name"),
+    [
+        ("tagName", "v0.2.1", "release-tag"),
+        ("isPrerelease", True, "prerelease-flag"),
+    ],
+)
+def test_postpublish_rejects_release_identity_mismatch(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    field: str,
+    value: Any,
+    check_name: str,
+) -> None:
+    workspace_root = tmp_path / "workspace"
+    repo_root = workspace_root / "Agents-of-Abyss"
+    remote_root = tmp_path / "aoa-origin.git"
+    _init_repo(repo_root, remote_root)
+    _write_release_surfaces(repo_root, repo_name="Agents-of-Abyss", version="0.2.0")
+    _commit_and_push(repo_root, "0.2.0")
+
+    api = ReleaseAPI(_workspace_for("Agents-of-Abyss", repo_root, workspace_root))
+    release = _parse_latest_release((repo_root / "CHANGELOG.md").read_text(encoding="utf-8"))
+    payload = _fresh_release_payload(
+        "Agents-of-Abyss",
+        "0.2.0",
+        build_release_body("Agents-of-Abyss", release),
+    )
+    payload[field] = value
+    monkeypatch.setattr("aoa_sdk.release.api._gh_release_view", lambda repo, tag, cwd: payload)
+    monkeypatch.setattr(
+        "aoa_sdk.release.api._gh_release_list",
+        lambda repo, cwd: [{"tagName": "v0.2.0", "isLatest": True, "isPrerelease": False}],
+    )
+
+    result = api.audit(workspace_root=workspace_root, phase="postpublish", repo="Agents-of-Abyss", include_all=False, strict=True)
+
+    assert result.passed is False
+    check = next(check for check in result.repo_reports[0].checks if check.name == check_name)
+    assert check.passed is False
