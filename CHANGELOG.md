@@ -10,6 +10,9 @@ Tracking starts with the community-docs baseline for this repository.
 - Add future changes here after the release tag lands.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
+- Make the shared release contour accept strict SemVer 2.0.0 prerelease
+  headings while preserving exact tag identity, stable parsing, and
+  prerelease-aware GitHub publication flags.
 
 ## [0.10.2] - 2026-08-08
 

@@ -583,6 +583,10 @@
 
 - [AOA-SDK-D-0058 - Recurrence Route-Role Branches](../AOA-SDK-D-0058-recurrence-route-role-branches.md) (`docs/decisions/AOA-SDK-D-0058-recurrence-route-role-branches.md`)
 
+## release audit/publish
+
+- [AOA-SDK-D-0103 - Preserve Exact SemVer Prerelease Release Identity](../AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md) (`docs/decisions/AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md`)
+
 ## release check
 
 - [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) (`docs/decisions/AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md`)
@@ -709,6 +713,10 @@
 
 - [AOA-SDK-D-0011 - Titan Helper Contract Part Localization](../AOA-SDK-D-0011-titan-helper-contract-part-localization.md) (`docs/decisions/AOA-SDK-D-0011-titan-helper-contract-part-localization.md`)
 - [AOA-SDK-D-0012 - Recurrence Control Plane Part Localization](../AOA-SDK-D-0012-recurrence-control-plane-part-localization.md) (`docs/decisions/AOA-SDK-D-0012-recurrence-control-plane-part-localization.md`)
+
+## SemVer identity
+
+- [AOA-SDK-D-0103 - Preserve Exact SemVer Prerelease Release Identity](../AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md) (`docs/decisions/AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md`)
 
 ## serial oracle
 

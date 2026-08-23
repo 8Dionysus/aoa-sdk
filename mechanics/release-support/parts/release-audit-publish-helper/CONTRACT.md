@@ -36,6 +36,8 @@ without leaving tracked drift.
 - Do not bypass protected branch, CI, or package publication checks.
 - Do not treat a release-candidate archive, checksum, attestation, or public
   trust record as the G5 owner-switch receipt or normal runtime admission.
+- Preserve the exact strict SemVer heading and derived tag identity, including
+  prerelease components; never alias a prerelease to a stable version.
 
 ## Owner Split
 

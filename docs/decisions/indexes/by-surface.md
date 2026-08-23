@@ -176,6 +176,10 @@
 
 - [AOA-SDK-D-0040 - Sibling Fallback Field Input Alias Normalization](../AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md) (`docs/decisions/AOA-SDK-D-0040-sibling-fallback-field-input-alias-normalization.md`)
 
+## compatibility/validation/workflow
+
+- [AOA-SDK-D-0103 - Preserve Exact SemVer Prerelease Release Identity](../AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md) (`docs/decisions/AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md`)
+
 ## continuation
 
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)

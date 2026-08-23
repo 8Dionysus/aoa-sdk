@@ -27,7 +27,7 @@ A release should make it easy to answer:
 ## Recommended release flow
 
 1. Confirm the release scope stays on the control plane.
-2. Update `CHANGELOG.md` and keep the latest tagged section in the `Summary / Validation / Notes` shape.
+2. Update `CHANGELOG.md` with a strict SemVer 2.0.0 heading and keep the latest tagged section in the `Summary / Validation / Notes` shape. A prerelease heading such as `## [0.4.0-alpha.1] - 2026-08-22` derives the exact `v0.4.0-alpha.1` tag; no stable alias is permitted.
 3. Run the bounded repo release battery:
    - `python scripts/release_check.py`
 4. Run the federation preflight audit from the workspace root:
@@ -51,6 +51,7 @@ Preflight is red if any of these are false:
 - README shows the exact current-release banner
 - the latest tagged changelog section has `Summary`, `Validation`, and `Notes`
 - `pyproject.toml` and `src/aoa_sdk/cli/main.py` agree with the latest release version
+- a prerelease GitHub Release flag matches the exact SemVer prerelease component
 
 Postpublish is red if any of these are false:
 
@@ -170,6 +171,6 @@ archive approval remain ordered follow-ups.
 
 ## Notes
 
-- `aoa release publish` may create or update the annotated tag and the GitHub Release, but it must not invent versions or prose.
+- `aoa release publish` may create or update the annotated tag and the GitHub Release, but it must not invent versions or prose. For a prerelease it carries the exact tag/version through `--prerelease`; stable releases do not receive that flag.
 - The GitHub Release highlights come only from `### Summary` bullets in the latest tagged changelog section.
 - Cadence debt is surfaced separately through `aoa release audit /srv/AbyssOS --phase cadence --all --json`.

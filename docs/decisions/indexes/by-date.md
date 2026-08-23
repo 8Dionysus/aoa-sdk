@@ -157,3 +157,7 @@
 ## 2026-08-21
 
 - [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
+
+## 2026-08-22
+
+- [AOA-SDK-D-0103 - Preserve Exact SemVer Prerelease Release Identity](../AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md) (`docs/decisions/AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md`)
