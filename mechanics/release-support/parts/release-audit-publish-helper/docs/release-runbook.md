@@ -52,6 +52,7 @@ Preflight is red if any of these are false:
 - the latest tagged changelog section has `Summary`, `Validation`, and `Notes`
 - `pyproject.toml` and `src/aoa_sdk/cli/main.py` agree with the latest release version
 - a prerelease GitHub Release flag matches the exact SemVer prerelease component
+- a prerelease does not displace the stable GitHub `latest` Release
 
 Postpublish is red if any of these are false:
 
@@ -171,6 +172,6 @@ archive approval remain ordered follow-ups.
 
 ## Notes
 
-- `aoa release publish` may create or update the annotated tag and the GitHub Release, but it must not invent versions or prose. For a prerelease it carries the exact tag/version through `--prerelease`; stable releases do not receive that flag.
+- `aoa release publish` may create or update the annotated tag and the GitHub Release, but it must not invent versions or prose. For a prerelease it carries the exact tag/version through `--prerelease` and leaves `--latest` unset because GitHub latest must remain stable; stable edits use `--prerelease=false` to clear stale remote state and retain `--latest`.
 - The GitHub Release highlights come only from `### Summary` bullets in the latest tagged changelog section.
 - Cadence debt is surfaced separately through `aoa release audit /srv/AbyssOS --phase cadence --all --json`.

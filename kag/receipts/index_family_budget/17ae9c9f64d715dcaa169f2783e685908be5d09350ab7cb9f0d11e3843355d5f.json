@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 15041808,
+  "allowed_tracked_bytes": 20812649,
+  "approved_by": "repository-owner",
+  "base_ref": "b57a523a8fdd26c62d58ee0f9f58722f03dfc9c7",
+  "changed_generated_bytes": 15041808,
+  "changed_generated_files": 273,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "17ae9c9f64d715dcaa169f2783e685908be5d09350ab7cb9f0d11e3843355d5f",
+  "reason": "Refresh the exact aoa-sdk portable owner family for the strict SemVer prerelease release contour repair, GitHub latest-state reconciliation, and bounded source-topology stop line; generated KAG only, no source or sibling release semantics.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20812649,
+  "tracked_bytes_max": 15728640
+}

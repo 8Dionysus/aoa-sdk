@@ -317,7 +317,7 @@ def _gh_release_view(repo: str, tag: str, *, cwd: Path) -> dict[str, Any] | None
 def _gh_release_list(repo: str, *, cwd: Path) -> list[dict[str, Any]]:
     try:
         completed = _run(
-            ["gh", "release", "list", "--repo", _github_repo_slug(repo), "--limit", "10", "--json", "tagName,isLatest"],
+            ["gh", "release", "list", "--repo", _github_repo_slug(repo), "--limit", "10", "--json", "tagName,isLatest,isPrerelease"],
             cwd=cwd,
             check=False,
             timeout=REMOTE_COMMAND_TIMEOUT_SECONDS,
@@ -790,12 +790,22 @@ class ReleaseAPI:
                     ),
                 ]
             )
-            latest_tag = next((item["tagName"] for item in _gh_release_list(repo, cwd=repo_root) if item.get("isLatest")), None)
+            latest_release = next(
+                (item for item in _gh_release_list(repo, cwd=repo_root) if item.get("isLatest")),
+                None,
+            )
+            latest_tag = latest_release.get("tagName") if latest_release else None
+            latest_is_stable = latest_release is not None and latest_release.get("isPrerelease") is False
             checks.append(
                 ReleaseCheck(
                     name="latest-tag",
-                    passed=latest_tag == release.tag,
-                    detail=f"latest GitHub Release must point at {release.tag}",
+                    passed=(latest_is_stable and (release.is_prerelease or latest_tag == release.tag)),
+                    detail=(
+                        "latest GitHub Release must remain stable while the exact "
+                        f"prerelease {release.tag} is published"
+                        if release.is_prerelease
+                        else f"latest GitHub Release must point at stable {release.tag}"
+                    ),
                 )
             )
             checks.extend(validate_release_body(repo, release, release_view.get("body", "")))
@@ -908,8 +918,9 @@ class ReleaseAPI:
         release_view = _gh_release_view(repo, release.tag, cwd=repo_root)
         actions.append("create GitHub Release" if release_view is None else "update GitHub Release")
         if release.is_prerelease:
-            actions.append("mark GitHub Release as prerelease")
-        actions.append("set GitHub Release as latest")
+            actions.append("mark GitHub Release as prerelease and keep stable latest release")
+        else:
+            actions.append("set GitHub Release as latest")
 
         if dry_run:
             return actions, release_view["url"] if release_view else None
@@ -936,9 +947,12 @@ class ReleaseAPI:
             handle.write(notes)
             notes_path = handle.name
         try:
-            release_flags = ["--latest"]
             if release.is_prerelease:
-                release_flags.append("--prerelease")
+                release_flags = ["--prerelease"]
+            else:
+                release_flags = ["--latest"]
+                if release_view is not None:
+                    release_flags.append("--prerelease=false")
             if release_view is None:
                 _run(
                     [

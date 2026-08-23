@@ -38,6 +38,8 @@ without leaving tracked drift.
   trust record as the G5 owner-switch receipt or normal runtime admission.
 - Preserve the exact strict SemVer heading and derived tag identity, including
   prerelease components; never alias a prerelease to a stable version.
+- Keep GitHub's `latest` pointer on a stable Release; a prerelease may be
+  published and audited without becoming latest.
 
 ## Owner Split
 

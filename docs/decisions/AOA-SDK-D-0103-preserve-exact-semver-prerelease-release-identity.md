@@ -34,8 +34,10 @@ present in the SDK CLI surface.
 Use one strict SemVer 2.0.0 matcher for release headings and the SDK CLI
 version surface. Derive the tag as `v` plus the exact parsed version. Pass the
 GitHub `--prerelease` flag only when the parsed version has a prerelease
-component, and require postpublish GitHub tag and prerelease state to match
-that exact version. Stable versions keep their existing behavior.
+component, leave `--latest` unset for prereleases, and require postpublish
+GitHub tag, prerelease state, and stable-latest behavior to match that exact
+version. Stable versions keep `--latest` and explicitly clear stale
+prerelease state on edits.
 
 ## Rationale
 

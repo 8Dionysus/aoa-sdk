@@ -12,7 +12,8 @@ Tracking starts with the community-docs baseline for this repository.
   inventories, and validation evidence.
 - Make the shared release contour accept strict SemVer 2.0.0 prerelease
   headings while preserving exact tag identity, stable parsing, and
-  prerelease-aware GitHub publication flags.
+  prerelease-aware GitHub publication flags; keep stable Releases latest and
+  clear stale prerelease state on stable edits.
 
 ## [0.10.2] - 2026-08-08
 
