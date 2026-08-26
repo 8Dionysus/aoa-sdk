@@ -31,6 +31,9 @@ PROGRAMMATIC_EXECUTION_SCHEMA_VERSION: Literal[
 PROGRAMMATIC_EXECUTION_ADAPTER_PROTOCOL_VERSION: Literal[
     "aoa_programmatic_tool_adapter_v1"
 ] = "aoa_programmatic_tool_adapter_v1"
+PROGRAMMATIC_ADMISSION_SCHEMA_VERSION: Literal[
+    "aoa_programmatic_tool_execution_admission_v1"
+] = "aoa_programmatic_tool_execution_admission_v1"
 
 ExecutionMode: TypeAlias = Literal["direct", "programmatic"]
 ProgrammaticActivationState: TypeAlias = Literal["not_admitted", "admitted"]
@@ -53,7 +56,7 @@ ObservationDimension: TypeAlias = Literal[
     "rework",
 ]
 ObservationAvailability: TypeAlias = Literal[
-    "observed", "unavailable", "not_applicable"
+    "observed", "partial", "unavailable", "not_applicable"
 ]
 EconomyAvailability: TypeAlias = Literal["observed", "partial", "unavailable"]
 MeasurementSource: TypeAlias = Literal["runtime", "provider", "derived"]
@@ -136,6 +139,9 @@ class ProgrammaticActivation(StrictControlPlaneModel):
 
     state: ProgrammaticActivationState = "not_admitted"
     admission_ref: ContentRef | None = None
+    admission_authority: ProvenanceRef | None = None
+    plan_ref: ContentRef | None = None
+    runtime_profile_ref: ContentRef | None = None
     admitted_at: datetime | None = None
 
     @field_validator("admitted_at")
@@ -148,11 +154,56 @@ class ProgrammaticActivation(StrictControlPlaneModel):
     @model_validator(mode="after")
     def validate_admission_state(self) -> ProgrammaticActivation:
         admitted = self.state == "admitted"
-        if admitted and (self.admission_ref is None or self.admitted_at is None):
-            raise ValueError(
-                "admitted programmatic execution requires an admission ref and time"
+        if admitted:
+            if any(
+                value is None
+                for value in (
+                    self.admission_ref,
+                    self.admission_authority,
+                    self.plan_ref,
+                    self.runtime_profile_ref,
+                    self.admitted_at,
+                )
+            ):
+                raise ValueError(
+                    "admitted programmatic execution requires an admission ref, "
+                    "authority, plan, runtime profile, and time"
+                )
+            admission_ref = self.admission_ref
+            admission_authority = self.admission_authority
+            if admission_ref is None or admission_authority is None:
+                raise ValueError(
+                    "admitted programmatic execution is missing admission evidence"
+                )
+            if (
+                admission_ref.schema_version
+                != PROGRAMMATIC_ADMISSION_SCHEMA_VERSION
+                or admission_authority.schema_version
+                != PROGRAMMATIC_ADMISSION_SCHEMA_VERSION
+            ):
+                raise ValueError(
+                    "programmatic admission evidence must use the admission schema"
+                )
+            if admission_ref.owner_repo != admission_authority.owner_repo:
+                raise ValueError(
+                    "programmatic admission ref and authority must share an owner"
+                )
+            if (
+                admission_ref.digest != admission_authority.artifact_digest
+            ):
+                raise ValueError(
+                    "programmatic admission ref and authority must share a digest"
+                )
+        if not admitted and any(
+            value is not None
+            for value in (
+                self.admission_ref,
+                self.admission_authority,
+                self.plan_ref,
+                self.runtime_profile_ref,
+                self.admitted_at,
             )
-        if not admitted and (self.admission_ref is not None or self.admitted_at is not None):
+        ):
             raise ValueError(
                 "unadmitted programmatic execution cannot carry admission evidence"
             )
@@ -224,6 +275,30 @@ class ProgrammaticExecutionRequest(StrictControlPlaneModel):
             raise ValueError(
                 "activation requirements must bind the request plan and runtime profile"
             )
+        if self.activation.state == "admitted":
+            activation = self.activation
+            if (
+                activation.plan_ref != self.plan_ref
+                or activation.runtime_profile_ref != self.runtime_profile_ref
+            ):
+                raise ValueError(
+                    "admission must bind the exact request plan and runtime profile"
+                )
+            assert activation.admission_ref is not None
+            assert activation.admission_authority is not None
+            assert activation.admitted_at is not None
+            runtime_owner = self.runtime_profile_ref.owner_repo
+            if (
+                activation.admission_ref.owner_repo != runtime_owner
+                or activation.admission_authority.owner_repo != runtime_owner
+            ):
+                raise ValueError(
+                    "admission evidence must come from the runtime profile owner"
+                )
+            if activation.admitted_at < self.requested_at:
+                raise ValueError(
+                    "admission time must not precede the request time"
+                )
         allowed_effects = set(self.effect_ceiling.allowed_effect_classes)
         if any(handle.effect_class not in allowed_effects for handle in self.tool_handles):
             raise ValueError("a tool handle exceeds the request effect ceiling")
@@ -296,6 +371,7 @@ class ProgrammaticEconomyObservation(StrictControlPlaneModel):
     intermediate_values: NonNegativeInt | None = None
     wall_time_ms: NonNegativeInt | None = None
     rework_count: NonNegativeInt | None = None
+    partial_reason: NonEmptyStr | None = None
     unavailable_reason: NonEmptyStr | None = None
     observed_at: datetime
 
@@ -322,7 +398,11 @@ class ProgrammaticEconomyObservation(StrictControlPlaneModel):
         if self.availability == "unavailable":
             if any(value is not None for value in measurements):
                 raise ValueError("unavailable economy cannot carry measurements")
-            if self.measurement_source is not None or self.unavailable_reason is None:
+            if (
+                self.measurement_source is not None
+                or self.partial_reason is not None
+                or self.unavailable_reason is None
+            ):
                 raise ValueError(
                     "unavailable economy requires a reason and no measurement source"
                 )
@@ -333,6 +413,10 @@ class ProgrammaticEconomyObservation(StrictControlPlaneModel):
             raise ValueError(
                 "observed or partial economy requires a source and measurement"
             )
+        if self.availability == "partial" and self.partial_reason is None:
+            raise ValueError("partial economy requires a partial reason")
+        if self.availability == "observed" and self.partial_reason is not None:
+            raise ValueError("observed economy cannot carry a partial reason")
         if (
             self.cached_input_tokens is not None
             and self.input_tokens is not None
@@ -357,6 +441,11 @@ class ProgrammaticObservationDimension(StrictControlPlaneModel):
         if self.availability == "observed":
             if self.evidence_ref is None or self.reason_code is not None:
                 raise ValueError("observed dimensions require only an evidence ref")
+        elif self.availability == "partial":
+            if self.evidence_ref is None or self.reason_code is None:
+                raise ValueError(
+                    "partial dimensions require an evidence ref and reason code"
+                )
         elif self.evidence_ref is not None or self.reason_code is None:
             raise ValueError(
                 "unavailable dimensions require only a reason code"
@@ -402,8 +491,8 @@ class ProgrammaticExecutionObservation(StrictControlPlaneModel):
                 raise ValueError(
                     "failed or cancelled execution requires failure and no result"
                 )
-        elif self.failure is not None and self.result_ref is None:
-            raise ValueError("partial execution failure must retain a result ref")
+        elif self.result_ref is None or self.failure is None:
+            raise ValueError("partial execution requires a result ref and failure")
 
         call_ids = [call.call_id for call in self.tool_calls]
         sequences = [call.sequence for call in self.tool_calls]
@@ -468,6 +557,54 @@ def assert_programmatic_execution_admitted(
         raise ControlPlaneContractError(
             "programmatic execution admission is missing its exact evidence"
         )
+    activation = request.activation
+    admission_ref = activation.admission_ref
+    admitted_at = activation.admitted_at
+    if admission_ref is None or admitted_at is None:
+        raise ControlPlaneContractError(
+            "programmatic execution admission is missing its exact evidence"
+        )
+    if (
+        activation.admission_authority is None
+        or activation.plan_ref is None
+        or activation.runtime_profile_ref is None
+    ):
+        raise ControlPlaneContractError(
+            "programmatic execution admission is missing its exact bindings"
+        )
+    if (
+        activation.plan_ref != request.plan_ref
+        or activation.runtime_profile_ref != request.runtime_profile_ref
+    ):
+        raise ControlPlaneContractError(
+            "programmatic execution admission is outside the exact plan/profile scope"
+        )
+    authority = activation.admission_authority
+    if (
+        admission_ref.schema_version != PROGRAMMATIC_ADMISSION_SCHEMA_VERSION
+        or authority.schema_version != PROGRAMMATIC_ADMISSION_SCHEMA_VERSION
+    ):
+        raise ControlPlaneContractError(
+            "programmatic execution admission evidence uses an invalid schema"
+        )
+    if (
+        admission_ref.owner_repo != authority.owner_repo
+        or admission_ref.digest != authority.artifact_digest
+    ):
+        raise ControlPlaneContractError(
+            "programmatic execution admission evidence is not owner/digest bound"
+        )
+    if (
+        admission_ref.owner_repo != request.runtime_profile_ref.owner_repo
+        or authority.owner_repo != request.runtime_profile_ref.owner_repo
+    ):
+        raise ControlPlaneContractError(
+            "programmatic execution admission evidence is not from the runtime owner"
+        )
+    if admitted_at < request.requested_at:
+        raise ControlPlaneContractError(
+            "programmatic execution admission predates the request"
+        )
 
 
 def assert_programmatic_execution_observation(
@@ -488,6 +625,23 @@ def assert_programmatic_execution_observation(
     ):
         raise ControlPlaneContractError(
             "execution observation is outside the request identity scope"
+        )
+    if observation.provenance.owner_repo != request.runtime_profile_ref.owner_repo:
+        raise ControlPlaneContractError(
+            "execution observation provenance does not come from the runtime owner"
+        )
+    if observation.started_at < request.requested_at:
+        raise ControlPlaneContractError(
+            "execution observation starts before the request"
+        )
+    admitted_at = request.activation.admitted_at
+    if admitted_at is None:
+        raise ControlPlaneContractError(
+            "execution observation is missing the admission time"
+        )
+    if observation.started_at < admitted_at:
+        raise ControlPlaneContractError(
+            "execution observation starts before admission"
         )
 
     handles = {handle.handle_id for handle in request.tool_handles}
@@ -524,16 +678,13 @@ def assert_programmatic_execution_observation(
     economy_dimension = observed_dimensions.get("economy")
     if economy_dimension is not None:
         if (
-            economy_dimension.availability == "observed"
-            and observation.economy.availability == "unavailable"
+            economy_dimension.availability
+            != {
+                "observed": "observed",
+                "partial": "partial",
+                "unavailable": "unavailable",
+            }[observation.economy.availability]
         ):
             raise ControlPlaneContractError(
-                "economy dimension is observed but economy counters are unavailable"
-            )
-        if (
-            economy_dimension.availability != "observed"
-            and observation.economy.availability != "unavailable"
-        ):
-            raise ControlPlaneContractError(
-                "economy counters are present while the economy dimension is unavailable"
+                "economy dimension availability must match economy counters"
             )

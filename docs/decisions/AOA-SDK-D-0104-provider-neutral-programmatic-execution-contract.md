@@ -34,9 +34,12 @@ owner. Runtime execution, sandbox enforcement, and durable evidence belong to
 Add `aoa_programmatic_tool_execution_v1` under the SDK Runtime Seam. The
 contract binds execution and correlation identity, direct/programmatic mode,
 stable tool handles, plan and runtime-profile refs, sandbox/effect ceiling,
-default-off activation, and required observation dimensions. It carries
-observed economy counters, tool-call records, intermediate refs, and typed
-failures without introducing token budgets or provider selection.
+default-off activation, and required observation dimensions. Admission carries
+runtime-owner authority provenance, exact plan/profile bindings, and a
+content-addressed admission schema; observations bind runtime-owner
+provenance and request/admission time ordering. Partial economy and partial
+execution states remain explicit without introducing token budgets or provider
+selection.
 
 `abyss-stack` owns the runtime adapter interface and concrete provider
 adapters. An observation is admissible only when it repeats the exact request
@@ -52,8 +55,11 @@ source presence from becoming activation.
 ## Consequences
 
 - SDK imports remain data-only and independent of live providers.
-- Runtime adapters must supply an explicit admission and a complete or
-  explicitly unavailable observation.
+- Runtime adapters must supply an explicit admission and a complete,
+  explicitly partial, or explicitly unavailable observation.
+- Admission and observation evidence must retain their runtime-owner and
+  request-scope bindings; partial economy cannot silently become complete
+  under the default reject-missing policy.
 - Economy values remain measurements, not hidden execution ceilings.
 - Runtime/eval/promotion and owner acceptance still require later paired
   baseline evidence.

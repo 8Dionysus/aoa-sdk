@@ -15,15 +15,19 @@ mode.
   classes. Tool-call limits are effect-surface limits, not token budgets.
 - `ProgrammaticActivationRequirements` binds the exact plan and runtime
   profile and keeps `default_enabled=false`. `ProgrammaticActivation` can be
-  admitted only with an explicit evidence ref and timestamp.
+  admitted only with an explicit runtime-owner admission ref, matching
+  authority provenance, exact plan/profile refs, and timestamp.
 - `ProgrammaticExecutionObservation` records execution status, tool calls,
   intermediate value refs, failures, economy counters, and dimension-level
-  missingness. Economy counters are observations, never predeclared limits.
+  missingness. Partial economy is represented as a partial dimension with a
+  reason, and rejected-missing policy never treats it as complete. Economy
+  counters are observations, never predeclared limits.
 
 `assert_programmatic_execution_observation()` checks the exact request digest,
-identity, handle set, effect ceiling, observation dimensions, and missingness
-policy. It does not decide whether a baseline is ready or whether a result is
-correct.
+identity, runtime-owner provenance, request/admission ordering, handle set,
+effect ceiling, observation dimensions, and missingness policy. Partial
+execution observations must retain both a result ref and failure detail. It
+does not decide whether a baseline is ready or whether a result is correct.
 
 ## Boundaries
 
