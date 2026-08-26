@@ -222,6 +222,7 @@
 - [AOA-SDK-D-0099 - Compile obligation actor plans without selecting meaning](../AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md) (`docs/decisions/AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md`)
 - [AOA-SDK-D-0100 - SDK Pre-Tool Agent Routing Owner](../AOA-SDK-D-0100-pre-tool-agent-routing-owner.md) (`docs/decisions/AOA-SDK-D-0100-pre-tool-agent-routing-owner.md`)
 - [AOA-SDK-D-0101 - Bind the exact runtime subject in incarnation v2](../AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md`)
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 
 ## control-plane routing
 
@@ -444,6 +445,7 @@
 - [AOA-SDK-D-0086 - Keep Route Callers Distinct from Providers](../AOA-SDK-D-0086-keep-route-callers-distinct-from-providers.md) (`docs/decisions/AOA-SDK-D-0086-keep-route-callers-distinct-from-providers.md`)
 - [AOA-SDK-D-0087 - Admit Typed Scenario Artifacts as Runtime Requests](../AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md) (`docs/decisions/AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md`)
 - [AOA-SDK-D-0100 - SDK Pre-Tool Agent Routing Owner](../AOA-SDK-D-0100-pre-tool-agent-routing-owner.md) (`docs/decisions/AOA-SDK-D-0100-pre-tool-agent-routing-owner.md`)
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 
 ## public support
 
@@ -600,6 +602,7 @@
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
 - [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 - [AOA-SDK-D-0101 - Bind the exact runtime subject in incarnation v2](../AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md`)
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 
 ## runtime seam
 

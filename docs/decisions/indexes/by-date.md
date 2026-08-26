@@ -161,3 +161,7 @@
 ## 2026-08-22
 
 - [AOA-SDK-D-0103 - Preserve Exact SemVer Prerelease Release Identity](../AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md) (`docs/decisions/AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md`)
+
+## 2026-08-26
+
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)

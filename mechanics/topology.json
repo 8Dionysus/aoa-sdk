@@ -156,7 +156,8 @@
       "portable-workspace-bootstrap",
       "control-plane-capsule",
       "runtime-mirror-boundary",
-      "abyss-stack-runtime-adapter"
+      "abyss-stack-runtime-adapter",
+      "programmatic-tool-execution"
     ],
     "boundary-bridge": [
       "consumed-surface-posture-gate",
@@ -713,20 +714,24 @@
         "mechanics/runtime-seam/parts/abyss-stack-runtime-adapter",
         "mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/tests/test_abyss_stack_runtime_adapter.py",
         "mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/scripts/verify_abyss_stack_adapter_wheel.py",
+        "mechanics/runtime-seam/parts/programmatic-tool-execution",
+        "mechanics/runtime-seam/parts/programmatic-tool-execution/tests/test_programmatic_tool_execution.py",
         "src/aoa_sdk/workspace",
-        "src/aoa_sdk/runtime_adapters"
+        "src/aoa_sdk/runtime_adapters",
+        "src/aoa_sdk/contracts/programmatic_execution.py"
       ],
       "candidate_parts": [
         "workspace-root-resolution",
         "control-plane-capsule",
         "portable-workspace-bootstrap",
         "runtime-mirror-boundary",
-        "abyss-stack-runtime-adapter"
+        "abyss-stack-runtime-adapter",
+        "programmatic-tool-execution"
       ],
       "validation": [
         "python scripts/build_workspace_control_plane.py --check",
         "python scripts/validate_workspace_control_plane.py",
-        "python -m pytest -q mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution_cli.py mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/tests/test_abyss_stack_runtime_adapter.py",
+        "python -m pytest -q mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution.py mechanics/runtime-seam/parts/workspace-root-resolution/tests/test_workspace_root_resolution_cli.py mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py mechanics/runtime-seam/parts/control-plane-capsule/tests/test_control_plane_capsule.py mechanics/runtime-seam/parts/runtime-mirror-boundary/tests/test_runtime_mirror_boundary.py mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/tests/test_abyss_stack_runtime_adapter.py mechanics/runtime-seam/parts/programmatic-tool-execution/tests/test_programmatic_tool_execution.py",
         "python -m mypy src/aoa_sdk/runtime_adapters",
         "python mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/scripts/verify_abyss_stack_adapter_wheel.py"
       ]
