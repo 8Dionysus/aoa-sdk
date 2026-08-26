@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 3690702,
+  "allowed_tracked_bytes": 20853123,
+  "approved_by": "repository-owner",
+  "base_ref": "e9a36b9930ff5a20db49fc7a8fba9e9a093e6a0b",
+  "changed_generated_bytes": 3690702,
+  "changed_generated_files": 71,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "2d3f5ef4022e3b95f57f4af5b5b5c619f0df7ae11baddf2774be00979d030390",
+  "reason": "Refresh the exact aoa-sdk portable owner family for the generic Goal lifecycle transition seam; generated KAG only, preserving authored SDK semantics and source-owner authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20853123,
+  "tracked_bytes_max": 15728640
+}
