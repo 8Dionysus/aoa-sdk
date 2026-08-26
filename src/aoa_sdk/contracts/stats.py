@@ -107,8 +107,10 @@ class InferenceEconomyObservationRequirement(StrictControlPlaneModel):
             raise ValueError("inference economy metric paths must be unique")
         if len(set(self.lifecycle_paths)) != len(self.lifecycle_paths):
             raise ValueError("inference economy lifecycle paths must be unique")
-        if not self.metric_paths and not self.lifecycle_paths:
-            raise ValueError("inference economy requirement must request an observation field")
+        if not self.metric_paths or not self.lifecycle_paths:
+            raise ValueError(
+                "inference economy requirement must request both metric and lifecycle fields"
+            )
         return self
 
 

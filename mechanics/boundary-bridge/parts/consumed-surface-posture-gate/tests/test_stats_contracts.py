@@ -76,3 +76,11 @@ def test_requirement_rejects_foreign_contract_duplicate_paths_and_activation() -
 
     with pytest.raises(ValidationError):
         requirement(activation_allowed=True)
+
+
+def test_requirement_rejects_one_sided_observation_requests() -> None:
+    with pytest.raises(ValidationError, match="both metric and lifecycle fields"):
+        requirement(metric_paths=[], lifecycle_paths=["runtime_outcome"])
+
+    with pytest.raises(ValidationError, match="both metric and lifecycle fields"):
+        requirement(metric_paths=["tokens.input"], lifecycle_paths=[])
