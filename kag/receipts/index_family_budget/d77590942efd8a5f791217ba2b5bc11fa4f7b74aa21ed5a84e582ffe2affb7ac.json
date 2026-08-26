@@ -8,7 +8,7 @@
   "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
   "default_limit_bytes": 1048576,
   "head_family_digest": "d77590942efd8a5f791217ba2b5bc11fa4f7b74aa21ed5a84e582ffe2affb7ac",
-  "reason": "Refresh the exact aoa-sdk portable owner family after the deterministic lifecycle-test time-fixture repair; generated KAG only, preserving authored SDK semantics and source-owner authority.",
+  "reason": "Refresh the exact aoa-sdk portable owner family after the provider-neutral programmatic execution contract delivery; generated KAG only, preserving authored SDK semantics and source-owner authority.",
   "repo": "aoa-sdk",
   "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
   "scope": "generated_delta_and_tracked_size",
