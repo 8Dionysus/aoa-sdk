@@ -8,7 +8,7 @@
   "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
   "default_limit_bytes": 1048576,
   "head_family_digest": "1e0728502ee65cc15c9e0332f5ba3bfd24f740771c5252aa4896ec272062a4e1",
-  "reason": "Refresh the exact aoa-sdk portable owner family for the stale-context fail-closed correction in the generic Goal lifecycle transition seam; generated KAG only, preserving authored SDK semantics and source-owner authority.",
+  "reason": "Refresh the exact aoa-sdk portable owner family after the canonical source-topology rebuild for the generic Goal lifecycle transition seam; generated KAG only, preserving authored SDK semantics and source-owner authority.",
   "repo": "aoa-sdk",
   "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
   "scope": "generated_delta_and_tracked_size",
