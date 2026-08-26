@@ -48,6 +48,12 @@ from aoa_sdk.contracts.admission_keeper import (  # noqa: E402
     AdmissionKeeperState,
 )
 from aoa_sdk.contracts.tasks import OwnerTaskRecord, TaskAuditReceipt  # noqa: E402
+from aoa_sdk.contracts.organ_exposure import (  # noqa: E402
+    ExposureAuthorizationCandidate,
+    ExposureSelectionRequest,
+    ProgressiveExposurePlan,
+    RenderedExposureSnapshot,
+)
 
 
 OUTPUTS = {
@@ -83,6 +89,10 @@ OUTPUTS = {
     "organ-admission-keeper-cycle.schema.json": AdmissionKeeperCycle,
     "owner-task-record.schema.json": OwnerTaskRecord,
     "owner-task-audit.schema.json": TaskAuditReceipt,
+    "organ-exposure-request.schema.json": ExposureSelectionRequest,
+    "organ-exposure-snapshot.schema.json": RenderedExposureSnapshot,
+    "organ-exposure-plan.schema.json": ProgressiveExposurePlan,
+    "organ-exposure-authorization.schema.json": ExposureAuthorizationCandidate,
 }
 
 PART_LOCAL_OUTPUTS = {
@@ -100,6 +110,10 @@ PART_LOCAL_OUTPUTS = {
     "organ-admission-keeper-cycle.schema.json",
     "owner-task-record.schema.json",
     "owner-task-audit.schema.json",
+    "organ-exposure-request.schema.json",
+    "organ-exposure-snapshot.schema.json",
+    "organ-exposure-plan.schema.json",
+    "organ-exposure-authorization.schema.json",
 }
 
 

@@ -24,6 +24,11 @@ from ..contracts.organs import (
     PolicyFamily,
     RegistryState,
 )
+from ..contracts.organ_exposure import (
+    ExposureAuthorizationCandidate,
+    ExposureSelectionRequest,
+    ProgressiveExposurePlan,
+)
 from ..contracts.organ_admission import (
     AdmissionDecisionReceipt,
     AdmissionEvidenceReceipt,
@@ -44,6 +49,7 @@ from .orchestration import (
     start_orchestration,
     validate_orchestration_run,
 )
+from .exposure import compile_progressive_exposure, prepare_exposure_authorization
 from .admission import (
     advance_admission,
     audit_admission_baseline,
@@ -71,6 +77,7 @@ class OrgansAPI:
         *,
         registry_path: str | Path | None = None,
         clock: Callable[[], datetime] | None = None,
+        progressive_exposure_enabled: bool = False,
     ) -> None:
         self.workspace = workspace
         self.registry_path = (
@@ -80,6 +87,9 @@ class OrgansAPI:
         )
         self._projection: OrganRegistryProjection | None = None
         self._clock = clock or (lambda: datetime.now(timezone.utc))
+        # The feature flag is intentionally local and deny-by-default.  A
+        # caller cannot turn it into activation authority through this API.
+        self._progressive_exposure_enabled = progressive_exposure_enabled
 
     def projection(self) -> OrganRegistryProjection:
         if self.registry_path is None:
@@ -209,6 +219,31 @@ class OrgansAPI:
         if not entry.discoverable:
             raise OrganRegistryError(f"organ {organ_id!r} is not discoverable")
         return self._find_capability(entry, capability_id)
+
+    def compile_exposure(
+        self,
+        request: ExposureSelectionRequest,
+        *,
+        evaluated_at: datetime | None = None,
+    ) -> ProgressiveExposurePlan:
+        """Compile a bounded schema-disclosure candidate without activation."""
+
+        return compile_progressive_exposure(
+            self.projection(),
+            request,
+            feature_enabled=self._progressive_exposure_enabled,
+            evaluated_at=evaluated_at or self._clock(),
+        )
+
+    @staticmethod
+    def prepare_exposure_authorization(
+        plan: ProgressiveExposurePlan,
+        *,
+        approval_ref=None,
+    ) -> ExposureAuthorizationCandidate:
+        """Hand a disclosure candidate to the external runtime owner."""
+
+        return prepare_exposure_authorization(plan, approval_ref=approval_ref)
 
     def start_orchestration(
         self,

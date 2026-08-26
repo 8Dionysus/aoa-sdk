@@ -1,6 +1,7 @@
 """Owner-bounded organ discovery and candidate-plan compilation."""
 
 from .api import OrgansAPI
+from .exposure import compile_progressive_exposure, prepare_exposure_authorization
 from .admission import (
     ADMISSION_STAGES,
     OrganAdmissionError,
@@ -96,6 +97,7 @@ __all__ = [
     "build_keeper_state",
     "build_admission_candidate",
     "compile_registry",
+    "compile_progressive_exposure",
     "compile_registry_v2",
     "load_registry_source",
     "load_registry_source_v2",
@@ -108,6 +110,7 @@ __all__ = [
     "migrate_registry_v1_to_v2",
     "rebase_expired_registry_v2_to_shadow",
     "plan_keeper_refresh",
+    "prepare_exposure_authorization",
     "run_keeper_cycle",
     "start_admission",
     "start_orchestration",
