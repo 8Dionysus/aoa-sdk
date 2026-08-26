@@ -106,6 +106,18 @@ def test_goal_lifecycle_rejects_stale_owner_state_without_transport_choice() -> 
     assert "expected_state_mismatch" in decision.reason_codes
 
 
+def test_goal_lifecycle_rejects_owner_context_older_than_request() -> None:
+    request = _request()
+    stale_context = _context(request).model_copy(
+        update={"observed_at": datetime(2026, 8, 25, 11, 59, tzinfo=timezone.utc)}
+    )
+
+    decision = resolve_goal_lifecycle(request, stale_context)
+
+    assert decision.status == "rejected"
+    assert decision.reason_codes == ("owner_context_stale_for_request",)
+
+
 def test_runtime_scope_accepts_only_the_exact_semantic_decision() -> None:
     request = _request()
     decision = resolve_goal_lifecycle(request, _context(request))

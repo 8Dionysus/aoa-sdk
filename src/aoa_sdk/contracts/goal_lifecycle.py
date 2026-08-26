@@ -251,6 +251,8 @@ def resolve_goal_lifecycle(
     """Resolve legitimacy from owner state without selecting or invoking a runtime."""
 
     reasons: list[str] = []
+    if context.observed_at < request.requested_at:
+        reasons.append("owner_context_stale_for_request")
     if request.correlation_id != context.correlation_id:
         reasons.append("correlation_mismatch")
     if request.goal_ref != context.goal_ref:
