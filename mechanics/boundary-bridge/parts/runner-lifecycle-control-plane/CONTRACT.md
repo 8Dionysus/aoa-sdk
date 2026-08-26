@@ -12,6 +12,23 @@
 - the SDK-owned deterministic reference adapter used only as a no-effect
   protocol witness.
 
+## Goal lifecycle seam
+
+`GoalLifecycleRequest` is the runtime-neutral instance contract for a Goal
+transition. It carries the Goal reference, observed and expected state,
+desired state, transition kind, reason, evidence, correlation and idempotency
+identities, current holder, and return owner. `GoalLifecycleContext` is the
+semantic owner's current Goal/DAG/ownership read model. `resolve_goal_lifecycle`
+returns a typed accepted or rejected `GoalLifecycleDecision` before any
+runtime adapter is selected or called.
+
+An adapter may execute only the exact accepted request/decision pair. Its
+`GoalLifecycleExecutionReceipt` is an `executed`-stage result that confirms the
+resulting state from its authoritative read surface. The receipt's boundary
+claims keep requested, accepted, executed, delivered, semantically accepted,
+and closed separate. State names and transition kinds are instance data, so a
+new Goal state or runtime adapter does not require changing this SDK contract.
+
 ## Stronger owner split
 
 - the caller chooses and supplies the adapter;

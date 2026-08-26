@@ -5,8 +5,8 @@ Run:
 ```bash
 python -m pytest -q mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/tests
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_r2_control_plane_contracts.py mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests/test_plan_compilation_control_plane.py
-python -m mypy src/aoa_sdk/contracts/control_plane.py src/aoa_sdk/control_plane src/aoa_sdk/api.py
-python -m ruff check src/aoa_sdk/contracts/control_plane.py src/aoa_sdk/control_plane src/aoa_sdk/api.py mechanics/boundary-bridge/parts/runner-lifecycle-control-plane
+python -m mypy src/aoa_sdk/contracts/control_plane.py src/aoa_sdk/contracts/goal_lifecycle.py src/aoa_sdk/control_plane src/aoa_sdk/api.py
+python -m ruff check src/aoa_sdk/contracts/control_plane.py src/aoa_sdk/contracts/goal_lifecycle.py src/aoa_sdk/control_plane src/aoa_sdk/api.py mechanics/boundary-bridge/parts/runner-lifecycle-control-plane
 python scripts/validate_mechanics_topology.py
 python scripts/validate_sdk_source_home.py
 python -m build
@@ -20,6 +20,8 @@ The focused suite covers:
 - normal completion and owner-complete closeout;
 - sequential multiple approvals, rejected and expired approvals, plus renewal;
 - pause/resume;
+- owner-resolved Goal lifecycle legitimacy for delegation yield and accepted
+  return, including stale-state rejection and exact adapter scope;
 - duplicate start, command, and approval;
 - repeat of a rejected command with no new event or receipt;
 - idempotency payload mismatch;
