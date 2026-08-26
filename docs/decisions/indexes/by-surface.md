@@ -28,6 +28,7 @@
 - [AOA-SDK-D-0081 - Delegate Run Lifecycle Through Explicit Adapters](../AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md) (`docs/decisions/AOA-SDK-D-0081-delegate-run-lifecycle-through-explicit-adapters.md`)
 - [AOA-SDK-D-0082 - Bind abyss-stack Through an Explicit Runtime Transport](../AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md) (`docs/decisions/AOA-SDK-D-0082-bind-abyss-stack-through-an-explicit-runtime-transport.md`)
 - [AOA-SDK-D-0087 - Admit Typed Scenario Artifacts as Runtime Requests](../AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md) (`docs/decisions/AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md`)
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 
 ## admission maintenance
 
@@ -365,6 +366,10 @@
 
 - [AOA-SDK-D-0059 - Shared Model Contract Branches](../AOA-SDK-D-0059-shared-model-contract-branches.md) (`docs/decisions/AOA-SDK-D-0059-shared-model-contract-branches.md`)
 
+## observation
+
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
+
 ## operator decision
 
 - [AOA-SDK-D-0095 - Admit One Contour Through Content-Addressed CAS](../AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md) (`docs/decisions/AOA-SDK-D-0095-admit-one-contour-through-content-addressed-cas.md`)
@@ -468,6 +473,7 @@
 - [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 - [AOA-SDK-D-0099 - Compile obligation actor plans without selecting meaning](../AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md) (`docs/decisions/AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md`)
 - [AOA-SDK-D-0101 - Bind the exact runtime subject in incarnation v2](../AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md`)
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 
 ## public API naming
 
@@ -578,6 +584,7 @@
 - [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 - [AOA-SDK-D-0099 - Compile obligation actor plans without selecting meaning](../AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md) (`docs/decisions/AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md`)
 - [AOA-SDK-D-0101 - Bind the exact runtime subject in incarnation v2](../AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md`)
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 
 ## runtime entrypoint
 

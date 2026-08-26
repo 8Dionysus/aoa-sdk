@@ -9,3 +9,4 @@ explicit.
 - `control-plane-capsule/`
 - `runtime-mirror-boundary/`
 - `abyss-stack-runtime-adapter/`
+- `programmatic-tool-execution/`

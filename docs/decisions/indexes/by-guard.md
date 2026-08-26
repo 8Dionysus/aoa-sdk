@@ -216,6 +216,7 @@
 - [AOA-SDK-D-0080 - Host-Visible Cross-Organ Orchestration](../AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md) (`docs/decisions/AOA-SDK-D-0080-host-visible-cross-organ-orchestration.md`)
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
 - [AOA-SDK-D-0099 - Compile obligation actor plans without selecting meaning](../AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md) (`docs/decisions/AOA-SDK-D-0099-compile-obligation-actor-plans-without-selecting-meaning.md`)
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 
 ## event chain
 
@@ -236,6 +237,10 @@
 ## exact recovery
 
 - [AOA-SDK-D-0083 - Compose Closeout After an Immutable Runtime Outcome](../AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md) (`docs/decisions/AOA-SDK-D-0083-compose-closeout-after-an-immutable-runtime-outcome.md`)
+
+## explicit activation
+
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 
 ## explicit adapter
 
@@ -446,6 +451,10 @@
 ## no tool selection
 
 - [AOA-SDK-D-0100 - SDK Pre-Tool Agent Routing Owner](../AOA-SDK-D-0100-pre-tool-agent-routing-owner.md) (`docs/decisions/AOA-SDK-D-0100-pre-tool-agent-routing-owner.md`)
+
+## observation integrity
+
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 
 ## operator approval
 

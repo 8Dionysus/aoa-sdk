@@ -15,7 +15,9 @@ bootstrap, and optional local units/hooks.
 Use this mechanic when workspace discovery, source/runtime mirror distinction,
 workspace bootstrap, generated control-plane capsule, hook posture, or bounded
 local automation changes. Use the `abyss-stack-runtime-adapter` part when one
-explicit SDK client crosses into a runtime-owner bridge.
+explicit SDK client crosses into a runtime-owner bridge. Use the
+`programmatic-tool-execution` part when the SDK contract for a governed direct
+or programmatic tool execution changes.
 
 ### SDK owns
 
@@ -43,7 +45,9 @@ ownership remain outside SDK truth.
 - `mechanics/runtime-seam/parts/control-plane-capsule/`
 - `mechanics/runtime-seam/parts/runtime-mirror-boundary/`
 - `mechanics/runtime-seam/parts/abyss-stack-runtime-adapter/`
+- `mechanics/runtime-seam/parts/programmatic-tool-execution/`
 - `src/aoa_sdk/runtime_adapters/`
+- `src/aoa_sdk/contracts/programmatic_execution.py`
 - workspace tests under `mechanics/runtime-seam/parts/*/tests/`
 
 ### Candidate parts
@@ -53,6 +57,7 @@ ownership remain outside SDK truth.
 - control-plane-capsule
 - runtime-mirror-boundary
 - abyss-stack-runtime-adapter
+- programmatic-tool-execution
 
 ### Must not claim
 

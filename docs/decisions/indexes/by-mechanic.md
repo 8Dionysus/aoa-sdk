@@ -221,6 +221,7 @@
 - [AOA-SDK-D-0093 - Bind model incarnation after plan compilation](../AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md) (`docs/decisions/AOA-SDK-D-0093-bind-model-incarnation-after-plan-compilation.md`)
 - [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 - [AOA-SDK-D-0101 - Bind the exact runtime subject in incarnation v2](../AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md`)
+- [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 
 ## titan
 
