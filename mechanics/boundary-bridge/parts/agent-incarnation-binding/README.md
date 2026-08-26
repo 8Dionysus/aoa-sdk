@@ -33,4 +33,14 @@ runtime profile, ABI refs, effect class, outputs, and closeout owners. It emits
 one runtime-neutral `RunPlan`; it does not infer any missing choice and admits
 only bounded read-only or repository-local mutation effects.
 
+The same owner boundary exposes the provider-neutral delegation-class ABI.
+`ephemeral_read_worker_v1` is stateless, read-only, bounded by immutable input,
+returns a content-addressed stack result, and retains responsibility with its
+parent. `external_incarnation_v1` carries the exact `aoa-agents` role and
+mandate, `aoa-models` realization, SDK binding and continuation, stack process,
+session and events, and separately typed transfer, reviewed return, eval,
+closeout, and acceptance references. Concrete Codex CLI and local/provider
+adapters are runtime-owned projections of that ABI; the SDK does not launch
+either one.
+
 See [CONTRACT.md](CONTRACT.md) and [VALIDATION.md](VALIDATION.md).

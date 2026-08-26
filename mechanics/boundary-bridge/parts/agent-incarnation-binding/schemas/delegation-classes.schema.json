@@ -1,0 +1,456 @@
+{
+  "$defs": {
+    "BoundedImmutableInput": {
+      "additionalProperties": false,
+      "description": "Content-addressed input set with an explicit byte ceiling.",
+      "properties": {
+        "input_refs": {
+          "items": {
+            "$ref": "#/$defs/ProvenanceRef"
+          },
+          "minItems": 1,
+          "title": "Input Refs",
+          "type": "array"
+        },
+        "max_input_bytes": {
+          "exclusiveMinimum": 0,
+          "title": "Max Input Bytes",
+          "type": "integer"
+        },
+        "max_output_bytes": {
+          "exclusiveMinimum": 0,
+          "title": "Max Output Bytes",
+          "type": "integer"
+        },
+        "snapshot_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Snapshot Digest",
+          "type": "string"
+        }
+      },
+      "required": [
+        "input_refs",
+        "snapshot_digest",
+        "max_input_bytes",
+        "max_output_bytes"
+      ],
+      "title": "BoundedImmutableInput",
+      "type": "object"
+    },
+    "ContentRef": {
+      "additionalProperties": false,
+      "description": "Content-addressed reference to another control-plane object.",
+      "properties": {
+        "digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Digest",
+          "type": "string"
+        },
+        "object_id": {
+          "minLength": 1,
+          "title": "Object Id",
+          "type": "string"
+        },
+        "owner_repo": {
+          "minLength": 1,
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "schema_version": {
+          "minLength": 1,
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "object_id",
+        "owner_repo",
+        "schema_version",
+        "digest"
+      ],
+      "title": "ContentRef",
+      "type": "object"
+    },
+    "DelegationAdapterProfile": {
+      "additionalProperties": false,
+      "description": "One concrete runtime adapter viewed through the common class ABI.",
+      "properties": {
+        "adapter_id": {
+          "minLength": 1,
+          "title": "Adapter Id",
+          "type": "string"
+        },
+        "adapter_kind": {
+          "enum": [
+            "codex_cli",
+            "local_provider"
+          ],
+          "title": "Adapter Kind",
+          "type": "string"
+        },
+        "delegation_class": {
+          "enum": [
+            "ephemeral_read_worker_v1",
+            "external_incarnation_v1"
+          ],
+          "title": "Delegation Class",
+          "type": "string"
+        },
+        "implementation_ref": {
+          "$ref": "#/$defs/ProvenanceRef"
+        },
+        "provider_neutral_abi": {
+          "const": true,
+          "default": true,
+          "title": "Provider Neutral Abi",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": "aoa_delegation_adapter_v1",
+          "default": "aoa_delegation_adapter_v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "uses_builtin_codex_subagents": {
+          "const": false,
+          "default": false,
+          "title": "Uses Builtin Codex Subagents",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "adapter_id",
+        "adapter_kind",
+        "delegation_class",
+        "implementation_ref"
+      ],
+      "title": "DelegationAdapterProfile",
+      "type": "object"
+    },
+    "DelegationLifecycleRefs": {
+      "additionalProperties": false,
+      "description": "Separate optional lifecycle evidence for an external incarnation.",
+      "properties": {
+        "acceptance_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "closeout_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
+        "eval_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContentRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        }
+      },
+      "title": "DelegationLifecycleRefs",
+      "type": "object"
+    },
+    "EphemeralReadWorkerV1": {
+      "additionalProperties": false,
+      "description": "Cheap stateless work that never acquires responsibility.",
+      "properties": {
+        "adapter": {
+          "$ref": "#/$defs/DelegationAdapterProfile"
+        },
+        "correlation_id": {
+          "minLength": 1,
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "delegation_class": {
+          "const": "ephemeral_read_worker_v1",
+          "default": "ephemeral_read_worker_v1",
+          "title": "Delegation Class",
+          "type": "string"
+        },
+        "delegation_id": {
+          "minLength": 1,
+          "title": "Delegation Id",
+          "type": "string"
+        },
+        "durable_responsibility_transfer_allowed": {
+          "const": false,
+          "default": false,
+          "title": "Durable Responsibility Transfer Allowed",
+          "type": "boolean"
+        },
+        "economy_observation_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "input": {
+          "$ref": "#/$defs/BoundedImmutableInput"
+        },
+        "parent_holder_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "parent_retains_responsibility": {
+          "const": true,
+          "default": true,
+          "title": "Parent Retains Responsibility",
+          "type": "boolean"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ProvenanceRef"
+        },
+        "read_only": {
+          "const": true,
+          "default": true,
+          "title": "Read Only",
+          "type": "boolean"
+        },
+        "result_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "role_formation_allowed": {
+          "const": false,
+          "default": false,
+          "title": "Role Formation Allowed",
+          "type": "boolean"
+        },
+        "schema_version": {
+          "const": "aoa_ephemeral_read_worker_v1",
+          "default": "aoa_ephemeral_read_worker_v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "stateless": {
+          "const": true,
+          "default": true,
+          "title": "Stateless",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "delegation_id",
+        "correlation_id",
+        "parent_holder_ref",
+        "adapter",
+        "economy_observation_ref",
+        "provenance",
+        "input",
+        "result_ref"
+      ],
+      "title": "EphemeralReadWorkerV1",
+      "type": "object"
+    },
+    "ExternalIncarnationV1": {
+      "additionalProperties": false,
+      "description": "Responsibility-bearing external actor with a separately reviewed return.",
+      "properties": {
+        "actor_mandate_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "adapter": {
+          "$ref": "#/$defs/DelegationAdapterProfile"
+        },
+        "allowed_effect_classes": {
+          "items": {
+            "enum": [
+              "read_only",
+              "repo_mutation"
+            ],
+            "type": "string"
+          },
+          "minItems": 1,
+          "title": "Allowed Effect Classes",
+          "type": "array"
+        },
+        "continuation_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "correlation_id": {
+          "minLength": 1,
+          "title": "Correlation Id",
+          "type": "string"
+        },
+        "delegation_class": {
+          "const": "external_incarnation_v1",
+          "default": "external_incarnation_v1",
+          "title": "Delegation Class",
+          "type": "string"
+        },
+        "delegation_id": {
+          "minLength": 1,
+          "title": "Delegation Id",
+          "type": "string"
+        },
+        "economy_observation_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "incarnation_binding_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "lifecycle": {
+          "$ref": "#/$defs/DelegationLifecycleRefs"
+        },
+        "model_realization_ref": {
+          "$ref": "#/$defs/ProvenanceRef"
+        },
+        "parent_holder_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "provenance": {
+          "$ref": "#/$defs/ProvenanceRef"
+        },
+        "responsibility_transfer_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "responsibility_transferred": {
+          "const": true,
+          "default": true,
+          "title": "Responsibility Transferred",
+          "type": "boolean"
+        },
+        "reviewed_return_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "reviewed_return_required": {
+          "const": true,
+          "default": true,
+          "title": "Reviewed Return Required",
+          "type": "boolean"
+        },
+        "role_contract_ref": {
+          "$ref": "#/$defs/ProvenanceRef"
+        },
+        "runtime_event_refs": {
+          "items": {
+            "$ref": "#/$defs/ContentRef"
+          },
+          "minItems": 1,
+          "title": "Runtime Event Refs",
+          "type": "array"
+        },
+        "runtime_process_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "runtime_session_ref": {
+          "$ref": "#/$defs/ContentRef"
+        },
+        "schema_version": {
+          "const": "aoa_external_incarnation_v1",
+          "default": "aoa_external_incarnation_v1",
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "stateless": {
+          "const": false,
+          "default": false,
+          "title": "Stateless",
+          "type": "boolean"
+        }
+      },
+      "required": [
+        "delegation_id",
+        "correlation_id",
+        "parent_holder_ref",
+        "adapter",
+        "economy_observation_ref",
+        "provenance",
+        "role_contract_ref",
+        "actor_mandate_ref",
+        "model_realization_ref",
+        "incarnation_binding_ref",
+        "continuation_ref",
+        "runtime_process_ref",
+        "runtime_session_ref",
+        "runtime_event_refs",
+        "responsibility_transfer_ref",
+        "reviewed_return_ref",
+        "lifecycle",
+        "allowed_effect_classes"
+      ],
+      "title": "ExternalIncarnationV1",
+      "type": "object"
+    },
+    "ProvenanceRef": {
+      "additionalProperties": false,
+      "description": "Exact owner-qualified provenance for a source or projected artifact.",
+      "properties": {
+        "artifact_digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Artifact Digest",
+          "type": "string"
+        },
+        "artifact_ref": {
+          "minLength": 1,
+          "title": "Artifact Ref",
+          "type": "string"
+        },
+        "owner_repo": {
+          "minLength": 1,
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "schema_ref": {
+          "minLength": 1,
+          "title": "Schema Ref",
+          "type": "string"
+        },
+        "schema_version": {
+          "minLength": 1,
+          "title": "Schema Version",
+          "type": "string"
+        },
+        "source_ref": {
+          "minLength": 1,
+          "title": "Source Ref",
+          "type": "string"
+        }
+      },
+      "required": [
+        "owner_repo",
+        "artifact_ref",
+        "source_ref",
+        "artifact_digest",
+        "schema_ref",
+        "schema_version"
+      ],
+      "title": "ProvenanceRef",
+      "type": "object"
+    }
+  },
+  "$id": "urn:aoa-sdk:delegation-classes:v1",
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "description": "Discriminated provider-neutral envelope for either delegation class.",
+  "discriminator": {
+    "mapping": {
+      "ephemeral_read_worker_v1": "#/$defs/EphemeralReadWorkerV1",
+      "external_incarnation_v1": "#/$defs/ExternalIncarnationV1"
+    },
+    "propertyName": "delegation_class"
+  },
+  "oneOf": [
+    {
+      "$ref": "#/$defs/EphemeralReadWorkerV1"
+    },
+    {
+      "$ref": "#/$defs/ExternalIncarnationV1"
+    }
+  ],
+  "title": "DelegationEnvelope",
+  "type": "object"
+}
