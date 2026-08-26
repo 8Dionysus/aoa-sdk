@@ -22,7 +22,7 @@ from aoa_sdk.contracts.goal_lifecycle import (
 )
 
 
-NOW = datetime(2026, 8, 25, 12, 0, tzinfo=timezone.utc)
+NOW = datetime.now(timezone.utc)
 VALID_UNTIL = NOW + timedelta(days=1)
 
 
