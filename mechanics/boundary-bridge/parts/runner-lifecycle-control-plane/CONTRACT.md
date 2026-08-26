@@ -22,12 +22,19 @@ semantic owner's current Goal/DAG/ownership read model. `resolve_goal_lifecycle`
 returns a typed accepted or rejected `GoalLifecycleDecision` before any
 runtime adapter is selected or called.
 
-An adapter may execute only the exact accepted request/decision pair. Its
-`GoalLifecycleExecutionReceipt` is an `executed`-stage result that confirms the
-resulting state from its authoritative read surface. The receipt's boundary
-claims keep requested, accepted, executed, delivered, semantically accepted,
-and closed separate. State names and transition kinds are instance data, so a
-new Goal state or runtime adapter does not require changing this SDK contract.
+The semantic context and decision carry an owner-supplied `valid_until`. The
+execution-scope assertion checks that expiry again immediately before runtime
+dispatch, so an accepted decision cannot remain executable indefinitely. An
+adapter may execute only the exact accepted request/decision pair, and
+`assert_goal_lifecycle_execution_receipt_scope()` binds its returned receipt
+back to that same correlation, idempotency, Goal, request, and decision.
+Successful execution receipts must carry evidence and confirm the resulting
+state from the authoritative read surface. Their boundary claims keep
+requested, accepted, executed, delivered, semantically accepted, and closed
+separate. A context may expose no admitted transitions; the resolver returns a
+typed rejection for an unadmitted edge. State names and transition kinds are
+instance data, so a new Goal state or runtime adapter does not require changing
+this SDK contract.
 
 ## Stronger owner split
 

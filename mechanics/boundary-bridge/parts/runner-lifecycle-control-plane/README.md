@@ -21,8 +21,8 @@ scope agree.
   `RunPlan`, `SessionHandle`, and durable adapter state
 - `GoalLifecycleRequest`, `GoalLifecycleContext`, `GoalLifecycleDecision`, and
   `resolve_goal_lifecycle()` for owner-side Goal transition admission;
-  `GoalLifecycleAdapterProtocol` and `GoalLifecycleExecutionReceipt` define
-  the runtime-neutral execution seam
+  `GoalLifecycleAdapterProtocol`, `GoalLifecycleExecutionReceipt`, and the
+  execution-scope assertions define the runtime-neutral execution seam
 - `DeterministicReferenceAdapter` and `reference_runtime_profile()` for
   no-effect lifecycle verification
 

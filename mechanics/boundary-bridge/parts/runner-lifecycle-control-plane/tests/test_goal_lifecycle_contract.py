@@ -1,20 +1,29 @@
 from __future__ import annotations
 
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 
 import pytest
 
-from aoa_sdk.contracts.control_plane import ContentRef, ProvenanceRef
+from aoa_sdk.contracts.control_plane import (
+    ContentRef,
+    ControlPlaneContractError,
+    ProvenanceRef,
+    canonical_digest,
+)
 from aoa_sdk.contracts.goal_lifecycle import (
     GoalLifecycleContext,
+    GoalLifecycleDecision,
+    GoalLifecycleExecutionReceipt,
     GoalLifecycleRequest,
     GoalLifecycleTransition,
     assert_goal_lifecycle_execution_scope,
+    assert_goal_lifecycle_execution_receipt_scope,
     resolve_goal_lifecycle,
 )
 
 
 NOW = datetime(2026, 8, 25, 12, 0, tzinfo=timezone.utc)
+VALID_UNTIL = NOW + timedelta(days=1)
 
 
 def _digest(label: str) -> str:
@@ -80,6 +89,7 @@ def _context(request: GoalLifecycleRequest) -> GoalLifecycleContext:
         ),
         evidence_refs=request.evidence_refs,
         observed_at=NOW,
+        valid_until=VALID_UNTIL,
         observed_by=_provenance("aoa-agents", "context/goal-dag-ownership"),
     )
 
@@ -118,6 +128,16 @@ def test_goal_lifecycle_rejects_owner_context_older_than_request() -> None:
     assert decision.reason_codes == ("owner_context_stale_for_request",)
 
 
+def test_goal_lifecycle_allows_empty_admitted_edges_to_resolve_as_rejection() -> None:
+    request = _request()
+    context = _context(request).model_copy(update={"allowed_transitions": ()})
+
+    decision = resolve_goal_lifecycle(request, context)
+
+    assert decision.status == "rejected"
+    assert "transition_not_admitted_by_goal_dag" in decision.reason_codes
+
+
 def test_runtime_scope_accepts_only_the_exact_semantic_decision() -> None:
     request = _request()
     decision = resolve_goal_lifecycle(request, _context(request))
@@ -128,3 +148,68 @@ def test_runtime_scope_accepts_only_the_exact_semantic_decision() -> None:
             request,
             decision.model_copy(update={"status": "rejected"}),
         )
+
+
+def test_runtime_scope_rejects_an_expired_accepted_decision() -> None:
+    request = _request()
+    decision = resolve_goal_lifecycle(request, _context(request))
+
+    with pytest.raises(ControlPlaneContractError, match="expired"):
+        assert_goal_lifecycle_execution_scope(
+            request,
+            decision,
+            now=VALID_UNTIL + timedelta(seconds=1),
+        )
+
+
+def _execution_receipt(
+    request: GoalLifecycleRequest,
+    decision: GoalLifecycleDecision,
+    *,
+    evidence_refs: tuple[ProvenanceRef, ...] | None = None,
+) -> GoalLifecycleExecutionReceipt:
+    decision_ref = ContentRef(
+        object_id=decision.decision_id,
+        owner_repo=decision.resolved_by.owner_repo,
+        schema_version=decision.schema_version,
+        digest=canonical_digest(decision),
+    )
+    return GoalLifecycleExecutionReceipt(
+        execution_id="goal-lifecycle-execution:test",
+        correlation_id=request.correlation_id,
+        idempotency_key=request.idempotency_key,
+        goal_ref=request.goal_ref,
+        request_ref=decision.request_ref,
+        decision_ref=decision_ref,
+        observed_state=request.observed_state,
+        desired_state=request.desired_state,
+        resulting_state=request.desired_state,
+        status="executed",
+        evidence_refs=request.evidence_refs if evidence_refs is None else evidence_refs,
+        produced_by=_provenance("abyss-stack", "goal-lifecycle-adapter"),
+        executed_at=NOW,
+        boundaries={"accepted": True, "executed": True},
+    )
+
+
+def test_execution_receipt_is_bound_to_the_exact_request_and_decision() -> None:
+    request = _request()
+    decision = resolve_goal_lifecycle(request, _context(request))
+    receipt = _execution_receipt(request, decision)
+
+    assert_goal_lifecycle_execution_receipt_scope(request, decision, receipt)
+
+    with pytest.raises(ControlPlaneContractError, match="outside request/decision scope"):
+        assert_goal_lifecycle_execution_receipt_scope(
+            request,
+            decision,
+            receipt.model_copy(update={"correlation_id": "foreign-correlation"}),
+        )
+
+
+def test_successful_execution_receipt_requires_evidence() -> None:
+    request = _request()
+    decision = resolve_goal_lifecycle(request, _context(request))
+
+    with pytest.raises(ValueError, match="must carry evidence"):
+        _execution_receipt(request, decision, evidence_refs=())

@@ -111,6 +111,7 @@ from .contracts.goal_lifecycle import (
     GoalLifecycleStage,
     GoalLifecycleTransition,
     assert_goal_lifecycle_execution_scope,
+    assert_goal_lifecycle_execution_receipt_scope,
     resolve_goal_lifecycle,
 )
 from .contracts.agent_tool_routing import (
@@ -435,6 +436,7 @@ __all__ = [
     "SessionHandle",
     "StartCommand",
     "assert_goal_lifecycle_execution_scope",
+    "assert_goal_lifecycle_execution_receipt_scope",
     "resolve_goal_lifecycle",
     "ArtifactAffectedReport",
     "ArtifactAffectedRow",
