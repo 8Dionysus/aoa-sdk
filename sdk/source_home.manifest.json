@@ -175,6 +175,7 @@
       "implementation_routes": [
         "src/aoa_sdk/models.py",
         "src/aoa_sdk/contracts/control_plane.py",
+        "src/aoa_sdk/contracts/goal_lifecycle.py",
         "src/aoa_sdk/contracts/evidence_chain.py",
         "schemas"
       ],
@@ -344,6 +345,7 @@
         "src/aoa_sdk/control_plane/runner",
         "src/aoa_sdk/control_plane/evidence_chain.py",
         "src/aoa_sdk/contracts/control_plane.py",
+        "src/aoa_sdk/contracts/goal_lifecycle.py",
         "src/aoa_sdk/contracts/evidence_chain.py",
         "src/aoa_sdk/runtime_adapters"
       ],

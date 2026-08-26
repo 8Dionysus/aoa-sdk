@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 3729756,
+  "allowed_tracked_bytes": 20854676,
+  "approved_by": "repository-owner",
+  "base_ref": "e9a36b9930ff5a20db49fc7a8fba9e9a093e6a0b",
+  "changed_generated_bytes": 3729756,
+  "changed_generated_files": 72,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "49514826915854706e4fdb5983247a53ed7a96bee2bb6158d6d1d755a53c95ac",
+  "reason": "Refresh the exact aoa-sdk portable owner family after the generic Goal lifecycle execution-scope hardening and canonical source-topology rebuild; generated KAG only, preserving authored SDK semantics and source-owner authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 20854676,
+  "tracked_bytes_max": 15728640
+}

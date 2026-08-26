@@ -19,6 +19,10 @@ scope agree.
   `cancel()`, `recover()`, `sync()`, `outcome()`, and `closeout()`
 - `AoARunner.restore()` for rebuilding a verified local observation from a
   `RunPlan`, `SessionHandle`, and durable adapter state
+- `GoalLifecycleRequest`, `GoalLifecycleContext`, `GoalLifecycleDecision`, and
+  `resolve_goal_lifecycle()` for owner-side Goal transition admission;
+  `GoalLifecycleAdapterProtocol`, `GoalLifecycleExecutionReceipt`, and the
+  execution-scope assertions define the runtime-neutral execution seam
 - `DeterministicReferenceAdapter` and `reference_runtime_profile()` for
   no-effect lifecycle verification
 
