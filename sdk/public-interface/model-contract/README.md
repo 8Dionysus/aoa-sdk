@@ -42,6 +42,13 @@ memo, checkpoint, and closeout material only by exact owner-qualified refs.
 Its `partial` or `complete` state is derived from required-owner coverage;
 callers cannot assert completeness.
 
+The inference-economy requirement is authored in
+`src/aoa_sdk/contracts/stats.py` and re-exported through `aoa_sdk.models`. It
+binds one correlation id to the aoa-stats observation contract and its typed
+metric/lifecycle paths. The model is immutable and permanently expresses
+`default_off`, `baseline_required`, and `activation_allowed=False`; it carries
+no provider, model, runtime, routing, eval, or promotion choice.
+
 The organ-access model family is authored in
 `src/aoa_sdk/contracts/organs.py`, published as deterministic JSON Schema in
 `schemas/organ-access/`, and re-exported through `aoa_sdk.models`. It keeps
