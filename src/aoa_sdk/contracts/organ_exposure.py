@@ -40,6 +40,9 @@ ORGAN_EXPOSURE_PLAN_VERSION: Literal["aoa_organ_exposure_plan_v1"] = (
 ORGAN_EXPOSURE_SNAPSHOT_VERSION: Literal["aoa_organ_exposure_snapshot_v1"] = (
     "aoa_organ_exposure_snapshot_v1"
 )
+BASELINE_EVIDENCE_OWNER = "d0-baseline"
+BASELINE_EVIDENCE_REF = "receipt://d0/baseline-ready"
+BASELINE_EVIDENCE_REVISION_PREFIX = "baseline-"
 
 ExposureFreshnessState: TypeAlias = Literal[
     "fresh",
@@ -295,6 +298,19 @@ class ProgressiveExposurePlan(StrictOrganModel):
             raise ValueError("exposure plan expiry must follow requested_at")
         if self.visible_tools != self.rendered_snapshot.tools:
             raise ValueError("plan visible tools must match rendered snapshot")
+        if len(set(self.requested_primitive_ids)) != len(self.requested_primitive_ids):
+            raise ValueError("plan requested primitive ids must be unique and ordered")
+        if self.visible_tools:
+            if any(
+                tool.capability_id != self.capability.capability_id
+                for tool in self.visible_tools
+            ):
+                raise ValueError("plan visible tools must bind the selected capability")
+            visible_primitives = tuple(tool.primitive_id for tool in self.visible_tools)
+            if visible_primitives != self.requested_primitive_ids:
+                raise ValueError(
+                    "plan visible tools must preserve the requested primitive selection"
+                )
         if self.plan_state == "blocked":
             if self.visible_tools or self.rendered_snapshot.rendered_bytes != 2:
                 raise ValueError("blocked disclosure cannot reveal tools or schemas")
@@ -304,6 +320,13 @@ class ProgressiveExposurePlan(StrictOrganModel):
             raise ValueError("candidate disclosure requires expansion reasons")
         if self.activation_authorized or self.execution_authorized:
             raise ValueError("progressive exposure plans are candidate-only")
+        unsigned = {
+            key: value
+            for key, value in self.model_dump(mode="json").items()
+            if key not in {"plan_id", "claim_limit"}
+        }
+        if self.plan_id != exposure_digest(unsigned):
+            raise ValueError("exposure plan id is not content addressed")
         return self
 
 

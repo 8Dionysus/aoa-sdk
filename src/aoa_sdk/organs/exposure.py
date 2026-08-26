@@ -7,6 +7,9 @@ from datetime import datetime, timezone
 from typing import Literal, cast
 
 from ..contracts.organ_exposure import (
+    BASELINE_EVIDENCE_OWNER,
+    BASELINE_EVIDENCE_REF,
+    BASELINE_EVIDENCE_REVISION_PREFIX,
     ExposureAuthorizationCandidate,
     ExposureCapabilityBinding,
     ExposureFreshnessState,
@@ -101,12 +104,11 @@ def _capability_binding(
     ttl_seconds = max(0, int((expires_at - observed_at).total_seconds()))
     state = _map_freshness(entry.freshness_state)
     reason_codes = () if state == "fresh" else (f"freshness_{state}",)
-    server_schema_digest = (
-        entry.endpoint.server_schema_digest
-        if entry.endpoint is not None
-        and entry.endpoint.server_schema_digest is not None
-        else projection.projection_digest
-    )
+    if entry.endpoint is None or entry.endpoint.server_schema_digest is None:
+        raise OrganRegistryError(
+            "exposure requires an owner-authored server schema digest"
+        )
+    server_schema_digest = entry.endpoint.server_schema_digest
     return ExposureCapabilityBinding(
         organ_id=entry.organ_id,
         capability_id=capability.capability_id,
@@ -134,6 +136,43 @@ def _capability_binding(
         effect_ceiling=capability.policy_family,
         rollback_route=entry.rollback_route,
     )
+
+
+def _baseline_evidence_is_valid(
+    evidence: QualifiedEvidenceRef,
+    *,
+    evaluated_at: datetime,
+) -> bool:
+    """Accept only the canonical d0 baseline-ready evidence identity."""
+
+    return (
+        evidence.owner == BASELINE_EVIDENCE_OWNER
+        and evidence.evidence_ref == BASELINE_EVIDENCE_REF
+        and evidence.revision.startswith(BASELINE_EVIDENCE_REVISION_PREFIX)
+        and evidence.expires_at is not None
+        and evidence.expires_at > evaluated_at
+    )
+
+
+def _approval_rejection_reason(
+    primitive,
+    approval_ref: QualifiedEvidenceRef | None,
+    *,
+    evaluated_at: datetime,
+) -> str | None:
+    if not primitive.approval_required:
+        return None
+    if approval_ref is None:
+        return "selected_tool_requires_approval"
+    if approval_ref.owner != primitive.approval_owner:
+        return "approval_owner_mismatch"
+    if approval_ref.observed_at > evaluated_at:
+        return "approval_evidence_from_future"
+    if approval_ref.expires_at is None:
+        return "approval_expiry_missing"
+    if approval_ref.expires_at <= evaluated_at:
+        return "approval_expired"
+    return None
 
 
 def compile_progressive_exposure(
@@ -181,6 +220,13 @@ def compile_progressive_exposure(
     plan_expiry = min(request.expires_at, projection.expires_at, freshness_expiry)
     if request.baseline_ready:
         assert request.baseline_evidence is not None
+        if not _baseline_evidence_is_valid(
+            request.baseline_evidence,
+            evaluated_at=evaluated_at,
+        ):
+            raise OrganRegistryError(
+                "baseline evidence is not the canonical d0 baseline-ready receipt"
+            )
         if request.baseline_evidence.observed_at > request.requested_at:
             raise OrganRegistryError("baseline evidence is from the future")
         if (
@@ -216,8 +262,13 @@ def compile_progressive_exposure(
         if POLICY_RANK[primitive.policy_family] > POLICY_RANK[request.requested_policy_family]:
             refusal_reasons.append("selected_tool_exceeds_requested_policy")
             continue
-        if primitive.approval_required and request.approval_ref is None:
-            refusal_reasons.append("selected_tool_requires_approval")
+        approval_reason = _approval_rejection_reason(
+            primitive,
+            request.approval_ref,
+            evaluated_at=evaluated_at,
+        )
+        if approval_reason is not None:
+            refusal_reasons.append(approval_reason)
             continue
         selected.append(
             exposure_tool_from_primitive(

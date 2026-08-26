@@ -103,3 +103,93 @@ def test_exposure_request_rejects_duplicate_ordered_selection() -> None:
     ]
     with pytest.raises(ValidationError, match="unique and ordered"):
         ExposureSelectionRequest.model_validate(payload)
+
+
+def test_exposure_rejects_unqualified_baseline_evidence(tmp_path) -> None:
+    api = OrgansAPI(
+        _api(tmp_path, _source(_record("aoa-kag", "admitted"))).workspace,
+        registry_path=_api(tmp_path, _source(_record("aoa-kag", "admitted"))).registry_path,
+        clock=lambda: NOW,
+        progressive_exposure_enabled=True,
+    )
+    request = _request(baseline_ready=True, reveal_schemas=True).model_dump(mode="json")
+    request["baseline_evidence"]["owner"] = "unrelated-owner"
+    with pytest.raises(Exception, match="canonical d0 baseline-ready"):
+        api.compile_exposure(
+            ExposureSelectionRequest.model_validate(request),
+            evaluated_at=NOW,
+        )
+
+
+def test_exposure_refuses_missing_owner_schema_digest(tmp_path) -> None:
+    record = _record("aoa-kag", "admitted")
+    record["endpoint"]["server_schema_digest"] = None
+    source = _source(record)
+    workspace_api = _api(tmp_path, source)
+    api = OrgansAPI(
+        workspace_api.workspace,
+        registry_path=workspace_api.registry_path,
+        clock=lambda: NOW,
+        progressive_exposure_enabled=True,
+    )
+    with pytest.raises(Exception, match="owner-authored server schema digest"):
+        api.compile_exposure(
+            _request(baseline_ready=True, reveal_schemas=True),
+            evaluated_at=NOW,
+        )
+
+
+def test_exposure_rejects_tampered_plan_identity(tmp_path) -> None:
+    workspace_api = _api(tmp_path, _source(_record("aoa-kag", "admitted")))
+    api = OrgansAPI(
+        workspace_api.workspace,
+        registry_path=workspace_api.registry_path,
+        clock=lambda: NOW,
+        progressive_exposure_enabled=True,
+    )
+    plan = api.compile_exposure(
+        _request(baseline_ready=True, reveal_schemas=True),
+        evaluated_at=NOW,
+    )
+    payload = plan.model_dump(mode="json")
+    payload["expires_at"] = (NOW + timedelta(minutes=30)).isoformat()
+    with pytest.raises(ValidationError, match="content addressed"):
+        type(plan).model_validate(payload)
+
+
+def test_exposure_rejects_mismatched_effect_approval(tmp_path) -> None:
+    workspace_api = _api(tmp_path, _source(_record("aoa-kag", "admitted", effect=True)))
+    api = OrgansAPI(
+        workspace_api.workspace,
+        registry_path=workspace_api.registry_path,
+        clock=lambda: NOW,
+        progressive_exposure_enabled=True,
+    )
+    request = ExposureSelectionRequest(
+        request_id="effect-exposure-request",
+        organ_id="aoa-kag",
+        capability_id="knowledge-publish",
+        selected_primitive_ids=("publish-change",),
+        requested_policy_family="external_effect",
+        requested_at=NOW,
+        expires_at=NOW + timedelta(hours=1),
+        baseline_ready=True,
+        baseline_evidence={
+            "owner": "d0-baseline",
+            "evidence_ref": "receipt://d0/baseline-ready",
+            "revision": "baseline-1",
+            "observed_at": NOW.isoformat(),
+            "expires_at": (NOW + timedelta(hours=1)).isoformat(),
+        },
+        reveal_schemas=True,
+        approval_ref={
+            "owner": "wrong-owner",
+            "evidence_ref": "approval://wrong",
+            "revision": "approval-1",
+            "observed_at": NOW.isoformat(),
+            "expires_at": (NOW + timedelta(hours=1)).isoformat(),
+        },
+    )
+    plan = api.compile_exposure(request, evaluated_at=NOW)
+    assert plan.plan_state == "blocked"
+    assert "approval_owner_mismatch" in plan.refusal_reasons
