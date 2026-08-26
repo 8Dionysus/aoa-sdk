@@ -191,3 +191,9 @@ registry source. It exposes deterministic projection, bounded catalog,
 organ/capability inspection, compatibility comparison, and candidate-only
 activation-plan compilation. Construction does not read the registry, scan
 the workspace, connect to MCP, or execute an organ.
+
+For a correlated provider-neutral economy observation request, use
+`InferenceEconomyObservationRequirement` from `aoa_sdk.models`. Its exact
+aoa-stats contract reference and separate metric/lifecycle paths are typed;
+the requirement remains default-off and baseline-gated, and does not activate
+runtime or produce an eval verdict.

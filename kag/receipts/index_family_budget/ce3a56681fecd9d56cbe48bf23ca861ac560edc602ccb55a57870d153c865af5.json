@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 2156293,
+  "allowed_tracked_bytes": 21012893,
+  "approved_by": "repository-owner",
+  "base_ref": "9540358c9443c2b7ef78dd9d1d8a0bc7b50ef240",
+  "changed_generated_bytes": 2156293,
+  "changed_generated_files": 38,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "ce3a56681fecd9d56cbe48bf23ca861ac560edc602ccb55a57870d153c865af5",
+  "reason": "Refresh the exact aoa-sdk portable owner family after rebuilding the source topology for the correlated economy requirement; generated KAG only, preserving authored SDK semantics and source-owner authority.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 21012893,
+  "tracked_bytes_max": 15728640
+}

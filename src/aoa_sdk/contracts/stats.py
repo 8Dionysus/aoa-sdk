@@ -1,8 +1,117 @@
 from __future__ import annotations
 
-from typing import Literal
+from typing import Literal, TypeAlias
 
 from pydantic import BaseModel, Field, model_validator
+
+from .control_plane import ContentRef, NonEmptyStr, ProvenanceRef, StrictControlPlaneModel
+
+
+INFERENCE_ECONOMY_REQUIREMENT_SCHEMA_VERSION: Literal[
+    "aoa_sdk_inference_economy_requirement_v1"
+] = "aoa_sdk_inference_economy_requirement_v1"
+INFERENCE_ECONOMY_OBSERVATION_SCHEMA_VERSION: Literal[
+    "aoa_stats_inference_economy_observation_v1"
+] = "aoa_stats_inference_economy_observation_v1"
+INFERENCE_ECONOMY_AUTHORITY_CEILING: Literal[
+    "Descriptive provider-neutral execution-economy observations only; they do not authorize activation, promotion, proof, policy, routing, or owner acceptance."
+] = (
+    "Descriptive provider-neutral execution-economy observations only; they do not "
+    "authorize activation, promotion, proof, policy, routing, or owner acceptance."
+)
+
+InferenceEconomyMetricPath: TypeAlias = Literal[
+    "tokens.input",
+    "tokens.cached_input",
+    "tokens.output",
+    "activity.turns",
+    "activity.model_calls",
+    "activity.intermediate_volume.items",
+    "activity.intermediate_volume.bytes",
+    "activity.intermediate_volume.tokens",
+    "activity.compactions",
+    "activity.losses",
+    "activity.retries",
+    "activity.rework",
+    "tools.schema_bytes",
+    "tools.schema_tokens",
+    "tools.calls",
+    "wall_time_seconds",
+]
+InferenceEconomyLifecyclePath: TypeAlias = Literal[
+    "runtime_outcome",
+    "eval_verdict",
+    "closeout",
+    "owner_acceptance",
+]
+
+INFERENCE_ECONOMY_METRIC_PATHS: tuple[InferenceEconomyMetricPath, ...] = (
+    "tokens.input",
+    "tokens.cached_input",
+    "tokens.output",
+    "activity.turns",
+    "activity.model_calls",
+    "activity.intermediate_volume.items",
+    "activity.intermediate_volume.bytes",
+    "activity.intermediate_volume.tokens",
+    "activity.compactions",
+    "activity.losses",
+    "activity.retries",
+    "activity.rework",
+    "tools.schema_bytes",
+    "tools.schema_tokens",
+    "tools.calls",
+    "wall_time_seconds",
+)
+INFERENCE_ECONOMY_LIFECYCLE_PATHS: tuple[InferenceEconomyLifecyclePath, ...] = (
+    "runtime_outcome",
+    "eval_verdict",
+    "closeout",
+    "owner_acceptance",
+)
+
+
+class InferenceEconomyObservationRequirement(StrictControlPlaneModel):
+    """Typed SDK request for one correlated, provider-neutral observation."""
+
+    schema_version: Literal[
+        "aoa_sdk_inference_economy_requirement_v1"
+    ] = INFERENCE_ECONOMY_REQUIREMENT_SCHEMA_VERSION
+    requirement_id: NonEmptyStr
+    correlation_id: NonEmptyStr
+    contract_ref: ContentRef
+    metric_paths: tuple[InferenceEconomyMetricPath, ...] = (
+        INFERENCE_ECONOMY_METRIC_PATHS
+    )
+    lifecycle_paths: tuple[InferenceEconomyLifecyclePath, ...] = (
+        INFERENCE_ECONOMY_LIFECYCLE_PATHS
+    )
+    requested_by: ProvenanceRef
+    reason: NonEmptyStr
+    default_off: Literal[True] = True
+    baseline_required: Literal[True] = True
+    activation_allowed: Literal[False] = False
+    authority_ceiling: Literal[
+        "Descriptive provider-neutral execution-economy observations only; they do not authorize activation, promotion, proof, policy, routing, or owner acceptance."
+    ] = INFERENCE_ECONOMY_AUTHORITY_CEILING
+
+    @model_validator(mode="after")
+    def validate_requirement(self) -> "InferenceEconomyObservationRequirement":
+        if self.contract_ref.owner_repo != "aoa-stats":
+            raise ValueError("inference economy contract must be owned by aoa-stats")
+        if self.contract_ref.schema_version != INFERENCE_ECONOMY_OBSERVATION_SCHEMA_VERSION:
+            raise ValueError(
+                "inference economy contract ref must identify the v1 observation schema"
+            )
+        if len(set(self.metric_paths)) != len(self.metric_paths):
+            raise ValueError("inference economy metric paths must be unique")
+        if len(set(self.lifecycle_paths)) != len(self.lifecycle_paths):
+            raise ValueError("inference economy lifecycle paths must be unique")
+        if not self.metric_paths or not self.lifecycle_paths:
+            raise ValueError(
+                "inference economy requirement must request both metric and lifecycle fields"
+            )
+        return self
 
 
 class StatsGeneratedFrom(BaseModel):
