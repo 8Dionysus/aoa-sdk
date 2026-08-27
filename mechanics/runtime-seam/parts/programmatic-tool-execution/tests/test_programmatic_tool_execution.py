@@ -11,19 +11,24 @@ from aoa_sdk.contracts.control_plane import (
     ProvenanceRef,
 )
 from aoa_sdk.contracts.programmatic_execution import (
+    DASHBOARD_ACTION_INTENT_SCHEMA_VERSION,
     ProgrammaticActivation,
     ProgrammaticActivationRequirements,
     ProgrammaticEconomyObservation,
     ProgrammaticEffectCeiling,
     ProgrammaticExecutionObservation,
+    ProgrammaticExecutionIntentBridge,
     ProgrammaticExecutionRequest,
     ProgrammaticObservationDimension,
     ProgrammaticObservationRequirements,
+    ProgrammaticReceiptBinding,
     ProgrammaticToolCallObservation,
     ProgrammaticToolHandle,
     PROGRAMMATIC_ADMISSION_SCHEMA_VERSION,
+    PROGRAMMATIC_INTENT_BRIDGE_SCHEMA_VERSION,
     assert_programmatic_execution_observation,
     assert_programmatic_execution_admitted,
+    assert_programmatic_execution_intent_bridge,
     programmatic_execution_request_digest,
     programmatic_execution_request_ref,
 )
@@ -78,12 +83,35 @@ def _handle() -> ProgrammaticToolHandle:
     )
 
 
+def _dashboard_intent_ref() -> ContentRef:
+    return _ref(
+        "action-intent:fixture",
+        owner="aoa-dashboard",
+        schema_version=DASHBOARD_ACTION_INTENT_SCHEMA_VERSION,
+    )
+
+
+def _receipt(name: str) -> ProgrammaticReceiptBinding:
+    return ProgrammaticReceiptBinding(
+        state="present",
+        ref=_ref(f"receipt:{name}", owner="receipt-owner"),
+    )
+
+
+def _not_applicable(name: str) -> ProgrammaticReceiptBinding:
+    return ProgrammaticReceiptBinding(
+        state="not_applicable",
+        reason_code=f"{name}_not_applicable",
+    )
+
+
 def _request(
     *,
     activation: ProgrammaticActivation | None = None,
     observation_requirements: ProgrammaticObservationRequirements | None = None,
     mode: str = "programmatic",
     effect_ceiling: ProgrammaticEffectCeiling | None = None,
+    input_ref: ContentRef | None = None,
 ) -> ProgrammaticExecutionRequest:
     plan_ref = _ref("plan")
     profile_ref = _ref("runtime-profile")
@@ -94,7 +122,7 @@ def _request(
         mode=mode,
         plan_ref=plan_ref,
         runtime_profile_ref=profile_ref,
-        input_ref=_ref("input"),
+        input_ref=input_ref or _ref("input"),
         program_ref=_ref("program") if mode == "programmatic" else None,
         tool_handles=(_handle(),),
         effect_ceiling=effect_ceiling
@@ -114,6 +142,7 @@ def _request(
 def _admitted_request(
     *,
     observation_requirements: ProgrammaticObservationRequirements | None = None,
+    input_ref: ContentRef | None = None,
 ) -> ProgrammaticExecutionRequest:
     return _request(
         activation=ProgrammaticActivation(
@@ -132,7 +161,62 @@ def _admitted_request(
             admitted_at=NOW,
         ),
         observation_requirements=observation_requirements,
+        input_ref=input_ref,
     )
+
+
+def _intent_bridge(
+    *,
+    state: str = "deferred",
+    request: ProgrammaticExecutionRequest | None = None,
+    invalid_reason: str | None = None,
+    **updates: object,
+) -> ProgrammaticExecutionIntentBridge:
+    source_intent_ref = _dashboard_intent_ref()
+    request = request or _request(input_ref=source_intent_ref)
+    values: dict[str, object] = {
+        "bridge_id": "intent-bridge:fixture",
+        "source_intent_ref": source_intent_ref,
+        "goal_ref": _ref(
+            "goal:fixture",
+            owner="codex-app-server",
+            schema_version="goal_v1",
+        ),
+        "correlation_id": request.correlation_id,
+        "authority_scope_ref": _ref("authority-scope:fixture", owner="operator"),
+        "effect_ceiling": request.effect_ceiling,
+        "request_ref": programmatic_execution_request_ref(request),
+        "request": request,
+        "state": state,
+        "invalid_reason": invalid_reason,
+        "provenance": _provenance("intent-bridge.json", owner="aoa-sdk"),
+    }
+    if state in {"requested", "awaiting_approval", "admitted", "executed"}:
+        values["approval_request"] = _receipt("approval-request")
+    if state in {"admitted", "executed"}:
+        values["approval_decision"] = _receipt("approval-decision")
+        values["execution_identity"] = _receipt("execution-identity")
+    if state == "refused":
+        values["refusal"] = _receipt("refusal")
+    if state == "narrowed":
+        values["narrowing"] = _receipt("narrowing")
+    if state == "expired":
+        values["expiry"] = _receipt("expiry")
+    if state == "executed":
+        values["terminal_result"] = _receipt("terminal-result")
+        values["usage"] = _receipt("usage")
+        values["rollback"] = _not_applicable("rollback")
+    values.update(updates)
+    return ProgrammaticExecutionIntentBridge(**values)
+
+
+def _revalidate_bridge(
+    bridge: ProgrammaticExecutionIntentBridge,
+    **updates: object,
+) -> ProgrammaticExecutionIntentBridge:
+    payload = bridge.model_dump(mode="python")
+    payload.update(updates)
+    return ProgrammaticExecutionIntentBridge.model_validate(payload)
 
 
 def _economy(
@@ -261,6 +345,187 @@ def test_request_is_default_off_and_has_no_token_budget() -> None:
     assert request.activation_requirements.default_enabled is False
     assert "token_budget" not in request.model_dump_json()
     assert programmatic_execution_request_digest(request).startswith("sha256:")
+
+
+def test_intent_bridge_is_deferred_and_default_off() -> None:
+    bridge = _intent_bridge()
+
+    assert bridge.schema_version == PROGRAMMATIC_INTENT_BRIDGE_SCHEMA_VERSION
+    assert bridge.source_intent_ref.owner_repo == "aoa-dashboard"
+    assert bridge.goal_ref.object_id == "goal:fixture"
+    assert bridge.correlation_id == bridge.request.correlation_id
+    assert bridge.request.activation.state == "not_admitted"
+    assert bridge.request.activation_requirements.default_enabled is False
+
+    with pytest.raises(ControlPlaneContractError, match="deferred"):
+        assert_programmatic_execution_intent_bridge(bridge)
+
+
+def test_intent_bridge_binds_exact_source_request_and_ceiling() -> None:
+    bridge = _intent_bridge()
+
+    with pytest.raises(ValueError, match="correlation"):
+        _revalidate_bridge(bridge, correlation_id="correlation:other")
+
+    with pytest.raises(ValueError, match="dashboard action-intent"):
+        _revalidate_bridge(
+            bridge,
+            source_intent_ref=_ref(
+                "action-intent:other",
+                owner="other-owner",
+                schema_version=DASHBOARD_ACTION_INTENT_SCHEMA_VERSION,
+            ),
+        )
+
+    with pytest.raises(ValueError, match="exact request input ref"):
+        _revalidate_bridge(
+            bridge,
+            source_intent_ref=_ref(
+                "action-intent:other",
+                owner="aoa-dashboard",
+                schema_version=DASHBOARD_ACTION_INTENT_SCHEMA_VERSION,
+            ),
+        )
+
+    with pytest.raises(ValueError, match="effect ceiling"):
+        _revalidate_bridge(
+            bridge,
+            effect_ceiling=ProgrammaticEffectCeiling(sandbox_id="sandbox:other"),
+        )
+
+    with pytest.raises(ValueError, match="request ref"):
+        _revalidate_bridge(bridge, request_ref=_ref("request:other"))
+
+
+def test_intent_bridge_schema_exposes_scope_and_receipt_bindings() -> None:
+    schema = _intent_bridge().model_json_schema()
+    properties = schema["properties"]
+
+    assert properties["schema_version"]["const"] == (
+        PROGRAMMATIC_INTENT_BRIDGE_SCHEMA_VERSION
+    )
+    for field in (
+        "authority_scope_ref",
+        "effect_ceiling",
+        "request_ref",
+        "approval_request",
+        "approval_decision",
+        "refusal",
+        "narrowing",
+        "expiry",
+        "execution_identity",
+        "terminal_result",
+        "usage",
+        "rollback",
+    ):
+        assert field in properties
+
+
+def test_receipt_binding_requires_explicit_ref_or_reason() -> None:
+    with pytest.raises(ValueError, match="present receipt bindings"):
+        ProgrammaticReceiptBinding(state="present")
+    with pytest.raises(ValueError, match="required receipt bindings"):
+        ProgrammaticReceiptBinding(state="required")
+    with pytest.raises(ValueError, match="invalid receipt bindings"):
+        ProgrammaticReceiptBinding(state="invalid")
+
+    present = _receipt("present")
+    missing = ProgrammaticReceiptBinding(
+        state="missing", reason_code="owner_receipt_missing"
+    )
+    assert present.state == "present"
+    assert missing.state == "missing"
+
+
+@pytest.mark.parametrize(
+    ("state", "binding_name"),
+    [
+        ("requested", "approval_request"),
+        ("awaiting_approval", "approval_request"),
+        ("refused", "refusal"),
+        ("narrowed", "narrowing"),
+        ("expired", "expiry"),
+    ],
+)
+def test_intent_bridge_preserves_non_execution_terminal_routes(
+    state: str,
+    binding_name: str,
+) -> None:
+    bridge = _intent_bridge(state=state)
+
+    assert getattr(bridge, binding_name).state == "present"
+    assert bridge.request.activation.state == "not_admitted"
+    with pytest.raises(ControlPlaneContractError, match=state):
+        assert_programmatic_execution_intent_bridge(bridge)
+
+
+def test_intent_bridge_missing_or_invalid_receipts_fail_closed() -> None:
+    missing = _intent_bridge(
+        state="invalid",
+        invalid_reason="terminal_result_missing",
+        terminal_result=ProgrammaticReceiptBinding(
+            state="missing", reason_code="terminal_result_missing"
+        ),
+    )
+    with pytest.raises(ControlPlaneContractError, match="invalid"):
+        assert_programmatic_execution_intent_bridge(missing)
+
+    with pytest.raises(ValueError, match="missing or invalid"):
+        _intent_bridge(
+            terminal_result=ProgrammaticReceiptBinding(
+                state="missing", reason_code="terminal_result_missing"
+            )
+        )
+
+
+def test_admitted_intent_bridge_requires_approval_and_execution_identity() -> None:
+    request = _admitted_request(input_ref=_dashboard_intent_ref())
+    bridge = _intent_bridge(state="admitted", request=request)
+
+    assert_programmatic_execution_intent_bridge(bridge)
+
+    with pytest.raises(ValueError, match="approval decision"):
+        _intent_bridge(
+            state="admitted",
+            request=request,
+            approval_decision=ProgrammaticReceiptBinding(
+                state="required", reason_code="approval_decision_required"
+            ),
+        )
+
+    with pytest.raises(ValueError, match="execution identity"):
+        _intent_bridge(
+            state="admitted",
+            request=request,
+            execution_identity=ProgrammaticReceiptBinding(
+                state="required", reason_code="execution_identity_required"
+            ),
+        )
+
+
+def test_executed_intent_bridge_requires_terminal_usage_and_rollback_binding() -> None:
+    request = _admitted_request(input_ref=_dashboard_intent_ref())
+    bridge = _intent_bridge(state="executed", request=request)
+
+    assert_programmatic_execution_intent_bridge(bridge)
+
+    with pytest.raises(ValueError, match="terminal_result"):
+        _intent_bridge(
+            state="executed",
+            request=request,
+            terminal_result=ProgrammaticReceiptBinding(
+                state="required", reason_code="terminal_result_required"
+            ),
+        )
+
+    with pytest.raises(ValueError, match="rollback"):
+        _intent_bridge(
+            state="executed",
+            request=request,
+            rollback=ProgrammaticReceiptBinding(
+                state="required", reason_code="rollback_required"
+            ),
+        )
 
 
 @pytest.mark.parametrize("mode", ["direct", "programmatic"])
