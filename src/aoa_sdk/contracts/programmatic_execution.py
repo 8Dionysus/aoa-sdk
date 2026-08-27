@@ -34,6 +34,12 @@ PROGRAMMATIC_EXECUTION_ADAPTER_PROTOCOL_VERSION: Literal[
 PROGRAMMATIC_ADMISSION_SCHEMA_VERSION: Literal[
     "aoa_programmatic_tool_execution_admission_v1"
 ] = "aoa_programmatic_tool_execution_admission_v1"
+PROGRAMMATIC_INTENT_BRIDGE_SCHEMA_VERSION: Literal[
+    "aoa_programmatic_execution_intent_bridge_v1"
+] = "aoa_programmatic_execution_intent_bridge_v1"
+DASHBOARD_ACTION_INTENT_SCHEMA_VERSION: Literal[
+    "aoa_dashboard_action_intent_v1"
+] = "aoa_dashboard_action_intent_v1"
 
 ExecutionMode: TypeAlias = Literal["direct", "programmatic"]
 ProgrammaticActivationState: TypeAlias = Literal["not_admitted", "admitted"]
@@ -60,6 +66,20 @@ ObservationAvailability: TypeAlias = Literal[
 ]
 EconomyAvailability: TypeAlias = Literal["observed", "partial", "unavailable"]
 MeasurementSource: TypeAlias = Literal["runtime", "provider", "derived"]
+ProgrammaticReceiptBindingState: TypeAlias = Literal[
+    "required", "present", "missing", "invalid", "not_applicable"
+]
+ProgrammaticExecutionIntentBridgeState: TypeAlias = Literal[
+    "deferred",
+    "requested",
+    "awaiting_approval",
+    "admitted",
+    "refused",
+    "narrowed",
+    "expired",
+    "executed",
+    "invalid",
+]
 
 NonNegativeInt = Annotated[int, Field(ge=0)]
 PositiveInt = Annotated[int, Field(gt=0)]
@@ -521,6 +541,264 @@ class ProgrammaticExecutionObservation(StrictControlPlaneModel):
                 "economy intermediate_values must match the observed ref count"
             )
         return self
+
+
+class ProgrammaticReceiptBinding(StrictControlPlaneModel):
+    """Presence state for an owner-supplied request or execution receipt."""
+
+    state: ProgrammaticReceiptBindingState
+    ref: ContentRef | None = None
+    reason_code: NonEmptyStr | None = None
+
+    @model_validator(mode="after")
+    def validate_binding(self) -> ProgrammaticReceiptBinding:
+        if self.state == "present":
+            if self.ref is None or self.reason_code is not None:
+                raise ValueError("present receipt bindings require only a ref")
+            return self
+        if self.state == "invalid":
+            if self.reason_code is None:
+                raise ValueError("invalid receipt bindings require a reason code")
+            return self
+        if self.ref is not None or self.reason_code is None:
+            raise ValueError(
+                f"{self.state} receipt bindings require only a reason code"
+            )
+        return self
+
+
+def _required_receipt_binding(reason_code: str) -> ProgrammaticReceiptBinding:
+    return ProgrammaticReceiptBinding(state="required", reason_code=reason_code)
+
+
+def _not_applicable_receipt_binding(reason_code: str) -> ProgrammaticReceiptBinding:
+    return ProgrammaticReceiptBinding(
+        state="not_applicable", reason_code=reason_code
+    )
+
+
+class ProgrammaticExecutionIntentBridge(StrictControlPlaneModel):
+    """Bind one upstream deferred intent to an existing execution request.
+
+    This is a data-only handoff envelope.  It carries references to stronger
+    owners' authority and receipts; it does not turn those references into
+    approval, runtime admission, execution, or acceptance.
+    """
+
+    schema_version: Literal[
+        "aoa_programmatic_execution_intent_bridge_v1"
+    ] = PROGRAMMATIC_INTENT_BRIDGE_SCHEMA_VERSION
+    bridge_id: NonEmptyStr
+    source_intent_ref: ContentRef
+    goal_ref: ContentRef
+    correlation_id: NonEmptyStr
+    authority_scope_ref: ContentRef
+    effect_ceiling: ProgrammaticEffectCeiling
+    request_ref: ContentRef
+    request: ProgrammaticExecutionRequest
+    approval_request: ProgrammaticReceiptBinding = Field(
+        default_factory=lambda: _required_receipt_binding(
+            "approval_request_required"
+        )
+    )
+    approval_decision: ProgrammaticReceiptBinding = Field(
+        default_factory=lambda: _required_receipt_binding(
+            "approval_decision_required"
+        )
+    )
+    refusal: ProgrammaticReceiptBinding = Field(
+        default_factory=lambda: _not_applicable_receipt_binding("not_refused")
+    )
+    narrowing: ProgrammaticReceiptBinding = Field(
+        default_factory=lambda: _not_applicable_receipt_binding("not_narrowed")
+    )
+    expiry: ProgrammaticReceiptBinding = Field(
+        default_factory=lambda: _not_applicable_receipt_binding("not_expired")
+    )
+    execution_identity: ProgrammaticReceiptBinding = Field(
+        default_factory=lambda: _required_receipt_binding(
+            "execution_identity_required"
+        )
+    )
+    terminal_result: ProgrammaticReceiptBinding = Field(
+        default_factory=lambda: _required_receipt_binding(
+            "terminal_result_required"
+        )
+    )
+    usage: ProgrammaticReceiptBinding = Field(
+        default_factory=lambda: _required_receipt_binding("usage_required")
+    )
+    rollback: ProgrammaticReceiptBinding = Field(
+        default_factory=lambda: _required_receipt_binding("rollback_required")
+    )
+    state: ProgrammaticExecutionIntentBridgeState = "deferred"
+    invalid_reason: NonEmptyStr | None = None
+    provenance: ProvenanceRef
+
+    @model_validator(mode="after")
+    def validate_bridge(self) -> ProgrammaticExecutionIntentBridge:
+        if (
+            self.source_intent_ref.owner_repo != "aoa-dashboard"
+            or self.source_intent_ref.schema_version
+            != DASHBOARD_ACTION_INTENT_SCHEMA_VERSION
+        ):
+            raise ValueError(
+                "intent bridge requires an exact dashboard action-intent ref"
+            )
+        if self.correlation_id != self.request.correlation_id:
+            raise ValueError("intent bridge correlation must match the request")
+        if self.request.input_ref != self.source_intent_ref:
+            raise ValueError(
+                "intent bridge source intent must be the exact request input ref"
+            )
+        if self.effect_ceiling != self.request.effect_ceiling:
+            raise ValueError("intent bridge effect ceiling must match the request")
+        if self.request_ref != programmatic_execution_request_ref(self.request):
+            raise ValueError("intent bridge request ref does not match the request")
+
+        bindings = {
+            "approval_request": self.approval_request,
+            "approval_decision": self.approval_decision,
+            "refusal": self.refusal,
+            "narrowing": self.narrowing,
+            "expiry": self.expiry,
+            "execution_identity": self.execution_identity,
+            "terminal_result": self.terminal_result,
+            "usage": self.usage,
+            "rollback": self.rollback,
+        }
+        invalid_bindings = [
+            name for name, binding in bindings.items() if binding.state == "invalid"
+        ]
+        missing_bindings = [
+            name for name, binding in bindings.items() if binding.state == "missing"
+        ]
+        if self.state == "invalid":
+            if self.invalid_reason is None:
+                raise ValueError("invalid intent bridges require an invalid reason")
+            if not invalid_bindings and not missing_bindings:
+                raise ValueError(
+                    "invalid intent bridges must retain an invalid or missing binding"
+                )
+        else:
+            if self.invalid_reason is not None:
+                raise ValueError("only invalid intent bridges may carry invalid_reason")
+            if invalid_bindings or missing_bindings:
+                raise ValueError(
+                    "missing or invalid receipt bindings fail closed outside invalid state"
+                )
+
+        if self.state in {
+            "deferred",
+            "requested",
+            "awaiting_approval",
+            "refused",
+            "narrowed",
+            "expired",
+        } and self.request.activation.state == "admitted":
+            raise ValueError("pre-execution intent bridge states cannot be admitted")
+        if self.state in {"admitted", "executed"} and self.request.activation.state != "admitted":
+            raise ValueError("admitted intent bridge states require request admission")
+
+        if self.state in {"requested", "awaiting_approval"}:
+            if not self.effect_ceiling.approval_required:
+                raise ValueError("approval states require an approval-required ceiling")
+            if self.approval_request.state != "present":
+                raise ValueError("approval states require an approval request binding")
+            if self.approval_decision.state == "present":
+                raise ValueError("pending approval states cannot carry a decision")
+
+        if self.state == "refused" and self.refusal.state != "present":
+            raise ValueError("refused intent bridges require a refusal binding")
+        if self.state == "narrowed" and self.narrowing.state != "present":
+            raise ValueError("narrowed intent bridges require a narrowing binding")
+        if self.state == "expired" and self.expiry.state != "present":
+            raise ValueError("expired intent bridges require an expiry binding")
+
+        if self.state in {
+            "deferred",
+            "requested",
+            "awaiting_approval",
+            "refused",
+            "narrowed",
+            "expired",
+        }:
+            for name in ("execution_identity", "terminal_result", "usage", "rollback"):
+                if bindings[name].state == "present":
+                    raise ValueError(
+                        f"{name} receipt cannot precede an admitted execution bridge"
+                    )
+
+        if self.state in {"admitted", "executed"}:
+            if self.effect_ceiling.approval_required:
+                if self.approval_request.state != "present":
+                    raise ValueError(
+                        "admitted intent bridges require an approval request binding"
+                    )
+                if self.approval_decision.state != "present":
+                    raise ValueError(
+                        "admitted intent bridges require an approval decision binding"
+                    )
+            else:
+                if (
+                    self.approval_request.state != "not_applicable"
+                    or self.approval_decision.state != "not_applicable"
+                ):
+                    raise ValueError(
+                        "a non-approval ceiling must explicitly mark approval bindings not applicable"
+                    )
+            if self.execution_identity.state != "present":
+                raise ValueError(
+                    "admitted intent bridges require an execution identity binding"
+                )
+
+        if self.state == "executed":
+            for name in ("terminal_result", "usage"):
+                if bindings[name].state != "present":
+                    raise ValueError(
+                        f"executed intent bridges require a {name} binding"
+                    )
+            if self.rollback.state not in {"present", "not_applicable"}:
+                raise ValueError(
+                    "executed intent bridges require a rollback receipt or explicit not-applicable state"
+                )
+        return self
+
+
+def _require_present_receipt(
+    binding: ProgrammaticReceiptBinding,
+    label: str,
+) -> None:
+    if binding.state != "present":
+        raise ControlPlaneContractError(
+            f"intent bridge is missing its {label} receipt binding"
+        )
+
+
+def assert_programmatic_execution_intent_bridge(
+    bridge: ProgrammaticExecutionIntentBridge,
+) -> None:
+    """Fail closed unless an intent bridge is admitted by its owner refs."""
+
+    if bridge.state != "admitted":
+        if bridge.state == "executed":
+            pass
+        else:
+            raise ControlPlaneContractError(
+                f"intent bridge is {bridge.state}; no execution admission is present"
+            )
+    assert_programmatic_execution_admitted(bridge.request)
+    if bridge.effect_ceiling.approval_required:
+        _require_present_receipt(bridge.approval_request, "approval request")
+        _require_present_receipt(bridge.approval_decision, "approval decision")
+    _require_present_receipt(bridge.execution_identity, "execution identity")
+    if bridge.state == "executed":
+        _require_present_receipt(bridge.terminal_result, "terminal/result")
+        _require_present_receipt(bridge.usage, "usage")
+        if bridge.rollback.state not in {"present", "not_applicable"}:
+            raise ControlPlaneContractError(
+                "executed intent bridge is missing its rollback binding"
+            )
 
 
 def programmatic_execution_request_digest(

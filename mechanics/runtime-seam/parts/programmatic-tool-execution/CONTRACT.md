@@ -22,6 +22,17 @@ mode.
   missingness. Partial economy is represented as a partial dimension with a
   reason, and rejected-missing policy never treats it as complete. Economy
   counters are observations, never predeclared limits.
+- `ProgrammaticExecutionIntentBridge` is an optional, data-only wrapper for an
+  exact upstream action-intent ref, Goal ref, correlation, authority-scope
+  ref, and `ProgrammaticExecutionRequest`. It repeats the request ref and
+  effect ceiling and carries explicit required/present/missing/invalid/
+  not-applicable bindings for approval, refusal, narrowing, expiry,
+  execution identity, terminal/result, usage, and rollback receipts.
+- The intent bridge defaults to `deferred`; missing or invalid bindings fail
+  closed, and an admitted/executed state requires the corresponding owner
+  refs. These refs are not approval, admission, execution, deployment, proof,
+  or acceptance receipts. The SDK does not inspect or create the upstream
+  action-intent payload or any downstream owner artifact.
 
 `assert_programmatic_execution_observation()` checks the exact request digest,
 identity, runtime-owner provenance, request/admission ordering, handle set,
