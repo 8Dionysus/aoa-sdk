@@ -61,6 +61,7 @@ from ..contracts.delegation import (
     ExternalIncarnationV1,
     validate_delegation_class,
 )
+from ..contracts.control_plane import ContinuityCapsuleRef
 
 __all__ = [
     "AoARunner",
@@ -75,6 +76,7 @@ __all__ = [
     "AgentIncarnationBinding",
     "AgentIncarnationBindingV2",
     "ContinuationObligation",
+    "ContinuityCapsuleRef",
     "IncarnationPermissionPosture",
     "IncarnationRuntimeSubject",
     "IncarnationStopCondition",

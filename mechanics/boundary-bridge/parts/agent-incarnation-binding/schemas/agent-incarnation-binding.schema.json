@@ -43,6 +43,17 @@
           "title": "Continuation Id",
           "type": "string"
         },
+        "continuity_capsule_ref": {
+          "anyOf": [
+            {
+              "$ref": "#/$defs/ContinuityCapsuleRef"
+            },
+            {
+              "type": "null"
+            }
+          ],
+          "default": null
+        },
         "deferred_parent_decisions": {
           "items": {
             "minLength": 1,
@@ -159,6 +170,40 @@
         "rollback_reentry_anchor"
       ],
       "title": "ContinuationObligation",
+      "type": "object"
+    },
+    "ContinuityCapsuleRef": {
+      "additionalProperties": false,
+      "description": "Exact optional reference to an aoa-session-memory continuity capsule.",
+      "properties": {
+        "digest": {
+          "pattern": "^sha256:[0-9a-f]{64}$",
+          "title": "Digest",
+          "type": "string"
+        },
+        "object_id": {
+          "minLength": 1,
+          "title": "Object Id",
+          "type": "string"
+        },
+        "owner_repo": {
+          "const": "aoa-session-memory",
+          "default": "aoa-session-memory",
+          "title": "Owner Repo",
+          "type": "string"
+        },
+        "schema_version": {
+          "const": "continuity_capsule_v1",
+          "default": "continuity_capsule_v1",
+          "title": "Schema Version",
+          "type": "string"
+        }
+      },
+      "required": [
+        "object_id",
+        "digest"
+      ],
+      "title": "ContinuityCapsuleRef",
       "type": "object"
     },
     "IncarnationPermissionPosture": {
@@ -518,6 +563,17 @@
     },
     "continuation": {
       "$ref": "#/$defs/ContinuationObligation"
+    },
+    "continuity_capsule_ref": {
+      "anyOf": [
+        {
+          "$ref": "#/$defs/ContinuityCapsuleRef"
+        },
+        {
+          "type": "null"
+        }
+      ],
+      "default": null
     },
     "correlation_id": {
       "minLength": 1,

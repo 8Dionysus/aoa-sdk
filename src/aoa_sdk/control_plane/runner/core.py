@@ -103,6 +103,7 @@ class AoARunner:
             ),
             plan_digest=plan.plan_digest,
             snapshot_digest=plan.snapshot.snapshot_digest,
+            continuity_capsule_ref=plan.continuity_capsule_ref,
             event_stream_id=f"aoa-execution-events:{token}",
             prepared_at=prepared_at,
             prepared_by=self._provenance,
@@ -924,6 +925,7 @@ def _assert_session_matches_plan(session: SessionHandle, plan: RunPlan) -> None:
         or session.plan_ref != expected_ref
         or session.plan_digest != plan.plan_digest
         or session.snapshot_digest != plan.snapshot.snapshot_digest
+        or session.continuity_capsule_ref != plan.continuity_capsule_ref
     ):
         raise AoARunnerError("session handle does not match the exact run plan")
 
@@ -937,6 +939,7 @@ def _assert_command_scope(
         command.session_id != record.session.session_id
         or command.correlation_id != record.session.correlation_id
         or command.plan_digest != record.plan.plan_digest
+        or command.continuity_capsule_ref != record.plan.continuity_capsule_ref
     ):
         raise AoARunnerError("runtime command is outside the session and plan scope")
     if command.expected_revision != status.revision:

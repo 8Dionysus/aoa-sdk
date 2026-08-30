@@ -17,6 +17,11 @@ The included continuation obligation carries the state needed after a parent
 inference truly yields. Its wake policy is event-filtered: child completion is
 an event, not an automatic order to wake the parent.
 
+When supplied, the plan, binding, continuation, Runner session, and lifecycle
+command carry one exact content-addressed `continuity_capsule_v1` reference.
+The SDK validates identity only; portable/private capsule content and
+compaction meaning remain owned by `aoa-session-memory` and the runtime owner.
+
 `AgentIncarnationBindingV2` is the evidence-complete contract for new external
 actors. It additionally binds the exact `aoa-agents` obligation, actor mandate,
 and passive role-resolution result plus the content-addressed `aoa-models`

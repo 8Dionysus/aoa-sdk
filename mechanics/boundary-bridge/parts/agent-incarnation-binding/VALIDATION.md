@@ -15,6 +15,7 @@ The focused tests prove byte-stable v1 compatibility, required v2 obligation,
 mandate, role-resolution, fit-result and fit-projection binding, digest and
 owner separation, exact runtime-subject binding and tamper rejection, exact
 plan/task/role matching, continuation completeness,
+exact continuity-capsule carry through plan, binding, session, and resume,
 effect ceilings, model-record hashing, runtime-profile owner projection, stale
 plan-digest rejection, and generated v1/v2 schema parity. Runtime execution
 remains paired proof in `abyss-stack`. Delegation-class tests additionally

@@ -8,6 +8,10 @@ Tracking starts with the community-docs baseline for this repository.
 ## [Unreleased]
 
 - Add future changes here after the release tag lands.
+- Carry an optional, exact `aoa-session-memory` `continuity_capsule_v1`
+  content reference through `RunPlan`, incarnation continuation, Runner
+  session, and lifecycle commands without copying capsule content or changing
+  legacy serialized plans.
 - Dated release sections own exact reconciliation spans, complete commit
   inventories, and validation evidence.
 - Make the shared release contour accept strict SemVer 2.0.0 prerelease
