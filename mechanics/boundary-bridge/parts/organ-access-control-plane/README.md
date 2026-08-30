@@ -51,6 +51,13 @@ deploy/runtime/lifecycle; `aoa-evals` retains proof; the relevant organ retains
 grounding, freshness, and acceptance. An owner-result review can assert only
 the first two; acceptance stays a separate axis.
 
+## Progressive exposure
+
+The optional [progressive exposure contract](docs/progressive-exposure.md)
+binds an explicit, ordered model-visible tool selection to a content-addressed
+candidate snapshot. It is default-off and candidate-only; runtime materializing,
+invocation, proof, and acceptance remain with their stronger owners.
+
 ## Next route
 
 Read [the detailed contract](docs/organ-access.md), then validate the
