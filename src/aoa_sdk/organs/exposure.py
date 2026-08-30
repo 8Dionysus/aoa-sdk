@@ -13,6 +13,7 @@ from ..contracts.organ_exposure import (
     ExposureAuthorizationCandidate,
     ExposureCapabilityBinding,
     ExposureFreshnessState,
+    ExposureRollbackBinding,
     ExposureSelectionRequest,
     ExposureFreshness,
     ProgressiveExposurePlan,
@@ -251,6 +252,8 @@ def compile_progressive_exposure(
         refusal_reasons.append("capability_freshness_not_usable")
 
     selected: list[VisibleTool] = []
+    rollback_bindings: list[ExposureRollbackBinding] = []
+    approval_bound = False
     for primitive_id in request.selected_primitive_ids:
         primitive = primitives.get(primitive_id)
         if primitive is None:
@@ -270,16 +273,32 @@ def compile_progressive_exposure(
         if approval_reason is not None:
             refusal_reasons.append(approval_reason)
             continue
-        selected.append(
-            exposure_tool_from_primitive(
-                capability,
-                primitive,
-                schema_digest=binding.schema_digest,
-            )
+        tool = exposure_tool_from_primitive(
+            capability,
+            primitive,
+            schema_digest=binding.schema_digest,
         )
+        selected.append(tool)
+        if primitive.approval_required:
+            approval_bound = True
+        if primitive.policy_family != "read":
+            assert primitive.rollback_route is not None
+            rollback_bindings.append(
+                ExposureRollbackBinding(
+                    tool_id=tool.tool_id,
+                    primitive_id=tool.primitive_id,
+                    rollback_route=primitive.rollback_route,
+                )
+            )
+
+    if approval_bound:
+        assert request.approval_ref is not None
+        assert request.approval_ref.expires_at is not None
+        plan_expiry = min(plan_expiry, request.approval_ref.expires_at)
 
     can_reveal = not refusal_reasons
     tools = tuple(selected) if can_reveal else ()
+    plan_rollback_bindings = tuple(rollback_bindings) if can_reveal else ()
     snapshot = _snapshot(
         source_digest=projection.source_digest,
         tools=tools,
@@ -318,6 +337,9 @@ def compile_progressive_exposure(
             if request.approval_ref is not None
             else None
         ),
+        "rollback_bindings": [
+            item.model_dump(mode="json") for item in plan_rollback_bindings
+        ],
         "rollback_route": binding.rollback_route,
         "requested_at": request.requested_at.isoformat().replace("+00:00", "Z"),
         "expires_at": plan_expiry.isoformat().replace("+00:00", "Z"),
@@ -352,5 +374,6 @@ def prepare_exposure_authorization(
         visible_tokens=plan.rendered_snapshot.rendered_tokens,
         reason_codes=reasons,
         approval_ref=approval_ref or plan.approval_ref,
+        rollback_bindings=plan.rollback_bindings,
         rollback_route=plan.rollback_route,
     )

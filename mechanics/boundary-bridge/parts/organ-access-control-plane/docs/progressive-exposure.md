@@ -8,7 +8,8 @@ The SDK binds:
 
 - the owner-qualified capability identity and source/schema digests;
 - freshness, provider watermark, and the bounded TTL;
-- the capability effect ceiling plus approval and rollback references;
+- the capability effect ceiling, approval lifetime, organ fallback rollback
+  route, and ordered primitive-specific rollback bindings;
 - the ordered visible tool descriptors; and
 - exact rendered bytes, explicitly labelled token counts, expansion reasons,
   and refusal reasons.

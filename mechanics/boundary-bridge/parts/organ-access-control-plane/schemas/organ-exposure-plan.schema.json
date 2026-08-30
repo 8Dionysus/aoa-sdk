@@ -178,6 +178,37 @@
       "title": "ExposureFreshness",
       "type": "object"
     },
+    "ExposureRollbackBinding": {
+      "additionalProperties": false,
+      "description": "Primitive-specific rollback route retained across runtime handoff.",
+      "properties": {
+        "primitive_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Primitive Id",
+          "type": "string"
+        },
+        "rollback_route": {
+          "maxLength": 512,
+          "minLength": 3,
+          "title": "Rollback Route",
+          "type": "string"
+        },
+        "tool_id": {
+          "maxLength": 512,
+          "minLength": 1,
+          "title": "Tool Id",
+          "type": "string"
+        }
+      },
+      "required": [
+        "tool_id",
+        "primitive_id",
+        "rollback_route"
+      ],
+      "title": "ExposureRollbackBinding",
+      "type": "object"
+    },
     "OrganOwners": {
       "additionalProperties": false,
       "properties": {
@@ -658,6 +689,14 @@
         "type": "string"
       },
       "title": "Requested Primitive Ids",
+      "type": "array"
+    },
+    "rollback_bindings": {
+      "default": [],
+      "items": {
+        "$ref": "#/$defs/ExposureRollbackBinding"
+      },
+      "title": "Rollback Bindings",
       "type": "array"
     },
     "rollback_route": {

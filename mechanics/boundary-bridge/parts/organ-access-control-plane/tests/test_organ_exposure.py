@@ -193,3 +193,55 @@ def test_exposure_rejects_mismatched_effect_approval(tmp_path) -> None:
     plan = api.compile_exposure(request, evaluated_at=NOW)
     assert plan.plan_state == "blocked"
     assert "approval_owner_mismatch" in plan.refusal_reasons
+
+
+def test_effect_exposure_is_capped_by_approval_and_preserves_rollback(
+    tmp_path,
+) -> None:
+    workspace_api = _api(tmp_path, _source(_record("aoa-kag", "admitted", effect=True)))
+    api = OrgansAPI(
+        workspace_api.workspace,
+        registry_path=workspace_api.registry_path,
+        clock=lambda: NOW,
+        progressive_exposure_enabled=True,
+    )
+    approval_expiry = NOW + timedelta(minutes=20)
+    request = ExposureSelectionRequest(
+        request_id="effect-exposure-request",
+        organ_id="aoa-kag",
+        capability_id="knowledge-publish",
+        selected_primitive_ids=("publish-change",),
+        requested_policy_family="external_effect",
+        requested_at=NOW,
+        expires_at=NOW + timedelta(hours=1),
+        baseline_ready=True,
+        baseline_evidence={
+            "owner": "d0-baseline",
+            "evidence_ref": "receipt://d0/baseline-ready",
+            "revision": "baseline-1",
+            "observed_at": NOW.isoformat(),
+            "expires_at": (NOW + timedelta(hours=1)).isoformat(),
+        },
+        reveal_schemas=True,
+        approval_ref={
+            "owner": "os-operator",
+            "evidence_ref": "approval://effect-exposure",
+            "revision": "approval-1",
+            "observed_at": NOW.isoformat(),
+            "expires_at": approval_expiry.isoformat(),
+        },
+    )
+
+    plan = api.compile_exposure(request, evaluated_at=NOW)
+
+    assert plan.plan_state == "candidate"
+    assert plan.expires_at == approval_expiry
+    assert [item.model_dump(mode="json") for item in plan.rollback_bindings] == [
+        {
+            "tool_id": "knowledge-publish.publish-change",
+            "primitive_id": "publish-change",
+            "rollback_route": "owner://rollback/publish",
+        }
+    ]
+    authorization = api.prepare_exposure_authorization(plan)
+    assert authorization.rollback_bindings == plan.rollback_bindings

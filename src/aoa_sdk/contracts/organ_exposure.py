@@ -166,6 +166,14 @@ class VisibleTool(StrictOrganModel):
         return self
 
 
+class ExposureRollbackBinding(StrictOrganModel):
+    """Primitive-specific rollback route retained across runtime handoff."""
+
+    tool_id: NonEmptyExposureText
+    primitive_id: NonEmptyExposureText
+    rollback_route: SecretFreeRef
+
+
 class RenderedExposureSnapshot(StrictOrganModel):
     """Deterministic model-visible tool-set and visibility accounting."""
 
@@ -274,6 +282,7 @@ class ProgressiveExposurePlan(StrictOrganModel):
     visible_tools: tuple[VisibleTool, ...] = ()
     rendered_snapshot: RenderedExposureSnapshot
     approval_ref: QualifiedEvidenceRef | None = None
+    rollback_bindings: tuple[ExposureRollbackBinding, ...] = ()
     rollback_route: SecretFreeRef
     requested_at: datetime
     expires_at: datetime
@@ -311,6 +320,19 @@ class ProgressiveExposurePlan(StrictOrganModel):
                 raise ValueError(
                     "plan visible tools must preserve the requested primitive selection"
                 )
+        expected_rollback_tools = tuple(
+            (tool.tool_id, tool.primitive_id)
+            for tool in self.visible_tools
+            if tool.policy_family != "read"
+        )
+        actual_rollback_tools = tuple(
+            (binding.tool_id, binding.primitive_id)
+            for binding in self.rollback_bindings
+        )
+        if actual_rollback_tools != expected_rollback_tools:
+            raise ValueError(
+                "plan rollback bindings must preserve every effectful visible tool"
+            )
         if self.plan_state == "blocked":
             if self.visible_tools or self.rendered_snapshot.rendered_bytes != 2:
                 raise ValueError("blocked disclosure cannot reveal tools or schemas")
@@ -345,6 +367,7 @@ class ExposureAuthorizationCandidate(StrictOrganModel):
     visible_tokens: Annotated[int, Field(ge=0)] | None = None
     reason_codes: tuple[NonEmptyExposureText, ...]
     approval_ref: QualifiedEvidenceRef | None = None
+    rollback_bindings: tuple[ExposureRollbackBinding, ...] = ()
     rollback_route: SecretFreeRef
 
 
