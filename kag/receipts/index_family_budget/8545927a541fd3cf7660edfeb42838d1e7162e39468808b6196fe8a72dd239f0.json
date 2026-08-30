@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 11350865,
+  "allowed_tracked_bytes": 21204821,
+  "approved_by": "repository-owner",
+  "base_ref": "873e1bd189294793ad13e81634038755ce87ff03",
+  "changed_generated_bytes": 11350865,
+  "changed_generated_files": 206,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "8545927a541fd3cf7660edfeb42838d1e7162e39468808b6196fe8a72dd239f0",
+  "reason": "land exact continuity capsule reference carry",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 21204821,
+  "tracked_bytes_max": 15728640
+}
