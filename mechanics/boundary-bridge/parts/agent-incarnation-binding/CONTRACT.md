@@ -8,6 +8,8 @@
   exact content-addressed runtime-subject canonical-digest chain for new
   external actors;
 - exact cross-object validation against one `RunPlan`;
+- optional exact `aoa-session-memory` continuity-capsule reference carry from
+  plan through binding and continuation without reading or copying its content;
 - validation of the plan snapshot and plan canonical digest before the
   incarnation can rely on its plan ref;
 - an owner-subordinate loader that hashes one `aoa-models` realization without
@@ -35,6 +37,8 @@
 - `abyss-stack` or another selected runtime owner owns tools, launch, process,
   session, events, resume, and execution evidence;
 - `aoa-evals` owns comparison and verdict meaning;
+- `aoa-session-memory` owns continuity-capsule content, portable/private view
+  meaning, omissions, protected-tail posture, and compaction evidence;
 - the target owner and human approval route own acceptance and effects.
 
 ## Admission order
@@ -68,6 +72,8 @@ procedure owner.
 - The model slug is not copied into role or plan truth.
 - A schema-valid binding is not activation, execution, persistence, proof,
   acceptance, landing, or net benefit.
+- A capsule reference is not capsule admission, freshness, materialization, or
+  proof that a compaction boundary occurred.
 - Historical v1 compatibility is not admission for a new external actor that
   requires the evidence-complete v2 chain.
 - Parent/child words in a task request remain first-route compatibility terms,

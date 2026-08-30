@@ -14,6 +14,7 @@ from ..contracts.control_plane import (
     CheckpointPolicy,
     CloseoutRequirement,
     ContentRef,
+    ContinuityCapsuleRef,
     EvidenceRequirement,
     PlanSnapshot,
     PlanStep,
@@ -94,6 +95,7 @@ def build_obligation_actor_run_plan(
     closeout_owner: ProvenanceRef,
     provenance: ProvenanceRef,
     capability_refs: tuple[CapabilityRef, ...] = (),
+    continuity_capsule_ref: ContinuityCapsuleRef | None = None,
 ) -> RunPlan:
     """Compile one already-decided obligation actor into a runtime-neutral plan.
 
@@ -191,6 +193,7 @@ def build_obligation_actor_run_plan(
         scenario_binding=scenario,
         runtime_profile=runtime_profile,
         snapshot=snapshot,
+        continuity_capsule_ref=continuity_capsule_ref,
         steps=(step,),
         checkpoint_policy=CheckpointPolicy(
             owner=checkpoint_owner,
@@ -314,6 +317,7 @@ def build_agent_incarnation_binding(
         usage_metering=usage_metering,
         stop_conditions=stop_conditions,
         expected_result_schema_ref=expected_result_schema_ref,
+        continuity_capsule_ref=plan.continuity_capsule_ref,
         continuation=continuation,
         wake_policy=wake_policy,
         binding_digest=_ZERO_DIGEST,

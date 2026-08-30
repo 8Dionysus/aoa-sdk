@@ -8,7 +8,14 @@ import jsonschema
 import pytest
 from pydantic import ValidationError
 
-from aoa_sdk.contracts.control_plane import AgentRef, ContentRef, ProvenanceRef, RunPlan
+from aoa_sdk.contracts.control_plane import (
+    AgentRef,
+    ContentRef,
+    ContinuityCapsuleRef,
+    ProvenanceRef,
+    RunPlan,
+    canonical_digest,
+)
 from aoa_sdk.control_plane import (
     AgentIncarnationBinding,
     AgentIncarnationBindingV2,
@@ -160,6 +167,7 @@ def _binding(
         exact_child_identity="incarnation:fixture:luna-max",
         owner_scope=("fixture-requester", "aoa-agents", "aoa-models", "abyss-stack"),
         immutable_input_refs=(task_request, workspace_source),
+        continuity_capsule_ref=plan.continuity_capsule_ref,
         expected_output="A schema-valid landing-readiness result with source citations.",
         validation_refs=(validation_ref,),
         deferred_parent_decisions=("Whether to accept or perform any landing effect.",),
@@ -291,6 +299,10 @@ def test_obligation_actor_plan_compiler_preserves_exact_owner_inputs() -> None:
         fit,
         workspace,
     )
+    capsule_ref = ContinuityCapsuleRef(
+        object_id="continuity-capsule:eval-duty",
+        digest="sha256:" + "1" * 64,
+    )
 
     plan = build_obligation_actor_run_plan(
         plan_id="run-plan:eval-duty",
@@ -317,6 +329,7 @@ def test_obligation_actor_plan_compiler_preserves_exact_owner_inputs() -> None:
         rollback_owner=workspace,
         closeout_owner=compiler,
         provenance=compiler,
+        continuity_capsule_ref=capsule_ref,
     )
 
     assert plan.plan_digest != ZERO_DIGEST
@@ -325,6 +338,7 @@ def test_obligation_actor_plan_compiler_preserves_exact_owner_inputs() -> None:
     assert plan.scenario_binding.scenario.provenance == task_dag
     assert plan.scenario_binding.input_artifact_bindings[0].artifact_ref == task_request
     assert plan.evidence_requirements[0].producer_owner == "aoa-evals"
+    assert plan.continuity_capsule_ref == capsule_ref
     assert "gpt-5.6-luna" not in plan.model_dump_json()
     assert "token_budget" not in plan.model_dump_json()
 
@@ -584,6 +598,32 @@ def test_continuation_must_name_every_wake_condition() -> None:
     with pytest.raises(ValidationError, match="preserve every wake condition"):
         AgentIncarnationBinding.model_validate(
             binding.model_dump(mode="python") | {"continuation": incomplete}
+        )
+
+
+def test_binding_and_continuation_preserve_exact_capsule_reference() -> None:
+    plan = _plan()
+    capsule_ref = ContinuityCapsuleRef(
+        object_id="continuity-capsule:binding-fixture",
+        digest="sha256:" + "2" * 64,
+    )
+    plan = plan.model_copy(
+        update={"continuity_capsule_ref": capsule_ref, "plan_digest": ZERO_DIGEST}
+    )
+    plan = plan.model_copy(
+        update={"plan_digest": canonical_digest(plan, exclude={"plan_digest"})}
+    )
+    binding = _binding(plan)
+
+    assert binding.continuity_capsule_ref == capsule_ref
+    assert binding.continuation.continuity_capsule_ref == capsule_ref
+
+    drifted = binding.continuation.model_copy(
+        update={"continuity_capsule_ref": None}
+    )
+    with pytest.raises(ValidationError, match="exact continuity capsule ref"):
+        AgentIncarnationBinding.model_validate(
+            binding.model_dump(mode="python") | {"continuation": drifted}
         )
 
 

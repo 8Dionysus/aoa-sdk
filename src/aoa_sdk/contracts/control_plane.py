@@ -98,6 +98,13 @@ class ContentRef(StrictControlPlaneModel):
     digest: Digest
 
 
+class ContinuityCapsuleRef(ContentRef):
+    """Exact optional reference to an aoa-session-memory continuity capsule."""
+
+    owner_repo: Literal["aoa-session-memory"] = "aoa-session-memory"
+    schema_version: Literal["continuity_capsule_v1"] = "continuity_capsule_v1"
+
+
 class AgentRef(StrictControlPlaneModel):
     agent_id: NonEmptyStr
     provenance: ProvenanceRef
@@ -552,6 +559,10 @@ class RunPlan(StrictControlPlaneModel):
     scenario_binding: ScenarioBinding
     runtime_profile: RuntimeProfile
     snapshot: PlanSnapshot
+    continuity_capsule_ref: ContinuityCapsuleRef | None = Field(
+        default=None,
+        exclude_if=lambda value: value is None,
+    )
     steps: tuple[PlanStep, ...]
     approval_requirements: tuple[ApprovalRequirement, ...] = ()
     checkpoint_policy: CheckpointPolicy
@@ -713,6 +724,10 @@ class SessionHandle(StrictControlPlaneModel):
     plan_ref: ContentRef
     plan_digest: Digest
     snapshot_digest: Digest
+    continuity_capsule_ref: ContinuityCapsuleRef | None = Field(
+        default=None,
+        exclude_if=lambda value: value is None,
+    )
     event_stream_id: NonEmptyStr
     prepared_at: datetime
     prepared_by: ProvenanceRef
@@ -839,6 +854,10 @@ class LifecycleCommand(StrictControlPlaneModel):
     session_id: NonEmptyStr
     correlation_id: NonEmptyStr
     plan_digest: Digest
+    continuity_capsule_ref: ContinuityCapsuleRef | None = Field(
+        default=None,
+        exclude_if=lambda value: value is None,
+    )
     expected_revision: Annotated[int, Field(ge=0)]
     issued_at: datetime
     issued_by: ProvenanceRef

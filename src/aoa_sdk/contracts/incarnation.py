@@ -13,6 +13,7 @@ from pydantic import Field, model_validator
 
 from .control_plane import (
     ContentRef,
+    ContinuityCapsuleRef,
     Digest,
     NonEmptyStr,
     ProvenanceRef,
@@ -175,6 +176,10 @@ class ContinuationObligation(StrictControlPlaneModel):
     exact_child_identity: NonEmptyStr
     owner_scope: tuple[NonEmptyStr, ...] = Field(min_length=1)
     immutable_input_refs: tuple[ProvenanceRef, ...] = Field(min_length=1)
+    continuity_capsule_ref: ContinuityCapsuleRef | None = Field(
+        default=None,
+        exclude_if=lambda value: value is None,
+    )
     expected_output: NonEmptyStr
     validation_refs: tuple[ProvenanceRef, ...] = Field(min_length=1)
     deferred_parent_decisions: tuple[NonEmptyStr, ...]
@@ -219,6 +224,10 @@ class _AgentIncarnationBindingBase(StrictControlPlaneModel):
     usage_metering: IncarnationUsageMetering
     stop_conditions: tuple[IncarnationStopCondition, ...] = Field(min_length=1)
     expected_result_schema_ref: ProvenanceRef
+    continuity_capsule_ref: ContinuityCapsuleRef | None = Field(
+        default=None,
+        exclude_if=lambda value: value is None,
+    )
     continuation: ContinuationObligation
     wake_policy: WakeEscalationPolicy
     binding_digest: Digest
@@ -249,6 +258,10 @@ class _AgentIncarnationBindingBase(StrictControlPlaneModel):
             )
         if self.continuation.exact_child_identity != self.incarnation_id:
             raise ValueError("continuation child identity must match incarnation_id")
+        if self.continuation.continuity_capsule_ref != self.continuity_capsule_ref:
+            raise ValueError(
+                "binding and continuation must preserve the exact continuity capsule ref"
+            )
         stop_ids = [item.condition_id for item in self.stop_conditions]
         if len(stop_ids) != len(set(stop_ids)):
             raise ValueError("incarnation stop condition ids must be unique")
