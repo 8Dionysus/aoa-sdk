@@ -22,6 +22,8 @@ from aoa_sdk.contracts.goal_lifecycle import (
 )
 
 
+# Keep the accepted fixture inside the execution window when the suite runs
+# after the original fixed test timestamp has elapsed.
 NOW = datetime.now(timezone.utc)
 VALID_UNTIL = NOW + timedelta(days=1)
 
@@ -119,7 +121,7 @@ def test_goal_lifecycle_rejects_stale_owner_state_without_transport_choice() -> 
 def test_goal_lifecycle_rejects_owner_context_older_than_request() -> None:
     request = _request()
     stale_context = _context(request).model_copy(
-        update={"observed_at": datetime(2026, 8, 25, 11, 59, tzinfo=timezone.utc)}
+        update={"observed_at": NOW - timedelta(minutes=1)}
     )
 
     decision = resolve_goal_lifecycle(request, stale_context)

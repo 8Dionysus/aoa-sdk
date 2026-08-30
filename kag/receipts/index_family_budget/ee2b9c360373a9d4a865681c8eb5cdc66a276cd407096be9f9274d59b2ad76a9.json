@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 3859199,
+  "allowed_tracked_bytes": 21068479,
+  "approved_by": "repository-owner",
+  "base_ref": "a6cbd758da18596de929fa3f3c5622abb0c2907b",
+  "changed_generated_bytes": 3859199,
+  "changed_generated_files": 73,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "ee2b9c360373a9d4a865681c8eb5cdc66a276cd407096be9f9274d59b2ad76a9",
+  "reason": "Refresh the portable aoa-sdk owner-family after rebasing the provider-neutral delegation classes onto the current baseline-gated SDK main; generated family admission does not claim runtime, eval, closeout, or owner acceptance.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 21068479,
+  "tracked_bytes_max": 15728640
+}
