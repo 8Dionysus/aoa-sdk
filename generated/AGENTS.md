@@ -18,7 +18,3 @@ They do not own skill, eval, memo, playbook, routing, role, or runtime meaning.
 - Update source docs, schemas, or scripts first, then regenerate.
 - Keep generated artifacts deterministic, public-safe, and owner-subordinate.
 - If generated output changes without a source change, explain why it is legitimate rather than silent drift.
-
-## Validation route
-
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.

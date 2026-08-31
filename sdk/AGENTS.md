@@ -24,7 +24,7 @@ not replace operation mechanics under `mechanics/`.
 | owner | `sdk/source_home.manifest.json`, this card, and nearest branch `AGENTS.md` |
 | next route | `sdk/README.md`, `sdk/SDK_SHAPE.md`, target branch `AGENTS.md`, implementation surface, mechanic part, or decision record |
 | tools | `scripts/validate_sdk_source_home.py`, `scripts/validate_nested_agents.py`, release gate |
-| validation | this card's `Validation` section plus target implementation or mechanic checks |
+| validation | inherited root `VALIDATION.md` route plus target implementation or mechanic checks |
 
 ## Route context
 
@@ -32,7 +32,7 @@ Use this card after root `AGENTS.md` and select the route by touched path, seman
 
 ## Relevant routes
 
-Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `sdk/README.md`, `sdk/SDK_SHAPE.md`, `sdk/source_home.manifest.json`.
+The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `sdk/README.md`, `sdk/SDK_SHAPE.md`, `sdk/source_home.manifest.json`.
 
 ## Owner Routes
 
@@ -70,13 +70,9 @@ Start with root `AGENTS.md`, then this nearest card. Open only the owner source,
 - Do not move Python modules, tests, schemas, generated readers, or mechanic
   payload into `sdk/` without a separate owner decision and validator.
 
-## Validation route
+## Local validation notes
 
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
-
-Owner-local validation notes:
-
-If the change touches implementation, mechanics, release, or generated
+Repository-wide validation remains owned by root `VALIDATION.md`. If the change touches implementation, mechanics, release, or generated
 surfaces, also run the validator named by that owner route.
 
 ## Closeout

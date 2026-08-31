@@ -22,7 +22,7 @@ navigation until an owner route accepts them.
 
 ## Relevant routes
 
-Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `mechanics/AGENTS.md`, `mechanics/checkpoint/README.md`, `mechanics/checkpoint/ROADMAP.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/README.md`, `mechanics/checkpoint/parts/AGENTS.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/README.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/AGENTS.md`, `docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`, `src/aoa_sdk/checkpoints/`.
+The conditional references retained from this card are: `mechanics/AGENTS.md`, `mechanics/checkpoint/README.md`, `mechanics/checkpoint/ROADMAP.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/README.md`, `mechanics/checkpoint/parts/AGENTS.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/README.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/AGENTS.md`, `docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`, `src/aoa_sdk/checkpoints/`.
 
 ## Boundaries
 
@@ -40,9 +40,9 @@ Start with root `AGENTS.md`, then this nearest card. Open only the owner source,
   verdicts.
 - Do not let hooks run closeout, harvest, push, merge, or release logic.
 
-## Validation route
+## Validation
 
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
+Validation for Checkpoint paths belongs to the nearest active checkpoint part `VALIDATION.md`; broader checks inherit root `VALIDATION.md`.
 
 ## Closeout
 

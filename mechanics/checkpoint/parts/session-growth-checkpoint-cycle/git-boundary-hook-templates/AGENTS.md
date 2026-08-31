@@ -16,7 +16,3 @@ They can preserve review pressure and boundary checks, but they must not become 
 - Keep boundary hooks fail-closed only for the documented pending-review cases.
 - Prefer small shell wrappers that delegate to reviewed SDK commands.
 - Do not add secrets, workstation-local paths, or repo-specific hacks that bypass documented config.
-
-## Validation route
-
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.

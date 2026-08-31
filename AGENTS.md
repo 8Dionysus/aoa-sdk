@@ -62,7 +62,7 @@ It does not own:
 
 ## Route
 
-Start with this root card, then open the nearest nested AGENTS.md for every touched path. Read README.md, DESIGN.md, ROADMAP.md, owner docs, decisions, generated surfaces, or sibling-owner sources only when the touched path, semantic question, or requested operation makes them relevant. For executable checks, use the applicable nearest VALIDATION.md or the root human validation entrypoint VALIDATION.md; the root README remains a compact public route.
+Start with this root card, then open the nearest nested AGENTS.md for every touched path. Read README.md, DESIGN.md, ROADMAP.md, owner docs, decisions, generated surfaces, or sibling-owner sources only when the touched path, semantic question, or requested operation makes them relevant. For executable checks, use the applicable nearest VALIDATION.md or the root human validation entrypoint VALIDATION.md; nested cards inherit this route and add only a narrower path-relative validation note when they own one; the root README remains a compact public route.
 
 ## AGENTS stack law
 

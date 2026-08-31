@@ -20,7 +20,3 @@ policy engine, or source of sibling-repo meaning.
 - Prefer explicit manifests and config over magic discovery.
 - Keep imports cheap and testable; do not require sibling repos, live services, or private workspace state for basic imports.
 - When topology, CLI behavior, compatibility, or reviewed closeout behavior changes, update docs and tests together.
-
-## Validation route
-
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.

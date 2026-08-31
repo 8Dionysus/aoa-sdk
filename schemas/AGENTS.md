@@ -16,7 +16,3 @@ They are owner-subordinate and must not convert sibling-repo meaning into SDK-ow
 - Pair schema changes with source code, generated artifacts, docs, and tests.
 - Preserve truth labels and owner refs; do not flatten multi-axis or reviewed-only states into a magic readiness score.
 - Avoid private paths, secrets, and live workspace assumptions in defaults or examples.
-
-## Validation route
-
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.

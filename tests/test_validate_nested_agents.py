@@ -20,7 +20,7 @@ def _write(path: Path, text: str) -> None:
 
 
 def _write_minimal_required_tree(repo_root: Path) -> None:
-    _write(repo_root / "AGENTS.md", "# AGENTS.md\nRoot guidance.\n")
+    _write(repo_root / "AGENTS.md", "# AGENTS.md\n## Validation route\nroot human validation entrypoint VALIDATION.md; scripts/release_check.py and accepted graph runner remain authoritative.\n")
     _write(repo_root / "VALIDATION.md", "# VALIDATION.md\nRoot procedure route.\n")
     _write(
         repo_root / "DESIGN.AGENTS.md",
@@ -39,6 +39,20 @@ class ValidateNestedAgentsTests(unittest.TestCase):
             _write_minimal_required_tree(repo_root)
             result = validator.validate(repo_root)
             self.assertEqual((), result.issues)
+
+    def test_stale_inherited_routes_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            _write_minimal_required_tree(repo_root)
+            stale = next(iter(validator.REQUIRED_AGENTS_DOCS))
+            _write(
+                repo_root / stale,
+                "# AGENTS.md\n" + validator.GENERIC_NESTED_ROUTE_PREFIX
+                + validator.REPEATED_VALIDATION_PARAGRAPH + "\n",
+            )
+            result = validator.validate(repo_root)
+            self.assertTrue(any("repeated repository validation route" in issue for issue in result.issues))
+            self.assertTrue(any("repeated root conditional route" in issue for issue in result.issues))
 
     def test_missing_root_agents_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

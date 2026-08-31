@@ -16,7 +16,7 @@ old-path route homes.
 
 ## Relevant routes
 
-Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `mechanics/AGENTS.md`, `mechanics/agon/AGENTS.md`, `mechanics/agon/PARTS.md`, `mechanics/agon/PROVENANCE.md`, `README.md`, `CONTRACT.md`, `VALIDATION.md`.
+The conditional references retained from this card are: `AGENTS.md`, `mechanics/AGENTS.md`, `mechanics/agon/AGENTS.md`, `mechanics/agon/PARTS.md`, `mechanics/agon/PROVENANCE.md`, `README.md`, `CONTRACT.md`, `VALIDATION.md`.
 
 ## Boundaries
 
@@ -26,10 +26,6 @@ Start with root `AGENTS.md`, then this nearest card. Open only the owner source,
 - Keep old root paths in `mechanics/agon/PROVENANCE.md` or package-local
   legacy indexes, not as active routes.
 - Keep `src/aoa_sdk/` as the importable SDK source home.
-
-## Validation route
-
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 
