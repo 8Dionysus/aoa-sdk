@@ -4,6 +4,11 @@
 
 Accepted.
 
+Partially superseded by `AOA-SDK-D-0105` for executable-command placement:
+commands live in on-demand validation and machine-owner surfaces rather than
+in inherited agent cards. The mechanics roadmap and package-contour rules
+remain accepted.
+
 ## Index Metadata
 
 - Decision ID: AOA-SDK-D-0049
