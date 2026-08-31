@@ -45,11 +45,7 @@ Every decision record must include an `## Index Metadata` block with:
 
 Use `none` only when a field is intentionally empty.
 
-## Validation route
-
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
-
-Owner-local validation notes:
+## Local validation notes
 
 For release-facing or broad topology changes, also run the root validation
 route from `AGENTS.md`.

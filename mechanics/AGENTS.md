@@ -15,7 +15,7 @@ source home.
 
 ## Relevant routes
 
-Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `docs/decisions/README.md`, `mechanics/README.md`, `mechanics/ROADMAP.md`, `mechanics/topology.json`, `README.md`, `ROADMAP.md`, `PARTS.md`, `PROVENANCE.md`, `CONTRACT.md`, `VALIDATION.md`.
+The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `docs/decisions/README.md`, `mechanics/README.md`, `mechanics/ROADMAP.md`, `mechanics/topology.json`, `README.md`, `ROADMAP.md`, `PARTS.md`, `PROVENANCE.md`, `CONTRACT.md`, `VALIDATION.md`.
 
 ## Boundaries
 
@@ -40,10 +40,6 @@ Start with root `AGENTS.md`, then this nearest card. Open only the owner source,
   legacy receipts. Active work starts from the current route.
 - Do not treat topology cards as proof that a source surface has moved; prove
   the move with current paths and validators.
-
-## Validation route
-
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

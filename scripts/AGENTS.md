@@ -11,7 +11,7 @@ control-plane utilities.
 
 ## Relevant routes
 
-Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `mechanics/README.md`, `VALIDATION.md`.
+The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `mechanics/README.md`, `VALIDATION.md`.
 
 ## Boundaries
 
@@ -22,10 +22,6 @@ Start with root `AGENTS.md`, then this nearest card. Open only the owner source,
 - Builders must name their source inputs and generated outputs.
 - Keep source-home validators repo-wide when they protect top-level homes such
   as `sdk/`.
-
-## Validation route
-
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

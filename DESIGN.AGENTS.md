@@ -171,9 +171,9 @@ Start with root `AGENTS.md`, then this nearest card. Open only the owner source,
 
 ## Boundaries
 
-## Validation route
+## Validation handoff
 
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
+Validation is inherited from root `AGENTS.md`; a card adds only a path-relative `VALIDATION.md` reference or local note when it owns a narrower check. Do not repeat repository-wide gate details in child cards.
 
 ## Closeout
 ```

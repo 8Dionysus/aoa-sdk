@@ -13,7 +13,7 @@ composition, and MCP consumers.
 
 ## Relevant routes
 
-Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `kag/README.md`, `kag/manifest.json`, `sdk/source_home.manifest.json`, `sdk/README.md`.
+The conditional references retained from this card are: `AGENTS.md`, `kag/README.md`, `kag/manifest.json`, `sdk/source_home.manifest.json`, `sdk/README.md`.
 
 ## Boundaries
 
@@ -21,11 +21,7 @@ Keep authored meaning with `aoa-sdk` source surfaces. Keep shared KAG schema,
 registry, composition, and provider validation with `aoa-kag`. Keep runtime
 serving state with `abyss-stack` or the runtime owner named by the consumer.
 
-## Validation route
-
-Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
-
-Owner-local validation notes:
+## Local validation notes
 
 Use the owner validator named in `manifest.json`, then validate this provider
 through the `aoa-kag` local subtree validator.
