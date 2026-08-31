@@ -4,6 +4,10 @@
 
 Accepted.
 
+Partially superseded by `AOA-SDK-D-0105` for executable-command placement:
+agent cards now route to on-demand `VALIDATION.md` procedure, while the public
+README rule and owner-surface split remain accepted.
+
 ## Index Metadata
 
 - Decision ID: AOA-SDK-D-0045
