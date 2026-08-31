@@ -65,7 +65,7 @@ and `8Dionysus/docs/CODEX_PLANE_REGENERATION.md`.
 ## Inspection
 
 Use the workspace inspection route owned by the SDK CLI and listed in root
-`AGENTS.md#verify` to confirm what the SDK will actually resolve.
+`VALIDATION.md` to confirm what the SDK will actually resolve.
 
 This prints the workspace root, federation root, manifest path, every resolved
 repository path, and the selected routing bundle/source-lock origins.

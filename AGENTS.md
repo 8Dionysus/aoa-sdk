@@ -60,30 +60,9 @@ It does not own:
   truth
 - hidden heuristics that are not documented and testable
 
-## Start here
+## Route
 
-1. `README.md`
-2. `DESIGN.md` when repository shape, source-home placement, or mechanics
-   topology changes
-3. `DESIGN.AGENTS.md` when agent-facing guidance, local cards, validation
-   posture, or closeout shape changes
-4. `docs/boundaries.md`
-5. `docs/workspace-layout.md`
-6. `docs/versioning.md`
-7. `ROADMAP.md`
-8. `docs/decisions/README.md` when topology, owner split, route-law, workflow, or validator authority changes
-9. `sdk/README.md` and `sdk/source_home.manifest.json` when SDK source-home
-   posture, public-interface, facade-boundary, runtime-entry, or distribution
-   topology changes
-10. `stats/AGENTS.md`, `stats/README.md`, and `stats/port.manifest.json` when
-    an SDK-owned statistical question or reference packet changes
-11. `skills/AGENTS.md`, `skills/README.md`, and `skills/port.manifest.json`
-    when an SDK-owned Titan helper procedure or owner exposure changes
-12. `mechanics/README.md` and `mechanics/ROADMAP.md` when repeatable SDK
-    operation topology, package routing, or mechanics future pressure changes
-13. `.aoa/workspace.toml`
-14. source files and tests you plan to touch
-
+Start with this root card, then open the nearest nested AGENTS.md for every touched path. Read README.md, DESIGN.md, ROADMAP.md, owner docs, decisions, generated surfaces, or sibling-owner sources only when the touched path, semantic question, or requested operation makes them relevant. For executable checks, use the applicable nearest VALIDATION.md or the root human validation entrypoint VALIDATION.md; the root README remains a compact public route.
 
 ## AGENTS stack law
 
@@ -135,80 +114,21 @@ expectations, or agent-facing design law.
 Design surfaces describe form. They do not override active source code,
 validators, decisions, nested route cards, or sibling-owner truth.
 
-## Inspection And Checkpoint Loop
+## Inspection and checkpoint route
 
-Use these compact anchors when a task touches skills, checkpoint evidence, or
-additive surface detection:
+When a task touches skills, checkpoint evidence, or additive surface detection, use the on-demand procedures in root VALIDATION.md. Skills inspection is passive only; it does not detect, rank,
+dispatch, activate, or create skill-session state. Preserve session-local
+evidence, owner-subordination, skipped_no_active_session, agent_review=pending,
+and capability_execution_claimed=false; this card does not activate skills or
+create live state.
 
-```bash
-aoa skills inspect /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
-aoa skills capability workflow.operations.checkpoint-closeout --root /srv/AbyssOS --json
-aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress
-aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint
-aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note
-aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json
-aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD --auto
-aoa checkpoint build-closeout-context /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
-aoa checkpoint materialize-closeout-handoff /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
-aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
-aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json
-aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
-```
+## Landing route
 
-`aoa skills ...` is passive inspection only; it does not detect, rank,
-dispatch, activate, or create skill-session state. Checkpoint notes and
-materialized evidence stay session-local and owner-subordinate. A
-`skipped_no_active_session` or `agent_review=pending` state is not final
-review, and `capability_execution_claimed=false` must remain explicit through
-materialization and A2A return.
+Root AGENTS.md and .github/AGENTS.md still own branch, PR, CI, and merge semantics. When landing is explicitly requested, follow the exact six-step procedure in root VALIDATION.md; this local mechanical lane does not push, open PRs, wait on CI, merge, or alter sibling/live state.
 
-## GitHub landing workflow
+## Validation route
 
-Root `AGENTS.md` owns the repository-wide branch, PR, CI, and merge route.
-`.github/AGENTS.md` owns the GitHub-native files that support it.
-
-When the user asks to commit, push, and merge in this repository, use this route:
-
-1. Start from a branch based on the current `origin/main`. If the worktree is already dirty, inventory it first and carry forward only the intended diff.
-2. Commit the intended change with a message that names the changed surface.
-3. Push the branch and open a pull request that states changed surfaces, validation run, skipped checks, and remaining risk.
-4. Wait for GitHub `Repo Validation` and any required GitHub checks. If a check fails, fix the branch and wait for the new result.
-5. Merge through GitHub after green validation. Use squash unless repository settings report a different required method; report the method that landed.
-6. Return to `main`, fast-forward from `origin/main`, and confirm the worktree is clean before closeout.
-
-If GitHub status or merge permissions cannot be observed, stop the landing route and report the exact blocker instead of guessing.
-
-## Verify
-
-Minimum validation for code, topology, or reviewed-handoff changes:
-
-```bash
-python scripts/generate_decision_indexes.py --check
-python scripts/validate_sdk_source_home.py
-python scripts/validate_local_stats_port.py
-python scripts/validate_mechanics_topology.py
-python scripts/build_source_topology_index.py --check
-python scripts/validate_source_topology_index.py
-python scripts/build_workspace_control_plane.py --check
-python scripts/validate_workspace_control_plane.py
-python -m pytest -q
-python -m ruff check .
-aoa workspace inspect /srv/AbyssOS/aoa-sdk
-aoa compatibility check /srv/AbyssOS/aoa-sdk
-aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json
-```
-
-When release or CI-facing surfaces change, also run:
-
-```bash
-python -m mypy src
-python -m build
-python scripts/release_check.py
-```
-
-`python scripts/release_check.py` runs the accepted full claim/evidence graph.
-Use `python scripts/release_check.py --mode serial` only for the retained exact
-completeness oracle, rollback, or an explicit comparison run.
+Use root VALIDATION.md for repository inspection, focused checks, release-facing checks, the full owner gate, serial completeness and rollback, checkpoint review, and landing procedure. The canonical machine selector remains scripts/release_check.py; the owner claim/evidence manifest, accepted graph runner, and serial release_check.COMMANDS inventory remain authoritative.
 
 ## Report
 

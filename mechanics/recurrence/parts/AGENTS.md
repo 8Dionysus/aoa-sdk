@@ -18,11 +18,6 @@ home for recurrence-only artifacts.
   not in active route names.
 - Keep `src/aoa_sdk/recurrence/` as the importable SDK source package.
 
-## Validation
+## Validation route
 
-Run the narrow part command listed in each `VALIDATION.md`, then run:
-
-```bash
-python scripts/validate_mechanics_topology.py
-python -m pytest -q tests/test_mechanics_topology.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.

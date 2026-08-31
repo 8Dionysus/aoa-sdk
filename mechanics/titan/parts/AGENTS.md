@@ -15,10 +15,6 @@ examples, scripts, tests, contract, and validation note.
 - Keep Titan role, runtime, memory, approval, and proof authority outside SDK.
 - Do not add root active Titan docs, schemas, examples, scripts, or tests.
 
-## Validation
+## Validation route
 
-Use the selected part `VALIDATION.md`, then run:
-
-```bash
-python scripts/validate_mechanics_topology.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.

@@ -9,12 +9,9 @@ Root `scripts/`.
 Root scripts are repo-wide builders, validators, release gates, and shared
 control-plane utilities.
 
-## Read Before Editing
+## Relevant routes
 
-1. Root `AGENTS.md`
-2. `DESIGN.md`
-3. `mechanics/README.md`
-4. The owning mechanic `VALIDATION.md` if a script serves one mechanic part
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `mechanics/README.md`, `VALIDATION.md`.
 
 ## Boundaries
 
@@ -26,16 +23,9 @@ control-plane utilities.
 - Keep source-home validators repo-wide when they protect top-level homes such
   as `sdk/`.
 
-## Validation
+## Validation route
 
-```bash
-python -m ruff check scripts
-python scripts/validate_sdk_source_home.py
-python scripts/validate_mechanics_topology.py
-python scripts/build_source_topology_index.py --check
-python scripts/validate_source_topology_index.py
-python scripts/release_check.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

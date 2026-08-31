@@ -13,20 +13,9 @@ mechanic part owns the artifact.
 Mechanics are operation homes and route maps. They are not the importable SDK
 source home.
 
-## Read before editing
+## Relevant routes
 
-1. Root `AGENTS.md`
-2. `DESIGN.md`
-3. `DESIGN.AGENTS.md`
-4. `docs/decisions/README.md`
-5. `mechanics/README.md`
-6. `mechanics/ROADMAP.md`
-7. `mechanics/topology.json`
-8. The package-local `AGENTS.md`, `README.md`, `ROADMAP.md`, `PARTS.md`, and
-   `PROVENANCE.md` for each touched mechanic
-9. The nearest part `README.md`, `CONTRACT.md`, and `VALIDATION.md` when a
-    functioning part exists
-10. The stronger source surface named by the mechanic card
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `docs/decisions/README.md`, `mechanics/README.md`, `mechanics/ROADMAP.md`, `mechanics/topology.json`, `README.md`, `ROADMAP.md`, `PARTS.md`, `PROVENANCE.md`, `CONTRACT.md`, `VALIDATION.md`.
 
 ## Boundaries
 
@@ -52,23 +41,9 @@ source home.
 - Do not treat topology cards as proof that a source surface has moved; prove
   the move with current paths and validators.
 
-## Validation
+## Validation route
 
-Run the narrow topology gate after editing this tree:
-
-```bash
-python scripts/validate_mechanics_topology.py
-```
-
-For structural route changes, also run:
-
-```bash
-python scripts/generate_decision_indexes.py --check
-python -m pytest -q tests/test_mechanics_topology.py tests/test_validate_nested_agents.py
-```
-
-Release-facing or root-route changes should continue through
-`python scripts/release_check.py`.
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

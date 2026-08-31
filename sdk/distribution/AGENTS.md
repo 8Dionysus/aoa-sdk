@@ -12,15 +12,9 @@ It routes distribution promises to package metadata, release-support
 mechanics, CI posture, and release validation without pretending a dry run is a
 published artifact.
 
-## Read Before Editing
+## Relevant routes
 
-1. root `AGENTS.md`
-2. `sdk/AGENTS.md`
-3. `sdk/source_home.manifest.json`
-4. `sdk/distribution/README.md`
-5. the target family README
-6. release-support mechanic cards
-7. release docs and CI workflows when touched
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `sdk/AGENTS.md`, `sdk/source_home.manifest.json`, `sdk/distribution/README.md`.
 
 ## Boundaries
 
@@ -29,13 +23,9 @@ published artifact.
 - Keep package metadata, changelog, release docs, and release helpers aligned.
 - Keep publication truth in GitHub tags/releases and package indexes.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_sdk_source_home.py
-python scripts/release_check.py
-python -m build
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

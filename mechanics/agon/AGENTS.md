@@ -10,14 +10,9 @@ Route the shared Agon mechanic for the SDK-owned pre-protocol routing bridge,
 helper candidates, registries, recurrence adapters and state-packet bridges.
 Quest source records route through root `quests/` and Questbook.
 
-## Read before editing
+## Relevant routes
 
-- `mechanics/AGENTS.md`
-- `mechanics/agon/README.md`
-- `mechanics/agon/ROADMAP.md`
-- `mechanics/agon/PARTS.md`
-- `mechanics/agon/PROVENANCE.md`
-- the nearest part card under `mechanics/agon/parts/`
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `mechanics/AGENTS.md`, `mechanics/agon/README.md`, `mechanics/agon/ROADMAP.md`, `mechanics/agon/PARTS.md`, `mechanics/agon/PROVENANCE.md`, `mechanics/agon/parts/`.
 
 ## Boundaries
 
@@ -28,38 +23,9 @@ Quest source records route through root `quests/` and Questbook.
   otherwise.
 - Do not turn SDK helper registries into Agon doctrine or verdict authority.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_mechanics_topology.py
-python mechanics/agon/parts/gate-routing-bridge/scripts/build_agon_gate_routing_registry.py --check
-python mechanics/agon/parts/gate-routing-bridge/scripts/validate_agon_gate_routing.py
-python mechanics/agon/parts/center-law-preview-helpers/scripts/build_agon_ccs_sdk_helper_candidates.py --check
-python mechanics/agon/parts/center-law-preview-helpers/scripts/validate_agon_ccs_sdk_helper_candidates.py
-python mechanics/agon/parts/state-packet-review-bindings/scripts/build_agon_sdk_state_packet_bindings.py --check
-python mechanics/agon/parts/state-packet-review-bindings/scripts/validate_agon_sdk_state_packet_bindings.py
-python mechanics/agon/parts/recurrence-adapter/scripts/build_agon_recurrence_adapter_registry.py --check
-python mechanics/agon/parts/recurrence-adapter/scripts/validate_agon_recurrence_adapter.py
-python mechanics/agon/parts/recurrence-adapter/scripts/build_agon_recurrence_prebinding_review_lanes.py --check
-python mechanics/agon/parts/recurrence-adapter/scripts/validate_agon_recurrence_prebinding_review_lanes.py
-python mechanics/agon/parts/duel-kernel-review-bindings/scripts/build_agon_duel_kernel_sdk_bindings.py --check
-python mechanics/agon/parts/duel-kernel-review-bindings/scripts/validate_agon_duel_kernel_sdk_bindings.py
-python mechanics/agon/parts/duel-kernel-review-bindings/scripts/build_agon_mechanical_trial_sdk_helpers.py --check
-python mechanics/agon/parts/duel-kernel-review-bindings/scripts/validate_agon_mechanical_trial_sdk_helpers.py
-python mechanics/agon/parts/verdict-retention-rank-review-helpers/scripts/build_agon_vds_sdk_helper_candidates.py --check
-python mechanics/agon/parts/verdict-retention-rank-review-helpers/scripts/validate_agon_vds_sdk_helper_candidates.py
-python mechanics/agon/parts/verdict-retention-rank-review-helpers/scripts/build_agon_retention_rank_sdk_helpers.py --check
-python mechanics/agon/parts/verdict-retention-rank-review-helpers/scripts/validate_agon_retention_rank_sdk_helpers.py
-python mechanics/agon/parts/epistemic-kag-review-helpers/scripts/build_agon_epistemic_sdk_helpers.py --check
-python mechanics/agon/parts/epistemic-kag-review-helpers/scripts/validate_agon_epistemic_sdk_helpers.py
-python mechanics/agon/parts/epistemic-kag-review-helpers/scripts/build_agon_kag_sdk_helpers.py --check
-python mechanics/agon/parts/epistemic-kag-review-helpers/scripts/validate_agon_kag_sdk_helpers.py
-python mechanics/agon/parts/school-lineage-campaign-review-helpers/scripts/build_agon_slc_sdk_helpers.py --check
-python mechanics/agon/parts/school-lineage-campaign-review-helpers/scripts/validate_agon_slc_sdk_helpers.py
-python mechanics/agon/parts/sophian-threshold-review-helpers/scripts/build_agon_sophian_sdk_helpers.py --check
-python mechanics/agon/parts/sophian-threshold-review-helpers/scripts/validate_agon_sophian_sdk_helpers.py
-python -m pytest -q mechanics/agon/parts/gate-routing-bridge/tests/test_agon_gate_routing_bridge.py mechanics/agon/parts/center-law-preview-helpers/tests/test_agon_ccs_sdk_helper_candidates.py mechanics/agon/parts/state-packet-review-bindings/tests/test_agon_sdk_state_packet_bindings.py mechanics/agon/parts/recurrence-adapter/tests/test_agon_recurrence_adapter.py mechanics/agon/parts/recurrence-adapter/tests/test_agon_recurrence_prebinding_review_lanes.py mechanics/agon/parts/duel-kernel-review-bindings/tests/test_agon_duel_kernel_sdk_bindings.py mechanics/agon/parts/duel-kernel-review-bindings/tests/test_agon_mechanical_trial_sdk_helpers.py mechanics/agon/parts/verdict-retention-rank-review-helpers/tests/test_agon_vds_sdk_helper_candidates.py mechanics/agon/parts/verdict-retention-rank-review-helpers/tests/test_agon_retention_rank_sdk_helpers.py mechanics/agon/parts/epistemic-kag-review-helpers/tests/test_agon_epistemic_sdk_helpers.py mechanics/agon/parts/epistemic-kag-review-helpers/tests/test_agon_kag_sdk_helpers.py mechanics/agon/parts/school-lineage-campaign-review-helpers/tests/test_agon_slc_sdk_helpers.py mechanics/agon/parts/sophian-threshold-review-helpers/tests/test_agon_sophian_sdk_helpers.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

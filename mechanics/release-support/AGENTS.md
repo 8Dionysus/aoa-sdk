@@ -9,19 +9,9 @@
 Route the shared release-support mechanic for changelog, release audit, CI
 posture, build, publication helper, and Repo Validation support.
 
-## Read before editing
+## Relevant routes
 
-- `mechanics/AGENTS.md`
-- `mechanics/release-support/README.md`
-- `mechanics/release-support/ROADMAP.md`
-- `mechanics/release-support/parts/AGENTS.md`
-- `mechanics/release-support/parts/release-audit-publish-helper/README.md`
-- `mechanics/release-support/parts/public-support-ci-posture/README.md`
-- `CHANGELOG.md`
-- `docs/RELEASING.md`
-- `docs/RELEASE_CI_POSTURE.md`
-- `scripts/release_check.py`
-- `src/aoa_sdk/release/`
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `mechanics/AGENTS.md`, `mechanics/release-support/README.md`, `mechanics/release-support/ROADMAP.md`, `mechanics/release-support/parts/AGENTS.md`, `mechanics/release-support/parts/release-audit-publish-helper/README.md`, `mechanics/release-support/parts/public-support-ci-posture/README.md`, `CHANGELOG.md`, `docs/RELEASING.md`, `docs/RELEASE_CI_POSTURE.md`, `scripts/release_check.py`, `src/aoa_sdk/release/`.
 
 ## Boundaries
 
@@ -30,13 +20,9 @@ posture, build, publication helper, and Repo Validation support.
 - Keep sibling release truth in sibling repositories.
 - Keep changelog claims tied to validation evidence.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_mechanics_topology.py
-python scripts/release_check.py
-python -m pytest -q mechanics/release-support/parts/release-audit-publish-helper/tests/test_release_audit_publish_helper.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

@@ -13,14 +13,9 @@ and historical context surfaces.
 `docs/README.md` is the docs entry map. Keep it route-oriented and weaker than
 the source surface it points to.
 
-## Read Before Editing
+## Relevant routes
 
-1. Root `AGENTS.md`
-2. `DESIGN.md`
-3. `DESIGN.AGENTS.md`
-4. `docs/README.md`
-5. `mechanics/README.md`
-6. The owning mechanic package and part when a doc is part-specific
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `docs/README.md`, `mechanics/README.md`.
 
 ## Boundaries
 
@@ -34,12 +29,9 @@ the source surface it points to.
 - Do not preserve old root guidance or one-off impact prose in flat `docs/`
   when current owner surfaces already carry the route.
 
-## Validation
+## Validation route
 
-```bash
-python -m pytest -q tests/test_docs_routes.py tests/test_design_surfaces.py
-python scripts/validate_nested_agents.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

@@ -71,7 +71,7 @@ land a local surface?
 | output | direction, horizon posture, future trigger, or owner-route pressure |
 | owner | root roadmap for direction; source, mechanics, decisions, generated companions, and release docs for detail |
 | next route | [sdk](sdk/README.md), [mechanics](mechanics/README.md), [mechanics roadmap](mechanics/ROADMAP.md), [docs](docs/README.md), [generated capsule](generated/workspace_control_plane.min.json), then nearest local route card |
-| validation | [AGENTS.md#verify](AGENTS.md#verify), plus route-specific tests when roadmap contracts move |
+| validation | [VALIDATION.md](VALIDATION.md), plus route-specific tests when roadmap contracts move |
 
 ## Current Direction
 

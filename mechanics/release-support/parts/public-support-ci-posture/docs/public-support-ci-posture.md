@@ -52,12 +52,12 @@ Use the tiers below when you need to verify a current SDK claim:
 
 | tier | purpose | surface |
 |---|---|---|
-| Tier 1 | local control-plane battery | root `AGENTS.md#verify` and `scripts/release_check.py` |
+| Tier 1 | local control-plane battery | root `VALIDATION.md` and `scripts/release_check.py` |
 | Tier 2 | release reinforcement | `scripts/release_check.py` and `.github/workflows/repo-validation.yml` |
 | Tier 3 | live sibling drift detection | the part-local sibling-canary runner and `.github/workflows/latest-sibling-canary.yml` |
 
 Repo-scoped compatibility inspection remains owned by the SDK CLI and is
-routed through root `AGENTS.md#verify`.
+routed through root `VALIDATION.md`.
 
 ## Release audit surface
 

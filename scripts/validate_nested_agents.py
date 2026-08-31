@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 from dataclasses import dataclass
 from pathlib import Path
+import re
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
 REPOSITORY_NAME = 'aoa-sdk'
@@ -25,7 +26,7 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'typed control-plane facades',
         'Stay on the control plane',
         'truth labels',
-        'python -m pytest -q',
+        'Validation route',
     ),
     '.github/AGENTS.md': (
         "GitHub platform surface",
@@ -37,24 +38,24 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'Root docs are public route',
         'part-local docs lane',
         'historical note',
-        'python -m pytest -q tests/test_docs_routes.py tests/test_design_surfaces.py',
+        'Validation route',
     ),
     'scripts/AGENTS.md': (
         'repo-wide builders, validators, release gates',
         'single-mechanic scripts',
         'mechanics/<parent>/parts/<part>/scripts/',
-        'python scripts/release_check.py',
+        'Validation route',
     ),
     'tests/AGENTS.md': (
         'Root tests prove repo-wide routes',
         'single-mechanic regressions',
         'mechanics/<parent>/parts/<part>/tests/',
-        'python -m pytest -q tests',
+        'Validation route',
     ),
     'evals/AGENTS.md': (
         'SDK-layer eval pressure',
         '`aoa-evals` owns central verdict',
-        'python ../aoa-evals/scripts/validate_local_eval_port.py --target-root .',
+        'Validation route',
     ),
     'kag/AGENTS.md': (
         'local KAG provider home',
@@ -64,7 +65,7 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
     'stats/AGENTS.md': (
         'SDK-local statistical questions',
         'Shared statistical grammar',
-        'python scripts/validate_local_stats_port.py',
+        'Validation route',
     ),
     'skills/AGENTS.md': (
         'canonical `aoa-sdk/skills/` owner home',
@@ -83,8 +84,8 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'Generated artifacts are lower authority than their sources',
         'workspace_control_plane.min.json',
         'source_topology.min.json',
-        'python scripts/build_workspace_control_plane.py --check',
-        'python scripts/build_source_topology_index.py --check',
+        'Validation route',
+        'Validation route',
     ),
     'schemas/AGENTS.md': (
         'root-published SDK helper contract schemas',
@@ -96,79 +97,79 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'durable rationale',
         'AOA-SDK-D-####',
         'Index Metadata',
-        'python scripts/generate_decision_indexes.py --check',
+        'Validation route',
     ),
     'quests/AGENTS.md': (
         'SDK source quest record district',
         'Stay on the control plane',
         'quests/<lane>/<state>/<quest-file>',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'sdk/AGENTS.md': (
         'source-authored SDK home',
         'Do not add `PARTS.md` to `sdk/`',
         'sdk/source_home.manifest.json',
-        'python scripts/validate_sdk_source_home.py',
+        'Validation route',
     ),
     'sdk/public-interface/AGENTS.md': (
         'public SDK contract posture',
         'src/aoa_sdk/',
         'Do not document a supported entrypoint',
-        'python scripts/validate_sdk_source_home.py',
+        'Validation route',
     ),
     'sdk/facade-boundary/AGENTS.md': (
         'SDK facades read sibling-owned surfaces',
         'truth labels',
         'Route source-meaning changes to the sibling owner',
-        'python scripts/validate_sdk_source_home.py',
+        'Validation route',
     ),
     'sdk/runtime-entry/AGENTS.md': (
         'Workspace, Codex, explicit Runner, and reviewed',
         'below runtime authority',
         'Do not make path guessing stronger than `.aoa/workspace.toml`',
-        'python scripts/validate_sdk_source_home.py',
+        'Validation route',
     ),
     'sdk/distribution/AGENTS.md': (
         'package, release, and public support posture',
         'Do not treat dry-run output as a GitHub Release',
-        'python scripts/release_check.py',
-        'python scripts/validate_sdk_source_home.py',
+        'Validation route',
+        'Validation route',
     ),
     'mechanics/AGENTS.md': (
         'SDK operation topology layer',
         'Stay on the control plane',
         'mechanics/topology.json',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/agon/AGENTS.md': (
         'Agon mechanic',
         'Stay on the control plane',
         'candidate-only',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/agon/parts/AGENTS.md': (
         'functioning Agon SDK operation parts',
         'Stay on the control plane',
         'old root paths',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/antifragility/AGENTS.md': (
         'Antifragility mechanic',
         'Stay on the control plane',
         'stress fixtures proof verdicts',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/antifragility/parts/AGENTS.md': (
         'Functioning Antifragility parts',
         'Stay on the control plane',
         'old root paths',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/boundary-bridge/AGENTS.md': (
         'boundary-bridge mechanic',
         'Stay on the control plane',
         'Do not make a facade a source owner',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/boundary-bridge/parts/AGENTS.md': (
         'Boundary Bridge Parts Route',
@@ -180,13 +181,13 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'Boundary Bridge mechanics parent names',
         'Stay on the control plane',
         'Do not treat former parent names as active route ids',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/checkpoint/AGENTS.md': (
         'checkpoint mechanic',
         'Stay on the control plane',
         'session-local',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/checkpoint/parts/AGENTS.md': (
         'Checkpoint Parts Route',
@@ -198,67 +199,67 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'Checkpoint mechanics parent names',
         'Stay on the control plane',
         'Do not treat former parent names as active route ids',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/codex-projection/AGENTS.md': (
         'Codex Projection mechanic',
         'Stay on the control plane',
         'not make SDK Codex reads a Codex runtime',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/codex-projection/parts/AGENTS.md': (
         'functioning Codex Projection parts',
         'Stay on the control plane',
         'external rollout artifact names as compatibility inputs',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/codex-projection/legacy/AGENTS.md': (
         'Codex Projection mechanics parent names',
         'Stay on the control plane',
         'Do not treat former parent names as active route ids',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/experience/AGENTS.md': (
         'Experience mechanic',
         'Stay on the control plane',
         'API helper calls as contracts',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/experience/parts/AGENTS.md': (
         'functioning Experience SDK helper-contract parts',
         'Stay on the control plane',
         'active routes',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/questbook/AGENTS.md': (
         'Questbook is the SDK operation package',
         'Stay on the control plane',
         'Source quest records live in root `quests/`',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/questbook/parts/AGENTS.md': (
         'Questbook parts keep root quest source records',
         'Stay on the control plane',
         'future dispatch readers',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/recurrence/AGENTS.md': (
         'recurrence mechanic',
         'Stay on the control plane',
         'Keep component truth with owner surfaces',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/recurrence/parts/AGENTS.md': (
         'mechanics/recurrence/parts/',
         'Route recurrence payload by active owner part',
         'Keep `src/aoa_sdk/recurrence/` as the importable SDK source package',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/release-support/AGENTS.md': (
         'release-support mechanic',
         'Stay on the control plane',
         'GitHub Release or package publication',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/release-support/parts/AGENTS.md': (
         'Release Support Parts Route',
@@ -270,19 +271,19 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'RPG mechanic',
         'Stay on the control plane',
         'gameplay, frontend, or RPG runtime authority',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/rpg/parts/AGENTS.md': (
         'Functioning RPG parts',
         'Stay on the control plane',
         'old root paths',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/runtime-seam/AGENTS.md': (
         'Runtime Seam mechanic',
         'Stay on the control plane',
         'Do not make path guessing stronger than `.aoa/workspace.toml`',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/runtime-seam/parts/AGENTS.md': (
         'Runtime Seam Parts Route',
@@ -294,24 +295,75 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'Runtime Seam mechanics parent names',
         'Stay on the control plane',
         'Do not treat former parent names as active route ids',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/titan/AGENTS.md': (
         'Titan mechanic',
         'Stay on the control plane',
         'runtime, role, identity, or memory authority',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
     'mechanics/titan/parts/AGENTS.md': (
         'Route active Titan SDK helper parts',
         'Stay on the control plane',
         'Do not add root active Titan docs',
-        'python scripts/validate_mechanics_topology.py',
+        'Validation route',
     ),
 }
 ADVISORY_AGENT_DIRS: tuple[str, ...] = ('config', 'examples', 'manifests/recurrence')
 HEADING_PREFIXES = ("# AGENTS.md", "# AGENTS")
 IGNORED_DIRS = {".git", ".venv", "__pycache__", ".pytest_cache", ".mypy_cache"}
+FENCE_MARKER = chr(96) * 3
+RUNNABLE_FENCE_LANGS = {"bash", "sh", "shell", "console", "zsh", "shell-session"}
+COMMAND_NAMES = (
+    r"python3?|pytest|uv|pip3?|aoa|git|ruff|mypy|make|tox|hatch|poetry|"
+    r"bash|sh|shellcheck|systemctl|systemd-analyze|curl|jq|rg|grep|sed|"
+    r"awk|find|chmod|mkdir|cp|mv|rm"
+)
+COMMAND_LINE_PATTERN = re.compile(
+    r"^[ \t]*(?:(?:[-*+]|[0-9]+[.)])[ \t]+)?(?:\$[ \t]+)?"
+    r"(?:[A-Z_][A-Z0-9_]*=\S+[ \t]+)*"
+    + "(?:" + COMMAND_NAMES + ")"
+    r"(?=\s|$)",
+    re.IGNORECASE | re.MULTILINE,
+)
+INLINE_COMMAND_PATTERN = re.compile(
+    FENCE_MARKER[:1]
+    + r"(?:(?:[A-Z_][A-Z0-9_]*=\S+[ \t]+)*\$?[ \t]*)"
+    + "(?:" + COMMAND_NAMES + ")"
+    r"(?=\s|$)[^"
+    + FENCE_MARKER[:1]
+    + r"\n]*"
+    + FENCE_MARKER[:1],
+    re.IGNORECASE,
+)
+FENCE_PATTERN = re.compile(
+    re.escape(FENCE_MARKER) + r"([^\n]*)\n(.*?)\n" + re.escape(FENCE_MARKER),
+    re.MULTILINE | re.DOTALL,
+)
+LEGACY_ROUTE_HEADINGS = re.compile(
+    r"^(?:start here|read before editing|reading order(?: shape)?|route stack|"
+    r"route inventory|required reading)$",
+    re.IGNORECASE,
+)
+README_ROUTE_PATTERN = re.compile(
+    r"\b(?:read|open|review|start\s+with|use)\b.*\bREADME(?:\.md)?\b",
+    re.IGNORECASE,
+)
+README_CONDITIONAL_MARKERS = (
+    "when ",
+    "if ",
+    "only ",
+    "where ",
+    "as needed",
+    "needed",
+    "relevant",
+    "selected",
+    "known",
+    "target",
+    "named",
+    "for ",
+)
 
 
 @dataclass(frozen=True)
@@ -344,6 +396,62 @@ def _is_ignored(path: Path, repo_root: Path) -> bool:
     return any(part in IGNORED_DIRS for part in parts)
 
 
+def _unconditional_readme_violations(relative_path: str, text: str) -> tuple[str, ...]:
+    """Reject mandatory README inventories while allowing task-conditional routes."""
+
+    issues: list[str] = []
+    lines = text.splitlines()
+    for line_number, line in enumerate(lines, start=1):
+        if not README_ROUTE_PATTERN.search(line):
+            continue
+        lowered = line.casefold()
+        if not any(marker in lowered for marker in README_CONDITIONAL_MARKERS):
+            issues.append(f"{relative_path}:{line_number}: unconditional README inventory")
+
+    for index, line in enumerate(lines):
+        heading = re.match(r"^#{1,6}\s+(.+?)\s*$", line)
+        if not heading or not LEGACY_ROUTE_HEADINGS.match(heading.group(1).strip()):
+            continue
+        end = index + 1
+        while end < len(lines) and not lines[end].lstrip().startswith("#"):
+            end += 1
+        section = lines[index + 1 : end]
+        if any("readme" in item.casefold() for item in section) and not any(
+            any(marker in item.casefold() for marker in README_CONDITIONAL_MARKERS)
+            for item in section
+        ):
+            issues.append(f"{relative_path}:{index + 1}: unconditional README inventory section")
+    return tuple(issues)
+
+
+def _procedure_violations(relative_path: str, text: str) -> tuple[str, ...]:
+    """Keep inherited cards semantic and route procedures on demand."""
+
+    issues: list[str] = []
+    for match in FENCE_PATTERN.finditer(text):
+        language = match.group(1).strip().lower()
+        body = match.group(2)
+        if language in RUNNABLE_FENCE_LANGS or COMMAND_LINE_PATTERN.search(body):
+            label = language or "command"
+            issues.append(f"{relative_path}: runnable procedure fence ({label})")
+
+    in_fence = False
+    for line_number, line in enumerate(text.splitlines(), start=1):
+        stripped = line.strip()
+        if stripped.startswith(FENCE_MARKER):
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            continue
+        if COMMAND_LINE_PATTERN.match(line):
+            issues.append(f"{relative_path}:{line_number}: runnable command line")
+        if INLINE_COMMAND_PATTERN.search(line):
+            issues.append(f"{relative_path}:{line_number}: inline runnable command")
+
+    issues.extend(_unconditional_readme_violations(relative_path, text))
+    return tuple(issues)
+
+
 def discover_nested_agents(repo_root: Path) -> set[str]:
     found: set[str] = set()
     for path in repo_root.rglob("AGENTS.md"):
@@ -372,6 +480,22 @@ def validate(
         root_text = root_agents.read_text(encoding="utf-8")
         if not _has_agents_heading(root_text):
             issues.append("AGENTS.md: missing AGENTS heading")
+        issues.extend(_procedure_violations("AGENTS.md", root_text))
+
+    validation_entrypoint = repo_root / "VALIDATION.md"
+    if not validation_entrypoint.is_file():
+        issues.append("VALIDATION.md: root human validation entrypoint is missing")
+
+    design_agents = repo_root / "DESIGN.AGENTS.md"
+    if not design_agents.is_file():
+        issues.append("DESIGN.AGENTS.md: design surface is missing")
+    else:
+        design_text = design_agents.read_text(encoding="utf-8")
+        for required_heading in ("## Conditional route shape", "## Relevant routes"):
+            if required_heading not in design_text:
+                issues.append(f"DESIGN.AGENTS.md: missing required route heading {required_heading!r}")
+        if "Executable procedures live in root" not in design_text:
+            issues.append("DESIGN.AGENTS.md: validation procedures do not route through VALIDATION.md")
 
     for rel_path, snippets in REQUIRED_AGENTS_DOCS.items():
         path = repo_root / rel_path
@@ -381,6 +505,7 @@ def validate(
         text = path.read_text(encoding="utf-8")
         if not _has_agents_heading(text):
             issues.append(f"{rel_path}: missing AGENTS heading")
+        issues.extend(_procedure_violations(rel_path, text))
         normalized = _normalize(text)
         for snippet in snippets:
             if _normalize(snippet) not in normalized:

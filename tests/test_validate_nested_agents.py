@@ -21,6 +21,13 @@ def _write(path: Path, text: str) -> None:
 
 def _write_minimal_required_tree(repo_root: Path) -> None:
     _write(repo_root / "AGENTS.md", "# AGENTS.md\nRoot guidance.\n")
+    _write(repo_root / "VALIDATION.md", "# VALIDATION.md\nRoot procedure route.\n")
+    _write(
+        repo_root / "DESIGN.AGENTS.md",
+        "# DESIGN.AGENTS.md\n## Conditional route shape\n"
+        "## Relevant routes\n"
+        "Executable procedures live in root VALIDATION.md.\n",
+    )
     for rel_path, snippets in validator.REQUIRED_AGENTS_DOCS.items():
         _write(repo_root / rel_path, "# AGENTS.md\n" + "\n".join(snippets) + "\n")
 
@@ -69,6 +76,42 @@ class ValidateNestedAgentsTests(unittest.TestCase):
             (repo_root / validator.ADVISORY_AGENT_DIRS[0]).mkdir(parents=True, exist_ok=True)
             result = validator.validate(repo_root, strict_advisory=True)
             self.assertTrue(any("high-risk directory" in issue for issue in result.issues))
+
+    def test_runnable_procedure_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            _write_minimal_required_tree(repo_root)
+            _write(
+                repo_root / "AGENTS.md",
+                "# AGENTS.md\n## Validation route\n" + chr(96) * 3 + "bash\npython -m pytest -q\n" + chr(96) * 3 + "\n",
+            )
+            result = validator.validate(repo_root)
+            self.assertTrue(any("runnable procedure fence" in issue for issue in result.issues))
+
+    def test_unconditional_readme_inventory_is_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            _write_minimal_required_tree(repo_root)
+            _write(
+                repo_root / "AGENTS.md",
+                "# AGENTS.md\n## Relevant routes\nRead README.md before editing.\n",
+            )
+            result = validator.validate(repo_root)
+            self.assertTrue(any("unconditional README inventory" in issue for issue in result.issues))
+
+    def test_command_list_and_inline_command_are_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            _write_minimal_required_tree(repo_root)
+            _write(
+                repo_root / "AGENTS.md",
+                "# AGENTS.md\n## Validation route\n"
+                "1. python -m pytest -q\n"
+                "Use `FOO=bar $ python -m pytest -q` when needed.\n",
+            )
+            result = validator.validate(repo_root)
+            self.assertTrue(any("runnable command line" in issue for issue in result.issues))
+            self.assertTrue(any("inline runnable command" in issue for issue in result.issues))
 
 
 if __name__ == "__main__":

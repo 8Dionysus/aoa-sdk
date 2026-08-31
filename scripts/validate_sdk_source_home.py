@@ -185,7 +185,8 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
         (
             "source-authored SDK home",
             "Do not add `PARTS.md` to `sdk/`",
-            "python scripts/validate_sdk_source_home.py",
+            "## Validation route",
+            "root `VALIDATION.md`",
         ),
         issues,
     )

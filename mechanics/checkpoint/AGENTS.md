@@ -20,18 +20,9 @@ candidate-intelligence route evidence for repeated action signatures, wrapper
 gaps, and owner pressure, but those classifier outputs stay unreviewed
 navigation until an owner route accepts them.
 
-## Read before editing
+## Relevant routes
 
-- `mechanics/AGENTS.md`
-- `mechanics/checkpoint/README.md`
-- `mechanics/checkpoint/ROADMAP.md`
-- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/README.md`
-- `mechanics/checkpoint/parts/AGENTS.md`
-- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`
-- `mechanics/checkpoint/parts/reviewed-closeout-context-carry/README.md`
-- `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/AGENTS.md`
-- `docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`
-- `src/aoa_sdk/checkpoints/`
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `mechanics/AGENTS.md`, `mechanics/checkpoint/README.md`, `mechanics/checkpoint/ROADMAP.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/README.md`, `mechanics/checkpoint/parts/AGENTS.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/docs/session-growth-checkpoint-cycle.md`, `mechanics/checkpoint/parts/reviewed-closeout-context-carry/README.md`, `mechanics/checkpoint/parts/session-growth-checkpoint-cycle/git-boundary-hook-templates/AGENTS.md`, `docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`, `src/aoa_sdk/checkpoints/`.
 
 ## Boundaries
 
@@ -49,17 +40,9 @@ navigation until an owner route accepts them.
   verdicts.
 - Do not let hooks run closeout, harvest, push, merge, or release logic.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_mechanics_topology.py
-python -m pytest -q mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_cli.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_api.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_session_growth_checkpoint_cycle_dirty_gate.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_lifecycle_indexes.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_session_memory.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_candidate_intelligence.py mechanics/checkpoint/parts/session-growth-checkpoint-cycle/tests/test_checkpoint_carrier_intelligence.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_reviewed_closeout_context_carry.py mechanics/checkpoint/parts/reviewed-closeout-context-carry/tests/test_component_refresh_followthrough.py
-aoa checkpoint lifecycle-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json
-aoa checkpoint backlog-audit /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --write-index --json
-aoa checkpoint close-archive /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
-aoa checkpoint reconcile-sessions /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --dry-run --json
-aoa checkpoint candidate-intelligence /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --sample-limit 3 --write-index --json
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

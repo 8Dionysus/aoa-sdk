@@ -10,14 +10,9 @@ Route the shared Experience mechanic for SDK helper contracts. This package
 keeps helper shape, examples, docs, and regression checks local to active parts;
 it does not own adoption, governance, deployment, office, or release decisions.
 
-## Read before editing
+## Relevant routes
 
-- `mechanics/AGENTS.md`
-- `mechanics/experience/README.md`
-- `mechanics/experience/ROADMAP.md`
-- `mechanics/experience/PARTS.md`
-- `mechanics/experience/PROVENANCE.md`
-- `mechanics/experience/parts/`
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `mechanics/AGENTS.md`, `mechanics/experience/README.md`, `mechanics/experience/ROADMAP.md`, `mechanics/experience/PARTS.md`, `mechanics/experience/PROVENANCE.md`, `mechanics/experience/parts/`.
 
 ## Boundaries
 
@@ -28,16 +23,9 @@ it does not own adoption, governance, deployment, office, or release decisions.
   or tests.
 - Do not absorb Experience owner truth into SDK examples or schemas.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_mechanics_topology.py
-python -m pytest -q mechanics/experience/parts/capture-pipeline-helper/tests/test_capture_pipeline_helper.py
-python -m pytest -q mechanics/experience/parts/adoption-federation-helper-contracts/tests/test_adoption_federation_helper_contracts.py
-python -m pytest -q mechanics/experience/parts/deployment-watchtower-helper-contracts/tests/test_deployment_watchtower_helper_contracts.py
-python -m pytest -q mechanics/experience/parts/governance-runtime-helper-contracts/tests/test_governance_runtime_helper_contracts.py
-python -m pytest -q mechanics/experience/parts/office-release-train-helper-contracts/tests/test_office_release_train_helper_contracts.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

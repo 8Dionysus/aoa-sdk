@@ -19,14 +19,6 @@ They do not own skill, eval, memo, playbook, routing, role, or runtime meaning.
 - Keep generated artifacts deterministic, public-safe, and owner-subordinate.
 - If generated output changes without a source change, explain why it is legitimate rather than silent drift.
 
-## Validate
+## Validation route
 
-Common gates:
-
-```bash
-python scripts/build_workspace_control_plane.py --check
-python scripts/validate_workspace_control_plane.py
-python scripts/build_source_topology_index.py --check
-python scripts/validate_source_topology_index.py
-python -m pytest -q
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.

@@ -10,7 +10,7 @@ identify the repo-local ABI identity, the built artifact subjects under
 
 The package build owner and the release-audit part validator form the
 executable validation route. Exact operator checks are maintained in root
-`AGENTS.md#verify` and the release-audit part `VALIDATION.md`.
+`VALIDATION.md` and the release-audit part `VALIDATION.md`.
 
 Generated sidecars are written under `dist/abyss-artifact-bundle/`; the local
 registry read-model is written under `dist/abyss-artifact-registry/`, and the

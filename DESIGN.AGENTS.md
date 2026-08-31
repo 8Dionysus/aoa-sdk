@@ -127,25 +127,9 @@ Functioning mechanic parts add the nearest active work route:
 proof. Old root paths route through package `PROVENANCE.md` and package-local
 `legacy/` indexes, while active work starts from the current part route.
 
-## Reading Order Shape
+## Conditional route shape
 
-For ordinary SDK changes, the intended order is:
-
-1. root `AGENTS.md`;
-2. nearest nested `AGENTS.md` for every touched path;
-3. owner source surface named by those cards;
-4. narrowest relevant validator;
-5. broader release or compatibility gates when the change is structural,
-   generated, route-facing, or release-facing.
-
-For repository-shape, source-home, route-law, or mechanics topology changes, read:
-
-1. root `AGENTS.md`;
-2. `DESIGN.md`;
-3. `DESIGN.AGENTS.md` when agent-facing guidance changes;
-4. `docs/decisions/README.md` and the relevant decision record;
-5. nearest nested `AGENTS.md`;
-6. owner source surface and validator.
+For ordinary SDK changes, start with root AGENTS.md, then the nearest nested AGENTS.md for every touched path. Open the owner source surface, README, DESIGN, CONTRACT, release, generated, or sibling-owner source only when the touched path, semantic question, or requested operation requires it. Select the narrowest relevant validator through the applicable VALIDATION.md; broaden to release or compatibility gates for structural, generated, route-facing, or release-facing work. Repository-shape, source-home, route-law, or mechanics-topology questions additionally consult DESIGN.md, this design surface, the decision index, and the relevant decision record only when that question is active.
 
 ## Design Law
 
@@ -181,11 +165,15 @@ Durable local `AGENTS.md` cards should usually begin from this shape:
 
 ## Role
 
-## Read before editing
+## Relevant routes
+
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory.
 
 ## Boundaries
 
-## Validation
+## Validation route
+
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 ```
@@ -221,8 +209,8 @@ surfaces.
 
 ## Validation Direction
 
-Executable commands live in root `AGENTS.md` and nearest local cards. This
-design surface names what validation should prove:
+Executable procedures live in root `VALIDATION.md` and the nearest applicable
+part `VALIDATION.md`. This design surface names what validation should prove:
 
 - required local route cards exist and preserve owner boundaries;
 - SDK source-home branches have local route cards and manifest coverage;
