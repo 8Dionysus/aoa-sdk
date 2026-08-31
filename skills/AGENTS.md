@@ -10,11 +10,9 @@ This home owns callable procedures over SDK-owned Titan helper contracts. It
 does not turn helper state into Titan runtime, operator, role, memory, proof,
 or playbook authority.
 
-## Read Before Editing
+## Relevant routes
 
-Read root `AGENTS.md`, `skills/README.md`, `skills/port.manifest.json` when it
-exists, the selected bundle and admission decision, then only the Titan helper
-owners named by that bundle.
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `skills/README.md`, `skills/port.manifest.json`.
 
 ## Boundaries
 
@@ -33,7 +31,11 @@ owners named by that bundle.
 - Global exposure comes from the single OS user profile. Do not add a duplicate
   `.agents/skills` projection for globally installed bundles.
 
-## Validation
+## Validation route
+
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
+
+Owner-local validation notes:
 
 Manual isolated, negative, baseline, coexistence, binding-failure, and
 bounded-effect trials decide usefulness. `skill-creator` quick validation and

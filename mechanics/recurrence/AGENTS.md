@@ -10,14 +10,9 @@ Route the SDK recurrence mechanic control plane across manifest gates, observati
 producers, graph readouts, review surfaces, downstream projections, rollout
 handoffs, and recursor readiness scans.
 
-## Read before editing
+## Relevant routes
 
-- `mechanics/AGENTS.md`
-- `mechanics/recurrence/README.md`
-- `mechanics/recurrence/ROADMAP.md`
-- `mechanics/recurrence/PARTS.md`
-- `mechanics/recurrence/parts/AGENTS.md`
-- `src/aoa_sdk/recurrence/`
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `mechanics/AGENTS.md`, `mechanics/recurrence/README.md`, `mechanics/recurrence/ROADMAP.md`, `mechanics/recurrence/PARTS.md`, `mechanics/recurrence/parts/AGENTS.md`, `src/aoa_sdk/recurrence/`.
 
 ## Boundaries
 
@@ -28,13 +23,9 @@ handoffs, and recursor readiness scans.
 - Use route-role names for active recurrence surfaces; historical chronology
   belongs only in provenance or migration accounting.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_mechanics_topology.py
-python mechanics/recurrence/parts/component-manifest-gate/scripts/validate_recurrence_manifests.py --workspace-root /srv/AbyssOS --json
-python -m pytest -q mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_registry.py mechanics/recurrence/parts/component-manifest-gate/tests/test_recurrence_seed.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

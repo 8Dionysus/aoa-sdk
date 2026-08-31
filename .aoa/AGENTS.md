@@ -18,11 +18,6 @@ It is configuration for explicit discovery, not a hidden source of truth for rep
 - Keep `/srv` assumptions documented and overrideable.
 - Do not add machine-local secrets, private paths, or unreviewable heuristics.
 
-## Validate
+## Validation route
 
-Common gates:
-
-```bash
-aoa workspace inspect /srv/aoa-sdk
-python -m pytest -q
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.

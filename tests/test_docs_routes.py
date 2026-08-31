@@ -100,7 +100,7 @@ def test_readme_is_public_front_door_not_command_authority() -> None:
     assert "This README is the public front door" in readme
     assert "The root README should not become that inventory." in readme
     assert "Use this README to choose the route, not to run the route." in readme
-    assert "AGENTS.md#verify" in readme
+    assert "[VALIDATION](VALIDATION.md)" in readme
     assert "part `VALIDATION.md`" in readme
 
     forbidden_command_text = [
@@ -207,16 +207,18 @@ def test_decision_readme_routes_lookup_through_generated_indexes() -> None:
 
 def test_agents_lists_compatibility_checks_in_minimum_validation() -> None:
     agents = read_text("AGENTS.md")
+    validation = read_text("VALIDATION.md")
 
-    assert "python scripts/generate_decision_indexes.py --check" in agents
-    assert "python scripts/validate_sdk_source_home.py" in agents
-    assert "python scripts/validate_mechanics_topology.py" in agents
-    assert "python scripts/build_source_topology_index.py --check" in agents
-    assert "python scripts/validate_source_topology_index.py" in agents
-    assert "python scripts/build_workspace_control_plane.py --check" in agents
-    assert "python scripts/validate_workspace_control_plane.py" in agents
-    assert "aoa compatibility check /srv/AbyssOS/aoa-sdk" in agents
-    assert "aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json" in agents
+    assert "## Validation route" in agents
+    assert "python scripts/generate_decision_indexes.py --check" in validation
+    assert "python scripts/validate_sdk_source_home.py" in validation
+    assert "python scripts/validate_mechanics_topology.py" in validation
+    assert "python scripts/build_source_topology_index.py --check" in validation
+    assert "python scripts/validate_source_topology_index.py" in validation
+    assert "python scripts/build_workspace_control_plane.py --check" in validation
+    assert "python scripts/validate_workspace_control_plane.py" in validation
+    assert "aoa compatibility check /srv/AbyssOS/aoa-sdk" in validation
+    assert "aoa compatibility check /srv/AbyssOS/aoa-sdk --repo aoa-skills --json" in validation
 
 
 def test_decision_lane_is_routed_before_mechanics() -> None:
@@ -350,19 +352,20 @@ def test_readme_routes_surface_detection_to_owner_surfaces() -> None:
 
 def test_agents_documents_passive_skill_inspection_and_checkpoint_truth_rules() -> None:
     agents = read_text("AGENTS.md")
+    validation = read_text("VALIDATION.md")
 
-    assert "## Inspection And Checkpoint Loop" in agents
-    assert "aoa skills inspect /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json" in agents
-    assert "aoa skills capability workflow.operations.checkpoint-closeout" in agents
-    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress" in agents
-    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint" in agents
-    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in agents
-    assert "aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json" in agents
-    assert "aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD --auto" in agents
-    assert "aoa checkpoint materialize-closeout-handoff" in agents
-    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in agents
-    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in agents
-    assert "`aoa skills ...` is passive inspection only" in agents
+    assert "## Inspection and checkpoint route" in agents
+    assert "aoa skills inspect /srv/AbyssOS/aoa-sdk --root /srv/AbyssOS --json" in validation
+    assert "aoa skills capability workflow.operations.checkpoint-closeout" in validation
+    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase ingress" in validation
+    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint" in validation
+    assert "aoa surfaces detect /srv/AbyssOS/aoa-sdk --phase checkpoint --checkpoint-kind commit --append-note" in validation
+    assert "aoa checkpoint after-commit /srv/AbyssOS/aoa-sdk --commit-ref HEAD --root /srv/AbyssOS --json" in validation
+    assert "aoa checkpoint review-note /srv/AbyssOS/aoa-sdk --commit-ref HEAD --auto" in validation
+    assert "aoa checkpoint materialize-closeout-handoff" in validation
+    assert "aoa checkpoint install-hook --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in validation
+    assert "aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json" in validation
+    assert "Skills inspection is passive only" in agents
     assert "does not detect, rank,\ndispatch, activate, or create skill-session state" in agents
     assert "Presence never\n  becomes selection, activation, capability execution, or owner authority" in agents
     assert "skipped_no_active_session" in agents

@@ -13,11 +13,9 @@ Stay on the control plane. This mechanic makes obligations visible and
 returnable; it does not turn a quest into a proof verdict, owner acceptance,
 runtime action, release readiness, or Agon authority.
 
-## Read Before Editing
+## Relevant routes
 
-Read root `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `QUESTBOOK.md`,
-`quests/README.md`, this package `README.md`, this package `ROADMAP.md`,
-`PARTS.md`, and the nearest part card.
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `QUESTBOOK.md`, `quests/README.md`, `README.md`, `ROADMAP.md`, `PARTS.md`.
 
 ## Boundaries
 
@@ -27,10 +25,6 @@ Read root `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `QUESTBOOK.md`,
 - Generated quest readers must be derived from source records and must land
   with builder and validator routes.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_mechanics_topology.py
-python scripts/validate_nested_agents.py --strict-advisory --fail-on-untracked
-python -m pytest -q tests/test_mechanics_topology.py tests/test_design_surfaces.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.

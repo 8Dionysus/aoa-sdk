@@ -20,7 +20,7 @@ follow the linked owner surface instead of expanding this page.
 | Repository boundary and stronger-owner stop lines | [docs/boundaries](docs/boundaries.md) |
 | System form | [DESIGN](DESIGN.md) |
 | Agent-facing guidance form | [DESIGN.AGENTS](DESIGN.AGENTS.md) |
-| Local route law and executable checks | [AGENTS](AGENTS.md) and nearest nested `AGENTS.md` |
+| Local route law and executable checks | [AGENTS](AGENTS.md), root [VALIDATION](VALIDATION.md), and nearest nested `AGENTS.md` or `VALIDATION.md` |
 | Documentation map | [docs](docs/README.md) |
 | Checked SDK source-home posture | [sdk](sdk/README.md), [source home manifest](sdk/source_home.manifest.json) |
 | SDK-owned statistical questions | [stats](stats/README.md), [local stats port](stats/port.manifest.json) |
@@ -70,7 +70,7 @@ follow the linked owner surface instead of expanding this page.
 | --- | --- |
 | Who owns the meaning? | Usually the sibling repo or a stronger owner named in [docs/boundaries](docs/boundaries.md). |
 | What does `aoa-sdk` own? | Typed handles, route cards, local checks, generated read models, and bounded helper behavior. |
-| What proves the change? | The nearest part `VALIDATION.md`, root [AGENTS](AGENTS.md), and the touched test route. |
+| What proves the change? | The nearest part `VALIDATION.md`, root [VALIDATION](VALIDATION.md), and the touched test route. |
 | Is this activation, durable memory, proof, progression, gameplay, or runtime deployment? | Route away from SDK helper authority unless the source owner has already made the meaning explicit. |
 
 ## Current Contour
@@ -214,7 +214,7 @@ history. Package-local future pressure lives in mechanics package roadmaps.
 
 ## Validation
 
-Executable validation routes live in [AGENTS](AGENTS.md#verify), nearest nested
+Executable validation routes live in root [VALIDATION](VALIDATION.md), nearest nested
 `AGENTS.md`, and part `VALIDATION.md` files. Release gates live in
 [docs/RELEASING](docs/RELEASING.md) and
 [mechanics/release-support](mechanics/release-support/README.md).

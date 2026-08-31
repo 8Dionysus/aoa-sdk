@@ -9,15 +9,9 @@
 Route the shared Antifragility mechanic for SDK stress-posture task-dispatch
 gates, reviewed stress closeout carry, and via negativa pruning.
 
-## Read before editing
+## Relevant routes
 
-- `mechanics/AGENTS.md`
-- `mechanics/antifragility/README.md`
-- `mechanics/antifragility/ROADMAP.md`
-- `mechanics/antifragility/parts/README.md`
-- `mechanics/antifragility/parts/stress-posture-dispatch-gate/README.md`
-- `mechanics/antifragility/parts/reviewed-stress-closeout-carry/README.md`
-- `mechanics/antifragility/parts/via-negativa/README.md`
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `mechanics/AGENTS.md`, `mechanics/antifragility/README.md`, `mechanics/antifragility/ROADMAP.md`, `mechanics/antifragility/parts/README.md`, `mechanics/antifragility/parts/stress-posture-dispatch-gate/README.md`, `mechanics/antifragility/parts/reviewed-stress-closeout-carry/README.md`, `mechanics/antifragility/parts/via-negativa/README.md`.
 
 ## Boundaries
 
@@ -25,12 +19,9 @@ gates, reviewed stress closeout carry, and via negativa pruning.
 - Do not make stress fixtures proof verdicts or cleanup approval.
 - Keep pruning and degraded-mode pressure reviewable and owner-routed.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_mechanics_topology.py
-python -m pytest -q mechanics/antifragility/parts/stress-posture-dispatch-gate/tests/test_stress_posture_dispatch_gate.py mechanics/antifragility/parts/reviewed-stress-closeout-carry/tests/test_reviewed_stress_closeout_carry.py mechanics/antifragility/parts/via-negativa/tests/test_via_negativa_checklist.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

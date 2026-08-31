@@ -26,28 +26,13 @@ not replace operation mechanics under `mechanics/`.
 | tools | `scripts/validate_sdk_source_home.py`, `scripts/validate_nested_agents.py`, release gate |
 | validation | this card's `Validation` section plus target implementation or mechanic checks |
 
-## Route Stack
+## Route context
 
-- Above: root `AGENTS.md` owns repository identity, owner boundaries, and
-  broad validation posture.
-- Here: `sdk/README.md` owns the source-home map,
-  `sdk/SDK_SHAPE.md` owns the human shape contract, and
-  `sdk/source_home.manifest.json` owns the checked family topology.
-- Below: branch cards own public-interface, facade-boundary, runtime-entry,
-  and distribution route law.
+Use this card after root `AGENTS.md` and select the route by touched path, semantic question, or requested operation. The owner map is conditional guidance; open only the surface needed for the selected lane. Relevant route surfaces include: `AGENTS.md`, `sdk/README.md`, `sdk/SDK_SHAPE.md`, `sdk/source_home.manifest.json`.
 
-## Read Before Editing
+## Relevant routes
 
-Read:
-
-1. root `AGENTS.md`
-2. `DESIGN.md`
-3. `DESIGN.AGENTS.md`
-4. `sdk/README.md`
-5. `sdk/SDK_SHAPE.md`
-6. `sdk/source_home.manifest.json`
-7. the nearest branch `AGENTS.md`
-8. the implementation, mechanic, docs, or release surface named by that branch
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `sdk/README.md`, `sdk/SDK_SHAPE.md`, `sdk/source_home.manifest.json`.
 
 ## Owner Routes
 
@@ -85,15 +70,11 @@ Read:
 - Do not move Python modules, tests, schemas, generated readers, or mechanic
   payload into `sdk/` without a separate owner decision and validator.
 
-## Validation
+## Validation route
 
-For source-home shape changes, run:
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
-```bash
-python scripts/validate_sdk_source_home.py
-python scripts/validate_nested_agents.py --strict-advisory --fail-on-untracked
-python -m pytest -q tests/test_sdk_source_home.py tests/test_design_surfaces.py
-```
+Owner-local validation notes:
 
 If the change touches implementation, mechanics, release, or generated
 surfaces, also run the validator named by that owner route.

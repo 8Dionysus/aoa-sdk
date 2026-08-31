@@ -17,11 +17,6 @@ They can preserve review pressure and boundary checks, but they must not become 
 - Prefer small shell wrappers that delegate to reviewed SDK commands.
 - Do not add secrets, workstation-local paths, or repo-specific hacks that bypass documented config.
 
-## Validate
+## Validation route
 
-Common gates:
-
-```bash
-aoa checkpoint hook-status --repo aoa-sdk --hook all --root /srv/AbyssOS --json
-python -m pytest -q
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.

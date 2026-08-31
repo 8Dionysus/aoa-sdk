@@ -9,12 +9,9 @@ Root `tests/`.
 Root tests prove repo-wide routes, generated indexes, design surfaces, topology
 validators, smoke import, and cross-mechanic docs contracts.
 
-## Read Before Editing
+## Relevant routes
 
-1. Root `AGENTS.md`
-2. `DESIGN.AGENTS.md`
-3. `mechanics/README.md`
-4. The owning part `VALIDATION.md` when a regression belongs to one mechanic
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `DESIGN.AGENTS.md`, `mechanics/README.md`, `VALIDATION.md`.
 
 ## Boundaries
 
@@ -24,12 +21,9 @@ validators, smoke import, and cross-mechanic docs contracts.
   contracts.
 - Do not use root test filenames as active compatibility aliases after a move.
 
-## Validation
+## Validation route
 
-```bash
-python -m pytest -q tests
-python scripts/validate_mechanics_topology.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

@@ -20,6 +20,10 @@ When workflow or repository-policy files change, report:
 - whether `Repo Validation` was added, renamed, skipped, or changed
 - remaining platform risk
 
-## Verify
+## Validation route
+
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
+
+Owner-local validation notes:
 
 Use the root `AGENTS.md` verification path for the changed surface. For GitHub-only edits, inspect the workflow YAML and run the nearest repo-local static, release, or validation check when available.

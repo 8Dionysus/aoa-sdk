@@ -19,12 +19,9 @@ remains the importable source home.
 - Keep old root paths in `mechanics/rpg/PROVENANCE.md` or package-local
   legacy indexes, not as active routes.
 
-## Validation
+## Validation route
 
-```bash
-python -m pytest -q mechanics/rpg/parts/typed-consumer-api/tests/test_typed_consumer_api.py mechanics/rpg/parts/surface-path-transport/tests/test_surface_path_transport.py
-python scripts/validate_mechanics_topology.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

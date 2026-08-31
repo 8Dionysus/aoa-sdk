@@ -106,8 +106,8 @@ cannot become an accepted carrier.
 
 ## Executable Route
 
-Root `AGENTS.md#inspection-and-checkpoint-loop` owns the compact operator
-commands. This part's `VALIDATION.md` owns focused manual lifecycle and
+Root `VALIDATION.md` owns the compact operator commands. This part's
+`VALIDATION.md` owns focused manual lifecycle and
 regression routes. Use current CLI help for exact optional flags; this design
 note does not duplicate executable command truth.
 

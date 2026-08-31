@@ -12,15 +12,9 @@ keeping sibling meaning outside the SDK.
 It routes sibling-reader, compatibility, and truth-label pressure to the
 implementation and Boundary Bridge mechanics.
 
-## Read Before Editing
+## Relevant routes
 
-1. root `AGENTS.md`
-2. `sdk/AGENTS.md`
-3. `sdk/source_home.manifest.json`
-4. `sdk/facade-boundary/README.md`
-5. the target family README
-6. `docs/boundaries.md`
-7. the owning mechanic route
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `sdk/AGENTS.md`, `sdk/source_home.manifest.json`, `sdk/facade-boundary/README.md`, `docs/boundaries.md`.
 
 ## Boundaries
 
@@ -30,13 +24,9 @@ implementation and Boundary Bridge mechanics.
   candidate, reviewed evidence, owner-accepted, executed, advisory.
 - Route source-meaning changes to the sibling owner.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_sdk_source_home.py
-python scripts/validate_mechanics_topology.py
-python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

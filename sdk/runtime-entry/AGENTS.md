@@ -14,15 +14,9 @@ packets, coordinate a typed lifecycle through a caller-supplied adapter,
 materialize reviewed evidence, or orient Codex; it must not become a runtime
 worker.
 
-## Read Before Editing
+## Relevant routes
 
-1. root `AGENTS.md`
-2. `sdk/AGENTS.md`
-3. `sdk/source_home.manifest.json`
-4. `sdk/runtime-entry/README.md`
-5. the target family README
-6. `.aoa/AGENTS.md` for workspace metadata changes
-7. the owning runtime-seam, codex-projection, or checkpoint mechanic route
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `AGENTS.md`, `sdk/AGENTS.md`, `sdk/source_home.manifest.json`, `sdk/runtime-entry/README.md`, `.aoa/AGENTS.md`.
 
 ## Boundaries
 
@@ -34,14 +28,9 @@ worker.
 - Do not discover or select a runtime adapter implicitly.
 - Do not treat reference-adapter lifecycle events as plan-step execution.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_sdk_source_home.py
-python scripts/build_workspace_control_plane.py --check
-python scripts/validate_workspace_control_plane.py
-python scripts/validate_mechanics_topology.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 

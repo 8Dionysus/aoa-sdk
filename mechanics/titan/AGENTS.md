@@ -10,15 +10,9 @@ Route the shared Titan mechanic for SDK helper contracts around incarnation,
 runtime receipts, operator console, appserver bridge, memory loom, visible
 session replay, and swarm closeout.
 
-## Read before editing
+## Relevant routes
 
-- `mechanics/AGENTS.md`
-- `mechanics/titan/README.md`
-- `mechanics/titan/ROADMAP.md`
-- `mechanics/titan/PARTS.md`
-- `mechanics/titan/PROVENANCE.md`
-- `mechanics/titan/parts/`
-- `src/aoa_sdk/titans/`
+Start with root `AGENTS.md`, then this nearest card. Open only the owner source, README, DESIGN, CONTRACT, VALIDATION, release, generated, or sibling-owner surface required by the touched path, semantic question, or requested operation. This is a conditional route, not an unconditional reading inventory. The conditional references retained from this card are: `mechanics/AGENTS.md`, `mechanics/titan/README.md`, `mechanics/titan/ROADMAP.md`, `mechanics/titan/PARTS.md`, `mechanics/titan/PROVENANCE.md`, `mechanics/titan/parts/`, `src/aoa_sdk/titans/`.
 
 ## Boundaries
 
@@ -29,13 +23,9 @@ session replay, and swarm closeout.
 - Keep launch, approval, replay, recall, and closeout artifacts explicit and
   inspectable.
 
-## Validation
+## Validation route
 
-```bash
-python scripts/validate_mechanics_topology.py
-python -m pytest -q mechanics/titan/parts/incarnation-identity-runtime-helper-contracts/tests/test_titanctl_runtime.py mechanics/titan/parts/incarnation-identity-runtime-helper-contracts/tests/test_titan_incarnation_spine.py
-python -m pytest -q mechanics/titan/parts/operator-console-helper-contracts/tests/test_titan_console.py mechanics/titan/parts/appserver-bridge-helper-contracts/tests/test_titan_appserver_bridge.py mechanics/titan/parts/memory-loom-recall-helper-contracts/tests/test_titan_memory_loom.py mechanics/titan/parts/session-praxis-replay-helper-contracts/tests/test_titan_session_replay.py mechanics/titan/parts/swarm-ledger-closeout-helper-contracts/tests/test_titan_swarm_ledger.py mechanics/titan/parts/swarm-ledger-closeout-helper-contracts/tests/test_titan_closeout_audit.py
-```
+Use the nearest applicable `VALIDATION.md` when the touched path, semantic question, or requested operation requires executable checks. For repository-wide, release-facing, generated, or cross-owner work, follow root `VALIDATION.md`. The machine gate remains `scripts/release_check.py`; the owner claim/evidence manifest, accepted validation graph, and serial completeness oracle remain authoritative.
 
 ## Closeout
 
