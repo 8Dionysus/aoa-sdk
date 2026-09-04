@@ -241,11 +241,11 @@
       "surface-path-transport"
     ]
   },
-  "legacy_route_indexes": [
-    "mechanics/runtime-seam/legacy/INDEX.md",
-    "mechanics/boundary-bridge/legacy/INDEX.md",
-    "mechanics/checkpoint/legacy/INDEX.md",
-    "mechanics/codex-projection/legacy/INDEX.md"
+  "former_route_manifests": [
+    "mechanics/runtime-seam/former-routes.json",
+    "mechanics/boundary-bridge/former-routes.json",
+    "mechanics/checkpoint/former-routes.json",
+    "mechanics/codex-projection/former-routes.json"
   ],
   "required_package_files": [
     "AGENTS.md",

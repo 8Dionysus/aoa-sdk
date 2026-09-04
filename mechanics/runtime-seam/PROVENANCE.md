@@ -34,7 +34,7 @@ request and observation shape; runtime adapters and execution remain with
 ## Notes
 
 Former parent-name candidates for this package live only in
-`legacy/INDEX.md`. Active Runtime Seam routes name the operation: workspace
+`former-routes.json`; historical rationale remains in the [pre-retirement index](https://github.com/8Dionysus/aoa-sdk/blob/4ea7e3bc8fb63d2ebbf531ee0f763a56a9d5fd43/mechanics/runtime-seam/legacy/INDEX.md). Active Runtime Seam routes name the operation: workspace
 root resolution, source/runtime boundary, control-plane capsule, bootstrap,
 and local automation seam.
 

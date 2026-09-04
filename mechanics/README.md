@@ -46,15 +46,15 @@ future-pressure router and test glue:
 - `AGENTS.md` for local edit law.
 - `ROADMAP.md` for mechanics-wide future-pressure routing.
 - `topology.json` for package order, source-family routes, active part routes,
-  validation route lists, and legacy index registration.
+  validation route lists, and former-route map registration.
 - `conftest.py` for shared part-local pytest fixtures.
 
 Do not add root rosters, prep reports, migration ledgers, backlogs, templates,
 or generic holding areas. Active operation detail belongs in the owning
 package or part. Package-local future pressure belongs in package
 `ROADMAP.md`. Durable rationale belongs in `docs/decisions/`. Former-path
-accounting belongs in package `PROVENANCE.md` and package-local `legacy/`
-indexes when needed.
+accounting belongs in package `PROVENANCE.md` and checked `former-routes.json`
+maps. Historical receipts remain recoverable through immutable Git references.
 
 ## Placement
 

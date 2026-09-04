@@ -61,15 +61,15 @@ def test_mechanics_roadmaps_are_required_route_surfaces() -> None:
         assert "## Update Trigger" not in package_roadmap
 
 
-def test_former_parent_names_are_legacy_indexed_not_active_topology() -> None:
+def test_former_parent_names_have_checked_maps_not_active_routes() -> None:
     topology = mechanics_validator._read_json(  # noqa: SLF001
         REPO_ROOT / mechanics_validator.TOPOLOGY_PATH,
         [],
     )
 
     assert "demoted_" + "parent_candidates" not in topology
-    assert topology["legacy_route_indexes"] == [
-        path.as_posix() for path in mechanics_validator.LEGACY_INDEX_FILES
+    assert topology["former_route_manifests"] == [
+        path.as_posix() for path in mechanics_validator.FORMER_ROUTE_FILES
     ]
     assert set(topology["active_part_routes"]["boundary-bridge"]) >= {
         "consumed-surface-posture-gate",

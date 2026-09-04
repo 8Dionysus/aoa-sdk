@@ -102,7 +102,7 @@ This shared mechanic name matches the repeated AoA boundary pattern: bridge the
 surface, keep ownership outside.
 
 Former parent-name candidates for this package live only in
-`legacy/INDEX.md`. Active Boundary Bridge routes name the operation: consumed
+`former-routes.json`; historical rationale remains in the [pre-retirement index](https://github.com/8Dionysus/aoa-sdk/blob/4ea7e3bc8fb63d2ebbf531ee0f763a56a9d5fd43/mechanics/boundary-bridge/legacy/INDEX.md). Active Boundary Bridge routes name the operation: consumed
 surface posture gate, skill environment inspector, and owner-layer signal handoff.
 The C3 Runner lifecycle is an active bridge part; its reference adapter is a
 protocol witness and not a runtime-seam or production-execution owner.
