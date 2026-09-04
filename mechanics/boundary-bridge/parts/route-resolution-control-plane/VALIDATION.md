@@ -1,13 +1,13 @@
 # Validation
 
+Repository-wide source-home, workspace-capsule, package-build, release, and full-suite checks are owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks) and [its release-facing lane](../../../../VALIDATION.md#release-facing-and-full-owner-checks).
+
 Run:
 
 ```bash
 python -m pytest -q mechanics/boundary-bridge/parts/route-resolution-control-plane/tests
 python -m mypy src/aoa_sdk/control_plane src/aoa_sdk/cli/route.py
 python -m ruff check src/aoa_sdk/control_plane src/aoa_sdk/cli/route.py
-python scripts/validate_mechanics_topology.py
-python scripts/validate_sdk_source_home.py
 ```
 
 The focused suite covers repeatability, no predecessor checkout, exact
@@ -23,3 +23,5 @@ Record the selected candidate, candidate count, snapshot digest, and
 
 These checks do not prove plan compilation, capability invocation, runtime
 execution, task quality, process cost, or compatibility-window exit.
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

@@ -8,6 +8,9 @@ Tracking starts with the community-docs baseline for this repository.
 ## [Unreleased]
 
 - Add future changes here after the release tag lands.
+- Slim the root agent card to control-plane ownership, activation stop-lines,
+  conditional source routes, and on-demand validation; historical G5/X2/C1-C4
+  detail remains in accepted decisions and active source contracts.
 - Carry an optional, exact `aoa-session-memory` `continuity_capsule_v1`
   content reference through `RunPlan`, incarnation continuation, Runner
   session, and lifecycle commands without copying capsule content or changing

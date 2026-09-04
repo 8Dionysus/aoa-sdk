@@ -9,8 +9,9 @@ trials:
 
 ```bash
 python -m pytest -q mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector_cli.py
-python scripts/validate_mechanics_topology.py
 ```
 
 For current-host parity, also inspect the live user root with `aoa skills
 inspect` and verify prompt visibility separately through the host runtime.
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

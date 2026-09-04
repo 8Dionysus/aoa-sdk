@@ -1,8 +1,5 @@
 # Portability Boundary Validation
 
-Run:
+The cross-part docs-route suite is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#cross-part-routing-suites).
 
-```bash
-python -m pytest -q tests/test_docs_routes.py
-python scripts/validate_mechanics_topology.py
-```
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

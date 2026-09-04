@@ -1,5 +1,7 @@
 # Validation
 
+Repository-wide source-home, workspace-capsule, package-build, release, and full-suite checks are owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks) and [its release-facing lane](../../../../VALIDATION.md#release-facing-and-full-owner-checks).
+
 Run:
 
 ```bash
@@ -7,9 +9,6 @@ python -m pytest -q mechanics/boundary-bridge/parts/runner-lifecycle-control-pla
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_r2_control_plane_contracts.py mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests/test_plan_compilation_control_plane.py
 python -m mypy src/aoa_sdk/contracts/control_plane.py src/aoa_sdk/contracts/goal_lifecycle.py src/aoa_sdk/control_plane src/aoa_sdk/api.py
 python -m ruff check src/aoa_sdk/contracts/control_plane.py src/aoa_sdk/contracts/goal_lifecycle.py src/aoa_sdk/control_plane src/aoa_sdk/api.py mechanics/boundary-bridge/parts/runner-lifecycle-control-plane
-python scripts/validate_mechanics_topology.py
-python scripts/validate_sdk_source_home.py
-python -m build
 python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_runner_wheel.py
 PATH_TO_WHEEL_VENV/bin/python mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/verify_isolated_runtime_lifecycle.py --chain PATH_TO_TYPED_ROUTE_PLAN_CHAIN.json --output PATH_TO_SESSION_LOCAL_RECEIPT.json
 ```
@@ -60,3 +59,5 @@ compiler output.
 These checks do not select a production adapter, execute a plan step, call a
 model or tool, produce an eval verdict, retain memory, prove task benefit,
 measure cost reduction, establish consumer-zero, or authorize archival.
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

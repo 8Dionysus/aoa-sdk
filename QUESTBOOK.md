@@ -38,6 +38,6 @@ in `mechanics/questbook/`.
 
 ## Validation
 
-Executable validation routes live in `AGENTS.md`, `mechanics/AGENTS.md`, and
-the touched part `VALIDATION.md`. For Questbook source-store changes, start at
+Agent cards name validation scope and stop-lines; executable procedure lives
+in root or touched-part `VALIDATION.md`. For Questbook source-store changes, start at
 `mechanics/questbook/README.md` and the relevant part route.

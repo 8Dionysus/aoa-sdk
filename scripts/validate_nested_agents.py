@@ -471,7 +471,9 @@ def validate(
             issues.append("AGENTS.md: missing AGENTS heading")
         if "## Validation route" not in root_text:
             issues.append("AGENTS.md: root validation route is missing")
-        for required_root_route in ("root human validation entrypoint VALIDATION.md", "scripts/release_check.py", "accepted graph runner"):
+        if "](VALIDATION.md)" not in root_text:
+            issues.append("AGENTS.md: root validation route must link to VALIDATION.md")
+        for required_root_route in ("scripts/release_check.py", "accepted graph runner"):
             if required_root_route not in root_text:
                 issues.append(f"AGENTS.md: root validation route missing {required_root_route!r}")
         issues.extend(_procedure_violations("AGENTS.md", root_text))

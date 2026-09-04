@@ -14,7 +14,9 @@ routes for low-context agents working on the SDK control plane.
 
 Adjacent routes:
 
-- executable route law: `AGENTS.md`, then the nearest nested `AGENTS.md`
+- inherited route law: `AGENTS.md`, then the nearest nested `AGENTS.md`
+- executable procedure: root `VALIDATION.md` or the nearest part route after
+  the touched lane is known
 - system form: `DESIGN.md`
 - durable rationale: `docs/decisions/`
 - owner boundaries: `docs/boundaries.md`
@@ -173,7 +175,10 @@ Start with root `AGENTS.md`, then this nearest card. Open only the owner source,
 
 ## Validation handoff
 
-Validation is inherited from root `AGENTS.md`; a card adds only a path-relative `VALIDATION.md` reference or local note when it owns a narrower check. Do not repeat repository-wide gate details in child cards.
+Validation posture is inherited from root `AGENTS.md`; executable procedure is
+selected through root or path-relative `VALIDATION.md`. A child card names only
+the applicable route or local stop-line and does not repeat repository-wide
+gate details.
 
 ## Closeout
 ```

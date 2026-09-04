@@ -8,6 +8,5 @@ python -m pytest -q mechanics/checkpoint/parts/reviewed-closeout-context-carry/t
 
 Run the topology gate after moving or renaming any active surface:
 
-```bash
-python scripts/validate_mechanics_topology.py
-```
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

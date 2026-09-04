@@ -1,5 +1,7 @@
 # Agon Gate Routing Bridge Validation
 
+Repository-wide source-home, workspace-capsule, package-build, release, and full-suite checks are owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks) and [its release-facing lane](../../../../VALIDATION.md#release-facing-and-full-owner-checks).
+
 ## Narrow Checks
 
 ```bash
@@ -23,7 +25,6 @@ python mechanics/agon/parts/gate-routing-bridge/scripts/validate_agon_gate_routi
 ## Installed Wheel
 
 ```bash
-python -m build
 python mechanics/agon/parts/gate-routing-bridge/scripts/verify_agon_gate_routing_wheel.py
 ```
 
@@ -32,7 +33,5 @@ The clean-wheel probe must load and rebuild the registry without either an
 
 ## Topology and Release
 
-```bash
-python scripts/validate_mechanics_topology.py
-python scripts/release_check.py
-```
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

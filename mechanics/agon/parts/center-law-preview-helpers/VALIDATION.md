@@ -10,6 +10,5 @@ python -m pytest -q mechanics/agon/parts/center-law-preview-helpers/tests/test_a
 
 ## Topology Check
 
-```bash
-python scripts/validate_mechanics_topology.py
-```
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

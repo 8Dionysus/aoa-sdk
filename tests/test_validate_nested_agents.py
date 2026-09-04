@@ -20,7 +20,7 @@ def _write(path: Path, text: str) -> None:
 
 
 def _write_minimal_required_tree(repo_root: Path) -> None:
-    _write(repo_root / "AGENTS.md", "# AGENTS.md\n## Validation route\nroot human validation entrypoint VALIDATION.md; scripts/release_check.py and accepted graph runner remain authoritative.\n")
+    _write(repo_root / "AGENTS.md", "# AGENTS.md\n## Validation route\nRoot [`VALIDATION.md`](VALIDATION.md) is the human procedure route; scripts/release_check.py and the accepted graph runner remain authoritative.\n")
     _write(repo_root / "VALIDATION.md", "# VALIDATION.md\nRoot procedure route.\n")
     _write(
         repo_root / "DESIGN.AGENTS.md",
@@ -58,6 +58,21 @@ class ValidateNestedAgentsTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             result = validator.validate(Path(tmp))
             self.assertIn("AGENTS.md: root guidance file is missing", result.issues)
+
+    def test_root_validation_route_requires_clickable_owner(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            _write_minimal_required_tree(repo_root)
+            _write(
+                repo_root / "AGENTS.md",
+                "# AGENTS.md\n## Validation route\n"
+                "VALIDATION.md owns procedure; scripts/release_check.py and the accepted graph runner remain authoritative.\n",
+            )
+            result = validator.validate(repo_root)
+            self.assertIn(
+                "AGENTS.md: root validation route must link to VALIDATION.md",
+                result.issues,
+            )
 
     def test_missing_required_doc_fails_when_required_docs_exist(self) -> None:
         if not validator.REQUIRED_AGENTS_DOCS:
