@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 14819825,
+  "allowed_tracked_bytes": 21372660,
+  "approved_by": "repository-owner",
+  "base_ref": "0167948b3ae74e001b05d95345e2234c93116e5a",
+  "changed_generated_bytes": 14819825,
+  "changed_generated_files": 294,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "6740b3b730b285a9f2c0718bf43fda0ce9551672ebbc3825b476dce72eb7b812",
+  "reason": "aoa-sdk owner repository exceeds the default portable-family budget; this repository-owner receipt authorizes only the measured generated KAG delta.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 21372660,
+  "tracked_bytes_max": 15728640
+}

@@ -21,7 +21,6 @@ Default repo-wide gate and exact rollback:
 
 ```bash
 python scripts/release_check.py --receipt /tmp/aoa-sdk-validation-receipt.json
-python scripts/release_check.py --mode serial
 AOA_SDK_VALIDATION_MODE=serial python scripts/release_check.py
 ```
 
@@ -48,5 +47,8 @@ Owner and topology checks:
 
 ```bash
 python /srv/AbyssOS/aoa-evals/scripts/validate_local_eval_port.py --target-root .
-python scripts/validate_mechanics_topology.py
 ```
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).
+
+Serial completeness is owned by [the root serial lane](../../../../VALIDATION.md#serial-completeness-and-rollback).

@@ -4,5 +4,6 @@ Run:
 
 ```bash
 python -m pytest -q mechanics/runtime-seam/parts/portable-workspace-bootstrap/tests/test_portable_workspace_bootstrap_cli.py
-python scripts/validate_mechanics_topology.py
 ```
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

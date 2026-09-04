@@ -19,7 +19,7 @@ to their owning surfaces instead.
 | output | canonical decision note, generated lookup indexes, and route back to the source surface |
 | owner | `docs/decisions/AGENTS.md` for lane law; decision notes for rationale; generated indexes for lookup only |
 | next route | source surface first, then nearest route card, `docs/boundaries.md`, `ROADMAP.md`, generated lookup indexes, or the affected sibling owner |
-| validation | decision-index builder/check route in `docs/decisions/AGENTS.md` plus the owning validator for the changed surface |
+| validation | decision-index route in root [`VALIDATION.md`](../../VALIDATION.md#focused-repository-checks) plus the owning validator for the changed surface |
 
 ## Authority
 

@@ -8,9 +8,6 @@ python -m pytest -q mechanics/experience/parts/capture-pipeline-helper/tests/tes
 
 ## Topology Check
 
-```bash
-python scripts/validate_mechanics_topology.py
-```
 
 ## What This Proves
 
@@ -18,3 +15,5 @@ python scripts/validate_mechanics_topology.py
 - the doc still names the seed zips and stop-lines;
 - the old root `docs/`, `schemas/`, `examples/`, and `tests/` paths are not
   active helper homes.
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

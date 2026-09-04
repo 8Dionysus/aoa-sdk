@@ -22,7 +22,7 @@ quests/<lane>/<state>/<quest-file>
 | output | lane/state source record, `QUESTBOOK.md` open-obligation entry, or handoff to an owning mechanic part |
 | owner | `quests/AGENTS.md` for editing law; `mechanics/questbook/` for source-store and lifecycle posture |
 | next route | `quests/<lane>/<state>/`, `QUESTBOOK.md`, `mechanics/questbook/`, or the owning mechanic part |
-| validation | `quests/AGENTS.md` and `mechanics/questbook/parts/*/VALIDATION.md` |
+| validation | nearest questbook part `VALIDATION.md`; `quests/AGENTS.md` selects the owner boundary |
 
 ## Lanes
 

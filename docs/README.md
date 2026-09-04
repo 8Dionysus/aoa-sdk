@@ -18,7 +18,7 @@ where meaning lives and which surface to open next.
 | output | next source surface, mechanic route, decision record, or stronger-owner stop line |
 | owner | `docs/AGENTS.md` for docs edits; target source files own their meaning |
 | next route | root `README.md`, `DESIGN.md`, `DESIGN.AGENTS.md`, `docs/decisions/`, `mechanics/`, or sibling owner repositories |
-| validation | [docs/AGENTS](AGENTS.md) and the nearest owner route card |
+| validation | nearest owner `VALIDATION.md`, with [docs/AGENTS](AGENTS.md) selecting the docs boundary |
 
 ## First Route
 

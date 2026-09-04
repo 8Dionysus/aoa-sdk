@@ -27,8 +27,9 @@ runtime implementation.
 Use the stronger surface when the change is narrower:
 
 - public entry and route choice: [README](README.md);
-- route law and executable checks: [AGENTS](AGENTS.md), then the nearest
-  nested `AGENTS.md`;
+- route law: [AGENTS](AGENTS.md), then the nearest nested `AGENTS.md`;
+- executable checks: root or nearest part `VALIDATION.md` after the touched
+  lane is known;
 - system form: [DESIGN](DESIGN.md);
 - agent-facing guidance form: [DESIGN.AGENTS](DESIGN.AGENTS.md);
 - docs entry and placement: [docs README](docs/README.md);

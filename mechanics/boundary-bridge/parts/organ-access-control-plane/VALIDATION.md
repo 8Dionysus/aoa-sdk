@@ -8,7 +8,6 @@ python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/genera
 pytest -q mechanics/boundary-bridge/parts/organ-access-control-plane/tests
 mypy src/aoa_sdk/contracts/organs.py src/aoa_sdk/organs src/aoa_sdk/cli/organs.py
 ruff check src/aoa_sdk/contracts/organ_registry_v2.py src/aoa_sdk/contracts/admission_keeper.py src/aoa_sdk/contracts/tasks.py src/aoa_sdk/organs/registry_v2.py src/aoa_sdk/organs/admission_keeper.py src/aoa_sdk/organs/task_store.py mechanics/boundary-bridge/parts/organ-access-control-plane/tests/test_mcp_next_control_plane.py
-python scripts/validate_mechanics_topology.py
 ```
 
 Schema parity also enforces owner placement: v2 contour, Keeper, and TaskStore
@@ -42,3 +41,5 @@ TaskStore tests likewise prove storage mechanics only, not MCP Tasks client
 support, owner work completion, or production readiness. The aggregate-status
 case reopens the store, reports bounded load/cancellation/expiry/quota facts,
 and proves that neither task IDs nor principal IDs enter the projection.
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

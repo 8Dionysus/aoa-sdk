@@ -1,17 +1,17 @@
 # Consumed Surface Posture Gate Validation
 
+Repository-wide source-home, workspace-capsule, package-build, release, and full-suite checks are owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks) and [its release-facing lane](../../../../VALIDATION.md#release-facing-and-full-owner-checks).
+
 Run:
 
 ```bash
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests
 python -m mypy src/aoa_sdk/control_plane/routing
-python -m build
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/verify_routing_g5_canonical_wheel.py
 python mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/measure_routing_succession_e1.py --check
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_x1_consumer_zero_candidate.py
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_x1_consumer_zero_report.py
 python -m pytest -q mechanics/boundary-bridge/parts/consumed-surface-posture-gate/tests/test_routing_succession_x2_archive_closeout.py
-python scripts/validate_mechanics_topology.py
 ```
 
 The M1 shadow, G4, G5 candidate, and G5 release-candidate probes remain
@@ -120,3 +120,5 @@ For full Boundary Bridge coverage, also run:
 ```bash
 python -m pytest -q mechanics/boundary-bridge/parts/skill-environment-inspector/tests/test_skill_environment_inspector.py mechanics/boundary-bridge/parts/technique-promotion-readiness-reader/tests/test_technique_promotion_readiness_reader.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff.py mechanics/boundary-bridge/parts/owner-layer-signal-handoff/tests/test_owner_layer_signal_handoff_cli.py
 ```
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

@@ -1,5 +1,7 @@
 # Validation
 
+Repository-wide source-home, workspace-capsule, package-build, release, and full-suite checks are owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks) and [its release-facing lane](../../../../VALIDATION.md#release-facing-and-full-owner-checks).
+
 Run:
 
 ```bash
@@ -7,8 +9,6 @@ python mechanics/boundary-bridge/parts/agent-incarnation-binding/scripts/generat
 python -m pytest -q mechanics/boundary-bridge/parts/agent-incarnation-binding/tests
 python -m ruff check src/aoa_sdk/contracts/incarnation.py src/aoa_sdk/contracts/delegation.py src/aoa_sdk/control_plane/incarnation.py src/aoa_sdk/runtime_adapters mechanics/boundary-bridge/parts/agent-incarnation-binding
 python -m mypy src/aoa_sdk/contracts/incarnation.py src/aoa_sdk/control_plane/incarnation.py src/aoa_sdk/runtime_adapters/abyss_stack.py
-python scripts/validate_mechanics_topology.py
-python scripts/validate_sdk_source_home.py
 ```
 
 The focused tests prove byte-stable v1 compatibility, required v2 obligation,
@@ -23,3 +23,5 @@ prove the discriminated `ephemeral_read_worker_v1` and
 `external_incarnation_v1` ABI, parent-retained versus transferred responsibility,
 owner-separated runtime/eval/closeout/acceptance refs, and adapter neutrality.
 The delegation-class tests are the focused source contract for this distinction.
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

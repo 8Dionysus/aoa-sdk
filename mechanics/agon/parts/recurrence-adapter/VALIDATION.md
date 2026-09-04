@@ -12,9 +12,6 @@ python -m pytest -q mechanics/agon/parts/recurrence-adapter/tests/test_agon_recu
 
 ## Topology Check
 
-```bash
-python scripts/validate_mechanics_topology.py
-```
 
 ## What This Proves
 
@@ -23,3 +20,5 @@ python scripts/validate_mechanics_topology.py
 - the old root paths are not required as active builder, validator, or test
   homes;
 - the mechanics topology knows this part-local artifact placement.
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

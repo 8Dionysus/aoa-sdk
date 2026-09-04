@@ -1,19 +1,18 @@
 # Validation
 
+Repository-wide source-home, workspace-capsule, package-build, release, and full-suite checks are owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks) and [its release-facing lane](../../../../VALIDATION.md#release-facing-and-full-owner-checks).
+
 Run:
 
 ```bash
 python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/pin_playbook_plan_contours.py --owner-root /srv/AbyssOS/aoa-playbooks --check
 python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/generate_plan_compilation_examples.py --check
 python -m pytest -q mechanics/boundary-bridge/parts/plan-compilation-control-plane/tests
-python -m build
 python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_plan_compilation_wheel.py
 PATH_TO_VENV/bin/python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_golden_scenario_chain.py --workspace /srv/AbyssOS/aoa-sdk
 TMPDIR=/srv/abyss-machine/tmp/ai PATH_TO_VENV/bin/python mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/verify_clean_federation_chain.py --source-federation /srv/AbyssOS --routing-bundle-root /srv/AbyssOS/abyss-stack/Knowledge/federation/aoa-routing
 python -m mypy src/aoa_sdk/contracts/control_plane.py src/aoa_sdk/control_plane src/aoa_sdk/cli/route.py
 python -m ruff check src/aoa_sdk/contracts/control_plane.py src/aoa_sdk/control_plane src/aoa_sdk/cli/route.py mechanics/boundary-bridge/parts/plan-compilation-control-plane
-python scripts/validate_mechanics_topology.py
-python scripts/validate_sdk_source_home.py
 ```
 
 The three generated plans cover bounded-change preview pruning, A2A eval
@@ -45,3 +44,5 @@ CLI compilation, and plan validation.
 These checks do not activate or invoke a capability, instantiate a runner,
 dispatch a runtime command, observe an execution event, prove task quality, or
 establish cost reduction.
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

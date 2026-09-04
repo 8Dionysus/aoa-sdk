@@ -4,7 +4,6 @@ Run:
 
 ```bash
 python -m pytest -q mechanics/codex-projection/parts/workspace-mcp-server/tests/test_workspace_mcp_server.py
-python scripts/validate_mechanics_topology.py
 ```
 
 `test_workspace_mcp_server.py` verifies:
@@ -28,8 +27,6 @@ python scripts/validate_mechanics_topology.py
 For the underlying organ contracts, also run:
 
 ```bash
-python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_schemas.py --check
-python mechanics/boundary-bridge/parts/organ-access-control-plane/scripts/generate_organ_access_example.py --check
 python -m pytest -q mechanics/boundary-bridge/parts/organ-access-control-plane/tests
 ```
 
@@ -38,3 +35,7 @@ For broader Codex Projection routing, also run:
 ```bash
 python -m pytest -q mechanics/codex-projection/parts/live-rollout-status-readout/tests/test_live_rollout_status_readout.py tests/test_docs_routes.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py
 ```
+
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).
+
+Organ-access schema and example generation are owned by [the organ-access validation surface](../../../boundary-bridge/parts/organ-access-control-plane/VALIDATION.md).

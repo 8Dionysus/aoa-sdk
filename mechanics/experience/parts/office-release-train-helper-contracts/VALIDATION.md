@@ -4,11 +4,8 @@ Run:
 
 ```bash
 python -m pytest -q mechanics/experience/parts/office-release-train-helper-contracts/tests/test_office_release_train_helper_contracts.py
-python scripts/validate_mechanics_topology.py
 ```
 
-For broader Experience routing, also run:
+The cross-part Experience routing suite is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#cross-part-routing-suites).
 
-```bash
-python -m pytest -q tests/test_docs_routes.py mechanics/release-support/parts/public-support-ci-posture/tests/test_public_support_ci_posture.py
-```
+The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).
