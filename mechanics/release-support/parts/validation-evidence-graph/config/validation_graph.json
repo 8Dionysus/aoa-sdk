@@ -205,7 +205,11 @@
             "-m",
             "pytest",
             "-q",
-            "--ignore=evals/suites/test_agent_os_control_plane_g11.py"
+            "--ignore=evals/suites/test_agent_os_control_plane_g11.py",
+            "-n",
+            "2",
+            "--dist",
+            "loadfile"
           ]
         }
       ]

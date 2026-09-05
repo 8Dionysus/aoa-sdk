@@ -17,6 +17,23 @@ The full command preserves every `scripts/release_check.py` obligation. The
 temporary receipt path is illustrative; CI should use its runner-managed
 temporary directory and retain the receipt even on failure.
 
+The ordinary test node uses two pytest-xdist workers with `loadfile`: each
+file and its module fixtures stay together. The separately isolated G11 nodes
+and every other graph obligation remain unchanged. This adds no new runner;
+the retained serial oracle still executes without xdist. For focused tests,
+use the relevant part's serial command instead of paying worker startup cost.
+
+Matched full ordinary-suite observations on a shared development host:
+serial 50.63 s wall / 34.14 s CPU, two workers 20.08 s / 36.61 s,
+four workers 13.29 s / 46.58 s. Each selected 889 passing tests, two existing
+skips and 537 passing subtests. These are single-run comparisons, not p95 or
+hosted-CI guarantees. Two workers keep total CPU near serial while other graph
+nodes run concurrently. Four remain useful when wall time outweighs contention:
+
+```bash
+python -m pytest -q -n 4 --dist loadfile --ignore=evals/suites/test_agent_os_control_plane_g11.py
+```
+
 Default repo-wide gate and exact rollback:
 
 ```bash
