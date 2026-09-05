@@ -1,25 +1,25 @@
 {
-  "allowed_bytes": 16561892,
-  "allowed_tracked_bytes": 21307633,
+  "allowed_bytes": 16606512,
+  "allowed_tracked_bytes": 21309467,
   "approved_by": "repository-owner",
   "base_ref": "4ea7e3bc8fb63d2ebbf531ee0f763a56a9d5fd43",
   "candidate_identity": {
     "algorithm": "sha256:canonical-json-file-inventory-v2",
     "base_ref": "4ea7e3bc8fb63d2ebbf531ee0f763a56a9d5fd43",
     "contract_version": "aoa-kag:budget-receipt-candidate-identity-v2",
-    "excluded_path": "kag/receipts/index_family_budget/8dfb25cdd3d208a8c5c25f716eb4638dece57d9d824efc895a8a06d8fb2c076c.json",
-    "family_digest": "8dfb25cdd3d208a8c5c25f716eb4638dece57d9d824efc895a8a06d8fb2c076c",
+    "excluded_path": "kag/receipts/index_family_budget/3f1991f12deaa1ba25657cbfc6de3f35d48d750e9e30250b2bb61cf97523786e.json",
+    "family_digest": "3f1991f12deaa1ba25657cbfc6de3f35d48d750e9e30250b2bb61cf97523786e",
     "file_count": 2317,
-    "seal": "289460caadbaf9d6653012bbd62ae56a75f891cfac62504cd4f6a4f6cb1d3aac",
-    "source_epoch": "sha256:383375b1d147d88e24efa7ecaa460cb2ae96baefdd29cadf2a7cd9393688905b",
-    "source_snapshot": "sha256:d7b1137905e3b620577c9593db62329f9356fa7e87ed7e81a996d4a6f9f01b52"
+    "seal": "8615998293c5bd4d187d7e9bd0b05c7667325df3ae75caa8fa437b4cf006a21f",
+    "source_epoch": "sha256:c5a3dd8393bea824d3798c3060afb1f28dc7f698cc2015648d705456b2014013",
+    "source_snapshot": "sha256:3b8b573387ff76a67281d5b6571f02d91e19e27d85f6aefe1b403693c65f024e"
   },
-  "changed_generated_bytes": 16561892,
-  "changed_generated_files": 307,
+  "changed_generated_bytes": 16606512,
+  "changed_generated_files": 310,
   "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
   "default_limit_bytes": 1048576,
-  "head_family_digest": "8dfb25cdd3d208a8c5c25f716eb4638dece57d9d824efc895a8a06d8fb2c076c",
-  "head_source_snapshot": "sha256:d7b1137905e3b620577c9593db62329f9356fa7e87ed7e81a996d4a6f9f01b52",
+  "head_family_digest": "3f1991f12deaa1ba25657cbfc6de3f35d48d750e9e30250b2bb61cf97523786e",
+  "head_source_snapshot": "sha256:3b8b573387ff76a67281d5b6571f02d91e19e27d85f6aefe1b403693c65f024e",
   "producer_identity": {
     "action": {
       "bytes": 5200,
@@ -600,9 +600,9 @@
         "state": "present"
       },
       {
-        "bytes": 7765,
-        "content_digest": "320608860cc49fa224a913b37b0024b25fa0a72666a833c4f780a0412219e243",
-        "git_blob": "sha1:745f202addd6df3bb89e212a5b194ae7d7f70fc6",
+        "bytes": 8135,
+        "content_digest": "f37f0980fc0985d0dc5ea175d90c64164d0b94e08f85a139955e89d2c2d7da40",
+        "git_blob": "sha1:2380703d832c0fc9a08172250fe142be34a1bcc3",
         "path": "scripts/validate_nested_agents.py",
         "state": "present"
       },
@@ -1160,7 +1160,7 @@
         "state": "present"
       }
     ],
-    "identity_digest": "eef1f5bd240974dd46e6795f213747702dc33036f9a9c7664794b2985307ac95",
+    "identity_digest": "7217f672c7d2848fd031551640e7e6d16ca90b470629f02c3a80f3341329fb47",
     "owner": "aoa-kag",
     "procedure_manifest": {
       "action_inputs": [
@@ -1360,12 +1360,12 @@
       "schema_path": "schemas/repo-local-kag-budget-producer-manifest.schema.json"
     },
     "revision_binding": "content-addressed-procedure-import-closure-portable-runtime-contract-and-descriptor-io-v1",
-    "source_digest": "df3b43c667409671f5b5fc71b847a54b0f5aed3b4d9cafb2ca7046896f5c2c37"
+    "source_digest": "4882f50ab3a09b04b02715510f2e5dbec13fa60a5032f98e9e043dc9e79f812e"
   },
-  "reason": "Retirement owner exception approved by operator for aoa-sdk: Spark/mechanics legacy retirement; source records 1649->1630; tracked bytes 21372660->21307633; current family shard rewrite is bounded to this exact source epoch; no standing budget change.",
+  "reason": "Approved D0106 card wording correction: historical mechanics stay in owning PROVENANCE and exact immutable history; active SDK routes unchanged.",
   "repo": "aoa-sdk",
   "schema_version": "aoa-repo-local-kag-budget-receipt-v2",
   "scope": "generated_delta_and_tracked_size",
-  "tracked_bytes": 21307633,
+  "tracked_bytes": 21309467,
   "tracked_bytes_max": 15728640
 }
