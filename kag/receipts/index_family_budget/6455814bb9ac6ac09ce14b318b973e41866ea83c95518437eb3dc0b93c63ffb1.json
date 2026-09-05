@@ -1,24 +1,24 @@
 {
-  "allowed_bytes": 16700814,
-  "allowed_tracked_bytes": 21335374,
+  "allowed_bytes": 16693302,
+  "allowed_tracked_bytes": 21335980,
   "approved_by": "repository-owner",
-  "base_ref": "de99c10959eb7dae0fd4c9781888706b96218c3c",
+  "base_ref": "e142d47a852d740d6d86e959383a6d06477915b6",
   "candidate_identity": {
     "algorithm": "sha256:canonical-json-file-inventory-v2",
-    "base_ref": "de99c10959eb7dae0fd4c9781888706b96218c3c",
+    "base_ref": "e142d47a852d740d6d86e959383a6d06477915b6",
     "contract_version": "aoa-kag:budget-receipt-candidate-identity-v2",
-    "excluded_path": "kag/receipts/index_family_budget/327240b1804e601acc6a8f44efb57ff1334a3003628dfcbcb1a530cea08d3a3b.json",
-    "family_digest": "327240b1804e601acc6a8f44efb57ff1334a3003628dfcbcb1a530cea08d3a3b",
+    "excluded_path": "kag/receipts/index_family_budget/6455814bb9ac6ac09ce14b318b973e41866ea83c95518437eb3dc0b93c63ffb1.json",
+    "family_digest": "6455814bb9ac6ac09ce14b318b973e41866ea83c95518437eb3dc0b93c63ffb1",
     "file_count": 2320,
-    "seal": "225fd115cab1457768281b00d5f526db53ca712fbe26bf3057aee511fdb042d4",
+    "seal": "98b87501f91328a041660292c8e21046ec386b58a1380144c921d0598f08e984",
     "source_epoch": "sha256:9748b6c0e7a8a1ed3dccaad6707482afd8c4d6995da3aa2036dc26036d38b744",
     "source_snapshot": "sha256:052f256fcfb319a597e22702559046697fa453c149d157ef5247360d445c874f"
   },
-  "changed_generated_bytes": 16700814,
-  "changed_generated_files": 315,
+  "changed_generated_bytes": 16693302,
+  "changed_generated_files": 311,
   "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
   "default_limit_bytes": 1048576,
-  "head_family_digest": "327240b1804e601acc6a8f44efb57ff1334a3003628dfcbcb1a530cea08d3a3b",
+  "head_family_digest": "6455814bb9ac6ac09ce14b318b973e41866ea83c95518437eb3dc0b93c63ffb1",
   "head_source_snapshot": "sha256:052f256fcfb319a597e22702559046697fa453c149d157ef5247360d445c874f",
   "producer_identity": {
     "action": {
@@ -35,13 +35,13 @@
           "bytes": 40,
           "kind": "git-ref",
           "state": "set",
-          "value_digest": "1e6221fd7ef10b4c49ca6e0a41775686474eda3894bd74b35f81527b3890f6fa"
+          "value_digest": "27bb3d7dd574aafcc979f7efb6fb5600db5c0243a46573e15fdf21d8502f5138"
         },
         "history-ref": {
           "bytes": 40,
           "kind": "git-ref",
           "state": "set",
-          "value_digest": "1e6221fd7ef10b4c49ca6e0a41775686474eda3894bd74b35f81527b3890f6fa"
+          "value_digest": "27bb3d7dd574aafcc979f7efb6fb5600db5c0243a46573e15fdf21d8502f5138"
         },
         "output": {
           "bytes": 37,
@@ -58,11 +58,11 @@
       },
       "command_targets": {
         "artifact_root": null,
-        "base_ref": "de99c10959eb7dae0fd4c9781888706b96218c3c",
-        "event_history_ref": "de99c10959eb7dae0fd4c9781888706b96218c3c",
+        "base_ref": "e142d47a852d740d6d86e959383a6d06477915b6",
+        "event_history_ref": "e142d47a852d740d6d86e959383a6d06477915b6",
         "externalized": false,
         "family_mode": "portable",
-        "history_ref": "de99c10959eb7dae0fd4c9781888706b96218c3c",
+        "history_ref": "e142d47a852d740d6d86e959383a6d06477915b6",
         "output": "kag/indexes/source_surface_index.json",
         "repo_root": {
           "path_digest": "21dba821671dd5da139d85927c06f360ae3bcc5751db42dae6d309553c903d79",
@@ -1160,7 +1160,7 @@
         "state": "present"
       }
     ],
-    "identity_digest": "e9fa1c0089d6fc34e9e946e31a4f05f97f0f6f23a6971ed5edf9be57b09ef662",
+    "identity_digest": "5d955623c17bb6ce29adf63c8c06f9396701b458cdcbfe26913d731a25cfdedd",
     "owner": "aoa-kag",
     "procedure_manifest": {
       "action_inputs": [
@@ -1362,10 +1362,10 @@
     "revision_binding": "content-addressed-procedure-import-closure-portable-runtime-contract-and-descriptor-io-v1",
     "source_digest": "4882f50ab3a09b04b02715510f2e5dbec13fa60a5032f98e9e043dc9e79f812e"
   },
-  "reason": "Approved SDK retirement integration: preserve D0106 historical recovery and active routes while incorporating origin/main validation-feedback changes; exact producer 14ee1e33, base de99c109.",
+  "reason": "Approved SDK retirement integration on exact origin/main e142d47a: preserve D0106 historical recovery and active routes while retaining bounded validation-feedback changes; exact producer 14ee1e33.",
   "repo": "aoa-sdk",
   "schema_version": "aoa-repo-local-kag-budget-receipt-v2",
   "scope": "generated_delta_and_tracked_size",
-  "tracked_bytes": 21335374,
+  "tracked_bytes": 21335980,
   "tracked_bytes_max": 15728640
 }
