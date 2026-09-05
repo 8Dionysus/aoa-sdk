@@ -130,13 +130,12 @@ REQUIRED_ROOT_FILES = (
 )
 
 REQUIRED_PACKAGE_FILES = ("AGENTS.md", "README.md", "ROADMAP.md", "PARTS.md", "PROVENANCE.md")
-LEGACY_ROUTE_FILES = (
-    MECHANICS_DIR / "runtime-seam" / "legacy" / "former-routes.json",
-    MECHANICS_DIR / "boundary-bridge" / "legacy" / "former-routes.json",
-    MECHANICS_DIR / "checkpoint" / "legacy" / "former-routes.json",
-    MECHANICS_DIR / "codex-projection" / "legacy" / "former-routes.json",
+FORMER_ROUTE_FILES = (
+    MECHANICS_DIR / "runtime-seam" / "former-routes.json",
+    MECHANICS_DIR / "boundary-bridge" / "former-routes.json",
+    MECHANICS_DIR / "checkpoint" / "former-routes.json",
+    MECHANICS_DIR / "codex-projection" / "former-routes.json",
 )
-LEGACY_INDEX_FILES = tuple(path.with_name("INDEX.md") for path in LEGACY_ROUTE_FILES)
 
 README_SNIPPETS = (
     "## Mechanic Card",
@@ -307,7 +306,7 @@ def _active_part_route_set(active_part_routes: Any, issues: list[str]) -> set[st
 
 
 def _load_legacy_routes(repo_root: Path, active_routes: set[str], issues: list[str]) -> None:
-    for rel_path in LEGACY_ROUTE_FILES:
+    for rel_path in FORMER_ROUTE_FILES:
         data = _read_json(repo_root / rel_path, issues)
         if not data:
             continue
@@ -317,11 +316,6 @@ def _load_legacy_routes(repo_root: Path, active_routes: set[str], issues: list[s
             issues.append(f"{rel_path.as_posix()}: parent must be a current mechanics package")
         if data.get("schema_version") != "aoa_sdk_mechanics_legacy_routes_v1":
             issues.append(f"{rel_path.as_posix()}: unexpected schema_version")
-
-        legacy_dir = rel_path.parent
-        for file_name in ("AGENTS.md", "README.md", "INDEX.md", "DISTILLATION_LOG.md", "raw/README.md"):
-            if not (repo_root / legacy_dir / file_name).is_file():
-                issues.append(f"{(legacy_dir / file_name).as_posix()}: required legacy file is missing")
 
         entries = data.get("entries")
         if not isinstance(entries, list) or not entries:
@@ -391,13 +385,13 @@ def validate(repo_root: Path = REPO_ROOT) -> list[str]:
 
     former_active_key = "demoted_" + "parent_candidates"
     if former_active_key in topology:
-        issues.append("mechanics/topology.json: former parent names must live in mechanics/*/legacy, not active topology")
+        issues.append("mechanics/topology.json: former parent names must live in package former-routes.json maps, not active route declarations")
 
-    legacy_indexes = topology.get("legacy_route_indexes")
-    expected_legacy_indexes = [path.as_posix() for path in LEGACY_INDEX_FILES]
-    if legacy_indexes != expected_legacy_indexes:
+    former_maps = topology.get("former_route_manifests")
+    expected_former_maps = [path.as_posix() for path in FORMER_ROUTE_FILES]
+    if former_maps != expected_former_maps:
         issues.append(
-            "mechanics/topology.json: legacy_route_indexes must point to the canonical package legacy indexes"
+            "mechanics/topology.json: former_route_manifests must point to the canonical package former-route maps"
         )
     active_part_routes_raw = topology.get("active_part_routes")
     active_routes = _active_part_route_set(active_part_routes_raw, issues)

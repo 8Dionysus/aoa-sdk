@@ -170,11 +170,6 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'source-owned truth',
         'reviewed handoff packets only',
     ),
-    'mechanics/boundary-bridge/legacy/AGENTS.md': (
-        'Boundary Bridge mechanics parent names',
-        'Stay on the control plane',
-        'Do not treat former parent names as active route ids',
-    ),
     'mechanics/checkpoint/AGENTS.md': (
         'checkpoint mechanic',
         'Stay on the control plane',
@@ -186,11 +181,6 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'owner verdict authority',
         'Do not strengthen a checkpoint packet',
     ),
-    'mechanics/checkpoint/legacy/AGENTS.md': (
-        'Checkpoint mechanics parent names',
-        'Stay on the control plane',
-        'Do not treat former parent names as active route ids',
-    ),
     'mechanics/codex-projection/AGENTS.md': (
         'Codex Projection mechanic',
         'Stay on the control plane',
@@ -200,11 +190,6 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'functioning Codex Projection parts',
         'Stay on the control plane',
         'external rollout artifact names as compatibility inputs',
-    ),
-    'mechanics/codex-projection/legacy/AGENTS.md': (
-        'Codex Projection mechanics parent names',
-        'Stay on the control plane',
-        'Do not treat former parent names as active route ids',
     ),
     'mechanics/experience/AGENTS.md': (
         'Experience mechanic',
@@ -267,11 +252,6 @@ REQUIRED_AGENTS_DOCS: dict[str, tuple[str, ...]] = {
         'workspace path resolution',
         'portable workspace bootstrap',
         'Do not hide path guessing',
-    ),
-    'mechanics/runtime-seam/legacy/AGENTS.md': (
-        'Runtime Seam mechanics parent names',
-        'Stay on the control plane',
-        'Do not treat former parent names as active route ids',
     ),
     'mechanics/titan/AGENTS.md': (
         'Titan mechanic',

@@ -37,7 +37,8 @@ The conditional references retained from this card are: `AGENTS.md`, `DESIGN.md`
   `mechanics/<parent>/parts/<part>/<district>/` home once the part has a local
   contract and validation route.
 - Preserve old-path accounting in package `PROVENANCE.md` or package-local
-  legacy receipts. Active work starts from the current route.
+  former-route maps. Historical receipts remain in Git; active work starts
+  from the current route.
 - Do not treat topology cards as proof that a source surface has moved; prove
   the move with current paths and validators.
 

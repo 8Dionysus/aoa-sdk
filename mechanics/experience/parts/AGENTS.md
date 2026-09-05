@@ -17,5 +17,5 @@ The conditional references retained from this card are: `AGENTS.md`, `mechanics/
 - Stay on the control plane.
 - Keep Experience helper surfaces as reviewable SDK contracts, not live
   operations.
-- Keep old root paths in provenance or package-local legacy indexes, not as
-  active routes.
+- Keep old root paths in the owning PROVENANCE surface or exact immutable
+  history, not as package-local legacy indexes or active routes.

@@ -11,7 +11,8 @@
 
 ## Provenance Bridge
 
-Former parent-name candidates for this package live only in
-`legacy/INDEX.md`. Active Codex Projection routes name the operation:
-workspace MCP server, live rollout status readout, portability boundary, and
-owner rollout reference handoff.
+Former parent-name candidates for this package are recorded in
+[`former-routes.json`](former-routes.json); historical names are not active
+contracts. Active Codex Projection routes name the operation: workspace MCP
+server, live rollout status readout, portability boundary, and owner rollout
+reference handoff.

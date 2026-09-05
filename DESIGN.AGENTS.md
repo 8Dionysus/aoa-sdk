@@ -126,8 +126,9 @@ surfaces.
 Functioning mechanic parts add the nearest active work route:
 `parts/<part>/README.md` names role, input, output, owner, and next route;
 `CONTRACT.md` names may/must-not boundaries; `VALIDATION.md` names executable
-proof. Old root paths route through package `PROVENANCE.md` and package-local
-`legacy/` indexes, while active work starts from the current part route.
+proof. Old root paths route through package `PROVENANCE.md` and checked
+`former-routes.json` maps; historical receipts remain recoverable in Git.
+Active work starts from the current part route.
 
 ## Conditional route shape
 

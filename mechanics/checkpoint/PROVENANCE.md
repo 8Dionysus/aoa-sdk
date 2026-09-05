@@ -36,7 +36,7 @@ move checkpoint files from `current/` to `archive/`, but it does not mutate
 aoa-session-memory or turn archive indexes into reviewed truth.
 
 Former parent-name candidates for this package live only in
-`legacy/INDEX.md`. Active Checkpoint routes name the operation: session-local
+`former-routes.json`; historical rationale remains in the [pre-retirement index](https://github.com/8Dionysus/aoa-sdk/blob/4ea7e3bc8fb63d2ebbf531ee0f763a56a9d5fd43/mechanics/checkpoint/legacy/INDEX.md). Active Checkpoint routes name the operation: session-local
 review and evidence materialization, child-task re-entry, and reviewed context
 carry.
 
