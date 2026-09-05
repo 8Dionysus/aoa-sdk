@@ -17,6 +17,14 @@ and `mechanics/boundary-bridge/parts/consumed-surface-posture-gate/`.
 Stop line: do not document an API promise here unless implementation and tests
 carry it.
 
+`from aoa_sdk import AoASDK` resolves the same class as
+`from aoa_sdk.api import AoASDK`. The package loads that facade on first access,
+not when a consumer imports an unrelated leaf helper. The export remains
+discoverable through `dir(aoa_sdk)` and `__all__`; unknown names still raise
+`AttributeError`. This keeps narrow helpers and their tests from initializing
+the complete SDK. Requesting the full facade retains its normal dependency
+and initialization cost.
+
 Artifact trust access is a typed consumer facade only. `AoASDK.artifacts` may
 load and validate abyss-machine JSON surfaces such as trust-gate verdicts,
 artifact classification, bundle registries, artifact requirements, affected

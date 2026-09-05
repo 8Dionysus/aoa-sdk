@@ -1,0 +1,17 @@
+{
+  "allowed_bytes": 2645717,
+  "allowed_tracked_bytes": 21399166,
+  "approved_by": "repository-owner",
+  "base_ref": "de99c10959eb7dae0fd4c9781888706b96218c3c",
+  "changed_generated_bytes": 2645717,
+  "changed_generated_files": 47,
+  "decision_ref": "aoa-kag:docs/decisions/AOA-KAG-D-0017-portable-content-addressed-repository-family.md",
+  "default_limit_bytes": 1048576,
+  "head_family_digest": "55525a92c92d54c8ffd37fcbf1304518cf78967de50a9e63950b79ad2fdc80cb",
+  "reason": "Regenerated portable owner family for exact reviewed validation-feedback candidate 56e8a193; CI sentinel requires a matching receipt and no gate limits or semantics changed.",
+  "repo": "aoa-sdk",
+  "schema_version": "aoa-repo-local-kag-budget-receipt-v1",
+  "scope": "generated_delta_and_tracked_size",
+  "tracked_bytes": 21399166,
+  "tracked_bytes_max": 15728640
+}

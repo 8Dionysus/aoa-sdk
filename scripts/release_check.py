@@ -2,10 +2,11 @@
 from __future__ import annotations
 
 import argparse
+import json
 import os
 import subprocess
 import sys
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Sequence
 
 REPO_ROOT = Path(__file__).resolve().parents[1]
@@ -159,7 +160,8 @@ def run_step(label: str, command: list[str]) -> int:
 
 def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
     parser = argparse.ArgumentParser(description="Run the complete aoa-sdk validation gate.")
-    parser.add_argument(
+    route = parser.add_mutually_exclusive_group()
+    route.add_argument(
         "--mode",
         choices=("graph", "serial"),
         default=os.environ.get(VALIDATION_MODE_ENV, "graph"),
@@ -168,6 +170,11 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
             f"completeness oracle and rollback (default: ${VALIDATION_MODE_ENV} or graph)"
         ),
     )
+    route.add_argument(
+        "--feedback", action="store_true",
+        help="Run owner-local affected tests, not release acceptance; unknown paths use the full graph.",
+    )
+    parser.add_argument("--changed-path", action="append", default=[])
     parser.add_argument(
         "--receipt",
         type=Path,
@@ -178,7 +185,55 @@ def parse_args(argv: Sequence[str] | None = None) -> argparse.Namespace:
         type=int,
         help="Explicit graph worker override; the accepted manifest default is three.",
     )
-    return parser.parse_args(argv)
+    args = parser.parse_args(argv)
+    if args.feedback:
+        if not args.changed_path:
+            parser.error("--feedback requires at least one --changed-path")
+        if args.receipt is not None or args.max_workers is not None:
+            parser.error("feedback emits no owner receipt and uses normal targeted pytest scheduling")
+    elif args.changed_path:
+        parser.error("--changed-path requires --feedback")
+    return args
+
+
+def feedback_test_paths(changed_paths: Sequence[str], repo_root: Path) -> list[str] | None:
+    """Select existing owner test territories; None means full fallback.
+
+    This is edit feedback, not a claim that no cross-owner consumer is affected.
+    Dirty/untracked files are legitimate inputs: callers supply the actual edit
+    set, and the selected tests read the current worktree.
+    """
+    selected: set[str] = set()
+    for raw in changed_paths:
+        path = PurePosixPath(raw)
+        if path.is_absolute() or ".." in path.parts or "\x00" in raw:
+            raise ValueError(f"changed path must be repository-relative: {raw!r}")
+        parts = path.parts
+        if len(parts) >= 5 and parts[0] == "mechanics" and parts[2] == "parts":
+            target = PurePosixPath(*parts[:4], "tests")
+        elif len(parts) >= 4 and parts[:2] == ("src", "aoa_sdk"):
+            try:
+                topology = json.loads((repo_root / "mechanics/topology.json").read_text())
+                mechanic = topology["source_family_routes"][parts[2]]["primary_mechanic"]
+            except (OSError, ValueError, KeyError, TypeError):
+                return None
+            if not isinstance(mechanic, str) or mechanic in {".", ".."} or len(PurePosixPath(mechanic).parts) != 1:
+                return None
+            target = PurePosixPath("mechanics", mechanic)
+        elif len(parts) == 2 and parts[0] == "tests" and path.name.startswith("test_") and path.suffix == ".py":
+            target = path
+        else:
+            return None
+        location = repo_root / target
+        if not location.resolve().is_relative_to(repo_root.resolve()):
+            raise ValueError(f"test territory escapes repository: {target}")
+        if not (location.is_file() or (location.is_dir() and next(location.rglob("test_*.py"), None))):
+            return None
+        selected.add(target.as_posix())
+    # A family plus one of its parts must not execute the part twice.
+    return [path for path in sorted(selected) if not any(
+        path.startswith(parent + "/") for parent in selected if parent != path
+    )] or None
 
 
 def run_serial() -> int:
@@ -191,6 +246,17 @@ def run_serial() -> int:
 
 def main(argv: Sequence[str] | None = None) -> int:
     args = parse_args(argv)
+    if args.feedback:
+        try:
+            paths = feedback_test_paths(args.changed_path, REPO_ROOT)
+        except ValueError as exc:
+            print(f"[error] {exc}", file=sys.stderr, flush=True)
+            return 2
+        if paths is not None:
+            print("[feedback] affected owner tests only; full release gate not executed", flush=True)
+            return run_step("affected tests", [sys.executable, "-m", "pytest", "-q", "--", *paths])
+        print("[feedback] unknown/shared surface: expanding to full owner graph", flush=True)
+        return run_step("run full claim/evidence validation graph", [sys.executable, GRAPH_RUNNER, "--profile", "full"])
     print(f"[mode] {args.mode}", flush=True)
     if args.mode == "serial":
         if args.receipt is not None:

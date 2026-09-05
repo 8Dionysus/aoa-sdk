@@ -39,6 +39,13 @@ The runner binds its own source-checkout commit, tree, worktree state, and file
 digest separately from the owner repository. An unavailable or changing runner
 identity makes a receipt insufficient.
 
+The existing `scripts/release_check.py --feedback --changed-path ...` entry
+selects local pytest territories using part locations and the source-family
+map in `mechanics/topology.json`. It is an edit-loop diagnostic, not graph
+sufficiency or a promotion of shadow routing. Unknown/shared surfaces use the
+full graph; explicit feedback cannot emit an owner-gate receipt. This keeps
+small product checks useful without adding another scheduler or receipt type.
+
 ## Next route
 
 Continue comparing the promoted graph with the serial oracle and evaluate

@@ -26,6 +26,24 @@ Confirm the intended worktree and required source HEAD before any bounded edit; 
 
 ## Focused repository checks
 
+For an ordinary edit, the existing release entrypoint can select a local test
+territory from the changed paths instead of running release preparation:
+
+```bash
+python scripts/release_check.py --feedback --changed-path mechanics/titan/parts/appserver-bridge-helper-contracts/scripts/titan_appserver_bridge.py
+```
+
+Repeat `--changed-path` for every edited surface. Part-local files select that
+part's tests; Python source families select their mechanic through the existing
+`mechanics/topology.json` map; a root test selects its own file. Selections are
+deduplicated. Unknown/shared paths and territories without tests expand to the
+full graph. Dirty and new files do not require a commit before feedback.
+
+This is a local diagnostic selection, not transitive cross-owner coverage or
+release acceptance: it emits no owner-gate receipt. The default command and
+required CI still execute the full graph. Use the part's validation guidance
+for required plugins; do not disable plugins globally merely to reduce startup.
+
 The focused repository battery is retained in this exact order:
 
 ```bash
