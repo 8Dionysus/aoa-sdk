@@ -1,8 +1,8 @@
-"""Typed pre-tool routing contracts for agent responsibility boundaries.
+"""Typed, optional routing for an explicitly presented AoA responsibility.
 
-The contract is deliberately narrower than a tool hook. It records the
-current holder's typed routing input and the next owner that must be presented;
-it never selects a model, transport, runtime, or tool.
+Ordinary Codex helpers do not need this contract. The compatibility pre-tool
+entry records the current holder's input without acquiring native orchestration
+or permission authority. A session phase is not a change of responsibility.
 """
 
 from __future__ import annotations
@@ -20,11 +20,11 @@ from .control_plane import (
 
 
 AGENT_TOOL_ROUTING_INTENT_VERSION: Literal[
-    "aoa_agent_tool_routing_intent_v1"
-] = "aoa_agent_tool_routing_intent_v1"
+    "aoa_agent_tool_routing_intent_v2"
+] = "aoa_agent_tool_routing_intent_v2"
 AGENT_TOOL_ROUTING_DECISION_VERSION: Literal[
-    "aoa_agent_tool_routing_decision_v1"
-] = "aoa_agent_tool_routing_decision_v1"
+    "aoa_agent_tool_routing_decision_v2"
+] = "aoa_agent_tool_routing_decision_v2"
 
 AgentToolRoutingPhase: TypeAlias = Literal[
     "initial",
@@ -45,17 +45,21 @@ AgentToolNextOwner: TypeAlias = Literal[
 ]
 AgentToolDispatchPosture: TypeAlias = Literal[
     "no_agent_tool",
+    "native_codex",
     "present_responsibility_boundary",
     "invoke_role_first_entry",
+    "inspect_existing_responsibility",
     "allow_codex_local_after_classification",
 ]
 BuiltInCodexAgentPosture: TypeAlias = Literal[
     "not_requested",
+    "native",
     "blocked",
     "deferred_until_classified",
 ]
 AgentToolRouteStatus: TypeAlias = Literal[
     "not_applicable",
+    "native_codex",
     "awaiting_classification",
     "owner_route",
     "compatibility_local",
@@ -63,10 +67,14 @@ AgentToolRouteStatus: TypeAlias = Literal[
 
 
 class AgentToolRoutingIntent(StrictControlPlaneModel):
-    """A current-holder request to route one possible agent-tool decision."""
+    """A current-holder responsibility request, not a prerequisite to spawn.
+
+    V1 inputs remain readable by the passive adapter; new outputs use v2.
+    Reusing an owner ref does not attest its currentness or authorize execution.
+    """
 
     schema_version: Literal[
-        "aoa_agent_tool_routing_intent_v1"
+        "aoa_agent_tool_routing_intent_v1", "aoa_agent_tool_routing_intent_v2"
     ] = AGENT_TOOL_ROUTING_INTENT_VERSION
     intent_id: NonEmptyStr
     correlation_id: NonEmptyStr
@@ -76,6 +84,7 @@ class AgentToolRoutingIntent(StrictControlPlaneModel):
     phase: AgentToolRoutingPhase
     agent_tool_requested: bool
     boundary_state: AgentToolBoundaryState
+    responsibility_changed: bool = False
     responsibility_result_ref: ContentRef | None = None
     local_next_route: Literal["codex_local"] | None = None
     provenance: ProvenanceRef
@@ -84,6 +93,15 @@ class AgentToolRoutingIntent(StrictControlPlaneModel):
     def validate_boundary_shape(self) -> "AgentToolRoutingIntent":
         if self.route_anchor != self.goal_ref.object_id:
             raise ValueError("route_anchor must equal goal_ref.object_id")
+
+        if (
+            self.schema_version == "aoa_agent_tool_routing_intent_v1"
+            and self.responsibility_changed
+        ):
+            raise ValueError("responsibility_changed requires the v2 intent contract")
+
+        if self.responsibility_changed and self.boundary_state != "unresolved":
+            raise ValueError("changed responsibility requires an unresolved boundary")
 
         if not self.agent_tool_requested:
             if self.boundary_state != "not_present":
@@ -101,23 +119,12 @@ class AgentToolRoutingIntent(StrictControlPlaneModel):
             return self
 
         if self.boundary_state == "not_present":
-            raise ValueError(
-                "an agent-tool request must present unresolved or classified responsibility"
-            )
-
-        if self.phase != "initial":
-            if self.boundary_state != "unresolved":
-                raise ValueError(
-                    "compaction, resume, reentry, and plan change require fresh unresolved classification"
-                )
             if self.responsibility_result_ref is not None:
                 raise ValueError(
-                    "fresh re-entry routing cannot reuse a prior responsibility result"
+                    "an absent responsibility boundary cannot carry a classification result"
                 )
             if self.local_next_route is not None:
-                raise ValueError(
-                    "fresh re-entry routing cannot carry a local next route"
-                )
+                raise ValueError("an absent responsibility boundary cannot carry a classified local route")
             return self
 
         if self.boundary_state == "unresolved":
@@ -168,10 +175,10 @@ class AgentToolRoutingIntent(StrictControlPlaneModel):
 
 
 class AgentToolRoutingDecision(StrictControlPlaneModel):
-    """The SDK-owned next-owner posture for one pre-tool routing intent."""
+    """A passive owner route; native posture is not execution permission."""
 
     schema_version: Literal[
-        "aoa_agent_tool_routing_decision_v1"
+        "aoa_agent_tool_routing_decision_v1", "aoa_agent_tool_routing_decision_v2"
     ] = AGENT_TOOL_ROUTING_DECISION_VERSION
     decision_id: NonEmptyStr
     correlation_id: NonEmptyStr

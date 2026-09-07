@@ -58,7 +58,7 @@ class ControlPlaneAPI:
     def pre_tool_route(
         self, intent: AgentToolRoutingIntent
     ) -> AgentToolRoutingDecision:
-        """Route one agent-tool boundary to its owner without invocation."""
+        """Compatibility entry for optional responsibility routing, not a tool gate."""
 
         return route_agent_tool_decision(intent)
 

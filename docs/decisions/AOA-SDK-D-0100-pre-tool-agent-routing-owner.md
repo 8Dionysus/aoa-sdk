@@ -2,7 +2,9 @@
 
 ## Status
 
-Accepted.
+Superseded by [AOA-SDK-D-0107](AOA-SDK-D-0107-responsibility-routing-without-native-interception.md).
+The original rationale below is preserved; its universal pre-tool and
+phase-only reclassification rules are no longer the active route.
 
 ## Index Metadata
 
@@ -12,7 +14,7 @@ Accepted.
 - SDK facets: control-plane, public interface, skill exposure, validation
 - Mechanic parents: boundary-bridge
 - Guard families: owner provenance, goal binding, re-entry freshness, no tool selection
-- Posture: accepted
+- Posture: superseded
 
 ## Context
 
