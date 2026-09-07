@@ -20,6 +20,15 @@ action facets: action signatures, repetition clusters, existing-wrapper fit,
 wrapper readiness, wrapper gaps, and bounded sample-audit targets. These
 classifier outputs are generated navigation only; they do not accept a
 wrapper, assign owner truth, or promote a single event.
+Novelty does not come from words such as `new wrapper` or `not covered`.
+The caller may supply `wrapper_novelty_reasons`, mapping an observed action
+signature id to a non-empty reason. An unknown signature or empty reason is
+invalid. This can produce only a review candidate for that signature; it
+does not erase the existing fit or upgrade another action's gap. Without an
+explicit reason, strong existing fit and SDK-mechanic reuse remain preferred.
+The `aoa surfaces detect --wrapper-novelty-reasons` CLI option accepts this
+mapping as JSON at checkpoint phase. Fit, readiness, and restrictive risk
+heuristics are separate policies and are not claimed to be measured proof.
 The part also exposes a read-only checkpoint backlog audit for no-closeout and
 stale `current/` pressure. It names runtime trace gaps, session-memory archive
 presence, required actions, and next routes without moving checkpoint files,

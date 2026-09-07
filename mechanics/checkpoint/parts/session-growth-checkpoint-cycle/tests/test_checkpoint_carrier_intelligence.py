@@ -361,11 +361,13 @@ def test_checkpoint_carrier_intelligence_cli_writes_generated_navigation_index(
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="manual",
         intent_text=intent_text,
+        declared_signals=["scenario-recurring", "proof-need", "recall-need"],
     )
     sdk.checkpoints.append(
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="manual",
         intent_text=intent_text,
+        declared_signals=["scenario-recurring", "proof-need", "recall-need"],
     )
 
     result = CliRunner().invoke(

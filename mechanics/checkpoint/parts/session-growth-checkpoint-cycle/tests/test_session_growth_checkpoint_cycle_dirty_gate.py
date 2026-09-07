@@ -35,11 +35,13 @@ def _prepare_reviewable_checkpoint_note(workspace_root: Path) -> AoASDK:
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="commit",
         intent_text="recurring workflow needs better handoff proof and recall",
+        declared_signals=["scenario-recurring", "proof-need", "recall-need"],
     )
     sdk.checkpoints.append(
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="verify_green",
         intent_text="recurring workflow needs better handoff proof and recall",
+        declared_signals=["scenario-recurring", "proof-need", "recall-need"],
     )
     return sdk
 

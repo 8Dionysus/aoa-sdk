@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-from ..errors import IncompatibleSurfaceVersion, RepoNotFound, SurfaceNotFound
+from ..errors import RepoNotFound, SurfaceNotFound
 from ..models import (
     RoutingOwnerLayerShortlistHint,
     StatsRegroundingSignal,
@@ -56,18 +56,15 @@ def partition_current_shortlist_hints(
 def load_stats_regrounding_hints(
     workspace: Workspace,
     *,
-    intent_text: str,
+    consumed_surface_refs: list[str],
     phase: str,
     mutation_surface: str,
 ) -> list[StatsRegroundingSignal]:
-    try:
-        return StatsAPI(workspace).regrounding_signals_for_intent(
-            intent_text=intent_text,
-            phase=phase,
-            mutation_surface=mutation_surface,
-        )
-    except (RepoNotFound, SurfaceNotFound, IncompatibleSurfaceVersion):
-        return []
+    return StatsAPI(workspace).regrounding_signals_for_surfaces(
+        consumed_surface_refs=consumed_surface_refs,
+        phase=phase,
+        mutation_surface=mutation_surface,
+    )
 
 
 def regrounding_reason_codes(

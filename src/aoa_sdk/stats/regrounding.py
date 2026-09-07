@@ -1,8 +1,8 @@
 from __future__ import annotations
 
-import re
 from typing import Literal
 
+from ..errors import RecordNotFound
 from ..models import (
     StatsRegroundingAction,
     StatsRegroundingSignal,
@@ -13,21 +13,6 @@ from ..models import (
 PHASES = {"ingress", "in-flight", "pre-mutation", "checkpoint", "closeout"}
 MUTATION_SURFACES = {"none", "code", "repo-config", "infra", "runtime", "public-share"}
 RISKY_MUTATION_SURFACES = {"code", "repo-config", "infra", "runtime", "public-share"}
-REGROUNDING_INTENT_TOKENS = {
-    "stats",
-    "summary",
-    "summaries",
-    "derived",
-    "observability",
-    "source_coverage",
-    "source-coverage",
-    "surface_profile",
-    "surface-profile",
-    "reground",
-    "regrounding",
-    "re-ground",
-    "re-grounding",
-}
 
 
 def build_regrounding_signal(
@@ -107,29 +92,22 @@ def build_regrounding_signal(
 def select_regrounding_surfaces(
     *,
     surfaces: list[StatsSummarySurface],
-    intent_text: str = "",
+    consumed_surface_refs: list[str],
 ) -> list[StatsSummarySurface]:
-    intent = intent_text.casefold()
-    if not is_regrounding_intent(intent):
-        return []
-
-    tokens = set(re.findall(r"[a-z0-9_-]+", intent))
+    """Resolve exact caller-declared consumption, never prose or risk by itself."""
+    by_ref = {
+        ref: surface
+        for surface in surfaces
+        for ref in (surface.name, surface.surface_ref, f"aoa-stats.{surface.name}.min")
+    }
     selected: list[StatsSummarySurface] = []
-    for surface in surfaces:
-        name_tokens = set(surface.name.casefold().replace("-", "_").split("_"))
-        explicit_match = surface.name.casefold() in intent or bool(tokens & name_tokens)
-        if explicit_match or surface.consumer_risk == "high" or surface.name == "source_coverage_summary":
+    for ref in dict.fromkeys(consumed_surface_refs):
+        if ref not in by_ref:
+            raise RecordNotFound(f"Unknown consumed stats surface: {ref}")
+        surface = by_ref[ref]
+        if surface not in selected:
             selected.append(surface)
     return selected
-
-
-def is_regrounding_intent(intent_text: str) -> bool:
-    return _is_regrounding_intent(intent_text.casefold())
-
-
-def _is_regrounding_intent(intent: str) -> bool:
-    normalized = intent.replace("_", "-")
-    return any(token in intent or token in normalized for token in REGROUNDING_INTENT_TOKENS)
 
 
 def _next_actions(

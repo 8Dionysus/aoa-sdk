@@ -6,7 +6,13 @@ from ..models import (
     SurfaceOpportunityReference,
 )
 from .common import SIGNAL_ORDER, TOKEN_RE, SurfacePhase, SurfaceSignal, dedupe_refs
-from .heuristics import EXPLICIT_LAYER_RULES_BY_TOKEN, HEURISTIC_RULES
+from .heuristics import (
+    EXPLICIT_LAYER_RULES,
+    EXPLICIT_LAYER_RULES_BY_TOKEN,
+    HEURISTIC_RULES,
+    HEURISTIC_RULES_BY_ID,
+    ExplicitLayerRule,
+)
 
 
 STATE_RANK = {"candidate-now": 2, "candidate-later": 1}
@@ -18,12 +24,16 @@ def derive_surface_items(
     surface_phase: SurfacePhase,
     intent_text: str,
     closeout_signal: bool,
+    requested_owner_layers: list[str] | None = None,
+    declared_signals: list[str] | None = None,
 ) -> list[SurfaceOpportunityItem]:
     return dedupe_surface_items(
         derive_heuristic_items(
             intent_text=intent_text,
             surface_phase=surface_phase,
             closeout_signal=closeout_signal,
+            requested_owner_layers=requested_owner_layers,
+            declared_signals=declared_signals,
         )
     )
 
@@ -33,32 +43,47 @@ def derive_heuristic_items(
     intent_text: str,
     surface_phase: SurfacePhase,
     closeout_signal: bool,
+    requested_owner_layers: list[str] | None = None,
+    declared_signals: list[str] | None = None,
 ) -> list[SurfaceOpportunityItem]:
     items: list[SurfaceOpportunityItem] = []
     tokens = set(TOKEN_RE.findall(intent_text.casefold()))
+    requested = set(requested_owner_layers or [])
+    declared = set(declared_signals or [])
+    unknown_owners = requested - {rule.owner_repo for rule in EXPLICIT_LAYER_RULES}
+    unknown_signals = declared - HEURISTIC_RULES_BY_ID.keys()
+    if unknown_owners or unknown_signals:
+        raise ValueError(f"unsupported owner layers or declared signals: {sorted(unknown_owners | unknown_signals)}")
 
     for rule in HEURISTIC_RULES:
+        asserted = rule.id in declared
         if rule.id == "repeated-pattern":
-            if not repeated_pattern_detected(tokens=tokens, phase=surface_phase):
+            if surface_phase not in {"checkpoint", "closeout"}:
                 continue
-        elif not tokens.intersection(rule.tokens):
+            if not asserted and not repeated_pattern_detected(tokens=tokens, phase=surface_phase):
+                continue
+        elif not asserted and not tokens.intersection(rule.tokens):
             continue
-        rule_signals: list[SurfaceSignal] = [rule.signal]
-        if closeout_signal:
+        rule_signals: list[SurfaceSignal] = [rule.signal] if asserted else []
+        if closeout_signal and asserted:
             rule_signals.append("closeout-chain")
         items.append(
             SurfaceOpportunityItem(
                 surface_ref=rule.surface_ref,
-                display_name=rule.display_name,
+                display_name=rule.display_name if asserted else f"{rule.owner_repo} topic hint",
                 object_kind=rule.object_kind,
                 owner_repo=rule.owner_repo,
-                state=rule.default_state,
+                state=rule.default_state if asserted else "candidate-later",
                 phase_detected=surface_phase,
-                reason=rule.reason_template,
+                reason=(
+                    f"caller declares {rule.signal}; inspect the owner surface"
+                    if asserted else
+                    "lexical topic match only; no request, recurrence, or proof need is inferred"
+                ),
                 signals=ordered_signals(rule_signals),
-                confidence=rule.confidence,
+                confidence=rule.confidence if asserted else "low",
                 execution=SurfaceOpportunityExecutionHint(
-                    lane=rule.execution_lane,
+                    lane=rule.execution_lane if asserted else "inspect-expand-use",
                     executable_now=False,
                     requires_confirmation=False,
                     existing_command=None,
@@ -66,9 +91,9 @@ def derive_heuristic_items(
                 ),
                 related_capability_refs=[],
                 closeout_capability_candidates=list(
-                    rule.closeout_capability_candidates
+                    rule.closeout_capability_candidates if asserted else ()
                 ),
-                promotion_hint=rule.promotion_hint,
+                promotion_hint=rule.promotion_hint if asserted else None,
                 family_entry_refs=default_family_entry_refs(
                     owner_repo=rule.owner_repo,
                     surface_ref=rule.surface_ref,
@@ -77,27 +102,32 @@ def derive_heuristic_items(
             )
         )
 
-    for token in sorted(tokens):
-        explicit_rule = EXPLICIT_LAYER_RULES_BY_TOKEN.get(token)
-        if explicit_rule is None:
-            continue
-        explicit_signals: list[SurfaceSignal] = ["explicit-request"]
-        if closeout_signal:
+    layer_rules: dict[str, ExplicitLayerRule] = {rule.owner_repo: rule for rule in EXPLICIT_LAYER_RULES}
+    mentioned = {
+        EXPLICIT_LAYER_RULES_BY_TOKEN[token].owner_repo
+        for token in tokens if token in EXPLICIT_LAYER_RULES_BY_TOKEN
+    }
+    for owner in sorted(requested | mentioned):
+        explicit_rule = layer_rules[owner]
+        asserted = owner in requested
+        explicit_signals: list[SurfaceSignal] = ["explicit-request"] if asserted else []
+        if closeout_signal and asserted:
             explicit_signals.append("closeout-chain")
         items.append(
             SurfaceOpportunityItem(
                 surface_ref=explicit_rule.surface_ref,
-                display_name=explicit_rule.display_name,
+                display_name=explicit_rule.display_name if asserted else f"{owner} topic hint",
                 object_kind=explicit_rule.object_kind,
                 owner_repo=explicit_rule.owner_repo,
-                state="candidate-now",
+                state="candidate-now" if asserted else "candidate-later",
                 phase_detected=surface_phase,
                 reason=(
-                    f"intent names the {explicit_rule.owner_repo} layer directly; "
-                    "inspect the owner surface without treating it as runtime activation"
+                    f"caller explicitly requests the {owner} layer; inspect without runtime activation"
+                    if asserted else
+                    f"lexical mention of {owner} only; no operator request is inferred"
                 ),
                 signals=ordered_signals(explicit_signals),
-                confidence="high",
+                confidence="high" if asserted else "low",
                 execution=SurfaceOpportunityExecutionHint(
                     lane="inspect-expand-use",
                     executable_now=False,

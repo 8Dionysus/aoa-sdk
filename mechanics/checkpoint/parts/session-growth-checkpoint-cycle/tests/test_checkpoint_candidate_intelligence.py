@@ -8,6 +8,8 @@ from typer.testing import CliRunner
 
 from aoa_sdk import AoASDK
 from aoa_sdk.cli.main import app
+from aoa_sdk.checkpoints import candidate_intelligence
+from aoa_sdk.models import ExistingWrapperFit
 
 
 @pytest.fixture(autouse=True)
@@ -17,6 +19,23 @@ def _explicit_runtime_identity(monkeypatch: pytest.MonkeyPatch) -> None:
 
 def _signature_by_action(report, action: str):  # type: ignore[no-untyped-def]
     return next(signature for signature in report.action_signatures if signature.action == action)
+
+
+@pytest.fixture
+def strong_existing_fits(monkeypatch: pytest.MonkeyPatch) -> None:
+    """Isolate novelty from the separate, unchanged fit-classification policy."""
+    def fits(*, signatures, **_kwargs):  # type: ignore[no-untyped-def]
+        return {
+            signature.signature_id: ExistingWrapperFit(
+                wrapper_family=signature.wrapper_family_hint,
+                fit_status="strong", existing_surface_ref="fixture:existing-wrapper",
+                nearest_existing_wrapper="fixture:existing-wrapper",
+                fit_reason="fixture supplies a strong existing fit",
+                evidence_refs=list(signature.evidence_refs),
+            )
+            for signature in signatures
+        }
+    monkeypatch.setattr(candidate_intelligence, "_existing_fits", fits)
 
 
 def _write_legacy_checkpoint_entry(note_dir: Path, *, observed_at: str) -> None:
@@ -70,6 +89,7 @@ def test_checkpoint_surface_detection_emits_action_facets_and_signature_refs(
         phase="checkpoint",
         checkpoint_kind="commit",
         intent_text="recurring workflow needs better handoff proof and recall",
+        declared_signals=["scenario-recurring", "repeated-pattern", "proof-need", "recall-need", "role-posture"],
     )
 
     assert report.action_events
@@ -105,6 +125,7 @@ def test_checkpoint_candidate_intelligence_counts_repetition_after_deduping_even
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="manual",
         intent_text=intent_text,
+        declared_signals=["scenario-recurring", "proof-need", "recall-need"],
     )
     assert first.repetition_clusters
     assert {
@@ -121,6 +142,7 @@ def test_checkpoint_candidate_intelligence_counts_repetition_after_deduping_even
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="manual",
         intent_text=intent_text,
+        declared_signals=["scenario-recurring", "proof-need", "recall-need"],
     )
 
     assert all(cluster.repeat_count == 2 for cluster in second.repetition_clusters)
@@ -135,6 +157,37 @@ def test_checkpoint_candidate_intelligence_counts_repetition_after_deduping_even
     assert len(second.action_events) < sum(
         len(entry.action_events) for entry in second.checkpoint_history
     )
+
+
+@pytest.mark.parametrize("intent", ["Do not create a new wrapper", "We need a new wrapper", 'Quote: "new wrapper"'])
+def test_words_do_not_override_strong_existing_wrapper_fit(workspace_root: Path, intent: str, strong_existing_fits: None) -> None:
+    report = AoASDK.from_workspace(workspace_root / "aoa-sdk").surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"), phase="checkpoint",
+        intent_text=intent, declared_signals=["scenario-recurring"],
+    )
+    assert report.action_signatures
+    assert report.wrapper_gap_candidates == []
+
+
+def test_reasoned_novelty_is_scoped_to_an_observed_signature(workspace_root: Path, strong_existing_fits: None) -> None:
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    args = dict(
+        repo_root=str(workspace_root / "aoa-sdk"), phase="checkpoint",
+        declared_signals=["scenario-recurring", "proof-need"],
+    )
+    baseline = sdk.surfaces.detect(**args)
+    signature = _signature_by_action(baseline, "repeat_manual_workflow")
+    reason = "Existing route lacks the required reversible multi-owner handoff boundary."
+    report = sdk.surfaces.detect(**args, wrapper_novelty_reasons={signature.signature_id: reason})
+    assert len(report.wrapper_gap_candidates) == 1
+    gap = report.wrapper_gap_candidates[0]
+    assert gap.signature_id == signature.signature_id
+    assert gap.draftability == "reviewable"
+    assert reason in gap.novelty_reason
+    assert gap.evidence_refs == signature.evidence_refs
+    for reasons in ({"signature:unknown": reason}, {signature.signature_id: " "}):
+        with pytest.raises(ValueError):
+            sdk.surfaces.detect(**args, wrapper_novelty_reasons=reasons)
 
 
 def test_checkpoint_candidate_intelligence_backfills_legacy_candidate_clusters(
@@ -394,18 +447,21 @@ def test_checkpoint_candidate_intelligence_classifies_wrapper_lanes_and_gap_pres
         phase="checkpoint",
         checkpoint_kind="manual",
         intent_text="verify regression proof invariant quality",
+        declared_signals=["proof-need"],
     )
     memo_report = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="checkpoint",
         checkpoint_kind="manual",
         intent_text="memory recall prior provenance",
+        declared_signals=["recall-need"],
     )
     owner_report = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="checkpoint",
         checkpoint_kind="manual",
         intent_text="agent role owner boundary",
+        declared_signals=["role-posture"],
     )
     risk_note = sdk.checkpoints.append(
         repo_root=str(workspace_root / "aoa-sdk"),
@@ -425,11 +481,8 @@ def test_checkpoint_candidate_intelligence_classifies_wrapper_lanes_and_gap_pres
     assert risk_note.repetition_clusters[0].wrapper_readiness.draftability == "blocked"
     assert "automation_risk_requires_review" in risk_note.repetition_clusters[0].wrapper_readiness.blockers
     assert "risk_signal_requires_review" in risk_note.action_signatures[0].negative_evidence
-    assert gap_report.action_signatures[0].family == "wrapper_gap"
-    assert gap_report.action_signatures[0].wrapper_family_hint == "unknown"
-    assert "wrapper_family_unknown" in gap_report.action_signatures[0].negative_evidence
-    assert gap_report.wrapper_gap_candidates[0].nearest_existing_wrapper is None
-    assert gap_report.wrapper_gap_candidates[0].draftability == "reviewable"
+    assert gap_report.action_signatures == []
+    assert gap_report.wrapper_gap_candidates == []
 
 
 def test_checkpoint_candidate_intelligence_cli_writes_generated_navigation_index(
@@ -441,6 +494,7 @@ def test_checkpoint_candidate_intelligence_cli_writes_generated_navigation_index
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="manual",
         intent_text=intent_text,
+        declared_signals=["scenario-recurring", "repeated-pattern", "proof-need", "recall-need", "role-posture"],
     )
     sdk.checkpoints.append(
         repo_root=str(workspace_root / "aoa-sdk"),

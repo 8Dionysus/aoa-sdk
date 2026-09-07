@@ -19,7 +19,6 @@ class SurfaceHeuristicRule:
     display_name: str
     default_state: Literal["candidate-now", "candidate-later"]
     execution_lane: Literal["inspect-expand-use", "closeout-harvest", "defer"]
-    reason_template: str
     signal: Literal["repeated-pattern", "proof-need", "recall-need", "scenario-recurring", "role-posture"]
     tokens: tuple[str, ...] = ()
     existing_surface: str | None = None
@@ -53,7 +52,6 @@ PROOF_NEED_RULE = SurfaceHeuristicRule(
     display_name="Bounded proof surface needed",
     default_state="candidate-now",
     execution_lane="inspect-expand-use",
-    reason_template="intent suggests bounded proof or verification posture",
     signal="proof-need",
     tokens=("verify", "proof", "regression", "quality", "score", "eval", "invariant", "property", "contract"),
     existing_surface="aoa-evals.runtime_candidate_template_index.min",
@@ -69,7 +67,6 @@ RECALL_NEED_RULE = SurfaceHeuristicRule(
     display_name="Memo semantic recall",
     default_state="candidate-now",
     execution_lane="inspect-expand-use",
-    reason_template="intent suggests provenance-aware recall rather than only fresh context",
     signal="recall-need",
     tokens=("recall", "memory", "previous", "prior", "why", "history", "provenance", "earlier", "context"),
     existing_surface="aoa-memo.memory_catalog.min",
@@ -85,7 +82,6 @@ SCENARIO_RECURRING_RULE = SurfaceHeuristicRule(
     display_name="Recurring route candidate",
     default_state="candidate-later",
     execution_lane="closeout-harvest",
-    reason_template="intent suggests a recurring multi-surface route rather than one bounded workflow",
     signal="scenario-recurring",
     tokens=("recurring", "repeat", "again", "runbook", "workflow", "handoff", "sequence", "campaign", "checkpoint"),
     existing_surface="aoa-playbooks.playbook_registry.min",
@@ -101,7 +97,6 @@ ROLE_POSTURE_RULE = SurfaceHeuristicRule(
     display_name="Role posture check",
     default_state="candidate-now",
     execution_lane="inspect-expand-use",
-    reason_template="intent suggests role contract or handoff posture work",
     signal="role-posture",
     tokens=("agent", "role", "handoff", "orchestrator", "subagent", "persona", "tier", "cohort"),
     existing_surface="aoa-agents.runtime_seam_bindings",
@@ -116,7 +111,6 @@ REPEATED_PATTERN_RULE = SurfaceHeuristicRule(
     display_name="Reusable practice candidate",
     default_state="candidate-later",
     execution_lane="closeout-harvest",
-    reason_template="repeated bounded discipline suggests technique extraction rather than one-off residue",
     signal="repeated-pattern",
     tokens=("repeat", "repeated", "again", "pattern", "recurring"),
     existing_surface="aoa-techniques.technique_promotion_readiness.min",

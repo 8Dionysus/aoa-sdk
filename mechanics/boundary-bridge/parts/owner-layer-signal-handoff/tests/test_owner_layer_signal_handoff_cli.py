@@ -7,6 +7,19 @@ from typer.testing import CliRunner
 from aoa_sdk.cli.main import app
 
 
+def test_surface_cli_preserves_explicit_non_english_owner_request(workspace_root: Path) -> None:
+    result = CliRunner().invoke(app, [
+        "surfaces", "detect", str(workspace_root / "aoa-sdk"),
+        "--phase", "ingress", "--intent-text", "Открой каталог навыков",
+        "--request-owner-layer", "aoa-skills", "--root", str(workspace_root / "aoa-sdk"), "--json",
+    ])
+    assert result.exit_code == 0, result.output
+    report = json.loads(result.stdout)["report"]
+    item = next(item for item in report["items"] if item["owner_repo"] == "aoa-skills")
+    assert item["signals"] == ["explicit-request"]
+    assert item["execution"]["executable_now"] is False
+
+
 def test_surfaces_detect_cli_can_emit_json_and_persist_default_report(
     workspace_root: Path,
 ) -> None:
@@ -64,6 +77,10 @@ def test_surfaces_handoff_cli_can_emit_json(
             "commit",
             "--intent-text",
             "recurring workflow needs better handoff proof and recall",
+            "--declare-signal",
+            "scenario-recurring",
+            "--declare-signal",
+            "proof-need",
             "--root",
             str(workspace_root / "aoa-sdk"),
             "--json",
@@ -80,6 +97,10 @@ def test_surfaces_handoff_cli_can_emit_json(
             "verify_green",
             "--intent-text",
             "recurring workflow needs better handoff proof and recall",
+            "--declare-signal",
+            "scenario-recurring",
+            "--declare-signal",
+            "proof-need",
             "--root",
             str(workspace_root / "aoa-sdk"),
             "--json",
