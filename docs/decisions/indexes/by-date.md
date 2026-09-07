@@ -173,3 +173,7 @@
 ## 2026-09-04
 
 - [AOA-SDK-D-0106 - Historical Mechanics Outside The Current Tree](../AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md) (`docs/decisions/AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md`)
+
+## 2026-09-07
+
+- [AOA-SDK-D-0107 - Responsibility routing without native interception](../AOA-SDK-D-0107-responsibility-routing-without-native-interception.md) (`docs/decisions/AOA-SDK-D-0107-responsibility-routing-without-native-interception.md`)

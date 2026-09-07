@@ -224,6 +224,7 @@
 - [AOA-SDK-D-0100 - SDK Pre-Tool Agent Routing Owner](../AOA-SDK-D-0100-pre-tool-agent-routing-owner.md) (`docs/decisions/AOA-SDK-D-0100-pre-tool-agent-routing-owner.md`)
 - [AOA-SDK-D-0101 - Bind the exact runtime subject in incarnation v2](../AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0101-bind-exact-runtime-subject-in-incarnation-v2.md`)
 - [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
+- [AOA-SDK-D-0107 - Responsibility routing without native interception](../AOA-SDK-D-0107-responsibility-routing-without-native-interception.md) (`docs/decisions/AOA-SDK-D-0107-responsibility-routing-without-native-interception.md`)
 
 ## control-plane routing
 
@@ -449,6 +450,7 @@
 - [AOA-SDK-D-0087 - Admit Typed Scenario Artifacts as Runtime Requests](../AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md) (`docs/decisions/AOA-SDK-D-0087-admit-typed-scenario-artifacts-as-runtime-requests.md`)
 - [AOA-SDK-D-0100 - SDK Pre-Tool Agent Routing Owner](../AOA-SDK-D-0100-pre-tool-agent-routing-owner.md) (`docs/decisions/AOA-SDK-D-0100-pre-tool-agent-routing-owner.md`)
 - [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
+- [AOA-SDK-D-0107 - Responsibility routing without native interception](../AOA-SDK-D-0107-responsibility-routing-without-native-interception.md) (`docs/decisions/AOA-SDK-D-0107-responsibility-routing-without-native-interception.md`)
 
 ## public support
 
@@ -719,6 +721,7 @@
 - [AOA-SDK-D-0100 - SDK Pre-Tool Agent Routing Owner](../AOA-SDK-D-0100-pre-tool-agent-routing-owner.md) (`docs/decisions/AOA-SDK-D-0100-pre-tool-agent-routing-owner.md`)
 - [AOA-SDK-D-0105 - Prompt-Light Agent Routes And On-Demand Validation](../AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md) (`docs/decisions/AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md`)
 - [AOA-SDK-D-0106 - Historical Mechanics Outside The Current Tree](../AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md) (`docs/decisions/AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md`)
+- [AOA-SDK-D-0107 - Responsibility routing without native interception](../AOA-SDK-D-0107-responsibility-routing-without-native-interception.md) (`docs/decisions/AOA-SDK-D-0107-responsibility-routing-without-native-interception.md`)
 
 ## validation authority
 

@@ -1,4 +1,4 @@
-"""Runtime-neutral pre-tool routing for responsibility boundaries."""
+"""Optional responsibility routing that leaves native Codex work native."""
 
 from __future__ import annotations
 
@@ -17,7 +17,7 @@ from ..contracts.agent_tool_routing import (
 from ..contracts.control_plane import ContentRef, ProvenanceRef, canonical_digest
 
 
-AGENT_TOOL_ROUTING_RESOLVER_VERSION = "aoa_pre_tool_agent_routing_v1"
+AGENT_TOOL_ROUTING_RESOLVER_VERSION = "aoa_agent_responsibility_routing_v2"
 
 
 def _decision(
@@ -62,7 +62,7 @@ def default_agent_tool_routing_provenance() -> ProvenanceRef:
         artifact_digest=f"sha256:{module_digest}",
         schema_ref=(
             "docs/decisions/"
-            "AOA-SDK-D-0100-pre-tool-agent-routing-owner.md"
+            "AOA-SDK-D-0107-responsibility-routing-without-native-interception.md"
         ),
         schema_version=AGENT_TOOL_ROUTING_DECISION_VERSION,
     )
@@ -75,7 +75,13 @@ def route_agent_tool_decision(
 ) -> AgentToolRoutingDecision:
     """Return the next owner without selecting or invoking an agent tool."""
 
-    intent_digest = canonical_digest(intent)
+    # A v2 default must not change the identity of a historical v1 input.
+    intent_digest = canonical_digest(
+        intent,
+        exclude={"responsibility_changed"}
+        if intent.schema_version == "aoa_agent_tool_routing_intent_v1"
+        else None,
+    )
     intent_ref = ContentRef(
         object_id=intent.intent_id,
         owner_repo="aoa-sdk",
@@ -99,14 +105,22 @@ def route_agent_tool_decision(
             provenance=provenance,
         )
 
-    if intent.boundary_state == "unresolved":
-        reasons: tuple[str, ...] = (
-            "fresh_classification_required"
-            if intent.phase != "initial"
-            else "responsibility_boundary_unresolved",
+    if intent.boundary_state in {"not_present", "not_independent"}:
+        return _decision(
+            decision_id=decision_id,
+            correlation_id=intent.correlation_id,
+            intent_ref=intent_ref,
+            status="native_codex",
+            next_owner="none",
+            dispatch_posture="native_codex",
+            built_in_codex_agent="native",
+            must_reclassify=False,
+            reason_codes=("no_independent_responsibility",),
+            provenance=provenance,
+            responsibility_result_ref=intent.responsibility_result_ref,
         )
-        if intent.phase != "initial":
-            reasons = ("reentry_requires_fresh_classification", *reasons)
+
+    if intent.boundary_state == "unresolved":
         return _decision(
             decision_id=decision_id,
             correlation_id=intent.correlation_id,
@@ -116,38 +130,28 @@ def route_agent_tool_decision(
             dispatch_posture="present_responsibility_boundary",
             built_in_codex_agent="blocked",
             must_reclassify=True,
-            reason_codes=tuple(dict.fromkeys(reasons)),
+            reason_codes=(
+                "responsibility_changed"
+                if intent.responsibility_changed
+                else "responsibility_boundary_unresolved",
+            ),
             provenance=provenance,
-        )
-
-    if intent.boundary_state == "independent":
-        return _decision(
-            decision_id=decision_id,
-            correlation_id=intent.correlation_id,
-            intent_ref=intent_ref,
-            status="owner_route",
-            next_owner="aoa-agents-skills",
-            dispatch_posture="invoke_role_first_entry",
-            built_in_codex_agent="blocked",
-            must_reclassify=False,
-            reason_codes=("independent_responsibility_classified",),
-            provenance=provenance,
-            responsibility_result_ref=intent.responsibility_result_ref,
         )
 
     return _decision(
         decision_id=decision_id,
         correlation_id=intent.correlation_id,
         intent_ref=intent_ref,
-        status="compatibility_local",
-        next_owner="aoa-summon",
-        dispatch_posture="allow_codex_local_after_classification",
-        built_in_codex_agent="deferred_until_classified",
-        must_reclassify=False,
-        reason_codes=(
-            "not_independent_classified",
-            "codex_local_is_compatibility_only",
+        status="owner_route",
+        next_owner="aoa-agents-skills",
+        dispatch_posture=(
+            "invoke_role_first_entry"
+            if intent.phase == "initial"
+            else "inspect_existing_responsibility"
         ),
+        built_in_codex_agent="blocked",
+        must_reclassify=False,
+        reason_codes=("independent_responsibility_classified",),
         provenance=provenance,
         responsibility_result_ref=intent.responsibility_result_ref,
     )

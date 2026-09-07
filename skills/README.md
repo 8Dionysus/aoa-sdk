@@ -20,9 +20,9 @@ bindings, not fictional skills. Titan summon stays with `aoa-agents`, and
 Titan closeout remains a blocked playbook route until `aoa-playbooks-mcp`
 exists.
 
-The separate `aoa-agent-tool-routing` bundle is an SDK control-plane front
-door. It presents a typed next-owner decision before an agent-tool choice and
-is advisory only: it is not a thread-turn hook, daemon, keyword rail, runtime
-enforcer, or actor launcher. Responsibility meaning remains with
-`aoa-agents`, and global exposure still comes only from the single managed OS
-user profile.
+AoA responsibility work enters through `aoa-agents-skills`, not an SDK skill
+before each native Codex helper. The former `aoa-agent-tool-routing` bundle is
+retired. The passive `ControlPlaneAPI.pre_tool_route()` compatibility API can
+inspect an explicitly presented boundary; it is not an orchestration or
+permission gate. Native Codex helpers need no SDK call or negative
+responsibility receipt.
