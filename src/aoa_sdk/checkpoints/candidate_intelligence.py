@@ -160,25 +160,6 @@ SIGNAL_PROFILES: dict[str, ActionProfile] = {
     ),
 }
 
-GENERIC_PROFILES: tuple[tuple[tuple[str, ...], ActionProfile], ...] = (
-    (
-        ("verify", "proof", "test", "invariant", "regression", "quality"),
-        SIGNAL_PROFILES["proof-need"],
-    ),
-    (
-        ("memory", "recall", "previous", "prior", "history", "provenance"),
-        SIGNAL_PROFILES["recall-need"],
-    ),
-    (
-        ("owner", "ambiguity", "route", "handoff", "boundary"),
-        SIGNAL_PROFILES["role-posture"],
-    ),
-    (
-        ("repeat", "again", "workflow", "sequence", "manual", "routine"),
-        SIGNAL_PROFILES["scenario-recurring"],
-    ),
-)
-
 KIND_TO_PROFILE = {
     "route": SIGNAL_PROFILES["scenario-recurring"],
     "pattern": SIGNAL_PROFILES["repeated-pattern"],
@@ -209,6 +190,7 @@ def build_candidate_intelligence_from_surface(
     candidate_clusters: Sequence[CandidateCluster],
     inspection_gaps: list[str],
     sample_limit: int = 0,
+    wrapper_novelty_reasons: dict[str, str] | None = None,
 ) -> CandidateIntelligenceReport:
     repo_root_path = _resolve_repo_root(workspace, repo_root)
     repo_label = _repo_label(workspace, repo_root)
@@ -228,7 +210,7 @@ def build_candidate_intelligence_from_surface(
         signatures=signatures,
         events=events,
         candidate_clusters=candidate_clusters,
-        intent_text=intent_text,
+        novelty_reasons=wrapper_novelty_reasons,
     )
     clusters = _repetition_clusters(
         signatures=signatures,
@@ -298,7 +280,6 @@ def build_candidate_intelligence_from_note(
         signatures=signatures,
         events=events,
         candidate_clusters=candidate_clusters or [],
-        intent_text="",
     )
     clusters = _repetition_clusters(
         signatures=signatures,
@@ -440,6 +421,8 @@ def _events_from_candidate_clusters(
 
 
 def _profile_for_item(item: SurfaceOpportunityItem) -> ActionProfile | None:
+    if not item.signals:
+        return None
     for signal in item.signals:
         if signal in SIGNAL_PROFILES:
             return SIGNAL_PROFILES[signal]
@@ -481,38 +464,10 @@ def _profile_for_cluster(cluster: CandidateCluster) -> ActionProfile:
 
 def _generic_profile(*, intent_text: str, inspection_gaps: list[str]) -> ActionProfile | None:
     normalized = " ".join([intent_text, *inspection_gaps]).lower()
-    for tokens, profile in GENERIC_PROFILES:
-        if any(token in normalized for token in tokens):
-            return profile
+    # Suspicion may retain a restrictive risk gate, never positive intent or
+    # novelty authority. Positive action profiles require declared signals.
     if any(token in normalized for token in ("risk", "gate", "hidden", "automation", "confirm", "danger")):
         return SIGNAL_PROFILES["risk-gate"]
-    if any(
-        token in normalized
-        for token in (
-            "gap",
-            "missing",
-            "new wrapper",
-            "no existing",
-            "not covered",
-            "нет похож",
-            "нет существ",
-            "новый aoa",
-            "обернуть",
-        )
-    ):
-        return ActionProfile(
-            event_type="wrapper_gap_candidate",
-            family="wrapper_gap",
-            action="identify_missing_wrapper",
-            object="unknown_repeated_action",
-            wrapper_family="unknown",
-            route_signals=("route_signal:wrapper_gap",),
-            steps=("name missing wrapper pressure", "collect evidence refs", "defer owner review"),
-            outputs=("wrapper gap candidate",),
-            verification=("review decides whether to split or add rule",),
-            failure_modes=("novel action forced into existing aoa surface",),
-            stop_lines=DEFAULT_STOP_LINES,
-        )
     return None
 
 
@@ -651,14 +606,20 @@ def _wrapper_gaps_for_signatures(
     signatures: list[ActionSignature],
     events: list[CheckpointActionEvent],
     candidate_clusters: Sequence[CandidateCluster],
-    intent_text: str,
+    novelty_reasons: dict[str, str] | None = None,
 ) -> list[WrapperGapCandidate]:
-    novelty = _novelty_markers(intent_text)
+    reasons = novelty_reasons or {}
     by_signature = {signature.signature_id: signature for signature in signatures}
+    if set(reasons) - by_signature.keys():
+        raise ValueError("wrapper novelty reasons must name observed action signature ids")
+    if any(not isinstance(reason, str) or not reason.strip() for reason in reasons.values()):
+        raise ValueError("wrapper novelty reasons must be non-empty caller assertions")
     fit_by_signature = _existing_fits(signatures=signatures, events=events, candidate_clusters=candidate_clusters)
     gaps: list[WrapperGapCandidate] = []
     for signature_id, fit in fit_by_signature.items():
         signature = by_signature[signature_id]
+        novelty_reason = reasons.get(signature_id)
+        novelty = novelty_reason is not None
         if fit.fit_status == "strong" and not novelty:
             continue
         if signature.wrapper_family_hint == "sdk_mechanic" and not novelty:
@@ -673,7 +634,10 @@ def _wrapper_gaps_for_signatures(
                 signature_id=signature_id,
                 proposed_wrapper_family=signature.wrapper_family_hint,
                 nearest_existing_wrapper=fit.nearest_existing_wrapper,
-                novelty_reason=_novelty_reason(fit=fit, novelty=novelty),
+                novelty_reason=(
+                    f"caller asserts novelty for this signature: {novelty_reason.strip()}"
+                    if novelty_reason is not None else _novelty_reason(fit=fit)
+                ),
                 draftability=draftability,
                 evidence_refs=evidence_refs,
             )
@@ -1098,28 +1062,7 @@ def _prefixed_values(values: list[str], prefix: str) -> list[str]:
     )
 
 
-def _novelty_markers(intent_text: str) -> bool:
-    normalized = intent_text.lower()
-    return any(
-        marker in normalized
-        for marker in (
-            "no existing",
-            "missing wrapper",
-            "wrapper gap",
-            "new wrapper",
-            "not covered",
-            "нет похож",
-            "нет существ",
-            "новый aoa",
-        )
-    )
-
-
-def _novelty_reason(*, fit: ExistingWrapperFit, novelty: bool) -> str:
-    if novelty and fit.fit_status == "strong":
-        return "operator intent names novelty pressure despite a strong existing wrapper resemblance"
-    if novelty:
-        return "operator intent names missing-wrapper pressure"
+def _novelty_reason(*, fit: ExistingWrapperFit) -> str:
     if fit.fit_status == "none":
         return "no existing wrapper surface matched this action signature"
     return "existing wrapper fit is weak and should stay candidate-only until review"

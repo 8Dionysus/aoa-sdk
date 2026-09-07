@@ -62,6 +62,10 @@
 
 - [AOA-SDK-D-0051 - Implementation Source Topology Index](../AOA-SDK-D-0051-implementation-source-topology-index.md) (`docs/decisions/AOA-SDK-D-0051-implementation-source-topology-index.md`)
 
+## API
+
+- [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
+
 ## archive carrier
 
 - [AOA-SDK-D-0074 - Use a Cross-zlib Canonical Release Carrier](../AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md) (`docs/decisions/AOA-SDK-D-0074-use-a-cross-zlib-canonical-release-carrier.md`)
@@ -167,6 +171,7 @@
 - [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
 - [AOA-SDK-D-0096 - Bind obligation and fit evidence in incarnation v2](../AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md) (`docs/decisions/AOA-SDK-D-0096-bind-obligation-and-fit-evidence-in-incarnation-v2.md`)
 - [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
+- [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
 
 ## compatibility accounting
 
@@ -398,6 +403,7 @@
 - [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 - [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 - [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
+- [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
 
 ## owner projection
 

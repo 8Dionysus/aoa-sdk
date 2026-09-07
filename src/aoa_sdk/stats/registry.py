@@ -20,7 +20,7 @@ from ..models import (
     StatsSummarySurface,
 )
 from ..workspace.discovery import Workspace
-from .regrounding import build_regrounding_signal, is_regrounding_intent, select_regrounding_surfaces
+from .regrounding import build_regrounding_signal, select_regrounding_surfaces
 
 
 STATS_SURFACE_IDS = (
@@ -156,14 +156,29 @@ class StatsAPI:
         intent_text: str,
         phase: str = "ingress",
         mutation_surface: str = "none",
+        consumed_surface_refs: builtin_list[str] | None = None,
     ) -> builtin_list[StatsRegroundingSignal]:
-        if not is_regrounding_intent(intent_text):
+        """Compatibility entry: prose is context, not evidence of consumption."""
+        return self.regrounding_signals_for_surfaces(
+            consumed_surface_refs=consumed_surface_refs or [],
+            phase=phase,
+            mutation_surface=mutation_surface,
+        )
+
+    def regrounding_signals_for_surfaces(
+        self,
+        *,
+        consumed_surface_refs: builtin_list[str],
+        phase: str = "ingress",
+        mutation_surface: str = "none",
+    ) -> builtin_list[StatsRegroundingSignal]:
+        if not consumed_surface_refs:
             return []
-        coverage = self.source_coverage()
         surfaces = select_regrounding_surfaces(
             surfaces=self.summary_catalog(),
-            intent_text=intent_text,
+            consumed_surface_refs=consumed_surface_refs,
         )
+        coverage = self.source_coverage()
         return [
             build_regrounding_signal(
                 surface=surface,

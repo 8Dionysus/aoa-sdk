@@ -309,6 +309,10 @@
 
 - [AOA-SDK-D-0001 - Decision Rationale Lane Before Mechanics](../AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md) (`docs/decisions/AOA-SDK-D-0001-decision-rationale-lane-before-mechanics.md`)
 
+## intent attribution
+
+- [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
+
 ## lifecycle health
 
 - [AOA-SDK-D-0084 - Map Owner Challenger Health to Degraded Routing](../AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md) (`docs/decisions/AOA-SDK-D-0084-map-owner-challenger-health-to-degraded-routing.md`)
@@ -457,6 +461,10 @@
 
 - [AOA-SDK-D-0100 - SDK Pre-Tool Agent Routing Owner](../AOA-SDK-D-0100-pre-tool-agent-routing-owner.md) (`docs/decisions/AOA-SDK-D-0100-pre-tool-agent-routing-owner.md`)
 
+## non-execution
+
+- [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
+
 ## observation integrity
 
 - [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
@@ -471,6 +479,7 @@
 - [AOA-SDK-D-0069 - Skill Evidence Requires an Explicit Owner](../AOA-SDK-D-0069-owner-authored-skill-evidence-only.md) (`docs/decisions/AOA-SDK-D-0069-owner-authored-skill-evidence-only.md`)
 - [AOA-SDK-D-0098 - Export the reference validation scheduler with an explicit owner root](../AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md) (`docs/decisions/AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md`)
 - [AOA-SDK-D-0105 - Prompt-Light Agent Routes And On-Demand Validation](../AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md) (`docs/decisions/AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md`)
+- [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
 
 ## owner binding
 

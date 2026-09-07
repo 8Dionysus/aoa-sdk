@@ -194,6 +194,10 @@ class CheckpointsAPI:
         agent_review_status: Literal["not_required", "pending", "reviewed"] = "not_required",
         agent_review_ref: str | None = None,
         auto_observation: SessionCheckpointAutoObservation | None = None,
+        requested_owner_layers: list[str] | None = None,
+        declared_signals: list[str] | None = None,
+        consumed_stats_surfaces: list[str] | None = None,
+        wrapper_novelty_reasons: dict[str, str] | None = None,
         observed_at: datetime | None = None,
         observed_at_local: str | None = None,
         observed_tz: str | None = None,
@@ -228,6 +232,10 @@ class CheckpointsAPI:
             intent_text=intent_text,
             mutation_surface=mutation_surface,
             checkpoint_kind=checkpoint_kind,
+            requested_owner_layers=requested_owner_layers,
+            declared_signals=declared_signals,
+            consumed_stats_surfaces=consumed_stats_surfaces,
+            wrapper_novelty_reasons=wrapper_novelty_reasons,
         )
         if report.phase != "checkpoint":
             raise ValueError("checkpoint append requires a checkpoint-phase surface report")

@@ -177,3 +177,4 @@
 ## 2026-09-07
 
 - [AOA-SDK-D-0107 - Responsibility routing without native interception](../AOA-SDK-D-0107-responsibility-routing-without-native-interception.md) (`docs/decisions/AOA-SDK-D-0107-responsibility-routing-without-native-interception.md`)
+- [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)

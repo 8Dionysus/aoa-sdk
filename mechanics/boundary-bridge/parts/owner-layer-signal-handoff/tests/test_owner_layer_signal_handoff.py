@@ -107,6 +107,7 @@ def test_surface_detect_keeps_explicit_skill_request_non_executable(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="ingress",
         intent_text="inspect the skill layer",
+        requested_owner_layers=["aoa-skills"],
     )
     item = _surface_item(report, "aoa-skills:layer-request")
 
@@ -121,13 +122,59 @@ def test_surface_detect_keeps_explicit_skill_request_non_executable(
     assert "skill_report_included" not in report_payload
 
 
-def test_surface_detect_maps_eval_and_memo_candidates_from_tokens(workspace_root: Path) -> None:
+@pytest.mark.parametrize("intent", [
+    "Do not create an agent, skill, or eval",
+    'Quoted example: "create a skill and recall prior memory"',
+    "A colleague said: create a playbook for a recurring workflow",
+    "Не создавай агента, навык или проверку",
+])
+def test_lexical_mentions_never_assert_intent_or_checkpoint_pressure(
+    workspace_root: Path, intent: str,
+) -> None:
+    report = AoASDK.from_workspace(workspace_root / "aoa-sdk").surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"), phase="checkpoint", intent_text=intent,
+    )
+    assert all(item.confidence == "low" and item.signals == [] for item in report.items)
+    assert all(item.execution.executable_now is False for item in report.items)
+    assert all(item.closeout_capability_candidates == [] and item.promotion_hint is None for item in report.items)
+    assert report.candidate_clusters == []
+    assert report.action_events == []
+    assert report.wrapper_gap_candidates == []
+
+
+def test_explicit_owner_request_is_independent_of_source_language(workspace_root: Path) -> None:
+    report = AoASDK.from_workspace(workspace_root / "aoa-sdk").surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"), phase="ingress",
+        intent_text="Открой каталог навыков",
+        requested_owner_layers=["aoa-skills"],
+    )
+    item = _surface_item(report, "aoa-skills:layer-request")
+    assert item.signals == ["explicit-request"]
+    assert item.confidence == "high"
+    assert item.execution.executable_now is False
+
+
+@pytest.mark.parametrize("intent", ["Please write a summary", "Do not use stats", "Example: surface_detection_summary"])
+def test_stats_words_do_not_select_or_require_stats(workspace_root: Path, intent: str) -> None:
+    _install_stats_regrounding_fixture(workspace_root)
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    report = sdk.surfaces.detect(
+        repo_root=str(workspace_root / "aoa-sdk"), phase="pre-mutation",
+        mutation_surface="code", intent_text=intent,
+    )
+    assert report.regrounding_hints == []
+    assert report.regrounding_required is False
+    assert sdk.stats.regrounding_signals_for_intent(intent_text=intent, phase="pre-mutation") == []
+
+
+def test_surface_detect_maps_declared_eval_and_memo_signals(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     report = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="ingress",
         intent_text="verify prior provenance and recall the earlier proof",
+        declared_signals=["proof-need", "recall-need"],
     )
 
     eval_item = _surface_item(report, "aoa-evals.runtime_candidate_template_index.min")
@@ -141,13 +188,14 @@ def test_surface_detect_maps_eval_and_memo_candidates_from_tokens(workspace_root
     assert memo_item.execution.lane == "inspect-expand-use"
 
 
-def test_surface_detect_maps_playbook_candidate_from_recurring_tokens(workspace_root: Path) -> None:
+def test_surface_detect_maps_declared_recurring_scenario(workspace_root: Path) -> None:
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
     report = sdk.surfaces.detect(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="ingress",
         intent_text="this recurring workflow needs a better handoff sequence",
+        declared_signals=["scenario-recurring"],
     )
     item = _surface_item(report, "aoa-playbooks.playbook_registry.min")
 
@@ -229,6 +277,7 @@ def test_surface_handoff_targets_are_deterministic(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="pre-mutation",
         intent_text="verify recurring pattern workflow",
+        declared_signals=["proof-need", "scenario-recurring"],
         mutation_surface="runtime",
     )
     handoff = sdk.surfaces.build_closeout_handoff(
@@ -255,6 +304,7 @@ def test_surface_handoff_does_not_promote_explicit_playbook_request_only(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="closeout",
         intent_text="playbook layer inspection only",
+        requested_owner_layers=["aoa-playbooks"],
     )
     handoff = sdk.surfaces.build_closeout_handoff(
         report,
@@ -276,6 +326,7 @@ def test_surface_detect_orders_explicit_layer_hints_stably(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="ingress",
         intent_text="skill technique playbook eval memo",
+        requested_owner_layers=["aoa-skills", "aoa-techniques", "aoa-playbooks", "aoa-evals", "aoa-memo"],
     )
 
     explicit_items = [
@@ -320,11 +371,13 @@ def test_surface_handoff_ignores_non_open_checkpoint_notes(
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="commit",
         intent_text="recurring workflow needs better handoff proof and recall",
+        declared_signals=["scenario-recurring", "proof-need", "recall-need"],
     )
     sdk.checkpoints.append(
         repo_root=str(workspace_root / "aoa-sdk"),
         checkpoint_kind="verify_green",
         intent_text="recurring workflow needs better handoff proof and recall",
+        declared_signals=["scenario-recurring", "proof-need", "recall-need"],
     )
     sdk.checkpoints.promote(
         repo_root=str(workspace_root / "aoa-sdk"),
@@ -395,6 +448,7 @@ def test_surface_detect_consumes_owner_layer_shortlist_without_changing_truth(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="ingress",
         intent_text="this recurring workflow needs a better handoff sequence",
+        declared_signals=["scenario-recurring"],
     )
     item = _surface_item(report, "aoa-playbooks.playbook_registry.min")
 
@@ -414,7 +468,7 @@ def test_surface_detect_consumes_owner_layer_shortlist_without_changing_truth(
     }
 
 
-def test_surface_detect_raises_stats_regrounding_hints_for_stats_intent(workspace_root: Path) -> None:
+def test_surface_detect_regrounds_only_declared_consumed_stats(workspace_root: Path) -> None:
     _install_stats_regrounding_fixture(workspace_root)
     sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
 
@@ -423,6 +477,7 @@ def test_surface_detect_raises_stats_regrounding_hints_for_stats_intent(workspac
         phase="pre-mutation",
         mutation_surface="code",
         intent_text="use stats surface_detection_summary before mutation",
+        consumed_stats_surfaces=["surface_detection_summary"],
     )
 
     assert report.regrounding_required is True
@@ -431,6 +486,41 @@ def test_surface_detect_raises_stats_regrounding_hints_for_stats_intent(workspac
     ]
     assert report.regrounding_hints[0].decision == "reground_required"
     assert "coverage_missing_owner_repos" in report.regrounding_reason_codes
+
+
+def test_consumed_stats_refs_are_exact_deduplicated_and_not_expanded_by_risk(workspace_root: Path) -> None:
+    from aoa_sdk.errors import RecordNotFound
+
+    _install_stats_regrounding_fixture(workspace_root)
+    catalog = workspace_root / "aoa-stats" / "generated" / "summary_surface_catalog.min.json"
+    payload = json.loads(catalog.read_text())
+    payload["surfaces"].append({
+        **payload["surfaces"][0], "name": "unrelated_high_risk_summary",
+        "surface_ref": "generated/unrelated_high_risk_summary.min.json",
+    })
+    catalog.write_text(json.dumps(payload))
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    signals = sdk.stats.regrounding_signals_for_surfaces(
+        consumed_surface_refs=["surface_detection_summary", "aoa-stats.surface_detection_summary.min", "generated/surface_detection_summary.min.json"],
+        phase="pre-mutation",
+    )
+    assert [signal.surface_name for signal in signals] == ["surface_detection_summary"]
+    assert signals[0].decision == "reground_required"
+    with pytest.raises(RecordNotFound, match="Unknown consumed stats surface"):
+        sdk.stats.regrounding_signals_for_surfaces(consumed_surface_refs=["summary"])
+
+
+def test_missing_declared_stats_dependency_is_not_silently_clear(workspace_root: Path) -> None:
+    from aoa_sdk.errors import SurfaceNotFound
+
+    _install_stats_regrounding_fixture(workspace_root)
+    (workspace_root / "aoa-stats" / "generated" / "source_coverage_summary.min.json").unlink()
+    sdk = AoASDK.from_workspace(workspace_root / "aoa-sdk")
+    with pytest.raises(SurfaceNotFound):
+        sdk.surfaces.detect(
+            repo_root=str(workspace_root / "aoa-sdk"), phase="pre-mutation",
+            consumed_stats_surfaces=["surface_detection_summary"],
+        )
 
 
 def test_surface_detect_skips_malformed_stats_for_non_stats_intent(workspace_root: Path) -> None:
@@ -543,6 +633,7 @@ def test_surface_detect_accepts_runtime_seed_and_profile_shortlist_hints(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="ingress",
         intent_text="skill control plane seed runtime profile route drift",
+        requested_owner_layers=["aoa-skills"],
     )
 
     assert report.shortlist_included is True
@@ -602,6 +693,7 @@ def test_surface_detect_does_not_promote_session_receipts_into_owner_truth(
         repo_root=str(workspace_root / "aoa-sdk"),
         phase="ingress",
         intent_text="inspect the skill layer",
+        requested_owner_layers=["aoa-skills"],
     )
     item = _surface_item(report, "aoa-skills:layer-request")
 

@@ -82,6 +82,7 @@
 - [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
 - [AOA-SDK-D-0106 - Historical Mechanics Outside The Current Tree](../AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md) (`docs/decisions/AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md`)
 - [AOA-SDK-D-0107 - Responsibility routing without native interception](../AOA-SDK-D-0107-responsibility-routing-without-native-interception.md) (`docs/decisions/AOA-SDK-D-0107-responsibility-routing-without-native-interception.md`)
+- [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
 
 ## checkpoint
 
@@ -116,6 +117,7 @@
 - [AOA-SDK-D-0067 - Owner-Scoped Skill Inspection](../AOA-SDK-D-0067-owner-scoped-skill-inspection.md) (`docs/decisions/AOA-SDK-D-0067-owner-scoped-skill-inspection.md`)
 - [AOA-SDK-D-0068 - Reviewed Closeout Is an Owner Handoff](../AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md) (`docs/decisions/AOA-SDK-D-0068-reviewed-closeout-owner-handoff.md`)
 - [AOA-SDK-D-0106 - Historical Mechanics Outside The Current Tree](../AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md) (`docs/decisions/AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md`)
+- [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
 
 ## codex-projection
 

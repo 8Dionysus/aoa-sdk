@@ -40,6 +40,8 @@ def checkpoint_append(
         help="Checkpoint kind: manual, commit, verify_green, pr_opened, pr_merged, pause, or owner_followthrough.",
     ),
     intent_text: str = typer.Option("", "--intent-text", help="Intent text used for checkpoint-aware surface detection."),
+    requested_owner_layers: list[str] | None = typer.Option(None, "--request-owner-layer", help="Repeatable caller-requested owner repo; never inferred from prose."),
+    declared_signals: list[str] | None = typer.Option(None, "--declare-signal", help="Repeatable caller-declared checkpoint signal."),
     mutation_surface: str = typer.Option(
         "none",
         "--mutation-surface",
@@ -65,6 +67,8 @@ def checkpoint_append(
         mutation_surface=mutation_surface,  # type: ignore[arg-type]
         runtime_session_file=runtime_session_file,
         manual_review_requested=mark_reviewable,
+        requested_owner_layers=requested_owner_layers,
+        declared_signals=declared_signals,
     )
     payload = note.model_dump(mode="json")
     if json_output:
