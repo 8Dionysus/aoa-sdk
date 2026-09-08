@@ -26,6 +26,10 @@ def surfaces_detect(
     repo_root: str = typer.Argument(..., help="Repository root or repo-relative path used as task context."),
     phase: str = typer.Option(..., "--phase", help="Detection phase: ingress, in-flight, pre-mutation, checkpoint, or closeout."),
     intent_text: str = typer.Option("", "--intent-text", help="Intent text used for additive surface detection."),
+    requested_owner_layers: list[str] | None = typer.Option(None, "--request-owner-layer", help="Repeatable owner repo explicitly requested by the caller, independently of wording."),
+    declared_signals: list[str] | None = typer.Option(None, "--declare-signal", help="Repeatable caller-declared signal; lexical matches alone do not create it."),
+    consumed_stats_surfaces: list[str] | None = typer.Option(None, "--consumed-stats-surface", help="Repeatable exact stats surface name or ref actually consumed by this operation."),
+    wrapper_novelty_reasons: str | None = typer.Option(None, "--wrapper-novelty-reasons", help="JSON object mapping observed action signature ids to explicit novelty reasons; checkpoint only."),
     mutation_surface: str = typer.Option(
         "none",
         "--mutation-surface",
@@ -72,6 +76,10 @@ def surfaces_detect(
         mutation_surface=mutation_surface,  # type: ignore[arg-type]
         closeout_path=closeout_path,
         checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
+        requested_owner_layers=requested_owner_layers,
+        declared_signals=declared_signals,
+        consumed_stats_surfaces=consumed_stats_surfaces,
+        wrapper_novelty_reasons=json.loads(wrapper_novelty_reasons) if wrapper_novelty_reasons is not None else None,
     )
     report_path = _resolve_surface_report_path(
         workspace=workspace,

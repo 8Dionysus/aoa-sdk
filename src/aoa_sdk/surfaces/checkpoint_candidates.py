@@ -318,6 +318,9 @@ def derive_checkpoint_candidate_clusters(
 ) -> list[CheckpointCandidateCluster]:
     clusters: list[CheckpointCandidateCluster] = []
     for item in items:
+        if not item.signals:
+            # Lexical topic hints are navigation, not checkpoint pressure.
+            continue
         evidence_refs = dedupe_strings(
             [
                 *[ref.ref for ref in item.family_entry_refs],

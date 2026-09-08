@@ -51,11 +51,20 @@ class SurfacesAPI:
         closeout_path: str | None = None,
         include_shortlist: bool = True,
         checkpoint_kind: CheckpointKind | None = None,
+        requested_owner_layers: list[str] | None = None,
+        declared_signals: list[str] | None = None,
+        consumed_stats_surfaces: list[str] | None = None,
+        wrapper_novelty_reasons: dict[str, str] | None = None,
     ) -> SurfaceDetectionReport:
         if phase not in SURFACE_PHASES:
             raise ValueError(f"unsupported phase {phase!r}")
         if mutation_surface not in MUTATION_SURFACES:
             raise ValueError(f"unsupported mutation_surface {mutation_surface!r}")
+        if wrapper_novelty_reasons is not None:
+            if not isinstance(wrapper_novelty_reasons, dict):
+                raise ValueError("wrapper_novelty_reasons must be an object keyed by action signature id")
+            if phase != "checkpoint":
+                raise ValueError("wrapper novelty reasons require phase=checkpoint")
 
         all_shortlist_hints = (
             load_shortlist_hints(self.workspace) if include_shortlist else []
@@ -65,7 +74,7 @@ class SurfacesAPI:
         )
         regrounding_hints = load_stats_regrounding_hints(
             self.workspace,
-            intent_text=intent_text,
+            consumed_surface_refs=consumed_stats_surfaces or [],
             phase=phase,
             mutation_surface=mutation_surface,
         )
@@ -74,6 +83,8 @@ class SurfacesAPI:
                 surface_phase=phase,
                 intent_text=intent_text,
                 closeout_signal=phase == "closeout" or closeout_path is not None,
+                requested_owner_layers=requested_owner_layers,
+                declared_signals=declared_signals,
             ),
             shortlist_hints=shortlist_hints,
         )
@@ -109,6 +120,7 @@ class SurfacesAPI:
                 items=items,
                 candidate_clusters=candidate_clusters,
                 inspection_gaps=inspection_gaps,
+                wrapper_novelty_reasons=wrapper_novelty_reasons,
             )
             if phase == "checkpoint"
             else None
