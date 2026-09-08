@@ -48,4 +48,15 @@ closeout, and acceptance references. Concrete Codex CLI and local/provider
 adapters are runtime-owned projections of that ABI; the SDK does not launch
 either one.
 
+The shared `parent_holder_ref` is a content-addressed reference to the
+existing parent holder or task context, so the formal read-worker class does
+not require a permanent Goal object. The current SDK admission is deliberately
+small: `ephemeral_read_worker_v1` accepts `local_provider` only, while
+`external_incarnation_v1` accepts `codex_cli` or `local_provider`. Every
+formal adapter is provider-neutral, runtime-owned, and marked
+`uses_builtin_codex_subagents: false`; concrete runtime profiles remain
+default-off and require explicit runtime-owner activation. Ordinary native
+Codex helpers remain in the native task route and do not become either formal
+class merely because a helper process exists.
+
 See [CONTRACT.md](CONTRACT.md) and [VALIDATION.md](VALIDATION.md).

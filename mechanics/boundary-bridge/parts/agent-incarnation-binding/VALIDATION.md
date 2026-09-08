@@ -22,6 +22,10 @@ remains paired proof in `abyss-stack`. Delegation-class tests additionally
 prove the discriminated `ephemeral_read_worker_v1` and
 `external_incarnation_v1` ABI, parent-retained versus transferred responsibility,
 owner-separated runtime/eval/closeout/acceptance refs, and adapter neutrality.
-The delegation-class tests are the focused source contract for this distinction.
+They also keep a parent task-context `ContentRef` valid without requiring a
+Goal object, reject the Codex adapter for the ephemeral class, and preserve
+both runtime adapter kinds for the external class. The delegation-class tests
+are the focused source contract for this distinction; default-off activation
+and native-helper exclusion remain runtime/owner boundaries.
 
 The repository-wide topology gate is owned by [root `VALIDATION.md`](../../../../VALIDATION.md#focused-repository-checks).

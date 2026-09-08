@@ -162,6 +162,21 @@ def test_both_classes_are_explicit_and_discriminated() -> None:
     assert validate_delegation_class(external.model_dump()) == external
 
 
+def test_parent_holder_can_be_existing_task_context_without_goal_object() -> None:
+    payload = _ephemeral().model_dump()
+    payload["parent_holder_ref"] = _content(
+        "codex-task",
+        "task-context:existing",
+        "task-context-v1",
+    ).model_dump()
+
+    worker = EphemeralReadWorkerV1.model_validate(payload)
+
+    assert worker.parent_holder_ref.object_id == "task-context:existing"
+    assert worker.parent_holder_ref.schema_version == "task-context-v1"
+    assert "goal_ref" not in worker.parent_holder_ref.model_dump()
+
+
 def test_adapter_abi_is_provider_neutral_but_adapter_ids_differ() -> None:
     codex = _adapter("codex_cli", "external_incarnation_v1")
     local = _adapter("local_provider", "external_incarnation_v1")
