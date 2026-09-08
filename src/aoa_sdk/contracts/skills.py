@@ -1,8 +1,9 @@
 from __future__ import annotations
 
-from typing import Any, Literal
+from pathlib import PurePosixPath
+from typing import Annotated, Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 
 class AgentSkillResourceInventory(BaseModel):
@@ -246,6 +247,8 @@ class SkillHomeProjection(BaseModel):
 
 
 class SkillHomePortManifest(BaseModel):
+    """Legacy v1 projection model; its public constructor stays compatible."""
+
     model_config = ConfigDict(extra="forbid")
 
     schema_version: Literal["aoa_skill_home_port_v1"]
@@ -254,6 +257,124 @@ class SkillHomePortManifest(BaseModel):
     owner_ref: str
     bundles: list[SkillHomeBundle] = Field(default_factory=list)
     projection: SkillHomeProjection
+
+
+SkillHomeName = Annotated[str, Field(pattern=r"^[a-z0-9]+(?:-[a-z0-9]+)*$")]
+
+
+def _skill_home_relative_path(value: str) -> str:
+    path = PurePosixPath(value)
+    if not value or "\x00" in value or path.is_absolute() or ".." in path.parts:
+        raise ValueError("skill-home path must be nonempty and owner-relative")
+    return value
+
+
+class SkillHomeAdmittedBundle(SkillHomeBundle):
+    name: SkillHomeName
+    version: Annotated[
+        str,
+        Field(
+            pattern=r"^(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)(?:-[0-9A-Za-z.-]+)?$"
+        ),
+    ]
+    lifecycle: Literal["admitted"]
+    visibility: Literal["advertised"]
+
+    @field_validator("admission_ref")
+    @classmethod
+    def validate_admission_ref(cls, value: str) -> str:
+        return _skill_home_relative_path(value)
+
+    @model_validator(mode="after")
+    def validate_source_path(self) -> SkillHomeAdmittedBundle:
+        if self.path != f"skills/{self.name}":
+            raise ValueError("bundle path must equal skills/<name>")
+        return self
+
+
+class SkillHomeExposureV2(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    runtime: Literal["codex"]
+    scope: Literal["user"]
+    profile: Literal["os-user-default"]
+    mode: Literal["profile-selected"]
+    skills: list[SkillHomeName] = Field(min_length=1)
+
+
+class SkillHomeExposureV3(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    runtime: SkillHomeName
+    scope: SkillHomeName
+    profile: SkillHomeName
+    mode: Literal["profile-eligible"]
+    skills: list[SkillHomeName] = Field(min_length=1)
+
+    @field_validator("skills")
+    @classmethod
+    def validate_unique_skills(cls, value: list[str]) -> list[str]:
+        if len(set(value)) != len(value):
+            raise ValueError("exposure skills must be unique")
+        return value
+
+
+class _SkillHomeOwnerManifest(BaseModel):
+    model_config = ConfigDict(extra="forbid")
+
+    contract_ref: Literal["aoa-skills:schemas/skill-home-port.schema.json"]
+    owner_repo: Annotated[str, Field(pattern=r"^[A-Za-z0-9][A-Za-z0-9._-]*$")]
+    owner_ref: str
+    bundles: list[SkillHomeAdmittedBundle] = Field(min_length=1)
+
+    @field_validator("owner_ref")
+    @classmethod
+    def validate_owner_ref(cls, value: str) -> str:
+        return _skill_home_relative_path(value)
+
+    @field_validator("bundles")
+    @classmethod
+    def validate_unique_bundles(
+        cls, value: list[SkillHomeAdmittedBundle]
+    ) -> list[SkillHomeAdmittedBundle]:
+        if len({bundle.name for bundle in value}) != len(value):
+            raise ValueError("bundle names must be unique")
+        return value
+
+
+class SkillHomePortManifestV2(_SkillHomeOwnerManifest):
+    schema_version: Literal["aoa_skill_home_port_v2"]
+    exposure: SkillHomeExposureV2
+
+    @model_validator(mode="after")
+    def validate_complete_exposure(self) -> SkillHomePortManifestV2:
+        if self.exposure.skills != [bundle.name for bundle in self.bundles]:
+            raise ValueError("v2 exposure skills must exactly match bundles order")
+        return self
+
+
+class SkillHomePortManifestV3(_SkillHomeOwnerManifest):
+    schema_version: Literal["aoa_skill_home_port_v3"]
+    exposures: list[SkillHomeExposureV3]
+
+    @model_validator(mode="after")
+    def validate_exposures(self) -> SkillHomePortManifestV3:
+        names = {bundle.name for bundle in self.bundles}
+        targets: set[tuple[str, str, str]] = set()
+        for exposure in self.exposures:
+            if not set(exposure.skills) <= names:
+                raise ValueError("exposure skills must refer to declared bundles")
+            target = (exposure.runtime, exposure.scope, exposure.profile)
+            if target in targets:
+                raise ValueError("exposure targets must be unique")
+            targets.add(target)
+        return self
+
+
+AnySkillHomePortManifest = Annotated[
+    SkillHomePortManifest | SkillHomePortManifestV2 | SkillHomePortManifestV3,
+    Field(discriminator="schema_version"),
+]
 
 
 class InstalledSkill(BaseModel):
@@ -267,6 +388,7 @@ class InstalledSkill(BaseModel):
         "unmanaged",
         "source-export",
         "legacy-unowned",
+        "owner-source",
     ]
     admitted: bool = False
     expected_source_dir: str | None = None
@@ -279,6 +401,7 @@ class SkillRootInspection(BaseModel):
         "repo-unowned",
         "workspace-legacy",
         "source-export",
+        "owner-source",
     ]
     scope: Literal["user", "repo", "workspace", "source"]
     path: str
@@ -288,9 +411,14 @@ class SkillRootInspection(BaseModel):
         "owner-projection",
         "legacy-unowned",
         "portable-export",
+        "owner-source",
     ]
     owner_repo: str | None = None
     manifest_path: str | None = None
+    source_schema_version: str | None = None
+    exposures: list[SkillHomeExposureV2 | SkillHomeExposureV3] = Field(
+        default_factory=list
+    )
     admitted_names: list[str] = Field(default_factory=list)
     entries: list[InstalledSkill] = Field(default_factory=list)
     issues: list[str] = Field(default_factory=list)

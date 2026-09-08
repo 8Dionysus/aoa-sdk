@@ -16,16 +16,21 @@ which capability applies to a task.
   manifest, and capability graph;
 - an explicit repository root;
 - an optional host-selected user skill root;
-- an admitted repository `skills/port.manifest.json`, when that repository owns
-  home skills.
+- an owner-authored `skills/port.manifest.json`: v1 repository projection or
+  v2/v3 owner home with consumer exposure declarations.
 
 ## Output
 
 - exact typed owner surfaces;
 - exact-node capability neighborhoods;
-- separate source-export, user, repository, unowned-repository, and legacy
-  workspace observations;
+- separate source-export, owner-source, user, repository, unowned-repository,
+  and legacy workspace observations;
 - current, drift, missing, unmanaged, duplicate, and admission warnings.
+
+The [contract](CONTRACT.md#home-port-compatibility) defines version dispatch
+and the distinction between an owner's declared bundle admission, consumer
+eligibility, and observed installation. Unsupported consumer exposures remain
+typed source observations; this reader does not implement another runtime.
 
 ## Owner
 
