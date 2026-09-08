@@ -60,6 +60,36 @@ RunPlan
 The SDK binds refs; it does not select the model, launch a process, infer a
 model-fit claim, or grant an effect.
 
+## Delegation classes and current adapter admission
+
+The shared `parent_holder_ref` is an owner-qualified `ContentRef` to the
+existing parent holder or task context. It does not require a permanent Goal
+object. A formal external actor still needs its complete obligation, mandate,
+role, incarnation, responsibility-transfer, continuation, runtime, and return
+chain from the named owners.
+
+Choose the class from its required properties before naming an adapter. The
+current SDK source admits this matrix:
+
+| Class | Required properties | Adapter admission in `aoa_sdk` |
+| --- | --- | --- |
+| `ephemeral_read_worker_v1` | Bounded immutable inputs; stateless, read-only work; content-addressed `abyss-stack` result and economy observation; parent retains responsibility; no role formation or durable transfer | `local_provider` only. `codex_cli` and built-in Codex subagents are rejected. |
+| `external_incarnation_v1` | Transferred responsibility; exact `aoa-agents` role and mandate; `aoa-models` realization; SDK incarnation and continuation refs; `abyss-stack` process, session, and event refs; required `aoa-agents` transfer and reviewed-return refs; separately owned lifecycle refs | `codex_cli` or `local_provider`. The SDK records the kind and owner-qualified implementation ref; it does not prove that a runtime implementation is available or admitted. |
+
+For `external_incarnation_v1`, `eval_ref`, `closeout_ref`, and
+`acceptance_ref` are optional lifecycle evidence at this boundary. When
+present, each keeps its exact owner/schema contract and all supplied lifecycle
+refs remain distinct. The required `reviewed_return_ref` is a separate
+`aoa-agents` return disposition; runtime completion or a transport receipt does
+not supply it automatically.
+
+The concrete `abyss-stack` adapter profiles are default-off and set
+`uses_builtin_codex_subagents` to `false`; activation remains an explicit
+runtime-owner decision. The SDK class ABI has no launch or activation side
+effect. Ordinary native Codex helpers use their existing task context and stay
+outside these formal AoA classes; their execution does not create an
+`EphemeralReadWorkerV1` or `ExternalIncarnationV1` admission.
+
 The obligation-plan helper is not a second route resolver or playbook owner.
 It accepts only already-selected refs and rejects external effects, empty or
 duplicate outputs, missing request/role/DAG inputs, and runtime/effect
