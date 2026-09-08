@@ -316,6 +316,7 @@ from .contracts.stats import (
 from .contracts.workspace import (
     SkillProfileBootstrapStep,
     SkillProfileBootstrapReport,
+    OSSkillProfileBootstrapReport,
 )
 from .contracts.checkpoints import (
     CheckpointLineageHint,
@@ -662,6 +663,7 @@ __all__ = [
     "StatsRegroundingSignal",
     "SkillProfileBootstrapStep",
     "SkillProfileBootstrapReport",
+    "OSSkillProfileBootstrapReport",
     "CheckpointLineageHint",
     "CloseoutOwnerFollowthroughHint",
     "CheckpointSessionMemoryRouteSignalSummary",

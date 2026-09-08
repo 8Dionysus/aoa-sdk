@@ -13,6 +13,7 @@ def _invoke_bootstrap(
     user_root: Path,
     *extra: str,
 ):
+    profile_args = [] if "--profile" in extra else ["--profile", "user-default"]
     return CliRunner().invoke(
         app,
         [
@@ -21,6 +22,7 @@ def _invoke_bootstrap(
             str(workspace_root),
             "--user-skill-root",
             str(user_root),
+            *profile_args,
             *extra,
             "--json",
         ],
@@ -50,6 +52,7 @@ def test_workspace_bootstrap_dry_run_plans_exact_user_profile_without_mutation(
     assert payload["ready"] is True
     assert payload["executed"] is False
     assert payload["verified"] is None
+    assert any("legacy portable vocabulary" in warning for warning in payload["warnings"])
     assert [(step["skill_name"], step["action"]) for step in payload["steps"]] == [
         ("aoa-decision", "create")
     ]
