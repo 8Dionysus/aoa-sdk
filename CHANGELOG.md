@@ -7,6 +7,10 @@ Tracking starts with the community-docs baseline for this repository.
 
 ## [Unreleased]
 
+- Read v2/v3 skill owner homes and consumer exposures as passive source
+  observations, retaining the v1 public model and repository projection
+  semantics. Exposure eligibility does not imply selection or installation.
+
 - Add future changes here after the release tag lands.
 - Slim the root agent card to control-plane ownership, activation stop-lines,
   conditional source routes, and on-demand validation; historical G5/X2/C1-C4

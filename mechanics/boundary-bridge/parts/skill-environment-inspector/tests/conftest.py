@@ -16,6 +16,40 @@ class SkillEnvironmentFixture:
     user_root: Path
 
 
+@pytest.fixture()
+def owner_home_payload(skill_environment_fixture) -> dict:
+    """A current owner home independent of the deprecated v1 fixture shape."""
+    payload = {
+        "schema_version": "aoa_skill_home_port_v3",
+        "contract_ref": "aoa-skills:schemas/skill-home-port.schema.json",
+        "owner_repo": "repo-home",
+        "owner_ref": "README.md",
+        "bundles": [
+            {
+                "name": "repo-home",
+                "path": "skills/repo-home",
+                "version": "1.0.0",
+                "lifecycle": "admitted",
+                "visibility": "advertised",
+                "admission_ref": "README.md",
+            }
+        ],
+        "exposures": [
+            {
+                "runtime": "codex",
+                "scope": "user",
+                "profile": "os-user-default",
+                "mode": "profile-eligible",
+                "skills": ["repo-home"],
+            }
+        ],
+    }
+    _write_json(
+        skill_environment_fixture.repo_root / "skills/port.manifest.json", payload
+    )
+    return payload
+
+
 def _write_json(path: Path, payload: object) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
