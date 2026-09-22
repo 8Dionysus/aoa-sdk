@@ -333,6 +333,53 @@ def test_scheduler_runs_independent_nodes_concurrently_and_fans_in_in_manifest_o
     assert elapsed < sequential_duration - 0.15
 
 
+def test_shipped_scheduler_prioritizes_early_high_signal_checks_without_dropping_claims(
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    manifest = validation_graph.load_manifest(MANIFEST_PATH)
+    full_claims = list(manifest["profiles"]["full"])
+    activated = validation_graph.activate_nodes(manifest, full_claims)
+    started: list[str] = []
+
+    def fake_run_node(
+        node: dict[str, object],
+        repo_root: Path,
+        input_cache: validation_graph.InputIdentityCache,
+    ) -> dict[str, object]:
+        del repo_root, input_cache
+        node_id = str(node["id"])
+        started.append(node_id)
+        return {
+            "id": node_id,
+            "tier": node["tier"],
+            "status": "passed",
+            "duration_seconds": 0.0,
+            "input_identity": {"unreadable": []},
+            "provides_evidence": list(node["provides_evidence"]),
+            "steps": [],
+        }
+
+    monkeypatch.setattr(validation_graph, "run_node", fake_run_node)
+    results = validation_graph.execute_nodes(
+        manifest,
+        activated,
+        repo_root=REPO_ROOT,
+        max_workers=1,
+        announce=False,
+    )
+
+    assert started[:5] == [
+        "validation-graph-contract",
+        "ruff",
+        "source-contracts",
+        "mypy",
+        "build-package",
+    ]
+    assert [result["id"] for result in results] == activated
+    assert {result["status"] for result in results} == {"passed"}
+    assert full_claims == manifest["profiles"]["full"]
+
+
 def test_failed_evidence_node_yields_a_bound_insufficient_receipt(tmp_path: Path) -> None:
     subprocess.run(["git", "init", "-q"], cwd=tmp_path, check=True)
     manifest = minimal_manifest(failing=True)

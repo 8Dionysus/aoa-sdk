@@ -289,7 +289,7 @@
     {
       "id": "source-contracts",
       "tier": "fast",
-      "priority": 70,
+      "priority": 98,
       "depends_on": [],
       "provides_evidence": [
         "source-contract-battery"
@@ -387,7 +387,7 @@
     {
       "id": "ruff",
       "tier": "fast",
-      "priority": 60,
+      "priority": 99,
       "depends_on": [],
       "provides_evidence": [
         "ruff-clean"
@@ -414,7 +414,7 @@
     {
       "id": "mypy",
       "tier": "contextual",
-      "priority": 60,
+      "priority": 97,
       "depends_on": [],
       "provides_evidence": [
         "mypy-clean"
