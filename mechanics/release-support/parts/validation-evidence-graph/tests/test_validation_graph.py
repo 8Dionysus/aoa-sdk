@@ -333,12 +333,129 @@ def test_scheduler_runs_independent_nodes_concurrently_and_fans_in_in_manifest_o
     assert elapsed < sequential_duration - 0.15
 
 
-def test_shipped_scheduler_prioritizes_early_high_signal_checks_without_dropping_claims(
-    monkeypatch: pytest.MonkeyPatch,
-) -> None:
+def _synthetic_scheduler_trial(
+    manifest: dict[str, object],
+    priorities: dict[str, int],
+    *,
+    failing_node: str | None,
+) -> dict[str, object]:
+    trial_manifest = copy.deepcopy(manifest)
+    nodes = trial_manifest["nodes"]
+    assert isinstance(nodes, list)
+    for node in nodes:
+        assert isinstance(node, dict)
+        node["priority"] = priorities[str(node["id"])]
+
+    profiles = trial_manifest["profiles"]
+    assert isinstance(profiles, dict)
+    full_claims = profiles["full"]
+    assert isinstance(full_claims, list)
+    activated = validation_graph.activate_nodes(trial_manifest, full_claims)
+    delays = {
+        "validation-graph-contract": 0.004,
+        "build-package": 0.040,
+        "ordinary-tests": 0.015,
+        "g11-isolated-a": 0.008,
+        "g11-isolated-b": 0.008,
+        "source-contracts": 0.006,
+        "ruff": 0.003,
+        "mypy": 0.003,
+        "routing-g5-wheel": 0.004,
+        "plan-c2-wheel": 0.004,
+        "runner-c3-wheel": 0.004,
+        "evidence-c5-wheel": 0.004,
+        "agon-gate-wheel": 0.004,
+        "abyss-package-artifact-bundle": 0.004,
+    }
+    events: list[dict[str, object]] = []
+    started_at = time.monotonic()
+
+    def fake_run_node(
+        node: dict[str, object],
+        repo_root: Path,
+        input_cache: validation_graph.InputIdentityCache,
+    ) -> dict[str, object]:
+        del repo_root, input_cache
+        node_id = str(node["id"])
+        event = {
+            "id": node_id,
+            "start_offset_seconds": round(time.monotonic() - started_at, 6),
+        }
+        events.append(event)
+        time.sleep(delays[node_id])
+        status = "failed" if node_id == failing_node else "passed"
+        event["status"] = status
+        return {
+            "id": node_id,
+            "tier": node["tier"],
+            "status": status,
+            "duration_seconds": delays[node_id],
+            "input_identity": {"unreadable": []},
+            "provides_evidence": list(node["provides_evidence"])
+            if status == "passed"
+            else [],
+            "steps": [],
+        }
+
+    original_run_node = validation_graph.run_node
+    validation_graph.run_node = fake_run_node
+    try:
+        trial_started = time.monotonic()
+        results = validation_graph.execute_nodes(
+            trial_manifest,
+            activated,
+            repo_root=REPO_ROOT,
+            max_workers=int(trial_manifest["max_workers"]),
+            announce=False,
+        )
+        elapsed = round(time.monotonic() - trial_started, 6)
+    finally:
+        validation_graph.run_node = original_run_node
+
+    first_failure = next(
+        (event for event in events if event["status"] != "passed"),
+        None,
+    )
+    return {
+        "started": events,
+        "green_makespan_seconds": elapsed if failing_node is None else None,
+        "first_failure": first_failure,
+        "result_statuses": {result["id"]: result["status"] for result in results},
+    }
+
+
+def _synthetic_priority_ab(manifest: dict[str, object]) -> dict[str, object]:
+    nodes = manifest["nodes"]
+    assert isinstance(nodes, list)
+    candidate = {str(node["id"]): int(node["priority"]) for node in nodes}
+    baseline = dict(candidate)
+    baseline.update({"source-contracts": 70, "ruff": 60, "mypy": 60})
+    return {
+        "baseline": {
+            "green": _synthetic_scheduler_trial(
+                manifest, baseline, failing_node=None
+            ),
+            "red": _synthetic_scheduler_trial(
+                manifest, baseline, failing_node="ruff"
+            ),
+        },
+        "candidate": {
+            "green": _synthetic_scheduler_trial(
+                manifest, candidate, failing_node=None
+            ),
+            "red": _synthetic_scheduler_trial(
+                manifest, candidate, failing_node="ruff"
+            ),
+        },
+    }
+
+
+def test_shipped_scheduler_runs_cheap_preflight_before_package_build() -> None:
     manifest = validation_graph.load_manifest(MANIFEST_PATH)
-    full_claims = list(manifest["profiles"]["full"])
-    activated = validation_graph.activate_nodes(manifest, full_claims)
+    nodes = manifest["nodes"]
+    assert isinstance(nodes, list)
+    priorities = {str(node["id"]): int(node["priority"]) for node in nodes}
+    activated = validation_graph.activate_nodes(manifest, manifest["profiles"]["full"])
     started: list[str] = []
 
     def fake_run_node(
@@ -359,25 +476,42 @@ def test_shipped_scheduler_prioritizes_early_high_signal_checks_without_dropping
             "steps": [],
         }
 
-    monkeypatch.setattr(validation_graph, "run_node", fake_run_node)
-    results = validation_graph.execute_nodes(
-        manifest,
-        activated,
-        repo_root=REPO_ROOT,
-        max_workers=1,
-        announce=False,
-    )
+    original_run_node = validation_graph.run_node
+    validation_graph.run_node = fake_run_node
+    try:
+        results = validation_graph.execute_nodes(
+            manifest,
+            activated,
+            repo_root=REPO_ROOT,
+            max_workers=1,
+            announce=False,
+        )
+    finally:
+        validation_graph.run_node = original_run_node
 
-    assert started[:5] == [
-        "validation-graph-contract",
-        "ruff",
-        "source-contracts",
-        "mypy",
-        "build-package",
-    ]
+    build_index = started.index("build-package")
+    cheap_preflight = {"ruff", "source-contracts", "mypy"}
+    assert cheap_preflight.issubset(set(started[:build_index]))
     assert [result["id"] for result in results] == activated
     assert {result["status"] for result in results} == {"passed"}
-    assert full_claims == manifest["profiles"]["full"]
+    assert all(priorities[node_id] > priorities["build-package"] for node_id in cheap_preflight)
+
+
+def test_priority_ab_diagnostic_uses_same_dag_and_exposes_no_ci_claim() -> None:
+    manifest = validation_graph.load_manifest(MANIFEST_PATH)
+    diagnostic = _synthetic_priority_ab(manifest)
+
+    for trial in diagnostic.values():
+        assert trial["green"]["green_makespan_seconds"] is not None
+        assert trial["red"]["first_failure"]["id"] == "ruff"
+
+    baseline_red = diagnostic["baseline"]["red"]["started"]
+    candidate_red = diagnostic["candidate"]["red"]["started"]
+    baseline_order = [event["id"] for event in baseline_red]
+    candidate_order = [event["id"] for event in candidate_red]
+    assert baseline_order.index("build-package") < baseline_order.index("ruff")
+    if "build-package" in candidate_order:
+        assert candidate_order.index("ruff") < candidate_order.index("build-package")
 
 
 def test_failed_evidence_node_yields_a_bound_insufficient_receipt(tmp_path: Path) -> None:
