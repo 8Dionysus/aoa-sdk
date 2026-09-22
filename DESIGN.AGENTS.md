@@ -218,13 +218,28 @@ surfaces.
 Executable procedures live in root `VALIDATION.md` and the nearest applicable
 part `VALIDATION.md`. This design surface names what validation should prove:
 
-- required local route cards exist and preserve owner boundaries;
+- required local route cards exist, with executable routes kept reachable;
 - SDK source-home branches have local route cards and manifest coverage;
 - generated companions are reproducible;
 - decision indexes are current;
 - source-home and mechanics topology changes have rationale;
 - compatibility checks do not hide missing sibling surfaces;
 - release-facing changes run broad gates after narrow checks.
+
+The nested-agent validator checks card coverage, route presence, and recognized
+command placement. Documentation tests check source references and navigation.
+Neither proves the meaning of natural-language instructions, their conditional
+reading policy, or preservation of owner authority by an agent. Exact wording,
+headings that no consumer parses, and historical release counters are not
+permanent machine contracts.
+
+Source-aware review owns guidance meaning: check that changed instructions keep
+the SDK on the control plane, do not contradict stronger sources, retain
+task-conditional reading, and do not repeat inherited procedure without a local
+need. A green structural check does not discharge this review. Product behavior
+such as passive inspection and reviewed handoff remains protected by its owning
+behavioral tests. See the documentation review route in `VALIDATION.md` and
+`docs/decisions/AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md`.
 
 ## One-Line Rule
 

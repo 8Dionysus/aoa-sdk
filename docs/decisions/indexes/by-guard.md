@@ -45,6 +45,7 @@
 - [AOA-SDK-D-0002 - Root Design Surfaces Before Mechanics](../AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md) (`docs/decisions/AOA-SDK-D-0002-root-design-surfaces-before-mechanics.md`)
 - [AOA-SDK-D-0105 - Prompt-Light Agent Routes And On-Demand Validation](../AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md) (`docs/decisions/AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md`)
 - [AOA-SDK-D-0106 - Historical Mechanics Outside The Current Tree](../AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md) (`docs/decisions/AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md`)
+- [AOA-SDK-D-0109 - Check Document Contracts, Not Editorial Snapshots](../AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md) (`docs/decisions/AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md`)
 
 ## agent routing
 
@@ -480,6 +481,7 @@
 - [AOA-SDK-D-0098 - Export the reference validation scheduler with an explicit owner root](../AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md) (`docs/decisions/AOA-SDK-D-0098-export-reference-validation-scheduler-with-explicit-owner-root.md`)
 - [AOA-SDK-D-0105 - Prompt-Light Agent Routes And On-Demand Validation](../AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md) (`docs/decisions/AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md`)
 - [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
+- [AOA-SDK-D-0109 - Check Document Contracts, Not Editorial Snapshots](../AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md) (`docs/decisions/AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md`)
 
 ## owner binding
 
@@ -699,6 +701,10 @@
 - [AOA-SDK-D-0038 - Manual Equivalence Active Lane Naming](../AOA-SDK-D-0038-manual-equivalence-active-lane-naming.md) (`docs/decisions/AOA-SDK-D-0038-manual-equivalence-active-lane-naming.md`)
 - [AOA-SDK-D-0039 - A2A Quest Passport Secondary Tier Naming](../AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md) (`docs/decisions/AOA-SDK-D-0039-a2a-quest-passport-secondary-tier-naming.md`)
 - [AOA-SDK-D-0066 - Decision Index Read Model Symmetry](../AOA-SDK-D-0066-decision-index-read-model-symmetry.md) (`docs/decisions/AOA-SDK-D-0066-decision-index-read-model-symmetry.md`)
+
+## route integrity
+
+- [AOA-SDK-D-0109 - Check Document Contracts, Not Editorial Snapshots](../AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md) (`docs/decisions/AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md`)
 
 ## route law
 

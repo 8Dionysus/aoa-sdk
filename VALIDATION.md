@@ -142,6 +142,28 @@ its manifest remain the composition authority.
 
 ## Cross-part routing suites
 
+### Documentation checks and semantic review
+
+Documentation checks protect concrete destinations, retained command owners,
+required local cards, and recognized command placement. They do not establish
+that a sentence preserves owner meaning. A test of a checker uses independently
+authored good and bad inputs; a current-tree check validates the actual files.
+Keep these responsibilities separate.
+
+For a changed guidance or route surface, review the applicable source contract
+and check both an unwanted change that must fail and a safe change that must
+pass. Wording, link labels, and unconsumed heading names may change without
+changing the route. Owner boundaries, task-conditional reading, instruction
+contradictions, and unnecessary inherited repetition require source-aware
+review. Retiring a prose assertion never establishes new behavioral coverage.
+
+The focused suite below checks that route destinations remain reachable and
+commands remain with their owners. Review the owning product tests separately
+when passive inspection, handoff, or runtime meaning changes; those contracts
+are not represented by mandatory documentation phrases. Historical release
+reconciliation belongs to the changed release dossier, not a permanent snapshot
+of an old release in ordinary documentation tests.
+
 These cross-part routes are composed here so their exact executable procedures
 remain owned once while the participating leaf surfaces link back to this lane:
 

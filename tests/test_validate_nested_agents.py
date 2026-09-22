@@ -20,39 +20,46 @@ def _write(path: Path, text: str) -> None:
 
 
 def _write_minimal_required_tree(repo_root: Path) -> None:
-    _write(repo_root / "AGENTS.md", "# AGENTS.md\n## Validation route\nRoot [`VALIDATION.md`](VALIDATION.md) is the human procedure route; scripts/release_check.py and the accepted graph runner remain authoritative.\n")
-    _write(repo_root / "VALIDATION.md", "# VALIDATION.md\nRoot procedure route.\n")
+    _write(
+        repo_root / "AGENTS.md",
+        "# AGENTS.md\n## Checks\n"
+        "Use [the procedure](VALIDATION.md); scripts/release_check.py owns the gate.\n",
+    )
+    _write(repo_root / "VALIDATION.md", "# Checks\nRoot procedure route.\n")
+    _write(repo_root / "scripts/release_check.py", "# Executable gate fixture.\n")
     _write(
         repo_root / "DESIGN.AGENTS.md",
-        "# DESIGN.AGENTS.md\n## Conditional route shape\n"
-        "## Relevant routes\n"
-        "Executable procedures live in root VALIDATION.md.\n",
+        "# Agent guidance design\nSee VALIDATION.md for executable procedures.\n",
     )
-    for rel_path, snippets in validator.REQUIRED_AGENTS_DOCS.items():
-        _write(repo_root / rel_path, "# AGENTS.md\n" + "\n".join(snippets) + "\n")
+    # The map supplies the coverage fixture, not the semantic oracle.
+    # Independently authored prose must pass without repeating validator phrases.
+    for rel_path in validator.REQUIRED_AGENTS_DOCS:
+        _write(repo_root / rel_path, "# AGENTS.md\nLocal source owners retain authority.\n")
 
 
 class ValidateNestedAgentsTests(unittest.TestCase):
-    def test_minimal_required_tree_passes(self) -> None:
+    def test_structural_tree_does_not_require_editorial_templates(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = Path(tmp)
             _write_minimal_required_tree(repo_root)
             result = validator.validate(repo_root)
             self.assertEqual((), result.issues)
 
-    def test_stale_inherited_routes_are_rejected(self) -> None:
+    def test_safe_route_label_and_guidance_rewording_passes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = Path(tmp)
             _write_minimal_required_tree(repo_root)
-            stale = next(iter(validator.REQUIRED_AGENTS_DOCS))
             _write(
-                repo_root / stale,
-                "# AGENTS.md\n" + validator.GENERIC_NESTED_ROUTE_PREFIX
-                + validator.REPEATED_VALIDATION_PARAGRAPH + "\n",
+                repo_root / "AGENTS.md",
+                "# AGENTS.md\n## Verification\n"
+                "Follow [checks for the selected path](./VALIDATION.md#focused-checks).\n"
+                "The executable gate is scripts/release_check.py.\n",
             )
-            result = validator.validate(repo_root)
-            self.assertTrue(any("repeated repository validation route" in issue for issue in result.issues))
-            self.assertTrue(any("repeated root conditional route" in issue for issue in result.issues))
+            _write(
+                repo_root / "src/aoa_sdk/AGENTS.md",
+                "# AGENTS.md\nSDK facades expose typed handles, not sibling authority.\n",
+            )
+            self.assertEqual((), validator.validate(repo_root).issues)
 
     def test_missing_root_agents_fails(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -60,87 +67,122 @@ class ValidateNestedAgentsTests(unittest.TestCase):
             self.assertIn("AGENTS.md: root guidance file is missing", result.issues)
 
     def test_root_validation_route_requires_clickable_owner(self) -> None:
+        for route in (
+            "VALIDATION.md", "[Checks](elsewhere.md)", "[Checks](VALIDATION.md.bak)",
+            "![Checks](VALIDATION.md)", "```text\n[Checks](VALIDATION.md)\n```",
+            "`[Checks](VALIDATION.md)`", "<!-- [Checks](VALIDATION.md) -->",
+        ):
+            with self.subTest(route=route), tempfile.TemporaryDirectory() as tmp:
+                repo_root = Path(tmp)
+                _write_minimal_required_tree(repo_root)
+                _write(
+                    repo_root / "AGENTS.md",
+                    f"# AGENTS.md\n{route}; scripts/release_check.py owns the gate.\n",
+                )
+                self.assertIn(
+                    "AGENTS.md: root validation route must link to VALIDATION.md",
+                    validator.validate(repo_root).issues,
+                )
+
+    def test_reference_style_validation_route_passes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = Path(tmp)
             _write_minimal_required_tree(repo_root)
             _write(
                 repo_root / "AGENTS.md",
-                "# AGENTS.md\n## Validation route\n"
-                "VALIDATION.md owns procedure; scripts/release_check.py and the accepted graph runner remain authoritative.\n",
+                "# AGENTS.md\n[The procedure][checks]. scripts/release_check.py owns the gate.\n"
+                "\n[checks]: ./VALIDATION.md#focused-checks\n",
             )
-            result = validator.validate(repo_root)
+            self.assertEqual((), validator.validate(repo_root).issues)
+
+    def test_named_route_and_required_documents_cannot_disappear(self) -> None:
+        # These expected locations are independent of the implementation's map.
+        for relative, expected in (
+            ("src/aoa_sdk/AGENTS.md", "src/aoa_sdk/AGENTS.md: required nested AGENTS.md is missing"),
+            ("tests/AGENTS.md", "tests/AGENTS.md: required nested AGENTS.md is missing"),
+            ("VALIDATION.md", "VALIDATION.md: root human validation entrypoint is missing"),
+            ("DESIGN.AGENTS.md", "DESIGN.AGENTS.md: design surface is missing"),
+            ("scripts/release_check.py", "scripts/release_check.py: root executable gate is missing"),
+        ):
+            with self.subTest(relative=relative), tempfile.TemporaryDirectory() as tmp:
+                repo_root = Path(tmp)
+                _write_minimal_required_tree(repo_root)
+                (repo_root / relative).unlink()
+                self.assertIn(expected, validator.validate(repo_root).issues)
+
+    def test_required_card_must_have_agents_heading(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            _write_minimal_required_tree(repo_root)
+            _write(repo_root / "tests/AGENTS.md", "This is not an agent route card.\n")
             self.assertIn(
-                "AGENTS.md: root validation route must link to VALIDATION.md",
-                result.issues,
+                "tests/AGENTS.md: missing AGENTS heading",
+                validator.validate(repo_root).issues,
             )
 
-    def test_missing_required_doc_fails_when_required_docs_exist(self) -> None:
-        if not validator.REQUIRED_AGENTS_DOCS:
-            self.skipTest("repository has no required nested AGENTS.md docs yet")
-        first_rel = next(iter(validator.REQUIRED_AGENTS_DOCS))
-        with tempfile.TemporaryDirectory() as tmp:
-            repo_root = Path(tmp)
-            _write_minimal_required_tree(repo_root)
-            (repo_root / first_rel).unlink()
-            result = validator.validate(repo_root)
-            self.assertTrue(any(first_rel in issue for issue in result.issues))
-
-    def test_missing_required_snippet_fails_when_required_docs_exist(self) -> None:
-        if not validator.REQUIRED_AGENTS_DOCS:
-            self.skipTest("repository has no required nested AGENTS.md docs yet")
-        first_rel = next(iter(validator.REQUIRED_AGENTS_DOCS))
-        with tempfile.TemporaryDirectory() as tmp:
-            repo_root = Path(tmp)
-            _write_minimal_required_tree(repo_root)
-            _write(repo_root / first_rel, "# AGENTS.md\nToo thin.\n")
-            result = validator.validate(repo_root)
-            self.assertTrue(any(first_rel in issue and "missing required snippet" in issue for issue in result.issues))
-
-    def test_advisory_can_become_strict(self) -> None:
-        if not validator.ADVISORY_AGENT_DIRS:
-            self.skipTest("repository has no advisory AGENTS.md candidates")
-        with tempfile.TemporaryDirectory() as tmp:
-            repo_root = Path(tmp)
-            _write_minimal_required_tree(repo_root)
-            (repo_root / validator.ADVISORY_AGENT_DIRS[0]).mkdir(parents=True, exist_ok=True)
-            result = validator.validate(repo_root, strict_advisory=True)
-            self.assertTrue(any("high-risk directory" in issue for issue in result.issues))
-
-    def test_runnable_procedure_is_rejected(self) -> None:
+    def test_root_gate_and_design_procedure_routes_are_retained(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = Path(tmp)
             _write_minimal_required_tree(repo_root)
             _write(
                 repo_root / "AGENTS.md",
-                "# AGENTS.md\n## Validation route\n" + chr(96) * 3 + "bash\npython -m pytest -q\n" + chr(96) * 3 + "\n",
+                "# AGENTS.md\n[Checks](VALIDATION.md)\nSee scripts/release_check.py.bak.\n",
             )
-            result = validator.validate(repo_root)
-            self.assertTrue(any("runnable procedure fence" in issue for issue in result.issues))
+            _write(repo_root / "DESIGN.AGENTS.md", "# Design\nSee VALIDATION.md.bak.\n")
+            issues = validator.validate(repo_root).issues
+            self.assertIn(
+                "AGENTS.md: root validation route missing 'scripts/release_check.py'", issues
+            )
+            self.assertIn(
+                "DESIGN.AGENTS.md: validation procedures do not route through VALIDATION.md",
+                issues,
+            )
 
-    def test_unconditional_readme_inventory_is_rejected(self) -> None:
+    def test_unmapped_card_and_advisory_directory_escalate_only_when_requested(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            repo_root = Path(tmp)
+            _write_minimal_required_tree(repo_root)
+            _write(repo_root / "new-district/AGENTS.md", "# AGENTS.md\nLocal route.\n")
+            (repo_root / "examples").mkdir()
+            result = validator.validate(repo_root)
+            self.assertEqual((), result.issues)
+            self.assertEqual(2, len(result.warnings))
+            self.assertTrue(validator.validate(repo_root, fail_on_untracked=True).issues)
+            self.assertEqual(
+                result.warnings, validator.validate(repo_root, strict_advisory=True).issues
+            )
+
+    def test_runnable_procedures_are_rejected_in_root_and_nested_cards(self) -> None:
+        fence = chr(96) * 3
+        inline = chr(96)
+        cases = (
+            (f"{fence}bash\npython -m pytest -q\n{fence}\n", "runnable procedure fence"),
+            ("1. python -m pytest -q\n", "runnable command line"),
+            (f"Use {inline}FOO=bar $ python -m pytest -q{inline}.\n", "inline runnable command"),
+        )
+        for relative in ("AGENTS.md", "tests/AGENTS.md"):
+            for content, expected in cases:
+                with self.subTest(relative=relative, expected=expected):
+                    with tempfile.TemporaryDirectory() as tmp:
+                        repo_root = Path(tmp)
+                        _write_minimal_required_tree(repo_root)
+                        path = repo_root / relative
+                        _write(path, path.read_text(encoding="utf-8") + content)
+                        self.assertTrue(any(
+                            expected in issue for issue in validator.validate(repo_root).issues
+                        ))
+
+    def test_source_path_mentions_and_non_command_code_are_allowed(self) -> None:
+        fence = chr(96) * 3
         with tempfile.TemporaryDirectory() as tmp:
             repo_root = Path(tmp)
             _write_minimal_required_tree(repo_root)
             _write(
-                repo_root / "AGENTS.md",
-                "# AGENTS.md\n## Relevant routes\nRead README.md before editing.\n",
+                repo_root / "tests/AGENTS.md",
+                "# AGENTS.md\nSee src/aoa_sdk/ and tests/ for source and checks.\n"
+                f"{fence}python\nfrom aoa_sdk import AoASDK\n{fence}\n",
             )
-            result = validator.validate(repo_root)
-            self.assertTrue(any("unconditional README inventory" in issue for issue in result.issues))
-
-    def test_command_list_and_inline_command_are_rejected(self) -> None:
-        with tempfile.TemporaryDirectory() as tmp:
-            repo_root = Path(tmp)
-            _write_minimal_required_tree(repo_root)
-            _write(
-                repo_root / "AGENTS.md",
-                "# AGENTS.md\n## Validation route\n"
-                "1. python -m pytest -q\n"
-                "Use `FOO=bar $ python -m pytest -q` when needed.\n",
-            )
-            result = validator.validate(repo_root)
-            self.assertTrue(any("runnable command line" in issue for issue in result.issues))
-            self.assertTrue(any("inline runnable command" in issue for issue in result.issues))
+            self.assertEqual((), validator.validate(repo_root).issues)
 
 
 if __name__ == "__main__":

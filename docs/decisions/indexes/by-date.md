@@ -178,3 +178,7 @@
 
 - [AOA-SDK-D-0107 - Responsibility routing without native interception](../AOA-SDK-D-0107-responsibility-routing-without-native-interception.md) (`docs/decisions/AOA-SDK-D-0107-responsibility-routing-without-native-interception.md`)
 - [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
+
+## 2026-09-21
+
+- [AOA-SDK-D-0109 - Check Document Contracts, Not Editorial Snapshots](../AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md) (`docs/decisions/AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md`)
