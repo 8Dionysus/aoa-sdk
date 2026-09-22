@@ -7,7 +7,7 @@ import subprocess
 from pathlib import Path
 from typing import Any, Literal, NamedTuple
 
-from ...errors import RepoNotFound, SurfaceNotFound
+from ...errors import InvalidSurface, RepoNotFound, SurfaceNotFound
 from ...workspace.discovery import Workspace
 
 
@@ -91,6 +91,31 @@ def read_git_commit_metadata(repo_root: Path, commit_ref: str) -> dict[str, Any]
         "commit_body": commit_body,
         "changed_paths": _dedupe_strings(changed_paths),
     }
+
+
+def validate_checkpoint_git_target(workspace: Workspace, repo_root: Path) -> None:
+    """Reject a wrong Git context before checkpoint state is read or written."""
+    if repo_root == workspace.federation_root and not any(
+        mapped.resolve() == repo_root for mapped in workspace.repo_roots.values()
+    ):
+        raise InvalidSurface(f"checkpoint target is a federation container, not an owner repo: {repo_root}")
+    try:
+        result = run_git(repo_root, "rev-parse", "--show-toplevel", check=False)
+    except (OSError, RuntimeError) as exc:
+        raise InvalidSurface(f"cannot validate checkpoint Git target {repo_root}: {exc}") from exc
+    if result.returncode != 0 or not result.stdout.strip():
+        raise InvalidSurface(f"checkpoint target is not a Git worktree root: {repo_root}")
+    git_root = Path(result.stdout.rstrip("\n")).resolve()
+    if git_root != repo_root:
+        raise InvalidSurface(
+            f"checkpoint target must be the Git worktree root {git_root}, not {repo_root}"
+        )
+    mapped_root = workspace.repo_roots.get(repo_root.name)
+    if mapped_root is not None and mapped_root.resolve() != repo_root:
+        raise InvalidSurface(
+            f"checkpoint target {repo_root} conflicts with workspace mapping "
+            f"{repo_root.name}={mapped_root}; use a workspace mapping for the intended worktree"
+        )
 
 
 def render_checkpoint_hook(
@@ -180,8 +205,22 @@ def resolve_git_hook_path(
 
 
 def run_git(repo_root: Path, *args: str, check: bool = True) -> subprocess.CompletedProcess[str]:
+    # A hook can inherit the calling repository's Git environment. The explicit
+    # target must select identity, commit metadata, and reachability consistently.
+    local_result = subprocess.run(
+        ["git", "rev-parse", "--local-env-vars"],
+        text=True,
+        capture_output=True,
+        check=False,
+    )
+    if local_result.returncode != 0:
+        detail = local_result.stderr.strip() or f"git exited {local_result.returncode}"
+        raise RuntimeError(f"cannot resolve repository-local Git environment: {detail}")
+    local_vars = local_result.stdout.splitlines()
+    git_env = {key: value for key, value in os.environ.items() if key not in local_vars}
     result = subprocess.run(
         ["git", "-C", str(repo_root), *args],
+        env=git_env,
         text=True,
         capture_output=True,
         check=False,

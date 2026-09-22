@@ -4,6 +4,7 @@ import json
 import subprocess
 from pathlib import Path
 
+import pytest
 from typer.testing import CliRunner
 
 from aoa_sdk.cli.main import app
@@ -93,6 +94,47 @@ def _commit(repo_root: Path, subject: str) -> str:
         capture_output=True,
         text=True,
     ).stdout.strip()
+
+
+@pytest.mark.parametrize("route", ["after-commit", "git-boundary-check"])
+@pytest.mark.parametrize("json_output", [False, True])
+def test_git_checkpoint_cli_rejects_federation_target_without_writes(
+    workspace_root: Path,
+    route: str,
+    json_output: bool,
+) -> None:
+    args = ["checkpoint", route, ".", "--root", str(workspace_root)]
+    if route == "git-boundary-check":
+        args += ["--boundary", "push"]
+    if json_output:
+        args.append("--json")
+    result = CliRunner().invoke(app, args)
+    assert result.exit_code != 0
+    assert "checkpoint target is a federation container" in result.output
+    assert not (workspace_root / "aoa-sdk" / ".aoa" / "session-growth").exists()
+
+
+@pytest.mark.parametrize("json_output", [False, True])
+def test_after_commit_cli_failed_report_exits_nonzero(
+    workspace_root: Path,
+    json_output: bool,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    args = [
+        "checkpoint", "after-commit", str(repo_root), "--root", str(workspace_root),
+        "--commit-ref", "missing-commit",
+    ]
+    if json_output:
+        args.append("--json")
+    result = CliRunner().invoke(app, args)
+    assert result.exit_code != 0
+    if json_output:
+        payload = json.loads(result.stdout)
+        assert payload["status"] == "failed"
+        assert Path(payload["report_path"]).is_file()
+    else:
+        assert "failed" in result.output
 
 
 def test_checkpoint_append_cli_requires_explicit_runtime_identity(

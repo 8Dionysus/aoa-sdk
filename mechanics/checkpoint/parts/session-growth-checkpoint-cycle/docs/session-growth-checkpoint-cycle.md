@@ -33,6 +33,28 @@ owner, or cross-repository workflow runner.
 - aoa-session-memory refs are read-only evidence coordinates. The SDK does not
   mutate session memory or promote its interpretation.
 
+## Git Target Boundary
+
+`after-commit` and `git-boundary-check` require the positional target to be an
+existing Git worktree root, not a nested directory, bare repository, or
+federation container that is not itself a mapped owner repo (even if that
+container has its own Git history). They reject an invalid target before reading or writing
+checkpoint state. `--root` remains the workspace discovery context. A target
+whose basename names a mapped workspace repo must match that mapping; linked
+worktrees retaining the owner basename are supported when discovery, manifest,
+or repo-path override selects that worktree. This does not introduce canonical
+checkpoint labels for arbitrarily renamed checkouts. Repository-local Git
+environment variables cannot redirect the
+explicit target's identity, commit metadata, or reachability checks.
+
+For a valid target, absent runtime identity or a missing checkpoint note keeps
+the existing `skipped_no_active_session`, `clear_no_active_session`, and
+`clear_no_note` behavior, subject to the existing unresolved-review gate.
+An `after-commit` report with `status=failed` exits nonzero in both CLI output
+modes. The post-commit shell hook still reports failure and exits zero because
+the commit already exists; pre-push and pre-merge checks remain blocking.
+This Git precondition does not apply to note-only capture APIs.
+
 ## Runtime Identity
 
 Checkpoint scope comes from host-provided runtime evidence such as

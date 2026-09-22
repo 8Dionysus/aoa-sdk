@@ -63,6 +63,7 @@ from .hooks.git_boundary import (
     checkpoint_hook_status_parts,
     read_git_commit_metadata,
     render_checkpoint_hook,
+    validate_checkpoint_git_target,
 )
 from .kinds import infer_auto_checkpoint_kind as _infer_auto_checkpoint_kind
 from .candidate_indexes import (
@@ -453,6 +454,7 @@ class CheckpointsAPI:
                 "post-commit checkpoint kind must be auto, commit, or owner_followthrough"
             )
         repo_root_path = _resolve_context_root(self.workspace, repo_root)
+        validate_checkpoint_git_target(self.workspace, repo_root_path)
         repo_label = _resolve_context_label(self.workspace, repo_root)
         session_path: Path | None = None
         runtime_session_id: str | None = None
@@ -1052,6 +1054,7 @@ class CheckpointsAPI:
         runtime_session_file: str | None = None,
     ) -> CheckpointGitBoundaryCheck:
         repo_root_path = _resolve_context_root(self.workspace, repo_root)
+        validate_checkpoint_git_target(self.workspace, repo_root_path)
         repo_label = _resolve_context_label(self.workspace, repo_root)
         session_path, runtime_metadata = probe_checkpoint_runtime_session(
             workspace=self.workspace,
