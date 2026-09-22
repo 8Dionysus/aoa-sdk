@@ -4,10 +4,12 @@ import copy
 import datetime as dt
 import hashlib
 import json
+import os
 import subprocess
 import sys
 import time
 from pathlib import Path
+from typing import Any
 
 import importlib.util
 
@@ -133,6 +135,182 @@ def workflow_steps(relative_path: str, job_id: str) -> dict[str, dict[str, objec
     payload = yaml.safe_load((REPO_ROOT / relative_path).read_text(encoding="utf-8"))
     steps = payload["jobs"][job_id]["steps"]
     return {step["name"]: step for step in steps}
+
+
+WHEEL_PROBE_SCRIPTS = (
+    "mechanics/boundary-bridge/parts/consumed-surface-posture-gate/scripts/"
+    "verify_routing_g5_canonical_wheel.py",
+    "mechanics/boundary-bridge/parts/plan-compilation-control-plane/scripts/"
+    "verify_plan_compilation_wheel.py",
+    "mechanics/boundary-bridge/parts/runner-lifecycle-control-plane/scripts/"
+    "verify_runner_wheel.py",
+    "mechanics/boundary-bridge/parts/evidence-closeout-chain/scripts/"
+    "verify_evidence_chain_wheel.py",
+    "mechanics/agon/parts/gate-routing-bridge/scripts/"
+    "verify_agon_gate_routing_wheel.py",
+)
+
+
+def _load_wheel_probe_module(
+    relative_script: str,
+    monkeypatch: pytest.MonkeyPatch,
+    module_name: str,
+) -> Any:
+    script = REPO_ROOT / Path(relative_script)
+    monkeypatch.syspath_prepend(str(script.parent))
+    spec = importlib.util.spec_from_file_location(module_name, script)
+    assert spec is not None and spec.loader is not None
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
+
+
+def _capture_outer_probe_subprocess(
+    module: Any,
+    monkeypatch: pytest.MonkeyPatch,
+    *,
+    fail_install: bool,
+) -> tuple[list[tuple[list[str], dict[str, Any]]], dict[str, str]]:
+    calls: list[tuple[list[str], dict[str, Any]]] = []
+    monkeypatch.setenv("PYTHONPATH", "hostile-parent-pythonpath")
+    monkeypatch.setenv("_PIP_RUNNING_IN_SUBPROCESS", "hostile-parent-flag")
+    before_call_environment = dict(os.environ)
+
+    def fake_run(command: list[str], **kwargs: Any) -> subprocess.CompletedProcess[str]:
+        captured_command = list(command)
+        captured_options = dict(kwargs)
+        calls.append((captured_command, captured_options))
+        pip_index = captured_command.index("-m") if "-m" in captured_command else -1
+        is_pip = pip_index >= 0 and captured_command[pip_index + 1 : pip_index + 2] == ["pip"]
+        is_pip_install = is_pip and "install" in captured_command
+        if is_pip_install and fail_install:
+            if kwargs.get("check"):
+                raise subprocess.CalledProcessError(17, captured_command)
+            return subprocess.CompletedProcess(captured_command, 17)
+        if is_pip_install:
+            target = (
+                captured_command[captured_command.index("--python") + 1]
+                if "--python" in captured_command
+                else captured_command[0]
+            )
+            target_path = Path(target)
+            config = target_path.parent.parent / "pyvenv.cfg"
+            captured_options["target_python"] = target
+            captured_options["target_python_exists"] = target_path.is_file()
+            captured_options["system_site_packages_disabled"] = (
+                "include-system-site-packages = false"
+                in config.read_text(encoding="utf-8").lower()
+            )
+            return subprocess.CompletedProcess(captured_command, 0)
+        if "--installed-probe" in captured_command:
+            captured_options["target_python"] = captured_command[0]
+            return subprocess.CompletedProcess(
+                captured_command,
+                0,
+                stdout="synthetic installed probe\n",
+                stderr="",
+            )
+        raise AssertionError(f"unexpected outer probe command: {captured_command}")
+
+    monkeypatch.setattr(module.subprocess, "run", fake_run)
+    return calls, before_call_environment
+
+
+def _assert_outer_install_targets_child(
+    module: Any,
+    calls: list[tuple[list[str], dict[str, Any]]],
+    *,
+    wheel: Path,
+) -> None:
+    install_calls = [
+        call
+        for call in calls
+        if "-m" in call[0]
+        and call[0][call[0].index("-m") + 1 :]
+        and call[0][call[0].index("-m") + 1] == "pip"
+    ]
+    child_calls = [call for call in calls if "--installed-probe" in call[0]]
+    assert len(install_calls) == 1
+    assert len(child_calls) == 1
+
+    install_command, install_options = install_calls[0]
+    child_command, child_options = child_calls[0]
+    target_python = child_command[0]
+    assert install_options["target_python"] == target_python
+    assert install_options["target_python_exists"] is True
+    assert install_options["system_site_packages_disabled"] is True
+    assert str(wheel) in install_command
+    if install_command[0] == target_python:
+        assert install_command[1:3] == ["-m", "pip"]
+        assert "--python" not in install_command
+    else:
+        assert install_command[:3] == [module.sys.executable, "-m", "pip"]
+        target_index = install_command.index("--python")
+        assert install_command[target_index + 1] == target_python
+    assert install_options["cwd"] == child_options["cwd"]
+    for _command, options in calls:
+        assert "PYTHONPATH" not in options["env"]
+        assert "_PIP_RUNNING_IN_SUBPROCESS" not in options["env"]
+
+
+@pytest.mark.parametrize(
+    "relative_script",
+    WHEEL_PROBE_SCRIPTS,
+    ids=lambda script: Path(script).stem,
+)
+def test_release_wheel_outer_probe_uses_fresh_target_and_scrubs_parent_flags(
+    relative_script: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_wheel_probe_module(
+        relative_script,
+        monkeypatch,
+        f"aoa_sdk_test_wheel_probe_{Path(relative_script).stem}",
+    )
+    calls, before_call_environment = _capture_outer_probe_subprocess(
+        module,
+        monkeypatch,
+        fail_install=False,
+    )
+    wheel = Path("synthetic-wheel.whl")
+
+    assert module._outer_probe(wheel) == 0
+
+    _assert_outer_install_targets_child(module, calls, wheel=wheel)
+    probe_root = Path(calls[0][1]["cwd"])
+    assert not probe_root.exists()
+    assert dict(os.environ) == before_call_environment
+
+
+@pytest.mark.parametrize(
+    "relative_script",
+    WHEEL_PROBE_SCRIPTS,
+    ids=lambda script: Path(script).stem,
+)
+def test_release_wheel_outer_probe_does_not_run_child_after_install_failure(
+    relative_script: str,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    module = _load_wheel_probe_module(
+        relative_script,
+        monkeypatch,
+        f"aoa_sdk_test_failed_wheel_probe_{Path(relative_script).stem}",
+    )
+    calls, before_call_environment = _capture_outer_probe_subprocess(
+        module,
+        monkeypatch,
+        fail_install=True,
+    )
+
+    with pytest.raises(subprocess.CalledProcessError):
+        module._outer_probe(Path("synthetic-wheel.whl"))
+
+    assert len(calls) == 1
+    assert all("--installed-probe" not in command for command, _options in calls)
+    assert "PYTHONPATH" not in calls[0][1]["env"]
+    assert "_PIP_RUNNING_IN_SUBPROCESS" not in calls[0][1]["env"]
+    assert Path(calls[0][1]["cwd"]).exists() is False
+    assert dict(os.environ) == before_call_environment
 
 
 def test_shipped_manifest_is_fail_closed_and_full_profile_is_complete() -> None:
