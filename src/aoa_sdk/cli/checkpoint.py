@@ -5,6 +5,7 @@ import json
 import typer
 
 from ..api import AoASDK
+from ..errors import InvalidSurface
 from .common import (
     _resolve_checkpoint_git_boundary,
     _resolve_checkpoint_hook_repos,
@@ -141,17 +142,23 @@ def checkpoint_after_commit(
     root: str = typer.Option(".", "--root", help="Workspace root used for federation discovery."),
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
-    report = AoASDK.from_workspace(root).checkpoints.after_commit(
-        repo_root=repo_root,
-        commit_ref=commit_ref,
-        runtime_session_file=runtime_session_file,
-        checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
-    )
+    try:
+        report = AoASDK.from_workspace(root).checkpoints.after_commit(
+            repo_root=repo_root,
+            commit_ref=commit_ref,
+            runtime_session_file=runtime_session_file,
+            checkpoint_kind=checkpoint_kind,  # type: ignore[arg-type]
+        )
+    except InvalidSurface as exc:
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(1) from exc
     payload = report.model_dump(mode="json")
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))
-        return
-    _print_checkpoint_after_commit_report(report)
+    else:
+        _print_checkpoint_after_commit_report(report)
+    if report.status == "failed":
+        raise typer.Exit(1)
 
 
 @checkpoint_app.command("review-note")
@@ -346,11 +353,15 @@ def checkpoint_git_boundary_check(
     json_output: bool = typer.Option(False, "--json", help="Emit machine-readable JSON."),
 ) -> None:
     resolved_boundary = _resolve_checkpoint_git_boundary(boundary)
-    report = AoASDK.from_workspace(root).checkpoints.git_boundary_check(
-        repo_root=repo_root,
-        boundary=resolved_boundary,
-        runtime_session_file=runtime_session_file,
-    )
+    try:
+        report = AoASDK.from_workspace(root).checkpoints.git_boundary_check(
+            repo_root=repo_root,
+            boundary=resolved_boundary,
+            runtime_session_file=runtime_session_file,
+        )
+    except InvalidSurface as exc:
+        typer.echo(f"error: {exc}", err=True)
+        raise typer.Exit(1) from exc
     payload = report.model_dump(mode="json")
     if json_output:
         typer.echo(json.dumps(payload, indent=2, ensure_ascii=True))

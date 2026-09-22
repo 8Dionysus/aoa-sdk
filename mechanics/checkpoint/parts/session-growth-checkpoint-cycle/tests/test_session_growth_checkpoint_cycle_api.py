@@ -117,6 +117,128 @@ def _current_scope(workspace_root: Path, session_id: str, repo: str = "aoa-sdk")
     )
 
 
+@pytest.mark.parametrize("target_kind", ["missing", "non_git", "federation", "git_federation", "nested", "bare"])
+def test_git_routes_reject_invalid_targets_without_checkpoint_writes(
+    workspace_root: Path,
+    target_kind: str,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    target = repo_root
+    if target_kind == "missing":
+        target = workspace_root / "missing"
+    elif target_kind in {"federation", "git_federation"}:
+        target = workspace_root
+        if target_kind == "git_federation":
+            _init_git_repo(target)
+    elif target_kind == "nested":
+        _init_git_repo(repo_root)
+        target = repo_root / "nested"
+        target.mkdir()
+    elif target_kind == "bare":
+        target = workspace_root / "bare.git"
+        subprocess.run(["git", "init", "--bare", str(target)], check=True, capture_output=True)
+
+    sdk = AoASDK.from_workspace(workspace_root)
+    with pytest.raises(InvalidSurface, match="checkpoint target"):
+        sdk.checkpoints.after_commit(repo_root=str(target))
+    with pytest.raises(InvalidSurface, match="checkpoint target"):
+        sdk.checkpoints.git_boundary_check(repo_root=str(target), boundary="push")
+    assert not (repo_root / ".aoa" / "session-growth").exists()
+
+
+def test_git_routes_preserve_valid_no_session_and_no_note(
+    workspace_root: Path,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _commit(repo_root, "valid checkpoint context")
+    sdk = AoASDK.from_workspace(workspace_root)
+    assert sdk.checkpoints.git_boundary_check(
+        repo_root=str(repo_root), boundary="push",
+    ).status == "clear_no_active_session"
+    metadata = _write_runtime_metadata(workspace_root / "runtime.json", session_id="no-note")
+    assert sdk.checkpoints.git_boundary_check(
+        repo_root=str(repo_root), boundary="merge", runtime_session_file=str(metadata),
+    ).status == "clear_no_note"
+    assert not (repo_root / ".aoa" / "session-growth").exists()
+    captured = sdk.checkpoints.after_commit(repo_root=str(repo_root))
+    assert captured.status == "skipped_no_active_session"
+    assert captured.commit_sha == commit_sha
+    assert sdk.checkpoints.git_boundary_check(
+        repo_root=str(repo_root), boundary="push",
+    ).status == "blocked_unresolved_checkpoint"
+
+
+def test_linked_worktree_requires_consistent_workspace_mapping(
+    workspace_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    _init_git_repo(repo_root)
+    commit_sha = _commit(repo_root, "linked checkpoint context")
+    linked = workspace_root / "linked" / "aoa-sdk"
+    linked.parent.mkdir()
+    subprocess.run(
+        ["git", "-C", str(repo_root), "worktree", "add", "--detach", str(linked), "HEAD"],
+        check=True, capture_output=True,
+    )
+    sdk = AoASDK.from_workspace(workspace_root)
+    with pytest.raises(InvalidSurface, match="workspace mapping"):
+        sdk.checkpoints.after_commit(repo_root=str(linked))
+    with pytest.raises(InvalidSurface, match="workspace mapping"):
+        sdk.checkpoints.git_boundary_check(repo_root=str(linked), boundary="push")
+    assert not (repo_root / ".aoa" / "session-growth").exists()
+    assert not (linked / ".aoa" / "session-growth").exists()
+
+    monkeypatch.setenv("AOA_SDK_REPO_PATH_AOA_SDK", str(linked))
+    monkeypatch.setenv("AOA_SDK_FEDERATION_ROOT", str(workspace_root))
+    sdk = AoASDK.from_workspace(workspace_root)
+    assert sdk.checkpoints.git_boundary_check(
+        repo_root=str(linked), boundary="push",
+    ).status == "clear_no_active_session"
+    captured = sdk.checkpoints.after_commit(repo_root=str(linked))
+    assert captured.status == "skipped_no_active_session"
+    assert captured.commit_sha == commit_sha
+    assert Path(captured.report_path).is_relative_to(linked)
+    assert not (repo_root / ".aoa" / "session-growth").exists()
+
+
+@pytest.mark.parametrize("target_is_git", [False, True])
+def test_inherited_git_environment_cannot_redirect_checkpoint_target(
+    workspace_root: Path,
+    monkeypatch: pytest.MonkeyPatch,
+    target_is_git: bool,
+) -> None:
+    repo_root = workspace_root / "aoa-sdk"
+    foreign = workspace_root / "aoa-skills"
+    _init_git_repo(foreign)
+    (foreign / "README.md").write_text("# Foreign repository\n", encoding="utf-8")
+    _commit(foreign, "unrelated repository commit")
+    if target_is_git:
+        _init_git_repo(repo_root)
+        commit_sha = _commit(repo_root, "intended repository commit")
+    monkeypatch.setenv("GIT_DIR", str(foreign / ".git"))
+    monkeypatch.setenv("GIT_COMMON_DIR", str(foreign / ".git"))
+    monkeypatch.setenv("GIT_WORK_TREE", str(repo_root))
+    monkeypatch.setenv("GIT_INDEX_FILE", str(foreign / ".git" / "index"))
+    sdk = AoASDK.from_workspace(workspace_root)
+    if not target_is_git:
+        with pytest.raises(InvalidSurface, match="checkpoint target"):
+            sdk.checkpoints.after_commit(repo_root=str(repo_root))
+        with pytest.raises(InvalidSurface, match="checkpoint target"):
+            sdk.checkpoints.git_boundary_check(repo_root=str(repo_root), boundary="push")
+        assert not (repo_root / ".aoa" / "session-growth").exists()
+        return
+
+    captured = sdk.checkpoints.after_commit(repo_root=str(repo_root))
+    assert captured.status == "skipped_no_active_session"
+    assert captured.commit_sha == commit_sha
+    # The skipped commit is reachable only in the explicit target, not foreign.
+    assert sdk.checkpoints.git_boundary_check(
+        repo_root=str(repo_root), boundary="push",
+    ).status == "blocked_unresolved_checkpoint"
+
+
 def test_checkpoint_mutation_requires_host_identity_and_creates_no_sdk_session(
     workspace_root: Path,
     monkeypatch: pytest.MonkeyPatch,
@@ -277,6 +399,9 @@ def test_after_commit_review_materialize_and_archive_preserve_owner_boundaries(
     assert captured.runtime_session_id == "runtime-closeout"
     assert captured.runtime_session_file_ref == str(metadata)
     assert captured.agent_review_status == "pending"
+    assert sdk.checkpoints.git_boundary_check(
+        repo_root=str(repo_root), boundary="push", runtime_session_file=str(metadata),
+    ).status == "blocked_pending_review"
 
     reviewed_note = sdk.checkpoints.review_note(
         repo_root=str(repo_root),
@@ -290,6 +415,9 @@ def test_after_commit_review_materialize_and_archive_preserve_owner_boundaries(
     )
 
     assert reviewed_note.agent_review_status == "reviewed"
+    assert sdk.checkpoints.git_boundary_check(
+        repo_root=str(repo_root), boundary="merge", runtime_session_file=str(metadata),
+    ).status == "clear"
     assert "workflow.operations.checkpoint-closeout" in (
         reviewed_note.related_capability_refs
     )
