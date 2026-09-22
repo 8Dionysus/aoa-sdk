@@ -653,7 +653,7 @@ class InputIdentityCache:
 
 def environment_identity() -> dict[str, Any]:
     packages: dict[str, str | None] = {}
-    for name in ("aoa-sdk", "build", "mypy", "pytest", "ruff"):
+    for name in ("aoa-sdk", "build", "mypy", "pip", "pytest", "ruff"):
         try:
             packages[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:

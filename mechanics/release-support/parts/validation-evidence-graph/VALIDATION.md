@@ -17,6 +17,14 @@ The full command preserves every `scripts/release_check.py` obligation. The
 temporary receipt path is illustrative; CI should use its runner-managed
 temporary directory and retain the receipt even on failure.
 
+The five release wheel probes keep their fresh, no-system-site-packages
+environments, but create them without `ensurepip`: the caller's pip (22.3 or
+newer, with `--python <fresh-venv-python>`) performs the wheel install. The
+outer install environment removes both `PYTHONPATH` and pip's internal
+`_PIP_RUNNING_IN_SUBPROCESS` marker before the installed-only child probe
+runs. This preserves the probe's isolation and does not create a shared
+environment or a cross-run wheel cache.
+
 The ordinary test node uses two pytest-xdist workers with `loadfile`: each
 file and its module fixtures stay together. The separately isolated G11 nodes
 and every other graph obligation remain unchanged. This adds no new runner;

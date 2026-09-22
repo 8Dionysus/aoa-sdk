@@ -8,6 +8,7 @@ import hashlib
 import json
 import os
 import subprocess
+import sys
 import tempfile
 import tomllib
 import venv
@@ -265,15 +266,22 @@ def _outer_probe(wheel: Path) -> int:
     ) as temp_dir:
         probe_root = Path(temp_dir)
         venv_root = probe_root / "venv"
-        venv.EnvBuilder(with_pip=True, clear=False).create(venv_root)
+        venv.EnvBuilder(
+            system_site_packages=False,
+            with_pip=False,
+            clear=False,
+        ).create(venv_root)
         python = venv_root / "bin" / "python"
         environment = os.environ.copy()
         environment.pop("PYTHONPATH", None)
+        environment.pop("_PIP_RUNNING_IN_SUBPROCESS", None)
         subprocess.run(
             [
-                str(python),
+                sys.executable,
                 "-m",
                 "pip",
+                "--python",
+                str(python),
                 "--disable-pip-version-check",
                 "install",
                 str(wheel),
