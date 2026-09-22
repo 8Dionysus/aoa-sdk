@@ -196,6 +196,7 @@
 - [AOA-SDK-D-0102 - Admit the 8Dionysus Public Route Map v3 With Strict Shape](../AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md) (`docs/decisions/AOA-SDK-D-0102-admit-public-route-map-v3-with-strict-shape.md`)
 - [AOA-SDK-D-0103 - Preserve Exact SemVer Prerelease Release Identity](../AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md) (`docs/decisions/AOA-SDK-D-0103-preserve-exact-semver-prerelease-release-identity.md`)
 - [AOA-SDK-D-0105 - Prompt-Light Agent Routes And On-Demand Validation](../AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md) (`docs/decisions/AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md`)
+- [AOA-SDK-D-0109 - Check Document Contracts, Not Editorial Snapshots](../AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md) (`docs/decisions/AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md`)
 
 ## rpg
 

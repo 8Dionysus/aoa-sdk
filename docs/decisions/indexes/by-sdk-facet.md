@@ -33,6 +33,7 @@
 - [AOA-SDK-D-0004 - Mechanics Skeleton After Inventory](../AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md) (`docs/decisions/AOA-SDK-D-0004-mechanics-skeleton-after-inventory.md`)
 - [AOA-SDK-D-0005 - Mechanics Parent Boundary Correction](../AOA-SDK-D-0005-mechanics-parent-boundary-correction.md) (`docs/decisions/AOA-SDK-D-0005-mechanics-parent-boundary-correction.md`)
 - [AOA-SDK-D-0105 - Prompt-Light Agent Routes And On-Demand Validation](../AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md) (`docs/decisions/AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md`)
+- [AOA-SDK-D-0109 - Check Document Contracts, Not Editorial Snapshots](../AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md) (`docs/decisions/AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md`)
 
 ## Agon helpers
 
@@ -226,6 +227,7 @@
 - [AOA-SDK-D-0104 - Provider-Neutral Programmatic Execution Contract](../AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md) (`docs/decisions/AOA-SDK-D-0104-provider-neutral-programmatic-execution-contract.md`)
 - [AOA-SDK-D-0107 - Responsibility routing without native interception](../AOA-SDK-D-0107-responsibility-routing-without-native-interception.md) (`docs/decisions/AOA-SDK-D-0107-responsibility-routing-without-native-interception.md`)
 - [AOA-SDK-D-0108 - Explicit Intent And Consumed Surface Inputs](../AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md) (`docs/decisions/AOA-SDK-D-0108-explicit-intent-and-consumed-surface-inputs.md`)
+- [AOA-SDK-D-0109 - Check Document Contracts, Not Editorial Snapshots](../AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md) (`docs/decisions/AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md`)
 
 ## control-plane routing
 
@@ -725,6 +727,7 @@
 - [AOA-SDK-D-0105 - Prompt-Light Agent Routes And On-Demand Validation](../AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md) (`docs/decisions/AOA-SDK-D-0105-prompt-light-agent-routes-and-on-demand-validation.md`)
 - [AOA-SDK-D-0106 - Historical Mechanics Outside The Current Tree](../AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md) (`docs/decisions/AOA-SDK-D-0106-historical-mechanics-outside-current-tree.md`)
 - [AOA-SDK-D-0107 - Responsibility routing without native interception](../AOA-SDK-D-0107-responsibility-routing-without-native-interception.md) (`docs/decisions/AOA-SDK-D-0107-responsibility-routing-without-native-interception.md`)
+- [AOA-SDK-D-0109 - Check Document Contracts, Not Editorial Snapshots](../AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md) (`docs/decisions/AOA-SDK-D-0109-check-document-contracts-not-editorial-snapshots.md`)
 
 ## validation authority
 
